@@ -153,8 +153,47 @@ class Bot(object):
 
         return Message.newFromJsonDict(data)
 
-    def sendAudio(self):
+    def sendAudio(self,
+                  chat_id,
+                  audio,
+                  reply_to_message_id=None,
+                  reply_markup=None):
+        """Use this method to send audio files, if you want Telegram clients to
+        display the file as a playable voice message. For this to work, your
+        audio must be in an .ogg file encoded with OPUS (other formats may be
+        sent as telegram.Document).
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient — User or GroupChat id.
+          audio:
+            Audio file to send. You can either pass a file_id as String to
+            resend an audio that is already on the Telegram servers, or upload
+            a new audio file using multipart/form-data.
+          reply_to_message_id:
+            If the message is a reply, ID of the original message. [Optional]
+          reply_markup:
+            Additional interface options. A JSON-serialized object for a
+            custom reply keyboard, instructions to hide keyboard or to force a
+            reply from the user. [Optional]
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
+
         url = '%s/sendAudio' % (self.base_url)
+
+        data = {'chat_id': chat_id,
+                'audio': audio}
+
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if reply_markup:
+            data['reply_markup'] = reply_markup
+
+        json_data = self._requestUrl(url, 'POST', data=data)
+        data = self._parseAndCheckTelegram(json_data.content)
+
+        return Message.newFromJsonDict(data)
 
     def sendDocument(self):
         url = '%s/sendDocument' % (self.base_url)
@@ -223,6 +262,17 @@ class Bot(object):
                         url,
                         data=data,
                         files={'photo': photo}
+                    )
+                except requests.RequestException as e:
+                    pass
+            if 'audio' in data and isinstance(data['audio'], file):
+                try:
+                    audio = data.pop('audio')
+
+                    return requests.post(
+                        url,
+                        data=data,
+                        files={'audio': audio}
                     )
                 except requests.RequestException as e:
                     pass
