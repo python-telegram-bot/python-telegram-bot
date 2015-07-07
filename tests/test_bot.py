@@ -49,25 +49,25 @@ class BotTest(unittest.TestCase):
         print 'Testing sendPhoto - File'
         message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
                                       chat_id=12173560)
-        self.assertEqual(12948, message.photo[2].get('file_size'))
+        self.assertEqual(12948, message.photo[2].file_size)
 
     def testResendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print 'Testing sendPhoto - Resend'
         message = self._bot.sendPhoto(photo=str('AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI'),
                                       chat_id=12173560)
-        self.assertEqual(u'AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI', message.photo[2].get('file_id'))
+        self.assertEqual(u'AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI', message.photo[2].file_id)
 
     def testSendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
         print 'Testing sendAudio - File'
         message = self._bot.sendAudio(audio=open('tests/telegram.ogg', 'rb'),
                                       chat_id=12173560)
-        self.assertEqual(9199, message.audio.get('file_size'))
+        self.assertEqual(9199, message.audio.file_size)
 
     def testResendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
         print 'Testing sendAudio - Resent'
         message = self._bot.sendAudio(audio=str('AwADAQADIQEAAvjAuQABSAXg_GhkhZcC'),
                                       chat_id=12173560)
-        self.assertEqual(u'AwADAQADIQEAAvjAuQABSAXg_GhkhZcC', message.audio.get('file_id'))
+        self.assertEqual(u'AwADAQADIQEAAvjAuQABSAXg_GhkhZcC', message.audio.file_id)

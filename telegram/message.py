@@ -61,6 +61,18 @@ class Message(object):
         else:
             reply_to_message = None
 
+        if 'audio' in data:
+            from telegram import Audio
+            audio = Audio.newFromJsonDict(data['audio'])
+        else:
+            audio = None
+
+        if 'photo' in data:
+            from telegram import PhotoSize
+            photo = [PhotoSize.newFromJsonDict(x) for x in data['photo']]
+        else:
+            photo = None
+
         if 'new_chat_participant' in data:
             from telegram import User
             new_chat_participant = User.newFromJsonDict(
@@ -85,9 +97,9 @@ class Message(object):
                        forward_date=data.get('forward_date', None),
                        reply_to_message=reply_to_message,
                        text=data.get('text', None),
-                       audio=data.get('audio', None),
+                       audio=audio,
                        document=data.get('document', None),
-                       photo=data.get('photo', None),
+                       photo=photo,
                        sticker=data.get('sticker', None),
                        video=data.get('video', None),
                        contact=data.get('contact', None),

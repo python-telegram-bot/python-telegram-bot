@@ -11,8 +11,8 @@ from user import User
 from message import Message
 from update import Update
 from groupchat import GroupChat
-# from photosize import PhotoSize
-# from audio import Audio
+from photosize import PhotoSize
+from audio import Audio
 # from document import Document
 # from sticket import Sticker
 # from video import Video
