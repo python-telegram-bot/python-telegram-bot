@@ -44,7 +44,9 @@ class BotTest(unittest.TestCase):
         self.assertEqual(u'Oi', message.text)
         self.assertEqual(u'leandrotoledo', message.forward_from.username)
 
-    # def testSendPhoto(self):
-    #     '''Test the telegram.Bot sendPhoto method'''
-    #     print 'Testing sendPhoto'
-    #     message = self._bot.sendPhoto()
+    def testSendPhoto(self):
+        '''Test the telegram.Bot sendPhoto method'''
+        print 'Testing sendPhoto'
+        message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
+                                      chat_id=12173560)
+        #self.assertEqual(u'')

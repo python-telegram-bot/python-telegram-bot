@@ -81,6 +81,7 @@ class Bot(object):
 
         data = {'chat_id': chat_id,
                 'photo': photo}
+
         if caption:
             data['caption'] = caption
         if reply_to_message_id:
@@ -143,13 +144,25 @@ class Bot(object):
                     data=None):
 
         if method == 'POST':
-            try:
-                return requests.post(
-                    url,
-                    data=data
-                )
-            except requests.RequestException as e:
-                pass
+            if data.has_key('photo'):
+                try:
+                    photo = data.pop('photo')
+
+                    return requests.post(
+                        url,
+                        data=data,
+                        files={'photo': photo}
+                    )
+                except requests.RequestException as e:
+                    pass
+            else:
+                try:
+                    return requests.post(
+                        url,
+                        data=data
+                    )
+                except requests.RequestException as e:
+                    pass
         if method == 'GET':
             try:
                 return requests.get(url)
