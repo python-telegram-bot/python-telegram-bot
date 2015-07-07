@@ -51,7 +51,7 @@ View the last release API documentation at: https://core.telegram.org/bots/api
 API
 ---
 
-The API is exposed via the ``telegram.Bot`` class.
+The API is exposed via the ``telegram.Bot`` class::
 
     >>> import telegram
     >>> bot = telegram.Bot(token='token')
