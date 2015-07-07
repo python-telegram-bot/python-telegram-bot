@@ -5,10 +5,8 @@ import os
 import telegram
 import unittest
 
-from token import TOKEN
 
-
-@unittest.skipIf(not TOKEN, "No tokens provided")
+@unittest.skipIf(not os.environ.get('TOKEN'), "No tokens provided")
 class BotTest(unittest.TestCase):
     def setUp(self):
         bot = telegram.Bot(token=os.environ.get('TOKEN'))
