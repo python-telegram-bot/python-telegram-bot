@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
 """A library that provides a Python interface to the Telegram Bots API"""
 
@@ -19,7 +20,12 @@ class Bot(object):
             self.base_url = base_url + token
 
     def getMe(self):
+        """A simple method for testing your bot's auth token.
 
+        Returns:
+          A telegram.User instance representing that bot if the
+          credentials are valid, None otherwise.
+        """
         url = '%s/getMe' % (self.base_url)
 
         json_data = self._requestUrl(url, 'GET')
@@ -33,6 +39,25 @@ class Bot(object):
                     disable_web_page_preview=None,
                     reply_to_message_id=None,
                     reply_markup=None):
+        """Use this method to send text messages.
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient — telegram.User or
+            telegram.GroupChat id.
+          text:
+            Text of the message to be sent.
+          disable_web_page_preview:
+            Disables link previews for links in this message. [Optional]
+          reply_to_message_id:
+            If the message is a reply, ID of the original message. [Optional]
+          reply_markup:
+            Additional interface options. A JSON-serialized object for a custom
+            reply keyboard, instructions to hide keyboard or to force a reply
+            from the user. [Optional]
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
 
         url = '%s/sendMessage' % (self.base_url)
 
@@ -54,6 +79,19 @@ class Bot(object):
                        chat_id,
                        from_chat_id,
                        message_id):
+        """Use this method to forward messages of any kind.
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient — User or GroupChat id.
+          from_chat_id:
+            Unique identifier for the chat where the original message was sent
+            — User or GroupChat id.
+          message_id:
+            Unique message identifier.
+        Returns:
+          A telegram.Message instance representing the message forwarded.
+        """
 
         url = '%s/forwardMessage' % (self.base_url)
 
@@ -76,6 +114,27 @@ class Bot(object):
                   caption=None,
                   reply_to_message_id=None,
                   reply_markup=None):
+        """Use this method to send photos.
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient — User or GroupChat id.
+          photo:
+            Photo to send. You can either pass a file_id as String to resend a
+            photo that is already on the Telegram servers, or upload a new
+            photo using multipart/form-data.
+          caption:
+            Photo caption (may also be used when resending photos by file_id).
+            [Optional]
+          reply_to_message_id:
+            If the message is a reply, ID of the original message. [Optional]
+          reply_markup:
+            Additional interface options. A JSON-serialized object for a custom
+            reply keyboard, instructions to hide keyboard or to force a reply
+            from the user. [Optional]
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
 
         url = '%s/sendPhoto' % (self.base_url)
 
@@ -142,9 +201,21 @@ class Bot(object):
                     url,
                     method,
                     data=None):
+        """Request an URL.
+
+        Args:
+          url:
+            The web location we want to retrieve.
+          method:
+            Either POST or GET.
+          data:
+            A dict of (str, unicode) key/value pairs.
+        Returns:
+          A JSON object.
+        """
 
         if method == 'POST':
-            if data.has_key('photo') and isinstance(data['photo'], file):
+            if 'photo' in data and isinstance(data['photo'], file):
                 try:
                     photo = data.pop('photo')
 
