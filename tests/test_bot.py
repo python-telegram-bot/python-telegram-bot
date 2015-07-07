@@ -46,7 +46,14 @@ class BotTest(unittest.TestCase):
 
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
-        print 'Testing sendPhoto'
+        print 'Testing sendPhoto - File'
         message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
                                       chat_id=12173560)
-        #self.assertEqual(u'')
+        self.assertEqual(12948, message.photo[2].get('file_size'))
+
+    def testReSendPhoto(self):
+        '''Test the telegram.Bot sendPhoto method'''
+        print 'Testing sendPhoto - Resend'
+        message = self._bot.sendPhoto(photo=str('AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI'),
+                                      chat_id=12173560)
+        self.assertEqual(u'AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI', message.photo[2].get('file_id'))

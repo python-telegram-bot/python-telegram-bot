@@ -144,7 +144,7 @@ class Bot(object):
                     data=None):
 
         if method == 'POST':
-            if data.has_key('photo'):
+            if data.has_key('photo') and isinstance(data['photo'], file):
                 try:
                     photo = data.pop('photo')
 
