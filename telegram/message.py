@@ -29,6 +29,10 @@ class Message(object):
 
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
+    
+    @property
+    def chat_id(self):
+        return self.chat.id
 
     @staticmethod
     def newFromJsonDict(data):
@@ -91,6 +95,12 @@ class Message(object):
         else:
             video = None
 
+        if 'location' in data:
+            from telegram import Location
+            location = Location.newFromJsonDict(data['location'])
+        else:
+            location = None
+
         if 'new_chat_participant' in data:
             from telegram import User
             new_chat_participant = User.newFromJsonDict(
@@ -121,7 +131,7 @@ class Message(object):
                        sticker=sticker,
                        video=video,
                        contact=data.get('contact', None),
-                       location=data.get('location', None),
+                       location=location,
                        new_chat_participant=new_chat_participant,
                        left_chat_participant=left_chat_participant,
                        new_chat_title=data.get('new_chat_title', None),

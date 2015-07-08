@@ -313,8 +313,46 @@ class Bot(object):
 
         return Message.newFromJsonDict(data)
 
-    def sendLocation(self):
+    def sendLocation(self,
+                     chat_id,
+                     latitude,
+                     longitude,
+                     reply_to_message_id=None,
+                     reply_markup=None):
+        """Use this method to send point on the map.
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient — User or GroupChat id.
+          latitude:
+            Latitude of location.
+          longitude:
+            Longitude of location.
+          reply_to_message_id:
+            If the message is a reply, ID of the original message. [Optional]
+          reply_markup:
+            Additional interface options. A JSON-serialized object for a
+            custom reply keyboard, instructions to hide keyboard or to force a
+            reply from the user. [Optional]
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
+
         url = '%s/sendLocation' % (self.base_url)
+
+        data = {'chat_id': chat_id,
+                'latitude': latitude,
+                'longitude': longitude}
+
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if reply_markup:
+            data['reply_markup'] = reply_markup
+
+        json_data = self._requestUrl(url, 'POST', data=data)
+        data = self._parseAndCheckTelegram(json_data.content)
+
+        return Message.newFromJsonDict(data)
 
     def sendChatAction(self):
         url = '%s/sendChatAction' % (self.base_url)

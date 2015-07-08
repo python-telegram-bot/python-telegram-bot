@@ -97,5 +97,14 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot sendVideo method'''
         print 'Testing sendVideo - Resend'
         message = self._bot.sendVideo(video=str('BAADAQADIgEAAvjAuQABOuTB937fPTgC'),
-                                        chat_id=12173560)
+                                      chat_id=12173560)
         self.assertEqual(4, message.video.duration)
+
+    def testSendLocation(self):
+        '''Test the telegram.Bot sendLocation method'''
+        print 'Testing sendLocation'
+        message = self._bot.sendLocation(latitude=-23.558873,
+                                         longitude=-46.659732,
+                                         chat_id=12173560)
+        self.assertEqual(-23.558873, message.location.latitude)
+        self.assertEqual(-46.659732, message.location.longitude)

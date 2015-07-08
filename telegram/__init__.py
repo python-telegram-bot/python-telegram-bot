@@ -17,7 +17,7 @@ from document import Document
 from sticker import Sticker
 from video import Video
 # from contact import Contact
-# from location import Location
+from location import Location
 # from inputfile import InputFile
 # from userprofilephotos import UserProfilePhotos
 # from replykeyboardmarkup import ReplyKeyboardMarkup
