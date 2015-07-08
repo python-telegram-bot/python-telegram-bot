@@ -53,7 +53,7 @@ API
 
 The API is exposed via the ``telegram.Bot`` class.
 
-To generate an Access Token you have to talk to `BotFather https://telegram.me/botfather`_ and follow a few simple steps (described `here https://core.telegram.org/bots#botfather`_).
+To generate an Access Token you have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
 
 For full details see the `Bots: An introduction for developers <https://core.telegram.org/bots>`_.
 
