@@ -51,7 +51,13 @@ View the last release API documentation at: https://core.telegram.org/bots/api
 API
 ---
 
-The API is exposed via the ``telegram.Bot`` class::
+The API is exposed via the ``telegram.Bot`` class.
+
+To generate an Access Token you have to talk to `BotFather https://telegram.me/botfather`_ and follow a few simple steps (described `here https://core.telegram.org/bots#botfather`_).
+
+For full details see the `Bots: An introduction for developers <https://core.telegram.org/bots>`_.
+
+To create an instance of the ``telegram.Bot``::
 
     >>> import telegram
     >>> bot = telegram.Bot(token='token')
@@ -62,3 +68,46 @@ To see if your credentials are successful::
     {"first_name": "Toledo's Palace Bot", "username": "ToledosPalaceBot"}
 
 **NOTE**: much more than the small sample given here will print
+
+Bots can't initiate conversations with users. A user must either add them to a group or send them a message first. People can use ``telegram.me/<bot_username>`` links or username search to find your bot.
+
+To fetch text messages sent to your Bot::
+
+    >>> updates = bot.getUpdates()
+    >>> print [u.message.text for u in updates]
+
+To fetch images sent to your Bot::
+
+    >>> updates = bot.getUpdates()
+    >>> print [u.message.photo for u in updates if u.message.photo]
+
+To post a text message (you'll always need chat_id to reply users)::
+
+    >>> chat_id = bot.getUpdates()[-1].message.chat_id
+    >>> bot.sendMessage(chat_id=chat_id, text=u"I'm sorry Dave I'm afraid I can't do that.")
+
+To post a audio file (you'll always need chat_id to reply users)::
+
+    >>> chat_id = bot.getUpdates()[-1].message.chat_id
+    >>> bot.sendAudio(chat_id=chat_id, audio=open('tests/telegram.ogg', 'rb'))
+
+To tell the user that something is happening on bot's side::
+
+    >>> chat_id = bot.getUpdates()[-1].message.chat_id
+    >>> bot.sendChatAction(chat_id=chat_id, action=telegram.ChatAction.TYPING)
+
+There are many more API methods, to read the full API documentation::
+
+    $ pydoc telegram.Bot
+
+----
+TODO
+----
+
+Patches and bug reports are `welcome <https://github.com/leandrotoledo/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
+
+Add more example scripts.
+
+Add `custom keyboards <https://core.telegram.org/bots#keyboards>`_ methods.
+
+Add commands handler.

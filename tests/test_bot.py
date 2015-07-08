@@ -112,9 +112,8 @@ class BotTest(unittest.TestCase):
     def testSendChatAction(self):
         '''Test the telegram.Bot sendChatAction method'''
         print 'Testing sendChatAction - ChatAction.TYPING'
-        message = self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
-                                           chat_id=12173560)
-        # TODO: return json
+        self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
+                                 chat_id=12173560)
 
     def testGetUserProfilePhotos(self):
         '''Test the telegram.Bot getUserProfilePhotos method'''

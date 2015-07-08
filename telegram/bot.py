@@ -50,6 +50,8 @@ class Bot(object):
         return self._username
 
     def clearCredentials(self):
+        """Clear any credentials for this instance.
+        """
         self.__auth = False
 
     def getMe(self):
@@ -439,9 +441,6 @@ class Bot(object):
             - ChatAction.UPLOAD_AUDIO or upload_audio for audio files,
             - ChatAction.UPLOAD_DOCUMENT for general files,
             - ChatAction.FIND_LOCATION for location data.
-
-        Returns:
-          ?
         """
 
         url = '%s/sendChatAction' % (self.base_url)
@@ -538,7 +537,6 @@ class Bot(object):
 
         if not self.__auth:
             raise TelegramError({'message': "API must be authenticated."})
-
 
     def _requestUrl(self,
                     url,
