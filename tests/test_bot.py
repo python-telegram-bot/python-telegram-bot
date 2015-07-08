@@ -85,3 +85,10 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendDocument(document=str('BQADAQADHAADNTwtBxZxUGKyxYbYAg'),
                                          chat_id=12173560)
         self.assertEqual(u'BQADAQADHAADNTwtBxZxUGKyxYbYAg', message.document.file_id)
+
+    def testSendSticker(self):
+        '''Test the telegram.Bot sendSticker method'''
+        print 'Testing sendSticket'
+        message = self._bot.sendSticker(sticker=str('BQADAQADHAADyIsGAAFZfq1bphjqlgI'),
+                                        chat_id=12173560)
+        self.assertEqual(39518, message.sticker.file_size)

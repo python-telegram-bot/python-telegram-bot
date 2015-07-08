@@ -5,6 +5,7 @@ class User(object):
     def __init__(self, **kwargs):
         param_defaults = {
             'id': None,
+            # 'chat_id' TODO
             'first_name': None,
             'last_name': None,
             'username': None

@@ -79,6 +79,12 @@ class Message(object):
         else:
             photo = None
 
+        if 'sticker' in data:
+            from telegram import Sticker
+            sticker = Sticker.newFromJsonDict(data['sticker'])
+        else:
+            sticker = None
+
         if 'new_chat_participant' in data:
             from telegram import User
             new_chat_participant = User.newFromJsonDict(
@@ -106,7 +112,7 @@ class Message(object):
                        audio=audio,
                        document=document,
                        photo=photo,
-                       sticker=data.get('sticker', None),
+                       sticker=sticker,
                        video=data.get('video', None),
                        contact=data.get('contact', None),
                        location=data.get('location', None),

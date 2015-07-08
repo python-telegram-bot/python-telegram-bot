@@ -234,8 +234,26 @@ class Bot(object):
 
         return Message.newFromJsonDict(data)
 
-    def sendSticker(self):
+    def sendSticker(self,
+                    chat_id,
+                    sticker,
+                    reply_to_message_id=None,
+                    reply_markup=None):
+
         url = '%s/sendSticker' % (self.base_url)
+
+        data = {'chat_id': chat_id,
+                'sticker': sticker}
+
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if reply_markup:
+            data['reply_markup'] = reply_markup
+
+        json_data = self._requestUrl(url, 'POST', data=data)
+        data = self._parseAndCheckTelegram(json_data.content)
+
+        return Message.newFromJsonDict(data)
 
     def sendVideo(self):
         url = '%s/sendVideo' % (self.base_url)
