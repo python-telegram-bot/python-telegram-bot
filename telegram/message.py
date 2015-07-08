@@ -67,6 +67,12 @@ class Message(object):
         else:
             audio = None
 
+        if 'document' in data:
+            from telegram import Document
+            document = Document.newFromJsonDict(data['document'])
+        else:
+            document = None
+
         if 'photo' in data:
             from telegram import PhotoSize
             photo = [PhotoSize.newFromJsonDict(x) for x in data['photo']]
@@ -98,7 +104,7 @@ class Message(object):
                        reply_to_message=reply_to_message,
                        text=data.get('text', None),
                        audio=audio,
-                       document=data.get('document', None),
+                       document=document,
                        photo=photo,
                        sticker=data.get('sticker', None),
                        video=data.get('video', None),

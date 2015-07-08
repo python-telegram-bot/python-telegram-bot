@@ -67,7 +67,21 @@ class BotTest(unittest.TestCase):
 
     def testResendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
-        print 'Testing sendAudio - Resent'
+        print 'Testing sendAudio - Resend'
         message = self._bot.sendAudio(audio=str('AwADAQADIQEAAvjAuQABSAXg_GhkhZcC'),
                                       chat_id=12173560)
         self.assertEqual(u'AwADAQADIQEAAvjAuQABSAXg_GhkhZcC', message.audio.file_id)
+
+    def testSendDocument(self):
+        '''Test the telegram.Bot sendDocument method'''
+        print 'Testing sendDocument - File'
+        message = self._bot.sendDocument(document=open('tests/telegram.png', 'rb'),
+                                         chat_id=12173560)
+        self.assertEqual(12948, message.document.file_size)
+
+    def testResendDocument(self):
+        '''Test the telegram.Bot sendDocument method'''
+        print 'Testing sendDocument - Resend'
+        message = self._bot.sendDocument(document=str('BQADAQADHAADNTwtBxZxUGKyxYbYAg'),
+                                         chat_id=12173560)
+        self.assertEqual(u'BQADAQADHAADNTwtBxZxUGKyxYbYAg', message.document.file_id)

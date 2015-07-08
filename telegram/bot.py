@@ -195,8 +195,44 @@ class Bot(object):
 
         return Message.newFromJsonDict(data)
 
-    def sendDocument(self):
+    def sendDocument(self,
+                     chat_id,
+                     document,
+                     reply_to_message_id=None,
+                     reply_markup=None):
+        """Use this method to send general files.
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient — User or GroupChat id.
+          document:
+            File to send. You can either pass a file_id as String to resend a
+            file that is already on the Telegram servers, or upload a new file
+            using multipart/form-data.
+          reply_to_message_id:
+            If the message is a reply, ID of the original message. [Optional]
+          reply_markup:
+            Additional interface options. A JSON-serialized object for a
+            custom reply keyboard, instructions to hide keyboard or to force a
+            reply from the user. [Optional]
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
+
         url = '%s/sendDocument' % (self.base_url)
+
+        data = {'chat_id': chat_id,
+                'document': document}
+
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if reply_markup:
+            data['reply_markup'] = reply_markup
+
+        json_data = self._requestUrl(url, 'POST', data=data)
+        data = self._parseAndCheckTelegram(json_data.content)
+
+        return Message.newFromJsonDict(data)
 
     def sendSticker(self):
         url = '%s/sendSticker' % (self.base_url)
@@ -273,6 +309,17 @@ class Bot(object):
                         url,
                         data=data,
                         files={'audio': audio}
+                    )
+                except requests.RequestException as e:
+                    pass
+            if 'document' in data and isinstance(data['document'], file):
+                try:
+                    document = data.pop('document')
+
+                    return requests.post(
+                        url,
+                        data=data,
+                        files={'document': document}
                     )
                 except requests.RequestException as e:
                     pass

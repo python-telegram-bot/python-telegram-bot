@@ -16,6 +16,6 @@ class Audio(object):
     @staticmethod
     def newFromJsonDict(data):
         return Audio(file_id=data.get('file_id', None),
-                         duration=data.get('duration', None),
-                         mime_type=data.get('mime_type', None),
-                         file_size=data.get('file_size', None))
+                     duration=data.get('duration', None),
+                     mime_type=data.get('mime_type', None),
+                     file_size=data.get('file_size', None))
