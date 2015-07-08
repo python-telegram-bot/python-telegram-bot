@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-"""A library that provides a Python interface to the Telegram Bots API"""
+"""A library that provides a Python interface to the Telegram Bot API"""
 
 import json
 import requests
 
-from telegram import (User, Message, Update)
+from telegram import (User, Message, Update, UserProfilePhotos)
 
 
 class Bot(object):
@@ -385,8 +385,24 @@ class Bot(object):
 
         self._requestUrl(url, 'POST', data=data)
 
-    def getUserProfilePhotos(self):
+    def getUserProfilePhotos(self,
+                             user_id,
+                             offset=None,
+                             limit=100):
+
         url = '%s/getUserProfilePhotos' % (self.base_url)
+
+        data = {'user_id': user_id}
+
+        if offset:
+            data['offset'] = offset
+        if limit:
+            data['limit'] = limit
+
+        json_data = self._requestUrl(url, 'POST', data=data)
+        data = self._parseAndCheckTelegram(json_data.content)
+
+        return UserProfilePhotos.newFromJsonDict(data)
 
     def getUpdates(self,
                    offset=None,

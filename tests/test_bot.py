@@ -115,3 +115,9 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
                                            chat_id=12173560)
         # TODO: return json
+
+    def testGetUserProfilePhotos(self):
+        '''Test the telegram.Bot getUserProfilePhotos method'''
+        print 'Testing getUserProfilePhotos'
+        upf = self._bot.getUserProfilePhotos(user_id=12173560)
+        self.assertEqual(8314, upf.photos[0][0].file_size)

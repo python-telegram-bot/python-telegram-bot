@@ -20,7 +20,7 @@ from video import Video
 from location import Location
 from chataction import ChatAction
 # from inputfile import InputFile
-# from userprofilephotos import UserProfilePhotos
+from userprofilephotos import UserProfilePhotos
 # from replykeyboardmarkup import ReplyKeyboardMarkup
 # from replykeyboardhide import ReplyKeyboardHide
 # from forcereply import ForceReply
