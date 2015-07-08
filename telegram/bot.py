@@ -326,6 +326,24 @@ class Bot(object):
                    offset=None,
                    limit=100,
                    timeout=0):
+        """Use this method to receive incoming updates using long polling.
+
+        Args:
+          offset:
+            Identifier of the first update to be returned. Must be greater by
+            one than the highest among the identifiers of previously received
+            updates. By default, updates starting with the earliest unconfirmed
+            update are returned. An update is considered confirmed as soon as
+            getUpdates is called with an offset higher than its update_id.
+          limit:
+            Limits the number of updates to be retrieved. Values between 1—100
+            are accepted. Defaults to 100.
+          timeout:
+            Timeout in seconds for long polling. Defaults to 0, i.e. usual
+            short polling.
+        Returns:
+          A list of telegram.Update objects are returned.
+        """
 
         url = '%s/getUpdates' % (self.base_url)
 
