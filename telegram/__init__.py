@@ -4,7 +4,7 @@
 """A library that provides a Python interface to the Telegram Bots API"""
 
 __author__ = 'leandrotoledodesouza@gmail.com'
-__version__ = '1.0'
+__version__ = '1.1'
 
 import json
 

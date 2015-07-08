@@ -15,16 +15,14 @@ def read(*paths):
 
 setup(
     name='python-telegram-bot',
-    version='1.0',
+    version='1.1',
     author='Leandro Toledo',
     author_email='leandrotoledodesouza@gmail.com',
     license='GPLv2',
     url='https://github.com/leandrotoledo/python-telegram-bot',
     keywords='telegram bot api',
     description='A Python wrapper around the Telegram Bot API',
-    long_description=(read('README.rst') + '\n\n' +
-                      read('AUTHORS.rst') + '\n\n' +
-                      read('CHANGES')),
+    long_description=(read('README.rst')),
     packages=find_packages(exclude=['tests*']),
     install_requires=['requests'],
     classifiers=[
