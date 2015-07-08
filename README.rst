@@ -4,8 +4,8 @@ A Python wrapper around the Telegram Bot API.
 
 By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 
-.. image:: https://travis-ci.org/leandrotoledo/python-telegram.svg?branch=master
-    :target: https://travis-ci.org/leandrotoledo/python-telegram
+.. image:: https://travis-ci.org/leandrotoledo/python-telegram-bot.svg?branch=master
+    :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
     :alt: Travis CI Status
 
 ============
