@@ -14,10 +14,43 @@ class Bot(object):
                  token,
                  base_url=None):
 
+        self.token = token
+
         if base_url is None:
-            self.base_url = 'https://api.telegram.org/bot%s' % token
+            self.base_url = 'https://api.telegram.org/bot%s' % self.token
         else:
-            self.base_url = base_url + token
+            self.base_url = base_url + self.token
+
+        try:
+            bot = self.getMe()
+
+            self._id = bot.id
+            self._first_name = bot.first_name
+            self._last_name = bot.last_name
+            self._username = bot.username
+
+            self.__auth = True
+        except TelegramError:
+            raise TelegramError({'message': 'Bad token'})
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def first_name(self):
+        return self._first_name
+
+    @property
+    def last_name(self):
+        return self._last_name
+
+    @property
+    def username(self):
+        return self._username
+
+    def clearCredentials(self):
+        self.__auth = False
 
     def getMe(self):
         """A simple method for testing your bot's auth token.
@@ -62,6 +95,9 @@ class Bot(object):
 
         url = '%s/sendMessage' % (self.base_url)
 
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
         data = {'chat_id': chat_id,
                 'text': text}
         if disable_web_page_preview:
@@ -96,6 +132,9 @@ class Bot(object):
         """
 
         url = '%s/forwardMessage' % (self.base_url)
+
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
 
         data = {}
         if chat_id:
@@ -140,6 +179,9 @@ class Bot(object):
         """
 
         url = '%s/sendPhoto' % (self.base_url)
+
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
 
         data = {'chat_id': chat_id,
                 'photo': photo}
@@ -186,6 +228,9 @@ class Bot(object):
 
         url = '%s/sendAudio' % (self.base_url)
 
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
         data = {'chat_id': chat_id,
                 'audio': audio}
 
@@ -226,6 +271,9 @@ class Bot(object):
 
         url = '%s/sendDocument' % (self.base_url)
 
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
         data = {'chat_id': chat_id,
                 'document': document}
 
@@ -265,6 +313,9 @@ class Bot(object):
         """
 
         url = '%s/sendSticker' % (self.base_url)
+
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
 
         data = {'chat_id': chat_id,
                 'sticker': sticker}
@@ -307,6 +358,9 @@ class Bot(object):
 
         url = '%s/sendVideo' % (self.base_url)
 
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
         data = {'chat_id': chat_id,
                 'video': video}
 
@@ -347,6 +401,9 @@ class Bot(object):
         """
 
         url = '%s/sendLocation' % (self.base_url)
+
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
 
         data = {'chat_id': chat_id,
                 'latitude': latitude,
@@ -389,6 +446,9 @@ class Bot(object):
 
         url = '%s/sendChatAction' % (self.base_url)
 
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
         data = {'chat_id': chat_id,
                 'action': action}
 
@@ -415,6 +475,9 @@ class Bot(object):
         """
 
         url = '%s/getUserProfilePhotos' % (self.base_url)
+
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
 
         data = {'user_id': user_id}
 
@@ -454,6 +517,9 @@ class Bot(object):
 
         url = '%s/getUpdates' % (self.base_url)
 
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
         data = {}
         if offset:
             data['offset'] = offset
@@ -469,6 +535,10 @@ class Bot(object):
 
     def setWebhook(self):
         url = '%s/setWebhook' % (self.base_url)
+
+        if not self.__auth:
+            raise TelegramError({'message': "API must be authenticated."})
+
 
     def _requestUrl(self,
                     url,
@@ -573,4 +643,4 @@ class Bot(object):
         """
 
         if not data['ok']:
-            raise TelegramError(data)
+            raise TelegramError(data['description'])
