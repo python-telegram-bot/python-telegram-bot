@@ -6,7 +6,7 @@
 import json
 import requests
 
-from telegram import (User, Message, Update, UserProfilePhotos)
+from telegram import (User, Message, Update, UserProfilePhotos, TelegramError)
 
 
 class Bot(object):
@@ -55,6 +55,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a custom
             reply keyboard, instructions to hide keyboard or to force a reply
             from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -89,6 +90,7 @@ class Bot(object):
             — User or GroupChat id.
           message_id:
             Unique message identifier.
+
         Returns:
           A telegram.Message instance representing the message forwarded.
         """
@@ -132,6 +134,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a custom
             reply keyboard, instructions to hide keyboard or to force a reply
             from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -176,6 +179,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a
             custom reply keyboard, instructions to hide keyboard or to force a
             reply from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -215,6 +219,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a
             custom reply keyboard, instructions to hide keyboard or to force a
             reply from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -254,6 +259,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a
             custom reply keyboard, instructions to hide keyboard or to force a
             reply from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -294,6 +300,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a
             custom reply keyboard, instructions to hide keyboard or to force a
             reply from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -334,6 +341,7 @@ class Bot(object):
             Additional interface options. A JSON-serialized object for a
             custom reply keyboard, instructions to hide keyboard or to force a
             reply from the user. [Optional]
+
         Returns:
           A telegram.Message instance representing the message posted.
         """
@@ -374,6 +382,7 @@ class Bot(object):
             - ChatAction.UPLOAD_AUDIO or upload_audio for audio files,
             - ChatAction.UPLOAD_DOCUMENT for general files,
             - ChatAction.FIND_LOCATION for location data.
+
         Returns:
           ?
         """
@@ -400,6 +409,7 @@ class Bot(object):
           limit:
             Limits the number of photos to be retrieved. Values between 1—100
             are accepted. Defaults to 100. [Optional]
+
         Returns:
           Returns a telegram.UserProfilePhotos object.
         """
@@ -437,6 +447,7 @@ class Bot(object):
           timeout:
             Timeout in seconds for long polling. Defaults to 0, i.e. usual
             short polling.
+
         Returns:
           A list of telegram.Update objects are returned.
         """
@@ -472,6 +483,7 @@ class Bot(object):
             Either POST or GET.
           data:
             A dict of (str, unicode) key/value pairs.
+
         Returns:
           A JSON object.
         """
@@ -487,7 +499,7 @@ class Bot(object):
                         files={'photo': photo}
                     )
                 except requests.RequestException as e:
-                    pass
+                    raise TelegramError(str(e))
             if 'audio' in data and isinstance(data['audio'], file):
                 try:
                     audio = data.pop('audio')
@@ -498,7 +510,7 @@ class Bot(object):
                         files={'audio': audio}
                     )
                 except requests.RequestException as e:
-                    pass
+                    raise TelegramError(str(e))
             if 'document' in data and isinstance(data['document'], file):
                 try:
                     document = data.pop('document')
@@ -509,7 +521,7 @@ class Bot(object):
                         files={'document': document}
                     )
                 except requests.RequestException as e:
-                    pass
+                    raise TelegramError(str(e))
             else:
                 try:
                     return requests.post(
@@ -517,20 +529,48 @@ class Bot(object):
                         data=data
                     )
                 except requests.RequestException as e:
-                    pass
+                    raise TelegramError(str(e))
         if method == 'GET':
             try:
                 return requests.get(url)
             except requests.RequestException as e:
-                pass  # raise TelegramError(str(e))
+                raise TelegramError(str(e))
         return 0
 
     def _parseAndCheckTelegram(self,
                                json_data):
+        """Try and parse the JSON returned from Telegram and return an empty
+        dictionary if there is any error.
+
+        Args:
+          json_data:
+            JSON results from Telegram Bot API.
+
+        Returns:
+          A JSON parsed as Python dict with results.
+        """
 
         try:
             data = json.loads(json_data)
+            self._checkForTelegramError(data)
         except ValueError:
-            pass
+            if '<title>403 Forbidden</title>' in json_data:
+                raise TelegramError({'message': 'API must be authenticated'})
+            raise TelegramError({'message': 'JSON decoding'})
 
         return data['result']
+
+    def _checkForTelegramError(self,
+                               data):
+        """Raises a TelegramError if Telegram returns an error message.
+
+        Args:
+          data:
+            A Python dict created from the Telegram JSON response.
+
+        Raises:
+          TelegramError wrapping the Telegram error message if one exists.
+        """
+
+        if not data['ok']:
+            raise TelegramError(data)

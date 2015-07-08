@@ -25,4 +25,5 @@ from userprofilephotos import UserProfilePhotos
 # from replykeyboardmarkup import ReplyKeyboardMarkup
 # from replykeyboardhide import ReplyKeyboardHide
 # from forcereply import ForceReply
+from error import TelegramError
 from bot import Bot
