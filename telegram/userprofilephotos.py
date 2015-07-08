@@ -17,9 +17,9 @@ class UserProfilePhotos(object):
             from telegram import PhotoSize
             photos = []
             for photo in data['photos']:
-             photos.append([PhotoSize.newFromJsonDict(x) for x in photo])
+                photos.append([PhotoSize.newFromJsonDict(x) for x in photo])
         else:
-            photos= None
+            photos = None
 
         return UserProfilePhotos(total_count=data.get('total_count', None),
                                  photos=photos)
