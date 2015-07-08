@@ -17,7 +17,7 @@ from audio import Audio
 from document import Document
 from sticker import Sticker
 from video import Video
-# from contact import Contact
+from contact import Contact
 from location import Location
 from chataction import ChatAction
 # from inputfile import InputFile

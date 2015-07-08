@@ -95,6 +95,12 @@ class Message(object):
         else:
             video = None
 
+        if 'contact' in data:
+            from telegram import Contact
+            contact = Contact.newFromJsonDict(data['contact'])
+        else:
+            contact = None
+
         if 'location' in data:
             from telegram import Location
             location = Location.newFromJsonDict(data['location'])
@@ -130,7 +136,7 @@ class Message(object):
                        photo=photo,
                        sticker=sticker,
                        video=video,
-                       contact=data.get('contact', None),
+                       contact=contact,
                        location=location,
                        new_chat_participant=new_chat_participant,
                        left_chat_participant=left_chat_participant,
