@@ -5,7 +5,6 @@ class User(object):
     def __init__(self, **kwargs):
         param_defaults = {
             'id': None,
-            # 'chat_id' TODO
             'first_name': None,
             'last_name': None,
             'username': None
@@ -13,6 +12,10 @@ class User(object):
 
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
+
+    @property
+    def chat_id(self):
+        return self.id
 
     @staticmethod
     def newFromJsonDict(data):

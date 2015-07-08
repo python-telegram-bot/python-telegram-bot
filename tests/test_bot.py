@@ -33,7 +33,7 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUpdates method'''
         print 'Testing getUpdates'
         updates = self._bot.getUpdates()
-        self.assertEqual(129566481, updates[0].update_id)
+        self.assertEqual(129566520, updates[0].update_id)
 
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''
@@ -86,9 +86,16 @@ class BotTest(unittest.TestCase):
                                          chat_id=12173560)
         self.assertEqual(u'BQADAQADHAADNTwtBxZxUGKyxYbYAg', message.document.file_id)
 
-    def testSendSticker(self):
+    def testResendSticker(self):
         '''Test the telegram.Bot sendSticker method'''
-        print 'Testing sendSticket'
+        print 'Testing sendSticker - Resend'
         message = self._bot.sendSticker(sticker=str('BQADAQADHAADyIsGAAFZfq1bphjqlgI'),
                                         chat_id=12173560)
         self.assertEqual(39518, message.sticker.file_size)
+
+    def testResendVideo(self):
+        '''Test the telegram.Bot sendVideo method'''
+        print 'Testing sendVideo - Resend'
+        message = self._bot.sendVideo(video=str('BAADAQADIgEAAvjAuQABOuTB937fPTgC'),
+                                        chat_id=12173560)
+        self.assertEqual(4, message.video.duration)

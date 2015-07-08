@@ -85,6 +85,12 @@ class Message(object):
         else:
             sticker = None
 
+        if 'video' in data:
+            from telegram import Video
+            video = Video.newFromJsonDict(data['video'])
+        else:
+            video = None
+
         if 'new_chat_participant' in data:
             from telegram import User
             new_chat_participant = User.newFromJsonDict(
@@ -113,7 +119,7 @@ class Message(object):
                        document=document,
                        photo=photo,
                        sticker=sticker,
-                       video=data.get('video', None),
+                       video=video,
                        contact=data.get('contact', None),
                        location=data.get('location', None),
                        new_chat_participant=new_chat_participant,
