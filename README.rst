@@ -14,6 +14,14 @@ Introduction
 
 This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. Python 3 support is under development.
 
+==========
+Installing
+==========
+
+You can install python-telegram-bot using::
+
+    $ pip install python-telegram-bot
+
 ================
 Getting the code
 ================
