@@ -29,7 +29,7 @@ class Message(object):
 
         for (param, default) in param_defaults.iteritems():
             setattr(self, param, kwargs.get(param, default))
-    
+
     @property
     def chat_id(self):
         return self.chat.id

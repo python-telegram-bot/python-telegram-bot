@@ -14,4 +14,4 @@ class Location(object):
     @staticmethod
     def newFromJsonDict(data):
         return Location(longitude=data.get('longitude', None),
-                     latitude=data.get('latitude', None))
+                        latitude=data.get('latitude', None))

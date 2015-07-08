@@ -108,3 +108,10 @@ class BotTest(unittest.TestCase):
                                          chat_id=12173560)
         self.assertEqual(-23.558873, message.location.latitude)
         self.assertEqual(-46.659732, message.location.longitude)
+
+    def testSendChatAction(self):
+        '''Test the telegram.Bot sendChatAction method'''
+        print 'Testing sendChatAction - ChatAction.TYPING'
+        message = self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
+                                           chat_id=12173560)
+        # TODO: return json
