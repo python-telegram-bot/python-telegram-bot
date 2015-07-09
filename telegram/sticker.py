@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 
+import json
+
+
 class Sticker(object):
     def __init__(self,
                  file_id,
@@ -27,3 +30,15 @@ class Sticker(object):
                        height=data.get('height', None),
                        thumb=thumb,
                        file_size=data.get('file_size', None))
+
+    def to_json(self):
+        json_data = {'file_id': self.file_id,
+                     'width': self.width,
+                     'height': self.height,
+                     'thumb': self.thumb.to_json()}
+        if self.file_size:
+            json_data['file_size'] = self.file_size
+        return json.dumps(json_data)
+
+    def __str__(self):
+        return self.to_json()

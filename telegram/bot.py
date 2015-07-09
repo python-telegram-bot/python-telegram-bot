@@ -197,7 +197,10 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
@@ -243,7 +246,10 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
@@ -286,7 +292,10 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
@@ -329,7 +338,10 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
@@ -373,7 +385,10 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
@@ -418,7 +433,10 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)

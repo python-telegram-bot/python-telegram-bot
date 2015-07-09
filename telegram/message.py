@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 
+import json
+
+
 class Message(object):
     def __init__(self,
                  message_id,
@@ -52,7 +55,7 @@ class Message(object):
 
     @staticmethod
     def de_json(data):
-        if 'from' in data:  # from is a reserved word, use user_from instead.
+        if 'from' in data:  # from is a reserved word, use from_user instead.
             from telegram import User
             from_user = User.de_json(data['from'])
         else:
@@ -154,3 +157,47 @@ class Message(object):
                        new_chat_photo=data.get('new_chat_photo', None),
                        delete_chat_photo=data.get('delete_chat_photo', None),
                        group_chat_created=data.get('group_chat_created', None))
+
+    def to_json(self):
+        json_data = {'message_id': self.message_id,
+                     'from': self.from_user.to_json(),
+                     'date': self.date,
+                     'chat': self.chat.to_json()}
+        if self.forward_from:
+            json_data['forward_from'] = self.forward_from
+        if self.forward_date:
+            json_data['forward_date'] = self.forward_date
+        if self.reply_to_message:
+            json_data['reply_to_message'] = self.reply_to_message
+        if self.text:
+            json_data['text'] = self.text
+        if self.audio:
+            json_data['audio'] = self.audio.to_json()
+        if self.document:
+            json_data['document'] = self.document.to_json()
+        if self.photo:
+            json_data['photo'] = self.photo.to_json()
+        if self.sticker:
+            json_data['sticker'] = self.sticker.to_json()
+        if self.video:
+            json_data['video'] = self.video.to_json()
+        if self.contact:
+            json_data['contact'] = self.contact.to_json()
+        if self.location:
+            json_data['location'] = self.location.to_json()
+        if self.new_chat_participant:
+            json_data['new_chat_participant'] = self.new_chat_participant
+        if self.left_chat_participant:
+            json_data['left_chat_participant'] = self.left_chat_participant
+        if self.new_chat_title:
+            json_data['new_chat_title'] = self.new_chat_title
+        if self.new_chat_photo:
+            json_data['new_chat_photo'] = self.new_chat_photo
+        if self.delete_chat_photo:
+            json_data['delete_chat_photo'] = self.delete_chat_photo
+        if self.group_chat_created:
+            json_data['group_chat_created'] = self.group_chat_created
+        return json.dumps(json_data)
+
+    def __str__(self):
+        return self.to_json()
