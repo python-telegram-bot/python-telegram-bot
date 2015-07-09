@@ -6,7 +6,8 @@
 import json
 import requests
 
-from telegram import (User, Message, Update, UserProfilePhotos, TelegramError, ReplyMarkup)
+from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
+                      ReplyMarkup)
 
 
 class Bot(object):
