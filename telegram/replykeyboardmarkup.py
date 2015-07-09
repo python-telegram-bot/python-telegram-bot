@@ -19,8 +19,12 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     @staticmethod
     def de_json(data):
         return ReplyKeyboardMarkup(keyboard=data.get('keyboard', None),
-                                   resize_keyboard=data.get('resize_keyboard', None),
-                                   one_time_keyboard=data.get('one_time_keyboard', None),
+                                   resize_keyboard=data.get(
+                                       'resize_keyboard', None
+                                       ),
+                                   one_time_keyboard=data.get(
+                                       'one_time_keyboard', None
+                                       ),
                                    selective=data.get('selective', None))
 
     def to_json(self):
