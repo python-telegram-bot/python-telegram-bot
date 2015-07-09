@@ -132,6 +132,4 @@ Patches and bug reports are `welcome <https://github.com/leandrotoledo/python-te
 
 Add more example scripts.
 
-Add `custom keyboards <https://core.telegram.org/bots#keyboards>`_ methods.
-
 Add commands handler.
