@@ -109,13 +109,13 @@ To tell the user that something is happening on bot's side::
 
     >>> bot.sendChatAction(chat_id=chat_id, action=telegram.ChatAction.TYPING)
 
-To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>_`::
+To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
 
     >>> custom_keyboard = [[ telegram.Emoji.THUMBS_UP_SIGN, telegram.Emoji.THUMBS_DOWN_SIGN ]]
     >>> reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     >>> bot.sendMessage(chat_id=chat_id, text="Stay here, I'll be back.", reply_markup=reply_markup)
 
-To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>_`::
+To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
 
     >>> reply_markup = telegram.ReplyKeyboardHide()
     >>> bot.sendMessage(chat_id=chat_id, text="I'm back.", reply_markup=reply_markup)
