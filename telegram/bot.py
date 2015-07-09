@@ -11,6 +11,7 @@ from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
 
 
 class Bot(object):
+
     def __init__(self,
                  token,
                  base_url=None):
@@ -554,11 +555,32 @@ class Bot(object):
 
         return [Update.de_json(x) for x in data]
 
-    def setWebhook(self):
+    def setWebhook(self, webhook_url=""):
+        """Use this method to specify a url and receive incoming updates via an
+        outgoing webhook. Whenever there is an update for the bot, we will send
+        an HTTPS POST request to the specified url, containing a
+        JSON-serialized Update. In case of an unsuccessful request, we will
+        give up after a reasonable amount of attempts.
+
+        Args:
+          url:
+            HTTPS url to send updates to.
+            Use an empty string to remove webhook integration
+
+        Returns:
+          True if successful else TelegramError was raised
+        """
         url = '%s/setWebhook' % (self.base_url)
 
         if not self.__auth:
             raise TelegramError({'message': "API must be authenticated."})
+
+        data = {'url': webhook_url}
+
+        json_data = self._requestUrl(url, 'POST', data=data)
+        data = self._parseAndCheckTelegram(json_data.content)
+
+        return True
 
     def _requestUrl(self,
                     url,
