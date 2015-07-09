@@ -2,14 +2,11 @@
 
 
 class Update(object):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'update_id': None,
-            'message': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+    def __init__(self,
+                 update_id,
+                 message=None):
+        self.update_id = update_id
+        self.message = message
 
     @staticmethod
     def de_json(data):

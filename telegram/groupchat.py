@@ -2,18 +2,11 @@
 
 
 class GroupChat(object):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'id': None,
-            'title': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
-
-    @property
-    def chat_id(self):
-        return self.id
+    def __init__(self,
+                 id,
+                 title):
+        self.id = id
+        self.title = title
 
     @staticmethod
     def de_json(data):

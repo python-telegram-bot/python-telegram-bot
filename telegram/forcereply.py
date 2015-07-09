@@ -6,14 +6,11 @@ from replymarkup import ReplyMarkup
 
 
 class ForceReply(ReplyMarkup):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'force_reply': True,
-            'selective': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+    def __init__(self,
+                 force_reply=True,
+                 selective=None):
+        self.force_reply = force_reply
+        self.selective = selective
 
     @staticmethod
     def de_json(data):

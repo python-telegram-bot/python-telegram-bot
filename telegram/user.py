@@ -2,16 +2,15 @@
 
 
 class User(object):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'id': None,
-            'first_name': None,
-            'last_name': None,
-            'username': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+    def __init__(self,
+                 id,
+                 first_name,
+                 last_name=None,
+                 username=None):
+        self.id = id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.username = username
 
     @staticmethod
     def de_json(data):

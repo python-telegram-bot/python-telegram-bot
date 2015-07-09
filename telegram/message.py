@@ -2,33 +2,49 @@
 
 
 class Message(object):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'message_id': None,
-            'user': None,
-            'date': None,
-            'chat': None,
-            'forward_from': None,
-            'forward_date': None,
-            'reply_to_message': None,
-            'text': None,
-            'audio': None,
-            'document': None,
-            'photo': None,
-            'sticker': None,
-            'video': None,
-            'contact': None,
-            'location': None,
-            'new_chat_participant': None,
-            'left_chat_participant': None,
-            'new_chat_title': None,
-            'new_chat_photo': None,
-            'delete_chat_photo': None,
-            'group_chat_created': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+    def __init__(self,
+                 message_id,
+                 from_user,
+                 date,
+                 chat,
+                 forward_from=None,
+                 forward_date=None,
+                 reply_to_message=None,
+                 text=None,
+                 audio=None,
+                 document=None,
+                 photo=None,
+                 sticker=None,
+                 video=None,
+                 contact=None,
+                 location=None,
+                 new_chat_participant=None,
+                 left_chat_participant=None,
+                 new_chat_title=None,
+                 new_chat_photo=None,
+                 delete_chat_photo=None,
+                 group_chat_created=None):
+        self.message_id = message_id
+        self.from_user = from_user
+        self.date = date
+        self.chat = chat
+        self.forward_from = forward_from
+        self.forward_date = forward_date
+        self.reply_to_message = reply_to_message
+        self.text = text
+        self.audio = audio
+        self.document = document
+        self.photo = photo
+        self.sticker = sticker
+        self.video = video
+        self.contact = contact
+        self.location = location
+        self.new_chat_participant = new_chat_participant
+        self.left_chat_participant = left_chat_participant
+        self.new_chat_title = new_chat_title
+        self.new_chat_photo = new_chat_photo
+        self.delete_chat_photo = delete_chat_photo
+        self.group_chat_created = group_chat_created
 
     @property
     def chat_id(self):
@@ -36,11 +52,11 @@ class Message(object):
 
     @staticmethod
     def de_json(data):
-        if 'from' in data:  # from on api
+        if 'from' in data:  # from is a reserved word, use user_from instead.
             from telegram import User
-            user = User.de_json(data['from'])
+            from_user = User.de_json(data['from'])
         else:
-            user = None
+            from_user = None
 
         if 'chat' in data:
             if 'username' in data['chat']:
@@ -59,9 +75,7 @@ class Message(object):
             forward_from = None
 
         if 'reply_to_message' in data:
-            reply_to_message = Message.de_json(
-                data['reply_to_message']
-            )
+            reply_to_message = Message.de_json(data['reply_to_message'])
         else:
             reply_to_message = None
 
@@ -109,22 +123,18 @@ class Message(object):
 
         if 'new_chat_participant' in data:
             from telegram import User
-            new_chat_participant = User.de_json(
-                data['new_chat_participant']
-            )
+            new_chat_participant = User.de_json(data['new_chat_participant'])
         else:
             new_chat_participant = None
 
         if 'left_chat_participant' in data:
             from telegram import User
-            left_chat_participant = User.de_json(
-                data['left_chat_participant']
-            )
+            left_chat_participant = User.de_json(data['left_chat_participant'])
         else:
             left_chat_participant = None
 
         return Message(message_id=data.get('message_id', None),
-                       user=user,
+                       from_user=from_user,
                        date=data.get('date', None),
                        chat=chat,
                        forward_from=forward_from,

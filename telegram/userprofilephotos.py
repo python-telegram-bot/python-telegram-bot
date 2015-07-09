@@ -2,14 +2,11 @@
 
 
 class UserProfilePhotos(object):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'total_count': None,
-            'photos': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+    def __init__(self,
+                 total_count,
+                 photos):
+        self.total_count = total_count
+        self.photos = photos
 
     @staticmethod
     def de_json(data):
