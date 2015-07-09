@@ -6,7 +6,7 @@
 import json
 import requests
 
-from telegram import (User, Message, Update, UserProfilePhotos, TelegramError)
+from telegram import (User, Message, Update, UserProfilePhotos, TelegramError, ReplyMarkup)
 
 
 class Bot(object):
@@ -66,7 +66,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'GET')
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return User.newFromJsonDict(data)
+        return User.de_json(data)
 
     def sendMessage(self,
                     chat_id,
@@ -107,12 +107,15 @@ class Bot(object):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def forwardMessage(self,
                        chat_id,
@@ -149,7 +152,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendPhoto(self,
                   chat_id,
@@ -198,7 +201,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendAudio(self,
                   chat_id,
@@ -244,7 +247,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendDocument(self,
                      chat_id,
@@ -287,7 +290,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendSticker(self,
                     chat_id,
@@ -330,7 +333,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendVideo(self,
                   chat_id,
@@ -374,7 +377,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendLocation(self,
                      chat_id,
@@ -419,7 +422,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return Message.newFromJsonDict(data)
+        return Message.de_json(data)
 
     def sendChatAction(self,
                        chat_id,
@@ -488,7 +491,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return UserProfilePhotos.newFromJsonDict(data)
+        return UserProfilePhotos.de_json(data)
 
     def getUpdates(self,
                    offset=None,
@@ -530,7 +533,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data.content)
 
-        return [Update.newFromJsonDict(x) for x in data]
+        return [Update.de_json(x) for x in data]
 
     def setWebhook(self):
         url = '%s/setWebhook' % (self.base_url)

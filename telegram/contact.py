@@ -14,7 +14,7 @@ class Contact(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         return Contact(phone_number=data.get('phone_number', None),
                        first_name=data.get('first_name', None),
                        last_name=data.get('last_name', None),

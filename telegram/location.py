@@ -12,6 +12,6 @@ class Location(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         return Location(longitude=data.get('longitude', None),
                         latitude=data.get('latitude', None))

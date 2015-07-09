@@ -14,7 +14,7 @@ class PhotoSize(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         return PhotoSize(file_id=data.get('file_id', None),
                          width=data.get('width', None),
                          height=data.get('height', None),

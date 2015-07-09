@@ -24,6 +24,7 @@ from chataction import ChatAction
 from userprofilephotos import UserProfilePhotos
 # from replykeyboardmarkup import ReplyKeyboardMarkup
 # from replykeyboardhide import ReplyKeyboardHide
-# from forcereply import ForceReply
+from forcereply import ForceReply
+from replymarkup import ReplyMarkup
 from error import TelegramError
 from bot import Bot

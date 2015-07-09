@@ -12,10 +12,10 @@ class Update(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         if 'message' in data:
             from telegram import Message
-            message = Message.newFromJsonDict(data['message'])
+            message = Message.de_json(data['message'])
         else:
             message = None
 

@@ -12,12 +12,12 @@ class UserProfilePhotos(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         if 'photos' in data:
             from telegram import PhotoSize
             photos = []
             for photo in data['photos']:
-                photos.append([PhotoSize.newFromJsonDict(x) for x in photo])
+                photos.append([PhotoSize.de_json(x) for x in photo])
         else:
             photos = None
 

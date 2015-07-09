@@ -14,7 +14,7 @@ class Audio(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         return Audio(file_id=data.get('file_id', None),
                      duration=data.get('duration', None),
                      mime_type=data.get('mime_type', None),

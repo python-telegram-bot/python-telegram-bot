@@ -16,6 +16,6 @@ class GroupChat(object):
         return self.id
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         return GroupChat(id=data.get('id', None),
                          title=data.get('title', None))

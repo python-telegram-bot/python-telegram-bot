@@ -35,31 +35,31 @@ class Message(object):
         return self.chat.id
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         if 'from' in data:  # from on api
             from telegram import User
-            user = User.newFromJsonDict(data['from'])
+            user = User.de_json(data['from'])
         else:
             user = None
 
         if 'chat' in data:
             if 'username' in data['chat']:
                 from telegram import User
-                chat = User.newFromJsonDict(data['chat'])
+                chat = User.de_json(data['chat'])
             if 'title' in data['chat']:
                 from telegram import GroupChat
-                chat = GroupChat.newFromJsonDict(data['chat'])
+                chat = GroupChat.de_json(data['chat'])
         else:
             chat = None
 
         if 'forward_from' in data:
             from telegram import User
-            forward_from = User.newFromJsonDict(data['forward_from'])
+            forward_from = User.de_json(data['forward_from'])
         else:
             forward_from = None
 
         if 'reply_to_message' in data:
-            reply_to_message = Message.newFromJsonDict(
+            reply_to_message = Message.de_json(
                 data['reply_to_message']
             )
         else:
@@ -67,49 +67,49 @@ class Message(object):
 
         if 'audio' in data:
             from telegram import Audio
-            audio = Audio.newFromJsonDict(data['audio'])
+            audio = Audio.de_json(data['audio'])
         else:
             audio = None
 
         if 'document' in data:
             from telegram import Document
-            document = Document.newFromJsonDict(data['document'])
+            document = Document.de_json(data['document'])
         else:
             document = None
 
         if 'photo' in data:
             from telegram import PhotoSize
-            photo = [PhotoSize.newFromJsonDict(x) for x in data['photo']]
+            photo = [PhotoSize.de_json(x) for x in data['photo']]
         else:
             photo = None
 
         if 'sticker' in data:
             from telegram import Sticker
-            sticker = Sticker.newFromJsonDict(data['sticker'])
+            sticker = Sticker.de_json(data['sticker'])
         else:
             sticker = None
 
         if 'video' in data:
             from telegram import Video
-            video = Video.newFromJsonDict(data['video'])
+            video = Video.de_json(data['video'])
         else:
             video = None
 
         if 'contact' in data:
             from telegram import Contact
-            contact = Contact.newFromJsonDict(data['contact'])
+            contact = Contact.de_json(data['contact'])
         else:
             contact = None
 
         if 'location' in data:
             from telegram import Location
-            location = Location.newFromJsonDict(data['location'])
+            location = Location.de_json(data['location'])
         else:
             location = None
 
         if 'new_chat_participant' in data:
             from telegram import User
-            new_chat_participant = User.newFromJsonDict(
+            new_chat_participant = User.de_json(
                 data['new_chat_participant']
             )
         else:
@@ -117,7 +117,7 @@ class Message(object):
 
         if 'left_chat_participant' in data:
             from telegram import User
-            left_chat_participant = User.newFromJsonDict(
+            left_chat_participant = User.de_json(
                 data['left_chat_participant']
             )
         else:

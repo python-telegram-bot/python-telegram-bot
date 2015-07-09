@@ -18,10 +18,10 @@ class Video(object):
             setattr(self, param, kwargs.get(param, default))
 
     @staticmethod
-    def newFromJsonDict(data):
+    def de_json(data):
         if 'thumb' in data:
             from telegram import PhotoSize
-            thumb = PhotoSize.newFromJsonDict(data['thumb'])
+            thumb = PhotoSize.de_json(data['thumb'])
         else:
             thumb = None
 
