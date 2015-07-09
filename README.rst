@@ -89,25 +89,36 @@ To fetch images sent to your Bot::
     >>> updates = bot.getUpdates()
     >>> print [u.message.photo for u in updates if u.message.photo]
 
-To post a text message (you'll always need chat_id to reply users)::
+To reply messages you'll always need the chat_id::
 
     >>> chat_id = bot.getUpdates()[-1].message.chat_id
+
+To post a text message::
+
     >>> bot.sendMessage(chat_id=chat_id, text="I'm sorry Dave I'm afraid I can't do that.")
 
 To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/emoji/tables/unicode>`_)::
 
-    >>> chat_id = bot.getUpdates()[-1].message.chat_id
     >>> bot.sendMessage(chat_id=chat_id, text=telegram.Emoji.PILE_OF_POO)
 
-To post a audio file (you'll always need chat_id to reply users)::
+To post a audio file::
 
-    >>> chat_id = bot.getUpdates()[-1].message.chat_id
     >>> bot.sendAudio(chat_id=chat_id, audio=open('tests/telegram.ogg', 'rb'))
 
 To tell the user that something is happening on bot's side::
 
-    >>> chat_id = bot.getUpdates()[-1].message.chat_id
     >>> bot.sendChatAction(chat_id=chat_id, action=telegram.ChatAction.TYPING)
+
+To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>_`::
+
+    >>> custom_keyboard = [[ telegram.Emoji.THUMBS_UP_SIGN, telegram.Emoji.THUMBS_DOWN_SIGN ]]
+    >>> reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+    >>> bot.sendMessage(chat_id=chat_id, text="Stay here, I'll be back.", reply_markup=reply_markup)
+
+To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>_`::
+
+    >>> reply_markup = telegram.ReplyKeyboardHide()
+    >>> bot.sendMessage(chat_id=chat_id, text="I'm back.", reply_markup=reply_markup)
 
 There are many more API methods, to read the full API documentation::
 
