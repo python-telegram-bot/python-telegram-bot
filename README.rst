@@ -92,7 +92,12 @@ To fetch images sent to your Bot::
 To post a text message (you'll always need chat_id to reply users)::
 
     >>> chat_id = bot.getUpdates()[-1].message.chat_id
-    >>> bot.sendMessage(chat_id=chat_id, text=u"I'm sorry Dave I'm afraid I can't do that.")
+    >>> bot.sendMessage(chat_id=chat_id, text="I'm sorry Dave I'm afraid I can't do that.")
+
+To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/emoji/tables/unicode>`_)::
+
+    >>> chat_id = bot.getUpdates()[-1].message.chat_id
+    >>> bot.sendMessage(chat_id=chat_id, text=telegram.Emoji.PILE_OF_POO)
 
 To post a audio file (you'll always need chat_id to reply users)::
 
