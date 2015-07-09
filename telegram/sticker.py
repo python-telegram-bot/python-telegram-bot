@@ -2,17 +2,17 @@
 
 
 class Sticker(object):
-    def __init__(self, **kwargs):
-        param_defaults = {
-            'file_id': None,
-            'width': None,
-            'height': None,
-            'thumb': None,
-            'file_size': None
-        }
-
-        for (param, default) in param_defaults.iteritems():
-            setattr(self, param, kwargs.get(param, default))
+    def __init__(self,
+                 file_id,
+                 width,
+                 height,
+                 thumb,
+                 file_size=None):
+        self.file_id = file_id
+        self.width = width
+        self.height = height
+        self.thumb = thumb
+        self.file_size = file_size
 
     @staticmethod
     def de_json(data):
