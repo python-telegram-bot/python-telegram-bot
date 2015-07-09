@@ -26,4 +26,5 @@ from replykeyboardhide import ReplyKeyboardHide
 from forcereply import ForceReply
 from replymarkup import ReplyMarkup
 from error import TelegramError
+from emoji import Emoji
 from bot import Bot
