@@ -4,10 +4,11 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 import json
-import requests
+import urllib
+import urllib2
 
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
-                      ReplyMarkup)
+                      ReplyMarkup, InputFile)
 
 
 class Bot(object):
@@ -66,7 +67,7 @@ class Bot(object):
         url = '%s/getMe' % (self.base_url)
 
         json_data = self._requestUrl(url, 'GET')
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return User.de_json(data)
 
@@ -115,7 +116,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -152,7 +153,7 @@ class Bot(object):
             data['message_id'] = message_id
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -204,7 +205,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -253,7 +254,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -299,7 +300,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -345,7 +346,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -392,7 +393,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -440,7 +441,7 @@ class Bot(object):
                 data['reply_markup'] = reply_markup
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return Message.de_json(data)
 
@@ -509,7 +510,7 @@ class Bot(object):
             data['limit'] = limit
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return UserProfilePhotos.de_json(data)
 
@@ -551,9 +552,9 @@ class Bot(object):
             data['timeout'] = timeout
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
-        return [Update.de_json(x) for x in data]
+        return [Update.de_json(x) for x in data] #  TODO: error handling
 
     def setWebhook(self, webhook_url=""):
         """Use this method to specify a url and receive incoming updates via an
@@ -578,7 +579,7 @@ class Bot(object):
         data = {'url': webhook_url}
 
         json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data.content)
+        data = self._parseAndCheckTelegram(json_data)
 
         return True
 
@@ -601,51 +602,35 @@ class Bot(object):
         """
 
         if method == 'POST':
-            if 'photo' in data and isinstance(data['photo'], file):
+            if 'audio' in data and isinstance(data['audio'], file) or \
+               'document' in data and isinstance(data['document'], file) or \
+               'photo' in data and isinstance(data['photo'], file) or \
+               'video' in data and isinstance(data['video'], file):
                 try:
-                    photo = data.pop('photo')
-
-                    return requests.post(
+                    data = InputFile(data)
+                    request = urllib2.Request(
                         url,
-                        data=data,
-                        files={'photo': photo}
+                        data=data.to_form(),
+                        headers=data.headers
                     )
-                except requests.RequestException as e:
-                    raise TelegramError(str(e))
-            if 'audio' in data and isinstance(data['audio'], file):
-                try:
-                    audio = data.pop('audio')
-
-                    return requests.post(
-                        url,
-                        data=data,
-                        files={'audio': audio}
-                    )
-                except requests.RequestException as e:
-                    raise TelegramError(str(e))
-            if 'document' in data and isinstance(data['document'], file):
-                try:
-                    document = data.pop('document')
-
-                    return requests.post(
-                        url,
-                        data=data,
-                        files={'document': document}
-                    )
-                except requests.RequestException as e:
+                    return urllib2.urlopen(request).read()
+                except urllib2.URLError as e:
                     raise TelegramError(str(e))
             else:
                 try:
-                    return requests.post(
+                    return urllib2.urlopen(
                         url,
-                        data=data
-                    )
-                except requests.RequestException as e:
+                        urllib.urlencode(data)
+                    ).read()
+                except urllib.IOError as e:
                     raise TelegramError(str(e))
+                except urllib2.URLError as e:
+                    raise TelegramError(str(e))
+
         if method == 'GET':
             try:
-                return requests.get(url)
-            except requests.RequestException as e:
+                return urllib2.urlopen(url).read()
+            except urllib2.URLError as e:
                 raise TelegramError(str(e))
         return 0
 
