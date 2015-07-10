@@ -554,7 +554,7 @@ class Bot(object):
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data)
 
-        return [Update.de_json(x) for x in data] #  TODO: error handling
+        return [Update.de_json(x) for x in data]
 
     def setWebhook(self, webhook_url=""):
         """Use this method to specify a url and receive incoming updates via an

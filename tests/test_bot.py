@@ -33,7 +33,7 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUpdates method'''
         print 'Testing getUpdates'
         updates = self._bot.getUpdates()
-        self.assertEqual(129566572, updates[0].update_id)
+        self.assertEqual(129566577, updates[0].update_id)
 
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''

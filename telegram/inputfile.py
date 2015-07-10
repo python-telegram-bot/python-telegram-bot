@@ -47,7 +47,7 @@ class InputFile(object):
         for name, value in self.data.iteritems():
             form.extend([
                 form_boundary,
-                'Content-Disposition: form-data; name="%s"' % name,
+                str('Content-Disposition: form-data; name="%s"' % name),
                 '',
                 str(value)
             ])
@@ -55,9 +55,9 @@ class InputFile(object):
         # Add input_file to upload
         form.extend([
             form_boundary,
-            'Content-Disposition: form-data; name="%s"; filename="%s"' % (
+            str('Content-Disposition: form-data; name="%s"; filename="%s"' % (
                 self.input_name, self.filename
-            ),
+            )),
             'Content-Type: %s' % self.mimetype,
             '',
             self.input_file_content
