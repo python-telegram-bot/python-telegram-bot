@@ -15,7 +15,7 @@ def read(*paths):
 
 setup(
     name='python-telegram-bot',
-    version='1.3',
+    version='1.4',
     author='Leandro Toledo',
     author_email='leandrotoledodesouza@gmail.com',
     license='GPLv2',
@@ -24,7 +24,6 @@ setup(
     description='A Python wrapper around the Telegram Bot API',
     long_description=(read('README.rst')),
     packages=find_packages(exclude=['tests*']),
-    install_requires=['requests'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
