@@ -1,5 +1,10 @@
 2015-07-10
 
+  Released 1.5
+  Fixes randomly unicode issues when using InputFile
+
+2015-07-10
+
   Released 1.4
   requests lib is no longer required
   Google App Engine (GAE) is supported
