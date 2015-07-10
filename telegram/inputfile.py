@@ -4,6 +4,7 @@
 import mimetools
 import mimetypes
 import os
+import urllib2
 
 
 class InputFile(object):
@@ -12,21 +13,26 @@ class InputFile(object):
         self.data = data
         self.boundary = mimetools.choose_boundary()
 
-        if 'audio' in data and isinstance(data['audio'], file):
+        if 'audio' in data:
             self.input_name = 'audio'
             self.input_file = data.pop('audio')
-        if 'document' in data and isinstance(data['document'], file):
+        if 'document' in data:
             self.input_name = 'document'
             self.input_file = data.pop('document')
-        if 'photo' in data and isinstance(data['photo'], file):
+        if 'photo' in data:
             self.input_name = 'photo'
             self.input_file = data.pop('photo')
-        if 'video' in data and isinstance(data['video'], file):
+        if 'video' in data:
             self.input_name = 'video'
             self.input_file = data.pop('video')
 
-        self.input_file_content = self.input_file.read()
-        self.filename = os.path.basename(self.input_file.name)
+        if isinstance(self.input_file, file):
+            self.filename = os.path.basename(self.input_file.name)
+            self.input_file_content = self.input_file.read()
+        if 'http' in self.input_file:
+            self.filename = os.path.basename(self.input_file)
+            self.input_file_content = urllib2.urlopen(self.input_file).read()
+
         self.mimetype = mimetypes.guess_type(self.filename)[0] or \
             'application/octet-stream'
 
