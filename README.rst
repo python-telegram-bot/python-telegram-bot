@@ -12,7 +12,29 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 Introduction
 ============
 
-This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. Python 3 support is under development.
+This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. Python 3 support is under development. It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
+
+==========
+Status
+==========
+
++-------+-------------------+--------------+
+| Telegram Bot API Method   | *Supported?* |
++=======+===================+==============+
+| getMe                     |	Yes          |
+| sendMessage               |	Yes          |
+| forwardMessage            |	Yes          |
+| sendPhoto                 |	Yes          |
+| sendAudio                 |	Yes          |
+| sendDocument              |	Yes          |
+| sendSticker               |	Yes          |
+| sendVideo                 |	Yes          |
+| sendLocation              |	Yes          |
+| sendChatAction            |	Yes          |
+| getUpdates                |	Yes          |
+| getUserProfilePhotos      |	Yes          |
+| setWebhook                |	Yes          |
++-------+-------------------+--------------+
 
 ==========
 Installing
@@ -33,21 +55,13 @@ Check out the latest development version anonymously with::
     $ git clone https://github.com/leandrotoledo/python-telegram-bot
     $ cd python-telegram-bot
 
-Setup a virtual environment and install dependencies:
-
-	$ make env
-
-Activate the virtual environment created:
-
-	$ source env/bin/activate
-
 Run tests:
 
-	$ make test
+    $ make test
 
 To see other options available, run:
 
-	$ make help
+    $ make help
 
 =============
 Documentation
