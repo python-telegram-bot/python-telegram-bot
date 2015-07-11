@@ -62,7 +62,7 @@ class Message(object):
             from_user = None
 
         if 'chat' in data:
-            if 'username' in data['chat']:
+            if 'username' in data['chat'] or 'id' in data['chat']:
                 from telegram import User
                 chat = User.de_json(data['chat'])
             if 'title' in data['chat']:
