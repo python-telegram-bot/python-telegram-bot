@@ -1,3 +1,8 @@
+2015-07.11
+
+  Released 1.7
+  Fixes crash when username is not defined on chat (special thanks to JRoot3D)
+
 2015-07-10
 
   Released 1.6
