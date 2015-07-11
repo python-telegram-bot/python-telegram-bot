@@ -538,7 +538,7 @@ class Bot(object):
         """Check if the request is a file request
         Args:
           data:
-            A dict od (str, unicode) key/value pairs
+            A dict of (str, unicode) key/value pairs
 
         Returns:
             bool
@@ -546,9 +546,12 @@ class Bot(object):
         if data:
             file_types = ['audio', 'document', 'photo', 'video']
             file_type = [i for i in data.keys() if i in file_types]
+
             if file_type:
                 file_content = data[file_type[0]]
-                return isinstance(file_content, file) or str(file_content).startswith('http')
+                return isinstance(file_content, file) or \
+                    str(file_content).startswith('http')
+
         return False
 
     def _requestUrl(self,
@@ -570,34 +573,34 @@ class Bot(object):
         """
 
         if method == 'POST':
-            if self._isFileRequest(data):
-                try:
+            try:
+                if self._isFileRequest(data):
                     data = InputFile(data)
+
                     request = urllib2.Request(
                         url,
                         data=data.to_form(),
                         headers=data.headers
                     )
+
                     return urllib2.urlopen(request).read()
-                except urllib2.URLError as e:
-                    raise TelegramError(str(e))
-            else:
-                try:
+                else:
                     return urllib2.urlopen(
                         url,
                         urllib.urlencode(data)
                     ).read()
-                except urllib.IOError as e:
-                    raise TelegramError(str(e))
-                except urllib2.URLError as e:
-                    raise TelegramError(str(e))
+            except urllib.IOError as e:
+                raise TelegramError(str(e))
+            except urllib2.URLError as e:
+                raise TelegramError(str(e))
 
         if method == 'GET':
             try:
                 return urllib2.urlopen(url).read()
             except urllib2.URLError as e:
                 raise TelegramError(str(e))
-        return 0
+
+        return 0  # if not a POST or GET request
 
     def _parseAndCheckTelegram(self,
                                json_data):
