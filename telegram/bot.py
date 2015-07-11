@@ -533,6 +533,24 @@ class Bot(object):
 
         return True
 
+    def _isFileRequest(self,
+                       data=None):
+        """Check if the request is a file request
+        Args:
+          data:
+            A dict od (str, unicode) key/value pairs
+
+        Returns:
+            bool
+        """
+        if data:
+            file_types = ['audio', 'document', 'photo', 'video']
+            file_type = [i for i in data.keys() if i in file_types]
+            if file_type:
+                file_content = data[file_type[0]]
+                return isinstance(file_content, file) or str(file_content).startswith('http')
+        return False
+
     def _requestUrl(self,
                     url,
                     method,
@@ -552,10 +570,7 @@ class Bot(object):
         """
 
         if method == 'POST':
-            if 'audio' in data and (isinstance(data['audio'], file) or 'http' in data['audio']) or \
-               'document' in data and (isinstance(data['document'], file) or 'http' in data['document']) or \
-               'photo' in data and (isinstance(data['photo'], file) or 'http' in data['photo']) or \
-               'video' in data and (isinstance(data['video'], file) or 'http' in data['video']):
+            if self._isFileRequest(data):
                 try:
                     data = InputFile(data)
                     request = urllib2.Request(
