@@ -49,14 +49,14 @@ class BotTest(unittest.TestCase):
         print 'Testing sendPhoto - File'
         message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
                                       chat_id=12173560)
-        self.assertEqual(12948, message.photo[2].file_size)
+        self.assertEqual(1451, message.photo[0].file_size)
 
     def testResendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print 'Testing sendPhoto - Resend'
-        message = self._bot.sendPhoto(photo=str('AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI'),
+        message = self._bot.sendPhoto(photo=str('AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI'),
                                       chat_id=12173560)
-        self.assertEqual(u'AgAD_v___6-nMRs1PC0HuqtHTCQ9qx0AFAI', message.photo[2].file_id)
+        self.assertEqual(u'AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI', message.photo[0].file_id)
 
     def testSendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
