@@ -2,16 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5d5353f8-b2fe-40ef-9cb7-e5e5ae60aeb9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/python-telegram-bot.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/telegram/bot.py" afterPath="$PROJECT_DIR$/telegram/bot.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/telegram_test.py" afterPath="$PROJECT_DIR$/telegram_test.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="python-telegram-bot.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -62,8 +53,8 @@
       <file leaf-file-name="bot.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/telegram/bot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.37201908" vertical-offset="9810" max-vertical-offset="11340">
-              <caret line="562" column="28" selection-start-line="562" selection-start-column="28" selection-end-line="562" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.4864865" vertical-offset="9594" max-vertical-offset="11340">
+              <caret line="554" column="2" selection-start-line="554" selection-start-column="2" selection-end-line="554" selection-end-column="2" />
               <folding />
             </state>
           </provider>
@@ -604,8 +595,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/telegram/bot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37201908" vertical-offset="9810" max-vertical-offset="11340">
-          <caret line="562" column="28" selection-start-line="562" selection-start-column="28" selection-end-line="562" selection-end-column="28" />
+        <state vertical-scroll-proportion="0.4864865" vertical-offset="9594" max-vertical-offset="11340">
+          <caret line="554" column="2" selection-start-line="554" selection-start-column="2" selection-end-line="554" selection-end-column="2" />
           <folding />
         </state>
       </provider>
