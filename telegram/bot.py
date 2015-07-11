@@ -6,6 +6,7 @@
 import json
 import urllib
 import urllib2
+import functools
 
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
                       ReplyMarkup, InputFile)
@@ -71,6 +72,48 @@ class Bot(object):
 
         return User.de_json(data)
 
+    def message(func):
+        """
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
+        functools.wraps(func)
+
+        def wrap(self, *args, **kwargs):
+            url, data = func(self, *args, **kwargs)
+
+            if kwargs.get('reply_to_message_id'):
+                reply_to_message_id = kwargs.get('reply_to_message_id')
+                data['reply_to_message_id'] = reply_to_message_id
+
+            if kwargs.get('reply_markup'):
+                reply_markup = kwargs.get('reply_markup')
+                if isinstance(reply_markup, ReplyMarkup):
+                    data['reply_markup'] = reply_markup.to_json()
+                else:
+                    data['reply_markup'] = reply_markup
+
+            json_data = self._requestUrl(url, 'POST', data=data)
+            data = self._parseAndCheckTelegram(json_data)
+
+            if data is True:
+                return data
+
+            return Message.de_json(data)
+        return wrap
+
+    def require_authentication(func):
+        functools.wraps(func)
+
+        def wrap(self, *args, **kwargs):
+            if not self.__auth:
+                raise TelegramError({'message': "API must be authenticated."})
+
+            return func(self, *args, **kwargs)
+        return wrap
+
+    @message
+    @require_authentication
     def sendMessage(self,
                     chat_id,
                     text,
@@ -100,26 +143,16 @@ class Bot(object):
 
         url = '%s/sendMessage' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'text': text}
+
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
+        return (url, data)
 
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def forwardMessage(self,
                        chat_id,
                        from_chat_id,
@@ -141,9 +174,6 @@ class Bot(object):
 
         url = '%s/forwardMessage' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {}
         if chat_id:
             data['chat_id'] = chat_id
@@ -152,11 +182,10 @@ class Bot(object):
         if message_id:
             data['message_id'] = message_id
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
+        return (url, data)
 
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendPhoto(self,
                   chat_id,
                   photo,
@@ -188,27 +217,16 @@ class Bot(object):
 
         url = '%s/sendPhoto' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'photo': photo}
 
         if caption:
             data['caption'] = caption
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
+        return (url, data)
 
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendAudio(self,
                   chat_id,
                   audio,
@@ -239,25 +257,13 @@ class Bot(object):
 
         url = '%s/sendAudio' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'audio': audio}
 
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+        return (url, data)
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
-
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendDocument(self,
                      chat_id,
                      document,
@@ -285,25 +291,13 @@ class Bot(object):
 
         url = '%s/sendDocument' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'document': document}
 
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+        return (url, data)
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
-
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendSticker(self,
                     chat_id,
                     sticker,
@@ -331,25 +325,13 @@ class Bot(object):
 
         url = '%s/sendSticker' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'sticker': sticker}
 
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+        return (url, data)
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
-
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendVideo(self,
                   chat_id,
                   video,
@@ -378,25 +360,13 @@ class Bot(object):
 
         url = '%s/sendVideo' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'video': video}
 
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+        return (url, data)
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
-
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendLocation(self,
                      chat_id,
                      latitude,
@@ -425,26 +395,14 @@ class Bot(object):
 
         url = '%s/sendLocation' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'latitude': latitude,
                 'longitude': longitude}
 
-        if reply_to_message_id:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
+        return (url, data)
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
-
-        return Message.de_json(data)
-
+    @message
+    @require_authentication
     def sendChatAction(self,
                        chat_id,
                        action):
@@ -469,14 +427,12 @@ class Bot(object):
 
         url = '%s/sendChatAction' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'chat_id': chat_id,
                 'action': action}
 
-        self._requestUrl(url, 'POST', data=data)
+        return (url, data)
 
+    @require_authentication
     def getUserProfilePhotos(self,
                              user_id,
                              offset=None,
@@ -499,9 +455,6 @@ class Bot(object):
 
         url = '%s/getUserProfilePhotos' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {'user_id': user_id}
 
         if offset:
@@ -514,6 +467,7 @@ class Bot(object):
 
         return UserProfilePhotos.de_json(data)
 
+    @require_authentication
     def getUpdates(self,
                    offset=None,
                    limit=100,
@@ -540,9 +494,6 @@ class Bot(object):
 
         url = '%s/getUpdates' % (self.base_url)
 
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
-
         data = {}
         if offset:
             data['offset'] = offset
@@ -556,7 +507,9 @@ class Bot(object):
 
         return [Update.de_json(x) for x in data]
 
-    def setWebhook(self, webhook_url=""):
+    @require_authentication
+    def setWebhook(self,
+                   webhook_url):
         """Use this method to specify a url and receive incoming updates via an
         outgoing webhook. Whenever there is an update for the bot, we will send
         an HTTPS POST request to the specified url, containing a
@@ -572,9 +525,6 @@ class Bot(object):
           True if successful else TelegramError was raised
         """
         url = '%s/setWebhook' % (self.base_url)
-
-        if not self.__auth:
-            raise TelegramError({'message': "API must be authenticated."})
 
         data = {'url': webhook_url}
 
@@ -648,7 +598,7 @@ class Bot(object):
         """
 
         try:
-            data = json.loads(json_data)
+            data = json.loads(json_data.decode())
             self._checkForTelegramError(data)
         except ValueError:
             if '<title>403 Forbidden</title>' in json_data:
