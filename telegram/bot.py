@@ -561,36 +561,16 @@ class Bot(object):
         """
 
         if method == 'POST':
-            if 'photo' in data and isinstance(data['photo'], file):
+            file_types = ['photo', 'audio', 'document']
+            # In sendVideo(), sendAudio() and sendPhoto(), data.keys()[1] represents the file type
+            if data.keys()[1] in file_types and isinstance(data.items()[1], file):
                 try:
-                    photo = data.pop('photo')
+                    file_pop = data.pop(data.keys()[1])
 
                     return requests.post(
                         url,
                         data=data,
-                        files={'photo': photo}
-                    )
-                except requests.RequestException as e:
-                    raise TelegramError(str(e))
-            if 'audio' in data and isinstance(data['audio'], file):
-                try:
-                    audio = data.pop('audio')
-
-                    return requests.post(
-                        url,
-                        data=data,
-                        files={'audio': audio}
-                    )
-                except requests.RequestException as e:
-                    raise TelegramError(str(e))
-            if 'document' in data and isinstance(data['document'], file):
-                try:
-                    document = data.pop('document')
-
-                    return requests.post(
-                        url,
-                        data=data,
-                        files={'document': document}
+                        files={data.keys()[1]: file_pop}
                     )
                 except requests.RequestException as e:
                     raise TelegramError(str(e))
