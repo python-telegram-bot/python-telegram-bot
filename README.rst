@@ -142,9 +142,15 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
-----
+=======
+Contact
+=======
+
+Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b949c1563d56eb053b0>`_.
+
+====
 TODO
-----
+====
 
 Patches and bug reports are `welcome <https://github.com/leandrotoledo/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
 
