@@ -18,23 +18,23 @@ This library provides a pure Python interface for the `Telegram Bot API <https:/
 Status
 ==========
 
-+-------+-------------------+--------------+
-| Telegram Bot API Method   | *Supported?* |
-+=======+===================+==============+
-| getMe                     |	Yes          |
-| sendMessage               |	Yes          |
-| forwardMessage            |	Yes          |
-| sendPhoto                 |	Yes          |
-| sendAudio                 |	Yes          |
-| sendDocument              |	Yes          |
-| sendSticker               |	Yes          |
-| sendVideo                 |	Yes          |
-| sendLocation              |	Yes          |
-| sendChatAction            |	Yes          |
-| getUpdates                |	Yes          |
-| getUserProfilePhotos      |	Yes          |
-| setWebhook                |	Yes          |
-+-------+-------------------+--------------+
+========================= ============
+Telegram Bot API Method   *Supported?*
+========================= ============
+getMe                     Yes
+sendMessage               Yes
+forwardMessage            Yes
+sendPhoto                 Yes
+sendAudio                 Yes
+sendDocument              Yes
+sendSticker               Yes
+sendVideo                 Yes
+sendLocation              Yes
+sendChatAction            Yes
+getUpdates                Yes
+getUserProfilePhotos      Yes
+setWebhook                Yes
+========================= ============
 
 ==========
 Installing
