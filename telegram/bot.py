@@ -602,10 +602,10 @@ class Bot(object):
         """
 
         if method == 'POST':
-            if 'audio' in data and (isinstance(data['audio'], file) or 'http' in data['audio']) or \
-               'document' in data and (isinstance(data['document'], file) or 'http' in data['document']) or \
-               'photo' in data and (isinstance(data['photo'], file) or 'http' in data['photo']) or \
-               'video' in data and (isinstance(data['video'], file) or 'http' in data['video']):
+            file_type = ['audio', 'document', 'photo', 'video']
+            # len(dict{key1: val1, key2: val2}) == 2, it is used in case data is None
+            if len(data) >= 2 and data.keys()[1] in file_type and \
+                    (isinstance(data.items()[1], file) or str(data.items()[1]).startswith('http')):
                 try:
                     data = InputFile(data)
                     request = urllib2.Request(
