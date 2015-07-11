@@ -8,15 +8,35 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
     :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
     :alt: Travis CI Status
 
-============
-Introduction
-============
+=================
+Table of contents
+=================
+
+- `Introduction`_
+
+- `Status`_
+
+- `Installing`_
+
+- `Getting the code`_
+
+- `Documentation`_
+  
+  1. `API`_
+  
+- `Contact`_
+
+- `TODO`_
+
+===============
+_`Introduction`
+===============
 
 This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. Python 3 support is under development. It also works with `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
 
-==========
-Status
-==========
+=========
+_`Status`
+=========
 
 ========================= ============
 Telegram Bot API Method   *Supported?*
@@ -36,17 +56,17 @@ getUserProfilePhotos      Yes
 setWebhook                Yes
 ========================= ============
 
-==========
-Installing
-==========
+=============
+_`Installing`
+=============
 
 You can install python-telegram-bot using::
 
     $ pip install python-telegram-bot
 
-================
-Getting the code
-================
+===================
+_`Getting the code`
+===================
 
 The code is hosted at https://github.com/leandrotoledo/python-telegram-bot
 
@@ -63,15 +83,15 @@ To see other options available, run:
 
     $ make help
 
-=============
-Documentation
-=============
+================
+_`Documentation`
+================
 
 View the last release API documentation at: https://core.telegram.org/bots/api
 
----
-API
----
+------
+_`API`
+------
 
 The API is exposed via the ``telegram.Bot`` class.
 
@@ -143,15 +163,15 @@ There are many more API methods, to read the full API documentation::
     $ pydoc telegram.Bot
 
 
-=======
-Contact
-=======
+==========
+_`Contact`
+==========
 
 Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b949c1563d56eb053b0>`_.
 
-====
-TODO
-====
+=======
+_`TODO`
+=======
 
 Patches and bug reports are `welcome <https://github.com/leandrotoledo/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
 
