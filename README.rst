@@ -115,7 +115,11 @@ To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/
 
     >>> bot.sendMessage(chat_id=chat_id, text=telegram.Emoji.PILE_OF_POO)
 
-To post a audio file::
+To post an image file via URL::
+
+    >>> bot.sendPhoto(chat_id=chat_id, photo='https://telegram.org/img/t_logo.png')
+
+To post an audio file::
 
     >>> bot.sendAudio(chat_id=chat_id, audio=open('tests/telegram.ogg', 'rb'))
 
