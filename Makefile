@@ -11,7 +11,7 @@ clean:
 	find . -name '*~' -exec rm -f {} \;
 
 lint:
-	flake8 telegram
+	flake8 --doctests --max-complexity 10 telegram
 
 test:
 	python telegram_test.py

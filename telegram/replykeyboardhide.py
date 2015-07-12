@@ -2,7 +2,7 @@
 
 
 import json
-from replymarkup import ReplyMarkup
+from .replymarkup import ReplyMarkup
 
 
 class ReplyKeyboardHide(ReplyMarkup):
