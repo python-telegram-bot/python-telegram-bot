@@ -82,6 +82,11 @@ class Message(object):
         else:
             reply_to_message = None
 
+        if 'text' in data:
+            text = data['text'].encode('utf-8')
+        else:
+            text = None
+
         if 'audio' in data:
             from telegram import Audio
             audio = Audio.de_json(data['audio'])
@@ -143,7 +148,7 @@ class Message(object):
                        forward_from=forward_from,
                        forward_date=data.get('forward_date', None),
                        reply_to_message=reply_to_message,
-                       text=data.get('text', None),
+                       text=text,
                        audio=audio,
                        document=document,
                        photo=photo,
