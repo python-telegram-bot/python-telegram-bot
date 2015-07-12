@@ -589,7 +589,9 @@ class Bot(object):
                         url,
                         urllib.urlencode(data)
                     ).read()
-            except urllib.IOError as e:
+            except IOError as e:
+                raise TelegramError(str(e))
+            except urllib2.HTTPError as e:
                 raise TelegramError(str(e))
             except urllib2.URLError as e:
                 raise TelegramError(str(e))
