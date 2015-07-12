@@ -6,7 +6,7 @@ import telegram
 import time
 
 # Telegram Bot Authorization Token
-bot = telegram.Bot('120405045:AAEAQ3EcfZ3NztkUbOkMOwCxXdDikEW1VZE')
+bot = telegram.Bot('token')
 
 # This will be our global variable to keep the latest update_id when requesting
 # for updates. It starts with the latest update_id available.
