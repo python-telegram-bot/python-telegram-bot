@@ -21,9 +21,9 @@ Table of contents
 - `Getting the code`_
 
 - `Documentation`_
-  
+
   1. `API`_
-  
+
 - `Contact`_
 
 - `TODO`_
@@ -62,7 +62,7 @@ _`Installing`
 
 You can install python-telegram-bot using::
 
-    $ pip install python-telegram-bot
+    $ pip install python-telegram-bot --upgrade
 
 ===================
 _`Getting the code`
