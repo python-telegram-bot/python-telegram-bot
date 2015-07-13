@@ -4,6 +4,7 @@
 import mimetools
 import mimetypes
 import os
+import re
 import urllib2
 
 
@@ -27,14 +28,16 @@ class InputFile(object):
             self.input_file = data.pop('video')
 
         if isinstance(self.input_file, file):
-            self.filename = os.path.basename(self.input_file.name)
             self.input_file_content = self.input_file.read()
+            self.filename = os.path.basename(self.input_file.name)
+            self.mimetype = mimetypes.guess_type(self.filename)[0] or \
+                'application/octet-stream'
         if 'http' in self.input_file:
-            self.filename = os.path.basename(self.input_file)
             self.input_file_content = urllib2.urlopen(self.input_file).read()
+            self.mimetype = InputFile.image_type(self.input_file_content)
+            self.filename = self.mimetype.replace('/', '.')
 
-        self.mimetype = mimetypes.guess_type(self.filename)[0] or \
-            'application/octet-stream'
+
 
     @property
     def headers(self):
@@ -73,3 +76,17 @@ class InputFile(object):
         form.append('')
 
         return '\r\n'.join(form)
+
+    @staticmethod
+    def image_type(stream):
+        header = stream[:10]
+
+        if re.match(r'GIF8', header):
+            return 'image/gif'
+
+        if re.match(r'\x89PNG', header):
+            return 'image/png'
+
+        if re.match(r'\xff\xd8\xff\xe0\x00\x10JFIF', header) or \
+           re.match(r'\xff\xd8\xff\xe1(.*){2}Exif', header):
+            return 'image/jpeg'
