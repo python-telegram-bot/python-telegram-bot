@@ -533,27 +533,6 @@ class Bot(object):
 
         return True
 
-    def _isFileRequest(self,
-                       data=None):
-        """Check if the request is a file request
-        Args:
-          data:
-            A dict of (str, unicode) key/value pairs
-
-        Returns:
-            bool
-        """
-        if data:
-            file_types = ['audio', 'document', 'photo', 'video']
-            file_type = [i for i in data.keys() if i in file_types]
-
-            if file_type:
-                file_content = data[file_type[0]]
-                return isinstance(file_content, file) or \
-                    str(file_content).startswith('http')
-
-        return False
-
     def _requestUrl(self,
                     url,
                     method,
@@ -574,7 +553,7 @@ class Bot(object):
 
         if method == 'POST':
             try:
-                if self._isFileRequest(data):
+                if InputFile.is_inputfile(data):
                     data = InputFile(data)
 
                     request = urllib2.Request(
@@ -619,25 +598,11 @@ class Bot(object):
 
         try:
             data = json.loads(json_data.decode())
-            self._checkForTelegramError(data)
+            if not data['ok']:
+                raise TelegramError(data['description'])
         except ValueError:
             if '<title>403 Forbidden</title>' in json_data:
                 raise TelegramError({'message': 'API must be authenticated'})
             raise TelegramError({'message': 'JSON decoding'})
 
         return data['result']
-
-    def _checkForTelegramError(self,
-                               data):
-        """Raises a TelegramError if Telegram returns an error message.
-
-        Args:
-          data:
-            A Python dict created from the Telegram JSON response.
-
-        Raises:
-          TelegramError wrapping the Telegram error message if one exists.
-        """
-
-        if not data['ok']:
-            raise TelegramError(data['description'])
