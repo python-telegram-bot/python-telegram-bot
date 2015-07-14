@@ -65,13 +65,14 @@ class Bot(object):
           A telegram.User instance representing that bot if the
           credentials are valid, None otherwise.
         """
-        url = '%s/getMe' % (self.base_url)
+        url = '%s/getMe' % self.base_url
 
         json_data = self._requestUrl(url, 'GET')
         data = self._parseAndCheckTelegram(json_data)
 
         return User.de_json(data)
 
+    @staticmethod
     def message(func):
         """
         Returns:
@@ -102,6 +103,7 @@ class Bot(object):
             return Message.de_json(data)
         return wrap
 
+    @staticmethod
     def require_authentication(func):
         functools.wraps(func)
 
@@ -141,7 +143,7 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendMessage' % (self.base_url)
+        url = '%s/sendMessage' % self.base_url
 
         data = {'chat_id': chat_id,
                 'text': text}
@@ -149,7 +151,7 @@ class Bot(object):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -172,7 +174,7 @@ class Bot(object):
           A telegram.Message instance representing the message forwarded.
         """
 
-        url = '%s/forwardMessage' % (self.base_url)
+        url = '%s/forwardMessage' % self.base_url
 
         data = {}
         if chat_id:
@@ -182,7 +184,7 @@ class Bot(object):
         if message_id:
             data['message_id'] = message_id
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -215,7 +217,7 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendPhoto' % (self.base_url)
+        url = '%s/sendPhoto' % self.base_url
 
         data = {'chat_id': chat_id,
                 'photo': photo}
@@ -223,7 +225,7 @@ class Bot(object):
         if caption:
             data['caption'] = caption
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -255,12 +257,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendAudio' % (self.base_url)
+        url = '%s/sendAudio' % self.base_url
 
         data = {'chat_id': chat_id,
                 'audio': audio}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -289,12 +291,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendDocument' % (self.base_url)
+        url = '%s/sendDocument' % self.base_url
 
         data = {'chat_id': chat_id,
                 'document': document}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -323,12 +325,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendSticker' % (self.base_url)
+        url = '%s/sendSticker' % self.base_url
 
         data = {'chat_id': chat_id,
                 'sticker': sticker}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -358,12 +360,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendVideo' % (self.base_url)
+        url = '%s/sendVideo' % self.base_url
 
         data = {'chat_id': chat_id,
                 'video': video}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -393,13 +395,13 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendLocation' % (self.base_url)
+        url = '%s/sendLocation' % self.base_url
 
         data = {'chat_id': chat_id,
                 'latitude': latitude,
                 'longitude': longitude}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -425,12 +427,12 @@ class Bot(object):
             - ChatAction.FIND_LOCATION for location data.
         """
 
-        url = '%s/sendChatAction' % (self.base_url)
+        url = '%s/sendChatAction' % self.base_url
 
         data = {'chat_id': chat_id,
                 'action': action}
 
-        return (url, data)
+        return url, data
 
     @require_authentication
     def getUserProfilePhotos(self,
@@ -453,7 +455,7 @@ class Bot(object):
           Returns a telegram.UserProfilePhotos object.
         """
 
-        url = '%s/getUserProfilePhotos' % (self.base_url)
+        url = '%s/getUserProfilePhotos' % self.base_url
 
         data = {'user_id': user_id}
 
@@ -492,7 +494,7 @@ class Bot(object):
           A list of telegram.Update objects are returned.
         """
 
-        url = '%s/getUpdates' % (self.base_url)
+        url = '%s/getUpdates' % self.base_url
 
         data = {}
         if offset:
@@ -524,7 +526,7 @@ class Bot(object):
         Returns:
           True if successful else TelegramError was raised
         """
-        url = '%s/setWebhook' % (self.base_url)
+        url = '%s/setWebhook' % self.base_url
 
         data = {'url': webhook_url}
 
