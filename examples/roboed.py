@@ -6,11 +6,11 @@
 __author__ = 'leandrotoledodesouza@gmail.com'
 
 import telegram
-import requests
+import urllib
 
 
 def main():
-    bot = telegram.Bot('token')  # Telegram Bot Authorization Token
+    bot = telegram.Bot('TOKEN')  # Telegram Bot Authorization Token
 
     global LAST_UPDATE_ID
     LAST_UPDATE_ID = bot.getUpdates()[-1].update_id  # Get lastest update
@@ -31,7 +31,7 @@ def main():
 
 def ed(text):
     url = 'http://www.ed.conpet.gov.br/mod_perl/bot_gateway.cgi?server=0.0.0.0%3A8085&charset_post=utf-8&charset=utf-8&pure=1&js=0&tst=1&msg=' + text
-    data = requests.get(url).content
+    data = urllib.urlopen(url).read()
 
     return data.strip()
 

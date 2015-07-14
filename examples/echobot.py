@@ -6,7 +6,7 @@ import telegram
 import time
 
 # Telegram Bot Authorization Token
-bot = telegram.Bot('token')
+bot = telegram.Bot('TOKEN')
 
 # This will be our global variable to keep the latest update_id when requesting
 # for updates. It starts with the latest update_id available.
@@ -35,4 +35,4 @@ def echo():
 if __name__ == '__main__':
     while True:
         echo()
-        time.sleep(5)
+        time.sleep(3)
