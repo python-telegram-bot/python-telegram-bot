@@ -7,6 +7,12 @@ import os
 import re
 import urllib2
 
+from .error import TelegramError
+
+DEFAULT_MIME_TYPE = 'application/octet-stream'
+USER_AGENT = 'Python Telegram Bot' \
+             ' (https://github.com/leandrotoledo/python-telegram-bot)'
+
 
 class InputFile(object):
     def __init__(self,
@@ -31,17 +37,16 @@ class InputFile(object):
             self.input_file_content = self.input_file.read()
             self.filename = os.path.basename(self.input_file.name)
             self.mimetype = mimetypes.guess_type(self.filename)[0] or \
-                'application/octet-stream'
+                DEFAULT_MIME_TYPE
+
         if 'http' in self.input_file:
             self.input_file_content = urllib2.urlopen(self.input_file).read()
-            self.mimetype = InputFile.image_type(self.input_file_content)
+            self.mimetype = InputFile.is_image(self.input_file_content)
             self.filename = self.mimetype.replace('/', '.')
-
-
 
     @property
     def headers(self):
-        return {'User-agent': 'Python Telegram Bot (https://github.com/leandrotoledo/python-telegram-bot)',
+        return {'User-agent': USER_AGENT,
                 'Content-type': self.content_type}
 
     @property
@@ -66,7 +71,7 @@ class InputFile(object):
             form_boundary,
             str('Content-Disposition: form-data; name="%s"; filename="%s"' % (
                 self.input_name, self.filename
-            )),
+                )),
             'Content-Type: %s' % self.mimetype,
             '',
             self.input_file_content
@@ -78,15 +83,54 @@ class InputFile(object):
         return '\r\n'.join(form)
 
     @staticmethod
-    def image_type(stream):
-        header = stream[:10]
+    def is_image(stream):
+        """Check if the content file is an image by analyzing its headers.
 
-        if re.match(r'GIF8', header):
-            return 'image/gif'
+        Args:
+          stream:
+            A str representing the content of a file.
 
-        if re.match(r'\x89PNG', header):
-            return 'image/png'
+        Returns:
+          The str mimetype of an image.
+        """
+        try:
+            header = stream[:10]
 
-        if re.match(r'\xff\xd8\xff\xe0\x00\x10JFIF', header) or \
-           re.match(r'\xff\xd8\xff\xe1(.*){2}Exif', header):
-            return 'image/jpeg'
+            if re.match(r'GIF8', header):
+                return 'image/gif'
+
+            if re.match(r'\x89PNG', header):
+                return 'image/png'
+
+            if re.match(r'\xff\xd8\xff\xe0\x00\x10JFIF', header) or \
+               re.match(r'\xff\xd8\xff\xe1(.*){2}Exif', header):
+                return 'image/jpeg'
+        except IndexError as e:
+            raise TelegramError(str(e))
+
+        raise TelegramError({'message': 'Could not parse file content'})
+
+    @staticmethod
+    def is_inputfile(data):
+        """Check if the request is a file request
+        Args:
+          data:
+            A dict of (str, unicode) key/value pairs
+
+        Returns:
+            bool
+        """
+        if data:
+            file_types = ['audio', 'document', 'photo', 'video']
+            file_type = [i for i in data.keys() if i in file_types]
+
+            if file_type:
+                file_content = data[file_type[0]]
+
+                if file_type[0] == 'photo':
+                    return isinstance(file_content, file) or \
+                        str(file_content).startswith('http')
+
+                return isinstance(file_content, file)
+
+        return False

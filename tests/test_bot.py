@@ -16,11 +16,11 @@ class BotTest(unittest.TestCase):
     def testGetMe(self):
         '''Test the telegram.Bot getMe method'''
         print('Testing getMe')
-        user = self._bot.getMe()
-        self.assertEqual(120405045, user.id)
-        self.assertEqual('Toledo\'s Palace Bot', user.first_name)
-        self.assertEqual(None, user.last_name)
-        self.assertEqual('ToledosPalaceBot', user.username)
+        bot = self._bot.getMe()
+        self.assertEqual(120405045, bot.id)
+        self.assertEqual('Toledo\'s Palace Bot', bot.first_name)
+        self.assertEqual(None, bot.last_name)
+        self.assertEqual('ToledosPalaceBot', bot.username)
 
     def testSendMessage(self):
         '''Test the telegram.Bot sendMessage method'''
@@ -33,7 +33,7 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUpdates method'''
         print('Testing getUpdates')
         updates = self._bot.getUpdates()
-        self.assertEqual(129566614, updates[0].update_id)
+        self.assertIsInstance(updates[0], telegram.Update)
 
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''
@@ -57,6 +57,13 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendPhoto(photo=str('AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI'),
                                       chat_id=12173560)
         self.assertEqual('AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI', message.photo[0].file_id)
+
+    def testSendURLPhoto(self):
+        '''Test the telegram.Bot sendPhoto method'''
+        print('Testing sendPhoto - URL')
+        message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.jpg&text=telegram'),
+                                      chat_id=12173560)
+        self.assertEqual(822, message.photo[0].file_size)
 
     def testSendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
@@ -86,13 +93,6 @@ class BotTest(unittest.TestCase):
                                          chat_id=12173560)
         self.assertEqual('BQADAQADHAADNTwtBxZxUGKyxYbYAg', message.document.file_id)
 
-    def testResendSticker(self):
-        '''Test the telegram.Bot sendSticker method'''
-        print('Testing sendSticker - Resend')
-        message = self._bot.sendSticker(sticker=str('BQADAQADHAADyIsGAAFZfq1bphjqlgI'),
-                                        chat_id=12173560)
-        self.assertEqual(39518, message.sticker.file_size)
-
     def testSendVideo(self):
         '''Test the telegram.Bot sendVideo method'''
         print('Testing sendVideo - File')
@@ -106,6 +106,13 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendVideo(video=str('BAADAQADIgEAAvjAuQABOuTB937fPTgC'),
                                       chat_id=12173560)
         self.assertEqual(4, message.video.duration)
+
+    def testResendSticker(self):
+        '''Test the telegram.Bot sendSticker method'''
+        print('Testing sendSticker - Resend')
+        message = self._bot.sendSticker(sticker=str('BQADAQADHAADyIsGAAFZfq1bphjqlgI'),
+                                        chat_id=12173560)
+        self.assertEqual(39518, message.sticker.file_size)
 
     def testSendLocation(self):
         '''Test the telegram.Bot sendLocation method'''
