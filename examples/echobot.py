@@ -9,8 +9,11 @@ import time
 bot = telegram.Bot('TOKEN')
 
 # This will be our global variable to keep the latest update_id when requesting
-# for updates. It starts with the latest update_id available.
-LAST_UPDATE_ID = bot.getUpdates()[-1].update_id
+# for updates. It starts with the latest update_id if available.
+try:
+    LAST_UPDATE_ID = bot.getUpdates()[-1].update_id
+except IndexError:
+    LAST_UPDATE_ID = None
 
 
 def echo():
