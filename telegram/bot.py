@@ -70,6 +70,7 @@ class Bot(object):
 
         return User.de_json(data)
 
+    @staticmethod
     def message(func):
         """
         Returns:
@@ -100,6 +101,7 @@ class Bot(object):
             return Message.de_json(data)
         return wrap
 
+    @staticmethod
     def require_authentication(func):
         functools.wraps(func)
 
