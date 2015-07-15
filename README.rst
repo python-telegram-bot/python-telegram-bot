@@ -32,7 +32,7 @@ Table of contents
 _`Introduction`
 ===============
 
-This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. Python 3 support is under development. It also works with `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
+This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. It also works with `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
 
 =========
 _`Status`
@@ -55,6 +55,16 @@ getUpdates                Yes
 getUserProfilePhotos      Yes
 setWebhook                Yes
 ========================= ============
+
+
+============== ============
+Python Version *Supported?*
+============== ============
+2.6            Yes
+2.7            Yes
+3.3            Yes
+3.4            Yes
+============== ============
 
 =============
 _`Installing`
