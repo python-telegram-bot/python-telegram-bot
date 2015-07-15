@@ -83,7 +83,7 @@ class Message(object):
             reply_to_message = None
 
         if 'text' in data:
-            text = data['text'].encode('utf-8')
+            text = data['text']
         else:
             text = None
 

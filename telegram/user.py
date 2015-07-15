@@ -15,6 +15,14 @@ class User(object):
         self.last_name = last_name
         self.username = username
 
+    @property
+    def name(self):
+        if self.username:
+            return '@%s' % self.username
+        if self.last_name:
+            return '%s %s' % (self.first_name, self.last_name)
+        return self.first_name
+
     @staticmethod
     def de_json(data):
         return User(id=data.get('id', None),

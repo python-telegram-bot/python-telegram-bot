@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
 import os
 import telegram
 import unittest
@@ -27,7 +26,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendMessage')
         message = self._bot.sendMessage(chat_id=12173560,
                                         text='Моё судно на воздушной подушке полно угрей')
-        self.assertEqual('Моё судно на воздушной подушке полно угрей', message.text)
+        self.assertEqual(u'Моё судно на воздушной подушке полно угрей', message.text)
 
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''

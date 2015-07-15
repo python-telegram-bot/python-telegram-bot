@@ -4,8 +4,14 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 import json
-import urllib
-import urllib2
+try:
+    from urllib.parse import urlencode
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError, URLError
+except ImportError:
+    from urllib import urlencode
+    from urllib2 import urlopen, Request
+    from urllib2 import HTTPError, URLError
 import functools
 
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
@@ -28,30 +34,22 @@ class Bot(object):
         try:
             bot = self.getMe()
 
-            self._id = bot.id
-            self._first_name = bot.first_name
-            self._last_name = bot.last_name
-            self._username = bot.username
+            self.id = bot.id
+            self.first_name = bot.first_name
+            self.last_name = bot.last_name
+            self.username = bot.username
 
             self.__auth = True
         except TelegramError:
             raise TelegramError({'message': 'Bad token'})
 
     @property
-    def id(self):
-        return self._id
-
-    @property
-    def first_name(self):
-        return self._first_name
-
-    @property
-    def last_name(self):
-        return self._last_name
-
-    @property
-    def username(self):
-        return self._username
+    def name(self):
+        if self.username:
+            return '@%s' % self.username
+        if self.last_name:
+            return '%s %s' % (self.first_name, self.last_name)
+        return self.first_name
 
     def clearCredentials(self):
         """Clear any credentials for this instance.
@@ -65,7 +63,7 @@ class Bot(object):
           A telegram.User instance representing that bot if the
           credentials are valid, None otherwise.
         """
-        url = '%s/getMe' % (self.base_url)
+        url = '%s/getMe' % self.base_url
 
         json_data = self._requestUrl(url, 'GET')
         data = self._parseAndCheckTelegram(json_data)
@@ -141,7 +139,7 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendMessage' % (self.base_url)
+        url = '%s/sendMessage' % self.base_url
 
         data = {'chat_id': chat_id,
                 'text': text}
@@ -149,7 +147,7 @@ class Bot(object):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -172,7 +170,7 @@ class Bot(object):
           A telegram.Message instance representing the message forwarded.
         """
 
-        url = '%s/forwardMessage' % (self.base_url)
+        url = '%s/forwardMessage' % self.base_url
 
         data = {}
         if chat_id:
@@ -182,7 +180,7 @@ class Bot(object):
         if message_id:
             data['message_id'] = message_id
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -215,7 +213,7 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendPhoto' % (self.base_url)
+        url = '%s/sendPhoto' % self.base_url
 
         data = {'chat_id': chat_id,
                 'photo': photo}
@@ -223,7 +221,7 @@ class Bot(object):
         if caption:
             data['caption'] = caption
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -255,12 +253,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendAudio' % (self.base_url)
+        url = '%s/sendAudio' % self.base_url
 
         data = {'chat_id': chat_id,
                 'audio': audio}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -289,12 +287,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendDocument' % (self.base_url)
+        url = '%s/sendDocument' % self.base_url
 
         data = {'chat_id': chat_id,
                 'document': document}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -323,12 +321,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendSticker' % (self.base_url)
+        url = '%s/sendSticker' % self.base_url
 
         data = {'chat_id': chat_id,
                 'sticker': sticker}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -358,12 +356,12 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendVideo' % (self.base_url)
+        url = '%s/sendVideo' % self.base_url
 
         data = {'chat_id': chat_id,
                 'video': video}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -393,13 +391,13 @@ class Bot(object):
           A telegram.Message instance representing the message posted.
         """
 
-        url = '%s/sendLocation' % (self.base_url)
+        url = '%s/sendLocation' % self.base_url
 
         data = {'chat_id': chat_id,
                 'latitude': latitude,
                 'longitude': longitude}
 
-        return (url, data)
+        return url, data
 
     @message
     @require_authentication
@@ -425,12 +423,12 @@ class Bot(object):
             - ChatAction.FIND_LOCATION for location data.
         """
 
-        url = '%s/sendChatAction' % (self.base_url)
+        url = '%s/sendChatAction' % self.base_url
 
         data = {'chat_id': chat_id,
                 'action': action}
 
-        return (url, data)
+        return url, data
 
     @require_authentication
     def getUserProfilePhotos(self,
@@ -453,7 +451,7 @@ class Bot(object):
           Returns a telegram.UserProfilePhotos object.
         """
 
-        url = '%s/getUserProfilePhotos' % (self.base_url)
+        url = '%s/getUserProfilePhotos' % self.base_url
 
         data = {'user_id': user_id}
 
@@ -492,7 +490,7 @@ class Bot(object):
           A list of telegram.Update objects are returned.
         """
 
-        url = '%s/getUpdates' % (self.base_url)
+        url = '%s/getUpdates' % self.base_url
 
         data = {}
         if offset:
@@ -524,7 +522,7 @@ class Bot(object):
         Returns:
           True if successful else TelegramError was raised
         """
-        url = '%s/setWebhook' % (self.base_url)
+        url = '%s/setWebhook' % self.base_url
 
         data = {'url': webhook_url}
 
@@ -556,29 +554,29 @@ class Bot(object):
                 if InputFile.is_inputfile(data):
                     data = InputFile(data)
 
-                    request = urllib2.Request(
+                    request = Request(
                         url,
                         data=data.to_form(),
                         headers=data.headers
                     )
 
-                    return urllib2.urlopen(request).read()
+                    return urlopen(request).read()
                 else:
-                    return urllib2.urlopen(
+                    return urlopen(
                         url,
-                        urllib.urlencode(data)
+                        urlencode(data).encode()
                     ).read()
             except IOError as e:
                 raise TelegramError(str(e))
-            except urllib2.HTTPError as e:
+            except HTTPError as e:
                 raise TelegramError(str(e))
-            except urllib2.URLError as e:
+            except URLError as e:
                 raise TelegramError(str(e))
 
         if method == 'GET':
             try:
-                return urllib2.urlopen(url).read()
-            except urllib2.URLError as e:
+                return urlopen(url).read()
+            except URLError as e:
                 raise TelegramError(str(e))
 
         return 0  # if not a POST or GET request

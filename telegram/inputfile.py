@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
-
-import mimetools
+try:
+    from email.generator import _make_boundary as choose_boundary
+    from urllib.request import urlopen
+    from io import BufferedReader as file
+except ImportError:
+    from mimetools import choose_boundary
+    from urllib2 import urlopen
 import mimetypes
 import os
 import re
-import urllib2
+import sys
 
 from .error import TelegramError
 
@@ -18,7 +23,7 @@ class InputFile(object):
     def __init__(self,
                  data):
         self.data = data
-        self.boundary = mimetools.choose_boundary()
+        self.boundary = choose_boundary()
 
         if 'audio' in data:
             self.input_name = 'audio'
@@ -40,7 +45,7 @@ class InputFile(object):
                 DEFAULT_MIME_TYPE
 
         if 'http' in self.input_file:
-            self.input_file_content = urllib2.urlopen(self.input_file).read()
+            self.input_file_content = urlopen(self.input_file).read()
             self.mimetype = InputFile.is_image(self.input_file_content)
             self.filename = self.mimetype.replace('/', '.')
 
@@ -58,10 +63,10 @@ class InputFile(object):
         form_boundary = '--' + self.boundary
 
         # Add data fields
-        for name, value in self.data.iteritems():
+        for name, value in self.data.items():
             form.extend([
                 form_boundary,
-                str('Content-Disposition: form-data; name="%s"' % name),
+                'Content-Disposition: form-data; name="%s"' % name,
                 '',
                 str(value)
             ])
@@ -69,9 +74,9 @@ class InputFile(object):
         # Add input_file to upload
         form.extend([
             form_boundary,
-            str('Content-Disposition: form-data; name="%s"; filename="%s"' % (
+            'Content-Disposition: form-data; name="%s"; filename="%s"' % (
                 self.input_name, self.filename
-                )),
+                ),
             'Content-Type: %s' % self.mimetype,
             '',
             self.input_file_content
@@ -80,6 +85,19 @@ class InputFile(object):
         form.append('--' + self.boundary + '--')
         form.append('')
 
+        return self._parse(form)
+
+    def _parse(self, form):
+        if sys.version_info > (3,):
+            # on Python 3 form needs to be byte encoded
+            encoded_form = []
+            for item in form:
+                try:
+                    encoded_form.append(item.encode())
+                except AttributeError:
+                    encoded_form.append(item)
+
+            return b'\r\n'.join(encoded_form)
         return '\r\n'.join(form)
 
     @staticmethod
@@ -96,14 +114,14 @@ class InputFile(object):
         try:
             header = stream[:10]
 
-            if re.match(r'GIF8', header):
+            if re.match(b'GIF8', header):
                 return 'image/gif'
 
-            if re.match(r'\x89PNG', header):
+            if re.match(b'\x89PNG', header):
                 return 'image/png'
 
-            if re.match(r'\xff\xd8\xff\xe0\x00\x10JFIF', header) or \
-               re.match(r'\xff\xd8\xff\xe1(.*){2}Exif', header):
+            if re.match(b'\xff\xd8\xff\xe0\x00\x10JFIF', header) or \
+               re.match(b'\xff\xd8\xff\xe1(.*){2}Exif', header):
                 return 'image/jpeg'
         except IndexError as e:
             raise TelegramError(str(e))
@@ -122,7 +140,7 @@ class InputFile(object):
         """
         if data:
             file_types = ['audio', 'document', 'photo', 'video']
-            file_type = [i for i in data.keys() if i in file_types]
+            file_type = [i for i in list(data.keys()) if i in file_types]
 
             if file_type:
                 file_content = data[file_type[0]]
