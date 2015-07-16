@@ -16,6 +16,10 @@ Table of contents
 
 - `Status`_
 
+  1. `Telegram API support`_
+  
+  2. `Python Version support`_
+
 - `Installing`_
 
 - `Getting the code`_
@@ -38,6 +42,10 @@ This library provides a pure Python interface for the `Telegram Bot API <https:/
 _`Status`
 =========
 
+-----------------------
+_`Telegram API support`
+-----------------------
+
 ========================= ============
 Telegram Bot API Method   *Supported?*
 ========================= ============
@@ -56,6 +64,9 @@ getUserProfilePhotos      Yes
 setWebhook                Yes
 ========================= ============
 
+-------------------------
+_`Python Version support`
+-------------------------
 
 ============== ============
 Python Version *Supported?*
