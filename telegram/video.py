@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class Video(object):
+class Video(Base):
     def __init__(self,
                  file_id,
                  width,
@@ -53,6 +54,3 @@ class Video(object):
         if self.caption:
             json_data['caption'] = self.caption
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

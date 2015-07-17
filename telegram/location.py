@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class Location(object):
+class Location(Base):
     def __init__(self,
                  longitude,
                  latitude):
@@ -20,6 +21,3 @@ class Location(object):
         json_data = {'longitude': self.longitude,
                      'latitude': self.latitude}
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

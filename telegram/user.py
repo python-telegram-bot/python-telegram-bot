@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class User(object):
+class User(Base):
     def __init__(self,
                  id,
                  first_name,
@@ -38,6 +39,3 @@ class User(object):
         if self.username:
             json_data['username'] = self.username
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

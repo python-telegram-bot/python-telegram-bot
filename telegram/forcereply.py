@@ -22,6 +22,3 @@ class ForceReply(ReplyMarkup):
         if self.selective:
             json_data['selective'] = self.selective
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

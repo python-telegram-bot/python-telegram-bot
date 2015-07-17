@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class Audio(object):
+class Audio(Base):
     def __init__(self,
                  file_id,
                  duration,
@@ -30,6 +31,3 @@ class Audio(object):
         if self.file_size:
             json_data['file_size'] = self.file_size
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

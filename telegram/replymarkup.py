@@ -1,9 +1,7 @@
 #!/usr/bin/env python
+from .telegram_boject_base import Base
 
 
-class ReplyMarkup(object):
+class ReplyMarkup(Base):
     def to_json(self):
         raise NotImplementedError
-
-    def __str__(self):
-        return self.to_json()

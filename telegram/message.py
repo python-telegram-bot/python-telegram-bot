@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class Message(object):
+class Message(Base):
     def __init__(self,
                  message_id,
                  from_user,
@@ -203,6 +204,3 @@ class Message(object):
         if self.group_chat_created:
             json_data['group_chat_created'] = self.group_chat_created
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()
