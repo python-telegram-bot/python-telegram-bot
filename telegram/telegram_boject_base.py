@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from telegram import TelegramError
+from .error import TelegramError
 
 
 class Base(object):
