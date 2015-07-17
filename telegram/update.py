@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class Update(object):
+class Update(Base):
     def __init__(self,
                  update_id,
                  message=None):
@@ -27,6 +28,3 @@ class Update(object):
         if self.message:
             json_data['message'] = self.message.to_json()
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class GroupChat(object):
+class GroupChat(Base):
     def __init__(self,
                  id,
                  title):
@@ -20,6 +21,3 @@ class GroupChat(object):
         json_data = {'id': self.id,
                      'title': self.title}
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()

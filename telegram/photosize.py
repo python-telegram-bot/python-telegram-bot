@@ -2,9 +2,10 @@
 
 
 import json
+from .telegram_boject_base import Base
 
 
-class PhotoSize(object):
+class PhotoSize(Base):
     def __init__(self,
                  file_id,
                  width,
@@ -29,6 +30,3 @@ class PhotoSize(object):
         if self.file_size:
             json_data['file_size'] = self.file_size
         return json.dumps(json_data)
-
-    def __str__(self):
-        return self.to_json()
