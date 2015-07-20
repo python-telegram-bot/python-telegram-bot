@@ -1,3 +1,11 @@
+2015-07-19
+
+  Released 2.0
+  Fixes bugs
+  Improves __str__ over to_json()
+  Creates abstractclass TelegramObject 
+
+
 2015-07-15
 
   Released 1.9
