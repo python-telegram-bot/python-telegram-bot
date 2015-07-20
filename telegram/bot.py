@@ -18,7 +18,8 @@ import logging
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
                       ReplyMarkup, InputFile, TelegramObject)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 class Bot(TelegramObject):
@@ -26,19 +27,19 @@ class Bot(TelegramObject):
     def __init__(self,
                  token,
                  base_url=None,
-                 debug=True):
-        self.log = logging.getLogger(__name__)
-        if debug:
-            self.log.setLevel(logging.DEBUG)
-        else:
-            self.log.setLevel(logging.INFO)
-
+                 debug=False):
         self.token = token
 
         if base_url is None:
             self.base_url = 'https://api.telegram.org/bot%s' % self.token
         else:
             self.base_url = base_url + self.token
+
+        self.log = logging.getLogger(__name__)
+        if debug:
+            self.log.setLevel(logging.DEBUG)
+        else:
+            self.log.setLevel(logging.INFO)
 
         try:
             bot = self.getMe()
@@ -61,10 +62,10 @@ class Bot(TelegramObject):
 
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
-            logger.debug('Entering %s' % func.__name__)
+            logger.debug('Entering: %s' % func.__name__)
             result = func(self, *args, **kwargs)
             logger.debug(result)
-            logger.debug('Exiting %s' % func.__name__)
+            logger.debug('Exiting: %s' % func.__name__)
             return result
         return decorator
 
@@ -105,7 +106,6 @@ class Bot(TelegramObject):
 
             return func(self, *args, **kwargs)
         return decorator
-
 
     @log
     @require_authentication
@@ -562,7 +562,6 @@ class Bot(TelegramObject):
 
         return True
 
-    @log
     def _requestUrl(self,
                     url,
                     method,
@@ -613,7 +612,6 @@ class Bot(TelegramObject):
 
         return 0  # if not a POST or GET request
 
-    @log
     def _parseAndCheckTelegram(self,
                                json_data):
         """Try and parse the JSON returned from Telegram and return an empty
@@ -638,7 +636,7 @@ class Bot(TelegramObject):
 
         return data['result']
 
-    def to_data(self):
+    def to_dict(self):
         data = {'id': self.id,
                 'username': self.username,
                 'first_name': self.username}
