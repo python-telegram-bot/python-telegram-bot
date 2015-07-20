@@ -3,7 +3,7 @@
 """A library that provides a Python interface to the Telegram Bots API"""
 
 __author__ = 'leandrotoledodesouza@gmail.com'
-__version__ = '2.0'
+__version__ = '2.1'
 
 from .user import User
 from .message import Message
