@@ -18,17 +18,18 @@ from .contact import Contact
 from .location import Location
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
+from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardhide import ReplyKeyboardHide
 from .forcereply import ForceReply
-from .replymarkup import ReplyMarkup
 from .inputfile import InputFile
 from .error import TelegramError
 from .emoji import Emoji
+from .base import TelegramObject
 from .bot import Bot
 
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
            'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
            'Video', 'Sticker', 'Document', 'Audio', 'PhotoSize', 'GroupChat',
-           'Update', 'Message', 'User']
+           'Update', 'Message', 'User', 'TelegramObject']

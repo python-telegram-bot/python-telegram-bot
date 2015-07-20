@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class UserProfilePhotos(Base):
+class UserProfilePhotos(TelegramObject):
     def __init__(self,
                  total_count,
                  photos):
@@ -25,12 +24,12 @@ class UserProfilePhotos(Base):
         return UserProfilePhotos(total_count=data.get('total_count', None),
                                  photos=photos)
 
-    def to_json(self):
-        json_data = {}
+    def to_data(self):
+        data = {}
         if self.total_count:
-            json_data['total_count'] = self.total_count
+            data['total_count'] = self.total_count
         if self.photos:
-            json_data['photos'] = []
+            data['photos'] = []
             for photo in self.photos:
-                json_data['photos'].append([x.to_json() for x in photo])
-        return json.dumps(json_data)
+                data['photos'].append([x.to_data() for x in photo])
+        return data

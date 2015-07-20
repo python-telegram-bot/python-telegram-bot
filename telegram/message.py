@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class Message(Base):
+class Message(TelegramObject):
     def __init__(self,
                  message_id,
                  from_user,
@@ -164,43 +163,43 @@ class Message(Base):
                        delete_chat_photo=data.get('delete_chat_photo', None),
                        group_chat_created=data.get('group_chat_created', None))
 
-    def to_json(self):
-        json_data = {'message_id': self.message_id,
-                     'from': self.from_user.to_json(),
-                     'date': self.date,
-                     'chat': self.chat.to_json()}
+    def to_data(self):
+        data = {'message_id': self.message_id,
+                'from': self.from_user.to_data(),
+                'date': self.date,
+                'chat': self.chat.to_data()}
         if self.forward_from:
-            json_data['forward_from'] = self.forward_from
+            data['forward_from'] = self.forward_from
         if self.forward_date:
-            json_data['forward_date'] = self.forward_date
+            data['forward_date'] = self.forward_date
         if self.reply_to_message:
-            json_data['reply_to_message'] = self.reply_to_message
+            data['reply_to_message'] = self.reply_to_message
         if self.text:
-            json_data['text'] = self.text
+            data['text'] = self.text
         if self.audio:
-            json_data['audio'] = self.audio.to_json()
+            data['audio'] = self.audio.to_data()
         if self.document:
-            json_data['document'] = self.document.to_json()
+            data['document'] = self.document.to_data()
         if self.photo:
-            json_data['photo'] = self.photo.to_json()
+            data['photo'] = self.photo.to_data()
         if self.sticker:
-            json_data['sticker'] = self.sticker.to_json()
+            data['sticker'] = self.sticker.to_data()
         if self.video:
-            json_data['video'] = self.video.to_json()
+            data['video'] = self.video.to_data()
         if self.contact:
-            json_data['contact'] = self.contact.to_json()
+            data['contact'] = self.contact.to_data()
         if self.location:
-            json_data['location'] = self.location.to_json()
+            data['location'] = self.location.to_data()
         if self.new_chat_participant:
-            json_data['new_chat_participant'] = self.new_chat_participant
+            data['new_chat_participant'] = self.new_chat_participant
         if self.left_chat_participant:
-            json_data['left_chat_participant'] = self.left_chat_participant
+            data['left_chat_participant'] = self.left_chat_participant
         if self.new_chat_title:
-            json_data['new_chat_title'] = self.new_chat_title
+            data['new_chat_title'] = self.new_chat_title
         if self.new_chat_photo:
-            json_data['new_chat_photo'] = self.new_chat_photo
+            data['new_chat_photo'] = self.new_chat_photo
         if self.delete_chat_photo:
-            json_data['delete_chat_photo'] = self.delete_chat_photo
+            data['delete_chat_photo'] = self.delete_chat_photo
         if self.group_chat_created:
-            json_data['group_chat_created'] = self.group_chat_created
-        return json.dumps(json_data)
+            data['group_chat_created'] = self.group_chat_created
+        return data

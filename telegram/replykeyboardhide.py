@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 
-import json
 from .replymarkup import ReplyMarkup
 
 
@@ -17,8 +16,8 @@ class ReplyKeyboardHide(ReplyMarkup):
         return ReplyKeyboardHide(hide_keyboard=data.get('hide_keyboard', None),
                                  selective=data.get('selective', None))
 
-    def to_json(self):
-        json_data = {'hide_keyboard': self.hide_keyboard}
+    def to_data(self):
+        data = {'hide_keyboard': self.hide_keyboard}
         if self.selective:
-            json_data['selective'] = self.selective
-        return json.dumps(json_data)
+            data['selective'] = self.selective
+        return data

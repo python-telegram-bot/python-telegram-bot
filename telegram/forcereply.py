@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .replymarkup import ReplyMarkup
+from .base import TelegramObject
 
 
-class ForceReply(ReplyMarkup):
+class ForceReply(TelegramObject):
     def __init__(self,
                  force_reply=True,
                  selective=None):
@@ -17,8 +16,8 @@ class ForceReply(ReplyMarkup):
         return ForceReply(force_reply=data.get('force_reply', None),
                           selective=data.get('selective', None))
 
-    def to_json(self):
-        json_data = {'force_reply': self.force_reply}
+    def to_data(self):
+        data = {'force_reply': self.force_reply}
         if self.selective:
-            json_data['selective'] = self.selective
-        return json.dumps(json_data)
+            data['selective'] = self.selective
+        return data

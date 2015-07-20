@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class Location(Base):
+class Location(TelegramObject):
     def __init__(self,
                  longitude,
                  latitude):
@@ -17,7 +16,7 @@ class Location(Base):
         return Location(longitude=data.get('longitude', None),
                         latitude=data.get('latitude', None))
 
-    def to_json(self):
-        json_data = {'longitude': self.longitude,
-                     'latitude': self.latitude}
-        return json.dumps(json_data)
+    def to_data(self):
+        data = {'longitude': self.longitude,
+                'latitude': self.latitude}
+        return data

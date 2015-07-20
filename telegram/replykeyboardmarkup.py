@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 
-import json
 from .replymarkup import ReplyMarkup
 
 
@@ -27,12 +26,12 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                                        ),
                                    selective=data.get('selective', None))
 
-    def to_json(self):
-        json_data = {'keyboard': self.keyboard}
+    def to_data(self):
+        data = {'keyboard': self.keyboard}
         if self.resize_keyboard:
-            json_data['resize_keyboard'] = self.resize_keyboard
+            data['resize_keyboard'] = self.resize_keyboard
         if self.one_time_keyboard:
-            json_data['one_time_keyboard'] = self.one_time_keyboard
+            data['one_time_keyboard'] = self.one_time_keyboard
         if self.selective:
-            json_data['selective'] = self.selective
-        return json.dumps(json_data)
+            data['selective'] = self.selective
+        return data

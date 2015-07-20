@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class Contact(Base):
+class Contact(TelegramObject):
     def __init__(self,
                  phone_number,
                  first_name,
@@ -23,11 +22,11 @@ class Contact(Base):
                        last_name=data.get('last_name', None),
                        user_id=data.get('user_id', None))
 
-    def to_json(self):
-        json_data = {'phone_number': self.phone_number,
-                     'first_name': self.first_name}
+    def to_data(self):
+        data = {'phone_number': self.phone_number,
+                'first_name': self.first_name}
         if self.last_name:
-            json_data['last_name'] = self.last_name
+            data['last_name'] = self.last_name
         if self.user_id:
-            json_data['user_id'] = self.user_id
-        return json.dumps(json_data)
+            data['user_id'] = self.user_id
+        return data

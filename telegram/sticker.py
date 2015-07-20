@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class Sticker(Base):
+class Sticker(TelegramObject):
     def __init__(self,
                  file_id,
                  width,
@@ -32,11 +31,11 @@ class Sticker(Base):
                        thumb=thumb,
                        file_size=data.get('file_size', None))
 
-    def to_json(self):
-        json_data = {'file_id': self.file_id,
-                     'width': self.width,
-                     'height': self.height,
-                     'thumb': self.thumb.to_json()}
+    def to_data(self):
+        data = {'file_id': self.file_id,
+                'width': self.width,
+                'height': self.height,
+                'thumb': self.thumb.to_data()}
         if self.file_size:
-            json_data['file_size'] = self.file_size
-        return json.dumps(json_data)
+            data['file_size'] = self.file_size
+        return data

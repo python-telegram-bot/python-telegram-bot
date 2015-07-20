@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class Update(Base):
+class Update(TelegramObject):
     def __init__(self,
                  update_id,
                  message=None):
@@ -23,8 +22,8 @@ class Update(Base):
         return Update(update_id=data.get('update_id', None),
                       message=message)
 
-    def to_json(self):
-        json_data = {'update_id': self.update_id}
+    def to_data(self):
+        data = {'update_id': self.update_id}
         if self.message:
-            json_data['message'] = self.message.to_json()
-        return json.dumps(json_data)
+            data['message'] = self.message.to_data()
+        return data

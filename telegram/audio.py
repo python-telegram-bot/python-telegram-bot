@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 
-import json
-from .telegram_boject_base import Base
+from .base import TelegramObject
 
 
-class Audio(Base):
+class Audio(TelegramObject):
     def __init__(self,
                  file_id,
                  duration,
@@ -23,11 +22,11 @@ class Audio(Base):
                      mime_type=data.get('mime_type', None),
                      file_size=data.get('file_size', None))
 
-    def to_json(self):
-        json_data = {'file_id': self.file_id,
-                     'duration': self.duration}
+    def to_data(self):
+        data = {'file_id': self.file_id,
+                'duration': self.duration}
         if self.mime_type:
-            json_data['mime_type'] = self.mime_type
+            data['mime_type'] = self.mime_type
         if self.file_size:
-            json_data['file_size'] = self.file_size
-        return json.dumps(json_data)
+            data['file_size'] = self.file_size
+        return data
