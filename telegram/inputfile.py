@@ -145,7 +145,7 @@ class InputFile(object):
             if file_type:
                 file_content = data[file_type[0]]
 
-                if file_type[0] == 'photo':
+                if file_type[0] == 'photo' or file_type[0] == 'document':
                     return isinstance(file_content, file) or \
                         str(file_content).startswith('http')
 
