@@ -44,8 +44,9 @@ class Video(TelegramObject):
         data = {'file_id': self.file_id,
                 'width': self.width,
                 'height': self.height,
-                'duration': self.duration,
-                'thumb': self.thumb.to_dict()}
+                'duration': self.duration}
+        if self.thumb:
+            data['thumb'] = self.thumb.to_dict()
         if self.mime_type:
             data['mime_type'] = self.mime_type
         if self.file_size:
