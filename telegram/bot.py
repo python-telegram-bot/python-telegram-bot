@@ -50,6 +50,8 @@ class Bot(TelegramObject):
             self.username = bot.username
 
             self.__auth = True
+
+            self.log.info('Starting bot %s' % self.name)
         except TelegramError:
             raise TelegramError({'message': 'Bad token'})
 
@@ -532,6 +534,12 @@ class Bot(TelegramObject):
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data)
+
+        if data:
+            self.log.info(
+                'Getting updates: %s' % [u['update_id'] for u in data])
+        else:
+            self.log.info('No new updates found.')
 
         return [Update.de_json(x) for x in data]
 

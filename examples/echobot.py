@@ -24,7 +24,7 @@ def echo():
         if LAST_UPDATE_ID < update.update_id:
             # chat_id is required to reply any message
             chat_id = update.message.chat_id
-            message = update.message.text
+            message = update.message.text.encode('utf-8')
 
             if (message):
                 # Reply the message
