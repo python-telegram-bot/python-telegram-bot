@@ -130,8 +130,6 @@ To see if your credentials are successful::
     >>> print bot.getMe()
     {"first_name": "Toledo's Palace Bot", "username": "ToledosPalaceBot"}
 
-**NOTE**: much more than the small sample given here will print
-
 Bots can't initiate conversations with users. A user must either add them to a group or send them a message first. People can use ``telegram.me/<bot_username>`` links or username search to find your bot.
 
 To fetch text messages sent to your Bot::
