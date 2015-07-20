@@ -30,7 +30,7 @@ class User(TelegramObject):
                     last_name=data.get('last_name', None),
                     username=data.get('username', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'id': self.id,
                 'first_name': self.first_name}
         if self.last_name:

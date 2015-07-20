@@ -31,9 +31,9 @@ class Document(TelegramObject):
                         mime_type=data.get('mime_type', None),
                         file_size=data.get('file_size', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'file_id': self.file_id,
-                'thumb': self.thumb.to_data()}
+                'thumb': self.thumb.to_dict()}
         if self.file_name:
             data['file_name'] = self.file_name
         if self.mime_type:

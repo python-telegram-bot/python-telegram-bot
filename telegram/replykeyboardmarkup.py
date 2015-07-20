@@ -26,7 +26,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                                        ),
                                    selective=data.get('selective', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'keyboard': self.keyboard}
         if self.resize_keyboard:
             data['resize_keyboard'] = self.resize_keyboard

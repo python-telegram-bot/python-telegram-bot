@@ -31,11 +31,11 @@ class Sticker(TelegramObject):
                        thumb=thumb,
                        file_size=data.get('file_size', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'file_id': self.file_id,
                 'width': self.width,
                 'height': self.height,
-                'thumb': self.thumb.to_data()}
+                'thumb': self.thumb.to_dict()}
         if self.file_size:
             data['file_size'] = self.file_size
         return data

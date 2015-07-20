@@ -22,7 +22,7 @@ class Audio(TelegramObject):
                      mime_type=data.get('mime_type', None),
                      file_size=data.get('file_size', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'file_id': self.file_id,
                 'duration': self.duration}
         if self.mime_type:

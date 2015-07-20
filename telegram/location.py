@@ -16,7 +16,7 @@ class Location(TelegramObject):
         return Location(longitude=data.get('longitude', None),
                         latitude=data.get('latitude', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'longitude': self.longitude,
                 'latitude': self.latitude}
         return data

@@ -16,7 +16,7 @@ class ReplyKeyboardHide(ReplyMarkup):
         return ReplyKeyboardHide(hide_keyboard=data.get('hide_keyboard', None),
                                  selective=data.get('selective', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'hide_keyboard': self.hide_keyboard}
         if self.selective:
             data['selective'] = self.selective

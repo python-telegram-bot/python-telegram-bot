@@ -163,11 +163,11 @@ class Message(TelegramObject):
                        delete_chat_photo=data.get('delete_chat_photo', None),
                        group_chat_created=data.get('group_chat_created', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'message_id': self.message_id,
-                'from': self.from_user.to_data(),
+                'from': self.from_user.to_dict(),
                 'date': self.date,
-                'chat': self.chat.to_data()}
+                'chat': self.chat.to_dict()}
         if self.forward_from:
             data['forward_from'] = self.forward_from
         if self.forward_date:
@@ -177,19 +177,19 @@ class Message(TelegramObject):
         if self.text:
             data['text'] = self.text
         if self.audio:
-            data['audio'] = self.audio.to_data()
+            data['audio'] = self.audio.to_dict()
         if self.document:
-            data['document'] = self.document.to_data()
+            data['document'] = self.document.to_dict()
         if self.photo:
-            data['photo'] = self.photo.to_data()
+            data['photo'] = [p.to_dict() for p in self.photo]
         if self.sticker:
-            data['sticker'] = self.sticker.to_data()
+            data['sticker'] = self.sticker.to_dict()
         if self.video:
-            data['video'] = self.video.to_data()
+            data['video'] = self.video.to_dict()
         if self.contact:
-            data['contact'] = self.contact.to_data()
+            data['contact'] = self.contact.to_dict()
         if self.location:
-            data['location'] = self.location.to_data()
+            data['location'] = self.location.to_dict()
         if self.new_chat_participant:
             data['new_chat_participant'] = self.new_chat_participant
         if self.left_chat_participant:
