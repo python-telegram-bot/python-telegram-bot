@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from .base import TelegramObject
+from telegram import TelegramObject
 
 
 class Document(TelegramObject):

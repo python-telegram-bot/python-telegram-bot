@@ -5,6 +5,7 @@
 __author__ = 'leandrotoledodesouza@gmail.com'
 __version__ = '1.9'
 
+from .base import TelegramObject
 from .user import User
 from .message import Message
 from .update import Update
@@ -25,7 +26,6 @@ from .forcereply import ForceReply
 from .inputfile import InputFile
 from .error import TelegramError
 from .emoji import Emoji
-from .base import TelegramObject
 from .bot import Bot
 
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',

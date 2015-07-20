@@ -13,16 +13,25 @@ except ImportError:
     from urllib2 import urlopen, Request
     from urllib2 import HTTPError, URLError
 import functools
+import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
-                      ReplyMarkup, InputFile)
+                      ReplyMarkup, InputFile, TelegramObject)
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-class Bot(object):
+class Bot(TelegramObject):
 
     def __init__(self,
                  token,
-                 base_url=None):
+                 base_url=None,
+                 debug=True):
+        self.log = logging.getLogger(__name__)
+        if debug:
+            self.log.setLevel(logging.DEBUG)
+        else:
+            self.log.setLevel(logging.INFO)
 
         self.token = token
 
@@ -45,39 +54,27 @@ class Bot(object):
 
     @property
     def name(self):
-        if self.username:
-            return '@%s' % self.username
-        if self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
-        return self.first_name
+        return '@%s' % self.username
 
-    def clearCredentials(self):
-        """Clear any credentials for this instance.
-        """
-        self.__auth = False
+    def log(func):
+        logger = logging.getLogger(func.__module__)
 
-    def getMe(self):
-        """A simple method for testing your bot's auth token.
-
-        Returns:
-          A telegram.User instance representing that bot if the
-          credentials are valid, None otherwise.
-        """
-        url = '%s/getMe' % self.base_url
-
-        json_data = self._requestUrl(url, 'GET')
-        data = self._parseAndCheckTelegram(json_data)
-
-        return User.de_json(data)
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
+            logger.debug('Entering %s' % func.__name__)
+            result = func(self, *args, **kwargs)
+            logger.debug(result)
+            logger.debug('Exiting %s' % func.__name__)
+            return result
+        return decorator
 
     def message(func):
         """
         Returns:
           A telegram.Message instance representing the message posted.
         """
-        functools.wraps(func)
-
-        def wrap(self, *args, **kwargs):
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
             url, data = func(self, *args, **kwargs)
 
             if kwargs.get('reply_to_message_id'):
@@ -98,18 +95,41 @@ class Bot(object):
                 return data
 
             return Message.de_json(data)
-        return wrap
+        return decorator
 
     def require_authentication(func):
-        functools.wraps(func)
-
-        def wrap(self, *args, **kwargs):
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
             if not self.__auth:
                 raise TelegramError({'message': "API must be authenticated."})
 
             return func(self, *args, **kwargs)
-        return wrap
+        return decorator
 
+
+    @log
+    @require_authentication
+    def clearCredentials(self):
+        """Clear any credentials for this instance.
+        """
+        self.__auth = False
+
+    @log
+    def getMe(self):
+        """A simple method for testing your bot's auth token.
+
+        Returns:
+          A telegram.User instance representing that bot if the
+          credentials are valid, None otherwise.
+        """
+        url = '%s/getMe' % self.base_url
+
+        json_data = self._requestUrl(url, 'GET')
+        data = self._parseAndCheckTelegram(json_data)
+
+        return User.de_json(data)
+
+    @log
     @message
     @require_authentication
     def sendMessage(self,
@@ -149,6 +169,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def forwardMessage(self,
@@ -182,6 +203,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendPhoto(self,
@@ -223,6 +245,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendAudio(self,
@@ -260,6 +283,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendDocument(self,
@@ -294,6 +318,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendSticker(self,
@@ -328,6 +353,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendVideo(self,
@@ -363,6 +389,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendLocation(self,
@@ -399,6 +426,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @message
     @require_authentication
     def sendChatAction(self,
@@ -430,6 +458,7 @@ class Bot(object):
 
         return url, data
 
+    @log
     @require_authentication
     def getUserProfilePhotos(self,
                              user_id,
@@ -465,6 +494,7 @@ class Bot(object):
 
         return UserProfilePhotos.de_json(data)
 
+    @log
     @require_authentication
     def getUpdates(self,
                    offset=None,
@@ -505,6 +535,7 @@ class Bot(object):
 
         return [Update.de_json(x) for x in data]
 
+    @log
     @require_authentication
     def setWebhook(self,
                    webhook_url):
@@ -531,6 +562,7 @@ class Bot(object):
 
         return True
 
+    @log
     def _requestUrl(self,
                     url,
                     method,
@@ -581,6 +613,7 @@ class Bot(object):
 
         return 0  # if not a POST or GET request
 
+    @log
     def _parseAndCheckTelegram(self,
                                json_data):
         """Try and parse the JSON returned from Telegram and return an empty
@@ -604,3 +637,11 @@ class Bot(object):
             raise TelegramError({'message': 'JSON decoding'})
 
         return data['result']
+
+    def to_data(self):
+        data = {'id': self.id,
+                'username': self.username,
+                'first_name': self.username}
+        if self.last_name:
+            data['last_name'] = self.last_name
+        return data

@@ -11,7 +11,7 @@ class TelegramObject(object):
     __metaclass__ = ABCMeta
 
     def __str__(self):
-        return self.to_data()
+        return str(self.to_data())
 
     def __getitem__(self, item):
         return self.__dict__[item]

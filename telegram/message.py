@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from .base import TelegramObject
+from telegram import TelegramObject
 
 
 class Message(TelegramObject):
@@ -181,7 +181,7 @@ class Message(TelegramObject):
         if self.document:
             data['document'] = self.document.to_data()
         if self.photo:
-            data['photo'] = self.photo.to_data()
+            data['photo'] = [p.to_data() for p in self.photo]
         if self.sticker:
             data['sticker'] = self.sticker.to_data()
         if self.video:
