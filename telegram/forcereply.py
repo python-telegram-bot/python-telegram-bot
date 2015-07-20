@@ -16,7 +16,7 @@ class ForceReply(TelegramObject):
         return ForceReply(force_reply=data.get('force_reply', None),
                           selective=data.get('selective', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'force_reply': self.force_reply}
         if self.selective:
             data['selective'] = self.selective

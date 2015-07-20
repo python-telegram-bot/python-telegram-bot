@@ -16,7 +16,7 @@ class GroupChat(TelegramObject):
         return GroupChat(id=data.get('id', None),
                          title=data.get('title', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'id': self.id,
                 'title': self.title}
         return data

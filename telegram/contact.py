@@ -22,7 +22,7 @@ class Contact(TelegramObject):
                        last_name=data.get('last_name', None),
                        user_id=data.get('user_id', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'phone_number': self.phone_number,
                 'first_name': self.first_name}
         if self.last_name:

@@ -24,12 +24,12 @@ class UserProfilePhotos(TelegramObject):
         return UserProfilePhotos(total_count=data.get('total_count', None),
                                  photos=photos)
 
-    def to_data(self):
+    def to_dict(self):
         data = {}
         if self.total_count:
             data['total_count'] = self.total_count
         if self.photos:
             data['photos'] = []
             for photo in self.photos:
-                data['photos'].append([x.to_data() for x in photo])
+                data['photos'].append([x.to_dict() for x in photo])
         return data

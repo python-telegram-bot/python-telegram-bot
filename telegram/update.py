@@ -22,8 +22,8 @@ class Update(TelegramObject):
         return Update(update_id=data.get('update_id', None),
                       message=message)
 
-    def to_data(self):
+    def to_dict(self):
         data = {'update_id': self.update_id}
         if self.message:
-            data['message'] = self.message.to_data()
+            data['message'] = self.message.to_dict()
         return data

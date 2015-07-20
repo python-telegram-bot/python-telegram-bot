@@ -22,7 +22,7 @@ class PhotoSize(TelegramObject):
                          height=data.get('height', None),
                          file_size=data.get('file_size', None))
 
-    def to_data(self):
+    def to_dict(self):
         data = {'file_id': self.file_id,
                 'width': self.width,
                 'height': self.height}
