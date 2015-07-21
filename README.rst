@@ -8,6 +8,10 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
     :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
     :alt: Travis CI Status
 
+.. image:: https://codeclimate.com/github/leandrotoledo/python-telegram-bot/badges/gpa.svg
+   :target: https://codeclimate.com/github/leandrotoledo/python-telegram-bot
+   :alt: Code Climate
+
 =================
 Table of contents
 =================
