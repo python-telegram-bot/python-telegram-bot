@@ -28,6 +28,8 @@ Table of contents
 
   1. `API`_
 
+- `Examples`_
+
 - `Contact`_
 
 - `TODO`_
@@ -36,7 +38,7 @@ Table of contents
 _`Introduction`
 ===============
 
-This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. It also works with `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
+This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
 
 =========
 _`Status`
@@ -181,6 +183,17 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
+===========
+_`Examples`
+===========
+
+Here follows some examples to help you to get your own Bot up to speed.
+
+`echobot <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/echobot.py>`_ replies back messages.
+
+`roboed <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
+
+`DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
 
 ==========
 _`Contact`
