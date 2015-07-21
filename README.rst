@@ -187,13 +187,13 @@ There are many more API methods, to read the full API documentation::
 _`Examples`
 ===========
 
-Here follows some examples to help you to get your own Bot up to speed.
+Here follows some examples to help you to get your own Bot up to speed:
 
-`echobot <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/echobot.py>`_ replies back messages.
+- `echobot <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/echobot.py>`_ replies back messages.
 
-`roboed <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
+- `roboed <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
 
-`DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
+- `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
 
 ==========
 _`Contact`
