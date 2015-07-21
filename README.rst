@@ -28,7 +28,7 @@ Table of contents
 
   1. `API`_
 
-- `Examples`_
+  2. `Examples`_
 
 - `Contact`_
 
