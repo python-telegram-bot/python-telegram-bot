@@ -183,9 +183,9 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
-===========
+-----------
 _`Examples`
-===========
+-----------
 
 Here follows some examples to help you to get your own Bot up to speed:
 
