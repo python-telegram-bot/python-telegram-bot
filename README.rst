@@ -85,7 +85,11 @@ _`Installing`
 
 You can install python-telegram-bot using::
 
-    $ pip install python-telegram-bot --upgrade
+    $ pip install python-telegram-bot
+    
+Or upgrade to the latest version::
+
+    $ pip install --upgrade python-telegram-bot
 
 ===================
 _`Getting the code`
@@ -207,6 +211,4 @@ _`TODO`
 
 Patches and bug reports are `welcome <https://github.com/leandrotoledo/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
 
-Add more example scripts.
-
-Add commands handler.
+- Add commands handler.
