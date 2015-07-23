@@ -191,6 +191,10 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
+To get a verbose mode to debug::
+    
+    >>> telegram.Bot('token', debug=True)
+    
 -----------
 _`Examples`
 -----------
