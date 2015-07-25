@@ -93,7 +93,7 @@ You can install python-telegram-bot using::
     
 Or upgrade to the latest version::
 
-    $ pip install --upgrade python-telegram-bot
+    $ pip install python-telegram-bot --upgrade
 
 ===================
 _`Getting the code`
