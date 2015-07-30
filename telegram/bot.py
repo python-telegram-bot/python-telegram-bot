@@ -587,6 +587,8 @@ class Bot(TelegramObject):
         Returns:
           A JSON object.
         """
+        if method not in ('POST', 'GET'):
+            raise ValueError("Method '{}' is neither 'POST' nor 'GET'".format(method))
 
         if method == 'POST':
             try:
@@ -618,7 +620,6 @@ class Bot(TelegramObject):
             except URLError as e:
                 raise TelegramError(str(e))
 
-        return 0  # if not a POST or GET request
 
     def _parseAndCheckTelegram(self,
                                json_data):
