@@ -18,9 +18,6 @@ import logging
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
                       ReplyMarkup, InputFile, TelegramObject)
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 
 class Bot(TelegramObject):
 
