@@ -1,6 +1,13 @@
+2015-08-08
+  Released 2.3
+  Fixes ForceReply class
+  Remove logging.basicConfig from library
+
+
 2015-07-25
   Released 2.2
   Allows debug=True when initializing telegram.Bot
+
 
 2015-07-20
   Released 2.1
