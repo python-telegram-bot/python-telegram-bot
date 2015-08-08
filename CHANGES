@@ -1,4 +1,10 @@
 2015-08-08
+  Released 2.4
+  Fixes Emoji class for Python 3
+  PEP8 improvements 
+
+
+2015-08-08
   Released 2.3
   Fixes ForceReply class
   Remove logging.basicConfig from library
