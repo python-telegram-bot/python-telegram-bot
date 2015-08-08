@@ -5,14 +5,16 @@
 
 __author__ = 'leandrotoledodesouza@gmail.com'
 
+import logging
 import telegram
 import urllib
 
 
 def main():
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     bot = telegram.Bot('TOKEN')  # Telegram Bot Authorization Token
 
-    global LAST_UPDATE_ID
     LAST_UPDATE_ID = bot.getUpdates()[-1].update_id  # Get lastest update
 
     while True:
