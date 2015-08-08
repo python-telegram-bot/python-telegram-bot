@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 
-from telegram import TelegramObject
+from .replymarkup import ReplyMarkup
 
 
-class ForceReply(TelegramObject):
+class ForceReply(ReplyMarkup):
     def __init__(self,
                  force_reply=True,
                  selective=None):
