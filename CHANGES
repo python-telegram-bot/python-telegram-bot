@@ -1,3 +1,8 @@
+2015-08-09
+  Released 2.5
+  Fixes logging calls in API
+
+
 2015-08-08
   Released 2.4
   Fixes Emoji class for Python 3
