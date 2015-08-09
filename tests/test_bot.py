@@ -7,7 +7,7 @@ import unittest
 
 class BotTest(unittest.TestCase):
     def setUp(self):
-        bot = telegram.Bot(token=os.environ.get('TOKEN'), debug=True)
+        bot = telegram.Bot(token=os.environ.get('TOKEN'))
         self._bot = bot
         print('Testing the Bot API class')
 

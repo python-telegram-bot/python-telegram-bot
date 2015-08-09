@@ -21,7 +21,7 @@ Table of contents
 - `Status`_
 
   1. `Telegram API support`_
-  
+
   2. `Python Version support`_
 
 - `Installing`_
@@ -32,7 +32,9 @@ Table of contents
 
   1. `API`_
 
-  2. `Examples`_
+  2. `Logging`_
+
+  3. `Examples`_
 
 - `Contact`_
 
@@ -90,7 +92,7 @@ _`Installing`
 You can install python-telegram-bot using::
 
     $ pip install python-telegram-bot
-    
+
 Or upgrade to the latest version::
 
     $ pip install python-telegram-bot --upgrade
@@ -191,10 +193,20 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
-To get a verbose mode to debug::
-    
-    >>> telegram.Bot('token', debug=True)
-    
+-----------
+_`Logging`
+-----------
+
+You can get logs in your main application by calling `logging` and setting the log level you want::
+
+    >>> import logging
+    >>> logger = logging.getLogger()
+    >>> logger.setLevel(logging.INFO)
+
+If you want DEBUG logs instead::
+
+    >>> logger.setLevel(logging.DEBUG)
+
 -----------
 _`Examples`
 -----------
