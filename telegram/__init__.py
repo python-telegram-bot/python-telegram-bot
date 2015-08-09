@@ -25,6 +25,7 @@ from .replykeyboardhide import ReplyKeyboardHide
 from .forcereply import ForceReply
 from .inputfile import InputFile
 from .error import TelegramError
+from .nullhandler import NullHandler
 from .emoji import Emoji
 from .bot import Bot
 
@@ -32,4 +33,4 @@ __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
            'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
            'Video', 'Sticker', 'Document', 'Audio', 'PhotoSize', 'GroupChat',
-           'Update', 'Message', 'User', 'TelegramObject']
+           'Update', 'Message', 'User', 'TelegramObject', 'NullHandler']

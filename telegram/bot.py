@@ -16,15 +16,17 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
-                      ReplyMarkup, InputFile, TelegramObject)
+                      ReplyMarkup, InputFile, TelegramObject, NullHandler)
+
+h = NullHandler()
+logging.getLogger(__name__).addHandler(h)
 
 
 class Bot(TelegramObject):
 
     def __init__(self,
                  token,
-                 base_url=None,
-                 debug=False):
+                 base_url=None):
         self.token = token
 
         if base_url is None:
@@ -33,10 +35,6 @@ class Bot(TelegramObject):
             self.base_url = base_url + self.token
 
         self.log = logging.getLogger(__name__)
-        if debug:
-            self.log.setLevel(logging.DEBUG)
-        else:
-            self.log.setLevel(logging.INFO)
 
         try:
             bot = self.getMe()
