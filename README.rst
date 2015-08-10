@@ -11,6 +11,10 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: PyPi Package
+   
+.. image:: https://img.shields.io/github/license/leandrotoledo/python-telegram-bot.svg
+   :target: http://www.gnu.org/licenses/lgpl-3.0.html
+   :alt: LGPLv3 License
 
 .. image:: https://codeclimate.com/github/leandrotoledo/python-telegram-bot/badges/gpa.svg
    :target: https://codeclimate.com/github/leandrotoledo/python-telegram-bot
