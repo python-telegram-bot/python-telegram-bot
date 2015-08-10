@@ -1,3 +1,8 @@
+2015-08-10
+  Released 2.5.1
+  Moved from GPLv2 to LGPLv3
+
+
 2015-08-09
   Released 2.5
   Fixes logging calls in API
@@ -6,7 +11,7 @@
 2015-08-08
   Released 2.4
   Fixes Emoji class for Python 3
-  PEP8 improvements 
+  PEP8 improvements
 
 
 2015-08-08
@@ -30,7 +35,7 @@
   Released 2.0
   Fixes bugs
   Improves __str__ over to_json()
-  Creates abstractclass TelegramObject 
+  Creates abstractclass TelegramObject
 
 
 2015-07-15
