@@ -18,7 +18,7 @@ setup(
     version='2.5',
     author='Leandro Toledo',
     author_email='leandrotoledodesouza@gmail.com',
-    license='GPLv2',
+    license='LGPLv3',
     url='https://github.com/leandrotoledo/python-telegram-bot',
     keywords='telegram bot api',
     description='A Python wrapper around the Telegram Bot API',
