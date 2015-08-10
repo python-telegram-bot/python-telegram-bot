@@ -4,13 +4,17 @@ A Python wrapper around the Telegram Bot API.
 
 By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 
+.. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
+   :target: https://pypi.python.org/pypi/python-telegram-bot
+   :alt: PyPi Package Version
+
 .. image:: https://travis-ci.org/leandrotoledo/python-telegram-bot.svg?branch=master
-    :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
-    :alt: Travis CI Status
+   :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
+   :alt: Travis CI Status
     
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
-   :alt: PyPi Package
+   :alt: PyPi Package Monthly Download
    
 .. image:: https://img.shields.io/github/license/leandrotoledo/python-telegram-bot.svg
    :target: http://www.gnu.org/licenses/lgpl-3.0.html
