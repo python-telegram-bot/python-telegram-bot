@@ -36,6 +36,8 @@ Table of contents
 
   3. `Examples`_
 
+- `License`_
+
 - `Contact`_
 
 - `TODO`_
@@ -220,6 +222,12 @@ Here follows some examples to help you to get your own Bot up to speed:
 - `Simple-Echo-Telegram-Bot <https://github.com/sooyhwang/Simple-Echo-Telegram-Bot>`_ simple Python Telegram bot that echoes your input with Flask microframework, setWebhook method, and Google App Engine (optional) - by @sooyhwang.
 
 - `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
+
+==========
+_`License`
+==========
+
+You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <http://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <http://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
 
 ==========
 _`Contact`
