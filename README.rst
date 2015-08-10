@@ -7,6 +7,10 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 .. image:: https://travis-ci.org/leandrotoledo/python-telegram-bot.svg?branch=master
     :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
     :alt: Travis CI Status
+    
+.. image:: https://img.shields.io/pypi/dm/python-telegram-bot.svg
+   :target: https://pypi.python.org/pypi/python-telegram-bot
+   :alt: PyPi Package
 
 .. image:: https://codeclimate.com/github/leandrotoledo/python-telegram-bot/badges/gpa.svg
    :target: https://codeclimate.com/github/leandrotoledo/python-telegram-bot
