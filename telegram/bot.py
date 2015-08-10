@@ -1,7 +1,23 @@
 #!/usr/bin/env python
-# encoding: utf-8
 
-"""A library that provides a Python interface to the Telegram Bot API"""
+"""
+    A library that provides a Python interface to the Telegram Bot API
+    Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser Public License for more details.
+
+    You should have received a copy of the GNU Lesser Public License
+    along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""
+
 
 import json
 try:
@@ -139,7 +155,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — telegram.User or
+            Unique identifier for the message recipient - telegram.User or
             telegram.GroupChat id.
           text:
             Text of the message to be sent.
@@ -177,10 +193,10 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           from_chat_id:
             Unique identifier for the chat where the original message was sent
-            — User or GroupChat id.
+            - User or GroupChat id.
           message_id:
             Unique message identifier.
 
@@ -213,7 +229,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           photo:
             Photo to send. You can either pass a file_id as String to resend a
             photo that is already on the Telegram servers, or upload a new
@@ -257,7 +273,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           audio:
             Audio file to send. You can either pass a file_id as String to
             resend an audio that is already on the Telegram servers, or upload
@@ -288,11 +304,11 @@ class Bot(TelegramObject):
                      document,
                      reply_to_message_id=None,
                      reply_markup=None):
-        """Use this method to send general files.
+        """Use this method to send Lesser files.
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           document:
             File to send. You can either pass a file_id as String to resend a
             file that is already on the Telegram servers, or upload a new file
@@ -327,7 +343,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           sticker:
             Sticker to send. You can either pass a file_id as String to resend
             a sticker that is already on the Telegram servers, or upload a new
@@ -363,7 +379,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           video:
             Video to send. You can either pass a file_id as String to resend a
             video that is already on the Telegram servers, or upload a new
@@ -399,7 +415,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           latitude:
             Latitude of location.
           longitude:
@@ -436,7 +452,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient — User or GroupChat id.
+            Unique identifier for the message recipient - User or GroupChat id.
           action:
             Type of action to broadcast. Choose one, depending on what the user
             is about to receive:
@@ -444,7 +460,7 @@ class Bot(TelegramObject):
             - ChatAction.UPLOAD_PHOTO for photos,
             - ChatAction.UPLOAD_VIDEO or upload_video for videos,
             - ChatAction.UPLOAD_AUDIO or upload_audio for audio files,
-            - ChatAction.UPLOAD_DOCUMENT for general files,
+            - ChatAction.UPLOAD_DOCUMENT for Lesser files,
             - ChatAction.FIND_LOCATION for location data.
         """
 
@@ -470,7 +486,7 @@ class Bot(TelegramObject):
             Sequential number of the first photo to be returned. By default,
             all photos are returned. [Optional]
           limit:
-            Limits the number of photos to be retrieved. Values between 1—100
+            Limits the number of photos to be retrieved. Values between 1-100
             are accepted. Defaults to 100. [Optional]
 
         Returns:
@@ -507,7 +523,7 @@ class Bot(TelegramObject):
             update are returned. An update is considered confirmed as soon as
             getUpdates is called with an offset higher than its update_id.
           limit:
-            Limits the number of updates to be retrieved. Values between 1—100
+            Limits the number of updates to be retrieved. Values between 1-100
             are accepted. Defaults to 100.
           timeout:
             Timeout in seconds for long polling. Defaults to 0, i.e. usual
