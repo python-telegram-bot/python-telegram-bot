@@ -35,6 +35,7 @@ class Message(TelegramObject):
                  photo=None,
                  sticker=None,
                  video=None,
+                 caption=None,
                  contact=None,
                  location=None,
                  new_chat_participant=None,
@@ -56,6 +57,7 @@ class Message(TelegramObject):
         self.photo = photo
         self.sticker = sticker
         self.video = video
+        self.caption = caption
         self.contact = contact
         self.location = location
         self.new_chat_participant = new_chat_participant
@@ -97,11 +99,6 @@ class Message(TelegramObject):
             reply_to_message = Message.de_json(data['reply_to_message'])
         else:
             reply_to_message = None
-
-        if 'text' in data:
-            text = data['text']
-        else:
-            text = ''
 
         if 'audio' in data:
             from telegram import Audio
@@ -164,12 +161,13 @@ class Message(TelegramObject):
                        forward_from=forward_from,
                        forward_date=data.get('forward_date', None),
                        reply_to_message=reply_to_message,
-                       text=text,
+                       text=data.get('text', ''),
                        audio=audio,
                        document=document,
                        photo=photo,
                        sticker=sticker,
                        video=video,
+                       caption=data.get('caption', ''),
                        contact=contact,
                        location=location,
                        new_chat_participant=new_chat_participant,
@@ -202,6 +200,8 @@ class Message(TelegramObject):
             data['sticker'] = self.sticker.to_dict()
         if self.video:
             data['video'] = self.video.to_dict()
+        if self.caption:
+            data['caption'] = self.caption
         if self.contact:
             data['contact'] = self.contact.to_dict()
         if self.location:

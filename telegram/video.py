@@ -26,10 +26,9 @@ class Video(TelegramObject):
                  width,
                  height,
                  duration,
-                 thumb,
+                 thumb=None,
                  mime_type=None,
-                 file_size=None,
-                 caption=None):
+                 file_size=None):
         self.file_id = file_id
         self.width = width
         self.height = height
@@ -37,7 +36,6 @@ class Video(TelegramObject):
         self.thumb = thumb
         self.mime_type = mime_type
         self.file_size = file_size
-        self.caption = caption
 
     @staticmethod
     def de_json(data):
@@ -53,8 +51,7 @@ class Video(TelegramObject):
                      duration=data.get('duration', None),
                      thumb=thumb,
                      mime_type=data.get('mime_type', None),
-                     file_size=data.get('file_size', None),
-                     caption=data.get('caption', None))
+                     file_size=data.get('file_size', None))
 
     def to_dict(self):
         data = {'file_id': self.file_id,
@@ -67,6 +64,4 @@ class Video(TelegramObject):
             data['mime_type'] = self.mime_type
         if self.file_size:
             data['file_size'] = self.file_size
-        if self.caption:
-            data['caption'] = self.caption
         return data

@@ -25,7 +25,7 @@ class Sticker(TelegramObject):
                  file_id,
                  width,
                  height,
-                 thumb,
+                 thumb=None,
                  file_size=None):
         self.file_id = file_id
         self.width = width

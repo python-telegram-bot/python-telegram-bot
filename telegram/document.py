@@ -23,7 +23,7 @@ from telegram import TelegramObject
 class Document(TelegramObject):
     def __init__(self,
                  file_id,
-                 thumb,
+                 thumb=None,
                  file_name=None,
                  mime_type=None,
                  file_size=None):

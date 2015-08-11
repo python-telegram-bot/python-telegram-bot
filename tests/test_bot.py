@@ -64,8 +64,10 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing sendPhoto - File')
         message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
+                                      caption='testSendPhoto',
                                       chat_id=12173560)
         self.assertEqual(1451, message.photo[0].file_size)
+        self.assertEqual('testSendPhoto', message.caption)
 
     def testResendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -113,8 +115,10 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot sendVideo method'''
         print('Testing sendVideo - File')
         message = self._bot.sendVideo(video=open('tests/telegram.mp4', 'rb'),
+                                      caption='testSendVideo',
                                       chat_id=12173560)
         self.assertEqual(326534, message.video.file_size)
+        self.assertEqual('testSendVideo', message.caption)
 
     def testResendVideo(self):
         '''Test the telegram.Bot sendVideo method'''
@@ -149,4 +153,4 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUserProfilePhotos method'''
         print('Testing getUserProfilePhotos')
         upf = self._bot.getUserProfilePhotos(user_id=12173560)
-        self.assertEqual(8314, upf.photos[0][0].file_size)
+        self.assertEqual(6547, upf.photos[0][0].file_size)
