@@ -8,6 +8,6 @@ python:
 install:
   - pip install coveralls
 script:
-  covarage run telegram_tests.py
+  coveralls run telegram_tests.py
 after_success:
   coveralls
