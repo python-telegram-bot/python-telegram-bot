@@ -304,7 +304,7 @@ class Bot(TelegramObject):
                      document,
                      reply_to_message_id=None,
                      reply_markup=None):
-        """Use this method to send Lesser files.
+        """Use this method to send general files.
 
         Args:
           chat_id:
@@ -460,7 +460,7 @@ class Bot(TelegramObject):
             - ChatAction.UPLOAD_PHOTO for photos,
             - ChatAction.UPLOAD_VIDEO or upload_video for videos,
             - ChatAction.UPLOAD_AUDIO or upload_audio for audio files,
-            - ChatAction.UPLOAD_DOCUMENT for Lesser files,
+            - ChatAction.UPLOAD_DOCUMENT for general files,
             - ChatAction.FIND_LOCATION for location data.
         """
 
@@ -663,3 +663,6 @@ class Bot(TelegramObject):
         if self.last_name:
             data['last_name'] = self.last_name
         return data
+
+    def __reduce__(self):
+        return (self.__class__, (self.token,))
