@@ -24,7 +24,7 @@ setup(
     description='A Python wrapper around the Telegram Bot API',
     long_description=(read('README.rst')),
     packages=find_packages(exclude=['tests*']),
-    include_package_data = True,
+    include_package_data=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
