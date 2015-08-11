@@ -103,7 +103,7 @@ class Message(TelegramObject):
         if 'text' in data:
             text = data['text']
         else:
-            text = None
+            text = ''
 
         if 'audio' in data:
             from telegram import Audio
