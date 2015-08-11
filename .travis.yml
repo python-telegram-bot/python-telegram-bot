@@ -6,3 +6,5 @@ python:
   - "3.4"
   - "nightly"
 script: make test
+after_success:
+  - coveralls
