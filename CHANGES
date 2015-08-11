@@ -1,3 +1,10 @@
+2015-08-11
+  Released 2.5.2
+  New changes from Telegram Bot API have been applied
+  telegram.Bot now supports to be pickled
+  Return empty str instead None when message.text is empty
+
+
 2015-08-10
   Released 2.5.1
   Moved from GPLv2 to LGPLv3
