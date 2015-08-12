@@ -675,5 +675,5 @@ class Bot(TelegramObject):
         return data
 
     def __reduce__(self):
-        return (self.__class__, (self.token, 
+        return (self.__class__, (self.token,
                                  self.base_url.replace(self.token, '')))
