@@ -18,7 +18,7 @@
 
 
 __author__ = 'leandrotoledodesouza@gmail.com'
-__version__ = '2.5.2'
+__version__ = '2.5.3'
 
 from .base import TelegramObject
 from .user import User

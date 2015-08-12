@@ -1,3 +1,8 @@
+2015-08-12
+  Released 2.5.3
+  telegram.Bot now supports to be unpickled
+
+
 2015-08-11
   Released 2.5.2
   New changes from Telegram Bot API have been applied
