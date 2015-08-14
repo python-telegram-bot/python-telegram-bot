@@ -45,9 +45,7 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendMessage(chat_id=12173560,
                                         text='Моё судно на воздушной подушке полно угрей')
         self.assertEqual(u'Моё судно на воздушной подушке полно угрей', message.text)
-        import pdb; pdb.set_trace()
         self.assertIsInstance(message.date, datetime)
-
 
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''
