@@ -18,6 +18,8 @@
 
 
 from telegram import TelegramObject
+from datetime import datetime
+from time import mktime
 
 
 class Message(TelegramObject):
@@ -79,6 +81,11 @@ class Message(TelegramObject):
         else:
             from_user = None
 
+        if 'date' in data:
+            date = datetime.fromtimestamp(data['date'])
+        else:
+            date = None
+
         if 'chat' in data:
             if 'first_name' in data['chat']:
                 from telegram import User
@@ -94,6 +101,11 @@ class Message(TelegramObject):
             forward_from = User.de_json(data['forward_from'])
         else:
             forward_from = None
+
+        if 'forward_date' in data:
+            forward_date = datetime.fromtimestamp(data['forward_date'])
+        else:
+            forward_date = None
 
         if 'reply_to_message' in data:
             reply_to_message = Message.de_json(data['reply_to_message'])
@@ -156,10 +168,10 @@ class Message(TelegramObject):
 
         return Message(message_id=data.get('message_id', None),
                        from_user=from_user,
-                       date=data.get('date', None),
+                       date=date,
                        chat=chat,
                        forward_from=forward_from,
-                       forward_date=data.get('forward_date', None),
+                       forward_date=forward_date,
                        reply_to_message=reply_to_message,
                        text=data.get('text', ''),
                        audio=audio,
@@ -180,12 +192,22 @@ class Message(TelegramObject):
     def to_dict(self):
         data = {'message_id': self.message_id,
                 'from': self.from_user.to_dict(),
-                'date': self.date,
                 'chat': self.chat.to_dict()}
+        try:
+            # Python 3.3+ supports .timestamp()
+            data['date'] = int(self.date.timestamp())
+
+            if self.forward_date:
+                data['forward_date'] = int(self.forward_date.timestamp())
+        except AttributeError:
+            # _totimestamp() for Python 3 (< 3.3) and Python 2
+            data['date'] = self._totimestamp(self.date)
+
+            if self.forward_date:
+                data['forward_date'] = self._totimestamp(self.forward_date)
+
         if self.forward_from:
             data['forward_from'] = self.forward_from
-        if self.forward_date:
-            data['forward_date'] = self.forward_date
         if self.reply_to_message:
             data['reply_to_message'] = self.reply_to_message
         if self.text:
@@ -219,3 +241,7 @@ class Message(TelegramObject):
         if self.group_chat_created:
             data['group_chat_created'] = self.group_chat_created
         return data
+
+    @staticmethod
+    def _totimestamp(dt):
+        return int(mktime(dt.timetuple()))

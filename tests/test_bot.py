@@ -21,6 +21,7 @@
 import os
 import telegram
 import unittest
+from datetime import datetime
 
 
 class BotTest(unittest.TestCase):
@@ -44,6 +45,9 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendMessage(chat_id=12173560,
                                         text='Моё судно на воздушной подушке полно угрей')
         self.assertEqual(u'Моё судно на воздушной подушке полно угрей', message.text)
+        import pdb; pdb.set_trace()
+        self.assertIsInstance(message.date, datetime)
+
 
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''
@@ -59,6 +63,7 @@ class BotTest(unittest.TestCase):
                                            message_id=138)
         self.assertEqual('Oi', message.text)
         self.assertEqual('leandrotoledo', message.forward_from.username)
+        self.assertIsInstance(message.forward_date, datetime)
 
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
