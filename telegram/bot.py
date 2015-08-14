@@ -141,6 +141,7 @@ class Bot(TelegramObject):
         data = self._parseAndCheckTelegram(json_data)
 
         self.bot = User.de_json(data)
+
         return self.bot
 
     @log
