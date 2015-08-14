@@ -1,3 +1,10 @@
+2015-08-14
+  Released 2.6.0
+  Depreciation of require_authentication and clearCredentials methods
+  Giving AUTHORS the proper credits for their contribution for this project
+  Message.date and Message.forward_date are now datetime objects
+
+
 2015-08-12
   Released 2.5.3
   telegram.Bot now supports to be unpickled
