@@ -48,21 +48,39 @@ class Bot(TelegramObject):
         else:
             self.base_url = base_url + self.token
 
+        self.bot = None
+
         self.log = logging.getLogger(__name__)
 
-        try:
-            bot = self.getMe()
+    def info(func):
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
+            if not self.bot:
+                self.getMe()
 
-            self.id = bot.id
-            self.first_name = bot.first_name
-            self.last_name = bot.last_name
-            self.username = bot.username
+            result = func(self, *args, **kwargs)
+            return result
+        return decorator
 
-            self.__auth = True
+    @property
+    @info
+    def id(self):
+        return self.bot.id
 
-            self.log.info('Starting bot %s' % self.name)
-        except TelegramError:
-            raise TelegramError({'message': 'Bad token'})
+    @property
+    @info
+    def first_name(self):
+        return self.bot.first_name
+
+    @property
+    @info
+    def last_name(self):
+        return self.bot.last_name
+
+    @property
+    @info
+    def username(self):
+        return self.bot.username
 
     @property
     def name(self):
@@ -109,22 +127,6 @@ class Bot(TelegramObject):
             return Message.de_json(data)
         return decorator
 
-    def require_authentication(func):
-        @functools.wraps(func)
-        def decorator(self, *args, **kwargs):
-            if not self.__auth:
-                raise TelegramError({'message': "API must be authenticated."})
-
-            return func(self, *args, **kwargs)
-        return decorator
-
-    @log
-    @require_authentication
-    def clearCredentials(self):
-        """Clear any credentials for this instance.
-        """
-        self.__auth = False
-
     @log
     def getMe(self):
         """A simple method for testing your bot's auth token.
@@ -138,11 +140,11 @@ class Bot(TelegramObject):
         json_data = self._requestUrl(url, 'GET')
         data = self._parseAndCheckTelegram(json_data)
 
-        return User.de_json(data)
+        self.bot = User.de_json(data)
+        return self.bot
 
     @log
     @message
-    @require_authentication
     def sendMessage(self,
                     chat_id,
                     text,
@@ -182,7 +184,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def forwardMessage(self,
                        chat_id,
                        from_chat_id,
@@ -216,7 +217,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendPhoto(self,
                   chat_id,
                   photo,
@@ -258,7 +258,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendAudio(self,
                   chat_id,
                   audio,
@@ -296,7 +295,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendDocument(self,
                      chat_id,
                      document,
@@ -331,7 +329,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendSticker(self,
                     chat_id,
                     sticker,
@@ -366,7 +363,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendVideo(self,
                   chat_id,
                   video,
@@ -414,7 +410,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendLocation(self,
                      chat_id,
                      latitude,
@@ -451,7 +446,6 @@ class Bot(TelegramObject):
 
     @log
     @message
-    @require_authentication
     def sendChatAction(self,
                        chat_id,
                        action):
@@ -482,7 +476,6 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @require_authentication
     def getUserProfilePhotos(self,
                              user_id,
                              offset=None,
@@ -518,7 +511,6 @@ class Bot(TelegramObject):
         return UserProfilePhotos.de_json(data)
 
     @log
-    @require_authentication
     def getUpdates(self,
                    offset=None,
                    limit=100,
@@ -565,7 +557,6 @@ class Bot(TelegramObject):
         return [Update.de_json(x) for x in data]
 
     @log
-    @require_authentication
     def setWebhook(self,
                    webhook_url):
         """Use this method to specify a url and receive incoming updates via an
