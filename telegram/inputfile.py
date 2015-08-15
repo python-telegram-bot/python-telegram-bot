@@ -26,8 +26,8 @@ except ImportError:
     from urllib2 import urlopen
 import mimetypes
 import os
-import re
 import sys
+import imghdr
 
 from .error import TelegramError
 
@@ -128,20 +128,9 @@ class InputFile(object):
         Returns:
           The str mimetype of an image.
         """
-        try:
-            header = stream[:10]
-
-            if re.match(b'GIF8', header):
-                return 'image/gif'
-
-            if re.match(b'\x89PNG', header):
-                return 'image/png'
-
-            if re.match(b'\xff\xd8\xff\xe0\x00\x10JFIF', header) or \
-               re.match(b'\xff\xd8\xff\xe1(.*){2}Exif', header):
-                return 'image/jpeg'
-        except IndexError as e:
-            raise TelegramError(str(e))
+        image = imghdr.what(None, stream)
+        if image:
+            return 'image/%s' % image
 
         raise TelegramError({'message': 'Could not parse file content'})
 

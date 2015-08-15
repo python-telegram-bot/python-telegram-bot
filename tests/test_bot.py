@@ -79,12 +79,26 @@ class BotTest(unittest.TestCase):
                                       chat_id=12173560)
         self.assertEqual('AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI', message.photo[0].file_id)
 
-    def testSendURLPhoto(self):
+    def testSendJPGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
-        print('Testing sendPhoto - URL')
+        print('Testing testSendJPGURLPhoto - URL')
         message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.jpg&text=telegram'),
                                       chat_id=12173560)
         self.assertEqual(822, message.photo[0].file_size)
+
+    def testSendPNGURLPhoto(self):
+        '''Test the telegram.Bot sendPhoto method'''
+        print('Testing testSendPNGURLPhoto - URL')
+        message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.png&text=telegram'),
+                                      chat_id=12173560)
+        self.assertEqual(684, message.photo[0].file_size)
+
+    def testSendGIFURLPhoto(self):
+        '''Test the telegram.Bot sendPhoto method'''
+        print('Testing testSendGIFURLPhoto - URL')
+        message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.gif&text=telegram'),
+                                      chat_id=12173560)
+        self.assertEqual(684, message.photo[0].file_size)
 
     def testSendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
@@ -106,6 +120,13 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendDocument(document=open('tests/telegram.png', 'rb'),
                                          chat_id=12173560)
         self.assertEqual(12948, message.document.file_size)
+
+    def testSendGIFURLDocument(self):
+        '''Test the telegram.Bot sendDocument method'''
+        print('Testing sendDocument - File')
+        message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.gif&text=telegram'),
+                                      chat_id=12173560)
+        self.assertEqual(684, message.photo[0].file_size)
 
     def testResendDocument(self):
         '''Test the telegram.Bot sendDocument method'''
