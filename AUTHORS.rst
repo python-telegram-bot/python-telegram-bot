@@ -13,6 +13,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `franciscod <https://github.com/franciscod>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
+- `macrojames <https://github.com/macrojames>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `wjt <https://github.com/wjt>`_
 
