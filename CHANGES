@@ -1,3 +1,8 @@
+2015-08-15
+  Released 2.6.1
+  Fixed parsing image header issue on < Python 2.7.3
+
+
 2015-08-14
   Released 2.6.0
   Depreciation of require_authentication and clearCredentials methods
