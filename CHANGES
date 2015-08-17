@@ -1,3 +1,10 @@
+2015-08-17
+  Release 2.7
+  Added support for Voice object and sendVoice method
+  Due backward compatibility performer or/and title will be required for sendAudio
+  Fixed JSON serialization when forwared message
+
+
 2015-08-15
   Released 2.6.1
   Fixed parsing image header issue on < Python 2.7.3
