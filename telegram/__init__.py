@@ -27,6 +27,7 @@ from .update import Update
 from .groupchat import GroupChat
 from .photosize import PhotoSize
 from .audio import Audio
+from .voice import Voice
 from .document import Document
 from .sticker import Sticker
 from .video import Video
@@ -48,4 +49,5 @@ __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
            'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
            'Video', 'Sticker', 'Document', 'Audio', 'PhotoSize', 'GroupChat',
-           'Update', 'Message', 'User', 'TelegramObject', 'NullHandler']
+           'Update', 'Message', 'User', 'TelegramObject', 'NullHandler',
+           'Voice']

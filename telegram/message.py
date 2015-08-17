@@ -37,6 +37,7 @@ class Message(TelegramObject):
                  photo=None,
                  sticker=None,
                  video=None,
+                 voice=None,
                  caption=None,
                  contact=None,
                  location=None,
@@ -59,6 +60,7 @@ class Message(TelegramObject):
         self.photo = photo
         self.sticker = sticker
         self.video = video
+        self.voice = voice
         self.caption = caption
         self.contact = contact
         self.location = location
@@ -142,6 +144,12 @@ class Message(TelegramObject):
         else:
             video = None
 
+        if 'voice' in data:
+            from telegram import Voice
+            voice = Voice.de_json(data['voice'])
+        else:
+            voice = None
+
         if 'contact' in data:
             from telegram import Contact
             contact = Contact.de_json(data['contact'])
@@ -179,6 +187,7 @@ class Message(TelegramObject):
                        photo=photo,
                        sticker=sticker,
                        video=video,
+                       voice=voice,
                        caption=data.get('caption', ''),
                        contact=contact,
                        location=location,
@@ -222,6 +231,8 @@ class Message(TelegramObject):
             data['sticker'] = self.sticker.to_dict()
         if self.video:
             data['video'] = self.video.to_dict()
+        if self.voice:
+            data['voice'] = self.voice.to_dict()
         if self.caption:
             data['caption'] = self.caption
         if self.contact:

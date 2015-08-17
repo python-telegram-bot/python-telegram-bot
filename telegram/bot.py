@@ -262,12 +262,21 @@ class Bot(TelegramObject):
     def sendAudio(self,
                   chat_id,
                   audio,
+                  duration=None,
+                  performer=None,
+                  title=None,
                   reply_to_message_id=None,
                   reply_markup=None):
         """Use this method to send audio files, if you want Telegram clients to
-        display the file as a playable voice message. For this to work, your
-        audio must be in an .ogg file encoded with OPUS (other formats may be
-        sent as telegram.Document).
+        display them in the music player. Your audio must be in an .mp3 format.
+        On success, the sent Message is returned. Bots can currently send audio
+        files of up to 50 MB in size, this limit may be changed in the future.
+
+        For backward compatibility, when both fields title and description are
+        empty and mime-type of the sent file is not "audio/mpeg", file is sent
+        as playable voice message. In this case, your audio must be in an .ogg
+        file encoded with OPUS. This will be removed in the future. You need to
+        use sendVoice method instead.
 
         Args:
           chat_id:
@@ -276,6 +285,12 @@ class Bot(TelegramObject):
             Audio file to send. You can either pass a file_id as String to
             resend an audio that is already on the Telegram servers, or upload
             a new audio file using multipart/form-data.
+          duration:
+            Duration of sent audio in seconds. [Optional]
+          performer:
+            Performer of sent audio. [Optional]
+          title:
+            Title of sent audio. [Optional]
           reply_to_message_id:
             If the message is a reply, ID of the original message. [Optional]
           reply_markup:
@@ -291,6 +306,13 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id,
                 'audio': audio}
+
+        if duration:
+            data['duration'] = duration
+        if performer:
+            data['performer'] = performer
+        if title:
+            data['title'] = title
 
         return url, data
 
@@ -406,6 +428,51 @@ class Bot(TelegramObject):
             data['duration'] = duration
         if caption:
             data['caption'] = caption
+
+        return url, data
+
+    @log
+    @message
+    def sendVoice(self,
+                  chat_id,
+                  voice,
+                  duration=None,
+                  reply_to_message_id=None,
+                  reply_markup=None):
+        """Use this method to send audio files, if you want Telegram clients to
+        display the file as a playable voice message. For this to work, your
+        audio must be in an .ogg file encoded with OPUS (other formats may be
+        sent as Audio or Document). On success, the sent Message is returned.
+        Bots can currently send audio files of up to 50 MB in size, this limit
+        may be changed in the future.
+
+        Args:
+          chat_id:
+            Unique identifier for the message recipient - User or GroupChat id.
+          voice:
+            Audio file to send. You can either pass a file_id as String to
+            resend an audio that is already on the Telegram servers, or upload
+            a new audio file using multipart/form-data.
+          duration:
+            Duration of sent audio in seconds. [Optional]
+          reply_to_message_id:
+            If the message is a reply, ID of the original message. [Optional]
+          reply_markup:
+            Additional interface options. A JSON-serialized object for a
+            custom reply keyboard, instructions to hide keyboard or to force a
+            reply from the user. [Optional]
+
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
+
+        url = '%s/sendVoice' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'voice': voice}
+
+        if duration:
+            data['duration'] = duration
 
         return url, data
 

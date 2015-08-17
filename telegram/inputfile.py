@@ -54,6 +54,9 @@ class InputFile(object):
         if 'video' in data:
             self.input_name = 'video'
             self.input_file = data.pop('video')
+        if 'voice' in data:
+            self.input_name = 'voice'
+            self.input_file = data.pop('voice')
 
         if isinstance(self.input_file, file):
             self.input_file_content = self.input_file.read()
@@ -145,7 +148,7 @@ class InputFile(object):
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'video']
+            file_types = ['audio', 'document', 'photo', 'video', 'voice']
             file_type = [i for i in list(data.keys()) if i in file_types]
 
             if file_type:
