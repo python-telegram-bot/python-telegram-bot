@@ -139,7 +139,8 @@ class InputFile(object):
 
     @staticmethod
     def is_inputfile(data):
-        """Check if the request is a file request
+        """Check if the request is a file request.
+
         Args:
           data:
             A dict of (str, unicode) key/value pairs

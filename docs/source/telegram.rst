@@ -29,6 +29,7 @@ Submodules
    telegram.user
    telegram.userprofilephotos
    telegram.video
+   telegram.voice
 
 Module contents
 ---------------
