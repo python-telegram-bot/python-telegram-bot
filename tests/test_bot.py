@@ -19,12 +19,21 @@
 
 
 import os
+import json
 import telegram
 import unittest
 from datetime import datetime
 
 
 class BotTest(unittest.TestCase):
+    @staticmethod
+    def is_json(string):
+        try:
+            json.loads(string)
+        except ValueError, e:
+            return False
+        return True
+
     def setUp(self):
         bot = telegram.Bot(token=os.environ.get('TOKEN'))
         self._bot = bot
@@ -34,6 +43,7 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getMe method'''
         print('Testing getMe')
         bot = self._bot.getMe()
+        self.assertTrue(self.is_json(bot.to_json()))
         self.assertEqual(120405045, bot.id)
         self.assertEqual('Toledo\'s Palace Bot', bot.first_name)
         self.assertEqual(None, bot.last_name)
@@ -44,6 +54,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendMessage')
         message = self._bot.sendMessage(chat_id=12173560,
                                         text='Моё судно на воздушной подушке полно угрей')
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(u'Моё судно на воздушной подушке полно угрей', message.text)
         self.assertIsInstance(message.date, datetime)
 
@@ -51,6 +62,7 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUpdates method'''
         print('Testing getUpdates')
         updates = self._bot.getUpdates()
+        self.assertTrue(self.is_json(updates[0].to_json()))
         self.assertIsInstance(updates[0], telegram.Update)
 
     def testForwardMessage(self):
@@ -59,6 +71,7 @@ class BotTest(unittest.TestCase):
         message = self._bot.forwardMessage(chat_id=12173560,
                                            from_chat_id=12173560,
                                            message_id=138)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual('Oi', message.text)
         self.assertEqual('leandrotoledo', message.forward_from.username)
         self.assertIsInstance(message.forward_date, datetime)
@@ -69,6 +82,7 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
                                       caption='testSendPhoto',
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(1451, message.photo[0].file_size)
         self.assertEqual('testSendPhoto', message.caption)
 
@@ -77,6 +91,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendPhoto - Resend')
         message = self._bot.sendPhoto(photo=str('AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual('AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI', message.photo[0].file_id)
 
     def testSendJPGURLPhoto(self):
@@ -84,6 +99,7 @@ class BotTest(unittest.TestCase):
         print('Testing testSendJPGURLPhoto - URL')
         message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.jpg&text=telegram'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(822, message.photo[0].file_size)
 
     def testSendPNGURLPhoto(self):
@@ -91,6 +107,7 @@ class BotTest(unittest.TestCase):
         print('Testing testSendPNGURLPhoto - URL')
         message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.png&text=telegram'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(684, message.photo[0].file_size)
 
     def testSendGIFURLPhoto(self):
@@ -98,6 +115,7 @@ class BotTest(unittest.TestCase):
         print('Testing testSendGIFURLPhoto - URL')
         message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.gif&text=telegram'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(684, message.photo[0].file_size)
 
     def testSendAudio(self):
@@ -105,6 +123,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendAudio - File')
         message = self._bot.sendAudio(audio=open('tests/telegram.ogg', 'rb'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(9199, message.audio.file_size)
 
     def testResendAudio(self):
@@ -112,6 +131,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendAudio - Resend')
         message = self._bot.sendAudio(audio=str('AwADAQADIQEAAvjAuQABSAXg_GhkhZcC'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual('AwADAQADIQEAAvjAuQABSAXg_GhkhZcC', message.audio.file_id)
 
     def testSendDocument(self):
@@ -119,6 +139,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendDocument - File')
         message = self._bot.sendDocument(document=open('tests/telegram.png', 'rb'),
                                          chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(12948, message.document.file_size)
 
     def testSendGIFURLDocument(self):
@@ -126,6 +147,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendDocument - File')
         message = self._bot.sendPhoto(photo=str('http://dummyimage.com/600x400/000/fff.gif&text=telegram'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(684, message.photo[0].file_size)
 
     def testResendDocument(self):
@@ -133,6 +155,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendDocument - Resend')
         message = self._bot.sendDocument(document=str('BQADAQADHAADNTwtBxZxUGKyxYbYAg'),
                                          chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual('BQADAQADHAADNTwtBxZxUGKyxYbYAg', message.document.file_id)
 
     def testSendVideo(self):
@@ -141,6 +164,7 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendVideo(video=open('tests/telegram.mp4', 'rb'),
                                       caption='testSendVideo',
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(326534, message.video.file_size)
         self.assertEqual('testSendVideo', message.caption)
 
@@ -149,6 +173,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendVideo - Resend')
         message = self._bot.sendVideo(video=str('BAADAQADIgEAAvjAuQABOuTB937fPTgC'),
                                       chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(4, message.video.duration)
 
     def testResendSticker(self):
@@ -156,6 +181,7 @@ class BotTest(unittest.TestCase):
         print('Testing sendSticker - Resend')
         message = self._bot.sendSticker(sticker=str('BQADAQADHAADyIsGAAFZfq1bphjqlgI'),
                                         chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(39518, message.sticker.file_size)
 
     def testSendLocation(self):
@@ -164,6 +190,7 @@ class BotTest(unittest.TestCase):
         message = self._bot.sendLocation(latitude=-23.558873,
                                          longitude=-46.659732,
                                          chat_id=12173560)
+        self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(-23.558873, message.location.latitude)
         self.assertEqual(-46.659732, message.location.longitude)
 
@@ -177,4 +204,5 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUserProfilePhotos method'''
         print('Testing getUserProfilePhotos')
         upf = self._bot.getUserProfilePhotos(user_id=12173560)
+        self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(6547, upf.photos[0][0].file_size)

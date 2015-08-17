@@ -207,7 +207,7 @@ class Message(TelegramObject):
                 data['forward_date'] = self._totimestamp(self.forward_date)
 
         if self.forward_from:
-            data['forward_from'] = self.forward_from
+            data['forward_from'] = self.forward_from.to_dict()
         if self.reply_to_message:
             data['reply_to_message'] = self.reply_to_message
         if self.text:
