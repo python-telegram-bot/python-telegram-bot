@@ -30,7 +30,7 @@ class BotTest(unittest.TestCase):
     def is_json(string):
         try:
             json.loads(string)
-        except ValueError, e:
+        except ValueError:
             return False
         return True
 
