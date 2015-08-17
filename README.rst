@@ -89,6 +89,7 @@ sendAudio                 Yes
 sendDocument              Yes
 sendSticker               Yes
 sendVideo                 Yes
+sendVoice                 Yes
 sendLocation              Yes
 sendChatAction            Yes
 getUpdates                Yes
@@ -194,9 +195,9 @@ To post an image file via URL (right now only sendPhoto supports this)::
 
     >>> bot.sendPhoto(chat_id=chat_id, photo='https://telegram.org/img/t_logo.png')
 
-To post an audio file::
+To post a voice file::
 
-    >>> bot.sendAudio(chat_id=chat_id, audio=open('tests/telegram.ogg', 'rb'))
+    >>> bot.sendVoice(chat_id=chat_id, voice=open('tests/telegram.ogg', 'rb'))
 
 To tell the user that something is happening on bot's side::
 
