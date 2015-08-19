@@ -15,7 +15,7 @@ def read(*paths):
 
 setup(
     name='python-telegram-bot',
-    version='2.7',
+    version='2.7.1',
     author='Leandro Toledo',
     author_email='leandrotoledodesouza@gmail.com',
     license='LGPLv3',

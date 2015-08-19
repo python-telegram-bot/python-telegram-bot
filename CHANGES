@@ -1,8 +1,13 @@
+2015-08-19
+  Released 2.7.1
+  Fixed JSON serialization for message
+
+
 2015-08-17
-  Release 2.7
+  Released 2.7
   Added support for Voice object and sendVoice method
   Due backward compatibility performer or/and title will be required for sendAudio
-  Fixed JSON serialization when forwared message
+  Fixed JSON serialization when forwarded message
 
 
 2015-08-15
