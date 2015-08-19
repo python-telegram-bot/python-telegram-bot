@@ -174,6 +174,12 @@ class Message(TelegramObject):
         else:
             left_chat_participant = None
 
+        if 'new_chat_photo' in data:
+            from telegram import PhotoSize
+            new_chat_photo = [PhotoSize.de_json(x) for x in data['new_chat_photo']]
+        else:
+            new_chat_photo = None
+
         return Message(message_id=data.get('message_id', None),
                        from_user=from_user,
                        date=date,
@@ -194,7 +200,7 @@ class Message(TelegramObject):
                        new_chat_participant=new_chat_participant,
                        left_chat_participant=left_chat_participant,
                        new_chat_title=data.get('new_chat_title', None),
-                       new_chat_photo=data.get('new_chat_photo', None),
+                       new_chat_photo=new_chat_photo,
                        delete_chat_photo=data.get('delete_chat_photo', None),
                        group_chat_created=data.get('group_chat_created', None))
 
@@ -218,7 +224,7 @@ class Message(TelegramObject):
         if self.forward_from:
             data['forward_from'] = self.forward_from.to_dict()
         if self.reply_to_message:
-            data['reply_to_message'] = self.reply_to_message
+            data['reply_to_message'] = self.reply_to_message.to_dict()
         if self.text:
             data['text'] = self.text
         if self.audio:
@@ -240,13 +246,13 @@ class Message(TelegramObject):
         if self.location:
             data['location'] = self.location.to_dict()
         if self.new_chat_participant:
-            data['new_chat_participant'] = self.new_chat_participant
+            data['new_chat_participant'] = self.new_chat_participant.to_dict()
         if self.left_chat_participant:
-            data['left_chat_participant'] = self.left_chat_participant
+            data['left_chat_participant'] = self.left_chat_participant.to_dict()
         if self.new_chat_title:
             data['new_chat_title'] = self.new_chat_title
         if self.new_chat_photo:
-            data['new_chat_photo'] = self.new_chat_photo
+            data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
         if self.delete_chat_photo:
             data['delete_chat_photo'] = self.delete_chat_photo
         if self.group_chat_created:
