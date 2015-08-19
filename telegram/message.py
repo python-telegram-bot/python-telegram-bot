@@ -176,7 +176,8 @@ class Message(TelegramObject):
 
         if 'new_chat_photo' in data:
             from telegram import PhotoSize
-            new_chat_photo = [PhotoSize.de_json(x) for x in data['new_chat_photo']]
+            new_chat_photo = \
+                [PhotoSize.de_json(x) for x in data['new_chat_photo']]
         else:
             new_chat_photo = None
 
@@ -248,7 +249,8 @@ class Message(TelegramObject):
         if self.new_chat_participant:
             data['new_chat_participant'] = self.new_chat_participant.to_dict()
         if self.left_chat_participant:
-            data['left_chat_participant'] = self.left_chat_participant.to_dict()
+            data['left_chat_participant'] = \
+                self.left_chat_participant.to_dict()
         if self.new_chat_title:
             data['new_chat_title'] = self.new_chat_title
         if self.new_chat_photo:
