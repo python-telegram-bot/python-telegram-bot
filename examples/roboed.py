@@ -38,12 +38,10 @@ def main():
             chat_id = update.message.chat.id
             update_id = update.update_id
 
-            if LAST_UPDATE_ID < update_id:  # If newer than the initial
-                                            # LAST_UPDATE_ID
-                if text:
-                    roboed = ed(text)  # Ask something to Robô Ed
-                    bot.sendMessage(chat_id=chat_id, text=roboed)
-                    LAST_UPDATE_ID = update_id
+            if text:
+                roboed = ed(text)  # Ask something to Robô Ed
+                bot.sendMessage(chat_id=chat_id, text=roboed)
+                LAST_UPDATE_ID = update_id + 1
 
 
 def ed(text):

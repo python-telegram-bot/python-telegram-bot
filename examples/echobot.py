@@ -49,20 +49,19 @@ def main():
 def echo(bot):
     global LAST_UPDATE_ID
 
-    # Request updates from last updated_id
+    # Request updates after the last updated_id
     for update in bot.getUpdates(offset=LAST_UPDATE_ID):
-        if LAST_UPDATE_ID < update.update_id:
-            # chat_id is required to reply any message
-            chat_id = update.message.chat_id
-            message = update.message.text.encode('utf-8')
+        # chat_id is required to reply any message
+        chat_id = update.message.chat_id
+        message = update.message.text.encode('utf-8')
 
-            if (message):
-                # Reply the message
-                bot.sendMessage(chat_id=chat_id,
-                                text=message)
+        if (message):
+            # Reply the message
+            bot.sendMessage(chat_id=chat_id,
+                            text=message)
 
-                # Updates global offset to get the new updates
-                LAST_UPDATE_ID = update.update_id
+            # Updates global offset to get the new updates
+            LAST_UPDATE_ID = update.update_id + 1
 
 
 if __name__ == '__main__':
