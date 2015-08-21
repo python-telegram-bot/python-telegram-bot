@@ -22,7 +22,6 @@ __version__ = '2.7.1'
 
 from .base import TelegramObject
 from .user import User
-from .message import Message
 from .update import Update
 from .groupchat import GroupChat
 from .photosize import PhotoSize
@@ -43,6 +42,7 @@ from .inputfile import InputFile
 from .error import TelegramError
 from .nullhandler import NullHandler
 from .emoji import Emoji
+from .message import Message
 from .bot import Bot
 
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
