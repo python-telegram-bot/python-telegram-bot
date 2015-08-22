@@ -16,33 +16,78 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Contact"""
 
 from telegram import TelegramObject
 
 
 class Contact(TelegramObject):
+    """This object represents a Telegram Contact.
+
+    Attributes:
+        phone_number (str):
+        first_name (str):
+        last_name (str):
+        user_id (int):
+
+    Args:
+        phone_number (str):
+        first_name (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        last_name (Optional[str]):
+        user_id (Optional[int]):
+    """
+
     def __init__(self,
                  phone_number,
                  first_name,
-                 last_name=None,
-                 user_id=None):
+                 **kwargs):
+        # Required
         self.phone_number = phone_number
         self.first_name = first_name
-        self.last_name = last_name
-        self.user_id = user_id
+        # Optionals
+        self.last_name = kwargs.get('last_name', '')
+        self.user_id = int(kwargs.get('user_id', 0))
 
     @staticmethod
     def de_json(data):
-        return Contact(phone_number=data.get('phone_number', None),
-                       first_name=data.get('first_name', None),
-                       last_name=data.get('last_name', None),
-                       user_id=data.get('user_id', None))
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.Contact:
+        """
+        if not data:
+            return None
+
+        contact = dict()
+
+        # Required
+        contact['phone_number'] = data['phone_number']
+        contact['first_name'] = data['first_name']
+        # Optionals
+        contact['last_name'] = data.get('last_name')
+        contact['user_id'] = data.get('user_id', 0)
+
+        return Contact(**contact)
 
     def to_dict(self):
-        data = {'phone_number': self.phone_number,
-                'first_name': self.first_name}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['phone_number'] = self.phone_number
+        data['first_name'] = self.first_name
+        # Optionals
         if self.last_name:
             data['last_name'] = self.last_name
         if self.user_id:
             data['user_id'] = self.user_id
+
         return data

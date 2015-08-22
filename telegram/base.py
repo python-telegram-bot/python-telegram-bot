@@ -41,4 +41,4 @@ class TelegramObject(object):
 
     @abstractmethod
     def to_dict(self):
-        return
+        return None

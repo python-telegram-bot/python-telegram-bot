@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-arguments,too-many-branches
+# pylint: disable=R0902,R0912,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -92,29 +91,31 @@ class Message(TelegramObject):
                  date,
                  chat,
                  **kwargs):
-        self.message_id = message_id
+        # Required
+        self.message_id = int(message_id)
         self.from_user = from_user
         self.date = date
         self.chat = chat
+        # Optionals
         self.forward_from = kwargs.get('forward_from')
         self.forward_date = kwargs.get('forward_date')
         self.reply_to_message = kwargs.get('reply_to_message')
-        self.text = kwargs.get('text')
+        self.text = kwargs.get('text', '')
         self.audio = kwargs.get('audio')
         self.document = kwargs.get('document')
         self.photo = kwargs.get('photo')
         self.sticker = kwargs.get('sticker')
         self.video = kwargs.get('video')
         self.voice = kwargs.get('voice')
-        self.caption = kwargs.get('caption')
+        self.caption = kwargs.get('caption', '')
         self.contact = kwargs.get('contact')
         self.location = kwargs.get('location')
         self.new_chat_participant = kwargs.get('new_chat_participant')
         self.left_chat_participant = kwargs.get('left_chat_participant')
-        self.new_chat_title = kwargs.get('new_chat_title')
+        self.new_chat_title = kwargs.get('new_chat_title', '')
         self.new_chat_photo = kwargs.get('new_chat_photo')
-        self.delete_chat_photo = kwargs.get('delete_chat_photo')
-        self.group_chat_created = kwargs.get('group_chat_created')
+        self.delete_chat_photo = bool(kwargs.get('delete_chat_photo', False))
+        self.group_chat_created = bool(kwargs.get('group_chat_created', False))
 
     @property
     def chat_id(self):
@@ -130,75 +131,58 @@ class Message(TelegramObject):
         Returns:
             telegram.Message:
         """
+        if not data:
+            return None
+
         message = dict()
 
-        message['message_id'] = int(data['message_id'])
+        # Required
+        message['message_id'] = data['message_id']
         message['from_user'] = User.de_json(data['from'])
         message['date'] = datetime.fromtimestamp(data['date'])
-
-        if 'first_name' in data['chat']:
-            message['chat'] = User.de_json(data['chat'])
-        elif 'title' in data['chat']:
-            message['chat'] = GroupChat.de_json(data['chat'])
-
-        if 'forward_from' in data:
-            message['forward_from'] = User.de_json(data['forward_from'])
-
-        if 'forward_date' in data:
-            message['forward_date'] = \
-                datetime.fromtimestamp(data['forward_date'])
-
-        message['text'] = data.get('text', '')
-
-        if 'reply_to_message' in data:
-            message['reply_to_message'] = \
-                Message.de_json(data['reply_to_message'])
-
-        if 'audio' in data:
-            message['audio'] = Audio.de_json(data['audio'])
-
-        if 'document' in data:
-            message['document'] = Document.de_json(data['document'])
-
-        if 'photo' in data:
-            message['photo'] = [PhotoSize.de_json(x) for x in data['photo']]
-
-        if 'sticker' in data:
-            message['sticker'] = Sticker.de_json(data['sticker'])
-
-        if 'video' in data:
-            message['video'] = Video.de_json(data['video'])
-
-        if 'voice' in data:
-            message['voice'] = Voice.de_json(data['voice'])
-
-        message['caption'] = data.get('caption', '')
-
-        if 'contact' in data:
-            message['contact'] = Contact.de_json(data['contact'])
-
-        if 'location' in data:
-            message['location'] = Location.de_json(data['location'])
-
-        if 'new_chat_participant' in data:
-            message['new_chat_participant'] = \
-                User.de_json(data['new_chat_participant'])
-
-        if 'left_chat_participant' in data:
-            message['left_chat_participant'] = \
-                User.de_json(data['left_chat_participant'])
-
-        message['new_chat_title'] = data.get('new_chat_title', '')
-
-        if 'new_chat_photo' in data:
-            message['new_chat_photo'] = \
-                [PhotoSize.de_json(x) for x in data['new_chat_photo']]
-
+        # Optionals
+        if 'first_name' in data.get('chat', ''):
+            message['chat'] = User.de_json(data.get('chat'))
+        elif 'title' in data.get('chat', ''):
+            message['chat'] = GroupChat.de_json(data.get('chat'))
+        message['forward_from'] = \
+            User.de_json(data.get('forward_from'))
+        message['forward_date'] = \
+            Message._fromtimestamp(data.get('forward_date'))
+        message['reply_to_message'] = \
+            Message.de_json(data.get('reply_to_message'))
+        message['text'] = \
+            data.get('text')
+        message['audio'] = \
+            Audio.de_json(data.get('audio'))
+        message['document'] = \
+            Document.de_json(data.get('document'))
+        message['photo'] = \
+            [PhotoSize.de_json(x) for x in data.get('photo', [])]
+        message['sticker'] = \
+            Sticker.de_json(data.get('sticker'))
+        message['video'] = \
+            Video.de_json(data.get('video'))
+        message['voice'] = \
+            Voice.de_json(data.get('voice'))
+        message['caption'] = \
+            data.get('caption')
+        message['contact'] = \
+            Contact.de_json(data.get('contact'))
+        message['location'] = \
+            Location.de_json(data.get('location'))
+        message['new_chat_participant'] = \
+            User.de_json(data.get('new_chat_participant'))
+        message['left_chat_participant'] = \
+            User.de_json(data.get('left_chat_participant'))
+        message['new_chat_title'] = \
+            data.get('new_chat_title')
+        message['new_chat_photo'] = \
+            [PhotoSize.de_json(x) for x in data.get('new_chat_photo', [])]
         message['delete_chat_photo'] = \
-            bool(data.get('delete_chat_photo', False))
-
+            data.get('delete_chat_photo')
         message['group_chat_created'] = \
-            bool(data.get('group_chat_created', False))
+            data.get('group_chat_created')
 
         return Message(**message)
 
@@ -207,70 +191,69 @@ class Message(TelegramObject):
         Returns:
             dict:
         """
-        data = {'message_id': self.message_id,
-                'from': self.from_user.to_dict(),
-                'date': self._totimestamp(self.date),
-                'chat': self.chat.to_dict()}
+        data = dict()
 
+        # Required
+        data['message_id'] = self.message_id
+        data['from'] = self.from_user.to_dict()
+        data['date'] = self._totimestamp(self.date)
+        data['chat'] = self.chat.to_dict()
+        # Optionals
         if self.forward_from:
             data['forward_from'] = self.forward_from.to_dict()
-
         if self.forward_date:
             data['forward_date'] = self._totimestamp(self.forward_date)
-
         if self.reply_to_message:
             data['reply_to_message'] = self.reply_to_message.to_dict()
-
         if self.text:
             data['text'] = self.text
-
         if self.audio:
             data['audio'] = self.audio.to_dict()
-
         if self.document:
             data['document'] = self.document.to_dict()
-
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
-
         if self.sticker:
             data['sticker'] = self.sticker.to_dict()
-
         if self.video:
             data['video'] = self.video.to_dict()
-
         if self.voice:
             data['voice'] = self.voice.to_dict()
-
         if self.caption:
             data['caption'] = self.caption
-
         if self.contact:
             data['contact'] = self.contact.to_dict()
-
         if self.location:
             data['location'] = self.location.to_dict()
-
         if self.new_chat_participant:
             data['new_chat_participant'] = self.new_chat_participant.to_dict()
-
         if self.left_chat_participant:
             data['left_chat_participant'] = \
                 self.left_chat_participant.to_dict()
-
         if self.new_chat_title:
             data['new_chat_title'] = self.new_chat_title
-
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
-
         if self.delete_chat_photo:
             data['delete_chat_photo'] = self.delete_chat_photo
-
         if self.group_chat_created:
             data['group_chat_created'] = self.group_chat_created
 
         return data
+
+    @staticmethod
+    def _fromtimestamp(unixtime):
+        """
+        Args:
+            unixtime (int):
+
+        Returns:
+            datetime.datetime:
+        """
+        if not unixtime:
+            return None
+
+        return datetime.fromtimestamp(unixtime)
 
     @staticmethod
     def _totimestamp(dt_obj):
@@ -281,6 +264,9 @@ class Message(TelegramObject):
         Returns:
             int:
         """
+        if not dt_obj:
+            return None
+
         try:
             # Python 3.3+
             return int(dt_obj.timestamp())

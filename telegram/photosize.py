@@ -16,32 +16,78 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram PhotoSize"""
 
 from telegram import TelegramObject
 
 
 class PhotoSize(TelegramObject):
+    """This object represents a Telegram PhotoSize.
+
+    Attributes:
+        file_id (str):
+        width (int):
+        height (int):
+        file_size (int):
+
+    Args:
+        file_id (str):
+        width (int):
+        height (int):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        file_size (Optional[int]):
+    """
+
     def __init__(self,
                  file_id,
                  width,
                  height,
-                 file_size=None):
+                 **kwargs):
+        # Required
         self.file_id = file_id
-        self.width = width
-        self.height = height
-        self.file_size = file_size
+        self.width = int(width)
+        self.height = int(height)
+        # Optionals
+        self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
     def de_json(data):
-        return PhotoSize(file_id=data.get('file_id', None),
-                         width=data.get('width', None),
-                         height=data.get('height', None),
-                         file_size=data.get('file_size', None))
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.PhotoSize:
+        """
+        if not data:
+            return None
+
+        photosize = dict()
+
+        # Required
+        photosize['file_id'] = data['file_id']
+        photosize['width'] = data['width']
+        photosize['height'] = data['height']
+        # Optionals
+        photosize['file_size'] = data.get('file_size', 0)
+
+        return PhotoSize(**photosize)
 
     def to_dict(self):
-        data = {'file_id': self.file_id,
-                'width': self.width,
-                'height': self.height}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['file_id'] = self.file_id
+        data['width'] = self.width
+        data['height'] = self.height
+        # Optionals
         if self.file_size:
             data['file_size'] = self.file_size
+
         return data
