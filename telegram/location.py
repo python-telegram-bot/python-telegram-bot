@@ -54,6 +54,7 @@ class Location(TelegramObject):
 
         location = dict()
 
+        # Required
         location['longitude'] = data['longitude']
         location['latitude'] = data['latitude']
 
@@ -66,6 +67,7 @@ class Location(TelegramObject):
         """
         data = dict()
 
+        # Required
         data['longitude'] = self.longitude
         data['latitude'] = self.latitude
 
