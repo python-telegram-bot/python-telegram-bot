@@ -33,7 +33,7 @@ def main():
     LAST_UPDATE_ID = bot.getUpdates()[-1].update_id  # Get lastest update
 
     while True:
-        for update in bot.getUpdates(offset=LAST_UPDATE_ID):
+        for update in bot.getUpdates(offset=LAST_UPDATE_ID, timeout=10):
             text = update.message.text
             chat_id = update.message.chat.id
             update_id = update.update_id
