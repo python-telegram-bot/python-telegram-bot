@@ -19,7 +19,6 @@
 
 import logging
 import telegram
-import time
 
 
 LAST_UPDATE_ID = None
@@ -43,14 +42,13 @@ def main():
 
     while True:
         echo(bot)
-        time.sleep(3)
 
 
 def echo(bot):
     global LAST_UPDATE_ID
 
     # Request updates after the last updated_id
-    for update in bot.getUpdates(offset=LAST_UPDATE_ID):
+    for update in bot.getUpdates(offset=LAST_UPDATE_ID, timeout=10):
         # chat_id is required to reply any message
         chat_id = update.message.chat_id
         message = update.message.text.encode('utf-8')
