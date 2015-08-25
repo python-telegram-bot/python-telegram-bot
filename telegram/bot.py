@@ -530,8 +530,8 @@ class Bot(TelegramObject):
             is about to receive:
             - ChatAction.TYPING for text messages,
             - ChatAction.UPLOAD_PHOTO for photos,
-            - ChatAction.UPLOAD_VIDEO or upload_video for videos,
-            - ChatAction.UPLOAD_AUDIO or upload_audio for audio files,
+            - ChatAction.UPLOAD_VIDEO for videos,
+            - ChatAction.UPLOAD_AUDIO for audio files,
             - ChatAction.UPLOAD_DOCUMENT for general files,
             - ChatAction.FIND_LOCATION for location data.
         """
