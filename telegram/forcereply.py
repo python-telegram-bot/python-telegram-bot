@@ -16,24 +16,63 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram ForceReply"""
 
 from telegram import ReplyMarkup
 
 
 class ForceReply(ReplyMarkup):
+    """This object represents a Telegram ForceReply.
+
+    Attributes:
+        force_reply (bool):
+        selective (bool):
+
+    Args:
+        force_reply (bool):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        selective (Optional[bool]):
+    """
+
     def __init__(self,
                  force_reply=True,
-                 selective=None):
-        self.force_reply = force_reply
-        self.selective = selective
+                 **kwargs):
+        # Required
+        self.force_reply = bool(force_reply)
+        # Optionals
+        self.selective = bool(kwargs.get('selective', False))
 
     @staticmethod
     def de_json(data):
-        return ForceReply(force_reply=data.get('force_reply', None),
-                          selective=data.get('selective', None))
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.ForceReply:
+        """
+        force_reply = dict()
+
+        # Required
+        force_reply['force_reply'] = data['force_reply']
+        # Optionals
+        force_reply['selective'] = data.get('selective', False)
+
+        return ForceReply(**force_reply)
 
     def to_dict(self):
-        data = {'force_reply': self.force_reply}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['force_reply'] = self.force_reply
+        # Optionals
         if self.selective:
             data['selective'] = self.selective
+
         return data

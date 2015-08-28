@@ -16,9 +16,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""Base class for Telegram ReplyMarkup Objects"""
 
 from telegram import TelegramObject
 
 
 class ReplyMarkup(TelegramObject):
-    pass
+    """Base class for Telegram ReplyMarkup Objects"""
+
+    @staticmethod
+    def de_json(data):
+        pass
+
+    def to_dict(self):
+        pass

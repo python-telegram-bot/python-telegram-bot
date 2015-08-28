@@ -16,38 +16,76 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram
+ReplyKeyboardMarkup"""
 
 from telegram import ReplyMarkup
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
+    """This object represents a Telegram ReplyKeyboardMarkup.
+
+    Attributes:
+        keyboard (List[List[str]]):
+        resize_keyboard (bool):
+        one_time_keyboard (bool):
+        selective (bool):
+
+    Args:
+        keyboard (List[List[str]]):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        resize_keyboard (Optional[bool]):
+        one_time_keyboard (Optional[bool]):
+        selective (Optional[bool]):
+    """
+
     def __init__(self,
                  keyboard,
-                 resize_keyboard=None,
-                 one_time_keyboard=None,
-                 selective=None):
+                 **kwargs):
+        # Required
         self.keyboard = keyboard
-        self.resize_keyboard = resize_keyboard
-        self.one_time_keyboard = one_time_keyboard
-        self.selective = selective
+        # Optionals
+        self.resize_keyboard = bool(kwargs.get('resize_keyboard', False))
+        self.one_time_keyboard = bool(kwargs.get('one_time_keyboard', False))
+        self.selective = bool(kwargs.get('selective', False))
 
     @staticmethod
     def de_json(data):
-        return ReplyKeyboardMarkup(keyboard=data.get('keyboard', None),
-                                   resize_keyboard=data.get(
-                                       'resize_keyboard', None
-                                       ),
-                                   one_time_keyboard=data.get(
-                                       'one_time_keyboard', None
-                                       ),
-                                   selective=data.get('selective', None))
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.ReplyKeyboardMarkup:
+        """
+        rkm = dict()
+
+        # Required
+        rkm['keyboard'] = data['keyboard']
+        # Optionals
+        rkm['resize_keyboard'] = data.get('resize_keyboard', False)
+        rkm['one_time_keyboard'] = data.get('one_time_keyboard', False)
+        rkm['selective'] = data.get('selective', False)
+
+        return ReplyKeyboardMarkup(**rkm)
 
     def to_dict(self):
-        data = {'keyboard': self.keyboard}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['keyboard'] = self.keyboard
+        # Optionals
         if self.resize_keyboard:
             data['resize_keyboard'] = self.resize_keyboard
         if self.one_time_keyboard:
             data['one_time_keyboard'] = self.one_time_keyboard
         if self.selective:
             data['selective'] = self.selective
+
         return data
