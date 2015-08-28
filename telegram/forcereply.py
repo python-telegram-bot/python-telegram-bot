@@ -53,26 +53,8 @@ class ForceReply(ReplyMarkup):
         Returns:
             telegram.ForceReply:
         """
-        force_reply = dict()
+        if not data:
+            return None
 
-        # Required
-        force_reply['force_reply'] = data['force_reply']
-        # Optionals
-        force_reply['selective'] = data.get('selective', False)
-
-        return ForceReply(**force_reply)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['force_reply'] = self.force_reply
-        # Optionals
-        if self.selective:
-            data['selective'] = self.selective
-
-        return data
+        return ForceReply(**data)
+        

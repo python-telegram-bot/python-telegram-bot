@@ -69,37 +69,4 @@ class Audio(TelegramObject):
         if not data:
             return None
 
-        audio = dict()
-
-        # Required
-        audio['file_id'] = data['file_id']
-        audio['duration'] = data['duration']
-        # Optionals
-        audio['performer'] = data.get('performer')
-        audio['title'] = data.get('title')
-        audio['mime_type'] = data.get('mime_type')
-        audio['file_size'] = data.get('file_size', 0)
-
-        return Audio(**audio)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['file_id'] = self.file_id
-        data['duration'] = self.duration
-        # Optionals
-        if self.performer:
-            data['performer'] = self.performer
-        if self.title:
-            data['title'] = self.title
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-
-        return data
+        return Audio(**data)

@@ -54,26 +54,7 @@ class ReplyKeyboardHide(ReplyMarkup):
         Returns:
             telegram.ReplyKeyboardHide:
         """
-        rkh = dict()
+        if not data:
+            return None
 
-        # Required
-        rkh['hide_keyboard'] = data['hide_keyboard']
-        # Optionals
-        rkh['selective'] = data.get('selective', False)
-
-        return ReplyKeyboardHide(**rkh)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['hide_keyboard'] = self.hide_keyboard
-        # Optionals
-        if self.selective:
-            data['selective'] = self.selective
-
-        return data
+        return ReplyKeyboardHide(**data)

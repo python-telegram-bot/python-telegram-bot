@@ -53,7 +53,7 @@ class BotTest(unittest.TestCase):
         self.assertTrue(self.is_json(bot.to_json()))
         self.assertEqual(bot.id, 120405045)
         self.assertEqual(bot.first_name, 'Toledo\'s Palace Bot')
-        self.assertEqual(bot.last_name, None)
+        self.assertEqual(bot.last_name, '')
         self.assertEqual(bot.username, 'ToledosPalaceBot')
         self.assertEqual(bot.name, '@ToledosPalaceBot')
 

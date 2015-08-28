@@ -63,31 +63,4 @@ class Contact(TelegramObject):
         if not data:
             return None
 
-        contact = dict()
-
-        # Required
-        contact['phone_number'] = data['phone_number']
-        contact['first_name'] = data['first_name']
-        # Optionals
-        contact['last_name'] = data.get('last_name')
-        contact['user_id'] = data.get('user_id', 0)
-
-        return Contact(**contact)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['phone_number'] = self.phone_number
-        data['first_name'] = self.first_name
-        # Optionals
-        if self.last_name:
-            data['last_name'] = self.last_name
-        if self.user_id:
-            data['user_id'] = self.user_id
-
-        return data
+        return Contact(**data)

@@ -60,32 +60,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         Returns:
             telegram.ReplyKeyboardMarkup:
         """
-        rkm = dict()
+        if not data:
+            return None
 
-        # Required
-        rkm['keyboard'] = data['keyboard']
-        # Optionals
-        rkm['resize_keyboard'] = data.get('resize_keyboard', False)
-        rkm['one_time_keyboard'] = data.get('one_time_keyboard', False)
-        rkm['selective'] = data.get('selective', False)
-
-        return ReplyKeyboardMarkup(**rkm)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['keyboard'] = self.keyboard
-        # Optionals
-        if self.resize_keyboard:
-            data['resize_keyboard'] = self.resize_keyboard
-        if self.one_time_keyboard:
-            data['one_time_keyboard'] = self.one_time_keyboard
-        if self.selective:
-            data['selective'] = self.selective
-
-        return data
+        return ReplyKeyboardMarkup(**data)

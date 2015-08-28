@@ -74,38 +74,4 @@ class Video(TelegramObject):
         if not data:
             return None
 
-        video = dict()
-
-        # Required
-        video['file_id'] = data['file_id']
-        video['width'] = data['width']
-        video['height'] = data['height']
-        video['duration'] = data['duration']
-        # Optionals
-        video['thumb'] = PhotoSize.de_json(data.get('thumb'))
-        video['mime_type'] = data.get('mime_type')
-        video['file_size'] = data.get('file_size', 0)
-
-        return Video(**video)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['file_id'] = self.file_id
-        data['width'] = self.width
-        data['height'] = self.height
-        data['duration'] = self.duration
-        # Optionals
-        if self.thumb:
-            data['thumb'] = self.thumb.to_dict()
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-
-        return data
+        return Video(**data)

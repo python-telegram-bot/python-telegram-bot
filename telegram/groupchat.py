@@ -53,23 +53,4 @@ class GroupChat(TelegramObject):
         if not data:
             return None
 
-        groupchat = dict()
-
-        # Required
-        groupchat['id'] = data['id']
-        groupchat['title'] = data['title']
-
-        return GroupChat(**groupchat)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['id'] = self.id
-        data['title'] = self.title
-
-        return data
+        return GroupChat(**data)

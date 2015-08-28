@@ -62,32 +62,4 @@ class Voice(TelegramObject):
         if not data:
             return None
 
-        voice = dict()
-
-        # Required
-        voice['file_id'] = data['file_id']
-        # Optionals
-        voice['duration'] = data.get('duration', 0)
-        voice['mime_type'] = data.get('mime_type')
-        voice['file_size'] = data.get('file_size', 0)
-
-        return Voice(**voice)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['file_id'] = self.file_id
-        # Optionals
-        if self.duration:
-            data['duration'] = self.duration
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-
-        return data
+        return Voice(**data)

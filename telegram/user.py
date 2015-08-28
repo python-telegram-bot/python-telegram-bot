@@ -73,31 +73,4 @@ class User(TelegramObject):
         if not data:
             return None
 
-        user = dict()
-
-        # Required
-        user['id'] = data['id']
-        user['first_name'] = data['first_name']
-        # Optionals
-        user['last_name'] = data.get('last_name')
-        user['username'] = data.get('username')
-
-        return User(**user)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['id'] = self.id
-        data['first_name'] = self.first_name
-        # Optionals
-        if self.last_name:
-            data['last_name'] = self.last_name
-        if self.username:
-            data['username'] = self.username
-
-        return data
+        return User(**data)

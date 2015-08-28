@@ -64,30 +64,22 @@ class PhotoSize(TelegramObject):
         if not data:
             return None
 
-        photosize = dict()
+        return PhotoSize(**data)
 
-        # Required
-        photosize['file_id'] = data['file_id']
-        photosize['width'] = data['width']
-        photosize['height'] = data['height']
-        # Optionals
-        photosize['file_size'] = data.get('file_size', 0)
-
-        return PhotoSize(**photosize)
-
-    def to_dict(self):
+    @staticmethod
+    def de_list(data):
         """
+        Args:
+            data (list):
+
         Returns:
-            dict:
+            List<telegram.PhotoSize>:
         """
-        data = dict()
+        if not data:
+            return []
 
-        # Required
-        data['file_id'] = self.file_id
-        data['width'] = self.width
-        data['height'] = self.height
-        # Optionals
-        if self.file_size:
-            data['file_size'] = self.file_size
+        photos = list()
+        for photo in data:
+            photos.append(PhotoSize.de_json(photo))
 
-        return data
+        return photos

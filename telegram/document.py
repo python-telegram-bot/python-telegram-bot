@@ -65,35 +65,4 @@ class Document(TelegramObject):
         if not data:
             return None
 
-        document = dict()
-
-        # Required
-        document['file_id'] = data['file_id']
-        # Optionals
-        document['thumb'] = PhotoSize.de_json(data.get('thumb'))
-        document['file_name'] = data.get('file_name')
-        document['mime_type'] = data.get('mime_type')
-        document['file_size'] = data.get('file_size', 0)
-
-        return Document(**document)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['file_id'] = self.file_id
-        # Optionals
-        if self.thumb:
-            data['thumb'] = self.thumb.to_dict()
-        if self.file_name:
-            data['file_name'] = self.file_name
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-
-        return data
+        return Document(**data)

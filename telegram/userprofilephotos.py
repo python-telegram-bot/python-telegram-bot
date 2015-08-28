@@ -53,25 +53,17 @@ class UserProfilePhotos(TelegramObject):
         if not data:
             return None
 
-        upf = dict()
+        data['photos'] = [PhotoSize.de_list(photo) for photo in data['photos']]
 
-        # Required
-        upf['total_count'] = data['total_count']
-        upf['photos'] = []
-        for photo in data['photos']:
-            upf['photos'].append([PhotoSize.de_json(x) for x in photo])
-
-        return UserProfilePhotos(**upf)
+        return UserProfilePhotos(**data)
 
     def to_dict(self):
         """
         Returns:
             dict:
         """
-        data = dict()
+        data = super(UserProfilePhotos, self).to_dict()
 
-        # Required
-        data['total_count'] = self.total_count
         data['photos'] = []
         for photo in self.photos:
             data['photos'].append([x.to_dict() for x in photo])

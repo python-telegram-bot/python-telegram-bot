@@ -52,24 +52,9 @@ class Update(TelegramObject):
         Returns:
             telegram.Update:
         """
-        update = dict()
+        if not data:
+            return None
 
-        update['update_id'] = data['update_id']
-        update['message'] = Message.de_json(data['message'])
+        data['message'] = Message.de_json(data['message'])
 
-        return Update(**update)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['update_id'] = self.update_id
-        # Optionals
-        if self.message:
-            data['message'] = self.message.to_dict()
-
-        return data
+        return Update(**data)

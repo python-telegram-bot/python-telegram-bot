@@ -19,7 +19,7 @@
 """Base class for Telegram Objects"""
 
 import json
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 
 class TelegramObject(object):
@@ -51,10 +51,18 @@ class TelegramObject(object):
         """
         return json.dumps(self.to_dict())
 
-    @abstractmethod
     def to_dict(self):
         """
         Returns:
             dict:
         """
-        return None
+        data = dict()
+
+        for key, value in self.__dict__.iteritems():
+            if value:
+                if hasattr(value, 'to_dict'):
+                    data[key] = value.to_dict()
+                else:
+                    data[key] = value
+
+        return data

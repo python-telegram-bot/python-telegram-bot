@@ -134,110 +134,60 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        message = dict()
-
-        # Required
-        message['message_id'] = data['message_id']
-        message['from_user'] = User.de_json(data['from'])
-        message['date'] = datetime.fromtimestamp(data['date'])
-        # Optionals
+        data['from_user'] = User.de_json(data['from'])
+        data['date'] = datetime.fromtimestamp(data['date'])
         if 'first_name' in data.get('chat', ''):
-            message['chat'] = User.de_json(data.get('chat'))
+            data['chat'] = User.de_json(data.get('chat'))
         elif 'title' in data.get('chat', ''):
-            message['chat'] = GroupChat.de_json(data.get('chat'))
-        message['forward_from'] = \
+            data['chat'] = GroupChat.de_json(data.get('chat'))
+        data['forward_from'] = \
             User.de_json(data.get('forward_from'))
-        message['forward_date'] = \
+        data['forward_date'] = \
             Message._fromtimestamp(data.get('forward_date'))
-        message['reply_to_message'] = \
+        data['reply_to_message'] = \
             Message.de_json(data.get('reply_to_message'))
-        message['text'] = \
-            data.get('text')
-        message['audio'] = \
+        data['audio'] = \
             Audio.de_json(data.get('audio'))
-        message['document'] = \
+        data['document'] = \
             Document.de_json(data.get('document'))
-        message['photo'] = \
-            [PhotoSize.de_json(x) for x in data.get('photo', [])]
-        message['sticker'] = \
+        data['photo'] = \
+            PhotoSize.de_list(data.get('photo'))
+        data['sticker'] = \
             Sticker.de_json(data.get('sticker'))
-        message['video'] = \
+        data['video'] = \
             Video.de_json(data.get('video'))
-        message['voice'] = \
+        data['voice'] = \
             Voice.de_json(data.get('voice'))
-        message['caption'] = \
-            data.get('caption')
-        message['contact'] = \
+        data['contact'] = \
             Contact.de_json(data.get('contact'))
-        message['location'] = \
+        data['location'] = \
             Location.de_json(data.get('location'))
-        message['new_chat_participant'] = \
+        data['new_chat_participant'] = \
             User.de_json(data.get('new_chat_participant'))
-        message['left_chat_participant'] = \
+        data['left_chat_participant'] = \
             User.de_json(data.get('left_chat_participant'))
-        message['new_chat_title'] = \
-            data.get('new_chat_title')
-        message['new_chat_photo'] = \
-            [PhotoSize.de_json(x) for x in data.get('new_chat_photo', [])]
-        message['delete_chat_photo'] = \
-            data.get('delete_chat_photo')
-        message['group_chat_created'] = \
-            data.get('group_chat_created')
+        data['new_chat_photo'] = \
+            PhotoSize.de_list(data.get('new_chat_photo'))
 
-        return Message(**message)
+        return Message(**data)
 
     def to_dict(self):
         """
         Returns:
             dict:
         """
-        data = dict()
+        data = super(Message, self).to_dict()
 
         # Required
-        data['message_id'] = self.message_id
-        data['from'] = self.from_user.to_dict()
+        data['from'] = data.pop('from_user')
         data['date'] = self._totimestamp(self.date)
-        data['chat'] = self.chat.to_dict()
         # Optionals
-        if self.forward_from:
-            data['forward_from'] = self.forward_from.to_dict()
         if self.forward_date:
             data['forward_date'] = self._totimestamp(self.forward_date)
-        if self.reply_to_message:
-            data['reply_to_message'] = self.reply_to_message.to_dict()
-        if self.text:
-            data['text'] = self.text
-        if self.audio:
-            data['audio'] = self.audio.to_dict()
-        if self.document:
-            data['document'] = self.document.to_dict()
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
-        if self.sticker:
-            data['sticker'] = self.sticker.to_dict()
-        if self.video:
-            data['video'] = self.video.to_dict()
-        if self.voice:
-            data['voice'] = self.voice.to_dict()
-        if self.caption:
-            data['caption'] = self.caption
-        if self.contact:
-            data['contact'] = self.contact.to_dict()
-        if self.location:
-            data['location'] = self.location.to_dict()
-        if self.new_chat_participant:
-            data['new_chat_participant'] = self.new_chat_participant.to_dict()
-        if self.left_chat_participant:
-            data['left_chat_participant'] = \
-                self.left_chat_participant.to_dict()
-        if self.new_chat_title:
-            data['new_chat_title'] = self.new_chat_title
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
-        if self.delete_chat_photo:
-            data['delete_chat_photo'] = self.delete_chat_photo
-        if self.group_chat_created:
-            data['group_chat_created'] = self.group_chat_created
 
         return data
 

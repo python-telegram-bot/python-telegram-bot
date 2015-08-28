@@ -67,33 +67,4 @@ class Sticker(TelegramObject):
         if not data:
             return None
 
-        sticker = dict()
-
-        # Required
-        sticker['file_id'] = data['file_id']
-        sticker['width'] = data['width']
-        sticker['height'] = data['height']
-        # Optionals
-        sticker['thumb'] = PhotoSize.de_json(data['thumb'])
-        sticker['file_size'] = data.get('file_size', 0)
-
-        return Sticker(**sticker)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['file_id'] = self.file_id
-        data['width'] = self.width
-        data['height'] = self.height
-        # Optionals
-        if self.thumb:
-            data['thumb'] = self.thumb.to_dict()
-        if self.file_size:
-            data['file_size'] = self.file_size
-
-        return data
+        return Sticker(**data)

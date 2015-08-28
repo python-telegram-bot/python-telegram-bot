@@ -52,23 +52,4 @@ class Location(TelegramObject):
         if not data:
             return None
 
-        location = dict()
-
-        # Required
-        location['longitude'] = data['longitude']
-        location['latitude'] = data['latitude']
-
-        return Location(**location)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = dict()
-
-        # Required
-        data['longitude'] = self.longitude
-        data['latitude'] = self.latitude
-
-        return data
+        return Location(**data)
