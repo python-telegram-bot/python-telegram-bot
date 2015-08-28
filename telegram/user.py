@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -16,23 +17,44 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram User"""
 
 from telegram import TelegramObject
 
 
 class User(TelegramObject):
+    """This object represents a Telegram Sticker.
+
+    Attributes:
+        id (int):
+        first_name (str):
+        last_name (str):
+        username (str):
+
+    Args:
+        id (int):
+        first_name (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        last_name (Optional[str]):
+        username (Optional[str]):
+    """
+
     def __init__(self,
                  id,
                  first_name,
-                 last_name=None,
-                 username=None):
-        self.id = id
+                 **kwargs):
+        # Required
+        self.id = int(id)
         self.first_name = first_name
-        self.last_name = last_name
-        self.username = username
+        # Optionals
+        self.last_name = kwargs.get('last_name', '')
+        self.username = kwargs.get('username', '')
 
     @property
     def name(self):
+        """str: """
         if self.username:
             return '@%s' % self.username
         if self.last_name:
@@ -41,16 +63,41 @@ class User(TelegramObject):
 
     @staticmethod
     def de_json(data):
-        return User(id=data.get('id', None),
-                    first_name=data.get('first_name', None),
-                    last_name=data.get('last_name', None),
-                    username=data.get('username', None))
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.User:
+        """
+        if not data:
+            return None
+
+        user = dict()
+
+        # Required
+        user['id'] = data['id']
+        user['first_name'] = data['first_name']
+        # Optionals
+        user['last_name'] = data.get('last_name')
+        user['username'] = data.get('username')
+
+        return User(**user)
 
     def to_dict(self):
-        data = {'id': self.id,
-                'first_name': self.first_name}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['id'] = self.id
+        data['first_name'] = self.first_name
+        # Optionals
         if self.last_name:
             data['last_name'] = self.last_name
         if self.username:
             data['username'] = self.username
+
         return data

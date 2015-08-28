@@ -62,8 +62,9 @@ class BotTest(unittest.TestCase):
         '''Test the telegram.Bot getUpdates method'''
         print('Testing getUpdates')
         updates = self._bot.getUpdates()
-        self.assertTrue(self.is_json(updates[0].to_json()))
-        self.assertIsInstance(updates[0], telegram.Update)
+        if updates:
+            self.assertTrue(self.is_json(updates[0].to_json()))
+            self.assertIsInstance(updates[0], telegram.Update)
 
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''

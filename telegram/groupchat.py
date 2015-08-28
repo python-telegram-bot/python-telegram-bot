@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -16,23 +17,59 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram GroupChat"""
 
 from telegram import TelegramObject
 
 
 class GroupChat(TelegramObject):
+    """This object represents a Telegram GroupChat.
+
+    Attributes:
+        id (int):
+        title (str):
+
+    Args:
+        id (int):
+        title (str):
+    """
+
     def __init__(self,
                  id,
                  title):
-        self.id = id
+        # Required
+        self.id = int(id)
         self.title = title
 
     @staticmethod
     def de_json(data):
-        return GroupChat(id=data.get('id', None),
-                         title=data.get('title', None))
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.GroupChat:
+        """
+        if not data:
+            return None
+
+        groupchat = dict()
+
+        # Required
+        groupchat['id'] = data['id']
+        groupchat['title'] = data['title']
+
+        return GroupChat(**groupchat)
 
     def to_dict(self):
-        data = {'id': self.id,
-                'title': self.title}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['id'] = self.id
+        data['title'] = self.title
+
         return data

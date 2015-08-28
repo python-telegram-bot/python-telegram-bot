@@ -22,8 +22,6 @@ __version__ = '2.7.1'
 
 from .base import TelegramObject
 from .user import User
-from .message import Message
-from .update import Update
 from .groupchat import GroupChat
 from .photosize import PhotoSize
 from .audio import Audio
@@ -39,10 +37,12 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardhide import ReplyKeyboardHide
 from .forcereply import ForceReply
-from .inputfile import InputFile
 from .error import TelegramError
+from .inputfile import InputFile
 from .nullhandler import NullHandler
 from .emoji import Emoji
+from .message import Message
+from .update import Update
 from .bot import Bot
 
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',

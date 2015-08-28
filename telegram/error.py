@@ -16,11 +16,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Error"""
+
 
 class TelegramError(Exception):
-    """Base class for Telegram errors."""
+    """This object represents a Telegram Error."""
 
     @property
     def message(self):
-        '''Returns the first argument used to construct this error.'''
+        """
+        Returns:
+            str:
+        """
         return self.args[0]

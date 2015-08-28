@@ -16,42 +16,84 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Sticker"""
 
-from telegram import TelegramObject
+from telegram import PhotoSize, TelegramObject
 
 
 class Sticker(TelegramObject):
+    """This object represents a Telegram Sticker.
+
+    Attributes:
+        file_id (str):
+        width (int):
+        height (int):
+        thumb (:class:`telegram.PhotoSize`):
+        file_size (int):
+
+    Args:
+        file_id (str):
+        width (int):
+        height (int):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        thumb (Optional[:class:`telegram.PhotoSize`]):
+        file_size (Optional[int]):
+    """
+
     def __init__(self,
                  file_id,
                  width,
                  height,
-                 thumb=None,
-                 file_size=None):
+                 **kwargs):
+        # Required
         self.file_id = file_id
-        self.width = width
-        self.height = height
-        self.thumb = thumb
-        self.file_size = file_size
+        self.width = int(width)
+        self.height = int(height)
+        # Optionals
+        self.thumb = kwargs.get('thumb')
+        self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
     def de_json(data):
-        if 'thumb' in data:
-            from telegram import PhotoSize
-            thumb = PhotoSize.de_json(data['thumb'])
-        else:
-            thumb = None
+        """
+        Args:
+            data (str):
 
-        return Sticker(file_id=data.get('file_id', None),
-                       width=data.get('width', None),
-                       height=data.get('height', None),
-                       thumb=thumb,
-                       file_size=data.get('file_size', None))
+        Returns:
+            telegram.Sticker:
+        """
+        if not data:
+            return None
+
+        sticker = dict()
+
+        # Required
+        sticker['file_id'] = data['file_id']
+        sticker['width'] = data['width']
+        sticker['height'] = data['height']
+        # Optionals
+        sticker['thumb'] = PhotoSize.de_json(data['thumb'])
+        sticker['file_size'] = data.get('file_size', 0)
+
+        return Sticker(**sticker)
 
     def to_dict(self):
-        data = {'file_id': self.file_id,
-                'width': self.width,
-                'height': self.height,
-                'thumb': self.thumb.to_dict()}
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        # Required
+        data['file_id'] = self.file_id
+        data['width'] = self.width
+        data['height'] = self.height
+        # Optionals
+        if self.thumb:
+            data['thumb'] = self.thumb.to_dict()
         if self.file_size:
             data['file_size'] = self.file_size
+
         return data
