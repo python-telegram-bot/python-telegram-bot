@@ -58,7 +58,7 @@ class BotTest(unittest.TestCase):
                                         text='Моё судно на воздушной подушке полно угрей')
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(u'Моё судно на воздушной подушке полно угрей', message.text)
-        self.assertIsInstance(message.date, datetime)
+        self.assertTrue(isinstance(message.date, datetime))
 
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''
@@ -66,7 +66,7 @@ class BotTest(unittest.TestCase):
         updates = self._bot.getUpdates()
         if updates:
             self.assertTrue(self.is_json(updates[0].to_json()))
-            self.assertIsInstance(updates[0], telegram.Update)
+            self.assertTrue(isinstance(updates[0], telegram.Update))
 
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''
@@ -77,7 +77,7 @@ class BotTest(unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual('Oi', message.text)
         self.assertEqual('leandrotoledo', message.forward_from.username)
-        self.assertIsInstance(message.forward_date, datetime)
+        self.assertTrue(isinstance(message.forward_date, datetime))
 
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
