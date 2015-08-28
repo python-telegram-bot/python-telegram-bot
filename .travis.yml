@@ -8,6 +8,6 @@ python:
 install:
   - pip install coveralls
 script:
-  coverage run make test
+  coverage run tests/test_*.py
 after_success:
   coveralls
