@@ -58,7 +58,7 @@ class TelegramObject(object):
         """
         data = dict()
 
-        for key, value in self.__dict__.iteritems():
+        for key, value in self.__dict__.items():
             if value:
                 if hasattr(value, 'to_dict'):
                     data[key] = value.to_dict()
