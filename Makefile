@@ -1,7 +1,4 @@
-help:
-	@echo "  clean		remove unwanted stuff"
-	@echo "  lint		check style with flake8"
-	@echo "  test		run tests"
+.PHONY: clean test lint help
 
 clean:
 	rm -fr build
@@ -14,4 +11,9 @@ lint:
 	flake8 --doctests --max-complexity 10 telegram
 
 test:
-	python telegram_test.py
+	@- $(foreach TEST, $(wildcard tests/test_*.py), python $(TEST))
+
+help:
+	@echo "  clean		remove unwanted stuff"
+	@echo "  lint		check style with flake8"
+	@echo "  test		run tests"

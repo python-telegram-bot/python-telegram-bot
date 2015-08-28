@@ -19,6 +19,8 @@
 
 
 import os
+import sys
+sys.path.append('.')
 import json
 import telegram
 import unittest
@@ -80,7 +82,7 @@ class BotTest(unittest.TestCase):
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing sendPhoto - File')
-        message = self._bot.sendPhoto(photo=open('tests/telegram.png', 'rb'),
+        message = self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
                                       caption='testSendPhoto',
                                       chat_id=12173560)
         self.assertTrue(self.is_json(message.to_json()))
@@ -122,7 +124,7 @@ class BotTest(unittest.TestCase):
     def testSendAudio(self):
         '''Test the telegram.Bot sendAudio method'''
         print('Testing sendAudio - File')
-        message = self._bot.sendAudio(audio=open('tests/telegram.mp3', 'rb'),
+        message = self._bot.sendAudio(audio=open('tests/data/telegram.mp3', 'rb'),
                                       chat_id=12173560,
                                       performer='Leandro Toledo',
                                       title='Teste')
@@ -144,7 +146,7 @@ class BotTest(unittest.TestCase):
     def testSendVoice(self):
         '''Test the telegram.Bot sendVoice method'''
         print('Testing sendVoice - File')
-        message = self._bot.sendVoice(voice=open('tests/telegram.ogg', 'rb'),
+        message = self._bot.sendVoice(voice=open('tests/data/telegram.ogg', 'rb'),
                                       chat_id=12173560)
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(9199, message.voice.file_size)
@@ -160,7 +162,7 @@ class BotTest(unittest.TestCase):
     def testSendDocument(self):
         '''Test the telegram.Bot sendDocument method'''
         print('Testing sendDocument - File')
-        message = self._bot.sendDocument(document=open('tests/telegram.png', 'rb'),
+        message = self._bot.sendDocument(document=open('tests/data/telegram.png', 'rb'),
                                          chat_id=12173560)
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(12948, message.document.file_size)
@@ -184,7 +186,7 @@ class BotTest(unittest.TestCase):
     def testSendVideo(self):
         '''Test the telegram.Bot sendVideo method'''
         print('Testing sendVideo - File')
-        message = self._bot.sendVideo(video=open('tests/telegram.mp4', 'rb'),
+        message = self._bot.sendVideo(video=open('tests/data/telegram.mp4', 'rb'),
                                       caption='testSendVideo',
                                       chat_id=12173560)
         self.assertTrue(self.is_json(message.to_json()))
@@ -229,3 +231,5 @@ class BotTest(unittest.TestCase):
         upf = self._bot.getUserProfilePhotos(user_id=12173560)
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(6547, upf.photos[0][0].file_size)
+
+unittest.main()
