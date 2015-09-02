@@ -262,7 +262,7 @@ You may copy, distribute and modify the software provided that modifications are
 _`Contact`
 ==========
 
-Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b9466b8ae0d6ea7df44>`_.
+Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b94d52953d3fa1ec504>`_.
 
 *If you face trouble joining in the group please ping me on Telegram (@leandrotoledo), I'll be glad to add you.*
 
