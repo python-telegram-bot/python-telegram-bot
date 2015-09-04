@@ -185,6 +185,7 @@ class BotTest(unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.document.file_size, 12948)
+        self.assertTrue(isinstance(message.document.thumb, telegram.PhotoSize))
 
     def testSendGIFURLDocument(self):
         '''Test the telegram.Bot sendDocument method'''
@@ -203,6 +204,7 @@ class BotTest(unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.document.file_id, 'BQADAQADHAADNTwtBxZxUGKyxYbYAg')
+        self.assertTrue(isinstance(message.document.thumb, telegram.PhotoSize))
 
     def testSendVideo(self):
         '''Test the telegram.Bot sendVideo method'''
@@ -214,6 +216,8 @@ class BotTest(unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.video.file_size, 326534)
         self.assertEqual(message.caption, 'testSendVideo')
+        if message.video.thumb:
+            self.assertTrue(isinstance(message.video.thumb, telegram.PhotoSize))
 
     def testResendVideo(self):
         '''Test the telegram.Bot sendVideo method'''
@@ -223,6 +227,7 @@ class BotTest(unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.video.duration, 4)
+        self.assertTrue(isinstance(message.video.thumb, telegram.PhotoSize))
 
     def testResendSticker(self):
         '''Test the telegram.Bot sendSticker method'''
@@ -232,6 +237,7 @@ class BotTest(unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.sticker.file_size, 39518)
+        self.assertTrue(isinstance(message.sticker.thumb, telegram.PhotoSize))
 
     def testSendLocation(self):
         '''Test the telegram.Bot sendLocation method'''
