@@ -1,3 +1,8 @@
+2015-09-05
+  Released 2.8.1
+  Fix regression on Telegram objects with thumb properties
+
+
 2015-09-04
   Released 2.8
   TelegramError when chat_id is empty for send* methods
