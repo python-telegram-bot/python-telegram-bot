@@ -146,6 +146,9 @@ class Bot(TelegramObject):
             """
             url, data = func(self, *args, **kwargs)
 
+            if not kwargs.get('chat_id'):
+                raise TelegramError('Invalid chat_id.')
+
             if kwargs.get('reply_to_message_id'):
                 reply_to_message_id = kwargs.get('reply_to_message_id')
                 data['reply_to_message_id'] = reply_to_message_id
