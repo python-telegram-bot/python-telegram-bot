@@ -65,4 +65,6 @@ class Document(TelegramObject):
         if not data:
             return None
 
+        data['thumb'] = PhotoSize.de_json(data.get('thumb'))
+
         return Document(**data)

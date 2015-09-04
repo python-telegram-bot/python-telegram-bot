@@ -57,4 +57,3 @@ class ForceReply(ReplyMarkup):
             return None
 
         return ForceReply(**data)
-        
