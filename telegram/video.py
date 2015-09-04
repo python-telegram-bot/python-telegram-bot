@@ -16,52 +16,62 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Video"""
 
-from telegram import TelegramObject
+from telegram import PhotoSize, TelegramObject
 
 
 class Video(TelegramObject):
+    """This object represents a Telegram Video.
+
+    Attributes:
+        file_id (str):
+        width (int):
+        height (int):
+        duration (int):
+        thumb (:class:`telegram.PhotoSize`):
+        mime_type (str):
+        file_size (int):
+
+    Args:
+        file_id (str):
+        width (int):
+        height (int):
+        duration (int):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        thumb (Optional[:class:`telegram.PhotoSize`]):
+        mime_type (Optional[str]):
+        file_size (Optional[int]):
+    """
+
     def __init__(self,
                  file_id,
                  width,
                  height,
                  duration,
-                 thumb=None,
-                 mime_type=None,
-                 file_size=None):
+                 **kwargs):
+        # Required
         self.file_id = file_id
-        self.width = width
-        self.height = height
-        self.duration = duration
-        self.thumb = thumb
-        self.mime_type = mime_type
-        self.file_size = file_size
+        self.width = int(width)
+        self.height = int(height)
+        self.duration = int(duration)
+        # Optionals
+        self.thumb = kwargs.get('thumb')
+        self.mime_type = kwargs.get('mime_type', '')
+        self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
     def de_json(data):
-        if 'thumb' in data:
-            from telegram import PhotoSize
-            thumb = PhotoSize.de_json(data['thumb'])
-        else:
-            thumb = None
+        """
+        Args:
+            data (str):
 
-        return Video(file_id=data.get('file_id', None),
-                     width=data.get('width', None),
-                     height=data.get('height', None),
-                     duration=data.get('duration', None),
-                     thumb=thumb,
-                     mime_type=data.get('mime_type', None),
-                     file_size=data.get('file_size', None))
+        Returns:
+            telegram.Video:
+        """
+        if not data:
+            return None
 
-    def to_dict(self):
-        data = {'file_id': self.file_id,
-                'width': self.width,
-                'height': self.height,
-                'duration': self.duration}
-        if self.thumb:
-            data['thumb'] = self.thumb.to_dict()
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-        return data
+        return Video(**data)

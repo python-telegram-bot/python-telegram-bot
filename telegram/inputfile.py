@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=W0622,E0611
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -16,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram InputFile"""
 
 try:
     from email.generator import _make_boundary as choose_boundary
@@ -29,7 +31,7 @@ import os
 import sys
 import imghdr
 
-from .error import TelegramError
+from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot' \
@@ -37,6 +39,8 @@ USER_AGENT = 'Python Telegram Bot' \
 
 
 class InputFile(object):
+    """This object represents a Telegram InputFile."""
+
     def __init__(self,
                  data):
         self.data = data
@@ -57,6 +61,9 @@ class InputFile(object):
         if 'voice' in data:
             self.input_name = 'voice'
             self.input_file = data.pop('voice')
+        if 'certificate' in data:
+            self.input_name = 'certificate'
+            self.input_file = data.pop('certificate')
 
         if isinstance(self.input_file, file):
             self.input_file_content = self.input_file.read()
@@ -71,14 +78,26 @@ class InputFile(object):
 
     @property
     def headers(self):
+        """
+        Returns:
+            str:
+        """
         return {'User-agent': USER_AGENT,
                 'Content-type': self.content_type}
 
     @property
     def content_type(self):
+        """
+        Returns:
+            str:
+        """
         return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
+        """
+        Returns:
+            str:
+        """
         form = []
         form_boundary = '--' + self.boundary
 
@@ -105,9 +124,14 @@ class InputFile(object):
         form.append('--' + self.boundary + '--')
         form.append('')
 
-        return self._parse(form)
+        return InputFile._parse(form)
 
-    def _parse(self, form):
+    @staticmethod
+    def _parse(form):
+        """
+        Returns:
+            str:
+        """
         if sys.version_info > (3,):
             # on Python 3 form needs to be byte encoded
             encoded_form = []
@@ -125,11 +149,10 @@ class InputFile(object):
         """Check if the content file is an image by analyzing its headers.
 
         Args:
-          stream:
-            A str representing the content of a file.
+            stream (str): A str representing the content of a file.
 
         Returns:
-          The str mimetype of an image.
+            str: The str mimetype of an image.
         """
         image = imghdr.what(None, stream)
         if image:
@@ -142,8 +165,7 @@ class InputFile(object):
         """Check if the request is a file request.
 
         Args:
-          data:
-            A dict of (str, unicode) key/value pairs
+            data (str): A dict of (str, unicode) key/value pairs
 
         Returns:
             bool

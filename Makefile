@@ -1,7 +1,4 @@
-help:
-	@echo "  clean		remove unwanted stuff"
-	@echo "  lint		check style with flake8"
-	@echo "  test		run tests"
+.PHONY: clean pep8 lint test
 
 clean:
 	rm -fr build
@@ -10,8 +7,18 @@ clean:
 	find . -name '*.pyo' -exec rm -f {} \;
 	find . -name '*~' -exec rm -f {} \;
 
+pep8:
+	flake8 telegram
+
 lint:
-	flake8 --doctests --max-complexity 10 telegram
+	pylint -E telegram
 
 test:
-	python telegram_test.py
+	@- $(foreach TEST, $(wildcard tests/test_*.py), python $(TEST))
+
+help:
+	@echo "Available targets:"
+	@echo "- clean       Clean up the source directory"
+	@echo "- pep8        Check style with flake8"
+	@echo "- lint        Check style with pylint"
+	@echo "- test        Run tests"

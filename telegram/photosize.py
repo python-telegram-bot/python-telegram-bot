@@ -16,32 +16,70 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram PhotoSize"""
 
 from telegram import TelegramObject
 
 
 class PhotoSize(TelegramObject):
+    """This object represents a Telegram PhotoSize.
+
+    Attributes:
+        file_id (str):
+        width (int):
+        height (int):
+        file_size (int):
+
+    Args:
+        file_id (str):
+        width (int):
+        height (int):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        file_size (Optional[int]):
+    """
+
     def __init__(self,
                  file_id,
                  width,
                  height,
-                 file_size=None):
+                 **kwargs):
+        # Required
         self.file_id = file_id
-        self.width = width
-        self.height = height
-        self.file_size = file_size
+        self.width = int(width)
+        self.height = int(height)
+        # Optionals
+        self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
     def de_json(data):
-        return PhotoSize(file_id=data.get('file_id', None),
-                         width=data.get('width', None),
-                         height=data.get('height', None),
-                         file_size=data.get('file_size', None))
+        """
+        Args:
+            data (str):
 
-    def to_dict(self):
-        data = {'file_id': self.file_id,
-                'width': self.width,
-                'height': self.height}
-        if self.file_size:
-            data['file_size'] = self.file_size
-        return data
+        Returns:
+            telegram.PhotoSize:
+        """
+        if not data:
+            return None
+
+        return PhotoSize(**data)
+
+    @staticmethod
+    def de_list(data):
+        """
+        Args:
+            data (list):
+
+        Returns:
+            List<telegram.PhotoSize>:
+        """
+        if not data:
+            return []
+
+        photos = list()
+        for photo in data:
+            photos.append(PhotoSize.de_json(photo))
+
+        return photos

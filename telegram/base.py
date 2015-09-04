@@ -16,13 +16,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""Base class for Telegram Objects"""
 
 import json
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 
 class TelegramObject(object):
-    """Base class for most telegram object"""
+    """Base class for most telegram objects"""
 
     __metaclass__ = ABCMeta
 
@@ -34,11 +35,34 @@ class TelegramObject(object):
 
     @staticmethod
     def de_json(data):
+        """
+        Args:
+            data (str):
+
+        Returns:
+            telegram.TelegramObject:
+        """
         raise NotImplementedError
 
     def to_json(self):
+        """
+        Returns:
+            str:
+        """
         return json.dumps(self.to_dict())
 
-    @abstractmethod
     def to_dict(self):
-        return
+        """
+        Returns:
+            dict:
+        """
+        data = dict()
+
+        for key, value in self.__dict__.items():
+            if value:
+                if hasattr(value, 'to_dict'):
+                    data[key] = value.to_dict()
+                else:
+                    data[key] = value
+
+        return data

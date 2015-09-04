@@ -16,30 +16,45 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Update"""
 
-from telegram import TelegramObject
+from telegram import Message, TelegramObject
 
 
 class Update(TelegramObject):
+    """This object represents a Telegram Update.
+
+    Attributes:
+        update_id (int):
+        message (:class:`telegram.Message`):
+
+    Args:
+        update_id (int):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        message (Optional[:class:`telegram.Message`]):
+    """
     def __init__(self,
                  update_id,
-                 message=None):
+                 **kwargs):
+        # Required
         self.update_id = update_id
-        self.message = message
+        # Optionals
+        self.message = kwargs.get('message')
 
     @staticmethod
     def de_json(data):
-        if 'message' in data:
-            from telegram import Message
-            message = Message.de_json(data['message'])
-        else:
-            message = None
+        """
+        Args:
+            data (str):
 
-        return Update(update_id=data.get('update_id', None),
-                      message=message)
+        Returns:
+            telegram.Update:
+        """
+        if not data:
+            return None
 
-    def to_dict(self):
-        data = {'update_id': self.update_id}
-        if self.message:
-            data['message'] = self.message.to_dict()
-        return data
+        data['message'] = Message.de_json(data['message'])
+
+        return Update(**data)

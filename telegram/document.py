@@ -16,45 +16,53 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Document"""
 
-from telegram import TelegramObject
+from telegram import PhotoSize, TelegramObject
 
 
 class Document(TelegramObject):
+    """This object represents a Telegram Document.
+
+    Attributes:
+        file_id (str):
+        thumb (:class:`telegram.PhotoSize`):
+        file_name (str):
+        mime_type (str):
+        file_size (int):
+
+    Args:
+        file_id (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        thumb (Optional[:class:`telegram.PhotoSize`]):
+        file_name (Optional[str]):
+        mime_type (Optional[str]):
+        file_size (Optional[int]):
+    """
+
     def __init__(self,
                  file_id,
-                 thumb=None,
-                 file_name=None,
-                 mime_type=None,
-                 file_size=None):
+                 **kwargs):
+        # Required
         self.file_id = file_id
-        self.thumb = thumb
-        self.file_name = file_name
-        self.mime_type = mime_type
-        self.file_size = file_size
+        # Optionals
+        self.thumb = kwargs.get('thumb')
+        self.file_name = kwargs.get('file_name', '')
+        self.mime_type = kwargs.get('mime_type', '')
+        self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
     def de_json(data):
-        if 'thumb' in data:
-            from telegram import PhotoSize
-            thumb = PhotoSize.de_json(data['thumb'])
-        else:
-            thumb = None
+        """
+        Args:
+            data (str):
 
-        return Document(file_id=data.get('file_id', None),
-                        thumb=thumb,
-                        file_name=data.get('file_name', None),
-                        mime_type=data.get('mime_type', None),
-                        file_size=data.get('file_size', None))
+        Returns:
+            telegram.Document:
+        """
+        if not data:
+            return None
 
-    def to_dict(self):
-        data = {'file_id': self.file_id}
-        if self.thumb:
-            data['thumb'] = self.thumb.to_dict()
-        if self.file_name:
-            data['file_name'] = self.file_name
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-        return data
+        return Document(**data)

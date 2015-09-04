@@ -4,9 +4,11 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "pypy"
+  - "pypy3"
 install:
   - pip install coveralls
 script:
-  coverage run telegram_test.py
+  coverage run tests/test_*.py
 after_success:
   coveralls

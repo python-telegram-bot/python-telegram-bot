@@ -16,23 +16,40 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Location"""
 
 from telegram import TelegramObject
 
 
 class Location(TelegramObject):
+    """This object represents a Telegram Sticker.
+
+    Attributes:
+        longitude (float):
+        latitude (float):
+
+    Args:
+        longitude (float):
+        latitude (float):
+    """
+
     def __init__(self,
                  longitude,
                  latitude):
-        self.longitude = longitude
-        self.latitude = latitude
+        # Required
+        self.longitude = float(longitude)
+        self.latitude = float(latitude)
 
     @staticmethod
     def de_json(data):
-        return Location(longitude=data.get('longitude', None),
-                        latitude=data.get('latitude', None))
+        """
+        Args:
+            data (str):
 
-    def to_dict(self):
-        data = {'longitude': self.longitude,
-                'latitude': self.latitude}
-        return data
+        Returns:
+            telegram.Location:
+        """
+        if not data:
+            return None
+
+        return Location(**data)

@@ -16,34 +16,50 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Voice"""
 
 from telegram import TelegramObject
 
 
 class Voice(TelegramObject):
+    """This object represents a Telegram Voice.
+
+    Attributes:
+        file_id (str):
+        duration (int):
+        mime_type (str):
+        file_size (int):
+
+    Args:
+        file_id (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        duration (Optional[int]):
+        mime_type (Optional[str]):
+        file_size (Optional[int]):
+    """
+
     def __init__(self,
                  file_id,
-                 duration=None,
-                 mime_type=None,
-                 file_size=None):
+                 **kwargs):
+        # Required
         self.file_id = file_id
-        self.duration = duration
-        self.mime_type = mime_type
-        self.file_size = file_size
+        # Optionals
+        self.duration = int(kwargs.get('duration', 0))
+        self.mime_type = kwargs.get('mime_type', '')
+        self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
     def de_json(data):
-        return Voice(file_id=data.get('file_id', None),
-                     duration=data.get('duration', None),
-                     mime_type=data.get('mime_type', None),
-                     file_size=data.get('file_size', None))
+        """
+        Args:
+            data (str):
 
-    def to_dict(self):
-        data = {'file_id': self.file_id}
-        if self.duration:
-            data['duration'] = self.duration
-        if self.mime_type:
-            data['mime_type'] = self.mime_type
-        if self.file_size:
-            data['file_size'] = self.file_size
-        return data
+        Returns:
+            telegram.Voice:
+        """
+        if not data:
+            return None
+
+        return Voice(**data)

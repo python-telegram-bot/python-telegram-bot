@@ -16,36 +16,56 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram
+UserProfilePhotos"""
 
-from telegram import TelegramObject
+from telegram import PhotoSize, TelegramObject
 
 
 class UserProfilePhotos(TelegramObject):
+    """This object represents a Telegram UserProfilePhotos.
+
+    Attributes:
+        total_count (int):
+        photos (List[List[:class:`telegram.PhotoSize`]]):
+
+    Args:
+        total_count (int):
+        photos (List[List[:class:`telegram.PhotoSize`]]):
+    """
+
     def __init__(self,
                  total_count,
                  photos):
-        self.total_count = total_count
+        # Required
+        self.total_count = int(total_count)
         self.photos = photos
 
     @staticmethod
     def de_json(data):
-        if 'photos' in data:
-            from telegram import PhotoSize
-            photos = []
-            for photo in data['photos']:
-                photos.append([PhotoSize.de_json(x) for x in photo])
-        else:
-            photos = None
+        """
+        Args:
+            data (str):
 
-        return UserProfilePhotos(total_count=data.get('total_count', None),
-                                 photos=photos)
+        Returns:
+            telegram.UserProfilePhotos:
+        """
+        if not data:
+            return None
+
+        data['photos'] = [PhotoSize.de_list(photo) for photo in data['photos']]
+
+        return UserProfilePhotos(**data)
 
     def to_dict(self):
-        data = {}
-        if self.total_count:
-            data['total_count'] = self.total_count
-        if self.photos:
-            data['photos'] = []
-            for photo in self.photos:
-                data['photos'].append([x.to_dict() for x in photo])
+        """
+        Returns:
+            dict:
+        """
+        data = super(UserProfilePhotos, self).to_dict()
+
+        data['photos'] = []
+        for photo in self.photos:
+            data['photos'].append([x.to_dict() for x in photo])
+
         return data

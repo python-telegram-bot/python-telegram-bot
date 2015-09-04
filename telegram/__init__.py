@@ -16,14 +16,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = 'leandrotoledodesouza@gmail.com'
 __version__ = '2.7.1'
 
 from .base import TelegramObject
 from .user import User
-from .message import Message
-from .update import Update
 from .groupchat import GroupChat
 from .photosize import PhotoSize
 from .audio import Audio
@@ -39,10 +38,12 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardhide import ReplyKeyboardHide
 from .forcereply import ForceReply
-from .inputfile import InputFile
 from .error import TelegramError
+from .inputfile import InputFile
 from .nullhandler import NullHandler
 from .emoji import Emoji
+from .message import Message
+from .update import Update
 from .bot import Bot
 
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',

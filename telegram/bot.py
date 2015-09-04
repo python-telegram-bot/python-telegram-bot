@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -16,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents a Telegram Bot"""
 
 import json
 try:
@@ -32,11 +34,27 @@ import logging
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
                       ReplyMarkup, InputFile, TelegramObject, NullHandler)
 
-h = NullHandler()
-logging.getLogger(__name__).addHandler(h)
+H = NullHandler()
+logging.getLogger(__name__).addHandler(H)
 
 
 class Bot(TelegramObject):
+    """This object represents a Telegram Bot.
+
+    Attributes:
+        id (int):
+        first_name (str):
+        last_name (str):
+        username (str):
+        name (str):
+
+    Args:
+        token (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        base_url (Optional[str]):
+    """
 
     def __init__(self,
                  token,
@@ -50,11 +68,17 @@ class Bot(TelegramObject):
 
         self.bot = None
 
-        self.log = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
 
     def info(func):
+        """
+        Returns:
+        """
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
+            """
+            decorator
+            """
             if not self.bot:
                 self.getMe()
 
@@ -65,36 +89,48 @@ class Bot(TelegramObject):
     @property
     @info
     def id(self):
+        """int: """
         return self.bot.id
 
     @property
     @info
     def first_name(self):
+        """str: """
         return self.bot.first_name
 
     @property
     @info
     def last_name(self):
+        """str: """
         return self.bot.last_name
 
     @property
     @info
     def username(self):
+        """str: """
         return self.bot.username
 
     @property
     def name(self):
+        """str: """
         return '@%s' % self.username
 
     def log(func):
+        """
+        Returns:
+          A telegram.Message instance representing the message posted.
+        """
         logger = logging.getLogger(func.__module__)
 
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
-            logger.debug('Entering: %s' % func.__name__)
+            """
+            decorator
+            """
+            logger.debug('Entering: %s', func.__name__)
             result = func(self, *args, **kwargs)
             logger.debug(result)
-            logger.debug('Exiting: %s' % func.__name__)
+            logger.debug('Exiting: %s', func.__name__)
             return result
         return decorator
 
@@ -105,7 +141,13 @@ class Bot(TelegramObject):
         """
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
+            """
+            decorator
+            """
             url, data = func(self, *args, **kwargs)
+
+            if not kwargs.get('chat_id'):
+                raise TelegramError('Invalid chat_id.')
 
             if kwargs.get('reply_to_message_id'):
                 reply_to_message_id = kwargs.get('reply_to_message_id')
@@ -118,8 +160,8 @@ class Bot(TelegramObject):
                 else:
                     data['reply_markup'] = reply_markup
 
-            json_data = self._requestUrl(url, 'POST', data=data)
-            data = self._parseAndCheckTelegram(json_data)
+            json_data = Bot._requestUrl(url, 'POST', data=data)
+            data = Bot._parseAndCheckTelegram(json_data)
 
             if data is True:
                 return data
@@ -150,8 +192,7 @@ class Bot(TelegramObject):
                     chat_id,
                     text,
                     disable_web_page_preview=None,
-                    reply_to_message_id=None,
-                    reply_markup=None):
+                    **kwargs):
         """Use this method to send text messages.
 
         Args:
@@ -222,8 +263,7 @@ class Bot(TelegramObject):
                   chat_id,
                   photo,
                   caption=None,
-                  reply_to_message_id=None,
-                  reply_markup=None):
+                  **kwargs):
         """Use this method to send photos.
 
         Args:
@@ -265,8 +305,7 @@ class Bot(TelegramObject):
                   duration=None,
                   performer=None,
                   title=None,
-                  reply_to_message_id=None,
-                  reply_markup=None):
+                  **kwargs):
         """Use this method to send audio files, if you want Telegram clients to
         display them in the music player. Your audio must be in an .mp3 format.
         On success, the sent Message is returned. Bots can currently send audio
@@ -321,8 +360,7 @@ class Bot(TelegramObject):
     def sendDocument(self,
                      chat_id,
                      document,
-                     reply_to_message_id=None,
-                     reply_markup=None):
+                     **kwargs):
         """Use this method to send general files.
 
         Args:
@@ -355,8 +393,7 @@ class Bot(TelegramObject):
     def sendSticker(self,
                     chat_id,
                     sticker,
-                    reply_to_message_id=None,
-                    reply_markup=None):
+                    **kwargs):
         """Use this method to send .webp stickers.
 
         Args:
@@ -391,8 +428,7 @@ class Bot(TelegramObject):
                   video,
                   duration=None,
                   caption=None,
-                  reply_to_message_id=None,
-                  reply_markup=None):
+                  **kwargs):
         """Use this method to send video files, Telegram clients support mp4
         videos (other formats may be sent as telegram.Document).
 
@@ -437,8 +473,7 @@ class Bot(TelegramObject):
                   chat_id,
                   voice,
                   duration=None,
-                  reply_to_message_id=None,
-                  reply_markup=None):
+                  **kwargs):
         """Use this method to send audio files, if you want Telegram clients to
         display the file as a playable voice message. For this to work, your
         audio must be in an .ogg file encoded with OPUS (other formats may be
@@ -482,8 +517,7 @@ class Bot(TelegramObject):
                      chat_id,
                      latitude,
                      longitude,
-                     reply_to_message_id=None,
-                     reply_markup=None):
+                     **kwargs):
         """Use this method to send point on the map.
 
         Args:
@@ -617,16 +651,17 @@ class Bot(TelegramObject):
         data = self._parseAndCheckTelegram(json_data)
 
         if data:
-            self.log.info(
-                'Getting updates: %s' % [u['update_id'] for u in data])
+            self.logger.info(
+                'Getting updates: %s', [u['update_id'] for u in data])
         else:
-            self.log.info('No new updates found.')
+            self.logger.info('No new updates found.')
 
         return [Update.de_json(x) for x in data]
 
     @log
     def setWebhook(self,
-                   webhook_url):
+                   webhook_url=None,
+                   certificate=None):
         """Use this method to specify a url and receive incoming updates via an
         outgoing webhook. Whenever there is an update for the bot, we will send
         an HTTPS POST request to the specified url, containing a
@@ -643,15 +678,19 @@ class Bot(TelegramObject):
         """
         url = '%s/setWebhook' % self.base_url
 
-        data = {'url': webhook_url}
+        data = {}
+        if webhook_url:
+            data['url'] = webhook_url
+        if certificate:
+            data['certificate'] = certificate
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data)
 
-        return True
+        return data
 
-    def _requestUrl(self,
-                    url,
+    @staticmethod
+    def _requestUrl(url,
                     method,
                     data=None):
         """Request an URL.
@@ -688,11 +727,11 @@ class Bot(TelegramObject):
                         url,
                         urlencode(data).encode()
                     ).read()
-            except IOError as e:
-                raise TelegramError(str(e))
             except HTTPError as e:
                 raise TelegramError(str(e))
             except URLError as e:
+                raise TelegramError(str(e))
+            except IOError as e:
                 raise TelegramError(str(e))
 
         if method == 'GET':
@@ -701,8 +740,8 @@ class Bot(TelegramObject):
             except URLError as e:
                 raise TelegramError(str(e))
 
-    def _parseAndCheckTelegram(self,
-                               json_data):
+    @staticmethod
+    def _parseAndCheckTelegram(json_data):
         """Try and parse the JSON returned from Telegram and return an empty
         dictionary if there is any error.
 
@@ -725,7 +764,15 @@ class Bot(TelegramObject):
 
         return data['result']
 
+    @staticmethod
+    def de_json(data):
+        pass
+
     def to_dict(self):
+        """
+        Returns:
+            dict:
+        """
         data = {'id': self.id,
                 'username': self.username,
                 'first_name': self.username}
