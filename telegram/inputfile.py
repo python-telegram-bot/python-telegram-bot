@@ -61,6 +61,9 @@ class InputFile(object):
         if 'voice' in data:
             self.input_name = 'voice'
             self.input_file = data.pop('voice')
+        if 'certificate' in data:
+            self.input_name = 'certificate'
+            self.input_file = data.pop('certificate')
 
         if isinstance(self.input_file, file):
             self.input_file_content = self.input_file.read()

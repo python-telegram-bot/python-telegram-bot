@@ -72,12 +72,12 @@ class Bot(TelegramObject):
 
     def info(func):
         """
-        bla
+        Returns:
         """
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             """
-            bla
+            decorator
             """
             if not self.bot:
                 self.getMe()
@@ -660,7 +660,8 @@ class Bot(TelegramObject):
 
     @log
     def setWebhook(self,
-                   webhook_url):
+                   webhook_url=None,
+                   certificate=None):
         """Use this method to specify a url and receive incoming updates via an
         outgoing webhook. Whenever there is an update for the bot, we will send
         an HTTPS POST request to the specified url, containing a
@@ -677,12 +678,16 @@ class Bot(TelegramObject):
         """
         url = '%s/setWebhook' % self.base_url
 
-        data = {'url': webhook_url}
+        data = {}
+        if webhook_url:
+            data['url'] = webhook_url
+        if certificate:
+            data['certificate'] = certificate
 
         json_data = self._requestUrl(url, 'POST', data=data)
         data = self._parseAndCheckTelegram(json_data)
 
-        return True
+        return data
 
     @staticmethod
     def _requestUrl(url,
