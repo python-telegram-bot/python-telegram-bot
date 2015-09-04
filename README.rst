@@ -7,15 +7,15 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: PyPi Package Version
-    
+
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: PyPi Package Monthly Download
-   
+
 .. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=latest
    :target: https://readthedocs.org/projects/python-telegram-bot/?badge=latest
    :alt: Documentation Status
-   
+
 .. image:: https://img.shields.io/github/license/leandrotoledo/python-telegram-bot.svg
    :target: http://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
@@ -27,7 +27,7 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 .. image:: https://codeclimate.com/github/leandrotoledo/python-telegram-bot/badges/gpa.svg
    :target: https://codeclimate.com/github/leandrotoledo/python-telegram-bot
    :alt: Code Climate
-   
+
 .. image:: https://coveralls.io/repos/leandrotoledo/python-telegram-bot/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/leandrotoledo/python-telegram-bot?branch=master
    :alt: Coveralls
@@ -55,7 +55,7 @@ Table of contents
   2. `Logging`_
 
   3. `Examples`_
-  
+
   4. `Documentation`_
 
 - `License`_
@@ -108,6 +108,8 @@ Python Version *Supported?*
 2.7            Yes
 3.3            Yes
 3.4            Yes
+PyPy           Yes
+PyPy3          Yes
 ============== ============
 
 =============

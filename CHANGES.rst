@@ -1,3 +1,12 @@
+2015-09-04
+  Released 2.8
+  TelegramError when chat_id is empty for send* methods
+  setWebhook now supports sending self-signed certificate
+  Huge redesign of existing Telegram classes
+  Added support for PyPy
+  Added docstring for existing classes
+
+
 2015-08-19
   Released 2.7.1
   Fixed JSON serialization for message
