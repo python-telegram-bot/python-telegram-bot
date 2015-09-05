@@ -27,6 +27,3 @@ class ReplyMarkup(TelegramObject):
     @staticmethod
     def de_json(data):
         pass
-
-    def to_dict(self):
-        pass
