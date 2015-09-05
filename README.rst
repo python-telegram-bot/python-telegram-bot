@@ -266,7 +266,7 @@ _`Contact`
 
 Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b946b2e8e98b73e19be>`_.
 
-*If you face trouble joining in the group please ping me `via Telegram <https://telegram.me/leandrotoledo>`_, I'll be glad to add you.*
+If you face trouble joining in the group please ping me `via Telegram <https://telegram.me/leandrotoledo>`_, I'll be glad to add you.
 
 =======
 _`TODO`
