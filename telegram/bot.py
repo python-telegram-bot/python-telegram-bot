@@ -19,20 +19,12 @@
 
 """This module contains a object that represents a Telegram Bot"""
 
-import json
-try:
-    from urllib.parse import urlencode
-    from urllib.request import urlopen, Request
-    from urllib.error import HTTPError, URLError
-except ImportError:
-    from urllib import urlencode
-    from urllib2 import urlopen, Request
-    from urllib2 import HTTPError, URLError
 import functools
 import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
-                      ReplyMarkup, InputFile, TelegramObject, NullHandler)
+                      ReplyMarkup, TelegramObject, NullHandler)
+from telegram.utils import request
 
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
@@ -160,13 +152,12 @@ class Bot(TelegramObject):
                 else:
                     data['reply_markup'] = reply_markup
 
-            json_data = Bot._requestUrl(url, 'POST', data=data)
-            data = Bot._parseAndCheckTelegram(json_data)
+            result = request.post(url, data)
 
-            if data is True:
-                return data
+            if result is True:
+                return result
 
-            return Message.de_json(data)
+            return Message.de_json(result)
         return decorator
 
     @log
@@ -179,10 +170,9 @@ class Bot(TelegramObject):
         """
         url = '%s/getMe' % self.base_url
 
-        json_data = self._requestUrl(url, 'GET')
-        data = self._parseAndCheckTelegram(json_data)
+        result = request.get(url)
 
-        self.bot = User.de_json(data)
+        self.bot = User.de_json(result)
 
         return self.bot
 
@@ -607,10 +597,9 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
+        result = request.post(url, data)
 
-        return UserProfilePhotos.de_json(data)
+        return UserProfilePhotos.de_json(result)
 
     @log
     def getUpdates(self,
@@ -647,16 +636,15 @@ class Bot(TelegramObject):
         if timeout:
             data['timeout'] = timeout
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
+        result = request.post(url, data)
 
-        if data:
+        if result:
             self.logger.info(
-                'Getting updates: %s', [u['update_id'] for u in data])
+                'Getting updates: %s', [u['update_id'] for u in result])
         else:
             self.logger.info('No new updates found.')
 
-        return [Update.de_json(x) for x in data]
+        return [Update.de_json(x) for x in result]
 
     @log
     def setWebhook(self,
@@ -684,85 +672,9 @@ class Bot(TelegramObject):
         if certificate:
             data['certificate'] = certificate
 
-        json_data = self._requestUrl(url, 'POST', data=data)
-        data = self._parseAndCheckTelegram(json_data)
+        result = request.post(url, data)
 
-        return data
-
-    @staticmethod
-    def _requestUrl(url,
-                    method,
-                    data=None):
-        """Request an URL.
-
-        Args:
-          url:
-            The web location we want to retrieve.
-          method:
-            Either POST or GET.
-          data:
-            A dict of (str, unicode) key/value pairs.
-
-        Returns:
-          A JSON object.
-        """
-        if method not in ('POST', 'GET'):
-            raise ValueError(
-                "Method '%s' is neither 'POST' nor 'GET'" % method)
-
-        if method == 'POST':
-            try:
-                if InputFile.is_inputfile(data):
-                    data = InputFile(data)
-
-                    request = Request(
-                        url,
-                        data=data.to_form(),
-                        headers=data.headers
-                    )
-
-                    return urlopen(request).read()
-                else:
-                    return urlopen(
-                        url,
-                        urlencode(data).encode()
-                    ).read()
-            except HTTPError as e:
-                raise TelegramError(str(e))
-            except URLError as e:
-                raise TelegramError(str(e))
-            except IOError as e:
-                raise TelegramError(str(e))
-
-        if method == 'GET':
-            try:
-                return urlopen(url).read()
-            except URLError as e:
-                raise TelegramError(str(e))
-
-    @staticmethod
-    def _parseAndCheckTelegram(json_data):
-        """Try and parse the JSON returned from Telegram and return an empty
-        dictionary if there is any error.
-
-        Args:
-          json_data:
-            JSON results from Telegram Bot API.
-
-        Returns:
-          A JSON parsed as Python dict with results.
-        """
-
-        try:
-            data = json.loads(json_data.decode())
-            if not data['ok']:
-                raise TelegramError(data['description'])
-        except ValueError:
-            if '<title>403 Forbidden</title>' in json_data:
-                raise TelegramError({'message': 'API must be authenticated'})
-            raise TelegramError({'message': 'JSON decoding'})
-
-        return data['result']
+        return result
 
     @staticmethod
     def de_json(data):
