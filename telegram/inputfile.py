@@ -171,7 +171,8 @@ class InputFile(object):
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'video', 'voice']
+            file_types = ['audio', 'document', 'photo', 'video', 'voice',
+                          'certificate']
             file_type = [i for i in list(data.keys()) if i in file_types]
 
             if file_type:
