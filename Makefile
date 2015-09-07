@@ -14,10 +14,7 @@ lint:
 	pylint -E telegram
 
 test:
-	@- $(foreach TEST, $(wildcard tests/test_*.py), python $(TEST);)
-
-coverage:
-	@- $(foreach TEST, $(wildcard tests/test_*.py), coverage run $(TEST);)
+	python tests/run.py
 
 help:
 	@echo "Available targets:"
