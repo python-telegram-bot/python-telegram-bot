@@ -49,12 +49,12 @@ class Audio(TelegramObject):
                  duration,
                  **kwargs):
         # Required
-        self.file_id = file_id
+        self.file_id = str(file_id)
         self.duration = int(duration)
         # Optionals
-        self.performer = kwargs.get('performer', '')
-        self.title = kwargs.get('title', '')
-        self.mime_type = kwargs.get('mime_type', '')
+        self.performer = str(kwargs.get('performer', ''))
+        self.title = str(kwargs.get('title', ''))
+        self.mime_type = str(kwargs.get('mime_type', ''))
         self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod

@@ -22,10 +22,14 @@
 class TelegramError(Exception):
     """This object represents a Telegram Error."""
 
-    @property
-    def message(self):
+    def __init__(self, message):
         """
         Returns:
             str:
         """
-        return self.args[0]
+        super(TelegramError, self).__init__()
+
+        self.message = message.split(':')[-1].strip().capitalize()
+
+    def __str__(self):
+        return '%s' % (self.message)

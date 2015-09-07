@@ -45,7 +45,7 @@ class Contact(TelegramObject):
                  first_name,
                  **kwargs):
         # Required
-        self.phone_number = phone_number
+        self.phone_number = str(phone_number)
         self.first_name = first_name
         # Optionals
         self.last_name = kwargs.get('last_name', '')

@@ -44,10 +44,10 @@ class Voice(TelegramObject):
                  file_id,
                  **kwargs):
         # Required
-        self.file_id = file_id
+        self.file_id = str(file_id)
         # Optionals
         self.duration = int(kwargs.get('duration', 0))
-        self.mime_type = kwargs.get('mime_type', '')
+        self.mime_type = str(kwargs.get('mime_type', ''))
         self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
