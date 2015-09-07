@@ -1,4 +1,4 @@
-.PHONY: clean pep8 lint test
+.PHONY: clean pep8 lint test coverage
 
 clean:
 	rm -fr build
@@ -15,6 +15,9 @@ lint:
 
 test:
 	@- $(foreach TEST, $(wildcard tests/test_*.py), python $(TEST);)
+
+coverage:
+	@- $(foreach TEST, $(wildcard tests/test_*.py), coverage run $(TEST);)
 
 help:
 	@echo "Available targets:"
