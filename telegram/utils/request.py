@@ -38,19 +38,18 @@ def _parse(json_data):
     dictionary if there is any error.
 
     Args:
-      json_data:
-        JSON results from Telegram Bot API.
+      url:
+        urllib.urlopen object
 
     Returns:
       A JSON parsed as Python dict with results.
     """
     try:
         data = json.loads(json_data.decode())
-        if not data['ok']:
-            raise TelegramError(data['description'])
+
+        if not data.get('ok') and data.get('description'):
+            return data['description']
     except ValueError:
-        if '<title>403 Forbidden</title>' in json_data:
-            raise TelegramError({'message': 'API must be authenticated'})
         raise TelegramError({'message': 'JSON decoding'})
 
     return data['result']
@@ -61,14 +60,13 @@ def get(url):
     Args:
       url:
         The web location we want to retrieve.
+
     Returns:
       A JSON object.
     """
-    try:
-        result = urlopen(url).read()
-        return _parse(result)
-    except URLError as error:
-        raise TelegramError(str(error))
+    result = urlopen(url).read()
+
+    return _parse(result)
 
 
 def post(url,
@@ -79,30 +77,24 @@ def post(url,
         The web location we want to retrieve.
       data:
         A dict of (str, unicode) key/value pairs.
+
     Returns:
       A JSON object.
     """
     try:
         if InputFile.is_inputfile(data):
             data = InputFile(data)
-
-            request = Request(
-                url,
-                data=data.to_form(),
-                headers=data.headers
-            )
+            request = Request(url, data=data.to_form(), headers=data.headers)
 
             result = urlopen(request).read()
         else:
-            result = urlopen(
-                url,
-                urlencode(data).encode()
-            ).read()
-
-        return _parse(result)
+            result = urlopen(url, urlencode(data).encode()).read()
     except HTTPError as error:
-        raise TelegramError(str(error))
+        message = _parse(error.read())
+        raise TelegramError(message)
     except URLError as error:
         raise TelegramError(str(error))
     except IOError as error:
         raise TelegramError(str(error))
+
+    return _parse(result)
