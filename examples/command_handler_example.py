@@ -1,12 +1,3 @@
-# There could be some unused imports
-import sys
-sys.path.append('..')
-sys.path.append('.')
-from inspect import getmembers, ismethod
-import threading
-import logging
-import telegram
-import time
 from telegram import CommandHandlerWithHelpAndFather, CommandHandler
 class ExampleCommandHandler(CommandHandlerWithHelpAndFather):
     """This is an example how to use a CommandHandlerWithHelp or just a CommandHandler.
