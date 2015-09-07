@@ -4,7 +4,7 @@ import logging
 import telegram
 import time
 logger = logging.getLogger(__name__)
-__all__ = ['CommandHandler', 'CommandHandlerWithHelp']
+__all__ = ['CommandHandler', 'CommandHandlerWithHelp', 'CommandHandlerWithFatherCommand', 'CommandHandlerWithHelpAndFather']
 class CommandHandler(object):
     """ This handles incomming commands and gives an easy way to create commands.
 
@@ -38,6 +38,7 @@ class CommandHandler(object):
             The timeout on a thread. If a thread is alive after this period then try to join the thread in
             the next loop.
         """
+
         old_threads = []
         while True:
             time.sleep(sleep)
@@ -82,7 +83,9 @@ class CommandHandler(object):
                 if username == bot_name:
                     command_func = self._get_command_func(command)
                     if command_func is not None:
-                        self.bot.sendChatAction(update.message.chat.id,telegram.ChatAction.TYPING)
+                        print (update.message.chat.id)
+                        print (type(update.message.chat.id))
+                        self.bot.sendChatAction(chat_id=update.message.chat.id, action=telegram.ChatAction.TYPING)
                         if self.isValidCommand is None or self.isValidCommand(update):
                             if make_thread:
                                 t = threading.Thread(target=command_func, args=(update,))
@@ -108,7 +111,7 @@ class CommandHandler(object):
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = "Sorry, the command was not authorised or valid: {command}.".format(command=update.message.text.split(' ')[0])
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
     def _command_not_found(self, update):
         """Inform the telegram user that the command was not found.
@@ -119,7 +122,7 @@ class CommandHandler(object):
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = "Sorry, I didn't understand the command: {command}.".format(command=update.message.text.split(' ')[0])
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
 
 class CommandHandlerWithHelp(CommandHandler):
@@ -132,6 +135,7 @@ class CommandHandlerWithHelp(CommandHandler):
         self._help_list_title = 'These are the commands:'  # the title of the list
         self.is_reply = True
         self.command_start = self.command_help
+        self.skip_in_help = []
 
     def _generate_help(self):
         """ Generate a string which can be send as a help file.
@@ -141,17 +145,23 @@ class CommandHandlerWithHelp(CommandHandler):
             command to the telegram user.
         """
 
-        command_functions = [attr[1] for attr in getmembers(self, predicate=ismethod) if attr[0][:8] == 'command_']
+        
         help_message = self._help_title + '\n\n'
         help_message += self._help_before_list + '\n\n'
         help_message += self._help_list_title + '\n'
+        help_message += self._generate_help_list()
+        help_message += '\n'
+        help_message += self._help_after_list
+        return help_message
+    
+    def _generate_help_list(self):
+        command_functions = [attr[1] for attr in getmembers(self, predicate=ismethod) if attr[0][:8] == 'command_' and attr[0] not in self.skip_in_help]
+        help_message = ''
         for command_function in command_functions:
             if command_function.__doc__ is not None:
                 help_message += '  /' + command_function.__name__[8:] + ' - ' + command_function.__doc__ + '\n'
             else:
                 help_message += '  /' + command_function.__name__[8:] + ' - ' + '\n'
-        help_message += '\n'
-        help_message += self._help_after_list
         return help_message
 
     def _command_not_found(self, update):
@@ -160,15 +170,42 @@ class CommandHandlerWithHelp(CommandHandler):
         reply_to = update.message.message_id
         message = 'Sorry, I did not understand the command: {command}. Please see /help for all available commands'
         if self.is_reply:
-            self.bot.sendMessage(chat_id, message.format(command=update.message.text.split(' ')[0]),
+            self.bot.sendMessage(chat_id=chat_id, text=message.format(command=update.message.text.split(' ')[0]),
                                  reply_to_message_id=reply_to)
         else:
-            self.bot.sendMessage(chat_id, message.format(command=update.message.text.split(' ')[0]))
+            self.bot.sendMessage(chat_id=chat_id, text=message.format(command=update.message.text.split(' ')[0]))
 
     def command_help(self, update):
         """ The help file. """
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = self._generate_help()
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
+
+class CommandHandlerWithFatherCommand(CommandHandler):
+    """ A class that creates some commands that are usefull when setting up the bot
+    """
+    def __init__(self, bot):
+        super(CommandHandlerWithFatherCommand, self).__init__(bot)
+        self.skip_in_help = ['command_father']
+
+    def command_father(self, update):
+        chat_id = update.message.chat.id
+        self.bot.sendMessage(chat_id=chat_id, text='Send the following messages to telegram.me/BotFather')
+        self.bot.sendMessage(chat_id=chat_id, text='/setcommands')
+        self.bot.sendMessage(chat_id=chat_id, text='@' + self.bot.getMe()['username'])
+        commands = ''
+        command_functions = [attr[1] for attr in getmembers(self, predicate=ismethod) if attr[0][:8] == 'command_' and attr[0] not in self.skip_in_help]
+    
+        for command_function in command_functions:
+            if command_function.__doc__ is not None:
+                commands +=  command_function.__name__[8:] + ' - ' + command_function.__doc__ + '\n'
+            else:
+                commands +=  command_function.__name__[8:] + ' - ' + '\n'
+        self.bot.sendMessage(chat_id=chat_id, text=commands)
+
+class CommandHandlerWithHelpAndFather(CommandHandlerWithFatherCommand, CommandHandlerWithHelp):
+    """A class that combines CommandHandlerWithHelp and CommandHandlerWithFatherCommand.
+    """
+    pass

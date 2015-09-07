@@ -1,11 +1,14 @@
 # There could be some unused imports
+import sys
+sys.path.append('..')
+sys.path.append('.')
 from inspect import getmembers, ismethod
 import threading
 import logging
 import telegram
 import time
-from telegram import CommandHandlerWithHelp, CommandHandler
-class ExampleCommandHandler(CommandHandlerWithHelp):
+from telegram import CommandHandlerWithHelpAndFather, CommandHandler
+class ExampleCommandHandler(CommandHandlerWithHelpAndFather):
     """This is an example how to use a CommandHandlerWithHelp or just a CommandHandler.
 
     If You want to use a CommandHandler it is very easy.
@@ -31,7 +34,7 @@ class ExampleCommandHandler(CommandHandlerWithHelp):
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = "Sorry, I don't know how to do {command}.".format(command=update.message.text.split(' ')[0])
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
     # creates /test command. This code gets called when a telegram user enters /test
     def command_test(self, update):
@@ -39,7 +42,7 @@ class ExampleCommandHandler(CommandHandlerWithHelp):
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = 'Yeah, the server is online!'
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
     # creates /parrot command
     def command_parrot(self, update):
@@ -50,7 +53,7 @@ class ExampleCommandHandler(CommandHandlerWithHelp):
         message = update.message.text[len(send[0]):]
         if len(send) == 1:
             message = '...'
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
     # creates /p command
     def command_p(self, update):
@@ -67,7 +70,7 @@ class ExampleCommandHandler(CommandHandlerWithHelp):
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = 'Yeah, this is another test'
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
 
 class Exampe2CommandHandler(CommandHandler):
@@ -79,11 +82,15 @@ class Exampe2CommandHandler(CommandHandler):
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
         message = 'Yeah, the server is online!'
-        self.bot.sendMessage(chat_id, message, reply_to_message_id=reply_to)
+        self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
 if __name__ == '__main__':
-    import telegram
-    token = ''  # use your own token here
+    import telegram as telegram
+    try:
+        from mytoken import token
+    except:
+        token = ''  # use your own token here
+    print ('token = ', token)
     Bot = telegram.Bot(token=token)
     test_command_handler = ExampleCommandHandler(Bot)
     test_command_handler.run()
