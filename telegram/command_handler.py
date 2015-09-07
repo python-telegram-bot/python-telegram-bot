@@ -4,7 +4,10 @@ import logging
 import telegram
 import time
 logger = logging.getLogger(__name__)
-__all__ = ['CommandHandler', 'CommandHandlerWithHelp', 'CommandHandlerWithFatherCommand', 'CommandHandlerWithHelpAndFather']
+__all__ = ['CommandHandler', 'CommandHandlerWithHelp', 'CommandHandlerWithFatherCommand',
+           'CommandHandlerWithHelpAndFather']
+
+
 class CommandHandler(object):
     """ This handles incomming commands and gives an easy way to create commands.
 
@@ -15,7 +18,8 @@ class CommandHandler(object):
     """
     def __init__(self, bot):
         self.bot = bot  # a telegram bot
-        self.isValidCommand = None  # a function that returns a boolean and takes one agrument an update. if False is returned the the comaand is not executed.
+        self.isValidCommand = None  # a function that returns a boolean and takes one agrument an update.
+                                    # If False is returned the the command is not executed.
 
     def _get_command_func(self, command):
         if command[0] == '/':
@@ -83,8 +87,6 @@ class CommandHandler(object):
                 if username == bot_name:
                     command_func = self._get_command_func(command)
                     if command_func is not None:
-                        print (update.message.chat.id)
-                        print (type(update.message.chat.id))
                         self.bot.sendChatAction(chat_id=update.message.chat.id, action=telegram.ChatAction.TYPING)
                         if self.isValidCommand is None or self.isValidCommand(update):
                             if make_thread:
@@ -110,7 +112,8 @@ class CommandHandler(object):
         """
         chat_id = update.message.chat.id
         reply_to = update.message.message_id
-        message = "Sorry, the command was not authorised or valid: {command}.".format(command=update.message.text.split(' ')[0])
+        message = "Sorry, the command was not authorised or valid: {command}.".format(
+            command=update.message.text.split(' ')[0])
         self.bot.sendMessage(chat_id=chat_id, text=message, reply_to_message_id=reply_to)
 
     def _command_not_found(self, update):
