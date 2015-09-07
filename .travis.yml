@@ -9,6 +9,6 @@ python:
 install:
   - pip install coveralls
 script:
-  make tests
+  make test
 after_success:
   coveralls
