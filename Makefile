@@ -14,7 +14,7 @@ lint:
 	pylint -E telegram
 
 test:
-	@- $(foreach TEST, $(wildcard tests/test_*.py), python $(TEST))
+	@- $(foreach TEST, $(wildcard tests/test_*.py), python $(TEST);)
 
 help:
 	@echo "Available targets:"
