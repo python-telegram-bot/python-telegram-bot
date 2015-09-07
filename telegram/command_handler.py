@@ -133,9 +133,22 @@ class CommandHandlerWithHelp(CommandHandler):
         self._help_before_list = ''  # text with information about the bot
         self._help_after_list = ''  # a footer
         self._help_list_title = 'These are the commands:'  # the title of the list
+        self._help_extra_message =  'These commands are only usefull to the developer.'
         self.is_reply = True
         self.command_start = self.command_help
         self.skip_in_help = []
+    
+    def command_helpextra(self,update):
+        """ The commands in here are only usefull to the developer of the bot"""
+        command_functions = [attr[1] for attr in getmembers(self, predicate=ismethod) if attr[0][:8] == 'command_' and attr[0] in self.skip_in_help]
+        chat_id = update.message.chat.id
+        help_message = self._help_extra_message +'\n'
+        for command_function in command_functions:
+            if command_function.__doc__ is not None:
+                help_message += '  /' + command_function.__name__[8:] + ' - ' + command_function.__doc__ + '\n'
+            else:
+                help_message += '  /' + command_function.__name__[8:] + ' - ' + '\n'
+        self.bot.sendMessage(chat_id=chat_id,text=help_message)
 
     def _generate_help(self):
         """ Generate a string which can be send as a help file.
