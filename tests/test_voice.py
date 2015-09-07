@@ -59,9 +59,9 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.mime_type, self.mime_type)
         self.assertEqual(voice.file_size, self.file_size)
 
-    def test_send_audio_all_args(self):
+    def test_send_voice_all_args(self):
         """Test telegram.Bot sendAudio method"""
-        print('Testing bot.sendVoice - With all required arguments')
+        print('Testing bot.sendVoice - With all arguments')
 
         message = self._bot.sendVoice(self._chat_id,
                                       self.voice_file,
@@ -82,7 +82,8 @@ class VoiceTest(BaseTest, unittest.TestCase):
         print('Testing bot.sendVoice - Ogg File')
 
         message = self._bot.sendVoice(chat_id=self._chat_id,
-                                      voice=self.voice_file)
+                                      voice=self.voice_file,
+                                      duration=self.duration)
 
         voice = message.voice
 
@@ -97,7 +98,8 @@ class VoiceTest(BaseTest, unittest.TestCase):
         print('Testing bot.sendVoice - Resend by file_id')
 
         message = self._bot.sendVoice(chat_id=self._chat_id,
-                                      voice=self.voice_file_id)
+                                      voice=self.voice_file_id,
+                                      duration=self.duration)
 
         voice = message.voice
 
