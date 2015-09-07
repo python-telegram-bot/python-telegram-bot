@@ -70,7 +70,24 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
 
-        self.assertEqual(user.name, 'Leandro S.')
+        self.assertEqual(user.name, '%s %s' % (self.first_name, self.last_name))
+
+
+    def test_user_de_json_without_username_and_lastname(self):
+        """Test User.de_json() method"""
+        print('Testing User.de_json() - Without username and last_name')
+
+        json_dict = self.json_dict
+
+        del(json_dict['username'])
+        del(json_dict['last_name'])
+
+        user = telegram.User.de_json(self.json_dict)
+
+        self.assertEqual(user.id, self.id)
+        self.assertEqual(user.first_name, self.first_name)
+
+        self.assertEqual(user.name, self.first_name)
 
     def test_user_to_json(self):
         """Test User.to_json() method"""

@@ -39,6 +39,14 @@ class GroupChatTest(BaseTest, unittest.TestCase):
             'title': self.title
         }
 
+    def test_group_chat_de_json_empty_json(self):
+        """Test GroupChat.de_json() method"""
+        print('Testing GroupChat.de_json() - Empty JSON')
+
+        group_chat = telegram.GroupChat.de_json({})
+
+        self.assertEqual(group_chat, None)
+
     def test_group_chat_de_json(self):
         """Test GroupChat.de_json() method"""
         print('Testing GroupChat.de_json()')
