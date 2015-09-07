@@ -51,7 +51,7 @@ class BotTest(unittest.TestCase):
         bot = self._bot.getMe()
 
         self.assertTrue(self.is_json(bot.to_json()))
-        self.assertEqual(bot.id, 120405045)
+        self.assertEqual(bot.id, 133505823)
         self.assertEqual(bot.first_name, 'Toledo\'s Palace Bot')
         self.assertEqual(bot.last_name, '')
         self.assertEqual(bot.username, 'ToledosPalaceBot')
@@ -134,30 +134,6 @@ class BotTest(unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
-
-    def testSendAudio(self):
-        '''Test the telegram.Bot sendAudio method'''
-        print('Testing sendAudio - File')
-        message = self._bot.sendAudio(audio=open('tests/data/telegram.mp3', 'rb'),
-                                      chat_id=self._chat_id,
-                                      performer='Leandro Toledo',
-                                      title='Teste')
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.audio.file_size, 28232)
-        self.assertEqual(message.audio.performer, 'Leandro Toledo')
-        self.assertEqual(message.audio.title, 'Teste')
-
-    def testResendAudio(self):
-        '''Test the telegram.Bot sendAudio method'''
-        print('Testing sendAudio - Resend')
-        message = self._bot.sendAudio(audio='BQADAQADwwcAAjU8LQdBRsl3_qD2TAI',
-                                      chat_id=self._chat_id,
-                                      performer='Leandro Toledo',   # Bug #39
-                                      title='Teste')                # Bug #39
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.audio.file_id, 'BQADAQADwwcAAjU8LQdBRsl3_qD2TAI')
 
     def testSendVoice(self):
         '''Test the telegram.Bot sendVoice method'''
