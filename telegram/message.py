@@ -171,6 +171,12 @@ class Message(TelegramObject):
 
         return Message(**data)
 
+    def __getitem__(self, item):
+        if item in self.__dict__.keys():
+            return self.__dict__[item]
+        elif item == 'chat_id':
+            return self.chat.id
+
     def to_dict(self):
         """
         Returns:
