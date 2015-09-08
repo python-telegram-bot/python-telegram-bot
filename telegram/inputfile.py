@@ -67,7 +67,10 @@ class InputFile(object):
 
         if isinstance(self.input_file, file):
             self.input_file_content = self.input_file.read()
-            self.filename = os.path.basename(self.input_file.name)
+            if self.data.has_key('filename') and self.data['filename']:
+                self.filename = self.data['filename']
+            else:
+                self.filename = os.path.basename(self.input_file.name)
             self.mimetype = mimetypes.guess_type(self.filename)[0] or \
                 DEFAULT_MIME_TYPE
 
