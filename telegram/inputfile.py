@@ -68,7 +68,7 @@ class InputFile(object):
         if isinstance(self.input_file, file):
             self.input_file_content = self.input_file.read()
             if 'filename' in self.data:
-                self.filename = self.data['filename']
+                self.filename = self.data.pop('filename')
             else:
                 self.filename = os.path.basename(self.input_file.name)
             self.mimetype = mimetypes.guess_type(self.filename)[0] or \
