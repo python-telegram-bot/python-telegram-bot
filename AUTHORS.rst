@@ -10,6 +10,7 @@ The following wonderful people contributed directly or indirectly to this projec
 
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
+- `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `franciscod <https://github.com/franciscod>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
