@@ -88,7 +88,7 @@ def post(url,
                                    headers=data.headers)
         else:
             data = json.dumps(data)
-            request = Request(url, data=data, 
+            request = Request(url, data=data.encode(), 
                                    headers={'Content-Type': 'application/json'})
 
         result = urlopen(request).read()
