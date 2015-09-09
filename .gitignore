@@ -58,3 +58,6 @@ docs/_build/
 # PyBuilder
 target/
 .idea/
+
+# token
+mytoken.py
