@@ -84,11 +84,14 @@ def post(url,
     try:
         if InputFile.is_inputfile(data):
             data = InputFile(data)
-            request = Request(url, data=data.to_form(), headers=data.headers)
-
-            result = urlopen(request).read()
+            request = Request(url, data=data.to_form(), 
+                                   headers=data.headers)
         else:
-            result = urlopen(url, urlencode(data).encode()).read()
+            data = json.dumps(data)
+            request = Request(url, data=data, 
+                                   headers={'Content-Type': 'application/json'})
+
+        result = urlopen(request).read()
     except HTTPError as error:
         message = _parse(error.read())
         raise TelegramError(message)
