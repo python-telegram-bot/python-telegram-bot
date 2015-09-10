@@ -18,6 +18,8 @@
 
 """This module contains a object that represents a Telegram Error"""
 
+import re
+
 
 class TelegramError(Exception):
     """This object represents a Telegram Error."""
@@ -29,7 +31,11 @@ class TelegramError(Exception):
         """
         super(TelegramError, self).__init__()
 
-        self.message = message.split(':')[-1].strip().capitalize()
+        api_error = re.match(r'^Error: (?P<message>.*)', message)
+        if api_error:
+            self.message = api_error.group('message').capitalize()
+        else:
+            self.message = message
 
     def __str__(self):
         return '%s' % (self.message)

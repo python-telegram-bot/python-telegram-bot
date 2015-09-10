@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module
+# pylint: disable=no-name-in-module,unused-import
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -44,13 +44,10 @@ def _parse(json_data):
     Returns:
       A JSON parsed as Python dict with results.
     """
-    try:
-        data = json.loads(json_data.decode())
+    data = json.loads(json_data.decode())
 
-        if not data.get('ok') and data.get('description'):
-            return data['description']
-    except ValueError:
-        raise TelegramError({'message': 'JSON decoding'})
+    if not data.get('ok') and data.get('description'):
+        return data['description']
 
     return data['result']
 
@@ -84,20 +81,21 @@ def post(url,
     try:
         if InputFile.is_inputfile(data):
             data = InputFile(data)
-            request = Request(url, data=data.to_form(), 
-                                   headers=data.headers)
+            request = Request(url,
+                              data=data.to_form(),
+                              headers=data.headers)
         else:
             data = json.dumps(data)
-            request = Request(url, data=data.encode(), 
-                                   headers={'Content-Type': 'application/json'})
+            request = Request(url,
+                              data=data.encode(),
+                              headers={'Content-Type': 'application/json'})
 
         result = urlopen(request).read()
     except HTTPError as error:
+        if error.getcode() == 403:
+            raise TelegramError('Unauthorized')
+
         message = _parse(error.read())
         raise TelegramError(message)
-    except URLError as error:
-        raise TelegramError(str(error))
-    except IOError as error:
-        raise TelegramError(str(error))
 
     return _parse(result)

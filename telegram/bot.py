@@ -139,7 +139,7 @@ class Bot(TelegramObject):
             url, data = func(self, *args, **kwargs)
 
             if not data.get('chat_id'):
-                raise TelegramError('Invalid chat_id.')
+                raise TelegramError('Invalid chat_id')
 
             if kwargs.get('reply_to_message_id'):
                 reply_to_message_id = kwargs.get('reply_to_message_id')
@@ -389,7 +389,7 @@ class Bot(TelegramObject):
 
         if filename:
             data['filename'] = filename
-            
+
         return url, data
 
     @log
@@ -422,7 +422,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id,
                 'sticker': sticker}
-            
+
         return url, data
 
     @log

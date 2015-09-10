@@ -164,7 +164,7 @@ class InputFile(object):
         if image:
             return 'image/%s' % image
 
-        raise TelegramError({'message': 'Could not parse file content'})
+        raise TelegramError('Could not parse file content')
 
     @staticmethod
     def is_inputfile(data):
@@ -177,7 +177,7 @@ class InputFile(object):
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'sticker', 'video', 
+            file_types = ['audio', 'document', 'photo', 'sticker', 'video',
                           'voice', 'certificate']
             file_type = [i for i in list(data.keys()) if i in file_types]
 
