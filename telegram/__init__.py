@@ -46,10 +46,12 @@ from .parsemode import ParseMode
 from .message import Message
 from .update import Update
 from .bot import Bot
+from .command_handler import *
 
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
            'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
            'Video', 'Sticker', 'Document', 'Audio', 'PhotoSize', 'GroupChat',
            'Update', 'ParseMode', 'Message', 'User', 'TelegramObject', 'NullHandler',
-           'Voice']
+           'Voice', 'CommandHandler', 'CommandHandlerWithHelp',
+           'CommandHandlerWithFatherCommand', 'CommandHandlerWithHelpAndFather']

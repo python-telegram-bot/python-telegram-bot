@@ -115,6 +115,29 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(message.caption, self.caption)
 
+    def test_send_video_mp4_file_with_custom_filename(self):
+        """Test telegram.Bot sendVideo method"""
+        print('Testing bot.sendVideo - MP4 File with custom filename')
+
+        message = self._bot.sendVideo(chat_id=self._chat_id,
+                                      video=self.video_file,
+                                      duration=self.duration,
+                                      caption=self.caption,
+                                      filename='telegram_custom.mp4')
+
+        video = message.video
+
+        self.assertTrue(isinstance(video.file_id, str))
+        self.assertNotEqual(video.file_id, '')
+        self.assertEqual(video.width, 0)
+        self.assertEqual(video.height, 0)
+        self.assertEqual(video.duration, self.duration)
+        self.assertEqual(video.thumb, None)
+        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.file_size, self.file_size)
+
+        self.assertEqual(message.caption, self.caption)
+
     def test_send_video_resend(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - Resend by file_id')

@@ -1,4 +1,4 @@
-.PHONY: clean pep8 lint test coverage
+.PHONY: clean pep8 lint test
 
 clean:
 	rm -fr build
@@ -14,7 +14,7 @@ lint:
 	pylint -E telegram
 
 test:
-	python tests/run.py
+	nosetests
 
 help:
 	@echo "Available targets:"
