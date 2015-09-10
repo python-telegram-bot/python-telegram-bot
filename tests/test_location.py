@@ -31,8 +31,8 @@ class LocationTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Location."""
 
     def setUp(self):
-        self.latitude = -46.788275
-        self.longitude = -23.691287
+        self.latitude = -23.691288
+        self.longitude = -46.788279
 
         self.json_dict = {
             'latitude': self.latitude,
