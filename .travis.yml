@@ -9,6 +9,6 @@ python:
 install:
   - pip install coveralls
 script:
-  coverage run tests/test_*.py
+  nosetests --with-coverage --cover-package telegram/
 after_success:
   coveralls

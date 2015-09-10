@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
@@ -16,26 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains a object that represents a Telegram Error"""
-
-import re
+"""This module contains a object that represents a Telegram Parse Modes"""
 
 
-class TelegramError(Exception):
-    """This object represents a Telegram Error."""
+class ParseMode(object):
+    """This object represents a Telegram Parse Modes."""
 
-    def __init__(self, message):
-        """
-        Returns:
-            str:
-        """
-        super(TelegramError, self).__init__()
-
-        api_error = re.match(r'^Error: (?P<message>.*)', message)
-        if api_error:
-            self.message = api_error.group('message').capitalize()
-        else:
-            self.message = message
-
-    def __str__(self):
-        return '%s' % (self.message)
+    MARKDOWN = 'Markdown'

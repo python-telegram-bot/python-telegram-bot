@@ -39,7 +39,7 @@ class Update(TelegramObject):
                  update_id,
                  **kwargs):
         # Required
-        self.update_id = update_id
+        self.update_id = int(update_id)
         # Optionals
         self.message = kwargs.get('message')
 

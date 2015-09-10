@@ -17,33 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains a object that represents Tests for Telegram Bot"""
 
 import os
-import sys
-sys.path.append('.')
-import json
-import telegram
 import unittest
 from datetime import datetime
+import sys
+sys.path.append('.')
+
+import telegram
+from tests.base import BaseTest
 
 
-class BotTest(unittest.TestCase):
-    @staticmethod
-    def is_json(string):
-        try:
-            json.loads(string)
-        except ValueError:
-            return False
-        return True
-
-    def setUp(self):
-        bot = telegram.Bot(token=os.environ.get('TOKEN'))
-        chat_id = os.environ.get('CHAT_ID')
-
-        self._bot = bot
-        self._chat_id = chat_id
-
-        print('Testing the Bot API class')
+class BotTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram Bot."""
 
     def testGetMe(self):
         '''Test the telegram.Bot getMe method'''
@@ -51,11 +38,11 @@ class BotTest(unittest.TestCase):
         bot = self._bot.getMe()
 
         self.assertTrue(self.is_json(bot.to_json()))
-        self.assertEqual(bot.id, 120405045)
-        self.assertEqual(bot.first_name, 'Toledo\'s Palace Bot')
+        self.assertEqual(bot.id, 133505823)
+        self.assertEqual(bot.first_name, 'PythonTelegramBot')
         self.assertEqual(bot.last_name, '')
-        self.assertEqual(bot.username, 'ToledosPalaceBot')
-        self.assertEqual(bot.name, '@ToledosPalaceBot')
+        self.assertEqual(bot.username, 'PythonTelegramBot')
+        self.assertEqual(bot.name, '@PythonTelegramBot')
 
     def testSendMessage(self):
         '''Test the telegram.Bot sendMessage method'''
@@ -81,10 +68,10 @@ class BotTest(unittest.TestCase):
         print('Testing forwardMessage')
         message = self._bot.forwardMessage(chat_id=self._chat_id,
                                            from_chat_id=self._chat_id,
-                                           message_id=138)
+                                           message_id=2398)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text, 'Oi')
+        self.assertEqual(message.text, 'teste')
         self.assertEqual(message.forward_from.username, 'leandrotoledo')
         self.assertTrue(isinstance(message.forward_date, datetime))
 
@@ -102,11 +89,11 @@ class BotTest(unittest.TestCase):
     def testResendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing sendPhoto - Resend')
-        message = self._bot.sendPhoto(photo='AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI',
+        message = self._bot.sendPhoto(photo='AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI',
                                       chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_id, 'AgADAQADr6cxGzU8LQe6q0dMJD2rHYkP2ykABFymiQqJgjxRGGMAAgI')
+        self.assertEqual(message.photo[0].file_id, 'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
 
     def testSendJPGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -135,121 +122,6 @@ class BotTest(unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
-    def testSendAudio(self):
-        '''Test the telegram.Bot sendAudio method'''
-        print('Testing sendAudio - File')
-        message = self._bot.sendAudio(audio=open('tests/data/telegram.mp3', 'rb'),
-                                      chat_id=self._chat_id,
-                                      performer='Leandro Toledo',
-                                      title='Teste')
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.audio.file_size, 28232)
-        self.assertEqual(message.audio.performer, 'Leandro Toledo')
-        self.assertEqual(message.audio.title, 'Teste')
-
-    def testResendAudio(self):
-        '''Test the telegram.Bot sendAudio method'''
-        print('Testing sendAudio - Resend')
-        message = self._bot.sendAudio(audio='BQADAQADwwcAAjU8LQdBRsl3_qD2TAI',
-                                      chat_id=self._chat_id,
-                                      performer='Leandro Toledo',   # Bug #39
-                                      title='Teste')                # Bug #39
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.audio.file_id, 'BQADAQADwwcAAjU8LQdBRsl3_qD2TAI')
-
-    def testSendVoice(self):
-        '''Test the telegram.Bot sendVoice method'''
-        print('Testing sendVoice - File')
-        message = self._bot.sendVoice(voice=open('tests/data/telegram.ogg', 'rb'),
-                                      chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.voice.file_size, 9199)
-
-    def testResendVoice(self):
-        '''Test the telegram.Bot sendVoice method'''
-        print('Testing sendVoice - Resend')
-        message = self._bot.sendVoice(voice='AwADAQADIQEAAvjAuQABSAXg_GhkhZcC',
-                                      chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.voice.file_id, 'AwADAQADIQEAAvjAuQABSAXg_GhkhZcC')
-
-    def testSendDocument(self):
-        '''Test the telegram.Bot sendDocument method'''
-        print('Testing sendDocument - File')
-        message = self._bot.sendDocument(document=open('tests/data/telegram.png', 'rb'),
-                                         chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.document.file_size, 12948)
-        self.assertTrue(isinstance(message.document.thumb, telegram.PhotoSize))
-
-    def testSendGIFURLDocument(self):
-        '''Test the telegram.Bot sendDocument method'''
-        print('Testing sendDocument - File')
-        message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram',
-                                      chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 684)
-
-    def testResendDocument(self):
-        '''Test the telegram.Bot sendDocument method'''
-        print('Testing sendDocument - Resend')
-        message = self._bot.sendDocument(document='BQADAQADHAADNTwtBxZxUGKyxYbYAg',
-                                         chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.document.file_id, 'BQADAQADHAADNTwtBxZxUGKyxYbYAg')
-        self.assertTrue(isinstance(message.document.thumb, telegram.PhotoSize))
-
-    def testSendVideo(self):
-        '''Test the telegram.Bot sendVideo method'''
-        print('Testing sendVideo - File')
-        message = self._bot.sendVideo(video=open('tests/data/telegram.mp4', 'rb'),
-                                      caption='testSendVideo',
-                                      chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.video.file_size, 326534)
-        self.assertEqual(message.caption, 'testSendVideo')
-        if message.video.thumb:
-            self.assertTrue(isinstance(message.video.thumb, telegram.PhotoSize))
-
-    def testResendVideo(self):
-        '''Test the telegram.Bot sendVideo method'''
-        print('Testing sendVideo - Resend')
-        message = self._bot.sendVideo(video='BAADAQADIgEAAvjAuQABOuTB937fPTgC',
-                                      chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.video.duration, 4)
-        self.assertTrue(isinstance(message.video.thumb, telegram.PhotoSize))
-
-    def testResendSticker(self):
-        '''Test the telegram.Bot sendSticker method'''
-        print('Testing sendSticker - Resend')
-        message = self._bot.sendSticker(sticker='BQADAQADHAADyIsGAAFZfq1bphjqlgI',
-                                        chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.sticker.file_size, 39518)
-        self.assertTrue(isinstance(message.sticker.thumb, telegram.PhotoSize))
-
-    def testSendLocation(self):
-        '''Test the telegram.Bot sendLocation method'''
-        print('Testing sendLocation')
-        message = self._bot.sendLocation(latitude=-23.558873,
-                                         longitude=-46.659732,
-                                         chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.location.latitude, -23.558873)
-        self.assertEqual(message.location.longitude, -46.659732)
-
     def testSendChatAction(self):
         '''Test the telegram.Bot sendChatAction method'''
         print('Testing sendChatAction - ChatAction.TYPING')
@@ -265,4 +137,5 @@ class BotTest(unittest.TestCase):
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(upf.photos[0][0].file_size, 6547)
 
-unittest.main()
+if __name__ == '__main__':
+    unittest.main()

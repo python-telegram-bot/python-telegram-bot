@@ -43,6 +43,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+.coveralls.yml
 
 # Translations
 *.mo
@@ -57,3 +58,6 @@ docs/_build/
 # PyBuilder
 target/
 .idea/
+
+# Sublime Text 2
+*.sublime*

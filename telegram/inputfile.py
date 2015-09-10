@@ -55,6 +55,9 @@ class InputFile(object):
         if 'photo' in data:
             self.input_name = 'photo'
             self.input_file = data.pop('photo')
+        if 'sticker' in data:
+            self.input_name = 'sticker'
+            self.input_file = data.pop('sticker')
         if 'video' in data:
             self.input_name = 'video'
             self.input_file = data.pop('video')
@@ -67,7 +70,10 @@ class InputFile(object):
 
         if isinstance(self.input_file, file):
             self.input_file_content = self.input_file.read()
-            self.filename = os.path.basename(self.input_file.name)
+            if 'filename' in data:
+                self.filename = self.data.pop('filename')
+            else:
+                self.filename = os.path.basename(self.input_file.name)
             self.mimetype = mimetypes.guess_type(self.filename)[0] or \
                 DEFAULT_MIME_TYPE
 
@@ -158,7 +164,7 @@ class InputFile(object):
         if image:
             return 'image/%s' % image
 
-        raise TelegramError({'message': 'Could not parse file content'})
+        raise TelegramError('Could not parse file content')
 
     @staticmethod
     def is_inputfile(data):
@@ -171,8 +177,8 @@ class InputFile(object):
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'video', 'voice',
-                          'certificate']
+            file_types = ['audio', 'document', 'photo', 'sticker', 'video',
+                          'voice', 'certificate']
             file_type = [i for i in list(data.keys()) if i in file_types]
 
             if file_type:
