@@ -42,6 +42,7 @@ from .error import TelegramError
 from .inputfile import InputFile
 from .nullhandler import NullHandler
 from .emoji import Emoji
+from .parsemode import ParseMode
 from .message import Message
 from .update import Update
 from .bot import Bot
@@ -50,5 +51,5 @@ __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
            'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
            'Video', 'Sticker', 'Document', 'Audio', 'PhotoSize', 'GroupChat',
-           'Update', 'Message', 'User', 'TelegramObject', 'NullHandler',
+           'Update', 'ParseMode', 'Message', 'User', 'TelegramObject', 'NullHandler',
            'Voice']

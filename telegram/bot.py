@@ -181,6 +181,7 @@ class Bot(TelegramObject):
     def sendMessage(self,
                     chat_id,
                     text,
+                    parse_mode=None,
                     disable_web_page_preview=None,
                     **kwargs):
         """Use this method to send text messages.
@@ -189,6 +190,10 @@ class Bot(TelegramObject):
           chat_id:
             Unique identifier for the message recipient - telegram.User or
             telegram.GroupChat id.
+          parse_mode:
+            Send Markdown, if you want Telegram apps to show bold, italic and
+            inline URLs in your bot's message. For the moment, only Telegram
+            for Android supports this. [Optional]
           text:
             Text of the message to be sent.
           disable_web_page_preview:
@@ -209,6 +214,8 @@ class Bot(TelegramObject):
         data = {'chat_id': chat_id,
                 'text': text}
 
+        if parse_mode:
+            data['parse_mode'] = parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
