@@ -1,4 +1,10 @@
 2015-09-05
+  Released 2.8.2
+  Fix regression on Telegram ReplyMarkup
+  Add certificate to is_inputfile method
+
+
+2015-09-05
   Released 2.8.1
   Fix regression on Telegram objects with thumb properties
 

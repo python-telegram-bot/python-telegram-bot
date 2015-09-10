@@ -22,13 +22,11 @@
 import json
 
 try:
-    from urllib.parse import urlencode
     from urllib.request import urlopen, Request
-    from urllib.error import HTTPError, URLError
+    from urllib.error import HTTPError
 except ImportError:
-    from urllib import urlencode
     from urllib2 import urlopen, Request
-    from urllib2 import HTTPError, URLError
+    from urllib2 import HTTPError
 
 from telegram import (InputFile, TelegramError)
 
