@@ -21,66 +21,17 @@
 
 import json
 
-REQUESTS = False
 try:
-    import requests
-    REQUESTS = True
-except ImportError:
-    pass
-
-try:
+    from urllib.parse import urlencode
     from urllib.request import urlopen, Request
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 except ImportError:
+    from urllib import urlencode
     from urllib2 import urlopen, Request
-    from urllib2 import HTTPError
-
-if REQUESTS:
-    _universal_post = requests.post
-else:
-    _universal_post = Request
+    from urllib2 import HTTPError, URLError
 
 from telegram import (InputFile, TelegramError)
 
-
-def retry(maxretries):
-    """@retry(x) decorates a function to run x times
-    if it doesn't return correctly.
-
-    Args:
-      maxretries:
-        Max number of retries until exception is raised further.
-
-    Returns:
-      The decorated function.
-    """
-    def retry_decorator(func):
-        def retry_wrapper(*args, **kwargs):
-            # logger.debug('Trying {} with arguments: {}, {}.'
-            #     .format(func.__name__, args, kwargs))
-            usedtries = 0
-            while usedtries <= (maxretries - 1):
-                try:
-                    reply = func(*args, **kwargs)
-                    if reply:
-                        # logger.debug(
-                        #     'Reply: {}'.format(reply.replace('\n','\\n')))
-                        pass
-                    else:
-                        # logger.debug(
-                        #     'Reply: none')
-                        pass
-                    return reply
-                except:
-                    if usedtries < (maxretries - 1):
-                        # logger.debug('Exception in {}: {}'
-                        #     .format(func.__name__, args, kwargs))
-                        usedtries += 1
-                    else:
-                        raise
-        retry_wrapper.fc = func.func_code
-        return retry_wrapper
-    return retry_decorator
 
 def _parse(json_data):
     """Try and parse the JSON returned from Telegram and return an empty
@@ -100,45 +51,29 @@ def _parse(json_data):
 
     return data['result']
 
-@retry(3)
-def get(url, timeout=None):
+
+def get(url):
     """Request an URL.
     Args:
       url:
         The web location we want to retrieve.
-      timeout:
-        (optional) timeout in seconds. Raises exception 
-        if request exceeds it.
 
     Returns:
       A JSON object.
     """
-    
-    kwargs = {}
-    if not timeout is None:
-        kwargs['timeout'] = timeout
-    
-    if REQUESTS:
-        result = requests.get(url, **kwargs).content
-    else:
-        result = urlopen(url, **kwargs).read()
+    result = urlopen(url).read()
 
     return _parse(result)
 
 
-@retry(3)
 def post(url,
-         data,
-         timeout=None):
+         data):
     """Request an URL.
     Args:
       url:
         The web location we want to retrieve.
       data:
         A dict of (str, unicode) key/value pairs.
-      timeout:
-        (optional) timeout in seconds. Raises exception 
-        if request exceeds it.
 
     Returns:
       A JSON object.
@@ -146,24 +81,16 @@ def post(url,
     try:
         if InputFile.is_inputfile(data):
             data = InputFile(data)
-            kwargs = {
-                'data': data.to_form(),
-                'headers': data.headers
-            }
+            request = Request(url,
+                              data=data.to_form(),
+                              headers=data.headers)
         else:
             data = json.dumps(data)
-            kwargs = {
-                'data': data.encode(),
-                'headers': {'Content-Type': 'application/json'}
-            }
-        if not timeout is None:
-            kwargs['timeout'] = timeout
-        request = _universal_post(url, **kwargs)
-        if REQUESTS:
-            request.raise_for_status()
-            result = request.content
-        else:
-            result = urlopen(request).read()
+            request = Request(url,
+                              data=data.encode(),
+                              headers={'Content-Type': 'application/json'})
+
+        result = urlopen(request).read()
     except HTTPError as error:
         if error.getcode() == 403:
             raise TelegramError('Unauthorized')
