@@ -619,7 +619,8 @@ class Bot(TelegramObject):
     def getUpdates(self,
                    offset=None,
                    limit=100,
-                   timeout=0):
+                   timeout=0,
+                   requestTimeout=None):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -650,7 +651,11 @@ class Bot(TelegramObject):
         if timeout:
             data['timeout'] = timeout
 
-        result = request.post(url, data)
+        kwargs = {}
+        if not requestTimeout is None:
+            kwargs['timeout'] = requestTimeout
+
+        result = request.post(url, data, **kwargs)
 
         if result:
             self.logger.info(
