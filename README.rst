@@ -94,6 +94,7 @@ sendLocation              Yes
 sendChatAction            Yes
 getUpdates                Yes
 getUserProfilePhotos      Yes
+getFile                   Yes
 setWebhook                Yes
 ========================= ============
 
@@ -220,6 +221,12 @@ To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
     >>> reply_markup = telegram.ReplyKeyboardHide()
     >>> bot.sendMessage(chat_id=chat_id, text="I'm back.", reply_markup=reply_markup)
 
+To download a file (you will need its file_id)::
+
+    >>> file_id = message.voice.file_id
+    >>> newFile = bot.getFile(file_id)
+    >>> newFile.download('voice.ogg')
+
 There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
@@ -268,9 +275,9 @@ You may copy, distribute and modify the software provided that modifications are
 _`Contact`
 ==========
 
-Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b946b2e8e98b73e19be>`_.
+Feel free to join to our `Telegram group <https://telegram.me/joinchat/00b9c0f802509b94d52953d3fa1ec504>`_.
 
-If you face trouble joining in the group please ping me `via Telegram <https://telegram.me/leandrotoledo>`_, I'll be glad to add you.
+*If you face trouble joining in the group please ping me on Telegram (@leandrotoledo), I'll be glad to add you.*
 
 =======
 _`TODO`

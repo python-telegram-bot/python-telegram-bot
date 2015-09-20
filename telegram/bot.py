@@ -22,8 +22,8 @@
 import functools
 import logging
 
-from telegram import (User, Message, Update, UserProfilePhotos, TelegramError,
-                      ReplyMarkup, TelegramObject, NullHandler)
+from telegram import (User, Message, Update, UserProfilePhotos, File,
+                      TelegramError, ReplyMarkup, TelegramObject, NullHandler)
 from telegram.utils import request
 
 H = NullHandler()
@@ -31,6 +31,7 @@ logging.getLogger(__name__).addHandler(H)
 
 
 class Bot(TelegramObject):
+
     """This object represents a Telegram Bot.
 
     Attributes:
@@ -57,6 +58,8 @@ class Bot(TelegramObject):
             self.base_url = 'https://api.telegram.org/bot%s' % self.token
         else:
             self.base_url = base_url + self.token
+
+        self.base_file_url = 'https://api.telegram.org/file/bot%s' % self.token
 
         self.bot = None
 
@@ -614,6 +617,33 @@ class Bot(TelegramObject):
         result = request.post(url, data)
 
         return UserProfilePhotos.de_json(result)
+
+    @log
+    def getFile(self,
+                file_id):
+        """Use this method to get basic info about a file and prepare it for
+        downloading. For the moment, bots can download files of up to 20MB in
+        size.
+
+        Args:
+          file_id:
+            File identifier to get info about.
+
+        Returns:
+          Returns a telegram.File object
+        """
+
+        url = '%s/getFile' % self.base_url
+
+        data = {'file_id': file_id}
+
+        result = request.post(url, data)
+
+        if result.get('file_path'):
+            result['file_path'] = '%s/%s' % (self.base_file_url,
+                                             result['file_path'])
+
+        return File.de_json(result)
 
     @log
     def getUpdates(self,

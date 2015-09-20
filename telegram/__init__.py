@@ -19,7 +19,7 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = 'leandrotoledodesouza@gmail.com'
-__version__ = '2.8.3'
+__version__ = '2.8.1'
 
 from .base import TelegramObject
 from .user import User
@@ -40,6 +40,7 @@ from .replykeyboardhide import ReplyKeyboardHide
 from .forcereply import ForceReply
 from .error import TelegramError
 from .inputfile import InputFile
+from .file import File
 from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
@@ -50,6 +51,6 @@ from .bot import Bot
 __all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
            'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
-           'Video', 'Sticker', 'Document', 'Audio', 'PhotoSize', 'GroupChat',
-           'Update', 'ParseMode', 'Message', 'User', 'TelegramObject',
-           'NullHandler', 'Voice']
+           'Video', 'Sticker', 'Document', 'File', 'Audio', 'PhotoSize',
+           'GroupChat', 'Update', 'ParseMode', 'Message', 'User',
+           'TelegramObject', 'NullHandler', 'Voice']
