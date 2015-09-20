@@ -1,3 +1,8 @@
+2015-09-20
+  Released 2.8.4
+  getFile and File.download is now fully supported
+
+
 2015-09-10
   Released 2.8.3
   Moved Bot._requestURL to its own class (telegram.utils.request)
