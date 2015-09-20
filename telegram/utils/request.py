@@ -23,10 +23,10 @@ import json
 
 try:
     from urllib.parse import urlencode
-    from urllib.request import urlopen, Request
+    from urllib.request import urlopen, urlretrieve, Request
     from urllib.error import HTTPError, URLError
 except ImportError:
-    from urllib import urlencode
+    from urllib import urlencode, urlretrieve
     from urllib2 import urlopen, Request
     from urllib2 import HTTPError, URLError
 
@@ -99,3 +99,17 @@ def post(url,
         raise TelegramError(message)
 
     return _parse(result)
+
+
+def download(url,
+             filename):
+    """Download a file by its URL.
+    Args:
+      url:
+        The web location we want to retrieve.
+
+      filename:
+        The filename wihtin the path to download the file.
+    """
+
+    urlretrieve(url, filename)

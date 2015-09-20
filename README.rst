@@ -94,6 +94,7 @@ sendLocation              Yes
 sendChatAction            Yes
 getUpdates                Yes
 getUserProfilePhotos      Yes
+getFile                   Yes
 setWebhook                Yes
 ========================= ============
 
@@ -219,6 +220,12 @@ To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
 
     >>> reply_markup = telegram.ReplyKeyboardHide()
     >>> bot.sendMessage(chat_id=chat_id, text="I'm back.", reply_markup=reply_markup)
+
+To download a file (you will need its file_id)::
+
+    >>> file_id = message.voice.file_id
+    >>> newFile = bot.getFile(file_id)
+    >>> newFile.download('voice.ogg')
 
 There are many more API methods, to read the full API documentation::
 
