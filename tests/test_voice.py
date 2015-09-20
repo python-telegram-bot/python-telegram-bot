@@ -123,7 +123,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.file_id, self.voice_file_id)
         self.assertEqual(voice.duration, self.duration)
         self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, self.file_size)
 
     def test_voice_de_json(self):
         """Test Voice.de_json() method"""

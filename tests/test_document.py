@@ -112,7 +112,6 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
         self.assertEqual(document.file_name, self.file_name)
         self.assertEqual(document.mime_type, self.mime_type)
-        self.assertEqual(document.file_size, self.file_size)
 
     def test_document_de_json(self):
         """Test Document.de_json() method"""

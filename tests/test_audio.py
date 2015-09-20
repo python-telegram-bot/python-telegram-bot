@@ -145,7 +145,6 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
 
     def test_audio_de_json(self):
         """Test Audio.de_json() method"""

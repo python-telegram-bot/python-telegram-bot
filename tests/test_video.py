@@ -153,7 +153,6 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.duration, 0)
         self.assertEqual(video.thumb, None)
         self.assertEqual(video.mime_type, '')
-        self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
 
