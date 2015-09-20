@@ -1,3 +1,22 @@
+2015-09-10
+  Released 2.8.3
+  Moved Bot._requestURL to its own class (telegram.utils.request)
+  Much better, such wow, Telegram Objects tests
+  Add consistency for str properties on Telegram Objects
+  Better design to test if chat_id is invalid
+  Add ability to set custom filename on Bot.sendDocument(..,filename='')
+  Fix Sticker as InputFile
+  Send JSON requests over urlencoded post data
+  Markdown support for Bot.sendMessage(..., parse_mode=ParseMode.MARKDOWN)
+  Refactor of TelegramError class (no more handling IOError or URLError)
+
+
+2015-09-05
+  Released 2.8.2
+  Fix regression on Telegram ReplyMarkup
+  Add certificate to is_inputfile method
+
+
 2015-09-05
   Released 2.8.1
   Fix regression on Telegram objects with thumb properties
