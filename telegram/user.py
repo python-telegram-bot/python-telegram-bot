@@ -23,7 +23,7 @@ from telegram import TelegramObject
 
 
 class User(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """This object represents a Telegram User.
 
     Attributes:
         id (int):
