@@ -49,7 +49,7 @@ class Document(TelegramObject):
         self.file_id = str(file_id)
         # Optionals
         self.thumb = kwargs.get('thumb')
-        self.file_name = str(kwargs.get('file_name', ''))
+        self.file_name = kwargs.get('file_name', '')
         self.mime_type = str(kwargs.get('mime_type', ''))
         self.file_size = int(kwargs.get('file_size', 0))
 
