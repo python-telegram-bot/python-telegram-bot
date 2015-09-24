@@ -1,3 +1,9 @@
+2015-09-24
+  Released 2.8.5
+  Handles HTTP Bad Gateway (503) errors on request
+  Fixes regression on Audio and Document for unicode fields
+
+
 2015-09-20
   Released 2.8.4
   getFile and File.download is now fully supported
