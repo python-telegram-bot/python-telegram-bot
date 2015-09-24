@@ -94,6 +94,8 @@ def post(url,
     except HTTPError as error:
         if error.getcode() == 403:
             raise TelegramError('Unauthorized')
+        if error.getcode() == 502:
+            raise TelegramError('Bad Gateway')
 
         message = _parse(error.read())
         raise TelegramError(message)
