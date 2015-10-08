@@ -35,12 +35,14 @@ class UserTest(BaseTest, unittest.TestCase):
         self.first_name = "Leandro"
         self.last_name = "S."
         self.username = "leandrotoledo"
+        self.type = "private"
 
         self.json_dict = {
             'id': self.id,
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'username': self.username
+            'username': self.username,
+            'type': self.type
         }
 
     def test_user_de_json(self):
@@ -53,6 +55,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.username, self.username)
+        self.assertEqual(user.type, self.type)
 
         self.assertEqual(user.name, '@leandrotoledo')
 
@@ -69,6 +72,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.id, self.id)
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
+        self.assertEqual(user.type, self.type)
 
         self.assertEqual(user.name, '%s %s' % (self.first_name, self.last_name))
 
@@ -108,6 +112,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user['first_name'], self.first_name)
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)
+        self.assertEqual(user['type'], self.type)
 
 if __name__ == '__main__':
     unittest.main()

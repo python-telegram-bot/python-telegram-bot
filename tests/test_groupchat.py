@@ -33,10 +33,12 @@ class GroupChatTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.id = -28767330
         self.title = 'ToledosPalaceBot - Group'
+        self.type = 'group'
 
         self.json_dict = {
             'id': self.id,
-            'title': self.title
+            'title': self.title,
+            'type': self.type
         }
 
     def test_group_chat_de_json_empty_json(self):
@@ -55,6 +57,7 @@ class GroupChatTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(group_chat.id, self.id)
         self.assertEqual(group_chat.title, self.title)
+        self.assertEqual(group_chat.type, self.type)
 
     def test_group_chat_to_json(self):
         """Test GroupChat.to_json() method"""
@@ -73,6 +76,7 @@ class GroupChatTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(group_chat.to_dict()))
         self.assertEqual(group_chat['id'], self.id)
         self.assertEqual(group_chat['title'], self.title)
+        self.assertEqual(group_chat['type'], self.type)
 
 if __name__ == '__main__':
     unittest.main()

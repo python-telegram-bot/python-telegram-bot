@@ -30,6 +30,7 @@ class User(TelegramObject):
         first_name (str):
         last_name (str):
         username (str):
+        type (str):
 
     Args:
         id (int):
@@ -37,6 +38,7 @@ class User(TelegramObject):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
+        type (Optional[str]):
         last_name (Optional[str]):
         username (Optional[str]):
     """
@@ -49,6 +51,7 @@ class User(TelegramObject):
         self.id = int(id)
         self.first_name = first_name
         # Optionals
+        self.type = kwargs.get('type', '')
         self.last_name = kwargs.get('last_name', '')
         self.username = kwargs.get('username', '')
 
