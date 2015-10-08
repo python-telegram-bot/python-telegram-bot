@@ -1,3 +1,8 @@
+2015-10-08
+  Released 2.8.6
+  Adds type to User and GroupChat classes (pre-release Telegram feature)
+
+
 2015-09-24
   Released 2.8.5
   Handles HTTP Bad Gateway (503) errors on request
