@@ -2,6 +2,8 @@ Python Telegram Bot
 
 A Python wrapper around the Telegram Bot API.
 
+*Stay tuned for library updates and new releases on our* `Telegram Channel <http://telegram.me/pythontelegrambotchannel>`_.
+
 By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
