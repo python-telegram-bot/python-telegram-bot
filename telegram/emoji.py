@@ -36,6 +36,7 @@ def call_decode_byte_strings(cls):
     cls._decode_byte_strings()
     return cls
 
+@call_decode_byte_strings
 class Emoji(object):
     """This object represents an Emoji."""
 
