@@ -51,12 +51,12 @@ def echo(bot):
     for update in bot.getUpdates(offset=LAST_UPDATE_ID, timeout=10):
         # chat_id is required to reply any message
         chat_id = update.message.chat_id
-        message = update.message.text.encode('utf-8')
+        reply_text = update.message.text
 
-        if (message):
+        if (reply_text):
             # Reply the message
             bot.sendMessage(chat_id=chat_id,
-                            text=message)
+                            text=reply_text)
 
             # Updates global offset to get the new updates
             LAST_UPDATE_ID = update.update_id + 1
