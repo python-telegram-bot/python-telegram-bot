@@ -24,7 +24,7 @@ import sys
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, specific_bot_required
 
 
 class FileTest(BaseTest, unittest.TestCase):
@@ -44,6 +44,7 @@ class FileTest(BaseTest, unittest.TestCase):
             'file_size': 28232
         }
 
+    @specific_bot_required
     def test_get_and_download_file_audio(self):
         """Test telegram.Bot getFile method - Audio"""
         print('Testing bot.getFile - With Audio.file_id')
@@ -58,6 +59,7 @@ class FileTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(os.path.isfile('telegram.mp3'))
 
+    @specific_bot_required
     def test_get_and_download_file_document(self):
         """Test telegram.Bot getFile method - Document"""
         print('Testing bot.getFile - With Document.file_id')
@@ -72,6 +74,7 @@ class FileTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(os.path.isfile('telegram.png'))
 
+    @specific_bot_required
     def test_get_and_download_file_sticker(self):
         """Test telegram.Bot getFile method - Sticker"""
         print('Testing bot.getFile - With Sticker.file_id')
@@ -86,6 +89,7 @@ class FileTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(os.path.isfile('telegram.webp'))
 
+    @specific_bot_required
     def test_get_and_download_file_video(self):
         """Test telegram.Bot getFile method - Video"""
         print('Testing bot.getFile - With Video.file_id')
@@ -100,6 +104,7 @@ class FileTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(os.path.isfile('telegram.mp4'))
 
+    @specific_bot_required
     def test_get_and_download_file_voice(self):
         """Test telegram.Bot getFile method - Voice"""
         print('Testing bot.getFile - With Voice.file_id')

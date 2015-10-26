@@ -19,19 +19,19 @@
 
 """This module contains a object that represents Tests for Telegram Bot"""
 
-import os
 import unittest
 from datetime import datetime
 import sys
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, specific_bot_required
 
 
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
 
+    @specific_bot_required
     def testGetMe(self):
         '''Test the telegram.Bot getMe method'''
         print('Testing getMe')
@@ -45,7 +45,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(bot.name, '@PythonTelegramBot')
 
     def testSendMessage(self):
-        '''Test the telegram.Bot sendMessage method'''
+        '''Test the telegram.Bot sendMessage and forwardMessage methods'''
         print('Testing sendMessage')
         message = self._bot.sendMessage(chat_id=self._chat_id,
                                         text='Моё судно на воздушной подушке полно угрей')
@@ -53,6 +53,17 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
         self.assertTrue(isinstance(message.date, datetime))
+
+        print('Testing forwardMessage')
+        message_id = message.message_id
+        message = self._bot.forwardMessage(chat_id=self._chat_id,
+                                           from_chat_id=self._chat_id,
+                                           message_id=message_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
+        self.assertEqual(message.forward_from.username, self._bot.username)
+        self.assertTrue(isinstance(message.forward_date, datetime))
 
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''
@@ -62,18 +73,6 @@ class BotTest(BaseTest, unittest.TestCase):
         if updates:
             self.assertTrue(self.is_json(updates[0].to_json()))
             self.assertTrue(isinstance(updates[0], telegram.Update))
-
-    def testForwardMessage(self):
-        '''Test the telegram.Bot forwardMessage method'''
-        print('Testing forwardMessage')
-        message = self._bot.forwardMessage(chat_id=self._chat_id,
-                                           from_chat_id=self._chat_id,
-                                           message_id=2398)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text, 'teste')
-        self.assertEqual(message.forward_from.username, 'leandrotoledo')
-        self.assertTrue(isinstance(message.forward_date, datetime))
 
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -86,14 +85,13 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.photo[0].file_size, 1451)
         self.assertEqual(message.caption, 'testSendPhoto')
 
-    def testResendPhoto(self):
-        '''Test the telegram.Bot sendPhoto method'''
         print('Testing sendPhoto - Resend')
-        message = self._bot.sendPhoto(photo='AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI',
+        photo_id = message.photo[0].file_id
+        message = self._bot.sendPhoto(photo=photo_id,
                                       chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_id, 'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
+        self.assertEqual(message.photo[0].file_id, photo_id)
 
     def testSendJPGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -129,6 +127,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
                                  chat_id=self._chat_id)
 
+    @specific_bot_required
     def testGetUserProfilePhotos(self):
         '''Test the telegram.Bot getUserProfilePhotos method'''
         print('Testing getUserProfilePhotos')

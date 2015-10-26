@@ -26,6 +26,19 @@ import json
 import telegram
 
 
+def specific_bot_required(test_function):
+    local_test = os.environ.get('LOCAL_TEST')
+
+    def wrapper(*args, **kwargs):
+        if local_test:
+            print('Skip test "%s" since it requires specific bot token' % test_function.__name__)
+            return
+        else:
+            test_function(*args, **kwargs)
+
+    return wrapper
+
+
 class BaseTest(object):
     """This object represents a Base test and its sets of functions."""
 

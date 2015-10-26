@@ -24,7 +24,7 @@ import sys
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, specific_bot_required
 
 
 class VideoTest(BaseTest, unittest.TestCase):
@@ -138,6 +138,7 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(message.caption, self.caption)
 
+    @specific_bot_required
     def test_send_video_resend(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - Resend by file_id')
