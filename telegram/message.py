@@ -134,7 +134,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data['from'])
+        data['from_user'] = User.de_json(data.get('from'))
         data['date'] = datetime.fromtimestamp(data['date'])
         if 'first_name' in data.get('chat', ''):
             data['chat'] = User.de_json(data.get('chat'))
