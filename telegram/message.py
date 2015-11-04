@@ -134,7 +134,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data['from'])
+        data['from_user'] = User.de_json(data.get('from'))
         data['date'] = datetime.fromtimestamp(data['date'])
         if 'first_name' in data.get('chat', ''):
             data['chat'] = User.de_json(data.get('chat'))
@@ -185,7 +185,7 @@ class Message(TelegramObject):
         data = super(Message, self).to_dict()
 
         # Required
-        data['from'] = data.pop('from_user')
+        data['from'] = data.pop('from_user', None)
         data['date'] = self._totimestamp(self.date)
         # Optionals
         if self.forward_date:
