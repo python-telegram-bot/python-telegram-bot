@@ -15,6 +15,18 @@ if sys.version_info.major is 2:
     from Queue import Queue
 elif sys.version_info.major is 3:
     from queue import Queue
+    
+def run_async(func):
+	from threading import Thread
+	from functools import wraps
+
+	@wraps(func)
+	def async_func(*args, **kwargs):
+		func_hl = Thread(target=func, args=args, kwargs=kwargs)
+		func_hl.start()
+		return func_hl
+
+	return async_func
 
 class BotEventHandler(TelegramObject):
     """
@@ -88,7 +100,8 @@ class BotEventHandler(TelegramObject):
                     self.update_queue.put(update)
                     self.last_update_id = update.update_id + 1
                     current_interval = poll_interval
-                    sleep(current_interval)
+                
+                sleep(current_interval)
             except TelegramError as te:
                 # Put the error into the update queue and let the Broadcaster
                 # broadcast it
