@@ -37,6 +37,7 @@ def anyMessageHandler(bot, update):
 def unknownCommandHandler(bot, update):
     bot.sendMessage(update.message.chat_id, text='Command not recognized!')
 
+
 @run_async
 def messageHandler(bot, update):
     """
@@ -63,7 +64,7 @@ def unknownCLICommandHandler(bot, update):
 
 def main():
     # Create the EventHandler and pass it your bot's token
-    eh = BotEventHandler("TOKEN")
+    eh = BotEventHandler("148447715:AAGG70cC6s_kwrji2pLsaMeEzKGe0llA1hY")
 
     # on different commands - answer in Telegram
     eh.broadcaster.addTelegramCommandHandler("start", startCommandHandler)

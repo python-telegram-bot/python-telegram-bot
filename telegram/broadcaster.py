@@ -6,6 +6,7 @@ This module contains the Broadcaster class.
 
 from telegram import (TelegramError, TelegramObject, Update)
 
+
 class Broadcaster(TelegramObject):
     """
     This class broadcasts all kinds of updates to its registered handlers.
@@ -15,7 +16,7 @@ class Broadcaster(TelegramObject):
     Args:
         bot (telegram.Bot): The bot object that should be passed to the handlers
         update_queue (queue.Queue): The synchronized queue that will contain the
-        updates
+        updates.
     """
     def __init__(self, bot, update_queue):
         self.bot = bot
@@ -64,8 +65,8 @@ class Broadcaster(TelegramObject):
         if matcher.math(update.message.text) is True.
 
         Args:
-            matcher (str): A compiled regex object that matches on messages that
-                handler should be listening to
+            matcher (__Regex): A compiled regex object that matches on messages
+                that handler should be listening to
             handler (function): A function that takes (Bot, Update) as
                 arguments.
         """
@@ -96,7 +97,7 @@ class Broadcaster(TelegramObject):
         if matcher.math(string) is True.
 
         Args:
-            matcher (str): A compiled regex object that matches on the string
+            matcher (__Regex): A compiled regex object that matches on the string
                 input that handler should be listening to
             handler (function): A function that takes (Bot, Update) as
                 arguments.
