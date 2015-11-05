@@ -9,24 +9,34 @@ import sys
 from threading import Thread
 from telegram import (Bot, TelegramError, TelegramObject, Broadcaster)
 from time import sleep
+from functools import wraps
 
 # Adjust for differences in Python versions
 if sys.version_info.major is 2:
     from Queue import Queue
 elif sys.version_info.major is 3:
     from queue import Queue
-    
+
+
 def run_async(func):
-	from threading import Thread
-	from functools import wraps
+    """
+    Function decorator that will run the function in a new thread.
 
-	@wraps(func)
-	def async_func(*args, **kwargs):
-		func_hl = Thread(target=func, args=args, kwargs=kwargs)
-		func_hl.start()
-		return func_hl
+    Args:
+        func (function): The function to run in the thread.
 
-	return async_func
+    Returns:
+        function:
+    """
+
+    @wraps(func)
+    def async_func(*args, **kwargs):
+        thread = Thread(target=func, args=args, kwargs=kwargs)
+        thread.start()
+        return thread
+
+    return async_func
+
 
 class BotEventHandler(TelegramObject):
     """
@@ -40,9 +50,6 @@ class BotEventHandler(TelegramObject):
     
     Args:
         token (str): The bots token given by the @BotFather
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         base_url (Optional[str]):
     """
     
@@ -57,9 +64,6 @@ class BotEventHandler(TelegramObject):
         Starts polling updates from Telegram. 
         
         Args:
-            **kwargs: Arbitrary keyword arguments.
-
-        Keyword Args:
             poll_interval (Optional[float]): Time to wait between polling 
                 updates from Telegram in seconds. Default is 1.0
 
