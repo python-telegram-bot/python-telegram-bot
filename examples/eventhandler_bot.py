@@ -11,7 +11,9 @@ inserted into the update queue for the bot to handle.
 """
 
 import sys
-from telegram.boteventhandler import BotEventHandler
+from telegram import BotEventHandler
+from telegram.boteventhandler import run_async
+from time import sleep
 import re
 
 global last_chat_id
@@ -35,9 +37,18 @@ def anyMessageHandler(bot, update):
 def unknownCommandHandler(bot, update):
     bot.sendMessage(update.message.chat_id, text='Command not recognized!')
 
+@run_async
 def messageHandler(bot, update):
+    """
+    Example for an asynchronous handler. It's not guaranteed that replies will
+    be in order when using @run_async
+    """
+    
+    # Save last chat_id to use in reply handler
     global last_chat_id
     last_chat_id = update.message.chat_id
+    
+    sleep(2)  # IO-heavy operation here
     bot.sendMessage(update.message.chat_id, text=update.message.text)
 
 def errorHandler(bot, error):
