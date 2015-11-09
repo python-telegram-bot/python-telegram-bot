@@ -18,7 +18,7 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
    :target: https://readthedocs.org/projects/python-telegram-bot/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://img.shields.io/github/license/leandrotoledo/python-telegram-bot.svg
+.. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
    :target: http://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
