@@ -67,13 +67,17 @@ def get(url):
 
 
 def post(url,
-         data):
+         data,
+         network_delay=2.):
     """Request an URL.
     Args:
       url:
         The web location we want to retrieve.
       data:
         A dict of (str, unicode) key/value pairs.
+      network_delay:
+        Additional timeout in seconds to allow the response from Telegram to
+        take some time.
 
     Returns:
       A JSON object.
@@ -82,10 +86,10 @@ def post(url,
     # Add time to the timeout of urlopen to allow data to be transferred over
     # the network.
     if 'timeout' in data:
-        if 'network_delay' in data:
-            timeout = data['timeout'] + data['network_delay']
+        if network_delay:
+            timeout = data['timeout'] + network_delay
         else:
-            timeout = data['timeout'] + 2.
+            timeout = data['timeout']
     else:
         timeout = None
 

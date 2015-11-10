@@ -650,7 +650,7 @@ class Bot(TelegramObject):
                    offset=None,
                    limit=100,
                    timeout=0,
-                   network_delay=2):
+                   network_delay=2.):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -685,10 +685,8 @@ class Bot(TelegramObject):
             data['limit'] = limit
         if timeout:
             data['timeout'] = timeout
-        if network_delay:
-            data['network_delay'] = network_delay
 
-        result = request.post(url, data)
+        result = request.post(url, data, network_delay=network_delay)
 
         if result:
             self.logger.info(
