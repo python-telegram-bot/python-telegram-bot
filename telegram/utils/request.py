@@ -86,10 +86,7 @@ def post(url,
     # Add time to the timeout of urlopen to allow data to be transferred over
     # the network.
     if 'timeout' in data:
-        if network_delay:
-            timeout = data['timeout'] + network_delay
-        else:
-            timeout = data['timeout']
+        timeout = data['timeout'] + network_delay
     else:
         timeout = None
 
