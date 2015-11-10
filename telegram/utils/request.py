@@ -79,10 +79,13 @@ def post(url,
       A JSON object.
     """
 
-    # Add one second to the timeout of urlopen to allow data to be transferred
-    # over the network.
+    # Add time to the timeout of urlopen to allow data to be transferred over
+    # the network.
     if 'timeout' in data:
-        timeout = data['timeout'] + 1.
+        if 'network_delay' in data:
+            timeout = data['timeout'] + data['network_delay']
+        else:
+            timeout = data['timeout'] + 2.
     else:
         timeout = None
 
@@ -108,7 +111,7 @@ def post(url,
         message = _parse(error.read())
         raise TelegramError(message)
     except SSLError as error:
-        if "The read operation timed out" == error.message:
+        if "operation timed out" in error.message:
             raise TelegramError("Timed out")
 
         raise TelegramError(error.message)
