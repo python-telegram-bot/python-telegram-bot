@@ -23,13 +23,12 @@ import json
 from ssl import SSLError
 
 try:
-    from urllib.parse import urlencode
     from urllib.request import urlopen, urlretrieve, Request
-    from urllib.error import HTTPError, URLError
+    from urllib.error import HTTPError
 except ImportError:
-    from urllib import urlencode, urlretrieve
+    from urllib import urlretrieve
     from urllib2 import urlopen, Request
-    from urllib2 import HTTPError, URLError
+    from urllib2 import HTTPError
 
 from telegram import (InputFile, TelegramError)
 
@@ -82,8 +81,8 @@ def post(url,
 
     # Add one second to the timeout of urlopen to allow data to be transferred
     # over the network.
-    if "timeout" in data:
-        timeout = data["timeout"] + 1.
+    if 'timeout' in data:
+        timeout = data['timeout'] + 1.
     else:
         timeout = None
 

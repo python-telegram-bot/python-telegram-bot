@@ -1,4 +1,4 @@
-.PHONY: clean pep8 lint test
+.PHONY: clean pep8 lint test install
 
 clean:
 	rm -fr build
@@ -15,6 +15,9 @@ lint:
 
 test:
 	nosetests
+
+install:
+	pip install -r requirements.txt
 
 help:
 	@echo "Available targets:"
