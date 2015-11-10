@@ -34,29 +34,29 @@
 *Released 2.8.5*
 
 - Handles HTTP Bad Gateway (503) errors on request
-- Fixes regression on Audio and Document for unicode fields
+- Fixes regression on ``Audio`` and ``Document`` for unicode fields
 
 
 **2015-09-20**
 
 *Released 2.8.4*
 
-- getFile and File.download is now fully supported
+- ``getFile`` and ``File.download`` is now fully supported
 
 
 **2015-09-10**
 
 *Released 2.8.3*
 
-- Moved Bot._requestURL to its own class (telegram.utils.request)
+- Moved ``Bot._requestURL`` to its own class (``telegram.utils.request``)
 - Much better, such wow, Telegram Objects tests
-- Add consistency for str properties on Telegram Objects
-- Better design to test if chat_id is invalid
-- Add ability to set custom filename on Bot.sendDocument(..,filename='')
-- Fix Sticker as InputFile
+- Add consistency for ``str`` properties on Telegram Objects
+- Better design to test if ``chat_id`` is invalid
+- Add ability to set custom filename on ``Bot.sendDocument(..,filename='')``
+- Fix Sticker as ``InputFile``
 - Send JSON requests over urlencoded post data
-- Markdown support for Bot.sendMessage(..., parse_mode=ParseMode.MARKDOWN)
-- Refactor of TelegramError class (no more handling IOError or URLError)
+- Markdown support for ``Bot.sendMessage(..., parse_mode=ParseMode.MARKDOWN)``
+- Refactor of ``TelegramError`` class (no more handling ``IOError`` or ``URLError``)
 
 
 **2015-09-05**
@@ -64,7 +64,7 @@
 *Released 2.8.2*
 
 - Fix regression on Telegram ReplyMarkup
-- Add certificate to is_inputfile method
+- Add certificate to ``is_inputfile`` method
 
 
 **2015-09-05**
@@ -78,8 +78,8 @@
 
 *Released 2.8*
 
-- TelegramError when chat_id is empty for send* methods
-- setWebhook now supports sending self-signed certificate
+- TelegramError when ``chat_id`` is empty for send* methods
+- ``setWebhook`` now supports sending self-signed certificate
 - Huge redesign of existing Telegram classes
 - Added support for PyPy
 - Added docstring for existing classes
@@ -89,15 +89,15 @@
 
 *Released 2.7.1*
 
-- Fixed JSON serialization for message
+- Fixed JSON serialization for ``message``
 
 
 **2015-08-17**
 
 *Released 2.7*
 
-- Added support for Voice object and sendVoice method
-- Due backward compatibility performer or/and title will be required for sendAudio
+- Added support for ``Voice`` object and ``sendVoice`` method
+- Due backward compatibility performer or/and title will be required for ``sendAudio``
 - Fixed JSON serialization when forwarded message
 
 
@@ -112,16 +112,16 @@
 
 *Released 2.6.0*
 
-- Depreciation of require_authentication and clearCredentials methods
-- Giving AUTHORS the proper credits for their contribution for this project
-- Message.date and Message.forward_date are now datetime objects
+- Depreciation of ``require_authentication`` and ``clearCredentials`` methods
+- Giving ``AUTHORS`` the proper credits for their contribution for this project
+- ``Message.date`` and ``Message.forward_date`` are now ``datetime`` objects
 
 
 **2015-08-12**
 
 *Released 2.5.3*
 
-- telegram.Bot now supports to be unpickled
+- ``telegram.Bot`` now supports to be unpickled
 
 
 **2015-08-11**
@@ -129,8 +129,8 @@
 *Released 2.5.2*
 
 - New changes from Telegram Bot API have been applied
-- telegram.Bot now supports to be pickled
-- Return empty str instead None when message.text is empty
+- ``telegram.Bot`` now supports to be pickled
+- Return empty ``str`` instead ``None`` when ``message.text`` is empty
 
 
 **2015-08-10**
@@ -151,30 +151,30 @@
 
 *Released 2.4*
 
-- Fixes Emoji class for Python 3
-- PEP8 improvements
+- Fixes ``Emoji`` class for Python 3
+- ``PEP8`` improvements
 
 
 **2015-08-08**
 
 *Released 2.3*
 
-- Fixes ForceReply class
-- Remove logging.basicConfig from library
+- Fixes ``ForceReply`` class
+- Remove ``logging.basicConfig`` from library
 
 
 **2015-07-25**
 
 *Released 2.2*
 
-- Allows debug=True when initializing telegram.Bot
+- Allows ``debug=True`` when initializing ``telegram.Bot``
 
 
 **2015-07-20**
 
 *Released 2.1*
 
-- Fix to_dict for Document and Video
+- Fix ``to_dict`` for ``Document`` and ``Video``
 
 
 **2015-07-19**
@@ -182,8 +182,8 @@
 *Released 2.0*
 
 - Fixes bugs
-- Improves __str__ over to_json()
-- Creates abstractclass TelegramObject
+- Improves ``__str__`` over ``to_json()``
+- Creates abstract class ``TelegramObject``
 
 
 **2015-07-15**
@@ -191,7 +191,7 @@
 *Released 1.9*
 
 - Python 3 officially supported
-- PEP8 improvements
+- ``PEP8`` improvements
 
 
 **2015-07-12**
@@ -205,7 +205,7 @@
 
 *Released 1.7*
 
-- Fixes crash when username is not defined on chat (special thanks to JRoot3D)
+- Fixes crash when ``username`` is not defined on ``chat`` (special thanks to JRoot3D)
 
 
 **2015-07-10**
@@ -219,14 +219,14 @@
 
 *Released 1.5*
 
-- Fixes randomly unicode issues when using InputFile
+- Fixes randomly unicode issues when using ``InputFile``
 
 
 **2015-07-10**
 
 *Released 1.4*
 
-- requests lib is no longer required
+- ``requests`` lib is no longer required
 - Google App Engine (GAE) is supported
 
 
@@ -234,16 +234,16 @@
 
 *Released 1.3*
 
-- Added support to setWebhook (special thanks to macrojames)
+- Added support to ``setWebhook`` (special thanks to macrojames)
 
 
 **2015-07-09**
 
 *Released 1.2*
 
-- CustomKeyboard classes now available
+- ``CustomKeyboard`` classes now available
 - Emojis available
-- PEP8 improvements
+- ``PEP8`` improvements
 
 
 **2015-07-08**
