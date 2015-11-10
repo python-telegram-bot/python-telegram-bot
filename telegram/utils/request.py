@@ -20,6 +20,7 @@
 """This module contains methods to make POST and GET requests"""
 
 import json
+from ssl import SSLError
 
 try:
     from urllib.parse import urlencode
@@ -78,6 +79,11 @@ def post(url,
     Returns:
       A JSON object.
     """
+    if "timeout" in data:
+        timeout = data["timeout"] + 1.
+    else:
+        timeout = None
+
     try:
         if InputFile.is_inputfile(data):
             data = InputFile(data)
@@ -90,7 +96,7 @@ def post(url,
                               data=data.encode(),
                               headers={'Content-Type': 'application/json'})
 
-        result = urlopen(request).read()
+        result = urlopen(request, timeout=timeout).read()
     except HTTPError as error:
         if error.getcode() == 403:
             raise TelegramError('Unauthorized')
@@ -99,7 +105,11 @@ def post(url,
 
         message = _parse(error.read())
         raise TelegramError(message)
+    except SSLError as error:
+        if "The read operation timed out" == error.message:
+            raise TelegramError("Timed out")
 
+        raise TelegramError(error.message)
     return _parse(result)
 
 
