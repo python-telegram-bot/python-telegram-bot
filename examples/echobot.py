@@ -53,13 +53,13 @@ def echo(bot):
         chat_id = update.message.chat_id
         reply_text = update.message.text
 
-        if (reply_text):
+        if reply_text:
             # Reply the message
             bot.sendMessage(chat_id=chat_id,
                             text=reply_text)
 
-            # Updates global offset to get the new updates
-            LAST_UPDATE_ID = update.update_id + 1
+        # Updates global offset to get the new updates
+        LAST_UPDATE_ID = update.update_id + 1
 
 
 if __name__ == '__main__':
