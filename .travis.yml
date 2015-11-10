@@ -8,6 +8,7 @@ python:
   - "pypy3"
 install:
   - pip install coveralls
+  - pip install -r requirements.txt
 script:
   nosetests --with-coverage --cover-package telegram/
 after_success:
