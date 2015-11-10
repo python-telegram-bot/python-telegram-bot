@@ -13,6 +13,17 @@ def read(*paths):
         return f.read()
 
 
+def requirements():
+    """Build the requirements list for this project"""
+    requirements_list = []
+
+    with open('requirements.txt') as requirements:
+        for install in requirements:
+            requirements_list.append(install.strip())
+
+    return requirements_list
+
+
 setup(
     name='python-telegram-bot',
     version='2.9',
@@ -24,6 +35,7 @@ setup(
     description='A Python wrapper around the Telegram Bot API',
     long_description=(read('README.rst')),
     packages=find_packages(exclude=['tests*']),
+    install_requires=requirements(),
     include_package_data=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
