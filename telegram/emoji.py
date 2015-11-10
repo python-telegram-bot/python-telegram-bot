@@ -20,9 +20,42 @@
 
 """This module contains a object that represents an Emoji"""
 
+import sys
 
+def call_decode_byte_strings(cls):
+    """ 
+    Calls the _decode_byte_strings function of the created class
+    
+    Args:
+        cls (Class):
+    
+    Returns:
+        Class:
+    """
+    
+    cls._decode_byte_strings()
+    return cls
+
+@call_decode_byte_strings
 class Emoji(object):
     """This object represents an Emoji."""
+
+    @classmethod
+    def _decode_byte_strings(cls):
+        """
+        Decodes the Emojis into unicode strings if using Python 3
+        
+        Args:
+            cls (Class):
+            
+        Returns:
+        """
+        
+        if sys.version_info.major is 3:
+            emojis = filter(lambda attr : type(getattr(cls, attr)) is bytes, 
+                     dir(cls))
+            for var in emojis:
+                setattr(cls, var, getattr(cls, var).decode('utf-8'))
 
     GRINNING_FACE_WITH_SMILING_EYES = b'\xF0\x9F\x98\x81'
     FACE_WITH_TEARS_OF_JOY = b'\xF0\x9F\x98\x82'
