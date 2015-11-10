@@ -1,3 +1,11 @@
+2015-11-10
+  Released 2.9
+  Emoji class now uses bytes_to_native_str from future 3rd party lib
+  Make user_from optional to work with channels channels
+  Raise exception if Telegram times out on long-polling
+  *Special thanks to @jh0ker for all hard work*
+
+
 2015-10-08
   Released 2.8.7
   Type as optional for GroupChat class
@@ -121,7 +129,6 @@
 
 
 2015-07-19
-
   Released 2.0
   Fixes bugs
   Improves __str__ over to_json()
@@ -129,51 +136,43 @@
 
 
 2015-07-15
-
   Released 1.9
   Python 3 officially supported
   PEP8 improvements
 
 
 2015-07-12
-
   Released 1.8
   Fixes crash when replying an unicode text message (special thanks to JRoot3D)
 
 
 2015-07-11
-
   Released 1.7
   Fixes crash when username is not defined on chat (special thanks to JRoot3D)
 
 
 2015-07-10
-
   Released 1.6
   Improvements for GAE support
 
 
 2015-07-10
-
   Released 1.5
   Fixes randomly unicode issues when using InputFile
 
 
 2015-07-10
-
   Released 1.4
   requests lib is no longer required
   Google App Engine (GAE) is supported
 
 
 2015-07-10
-
   Released 1.3
   Added support to setWebhook (special thanks to macrojames)
 
 
 2015-07-09
-
   Released 1.2
   CustomKeyboard classes now available
   Emojis available
@@ -181,12 +180,10 @@
 
 
 2015-07-08
-
   Released 1.1
   PyPi package now available
 
 
 2015-07-08
-
   Released 1.0
   Initial checkin of python-telegram-bot
