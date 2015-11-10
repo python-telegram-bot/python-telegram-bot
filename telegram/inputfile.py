@@ -79,7 +79,7 @@ class InputFile(object):
 
         if 'http' in self.input_file:
             self.input_file_content = urlopen(self.input_file).read()
-            self.mimetype = InputFile.is_image(self.input_file_content)
+            self.mimetype = InputFile.is_image(self.input_file_content, self.input_file)
             self.filename = self.mimetype.replace('/', '.')
 
     @property
@@ -151,18 +151,31 @@ class InputFile(object):
         return '\r\n'.join(form)
 
     @staticmethod
-    def is_image(stream):
+    def is_image(stream, url=None):
         """Check if the content file is an image by analyzing its headers.
 
         Args:
             stream (str): A str representing the content of a file.
+            url (str): (Optional) The URL for a file to fallback on, if imghdr fails
 
         Returns:
             str: The str mimetype of an image.
         """
         image = imghdr.what(None, stream)
         if image:
-            return 'image/%s' % image
+            mimetype = 'image/%s' % image
+        elif url:
+            mimeinfo = mimetypes.guess_type(url)
+            if mimeinfo[0]:
+                mimetype = mimeinfo[0]
+            else:
+                try:
+                    mimetype = urlopen(url).headers['content-type']
+                except IndexError:
+                    mimetype = None
+
+        if mimetype:
+            return mimetype
 
         raise TelegramError('Could not parse file content')
 
