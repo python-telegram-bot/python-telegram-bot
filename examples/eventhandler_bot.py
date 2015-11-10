@@ -64,7 +64,7 @@ def unknownCLICommandHandler(bot, update):
 
 def main():
     # Create the EventHandler and pass it your bot's token
-    eh = BotEventHandler("148447715:AAGG70cC6s_kwrji2pLsaMeEzKGe0llA1hY")
+    eh = BotEventHandler("TOKEN")
 
     # on different commands - answer in Telegram
     eh.broadcaster.addTelegramCommandHandler("start", startCommandHandler)
