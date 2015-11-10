@@ -79,6 +79,9 @@ def post(url,
     Returns:
       A JSON object.
     """
+
+    # Add one second to the timeout of urlopen to allow data to be transferred
+    # over the network.
     if "timeout" in data:
         timeout = data["timeout"] + 1.
     else:
