@@ -1,7 +1,4 @@
 language: python
-os:
-  - linux
-  - osx
 python:
   - "2.6"
   - "2.7"
@@ -14,7 +11,7 @@ install:
   - pip install -r requirements.txt
 script:
   - nosetests --with-coverage --cover-package telegram/
-  - pylint -E telegram
   - flake8 telegram
+  - 'if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pylint -E telegram; fi'
 after_success:
   coveralls
