@@ -13,8 +13,8 @@ install:
   - pip install pylint flake8 coveralls
   - pip install -r requirements.txt
 script:
-  nosetests --with-coverage --cover-package telegram/
-  pylint -E telegram
-  flake8 telegram
+  - nosetests --with-coverage --cover-package telegram/
+  - pylint -E telegram
+  - flake8 telegram
 after_success:
   coveralls
