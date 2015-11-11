@@ -3,11 +3,42 @@
 """
 This module contains the Broadcaster class.
 """
+from functools import wraps
 
 from telegram import (TelegramError, TelegramObject, Update)
+from threading import Thread, BoundedSemaphore
+
+semaphore = None
 
 
-class Broadcaster(TelegramObject):
+def run_async(func):
+    """
+    Function decorator that will run the function in a new thread.
+
+    Args:
+        func (function): The function to run in the thread.
+
+    Returns:
+        function:
+    """
+
+    @wraps(func)
+    def pooled(*args, **kwargs):
+        result = func(*args, **kwargs)
+        semaphore.release()
+        return result
+
+    @wraps(func)
+    def async_func(*args, **kwargs):
+        thread = Thread(target=pooled, args=args, kwargs=kwargs)
+        semaphore.acquire()
+        thread.start()
+        return thread
+
+    return async_func
+
+
+class Broadcaster:
     """
     This class broadcasts all kinds of updates to its registered handlers.
 
@@ -18,7 +49,7 @@ class Broadcaster(TelegramObject):
         update_queue (queue.Queue): The synchronized queue that will contain the
         updates.
     """
-    def __init__(self, bot, update_queue):
+    def __init__(self, bot, update_queue, workers=4):
         self.bot = bot
         self.update_queue = update_queue
         self.telegram_message_handlers = []
@@ -30,6 +61,12 @@ class Broadcaster(TelegramObject):
         self.unknown_telegram_command_handlers = []
         self.unknown_string_command_handlers = []
         self.error_handlers = []
+
+        global semaphore
+        if not semaphore:
+            semaphore = BoundedSemaphore(value=workers)
+        else:
+            print("Semaphore already initialized, skipping.")
 
     # Add Handlers
     def addTelegramMessageHandler(self, handler):
