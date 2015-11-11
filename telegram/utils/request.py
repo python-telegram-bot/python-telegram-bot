@@ -20,6 +20,7 @@
 """This module contains methods to make POST and GET requests"""
 
 import json
+import socket
 from ssl import SSLError
 
 try:
@@ -111,11 +112,11 @@ def post(url,
 
         message = _parse(error.read())
         raise TelegramError(message)
-    except SSLError as error:
-        if "operation timed out" in error.message:
+    except (SSLError, socket.timeout) as error:
+        if "operation timed out" in str(error):
             raise TelegramError("Timed out")
 
-        raise TelegramError(error.message)
+        raise TelegramError(str(error))
     return _parse(result)
 
 

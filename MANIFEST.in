@@ -1,1 +1,1 @@
-include LICENSE LICENSE.lesser Makefile
+include LICENSE LICENSE.lesser Makefile requirements.txt

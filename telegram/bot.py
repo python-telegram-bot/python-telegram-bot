@@ -667,10 +667,10 @@ class Bot(TelegramObject):
             Timeout in seconds for long polling. Defaults to 0, i.e. usual
             short polling.
           network_delay:
-            Additional timeout in seconds to allow the response from Telegram to
-            take some time when using long polling. Defaults to 2, which should
-            be enough for most connections. Increase it if it takes very long
-            for data to be transmitted from and to the Telegram servers.
+            Additional timeout in seconds to allow the response from Telegram
+            to take some time when using long polling. Defaults to 2, which
+            should be enough for most connections. Increase it if it takes very
+            long for data to be transmitted from and to the Telegram servers.
 
         Returns:
           A list of telegram.Update objects are returned.

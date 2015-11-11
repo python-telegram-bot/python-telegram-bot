@@ -58,7 +58,7 @@ author = u'Leandro Toledo'
 # built documents.
 #
 # The short X.Y version.
-version = '2.9.1'
+version = '2.9'
 # The full version, including alpha/beta/rc tags.
 release = '2.9.1'
 
