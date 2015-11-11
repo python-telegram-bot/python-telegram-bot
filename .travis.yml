@@ -1,4 +1,7 @@
 language: python
+os:
+  - linux
+  - osx
 python:
   - "2.6"
   - "2.7"
@@ -7,9 +10,11 @@ python:
   - "pypy"
   - "pypy3"
 install:
-  - pip install coveralls
+  - pip install pylint flake8 coveralls
   - pip install -r requirements.txt
 script:
   nosetests --with-coverage --cover-package telegram/
+  pylint -E telegram
+  flake8 telegram
 after_success:
   coveralls
