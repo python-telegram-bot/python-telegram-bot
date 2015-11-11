@@ -12,27 +12,31 @@ inserted into the update queue for the bot to handle.
 
 import sys
 from telegram import BotEventHandler
-from telegram.boteventhandler import run_async
+from telegram.broadcaster import run_async
 from time import sleep
 import re
 
-global last_chat_id
 last_chat_id = 0
+
 
 def removeCommand(text):
     return ' '.join(text.split(' ')[1:])
 
-""" Command Handlers """
+
+# Command Handlers
 def startCommandHandler(bot, update):
     bot.sendMessage(update.message.chat_id, text='Hi!')
 
+
 def helpCommandHandler(bot, update):
     bot.sendMessage(update.message.chat_id, text='Help!')
+
 
 def anyMessageHandler(bot, update):
     print("chat_id: %d\nFrom: %s\nText: %s" %
           (update.message.chat_id, str(update.message.from_user),
            update.message.text))
+
 
 def unknownCommandHandler(bot, update):
     bot.sendMessage(update.message.chat_id, text='Command not recognized!')
@@ -52,42 +56,49 @@ def messageHandler(bot, update):
     sleep(2)  # IO-heavy operation here
     bot.sendMessage(update.message.chat_id, text=update.message.text)
 
+
 def errorHandler(bot, error):
     print(str(error))
+
 
 def CLIReplyCommandHandler(bot, update):
     if last_chat_id is not 0:
         bot.sendMessage(chat_id=last_chat_id, text=removeCommand(update))
 
+
 def unknownCLICommandHandler(bot, update):
     print("Command not found: %s" % update)
+
 
 def main():
     # Create the EventHandler and pass it your bot's token
     eh = BotEventHandler("TOKEN")
 
+    # Get the broadcaster to register handlers
+    bc = eh.broadcaster
+
     # on different commands - answer in Telegram
-    eh.broadcaster.addTelegramCommandHandler("start", startCommandHandler)
-    eh.broadcaster.addTelegramCommandHandler("help", helpCommandHandler)
+    bc.addTelegramCommandHandler("start", startCommandHandler)
+    bc.addTelegramCommandHandler("help", helpCommandHandler)
 
     # on regex match - print all messages to stdout
-    eh.broadcaster.addTelegramRegexHandler(re.compile('.*'), anyMessageHandler)
+    bc.addTelegramRegexHandler(re.compile('.*'), anyMessageHandler)
     
     # on CLI commands - type "/reply text" in terminal to reply to the last
     # active chat
-    eh.broadcaster.addStringCommandHandler('reply', CLIReplyCommandHandler)
+    bc.addStringCommandHandler('reply', CLIReplyCommandHandler)
 
     # on unknown commands - answer on Telegram
-    eh.broadcaster.addUnknownTelegramCommandHandler(unknownCommandHandler)
+    bc.addUnknownTelegramCommandHandler(unknownCommandHandler)
 
     # on unknown CLI commands - notify the user
-    eh.broadcaster.addUnknownStringCommandHandler(unknownCLICommandHandler)
+    bc.addUnknownStringCommandHandler(unknownCLICommandHandler)
 
     # on noncommand i.e message - echo the message on Telegram
-    eh.broadcaster.addTelegramMessageHandler(messageHandler)
+    bc.addTelegramMessageHandler(messageHandler)
 
     # on error - print error to stdout
-    eh.broadcaster.addErrorHandler(errorHandler)
+    bc.addErrorHandler(errorHandler)
 
     # Start the Bot and store the update Queue,
     # so we can insert updates ourselves
