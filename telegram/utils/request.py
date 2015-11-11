@@ -20,6 +20,7 @@
 """This module contains methods to make POST and GET requests"""
 
 import json
+import socket
 from ssl import SSLError
 
 try:
@@ -67,22 +68,26 @@ def get(url):
 
 
 def post(url,
-         data):
+         data,
+         network_delay=2.):
     """Request an URL.
     Args:
       url:
         The web location we want to retrieve.
       data:
         A dict of (str, unicode) key/value pairs.
+      network_delay:
+        Additional timeout in seconds to allow the response from Telegram to
+        take some time.
 
     Returns:
       A JSON object.
     """
 
-    # Add one second to the timeout of urlopen to allow data to be transferred
-    # over the network.
+    # Add time to the timeout of urlopen to allow data to be transferred over
+    # the network.
     if 'timeout' in data:
-        timeout = data['timeout'] + 1.
+        timeout = data['timeout'] + network_delay
     else:
         timeout = None
 
@@ -107,11 +112,11 @@ def post(url,
 
         message = _parse(error.read())
         raise TelegramError(message)
-    except SSLError as error:
-        if "The read operation timed out" == error.message:
+    except (SSLError, socket.timeout) as error:
+        if "operation timed out" in str(error):
             raise TelegramError("Timed out")
 
-        raise TelegramError(error.message)
+        raise TelegramError(str(error))
     return _parse(result)
 
 

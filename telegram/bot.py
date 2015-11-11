@@ -649,7 +649,8 @@ class Bot(TelegramObject):
     def getUpdates(self,
                    offset=None,
                    limit=100,
-                   timeout=0):
+                   timeout=0,
+                   network_delay=2.):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -665,6 +666,11 @@ class Bot(TelegramObject):
           timeout:
             Timeout in seconds for long polling. Defaults to 0, i.e. usual
             short polling.
+          network_delay:
+            Additional timeout in seconds to allow the response from Telegram
+            to take some time when using long polling. Defaults to 2, which
+            should be enough for most connections. Increase it if it takes very
+            long for data to be transmitted from and to the Telegram servers.
 
         Returns:
           A list of telegram.Update objects are returned.
@@ -680,7 +686,7 @@ class Bot(TelegramObject):
         if timeout:
             data['timeout'] = timeout
 
-        result = request.post(url, data)
+        result = request.post(url, data, network_delay=network_delay)
 
         if result:
             self.logger.info(
