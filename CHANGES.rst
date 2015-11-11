@@ -1,3 +1,9 @@
+**2015-11-11**
+
+*Released 2.9.2*
+
+- Error handling on request timeouts has been improved
+
 **2015-11-10**
 
 *Released 2.9.1*
