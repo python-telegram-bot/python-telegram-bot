@@ -10,7 +10,6 @@ install:
   - pip install coveralls
   - pip install -r requirements.txt
 script:
-  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && bundle exec rake tests:integration || false'
-  - nosetests --with-coverage --cover-package telegram/
+  nosetests --with-coverage --cover-package telegram/
 after_success:
-  - coveralls
+  coveralls
