@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
-# Simple Bot to reply Telegram messages
+# Simple Bot to reply to Telegram messages
 # Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,13 +20,16 @@
 
 import logging
 import telegram
+from time import sleep
 
-
-LAST_UPDATE_ID = None
+try:
+    from urllib.error import URLError
+except ImportError:
+    from urllib2 import URLError  # python 2
 
 
 def main():
-    global LAST_UPDATE_ID
+    update_id = None
 
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -33,33 +37,35 @@ def main():
     # Telegram Bot Authorization Token
     bot = telegram.Bot('TOKEN')
 
-    # This will be our global variable to keep the latest update_id when requesting
-    # for updates. It starts with the latest update_id if available.
-    try:
-        LAST_UPDATE_ID = bot.getUpdates()[-1].update_id
-    except IndexError:
-        LAST_UPDATE_ID = None
-
     while True:
-        echo(bot)
+        try:
+            update_id = echo(bot, update_id)
+        except telegram.TelegramError as e:
+            # These are network problems with Telegram.
+            if e.message in ("Bad Gateway", "Timed out"):
+                sleep(1)
+            else:
+                raise e
+        except URLError as e:
+            # These are network problems on our end.
+            sleep(1)
 
 
-def echo(bot):
-    global LAST_UPDATE_ID
+def echo(bot, update_id):
 
-    # Request updates after the last updated_id
-    for update in bot.getUpdates(offset=LAST_UPDATE_ID, timeout=10):
-        # chat_id is required to reply any message
+    # Request updates after the last update_id
+    for update in bot.getUpdates(offset=update_id, timeout=10):
+        # chat_id is required to reply to any message
         chat_id = update.message.chat_id
-        reply_text = update.message.text
+        update_id = update.update_id + 1
+        message = update.message.text
 
-        if reply_text:
-            # Reply the message
+        if message:
+            # Reply to the message
             bot.sendMessage(chat_id=chat_id,
-                            text=reply_text)
+                            text=message)
 
-        # Updates global offset to get the new updates
-        LAST_UPDATE_ID = update.update_id + 1
+    return update_id
 
 
 if __name__ == '__main__':
