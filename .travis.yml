@@ -7,9 +7,11 @@ python:
   - "pypy"
   - "pypy3"
 install:
-  - pip install coveralls
+  - pip install pylint flake8 coveralls
   - pip install -r requirements.txt
 script:
-  nosetests --with-coverage --cover-package telegram/
+  - nosetests --with-coverage --cover-package telegram/
+  - flake8 telegram
+  - 'if [[ $TRAVIS_PYTHON_VERSION != 2.6 ]]; then pylint -E telegram; fi'
 after_success:
   coveralls

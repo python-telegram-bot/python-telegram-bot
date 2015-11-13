@@ -110,7 +110,11 @@ def post(url,
         if error.getcode() == 502:
             raise TelegramError('Bad Gateway')
 
-        message = _parse(error.read())
+        try:
+            message = _parse(error.read())
+        except ValueError:
+            message = 'Unknown HTTPError'
+
         raise TelegramError(message)
     except (SSLError, socket.timeout) as error:
         if "operation timed out" in str(error):
