@@ -57,8 +57,8 @@ def messageHandler(bot, update):
     bot.sendMessage(update.message.chat_id, text=update.message.text)
 
 
-def errorHandler(bot, error):
-    print(str(error))
+def errorHandler(bot, update, error):
+    print('Update %s caused error %s' % (update, error))
 
 
 def CLIReplyCommandHandler(bot, update):
