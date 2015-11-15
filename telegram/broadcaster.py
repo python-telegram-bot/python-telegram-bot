@@ -107,6 +107,8 @@ class Broadcaster:
         self.logger.info('Broadcaster thread started')
 
         while True:
+            update = None
+
             try:
                 # Pop update from update queue.
                 # Blocks if no updates are available.
@@ -119,7 +121,7 @@ class Broadcaster:
             
             # Broadcast any errors
             except TelegramError as te:
-                self.broadcastError(te)
+                self.broadcastError(update, te)
 
         self.logger.info('Broadcaster thread stopped')
 
@@ -157,7 +159,7 @@ class Broadcaster:
 
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.broadcastError(update)
+            self.broadcastError(None, update)
             handled = True
 
         # Telegram update (regex)
@@ -178,7 +180,7 @@ class Broadcaster:
 
         # Update not recognized
         if not handled:
-            self.broadcastError(TelegramError(
+            self.broadcastError(update, TelegramError(
                 "Received update of unknown type %s" % type(update)))
 
     # Add Handlers
@@ -498,7 +500,7 @@ class Broadcaster:
             if isinstance(update, t):
                 self.broadcastTo(self.type_handlers[t], update)
         else:
-            self.broadcastError(TelegramError(
+            self.broadcastError(update, TelegramError(
                 "Received update of unknown type %s" % type(update)))
     
     def broadcastTelegramMessage(self, update):
@@ -512,16 +514,17 @@ class Broadcaster:
         
         self.broadcastTo(self.telegram_message_handlers, update)
 
-    def broadcastError(self, error):
+    def broadcastError(self, update, error):
         """
         Broadcasts an error.
 
         Args:
+            update (any): The pdate that caused the error
             error (telegram.TelegramError): The Telegram error that was raised.
         """
 
         for handler in self.error_handlers:
-            handler(self.bot, error)
+            handler(self.bot, update, error)
 
     def broadcastTo(self, handlers, update):
         """
