@@ -8,6 +8,10 @@ the Broadcaster and registered at their respective places.
 Then, the bot is started and the CLI-Loop is entered, where all text inputs are
 inserted into the update queue for the bot to handle.
 
+Usage:
+Basic Echobot example, repeats messages. Reply to last chat from the command
+line by typing "/reply <text>"
+Type 'stop' on the command line to stop the bot.
 """
 
 import sys

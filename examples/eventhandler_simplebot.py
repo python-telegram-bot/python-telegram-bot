@@ -7,6 +7,9 @@ First, a few handler functions are defined. Then, those functions are passed to
 the Broadcaster and registered at their respective places.
 Then, the bot is started and the CLI-Loop is entered.
 
+Usage:
+Basic Echobot example, repeats messages.
+Type 'stop' on the command line to stop the bot.
 """
 
 from telegram import BotEventHandler
