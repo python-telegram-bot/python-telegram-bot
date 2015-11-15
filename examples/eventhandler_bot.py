@@ -14,7 +14,17 @@ import sys
 from telegram import BotEventHandler
 from telegram.broadcaster import run_async
 from time import sleep
-import re
+import logging
+import sys
+
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+root.addHandler(ch)
 
 last_chat_id = 0
 
