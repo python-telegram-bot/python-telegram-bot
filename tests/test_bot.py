@@ -135,7 +135,7 @@ class BotTest(BaseTest, unittest.TestCase):
         upf = self._bot.getUserProfilePhotos(user_id=self._chat_id)
 
         self.assertTrue(self.is_json(upf.to_json()))
-        self.assertEqual(upf.photos[0][0].file_size, 6547)
+        self.assertEqual(upf.photos[0][0].file_size, 12421)
 
 if __name__ == '__main__':
     unittest.main()
