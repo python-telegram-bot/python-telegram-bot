@@ -31,10 +31,12 @@ logging.getLogger(__name__).addHandler(H)
 class BotEventHandler:
     """
     This class provides a frontend to telegram.Bot to the programmer, so they
-    can focus on coding the bot. I also runs in a separate thread, so the user
+    can focus on coding the bot. It also runs in a separate thread, so the user
     can interact with the bot, for example on the command line. It supports
     Handlers for different kinds of data: Updates from Telegram, basic text
     commands and even arbitrary types.
+
+    Polling as well as webhook are supported.
     
     Attributes:
     
@@ -95,7 +97,7 @@ class BotEventHandler:
 
     def start_webhook(self, host, port, cert, key, listen='0.0.0.0'):
         """
-        Starts polling updates from Telegram.
+        Starts a small http server to listen for updates via webhook
 
         Args:
             host (str): Hostname or IP of the bot
