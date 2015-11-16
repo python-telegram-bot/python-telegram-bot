@@ -5,17 +5,23 @@ This module contains the class BotEventHandler, which tries to make creating
 Telegram Bots intuitive!
 """
 import logging
-import sys
+import ssl
 from threading import Thread
 from telegram import (Bot, TelegramError, broadcaster, Broadcaster,
                       NullHandler)
+from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 from time import sleep
 
 # Adjust for differences in Python versions
-if sys.version_info.major is 2:
+try:
     from Queue import Queue
-elif sys.version_info.major is 3:
+except ImportError:
     from queue import Queue
+
+try:
+    import BaseHTTPServer
+except ImportError:
+    import http.server as BaseHTTPServer
 
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
@@ -53,8 +59,9 @@ class BotEventHandler:
                                            workers=workers)
         self.logger = logging.getLogger(__name__)
         self.running = False
+        self.httpd = None
 
-    def start(self, poll_interval=1.0, timeout=10, network_delay=2):
+    def start_polling(self, poll_interval=1.0, timeout=10, network_delay=2):
         """
         Starts polling updates from Telegram. 
         
@@ -71,7 +78,8 @@ class BotEventHandler:
         # Create Thread objects
         broadcaster_thread = Thread(target=self.broadcaster.start,
                                     name="broadcaster")
-        event_handler_thread = Thread(target=self.__start, name="eventhandler",
+        event_handler_thread = Thread(target=self._start_polling,
+                                      name="eventhandler",
                                       args=(poll_interval, timeout,
                                             network_delay))
 
@@ -84,7 +92,38 @@ class BotEventHandler:
         # Return the update queue so the main thread can insert updates
         return self.update_queue
 
-    def __start(self, poll_interval, timeout, network_delay):
+    def start_webhook(self, host, port, cert, key, listen='0.0.0.0'):
+        """
+        Starts polling updates from Telegram.
+
+        Args:
+            host (str): Hostname or IP of the bot
+            port (int): Port the bot should be listening on
+            cert (str): Path to the SSL certificate file
+            key (str): Path to the SSL key file
+            listen (Optional[str]): IP-Address to listen on
+
+        Returns:
+            Queue: The update queue that can be filled from the main thread
+        """
+
+        # Create Thread objects
+        broadcaster_thread = Thread(target=self.broadcaster.start,
+                                    name="broadcaster")
+        event_handler_thread = Thread(target=self._start_webhook,
+                                      name="eventhandler",
+                                      args=(host, port, cert, key, listen))
+
+        self.running = True
+
+        # Start threads
+        broadcaster_thread.start()
+        event_handler_thread.start()
+
+        # Return the update queue so the main thread can insert updates
+        return self.update_queue
+
+    def _start_polling(self, poll_interval, timeout, network_delay):
         """
         Thread target of thread 'eventhandler'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
@@ -93,6 +132,9 @@ class BotEventHandler:
 
         current_interval = poll_interval
         self.logger.info('Event Handler thread started')
+
+        # Remove webhook
+        self.bot.setWebhook(webhook_url=None)
 
         while self.running:
             try:
@@ -125,12 +167,42 @@ class BotEventHandler:
 
         self.logger.info('Event Handler thread stopped')
 
+    def _start_webhook(self, host, port, cert, key, listen):
+        self.logger.info('Event Handler thread started')
+        url_base = "https://%s:%d" % (host, port)
+        url_path = "/%s" % self.bot.token
+
+        # Remove webhook
+        self.bot.setWebhook(webhook_url=None)
+
+        # Set webhook
+        self.bot.setWebhook(webhook_url=url_base + url_path,
+                            certificate=open(cert, 'rb'))
+
+        # Start server
+        self.httpd = WebhookServer((listen, port), WebhookHandler,
+                                   self.update_queue, url_path)
+
+        self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
+                                            certfile=cert,
+                                            keyfile=key,
+                                            server_side=True)
+
+        self.httpd.serve_forever()
+        self.logger.info('Event Handler thread stopped')
+
     def stop(self):
         """
         Stops the polling thread and the broadcaster
         """
         self.logger.info('Stopping Event Handler and Broadcaster...')
         self.running = False
+
+        if self.httpd:
+            self.logger.info(
+                'BETA: Webhook Server will stop after next message')
+            self.httpd.shutdown()
+
         self.broadcaster.stop()
         while broadcaster.running_async > 0:
             sleep(1)
