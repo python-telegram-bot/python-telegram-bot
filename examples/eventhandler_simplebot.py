@@ -62,7 +62,7 @@ def main():
     bc.addErrorHandler(error)
 
     # Start the Bot
-    eh.start()
+    eh.start_polling()
 
     # Start CLI-Loop
     while True:

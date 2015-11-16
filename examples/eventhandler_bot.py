@@ -127,7 +127,7 @@ def main():
 
     # Start the Bot and store the update Queue,
     # so we can insert updates ourselves
-    update_queue = eh.start(poll_interval=0.1, timeout=20)
+    update_queue = eh.start_polling(poll_interval=0.1, timeout=20)
     
     # Start CLI-Loop
     while True:
