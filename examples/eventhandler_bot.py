@@ -128,6 +128,11 @@ def main():
     # Start the Bot and store the update Queue,
     # so we can insert updates ourselves
     update_queue = eh.start_polling(poll_interval=0.1, timeout=20)
+    '''
+    # Alternatively, run with webhook:
+    update_queue = eh.start_webhook('example.com', 443, 'cert.pem', 'key.key',
+                                    listen='0.0.0.0')
+    '''
     
     # Start CLI-Loop
     while True:
