@@ -7,10 +7,11 @@ Telegram Bots intuitive!
 import logging
 import ssl
 from threading import Thread
+from time import sleep
+
 from telegram import (Bot, TelegramError, broadcaster, Broadcaster,
                       NullHandler)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
-from time import sleep
 
 # Adjust for differences in Python versions
 try:
@@ -188,7 +189,7 @@ class BotEventHandler:
                                             keyfile=key,
                                             server_side=True)
 
-        self.httpd.serve_forever()
+        self.httpd.serve_forever(poll_interval=1)
         self.logger.info('Event Handler thread stopped')
 
     def stop(self):
@@ -200,8 +201,10 @@ class BotEventHandler:
 
         if self.httpd:
             self.logger.info(
-                'BETA: Webhook Server will stop after next message')
+                'Waiting for current webhook connection to be closed... '
+                'Send a Telegram message to the bot to exit immediately.')
             self.httpd.shutdown()
+            self.httpd = None
 
         self.broadcaster.stop()
         while broadcaster.running_async > 0:

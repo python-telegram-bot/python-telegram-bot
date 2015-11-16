@@ -66,9 +66,9 @@ def main():
 
     # Start CLI-Loop
     while True:
-        if sys.version_info.major is 2:
+        try:
             text = raw_input()
-        elif sys.version_info.major is 3:
+        except NameError:
             text = input()
 
         # Gracefully stop the event handler

@@ -13,10 +13,10 @@ H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
 
 
-class WebhookServer(BaseHTTPServer.HTTPServer):
+class WebhookServer(BaseHTTPServer.HTTPServer, object):
     def __init__(self, server_address, RequestHandlerClass, update_queue,
                  webhook_path):
-        super().__init__(server_address, RequestHandlerClass)
+        super(WebhookServer, self).__init__(server_address, RequestHandlerClass)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
 
@@ -24,12 +24,11 @@ class WebhookServer(BaseHTTPServer.HTTPServer):
 # WebhookHandler, process webhook calls
 # Based on: https://github.com/eternnoir/pyTelegramBotAPI/blob/master/
 # examples/webhook_examples/webhook_cpython_echo_bot.py
-class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
     server_version = "WebhookHandler/1.0"
 
     def __init__(self, request, client_address, server):
-        super().__init__(request, client_address, server)
-        self.logger = logging.getLogger(__name__)
+        super(WebhookHandler, self).__init__(request, client_address, server)
 
     def do_HEAD(self):
         self.send_response(200)

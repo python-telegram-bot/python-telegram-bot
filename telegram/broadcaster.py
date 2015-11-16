@@ -90,7 +90,7 @@ class Broadcaster:
         else:
             self.logger.info("Semaphore already initialized, skipping.")
 
-    class _Stop:
+    class _Stop(object):
         """
         A class which objects can be passed into the update queue to stop the
         thread
