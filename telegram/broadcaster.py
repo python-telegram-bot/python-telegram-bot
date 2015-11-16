@@ -65,9 +65,9 @@ class Broadcaster:
     Attributes:
 
     Args:
-        bot (telegram.Bot): The bot object that should be passed to the handlers
-        update_queue (queue.Queue): The synchronized queue that will contain the
-        updates.
+        bot (telegram.Bot): The bot object that should be passed to the
+        handlers update_queue (queue.Queue): The synchronized queue that will
+        contain the updates.
     """
     def __init__(self, bot, update_queue, workers=4):
         self.bot = bot
@@ -213,12 +213,12 @@ class Broadcaster:
 
     def addTelegramRegexHandler(self, matcher, handler):
         """
-        Registers a regex handler in the Broadcaster. If handlers will be called
-        if matcher.math(update.message.text) is True.
+        Registers a regex handler in the Broadcaster. If handlers will be
+        called if re.match(matcher, update.message.text) is True.
 
         Args:
-            matcher (__Regex): A compiled regex object that matches on messages
-                that handler should be listening to
+            matcher (__Regex): A regex string or compiled regex object that
+                matches on messages that handler should be listening to
             handler (function): A function that takes (Bot, Update) as
                 arguments.
         """
@@ -245,12 +245,12 @@ class Broadcaster:
 
     def addStringRegexHandler(self, matcher, handler):
         """
-        Registers a regex handler in the Broadcaster. If handlers will be called
-        if matcher.math(string) is True.
+        Registers a regex handler in the Broadcaster. If handlers will be
+        called if re.match(matcher, string) is True.
 
         Args:
-            matcher (__Regex): A compiled regex object that matches on the string
-                input that handler should be listening to
+            matcher (__Regex): A regex string or compiled regex object that
+                matches on the string input that handler should be listening to
             handler (function): A function that takes (Bot, Update) as
                 arguments.
         """
@@ -274,8 +274,8 @@ class Broadcaster:
 
     def addUnknownStringCommandHandler(self, handler):
         """
-        Registers a string-command handler in the Broadcaster, that will receive
-        all commands that have no associated handler.
+        Registers a string-command handler in the Broadcaster, that will
+        receive all commands that have no associated handler.
 
         Args:
             handler (function): A function that takes (Bot, str) as arguments.
@@ -437,7 +437,8 @@ class Broadcaster:
 
     def broadcastTelegramRegex(self, update):
         """
-        Broadcasts an update to all regex handlers that match the message string.
+        Broadcasts an update to all regex handlers that match the message
+        string.
 
         Args:
             command (str): The command keyword
@@ -471,7 +472,8 @@ class Broadcaster:
 
     def broadcastStringRegex(self, update):
         """
-        Broadcasts an update to all string regex handlers that match the string.
+        Broadcasts an update to all string regex handlers that match the
+        string.
 
         Args:
             command (str): The command keyword

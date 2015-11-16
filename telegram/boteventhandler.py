@@ -144,7 +144,7 @@ class BotEventHandler:
                                               network_delay=network_delay)
                 if not self.running:
                     if len(updates) > 0:
-                        self.logger.info('Updates ignored and will be pulled ' +
+                        self.logger.info('Updates ignored and will be pulled '
                                          'again on restart.')
                     break
 

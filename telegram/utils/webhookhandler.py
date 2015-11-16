@@ -16,7 +16,8 @@ logging.getLogger(__name__).addHandler(H)
 class WebhookServer(BaseHTTPServer.HTTPServer, object):
     def __init__(self, server_address, RequestHandlerClass, update_queue,
                  webhook_path):
-        super(WebhookServer, self).__init__(server_address, RequestHandlerClass)
+        super(WebhookServer, self).__init__(server_address,
+                                            RequestHandlerClass)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
 
