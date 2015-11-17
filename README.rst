@@ -261,6 +261,8 @@ Here follows some examples to help you to get your own Bot up to speed:
 
 - `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
 
+- `TwitterForwarderBot <https://github.com/franciscod/telegram-twitter-forwarder-bot>`_ forwards you tweets from people that you have subscribed to.
+
 ================
 _`Documentation`
 ================
