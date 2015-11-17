@@ -37,9 +37,9 @@ class BotEventHandler:
     commands and even arbitrary types.
 
     Polling as well as webhook are supported.
-    
+
     Attributes:
-    
+
     Args:
         token (str): The bots token given by the @BotFather
         base_url (Optional[str]):
@@ -48,7 +48,7 @@ class BotEventHandler:
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
     """
-    
+
     def __init__(self, token, base_url=None, broadcaster=None, workers=4):
         self.bot = Bot(token, base_url)
         self.last_update_id = 0
@@ -66,10 +66,10 @@ class BotEventHandler:
 
     def start_polling(self, poll_interval=1.0, timeout=10, network_delay=2):
         """
-        Starts polling updates from Telegram. 
-        
+        Starts polling updates from Telegram.
+
         Args:
-            poll_interval (Optional[float]): Time to wait between polling 
+            poll_interval (Optional[float]): Time to wait between polling
                 updates from Telegram in seconds. Default is 1.0
             timeout (Optional[float]): Passed to Bot.getUpdates
             network_delay (Optional[float]): Passed to Bot.getUpdates
@@ -87,11 +87,11 @@ class BotEventHandler:
                                             network_delay))
 
         self.running = True
-        
+
         # Start threads
         broadcaster_thread.start()
         event_handler_thread.start()
-        
+
         # Return the update queue so the main thread can insert updates
         return self.update_queue
 
@@ -154,7 +154,7 @@ class BotEventHandler:
                     self.update_queue.put(update)
                     self.last_update_id = update.update_id + 1
                     current_interval = poll_interval
-                
+
                 sleep(current_interval)
             except TelegramError as te:
                 # Put the error into the update queue and let the Broadcaster
