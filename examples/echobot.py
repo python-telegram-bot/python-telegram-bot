@@ -29,13 +29,18 @@ except ImportError:
 
 
 def main():
-    update_id = None
+    # Telegram Bot Authorization Token
+    bot = telegram.Bot('TOKEN')
+
+    # get the first pending update_id, this is so we can skip over it in case
+    # we get an "Unauthorized" exception.
+    try:
+        update_id = bot.getUpdates()[0].update_id
+    except IndexError:
+        update_id = None
 
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    # Telegram Bot Authorization Token
-    bot = telegram.Bot('TOKEN')
 
     while True:
         try:
@@ -44,6 +49,9 @@ def main():
             # These are network problems with Telegram.
             if e.message in ("Bad Gateway", "Timed out"):
                 sleep(1)
+            elif e.message == "Unauthorized":
+                # The user has removed or blocked the bot.
+                update_id += 1
             else:
                 raise e
         except URLError as e:
