@@ -118,7 +118,7 @@ class Broadcaster:
                     break
 
                 self.processUpdate(update)
-            
+
             # Broadcast any errors
             except TelegramError as te:
                 self.broadcastError(update, te)
@@ -420,16 +420,16 @@ class Broadcaster:
 
     def broadcastTelegramCommand(self, update):
         """
-        Broadcasts an update that contains a command. 
-        
+        Broadcasts an update that contains a command.
+
         Args:
             command (str): The command keyword
             update (telegram.Update): The Telegram update that contains the
                 command
         """
-        
+
         command = update.message.text.split(' ')[0][1:].split('@')[0]
-        
+
         if command in self.telegram_command_handlers:
             self.broadcastTo(self.telegram_command_handlers[command], update)
         else:
@@ -454,17 +454,17 @@ class Broadcaster:
                     matching_handlers.append(handler)
 
         self.broadcastTo(matching_handlers, update)
-    
+
     def broadcastStringCommand(self, update):
         """
-        Broadcasts a string-update that contains a command. 
-        
+        Broadcasts a string-update that contains a command.
+
         Args:
             update (str): The string input
         """
-        
+
         command = update.split(' ')[0][1:]
-        
+
         if command in self.string_command_handlers:
             self.broadcastTo(self.string_command_handlers[command], update)
         else:
@@ -493,7 +493,7 @@ class Broadcaster:
     def broadcastType(self, update):
         """
         Broadcasts an update of any type.
-        
+
         Args:
             update (any): The update
         """
@@ -504,16 +504,16 @@ class Broadcaster:
         else:
             self.broadcastError(update, TelegramError(
                 "Received update of unknown type %s" % type(update)))
-    
+
     def broadcastTelegramMessage(self, update):
         """
-        Broadcasts an update that contains a regular message. 
-        
+        Broadcasts an update that contains a regular message.
+
         Args:
             update (telegram.Update): The Telegram update that contains the
                 message.
         """
-        
+
         self.broadcastTo(self.telegram_message_handlers, update)
 
     def broadcastError(self, update, error):

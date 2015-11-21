@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 """
-This module contains the class BotEventHandler, which tries to make creating 
+This module contains the class BotEventHandler, which tries to make creating
+
 Telegram Bots intuitive!
 """
 import logging
@@ -19,11 +20,6 @@ try:
 except ImportError:
     from queue import Queue
 
-try:
-    import BaseHTTPServer
-except ImportError:
-    import http.server as BaseHTTPServer
-
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
 
@@ -35,8 +31,8 @@ class BotEventHandler:
     can interact with the bot, for example on the command line. It supports
     Handlers for different kinds of data: Updates from Telegram, basic text
     commands and even arbitrary types.
-
     Polling as well as webhook are supported.
+
 
     Attributes:
 
@@ -211,4 +207,3 @@ class BotEventHandler:
         self.broadcaster.stop()
         while broadcaster.running_async > 0:
             sleep(1)
-
