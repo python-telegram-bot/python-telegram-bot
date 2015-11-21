@@ -167,7 +167,7 @@ class MockBot:
         update.message = message
         return update
 
-    def setWebhook(self, url=None, certificate=None):
+    def setWebhook(self, webhook_url=None, certificate=None):
         pass
 
     def getUpdates(self,
