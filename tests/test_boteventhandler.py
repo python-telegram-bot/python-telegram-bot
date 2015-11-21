@@ -54,7 +54,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('Test')
         self.beh.broadcaster.addTelegramMessageHandler(
             self.telegramHandlerTest)
-        self.beh.start(0.05)
+        self.beh.start_polling(0.05)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test')
 
@@ -63,7 +63,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('Multiple', 1000)
         self.beh.broadcaster.addTelegramMessageHandler(
             self.telegramHandlerTest)
-        self.beh.start(0.0)
+        self.beh.start_polling(0.0)
         sleep(.1)
         self.assertEqual(self.received_message, 'Multiple')
         self.assertEqual(self.message_count, 1000)
@@ -73,7 +73,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('Test2')
         self.beh.broadcaster.addTelegramRegexHandler(re.compile('Te.*'),
                                                    self.telegramHandlerTest)
-        self.beh.start(0.05)
+        self.beh.start_polling(0.05)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test2')
 
@@ -82,7 +82,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('/test')
         self.beh.broadcaster.addTelegramCommandHandler(
             'test', self.telegramHandlerTest)
-        self.beh.start(0.05)
+        self.beh.start_polling(0.05)
         sleep(.1)
         self.assertEqual(self.received_message, '/test')
 
@@ -91,7 +91,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('/test2')
         self.beh.broadcaster.addUnknownTelegramCommandHandler(
             self.telegramHandlerTest)
-        self.beh.start(0.05)
+        self.beh.start_polling(0.05)
         sleep(.1)
         self.assertEqual(self.received_message, '/test2')
 
@@ -100,7 +100,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('')
         self.beh.broadcaster.addStringRegexHandler(re.compile('Te.*'),
                                                    self.stringHandlerTest)
-        queue = self.beh.start(0.05)
+        queue = self.beh.start_polling(0.05)
         queue.put('Test3')
         sleep(.1)
         self.assertEqual(self.received_message, 'Test3')
@@ -111,7 +111,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.broadcaster.addStringCommandHandler(
             'test3', self.stringHandlerTest)
 
-        queue = self.beh.start(0.05)
+        queue = self.beh.start_polling(0.05)
         queue.put('/test3')
         sleep(.1)
         self.assertEqual(self.received_message, '/test3')
@@ -121,7 +121,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('/test')
         self.beh.broadcaster.addUnknownStringCommandHandler(
             self.stringHandlerTest)
-        queue = self.beh.start(0.05)
+        queue = self.beh.start_polling(0.05)
         queue.put('/test4')
         sleep(.1)
         self.assertEqual(self.received_message, '/test4')
@@ -130,7 +130,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         print('Testing addErrorHandler')
         self.beh.bot = MockBot('')
         self.beh.broadcaster.addErrorHandler(self.stringHandlerTest)
-        queue = self.beh.start(0.05)
+        queue = self.beh.start_polling(0.05)
         error = TelegramError("Unauthorized.")
         queue.put(error)
         sleep(.1)
@@ -140,7 +140,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         print('Testing addTypeHandler')
         self.beh.bot = MockBot('')
         self.beh.broadcaster.addTypeHandler(dict, self.stringHandlerTest)
-        queue = self.beh.start(0.05)
+        queue = self.beh.start_polling(0.05)
         payload = {"Test": 42}
         queue.put(payload)
         sleep(.1)
