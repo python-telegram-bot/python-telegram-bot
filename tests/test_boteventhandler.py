@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """ This module contains a object that represents Tests for BotEventHandler """
-
+import logging
 import unittest
 import sys
 from time import sleep
@@ -31,6 +31,16 @@ from telegram import Update, Message, TelegramError
 from telegram.broadcaster import run_async
 from tests.base import BaseTest
 from threading import Lock
+
+# Enable logging
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.WARN)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+root.addHandler(ch)
 
 
 class BotEventHandlerTest(BaseTest, unittest.TestCase):
@@ -153,6 +163,14 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEqual(self.received_message, error)
 
+    def test_errorOnGetUpdates(self):
+        print('Testing errorOnGetUpdates')
+        self.beh.bot = MockBot('', raise_error=True)
+        self.beh.broadcaster.addErrorHandler(self.errorHandlerTest)
+        self.beh.start_polling(0.05)
+        sleep(.1)
+        self.assertEqual(self.received_message.message, "Test Error")
+
     def test_addTypeHandler(self):
         print('Testing addTypeHandler')
         self.beh.bot = MockBot('')
@@ -173,12 +191,31 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message, 'Test4')
         self.assertEqual(self.message_count, 2)
 
+    def test_webhook(self):
+        """ Work in progress """
+        print('Testing @run_async')
+        self.beh.bot = MockBot('Test4', messages=2)
+        self.beh.broadcaster.addTelegramMessageHandler(
+            self.telegramHandlerTest)
+        self.beh.start_webhook('127.0.0.1', 8000,
+                               './tests/test_boteventhandler.py',
+                               './tests/test_boteventhandler.py',
+                               listen='127.0.0.1')
+        sleep(1)
+        # Error is logged - run self.beh.httpd.serve_forever() in a separate
+        # Thread here, then send a json-encrypted update via request.post()?
+
+        # self.assertEqual(self.received_message, 'Test4')
+        self.assertEqual(self.message_count, 0)
+
 
 class MockBot:
 
-    def __init__(self, text, messages=1):
+    def __init__(self, text, messages=1, raise_error=False):
         self.text = text
         self.send_messages = messages
+        self.raise_error = raise_error
+        self.token = "TOKEN"
         pass
 
     def mockUpdate(self, text):
@@ -197,7 +234,9 @@ class MockBot:
                    timeout=0,
                    network_delay=2.):
 
-        if self.send_messages >= 2:
+        if self.raise_error:
+            raise TelegramError('Test Error')
+        elif self.send_messages >= 2:
             self.send_messages -= 2
             return self.mockUpdate(self.text), self.mockUpdate(self.text)
         elif self.send_messages == 1:
