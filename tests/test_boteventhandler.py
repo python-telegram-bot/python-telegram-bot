@@ -21,16 +21,21 @@
 import logging
 import unittest
 import sys
-from time import sleep
-
 import re
+from time import sleep
+from datetime import datetime
+
+try:
+    from urllib2 import urlopen, Request
+except ImportError:
+    from urllib.request import Request, urlopen
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError
+from telegram import Update, Message, TelegramError, User, GroupChat
 from telegram.broadcaster import run_async
 from tests.base import BaseTest
-from threading import Lock
+from threading import Lock, Thread
 
 # Enable logging
 root = logging.getLogger()
@@ -192,8 +197,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.message_count, 2)
 
     def test_webhook(self):
-        """ Work in progress """
-        print('Testing @run_async')
+        print('Testing Webhook')
         self.beh.bot = MockBot('Test4', messages=2)
         self.beh.broadcaster.addTelegramMessageHandler(
             self.telegramHandlerTest)
@@ -201,12 +205,30 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
                                './tests/test_boteventhandler.py',
                                './tests/test_boteventhandler.py',
                                listen='127.0.0.1')
-        sleep(1)
-        # Error is logged - run self.beh.httpd.serve_forever() in a separate
-        # Thread here, then send a json-encrypted update via request.post()?
+        sleep(0.5)
+        # SSL-Wrapping will fail, so we start the server without SSL
+        Thread(target=self.beh.httpd.serve_forever).start()
 
-        # self.assertEqual(self.received_message, 'Test4')
-        self.assertEqual(self.message_count, 0)
+        # Now, we send an update to the server via urlopen
+        message = Message(1, User(1, "Tester"), datetime.now(),
+                          GroupChat(1, "Test Group"))
+
+        message.text = "Webhook Test"
+        update = Update(1)
+        update.message = message
+
+        payload = bytes(update.to_json(), encoding='utf-8')
+        header = {
+            'content-type': 'application/json',
+            'content-length': str(len(payload))
+        }
+
+        r = Request('http://127.0.0.1:8000/TOKEN', data=payload, headers=header)
+
+        urlopen(r)
+
+        sleep(1)
+        self.assertEqual(self.received_message, 'Webhook Test')
 
 
 class MockBot:
