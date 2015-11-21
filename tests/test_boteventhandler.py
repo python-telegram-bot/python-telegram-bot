@@ -22,6 +22,7 @@ import logging
 import unittest
 import sys
 import re
+from random import randrange
 from time import sleep
 from datetime import datetime
 
@@ -201,7 +202,10 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.bot = MockBot('Test4', messages=2)
         self.beh.broadcaster.addTelegramMessageHandler(
             self.telegramHandlerTest)
-        self.beh.start_webhook('127.0.0.1', 8000,
+
+        # Select random port for travis
+        port = randrange(1024, 49152)
+        self.beh.start_webhook('127.0.0.1', port,
                                './tests/test_boteventhandler.py',
                                './tests/test_boteventhandler.py',
                                listen='127.0.0.1')
@@ -217,13 +221,19 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         update = Update(1)
         update.message = message
 
-        payload = bytes(update.to_json(), encoding='utf-8')
+        try:
+            payload = bytes(update.to_json(), encoding='utf-8')
+        except TypeError:
+            payload = bytes(update.to_json())
+
         header = {
             'content-type': 'application/json',
             'content-length': str(len(payload))
         }
 
-        r = Request('http://127.0.0.1:8000/TOKEN', data=payload, headers=header)
+        r = Request('http://127.0.0.1:%d/TOKEN' % port,
+                    data=payload,
+                    headers=header)
 
         urlopen(r)
 
