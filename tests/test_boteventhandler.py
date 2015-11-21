@@ -28,7 +28,9 @@ import re
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError
+from telegram.broadcaster import run_async
 from tests.base import BaseTest
+from threading import Lock
 
 
 class BotEventHandlerTest(BaseTest, unittest.TestCase):
@@ -36,10 +38,11 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         from telegram import BotEventHandler
-        self.beh = BotEventHandler('')
+        self.beh = BotEventHandler('', workers=2)
 
         self.received_message = None
         self.message_count = 0
+        self.lock = Lock()
 
     def tearDown(self):
         self.beh.stop()
@@ -47,6 +50,13 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def telegramHandlerTest(self, bot, update):
         self.received_message = update.message.text
         self.message_count += 1
+
+    @run_async
+    def asyncHandlerTest(self, bot, update):
+        sleep(1)
+        with self.lock:
+            self.received_message = update.message.text
+            self.message_count += 1
 
     def stringHandlerTest(self, bot, update):
         self.received_message = update
@@ -152,6 +162,17 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         queue.put(payload)
         sleep(.1)
         self.assertEqual(self.received_message, payload)
+
+    def test_runAsync(self):
+        print('Testing @run_async')
+        self.beh.bot = MockBot('Test4', messages=2)
+        self.beh.broadcaster.addTelegramMessageHandler(
+            self.asyncHandlerTest)
+        self.beh.start_polling(0.01)
+        sleep(1.2)
+        self.assertEqual(self.received_message, 'Test4')
+        self.assertEqual(self.message_count, 2)
+
 
 class MockBot:
 
