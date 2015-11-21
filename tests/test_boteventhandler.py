@@ -28,7 +28,7 @@ import re
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError
-from tests.base import BaseTest
+from base import BaseTest
 
 
 class BotEventHandlerTest(BaseTest, unittest.TestCase):
@@ -41,12 +41,19 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.received_message = None
         self.message_count = 0
 
+    def tearDown(self):
+        self.beh.stop()
+
     def telegramHandlerTest(self, bot, update):
         self.received_message = update.message.text
         self.message_count += 1
 
     def stringHandlerTest(self, bot, update):
         self.received_message = update
+        self.message_count += 1
+
+    def errorHandlerTest(self, bot, update, error):
+        self.received_message = error
         self.message_count += 1
 
     def test_addTelegramMessageHandler(self):
@@ -129,7 +136,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addErrorHandler(self):
         print('Testing addErrorHandler')
         self.beh.bot = MockBot('')
-        self.beh.broadcaster.addErrorHandler(self.stringHandlerTest)
+        self.beh.broadcaster.addErrorHandler(self.errorHandlerTest)
         queue = self.beh.start_polling(0.05)
         error = TelegramError("Unauthorized.")
         queue.put(error)
@@ -160,7 +167,11 @@ class MockBot:
         update.message = message
         return update
 
-    def getUpdates(self, offset):
+    def getUpdates(self,
+                   offset=None,
+                   limit=100,
+                   timeout=0,
+                   network_delay=2.):
 
         if self.send_messages >= 2:
             self.send_messages -= 2
