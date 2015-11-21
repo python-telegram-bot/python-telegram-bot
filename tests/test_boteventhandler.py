@@ -67,13 +67,13 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         print('Testing addTelegramMessageHandler and send 100 messages...')
-        self.beh.bot = MockBot('Multiple', 1000)
+        self.beh.bot = MockBot('Multiple', 100)
         self.beh.broadcaster.addTelegramMessageHandler(
             self.telegramHandlerTest)
         self.beh.start_polling(0.0)
-        sleep(.1)
+        sleep(.5)
         self.assertEqual(self.received_message, 'Multiple')
-        self.assertEqual(self.message_count, 1000)
+        self.assertEqual(self.message_count, 100)
 
     def test_addTelegramRegexHandler(self):
         print('Testing addStringRegexHandler')
