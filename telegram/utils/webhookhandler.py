@@ -18,13 +18,16 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
                  webhook_path):
         super(WebhookServer, self).__init__(server_address,
                                             RequestHandlerClass)
+        self.logger = logging.getLogger(__name__)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
         self.is_running = False
 
     def serve_forever(self, poll_interval=0.5):
         self.is_running = True
+        self.logger.info("Webhook Server started.")
         super(WebhookServer, self).serve_forever(poll_interval)
+        self.logger.info("Webhook Server stopped.")
 
     def shutdown(self):
         if not self.is_running:
@@ -40,6 +43,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
     server_version = "WebhookHandler/1.0"
 
     def __init__(self, request, client_address, server):
+        self.logger = logging.getLogger(__name__)
         super(WebhookHandler, self).__init__(request, client_address, server)
 
     def do_HEAD(self):
@@ -51,6 +55,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         self.end_headers()
 
     def do_POST(self):
+        self.logger.debug("Webhook triggered")
         if self.path == self.server.webhook_path and \
            'content-type' in self.headers and \
            'content-length' in self.headers and \
@@ -61,7 +66,11 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.send_response(200)
             self.end_headers()
 
+            self.logger.debug("Webhook received data: " + json_string)
+
             update = Update.de_json(json.loads(json_string))
+            self.logger.info("Received Update with ID %d on Webhook" %
+                             update.update_id)
             self.server.update_queue.put(update)
 
         else:

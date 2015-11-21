@@ -207,7 +207,6 @@ class BotEventHandler:
                 'Send a Telegram message to the bot to exit immediately.')
             self.httpd.shutdown()
             self.httpd = None
-            self.logger.debug("Webhook-HTTPServer closed.")
 
         self.logger.debug("Requesting Broadcaster to stop...")
         self.broadcaster.stop()
