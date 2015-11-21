@@ -20,6 +20,17 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
                                             RequestHandlerClass)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
+        self.is_running = False
+
+    def serve_forever(self, poll_interval=0.5):
+        self.is_running = True
+        super(WebhookServer, self).serve_forever(poll_interval)
+
+    def shutdown(self):
+        if not self.is_running:
+            return
+        else:
+            super(WebhookServer, self).shutdown()
 
 
 # WebhookHandler, process webhook calls
