@@ -28,7 +28,7 @@ import re
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError
-from base import BaseTest
+from tests.base import BaseTest
 
 
 class BotEventHandlerTest(BaseTest, unittest.TestCase):
@@ -166,6 +166,9 @@ class MockBot:
         update = Update(0)
         update.message = message
         return update
+
+    def setWebhook(self, url=None, certificate=None):
+        pass
 
     def getUpdates(self,
                    offset=None,
