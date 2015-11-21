@@ -182,10 +182,14 @@ class BotEventHandler:
         self.httpd = WebhookServer((listen, port), WebhookHandler,
                                    self.update_queue, url_path)
 
-        self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
-                                            certfile=cert,
-                                            keyfile=key,
-                                            server_side=True)
+        try:
+            self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
+                                                certfile=cert,
+                                                keyfile=key,
+                                                server_side=True)
+        except ssl.SSLError as error:
+            self.logger.error(str(error))
+            return
 
         self.httpd.serve_forever(poll_interval=1)
         self.logger.info('Event Handler thread stopped')
@@ -203,7 +207,11 @@ class BotEventHandler:
                 'Send a Telegram message to the bot to exit immediately.')
             self.httpd.shutdown()
             self.httpd = None
+            self.logger.debug("Webhook-HTTPServer closed.")
 
+        self.logger.debug("Requesting Broadcaster to stop...")
         self.broadcaster.stop()
         while broadcaster.running_async > 0:
             sleep(1)
+
+        self.logger.debug("Broadcaster stopped.")
