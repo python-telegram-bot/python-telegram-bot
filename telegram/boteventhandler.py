@@ -10,6 +10,8 @@ import ssl
 from threading import Thread
 from time import sleep
 
+import subprocess
+
 from telegram import (Bot, TelegramError, broadcaster, Broadcaster,
                       NullHandler)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
@@ -182,17 +184,25 @@ class BotEventHandler:
         self.httpd = WebhookServer((listen, port), WebhookHandler,
                                    self.update_queue, url_path)
 
+        # Check SSL-Certificate with openssl, if possible
         try:
-            self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
-                                                certfile=cert,
-                                                keyfile=key,
-                                                server_side=True)
-        except ssl.SSLError as error:
-            self.logger.error(str(error))
-            return
+            exit_code = subprocess.call(["openssl", "x509", "-text", "-noout",
+                                         "-in", cert])
+        except OSError:
+            exit_code = 0
 
-        self.httpd.serve_forever(poll_interval=1)
-        self.logger.info('Event Handler thread stopped')
+        if exit_code is 0:
+            try:
+                self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
+                                                    certfile=cert,
+                                                    keyfile=key,
+                                                    server_side=True)
+            except ssl.SSLError as error:
+                self.logger.error(str(error))
+                return
+
+            self.httpd.serve_forever(poll_interval=1)
+            self.logger.info('Event Handler thread stopped')
 
     def stop(self):
         """
