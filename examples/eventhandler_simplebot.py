@@ -28,6 +28,7 @@ formatter = \
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
+logger = logging.getLogger(__name__)
 
 # Command Handlers
 def start(bot, update):
@@ -43,7 +44,7 @@ def echo(bot, update):
 
 
 def error(bot, update, error):
-    print('Update "%s" caused error "%s"' % (update, error))
+    logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 
 def main():
