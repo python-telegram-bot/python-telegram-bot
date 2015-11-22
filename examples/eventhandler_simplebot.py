@@ -4,7 +4,7 @@
 This Bot uses the BotEventHandler class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
-the Broadcaster and registered at their respective places.
+the Dispatcher and registered at their respective places.
 Then, the bot is started and the CLI-Loop is entered.
 
 Usage:
@@ -48,18 +48,18 @@ def main():
     # Create the EventHandler and pass it your bot's token.
     eh = BotEventHandler("TOKEN")
 
-    # Get the broadcaster to register handlers
-    bc = eh.broadcaster
+    # Get the dispatcher to register handlers
+    dp = eh.dispatcher
 
     # on different commands - answer in Telegram
-    bc.addTelegramCommandHandler("start", start)
-    bc.addTelegramCommandHandler("help", help)
+    dp.addTelegramCommandHandler("start", start)
+    dp.addTelegramCommandHandler("help", help)
 
     # on noncommand i.e message - echo the message on Telegram
-    bc.addTelegramMessageHandler(echo)
+    dp.addTelegramMessageHandler(echo)
 
     # on error - print error to stdout
-    bc.addErrorHandler(error)
+    dp.addErrorHandler(error)
 
     # Start the Bot
     eh.start_polling()

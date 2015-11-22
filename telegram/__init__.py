@@ -47,10 +47,10 @@ from .parsemode import ParseMode
 from .message import Message
 from .update import Update
 from .bot import Bot
-from .broadcaster import Broadcaster
+from .broadcaster import Dispatcher
 from .boteventhandler import BotEventHandler
 
-__all__ = ['Bot', 'BotEventHandler', 'Broadcaster', 'Emoji', 'TelegramError',
+__all__ = ['Bot', 'BotEventHandler', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
            'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',

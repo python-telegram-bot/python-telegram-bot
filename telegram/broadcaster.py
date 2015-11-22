@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This module contains the Broadcaster class.
+This module contains the Dispatcher class.
 """
 import logging
 from functools import wraps
@@ -58,9 +58,9 @@ def run_async(func):
     return async_func
 
 
-class Broadcaster:
+class Dispatcher:
     """
-    This class broadcasts all kinds of updates to its registered handlers.
+    This class dispatches all kinds of updates to its registered handlers.
 
     A handler is a function that usually takes the following parameters:
         bot: The telegram.Bot instance that received the message
@@ -74,7 +74,7 @@ class Broadcaster:
     appending one or more of the following arguments in their argument list for
     convenience:
         update_queue: The Queue instance which contains all new updates and is
-            processed by the Broadcaster. Be careful with this - you might
+            processed by the Dispatcher. Be careful with this - you might
             create an infinite loop.
         args: If the update is an instance str or telegram.Update, this will be
             a list that contains the content of the message split on spaces,
@@ -119,12 +119,12 @@ class Broadcaster:
 
     def start(self):
         """
-        Thread target of thread 'broadcaster'. Runs in background and processes
+        Thread target of thread 'dispatcher'. Runs in background and processes
         the update queue.
         """
 
         self.running = True
-        self.logger.info('Broadcaster thread started')
+        self.logger.info('Dispatcher thread started')
 
         while True:
             update = None
@@ -139,11 +139,11 @@ class Broadcaster:
 
                 self.processUpdate(update)
 
-            # Broadcast any errors
+            # Dispatch any errors
             except TelegramError as te:
-                self.broadcastError(update, te)
+                self.dispatchError(update, te)
 
-        self.logger.info('Broadcaster thread stopped')
+        self.logger.info('Dispatcher thread stopped')
 
     def stop(self):
         """
@@ -166,47 +166,47 @@ class Broadcaster:
         # Custom type handlers
         for t in self.type_handlers:
             if isinstance(update, t):
-                self.broadcastType(update)
+                self.dispatchType(update)
                 handled = True
 
         # string update
         if type(update) is str and update.startswith('/'):
-            self.broadcastStringCommand(update)
+            self.dispatchStringCommand(update)
             handled = True
         elif type(update) is str:
-            self.broadcastStringRegex(update)
+            self.dispatchStringRegex(update)
             handled = True
 
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.broadcastError(None, update)
+            self.dispatchError(None, update)
             handled = True
 
         # Telegram update (regex)
         if isinstance(update, Update):
-            self.broadcastTelegramRegex(update)
+            self.dispatchTelegramRegex(update)
             handled = True
 
         # Telegram update (command)
         if isinstance(update, Update) \
                 and update.message.text.startswith('/'):
-            self.broadcastTelegramCommand(update)
+            self.dispatchTelegramCommand(update)
             handled = True
 
         # Telegram update (message)
         elif isinstance(update, Update):
-            self.broadcastTelegramMessage(update)
+            self.dispatchTelegramMessage(update)
             handled = True
 
         # Update not recognized
         if not handled:
-            self.broadcastError(update, TelegramError(
+            self.dispatchError(update, TelegramError(
                 "Received update of unknown type %s" % type(update)))
 
     # Add Handlers
     def addTelegramMessageHandler(self, handler):
         """
-        Registers a message handler in the Broadcaster.
+        Registers a message handler in the Dispatcher.
 
         Args:
             handler (function): A function that takes (Bot, Update, *args) as
@@ -217,7 +217,7 @@ class Broadcaster:
 
     def addTelegramCommandHandler(self, command, handler):
         """
-        Registers a command handler in the Broadcaster.
+        Registers a command handler in the Dispatcher.
 
         Args:
             command (str): The command keyword that this handler should be
@@ -233,7 +233,7 @@ class Broadcaster:
 
     def addTelegramRegexHandler(self, matcher, handler):
         """
-        Registers a regex handler in the Broadcaster. If handlers will be
+        Registers a regex handler in the Dispatcher. If handlers will be
         called if re.match(matcher, update.message.text) is True.
 
         Args:
@@ -250,7 +250,7 @@ class Broadcaster:
 
     def addStringCommandHandler(self, command, handler):
         """
-        Registers a string-command handler in the Broadcaster.
+        Registers a string-command handler in the Dispatcher.
 
         Args:
             command (str): The command keyword that this handler should be
@@ -266,7 +266,7 @@ class Broadcaster:
 
     def addStringRegexHandler(self, matcher, handler):
         """
-        Registers a regex handler in the Broadcaster. If handlers will be
+        Registers a regex handler in the Dispatcher. If handlers will be
         called if re.match(matcher, string) is True.
 
         Args:
@@ -283,7 +283,7 @@ class Broadcaster:
 
     def addUnknownTelegramCommandHandler(self, handler):
         """
-        Registers a command handler in the Broadcaster, that will receive all
+        Registers a command handler in the Dispatcher, that will receive all
         commands that have no associated handler.
 
         Args:
@@ -295,7 +295,7 @@ class Broadcaster:
 
     def addUnknownStringCommandHandler(self, handler):
         """
-        Registers a string-command handler in the Broadcaster, that will
+        Registers a string-command handler in the Dispatcher, that will
         receive all commands that have no associated handler.
 
         Args:
@@ -307,7 +307,7 @@ class Broadcaster:
 
     def addErrorHandler(self, handler):
         """
-        Registers an error handler in the Broadcaster.
+        Registers an error handler in the Dispatcher.
 
         Args:
             handler (function): A function that takes (Bot, TelegramError) as
@@ -318,7 +318,7 @@ class Broadcaster:
 
     def addTypeHandler(self, the_type, handler):
         """
-        Registers a type handler in the Broadcaster. This allows you to send
+        Registers a type handler in the Dispatcher. This allows you to send
         any type of object into the update queue.
 
         Args:
@@ -441,9 +441,9 @@ class Broadcaster:
                 and handler in self.type_handlers[the_type]:
             self.type_handlers[the_type].remove(handler)
 
-    def broadcastTelegramCommand(self, update):
+    def dispatchTelegramCommand(self, update):
         """
-        Broadcasts an update that contains a command.
+        Dispatches an update that contains a command.
 
         Args:
             command (str): The command keyword
@@ -454,13 +454,13 @@ class Broadcaster:
         command = update.message.text.split(' ')[0][1:].split('@')[0]
 
         if command in self.telegram_command_handlers:
-            self.broadcastTo(self.telegram_command_handlers[command], update)
+            self.dispatchTo(self.telegram_command_handlers[command], update)
         else:
-            self.broadcastTo(self.unknown_telegram_command_handlers, update)
+            self.dispatchTo(self.unknown_telegram_command_handlers, update)
 
-    def broadcastTelegramRegex(self, update):
+    def dispatchTelegramRegex(self, update):
         """
-        Broadcasts an update to all regex handlers that match the message
+        Dispatches an update to all regex handlers that match the message
         string.
 
         Args:
@@ -476,11 +476,11 @@ class Broadcaster:
                 for handler in self.telegram_regex_handlers[matcher]:
                     matching_handlers.append(handler)
 
-        self.broadcastTo(matching_handlers, update)
+        self.dispatchTo(matching_handlers, update)
 
-    def broadcastStringCommand(self, update):
+    def dispatchStringCommand(self, update):
         """
-        Broadcasts a string-update that contains a command.
+        Dispatches a string-update that contains a command.
 
         Args:
             update (str): The string input
@@ -489,13 +489,13 @@ class Broadcaster:
         command = update.split(' ')[0][1:]
 
         if command in self.string_command_handlers:
-            self.broadcastTo(self.string_command_handlers[command], update)
+            self.dispatchTo(self.string_command_handlers[command], update)
         else:
-            self.broadcastTo(self.unknown_string_command_handlers, update)
+            self.dispatchTo(self.unknown_string_command_handlers, update)
 
-    def broadcastStringRegex(self, update):
+    def dispatchStringRegex(self, update):
         """
-        Broadcasts an update to all string regex handlers that match the
+        Dispatches an update to all string regex handlers that match the
         string.
 
         Args:
@@ -511,11 +511,11 @@ class Broadcaster:
                 for handler in self.string_regex_handlers[matcher]:
                     matching_handlers.append(handler)
 
-        self.broadcastTo(matching_handlers, update)
+        self.dispatchTo(matching_handlers, update)
 
-    def broadcastType(self, update):
+    def dispatchType(self, update):
         """
-        Broadcasts an update of any type.
+        Dispatches an update of any type.
 
         Args:
             update (any): The update
@@ -523,25 +523,25 @@ class Broadcaster:
 
         for t in self.type_handlers:
             if isinstance(update, t):
-                self.broadcastTo(self.type_handlers[t], update)
+                self.dispatchTo(self.type_handlers[t], update)
         else:
-            self.broadcastError(update, TelegramError(
+            self.dispatchError(update, TelegramError(
                 "Received update of unknown type %s" % type(update)))
 
-    def broadcastTelegramMessage(self, update):
+    def dispatchTelegramMessage(self, update):
         """
-        Broadcasts an update that contains a regular message.
+        Dispatches an update that contains a regular message.
 
         Args:
             update (telegram.Update): The Telegram update that contains the
                 message.
         """
 
-        self.broadcastTo(self.telegram_message_handlers, update)
+        self.dispatchTo(self.telegram_message_handlers, update)
 
-    def broadcastError(self, update, error):
+    def dispatchError(self, update, error):
         """
-        Broadcasts an error.
+        Dispatches an error.
 
         Args:
             update (any): The pdate that caused the error
@@ -551,13 +551,13 @@ class Broadcaster:
         for handler in self.error_handlers:
             handler(self.bot, update, error)
 
-    def broadcastTo(self, handlers, update):
+    def dispatchTo(self, handlers, update):
         """
-        Broadcasts an update to a list of handlers.
+        Dispatches an update to a list of handlers.
 
         Args:
             handlers (list): A list of handler-functions.
-            update (any): The update to be broadcasted
+            update (any): The update to be dispatched
         """
 
         for handler in handlers:

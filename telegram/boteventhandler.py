@@ -12,7 +12,7 @@ from time import sleep
 
 import subprocess
 
-from telegram import (Bot, TelegramError, broadcaster, Broadcaster,
+from telegram import (Bot, TelegramError, broadcaster, Dispatcher,
                       NullHandler)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
@@ -49,8 +49,8 @@ class BotEventHandler:
 
         self.bot = Bot(token, base_url)
         self.update_queue = Queue()
-        self.broadcaster = Broadcaster(self.bot, self.update_queue,
-                                       workers=workers)
+        self.dispatcher = Dispatcher(self.bot, self.update_queue,
+                                     workers=workers)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
@@ -71,8 +71,8 @@ class BotEventHandler:
         """
 
         # Create Thread objects
-        broadcaster_thread = Thread(target=self.broadcaster.start,
-                                    name="broadcaster")
+        dispatcher_thread = Thread(target=self.dispatcher.start,
+                                   name="dispatcher")
         event_handler_thread = Thread(target=self._start_polling,
                                       name="eventhandler",
                                       args=(poll_interval, timeout,
@@ -81,7 +81,7 @@ class BotEventHandler:
         self.running = True
 
         # Start threads
-        broadcaster_thread.start()
+        dispatcher_thread.start()
         event_handler_thread.start()
 
         # Return the update queue so the main thread can insert updates
@@ -103,8 +103,8 @@ class BotEventHandler:
         """
 
         # Create Thread objects
-        broadcaster_thread = Thread(target=self.broadcaster.start,
-                                    name="broadcaster")
+        dispatcher_thread = Thread(target=self.dispatcher.start,
+                                   name="dispatcher")
         event_handler_thread = Thread(target=self._start_webhook,
                                       name="eventhandler",
                                       args=(host, port, cert, key, listen))
@@ -112,7 +112,7 @@ class BotEventHandler:
         self.running = True
 
         # Start threads
-        broadcaster_thread.start()
+        dispatcher_thread.start()
         event_handler_thread.start()
 
         # Return the update queue so the main thread can insert updates
@@ -122,7 +122,7 @@ class BotEventHandler:
         """
         Thread target of thread 'eventhandler'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
-        Broadcaster.
+        Dispatcher.
         """
 
         current_interval = poll_interval
@@ -149,7 +149,7 @@ class BotEventHandler:
 
                 sleep(current_interval)
             except TelegramError as te:
-                # Put the error into the update queue and let the Broadcaster
+                # Put the error into the update queue and let the Dispatcher
                 # broadcast it
                 self.update_queue.put(te)
                 sleep(current_interval)
@@ -200,9 +200,9 @@ class BotEventHandler:
 
     def stop(self):
         """
-        Stops the polling thread and the broadcaster
+        Stops the polling thread and the dispatcher
         """
-        self.logger.info('Stopping Event Handler and Broadcaster...')
+        self.logger.info('Stopping Event Handler and Dispatcher...')
         self.running = False
 
         if self.httpd:
@@ -212,9 +212,9 @@ class BotEventHandler:
             self.httpd.shutdown()
             self.httpd = None
 
-        self.logger.debug("Requesting Broadcaster to stop...")
-        self.broadcaster.stop()
+        self.logger.debug("Requesting Dispatcher to stop...")
+        self.dispatcher.stop()
         while broadcaster.running_async > 0:
             sleep(1)
 
-        self.logger.debug("Broadcaster stopped.")
+        self.logger.debug("Dispatcher stopped.")

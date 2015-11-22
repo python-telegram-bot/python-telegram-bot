@@ -4,7 +4,7 @@
 This Bot uses the BotEventHandler class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
-the Broadcaster and registered at their respective places.
+the Dispatcher and registered at their respective places.
 Then, the bot is started and the CLI-Loop is entered, where all text inputs are
 inserted into the update queue for the bot to handle.
 
@@ -100,34 +100,34 @@ def main():
     # Create the EventHandler and pass it your bot's token.
     eh = BotEventHandler("TOKEN", workers=2)
 
-    # Get the broadcaster to register handlers
-    bc = eh.broadcaster
+    # Get the dispatcher to register handlers
+    dp = eh.dispatcher
 
     # on different commands - answer in Telegram
-    bc.addTelegramCommandHandler("start", startCommandHandler)
-    bc.addTelegramCommandHandler("help", helpCommandHandler)
+    dp.addTelegramCommandHandler("start", startCommandHandler)
+    dp.addTelegramCommandHandler("help", helpCommandHandler)
 
     # on regex match - print all messages to stdout
-    bc.addTelegramRegexHandler('.*', anyMessageHandler)
-    
+    dp.addTelegramRegexHandler('.*', anyMessageHandler)
+
     # on CLI commands - type "/reply text" in terminal to reply to the last
     # active chat
-    bc.addStringCommandHandler('reply', CLIReplyCommandHandler)
+    dp.addStringCommandHandler('reply', CLIReplyCommandHandler)
 
     # on unknown commands - answer on Telegram
-    bc.addUnknownTelegramCommandHandler(unknownCommandHandler)
+    dp.addUnknownTelegramCommandHandler(unknownCommandHandler)
 
     # on unknown CLI commands - notify the user
-    bc.addUnknownStringCommandHandler(unknownCLICommandHandler)
+    dp.addUnknownStringCommandHandler(unknownCLICommandHandler)
 
     # on any CLI message that is not a command - resend it as a command
-    bc.addStringRegexHandler('[^/].*', anyCLIHandler)
+    dp.addStringRegexHandler('[^/].*', anyCLIHandler)
 
     # on noncommand i.e message - echo the message on Telegram
-    bc.addTelegramMessageHandler(messageHandler)
+    dp.addTelegramMessageHandler(messageHandler)
 
     # on error - print error to stdout
-    bc.addErrorHandler(errorHandler)
+    dp.addErrorHandler(errorHandler)
 
     # Start the Bot and store the update Queue,
     # so we can insert updates ourselves
@@ -137,7 +137,7 @@ def main():
     update_queue = eh.start_webhook('example.com', 443, 'cert.pem', 'key.key',
                                     listen='0.0.0.0')
     '''
-    
+
     # Start CLI-Loop
     while True:
         try:

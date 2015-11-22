@@ -93,7 +93,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addTelegramMessageHandler(self):
         print('Testing addTelegramMessageHandler')
         self.beh.bot = MockBot('Test')
-        self.beh.broadcaster.addTelegramMessageHandler(
+        self.beh.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
         self.beh.start_polling(0.05)
         sleep(.1)
@@ -102,7 +102,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addTelegramMessageHandlerMultipleMessages(self):
         print('Testing addTelegramMessageHandler and send 100 messages...')
         self.beh.bot = MockBot('Multiple', 100)
-        self.beh.broadcaster.addTelegramMessageHandler(
+        self.beh.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
         self.beh.start_polling(0.0)
         sleep(.5)
@@ -112,7 +112,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addTelegramRegexHandler(self):
         print('Testing addStringRegexHandler')
         self.beh.bot = MockBot('Test2')
-        self.beh.broadcaster.addTelegramRegexHandler(re.compile('Te.*'),
+        self.beh.dispatcher.addTelegramRegexHandler(re.compile('Te.*'),
                                                    self.telegramHandlerTest)
         self.beh.start_polling(0.05)
         sleep(.1)
@@ -121,7 +121,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addTelegramCommandHandler(self):
         print('Testing addTelegramCommandHandler')
         self.beh.bot = MockBot('/test')
-        self.beh.broadcaster.addTelegramCommandHandler(
+        self.beh.dispatcher.addTelegramCommandHandler(
             'test', self.telegramHandlerTest)
         self.beh.start_polling(0.05)
         sleep(.1)
@@ -130,7 +130,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addUnknownTelegramCommandHandler(self):
         print('Testing addUnknownTelegramCommandHandler')
         self.beh.bot = MockBot('/test2')
-        self.beh.broadcaster.addUnknownTelegramCommandHandler(
+        self.beh.dispatcher.addUnknownTelegramCommandHandler(
             self.telegramHandlerTest)
         self.beh.start_polling(0.05)
         sleep(.1)
@@ -139,7 +139,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addStringRegexHandler(self):
         print('Testing addStringRegexHandler')
         self.beh.bot = MockBot('')
-        self.beh.broadcaster.addStringRegexHandler(re.compile('Te.*'),
+        self.beh.dispatcher.addStringRegexHandler(re.compile('Te.*'),
                                                    self.stringHandlerTest)
         queue = self.beh.start_polling(0.05)
         queue.put('Test3')
@@ -149,7 +149,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addStringCommandHandler(self):
         print('Testing addStringCommandHandler')
         self.beh.bot = MockBot('')
-        self.beh.broadcaster.addStringCommandHandler(
+        self.beh.dispatcher.addStringCommandHandler(
             'test3', self.stringHandlerTest)
 
         queue = self.beh.start_polling(0.05)
@@ -160,7 +160,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addUnknownStringCommandHandler(self):
         print('Testing addUnknownStringCommandHandler')
         self.beh.bot = MockBot('/test')
-        self.beh.broadcaster.addUnknownStringCommandHandler(
+        self.beh.dispatcher.addUnknownStringCommandHandler(
             self.stringHandlerTest)
         queue = self.beh.start_polling(0.05)
         queue.put('/test4')
@@ -170,7 +170,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addErrorHandler(self):
         print('Testing addErrorHandler')
         self.beh.bot = MockBot('')
-        self.beh.broadcaster.addErrorHandler(self.errorHandlerTest)
+        self.beh.dispatcher.addErrorHandler(self.errorHandlerTest)
         queue = self.beh.start_polling(0.05)
         error = TelegramError("Unauthorized.")
         queue.put(error)
@@ -180,7 +180,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_errorOnGetUpdates(self):
         print('Testing errorOnGetUpdates')
         self.beh.bot = MockBot('', raise_error=True)
-        self.beh.broadcaster.addErrorHandler(self.errorHandlerTest)
+        self.beh.dispatcher.addErrorHandler(self.errorHandlerTest)
         self.beh.start_polling(0.05)
         sleep(.1)
         self.assertEqual(self.received_message.message, "Test Error")
@@ -188,7 +188,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_addTypeHandler(self):
         print('Testing addTypeHandler')
         self.beh.bot = MockBot('')
-        self.beh.broadcaster.addTypeHandler(dict, self.stringHandlerTest)
+        self.beh.dispatcher.addTypeHandler(dict, self.stringHandlerTest)
         queue = self.beh.start_polling(0.05)
         payload = {"Test": 42}
         queue.put(payload)
@@ -198,7 +198,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_runAsync(self):
         print('Testing @run_async')
         self.beh.bot = MockBot('Test4', messages=2)
-        self.beh.broadcaster.addTelegramMessageHandler(
+        self.beh.dispatcher.addTelegramMessageHandler(
             self.asyncHandlerTest)
         self.beh.start_polling(0.01)
         sleep(1.2)
@@ -208,7 +208,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_additionalArgs(self):
         print('Testing additional arguments for handlers')
         self.beh.bot = MockBot('')
-        self.beh.broadcaster.addStringCommandHandler(
+        self.beh.dispatcher.addStringCommandHandler(
             'test5', self.additionalArgsTest)
 
         queue = self.beh.start_polling(0.05)
@@ -220,7 +220,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
     def test_webhook(self):
         print('Testing Webhook')
         self.beh.bot = MockBot('Test4', messages=2)
-        self.beh.broadcaster.addTelegramMessageHandler(
+        self.beh.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
 
         # Select random port for travis
