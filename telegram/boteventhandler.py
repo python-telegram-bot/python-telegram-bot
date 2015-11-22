@@ -41,24 +41,16 @@ class BotEventHandler:
     Args:
         token (str): The bots token given by the @BotFather
         base_url (Optional[str]):
-        broadcaster (Optional[Broadcaster]): Use present Broadcaster object. If
-            None, a new one will be created.
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
     """
 
-    def __init__(self, token, base_url=None, broadcaster=None, workers=4):
+    def __init__(self, token, base_url=None, workers=4):
 
-        if broadcaster:
-            self.bot = broadcaster.bot
-            self.update_queue = broadcaster.update_queue
-            self.broadcaster = broadcaster
-        else:
-            self.bot = Bot(token, base_url)
-            self.update_queue = Queue()
-            self.broadcaster = Broadcaster(self.bot, self.update_queue,
-                                           workers=workers)
-
+        self.bot = Bot(token, base_url)
+        self.update_queue = Queue()
+        self.broadcaster = Broadcaster(self.bot, self.update_queue,
+                                       workers=workers)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
