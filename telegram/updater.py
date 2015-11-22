@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 """
-This module contains the class BotEventHandler, which tries to make creating
-
-Telegram Bots intuitive!
+This module contains the class Updater, which tries to make creating Telegram
+Bots intuitive!
 """
 import logging
 import os
