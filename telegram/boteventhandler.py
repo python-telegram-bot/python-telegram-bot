@@ -48,16 +48,18 @@ class BotEventHandler:
     """
 
     def __init__(self, token, base_url=None, broadcaster=None, workers=4):
-        self.bot = Bot(token, base_url)
-        self.last_update_id = 0
 
         if broadcaster:
+            self.bot = broadcaster.bot
             self.update_queue = broadcaster.update_queue
             self.broadcaster = broadcaster
         else:
+            self.bot = Bot(token, base_url)
             self.update_queue = Queue()
             self.broadcaster = Broadcaster(self.bot, self.update_queue,
                                            workers=workers)
+
+        self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
         self.httpd = None
