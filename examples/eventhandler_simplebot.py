@@ -12,9 +12,10 @@ Basic Echobot example, repeats messages.
 Type 'stop' on the command line to stop the bot.
 """
 
-from telegram import BotEventHandler
+from telegram import Updater
 import logging
 import sys
+from time import sleep
 
 # Enable logging
 root = logging.getLogger()
@@ -22,7 +23,8 @@ root.setLevel(logging.INFO)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = \
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
@@ -46,10 +48,10 @@ def error(bot, update, error):
 
 def main():
     # Create the EventHandler and pass it your bot's token.
-    eh = BotEventHandler("TOKEN")
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
-    dp = eh.dispatcher
+    dp = updater.dispatcher
 
     # on different commands - answer in Telegram
     dp.addTelegramCommandHandler("start", start)
@@ -62,19 +64,10 @@ def main():
     dp.addErrorHandler(error)
 
     # Start the Bot
-    eh.start_polling()
+    updater.start_polling(timeout=5)
 
-    # Start CLI-Loop
-    while True:
-        try:
-            text = raw_input()
-        except NameError:
-            text = input()
-
-        # Gracefully stop the event handler
-        if text == 'stop':
-            eh.stop()
-            break
+    # Run the bot until the user presses Ctrl-C
+    updater.idle()
 
 if __name__ == '__main__':
     main()

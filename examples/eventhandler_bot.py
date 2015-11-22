@@ -14,7 +14,7 @@ line by typing "/reply <text>"
 Type 'stop' on the command line to stop the bot.
 """
 
-from telegram import BotEventHandler
+from telegram import Updater
 from telegram.dispatcher import run_async
 from time import sleep
 import logging
@@ -24,117 +24,113 @@ root = logging.getLogger()
 root.setLevel(logging.INFO)
 
 ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setLevel(logging.INFO)
+formatter = \
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
 last_chat_id = 0
 
-
-def removeCommand(text):
-    return ' '.join(text.split(' ')[1:])
-
+logger = logging.getLogger(__name__)
 
 # Command Handlers
-def startCommandHandler(bot, update):
+def start(bot, update):
+    """ Answer in Telegram """
     bot.sendMessage(update.message.chat_id, text='Hi!')
 
 
-def helpCommandHandler(bot, update):
+def help(bot, update):
+    """ Answer in Telegram """
     bot.sendMessage(update.message.chat_id, text='Help!')
 
 
-def anyMessageHandler(bot, update):
-    print("chat_id: %d\nFrom: %s\nText: %s" %
-          (update.message.chat_id, str(update.message.from_user),
-           update.message.text))
+def any_message(bot, update):
+    """ Print to console """
+
+    # Save last chat_id to use in reply handler
+    global last_chat_id
+    last_chat_id = update.message.chat_id
+
+    logger.info("New message\nFrom: %s\nchat_id: %d\nText: %s" %
+                (update.message.from_user,
+                 update.message.chat_id,
+                 update.message.text))
 
 
-def unknownCommandHandler(bot, update):
+def unknown_command(bot, update):
+    """ Answer in Telegram """
     bot.sendMessage(update.message.chat_id, text='Command not recognized!')
 
 
 @run_async
-def messageHandler(bot, update):
+def message(bot, update):
     """
     Example for an asynchronous handler. It's not guaranteed that replies will
     be in order when using @run_async.
     """
-    
-    # Save last chat_id to use in reply handler
-    global last_chat_id
-    last_chat_id = update.message.chat_id
-    
+
     sleep(2)  # IO-heavy operation here
-    bot.sendMessage(update.message.chat_id, text=update.message.text)
+    bot.sendMessage(update.message.chat_id, text='Echo: %s' %
+                                                 update.message.text)
 
 
-def errorHandler(bot, update, error):
-    print('Update %s caused error %s' % (update, error))
+def error(bot, update, error):
+    """ Print error to console """
+    logger.warn('Update %s caused error %s' % (update, error))
 
 
-def CLIReplyCommandHandler(bot, update, args):
+def cli_reply(bot, update, args):
     """
     For any update of type telegram.Update or str, you can get the argument
     list by appending args to the function parameters.
+    Here, we reply to the last active chat with the text after the command.
     """
     if last_chat_id is not 0:
         bot.sendMessage(chat_id=last_chat_id, text=' '.join(args))
 
 
-def anyCLIHandler(bot, update, update_queue):
+def cli_noncommand(bot, update, update_queue):
     """
     You can also get the update queue as an argument in any handler by
     appending it to the argument list. Be careful with this though.
+    Here, we put the input string back into the queue, but as a command.
     """
     update_queue.put('/%s' % update)
 
 
-def unknownCLICommandHandler(bot, update):
-    print("Command not found: %s" % update)
+def unknown_cli_command(bot, update):
+    logger.warn("Command not found: %s" % update)
 
 
 def main():
     # Create the EventHandler and pass it your bot's token.
-    eh = BotEventHandler("TOKEN", workers=2)
+    updater = Updater("TOKEN", workers=2)
 
     # Get the dispatcher to register handlers
-    dp = eh.dispatcher
+    dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
-    dp.addTelegramCommandHandler("start", startCommandHandler)
-    dp.addTelegramCommandHandler("help", helpCommandHandler)
+    dp.addTelegramCommandHandler("start", start)
+    dp.addTelegramCommandHandler("help", help)
+    dp.addUnknownTelegramCommandHandler(unknown_command)
+    dp.addTelegramMessageHandler(message)
+    dp.addTelegramRegexHandler('.*', any_message)
 
-    # on regex match - print all messages to stdout
-    dp.addTelegramRegexHandler('.*', anyMessageHandler)
+    dp.addStringCommandHandler('reply', cli_reply)
+    dp.addUnknownStringCommandHandler(unknown_cli_command)
+    dp.addStringRegexHandler('[^/].*', cli_noncommand)
 
-    # on CLI commands - type "/reply text" in terminal to reply to the last
-    # active chat
-    dp.addStringCommandHandler('reply', CLIReplyCommandHandler)
+    dp.addErrorHandler(error)
 
-    # on unknown commands - answer on Telegram
-    dp.addUnknownTelegramCommandHandler(unknownCommandHandler)
-
-    # on unknown CLI commands - notify the user
-    dp.addUnknownStringCommandHandler(unknownCLICommandHandler)
-
-    # on any CLI message that is not a command - resend it as a command
-    dp.addStringRegexHandler('[^/].*', anyCLIHandler)
-
-    # on noncommand i.e message - echo the message on Telegram
-    dp.addTelegramMessageHandler(messageHandler)
-
-    # on error - print error to stdout
-    dp.addErrorHandler(errorHandler)
-
-    # Start the Bot and store the update Queue,
-    # so we can insert updates ourselves
-    update_queue = eh.start_polling(poll_interval=0.1, timeout=20)
+    # Start the Bot and store the update Queue, so we can insert updates
+    update_queue = updater.start_polling(poll_interval=0.1, timeout=20)
     '''
     # Alternatively, run with webhook:
-    update_queue = eh.start_webhook('example.com', 443, 'cert.pem', 'key.key',
-                                    listen='0.0.0.0')
+    update_queue = updater.start_webhook('example.com',
+                                         443,
+                                         'cert.pem',
+                                         'key.key',
+                                         listen='0.0.0.0')
     '''
 
     # Start CLI-Loop
@@ -146,7 +142,7 @@ def main():
 
         # Gracefully stop the event handler
         if text == 'stop':
-            eh.stop()
+            updater.stop()
             break
 
         # else, put the text into the update queue
