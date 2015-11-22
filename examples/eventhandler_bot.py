@@ -75,15 +75,19 @@ def errorHandler(bot, update, error):
     print('Update %s caused error %s' % (update, error))
 
 
-def CLIReplyCommandHandler(bot, update):
+def CLIReplyCommandHandler(bot, update, args):
+    """
+    For any update of type telegram.Update or str, you can get the argument
+    list by appending args to the function parameters.
+    """
     if last_chat_id is not 0:
-        bot.sendMessage(chat_id=last_chat_id, text=removeCommand(update))
+        bot.sendMessage(chat_id=last_chat_id, text=' '.join(args))
 
 
 def anyCLIHandler(bot, update, update_queue):
     """
-    You can get the update queue as an argument in any handler just by adding
-    it to the argument list. Be careful with this though.
+    You can also get the update queue as an argument in any handler by
+    appending it to the argument list. Be careful with this though.
     """
     update_queue.put('/%s' % update)
 
