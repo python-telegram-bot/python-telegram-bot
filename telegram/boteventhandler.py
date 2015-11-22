@@ -6,6 +6,7 @@ This module contains the class BotEventHandler, which tries to make creating
 Telegram Bots intuitive!
 """
 import logging
+import os
 import ssl
 from threading import Thread
 from time import sleep
@@ -180,8 +181,11 @@ class BotEventHandler:
 
         # Check SSL-Certificate with openssl, if possible
         try:
+            DEVNULL = open(os.devnull, 'wb')
             exit_code = subprocess.call(["openssl", "x509", "-text", "-noout",
-                                         "-in", cert])
+                                         "-in", cert],
+                                        stdout=DEVNULL,
+                                        stderr=subprocess.STDOUT)
         except OSError:
             exit_code = 0
 
@@ -191,12 +195,13 @@ class BotEventHandler:
                                                     certfile=cert,
                                                     keyfile=key,
                                                     server_side=True)
+                self.httpd.serve_forever(poll_interval=1)
             except ssl.SSLError as error:
                 self.logger.error(str(error))
-                return
-
-            self.httpd.serve_forever(poll_interval=1)
-            self.logger.info('Event Handler thread stopped')
+            finally:
+                self.logger.info('Event Handler thread stopped')
+        else:
+            raise TelegramError('SSL Certificate invalid')
 
     def stop(self):
         """
