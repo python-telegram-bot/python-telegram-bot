@@ -27,14 +27,18 @@ H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
 
 
-class BotEventHandler:
+class Updater:
     """
-    This class provides a frontend to telegram.Bot to the programmer, so they
-    can focus on coding the bot. It also runs in a separate thread, so the user
-    can interact with the bot, for example on the command line. It supports
-    Handlers for different kinds of data: Updates from Telegram, basic text
+    This class, which employs the Dispatcher class, provides a frontend to
+    telegram.Bot to the programmer, so they can focus on coding the bot. It's
+    purpose is to receive the updates from Telegram and to deliver them to said
+    dispatcher. It also runs in a separate thread, so the user can interact
+    with the bot, for example on the command line. The dispatcher supports
+    handlers for different kinds of data: Updates from Telegram, basic text
     commands and even arbitrary types.
-    Polling as well as webhook are supported.
+    The updater can be started as a polling service or, for production, use a
+    webhook to receive updates. This is achieved using the WebhookServer and
+    WebhookHandler classes.
 
 
     Attributes:
@@ -75,7 +79,7 @@ class BotEventHandler:
         dispatcher_thread = Thread(target=self.dispatcher.start,
                                    name="dispatcher")
         event_handler_thread = Thread(target=self._start_polling,
-                                      name="eventhandler",
+                                      name="updater",
                                       args=(poll_interval, timeout,
                                             network_delay))
 
@@ -107,7 +111,7 @@ class BotEventHandler:
         dispatcher_thread = Thread(target=self.dispatcher.start,
                                    name="dispatcher")
         event_handler_thread = Thread(target=self._start_webhook,
-                                      name="eventhandler",
+                                      name="updater",
                                       args=(host, port, cert, key, listen))
 
         self.running = True
@@ -121,13 +125,13 @@ class BotEventHandler:
 
     def _start_polling(self, poll_interval, timeout, network_delay):
         """
-        Thread target of thread 'eventhandler'. Runs in background, pulls
+        Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
         Dispatcher.
         """
 
         current_interval = poll_interval
-        self.logger.info('Event Handler thread started')
+        self.logger.info('Updater thread started')
 
         # Remove webhook
         self.bot.setWebhook(webhook_url=None)
@@ -161,10 +165,10 @@ class BotEventHandler:
                 if current_interval > 30:
                     current_interval = 30
 
-        self.logger.info('Event Handler thread stopped')
+        self.logger.info('Updater thread stopped')
 
     def _start_webhook(self, host, port, cert, key, listen):
-        self.logger.info('Event Handler thread started')
+        self.logger.info('Updater thread started')
         url_base = "https://%s:%d" % (host, port)
         url_path = "/%s" % self.bot.token
 
@@ -199,15 +203,17 @@ class BotEventHandler:
             except ssl.SSLError as error:
                 self.logger.error(str(error))
             finally:
-                self.logger.info('Event Handler thread stopped')
+                self.logger.info('Updater thread stopped')
         else:
             raise TelegramError('SSL Certificate invalid')
 
     def stop(self):
         """
-        Stops the polling thread and the dispatcher
+        Stops the polling/webhook thread and the dispatcher
         """
-        self.logger.info('Stopping Event Handler and Dispatcher...')
+        self.logger.info('Stopping Updater and Dispatcher...')
+        self.logger.debug('This might take a long time if you set a high value'
+                          ' as polling timeout.')
         self.running = False
 
         if self.httpd:
@@ -223,3 +229,12 @@ class BotEventHandler:
             sleep(1)
 
         self.logger.debug("Dispatcher stopped.")
+
+    def idle(self):
+        """ Waits for the user to press Ctrl-C and stops the updater """
+        while True:
+            try:
+                sleep(1)
+            except KeyboardInterrupt:
+                self.stop()
+                break

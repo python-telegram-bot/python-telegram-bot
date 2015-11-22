@@ -48,9 +48,9 @@ from .message import Message
 from .update import Update
 from .bot import Bot
 from .dispatcher import Dispatcher
-from .boteventhandler import BotEventHandler
+from .boteventhandler import Updater
 
-__all__ = ['Bot', 'BotEventHandler', 'Dispatcher', 'Emoji', 'TelegramError',
+__all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
            'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
