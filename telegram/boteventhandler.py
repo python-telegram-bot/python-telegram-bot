@@ -12,7 +12,7 @@ from time import sleep
 
 import subprocess
 
-from telegram import (Bot, TelegramError, broadcaster, Dispatcher,
+from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
                       NullHandler)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
@@ -214,7 +214,7 @@ class BotEventHandler:
 
         self.logger.debug("Requesting Dispatcher to stop...")
         self.dispatcher.stop()
-        while broadcaster.running_async > 0:
+        while dispatcher.running_async > 0:
             sleep(1)
 
         self.logger.debug("Dispatcher stopped.")

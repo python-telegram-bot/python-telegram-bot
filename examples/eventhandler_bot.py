@@ -14,9 +14,8 @@ line by typing "/reply <text>"
 Type 'stop' on the command line to stop the bot.
 """
 
-import sys
 from telegram import BotEventHandler
-from telegram.broadcaster import run_async
+from telegram.dispatcher import run_async
 from time import sleep
 import logging
 import sys

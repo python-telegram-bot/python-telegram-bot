@@ -34,7 +34,7 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, GroupChat
-from telegram.broadcaster import run_async
+from telegram.dispatcher import run_async
 from tests.base import BaseTest
 from threading import Lock, Thread
 

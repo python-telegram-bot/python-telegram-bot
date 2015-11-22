@@ -47,7 +47,7 @@ from .parsemode import ParseMode
 from .message import Message
 from .update import Update
 from .bot import Bot
-from .broadcaster import Dispatcher
+from .dispatcher import Dispatcher
 from .boteventhandler import BotEventHandler
 
 __all__ = ['Bot', 'BotEventHandler', 'Dispatcher', 'Emoji', 'TelegramError',
