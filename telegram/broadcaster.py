@@ -577,7 +577,8 @@ class Broadcaster:
 
         if 'update_queue' in fargs:
             kwargs['update_queue'] = self.update_queue
-        elif 'args' in fargs:
+
+        if 'args' in fargs:
             if isinstance(update, Update):
                 args = update.message.text.split(' ')[1:]
             elif isinstance(update, str):
