@@ -62,6 +62,26 @@ class Broadcaster:
     """
     This class broadcasts all kinds of updates to its registered handlers.
 
+    A handler is a function that usually takes the following parameters:
+        bot: The telegram.Bot instance that received the message
+        update: The update that should be handled by the handler
+
+    Error handlers take an additional parameter:
+        error: The TelegramError instance that was raised during processing the
+            update
+
+    All handlers, except error handlers, can also request more information by
+    appending one or more of the following arguments in their argument list for
+    convenience:
+        update_queue: The Queue instance which contains all new updates and is
+            processed by the Broadcaster. Be careful with this - you might
+            create an infinite loop.
+        args: If the update is an instance str or telegram.Update, this will be
+            a list that contains the content of the message split on spaces,
+            except the first word (usually the command).
+            Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
+            For other updates, args will be None
+
     Attributes:
 
     Args:
@@ -189,7 +209,7 @@ class Broadcaster:
         Registers a message handler in the Broadcaster.
 
         Args:
-            handler (function): A function that takes (Bot, Update) as
+            handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
         """
 
@@ -202,7 +222,7 @@ class Broadcaster:
         Args:
             command (str): The command keyword that this handler should be
                 listening to.
-            handler (function): A function that takes (Bot, Update) as
+            handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
         """
 
@@ -219,7 +239,7 @@ class Broadcaster:
         Args:
             matcher (__Regex): A regex string or compiled regex object that
                 matches on messages that handler should be listening to
-            handler (function): A function that takes (Bot, Update) as
+            handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
         """
 
@@ -235,7 +255,8 @@ class Broadcaster:
         Args:
             command (str): The command keyword that this handler should be
                 listening to.
-            handler (function): A function that takes (Bot, str) as arguments.
+            handler (function): A function that takes (Bot, str, *args) as
+                arguments.
         """
 
         if command not in self.string_command_handlers:
@@ -251,7 +272,7 @@ class Broadcaster:
         Args:
             matcher (__Regex): A regex string or compiled regex object that
                 matches on the string input that handler should be listening to
-            handler (function): A function that takes (Bot, Update) as
+            handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
         """
 
@@ -266,7 +287,7 @@ class Broadcaster:
         commands that have no associated handler.
 
         Args:
-            handler (function): A function that takes (Bot, Update) as
+            handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
         """
 
@@ -278,7 +299,8 @@ class Broadcaster:
         receive all commands that have no associated handler.
 
         Args:
-            handler (function): A function that takes (Bot, str) as arguments.
+            handler (function): A function that takes (Bot, str, *args) as
+                arguments.
         """
 
         self.unknown_string_command_handlers.append(handler)
@@ -301,7 +323,8 @@ class Broadcaster:
 
         Args:
             the_type (type): The type this handler should listen to
-            handler (function): A function that takes (Bot, type) as arguments.
+            handler (function): A function that takes (Bot, type, *args) as
+                arguments.
         """
 
         if the_type not in self.type_handlers:
@@ -541,8 +564,27 @@ class Broadcaster:
             self.call_handler(handler, update)
 
     def call_handler(self, handler, update):
+        """
+        Calls an update handler. Checks the handler for keyword arguments and
+        fills them, if possible.
+
+        Args:
+            handler (function): An update handler function
+            update (any): An update
+        """
         kwargs = {}
-        if 'update_queue' in getargspec(handler).args:
+        fargs = getargspec(handler).args
+
+        if 'update_queue' in fargs:
             kwargs['update_queue'] = self.update_queue
+        elif 'args' in fargs:
+            if isinstance(update, Update):
+                args = update.message.text.split(' ')[1:]
+            elif isinstance(update, str):
+                args = update.split(' ')[1:]
+            else:
+                args = None
+
+            kwargs['args'] = args
 
         handler(self.bot, update, **kwargs)
