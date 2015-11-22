@@ -78,6 +78,14 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.received_message = update
         self.message_count += 1
 
+    def additionalArgsTest(self, bot, update, update_queue, args):
+        self.received_message = update
+        self.message_count += 1
+        if args[0] == 'resend':
+            update_queue.put('/test5 noresend')
+        elif args[0] == 'noresend':
+            pass
+
     def errorHandlerTest(self, bot, update, error):
         self.received_message = error
         self.message_count += 1
@@ -195,6 +203,18 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.beh.start_polling(0.01)
         sleep(1.2)
         self.assertEqual(self.received_message, 'Test4')
+        self.assertEqual(self.message_count, 2)
+
+    def test_additionalArgs(self):
+        print('Testing additional arguments for handlers')
+        self.beh.bot = MockBot('')
+        self.beh.broadcaster.addStringCommandHandler(
+            'test5', self.additionalArgsTest)
+
+        queue = self.beh.start_polling(0.05)
+        queue.put('/test5 resend')
+        sleep(.2)
+        self.assertEqual(self.received_message, '/test5 noresend')
         self.assertEqual(self.message_count, 2)
 
     def test_webhook(self):
