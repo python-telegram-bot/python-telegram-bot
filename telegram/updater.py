@@ -234,11 +234,17 @@ class Updater:
         self.is_idle = False
         self.stop()
 
-    def idle(self):
-        """ Waits for the user to press Ctrl-C and stops the updater """
-        signal(SIGINT, self.signal_handler)
-        signal(SIGTERM, self.signal_handler)
-        signal(SIGABRT, self.signal_handler)
+    def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
+        """
+        Waits for the user to press Ctrl-C and stops the updater
+
+        Args:
+            stop_signals: Iterable containing signals from the signal module
+                that should be subscribed to. Updater.stop() will be called on
+                receiving one of those signals.
+        """
+        for sig in stop_signals:
+            signal(sig, self.signal_handler)
 
         self.is_idle = True
 

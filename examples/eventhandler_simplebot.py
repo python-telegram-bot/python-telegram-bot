@@ -67,7 +67,8 @@ def main():
     # Start the Bot
     updater.start_polling(timeout=5)
 
-    # Run the bot until the user presses Ctrl-C
+    # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT
     updater.idle()
 
 if __name__ == '__main__':
