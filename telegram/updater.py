@@ -9,8 +9,8 @@ import os
 import ssl
 from threading import Thread
 from time import sleep
-
 import subprocess
+from signal import signal, SIGINT, SIGTERM, SIGABRT
 
 from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
                       NullHandler)
@@ -58,6 +58,7 @@ class Updater:
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
+        self.is_idle = False
         self.httpd = None
 
     def start_polling(self, poll_interval=1.0, timeout=10, network_delay=2):
@@ -229,11 +230,17 @@ class Updater:
 
         self.logger.debug("Dispatcher stopped.")
 
+    def signal_handler(self, signum, frame):
+        self.is_idle = False
+        self.stop()
+
     def idle(self):
         """ Waits for the user to press Ctrl-C and stops the updater """
-        while True:
-            try:
-                sleep(1)
-            except KeyboardInterrupt:
-                self.stop()
-                break
+        signal(SIGINT, self.signal_handler)
+        signal(SIGTERM, self.signal_handler)
+        signal(SIGABRT, self.signal_handler)
+
+        self.is_idle = True
+
+        while self.is_idle:
+            sleep(1)
