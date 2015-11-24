@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This Bot uses the BotEventHandler class to handle the bot.
+This Bot uses the Updater class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
@@ -15,7 +15,6 @@ Type 'stop' on the command line to stop the bot.
 from telegram import Updater
 import logging
 import sys
-from time import sleep
 
 # Enable logging
 root = logging.getLogger()
@@ -29,6 +28,7 @@ ch.setFormatter(formatter)
 root.addHandler(ch)
 
 logger = logging.getLogger(__name__)
+
 
 # Command Handlers
 def start(bot, update):
@@ -73,4 +73,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

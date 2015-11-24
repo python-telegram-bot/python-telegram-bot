@@ -17,7 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-""" This module contains a object that represents Tests for BotEventHandler """
+"""
+This module contains a object that represents Tests for Updater, Dispatcher,
+WebhookServer and WebhookHandler
+"""
 import logging
 import unittest
 import sys
@@ -51,8 +54,11 @@ ch.setFormatter(formatter)
 root.addHandler(ch)
 
 
-class BotEventHandlerTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Bot."""
+class UpdaterTest(BaseTest, unittest.TestCase):
+    """
+    This object represents Tests for Updater, Dispatcher, WebhookServer and
+    WebhookHandler
+    """
 
     def setUp(self):
         self.updater = Updater('', workers=2)
@@ -116,7 +122,6 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
-
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         print('Testing addTelegramMessageHandler and send 100 messages...')
@@ -345,8 +350,8 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         # Select random port for travis
         port = randrange(1024, 49152)
         self.updater.start_webhook('127.0.0.1', port,
-                               './tests/test_boteventhandler.py',
-                               './tests/test_boteventhandler.py',
+                                   './tests/test_updater.py',
+                                   './tests/test_updater.py',
                                    listen='127.0.0.1')
         sleep(0.5)
         # SSL-Wrapping will fail, so we start the server without SSL
@@ -396,7 +401,6 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.httpd.shutdown()
         self.assertTrue(True)
 
-
     def signalsender(self):
         sleep(0.5)
         os.kill(os.getpid(), signal.SIGTERM)
@@ -412,7 +416,6 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.running = False
 
 
-
 class MockBot:
 
     def __init__(self, text, messages=1, raise_error=False):
@@ -422,7 +425,8 @@ class MockBot:
         self.token = "TOKEN"
         pass
 
-    def mockUpdate(self, text):
+    @staticmethod
+    def mockUpdate(text):
         message = Message(0, None, None, None)
         message.text = text
         update = Update(0)

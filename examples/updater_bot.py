@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This Bot uses the BotEventHandler class to handle the bot.
+This Bot uses the Updater class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
@@ -33,6 +33,7 @@ root.addHandler(ch)
 last_chat_id = 0
 
 logger = logging.getLogger(__name__)
+
 
 # Command Handlers
 def start(bot, update):
@@ -151,4 +152,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
