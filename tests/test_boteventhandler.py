@@ -115,7 +115,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         bot.send_messages = 1
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
@@ -146,7 +146,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         bot.send_messages = 1
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_addRemoveTelegramCommandHandler(self):
         print('Testing add/removeTelegramCommandHandler')
@@ -165,7 +165,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         bot.send_messages = 1
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_addRemoveUnknownTelegramCommandHandler(self):
         print('Testing add/removeUnknownTelegramCommandHandler')
@@ -184,7 +184,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         bot.send_messages = 1
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_addRemoveStringRegexHandler(self):
         print('Testing add/removeStringRegexHandler')
@@ -203,7 +203,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         queue.put('Test3')
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_addRemoveStringCommandHandler(self):
         print('Testing add/removeStringCommandHandler')
@@ -224,7 +224,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         queue.put('/test3')
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_addRemoveUnknownStringCommandHandler(self):
         print('Testing add/removeUnknownStringCommandHandler')
@@ -244,7 +244,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         bot.send_messages = 1
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_addRemoveErrorHandler(self):
         print('Testing add/removeErrorHandler')
@@ -264,7 +264,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         queue.put(error)
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_errorInHandler(self):
         print('Testing error in Handler')
@@ -308,7 +308,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         queue.put(payload)
         sleep(.1)
-        self.assertIsNone(self.received_message)
+        self.assertTrue(None is self.received_message)
 
     def test_runAsync(self):
         print('Testing @run_async')
