@@ -141,6 +141,7 @@ class Dispatcher:
 
             # Dispatch any errors
             except TelegramError as te:
+                self.logger.warn("Error was raised while processing Update.")
                 self.dispatchError(update, te)
 
         self.logger.info('Dispatcher thread stopped')
