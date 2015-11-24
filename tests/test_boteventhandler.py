@@ -22,6 +22,8 @@ import logging
 import unittest
 import sys
 import re
+import os
+import signal
 from random import randrange
 from time import sleep
 from datetime import datetime
@@ -258,6 +260,21 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test')
+
+    def signalsender(self):
+        sleep(0.5)
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    def test_idle(self):
+        print('Testing idle')
+        self.updater.bot = MockBot('Test4', messages=0)
+        self.updater.start_polling(poll_interval=0.01)
+        Thread(target=self.signalsender).start()
+        self.updater.idle()
+        # If we get this far, idle() ran through
+        sleep(1)
+        self.updater.running = False
+
 
 
 class MockBot:
