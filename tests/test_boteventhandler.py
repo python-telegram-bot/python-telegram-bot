@@ -87,8 +87,11 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         elif args[0] == 'noresend':
             pass
 
+    def errorRaisingHandlerTest(self, bot, update):
+        raise TelegramError(update)
+
     def errorHandlerTest(self, bot, update, error):
-        self.received_message = error
+        self.received_message = error.message
         self.message_count += 1
 
     def test_addTelegramMessageHandler(self):
@@ -96,7 +99,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.bot = MockBot('Test')
         self.updater.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
-        self.updater.start_polling(0.05)
+        self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test')
 
@@ -115,7 +118,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.bot = MockBot('Test2')
         self.updater.dispatcher.addTelegramRegexHandler(re.compile('Te.*'),
                                                         self.telegramHandlerTest)
-        self.updater.start_polling(0.05)
+        self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test2')
 
@@ -124,7 +127,7 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.bot = MockBot('/test')
         self.updater.dispatcher.addTelegramCommandHandler(
             'test', self.telegramHandlerTest)
-        self.updater.start_polling(0.05)
+        self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, '/test')
 
@@ -133,27 +136,27 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.bot = MockBot('/test2')
         self.updater.dispatcher.addUnknownTelegramCommandHandler(
             self.telegramHandlerTest)
-        self.updater.start_polling(0.05)
+        self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, '/test2')
 
     def test_addStringRegexHandler(self):
         print('Testing addStringRegexHandler')
-        self.updater.bot = MockBot('')
+        self.updater.bot = MockBot('', messages=0)
         self.updater.dispatcher.addStringRegexHandler(re.compile('Te.*'),
                                                       self.stringHandlerTest)
-        queue = self.updater.start_polling(0.05)
+        queue = self.updater.start_polling(0.01)
         queue.put('Test3')
         sleep(.1)
         self.assertEqual(self.received_message, 'Test3')
 
     def test_addStringCommandHandler(self):
         print('Testing addStringCommandHandler')
-        self.updater.bot = MockBot('')
+        self.updater.bot = MockBot('', messages=0)
         self.updater.dispatcher.addStringCommandHandler(
             'test3', self.stringHandlerTest)
 
-        queue = self.updater.start_polling(0.05)
+        queue = self.updater.start_polling(0.01)
         queue.put('/test3')
         sleep(.1)
         self.assertEqual(self.received_message, '/test3')
@@ -163,34 +166,46 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         self.updater.bot = MockBot('/test')
         self.updater.dispatcher.addUnknownStringCommandHandler(
             self.stringHandlerTest)
-        queue = self.updater.start_polling(0.05)
+        queue = self.updater.start_polling(0.01)
         queue.put('/test4')
         sleep(.1)
         self.assertEqual(self.received_message, '/test4')
 
     def test_addErrorHandler(self):
         print('Testing addErrorHandler')
-        self.updater.bot = MockBot('')
+        self.updater.bot = MockBot('', messages=0)
         self.updater.dispatcher.addErrorHandler(self.errorHandlerTest)
-        queue = self.updater.start_polling(0.05)
+        queue = self.updater.start_polling(0.01)
         error = TelegramError("Unauthorized.")
         queue.put(error)
         sleep(.1)
-        self.assertEqual(self.received_message, error)
+        self.assertEqual(self.received_message, "Unauthorized.")
+
+    def test_errorInHandler(self):
+        print('Testing error in Handler')
+        self.updater.bot = MockBot('', messages=0)
+        self.updater.dispatcher.addStringRegexHandler('.*',
+                                                self.errorRaisingHandlerTest)
+        self.updater.dispatcher.addErrorHandler(self.errorHandlerTest)
+        queue = self.updater.start_polling(0.01)
+
+        queue.put('Test Error 1')
+        sleep(.1)
+        self.assertEqual(self.received_message, 'Test Error 1')
 
     def test_errorOnGetUpdates(self):
-        print('Testing errorOnGetUpdates')
+        print('Testing error on getUpdates')
         self.updater.bot = MockBot('', raise_error=True)
         self.updater.dispatcher.addErrorHandler(self.errorHandlerTest)
-        self.updater.start_polling(0.05)
+        self.updater.start_polling(0.01)
         sleep(.1)
-        self.assertEqual(self.received_message.message, "Test Error")
+        self.assertEqual(self.received_message, "Test Error 2")
 
     def test_addTypeHandler(self):
         print('Testing addTypeHandler')
-        self.updater.bot = MockBot('')
+        self.updater.bot = MockBot('', messages=0)
         self.updater.dispatcher.addTypeHandler(dict, self.stringHandlerTest)
-        queue = self.updater.start_polling(0.05)
+        queue = self.updater.start_polling(0.01)
         payload = {"Test": 42}
         queue.put(payload)
         sleep(.1)
@@ -198,29 +213,29 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
 
     def test_runAsync(self):
         print('Testing @run_async')
-        self.updater.bot = MockBot('Test4', messages=2)
+        self.updater.bot = MockBot('Test5', messages=2)
         self.updater.dispatcher.addTelegramMessageHandler(
             self.asyncHandlerTest)
         self.updater.start_polling(0.01)
         sleep(1.2)
-        self.assertEqual(self.received_message, 'Test4')
+        self.assertEqual(self.received_message, 'Test5')
         self.assertEqual(self.message_count, 2)
 
     def test_additionalArgs(self):
         print('Testing additional arguments for handlers')
-        self.updater.bot = MockBot('')
+        self.updater.bot = MockBot('', messages=0)
         self.updater.dispatcher.addStringCommandHandler(
             'test5', self.additionalArgsTest)
 
-        queue = self.updater.start_polling(0.05)
+        queue = self.updater.start_polling(0.01)
         queue.put('/test5 resend')
-        sleep(.2)
+        sleep(.1)
         self.assertEqual(self.received_message, '/test5 noresend')
         self.assertEqual(self.message_count, 2)
 
     def test_webhook(self):
         print('Testing Webhook')
-        self.updater.bot = MockBot('Test4', messages=2)
+        self.updater.bot = MockBot('', messages=0)
         self.updater.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
 
@@ -261,13 +276,31 @@ class BotEventHandlerTest(BaseTest, unittest.TestCase):
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test')
 
+        print("Test other webhook server functionalites...")
+        request = Request('http://localhost:%d/webookhandler.py' % port)
+        response = urlopen(request)
+        self.assertEqual(b'', response.read())
+        self.assertEqual(200, response.code)
+
+        request.get_method = lambda: 'HEAD'
+
+        response = urlopen(request)
+        self.assertEqual(b'', response.read())
+        self.assertEqual(200, response.code)
+
+        # Test multiple shutdown() calls
+        self.updater.httpd.shutdown()
+        self.updater.httpd.shutdown()
+        self.assertTrue(True)
+
+
     def signalsender(self):
         sleep(0.5)
         os.kill(os.getpid(), signal.SIGTERM)
 
     def test_idle(self):
         print('Testing idle')
-        self.updater.bot = MockBot('Test4', messages=0)
+        self.updater.bot = MockBot('Test6', messages=0)
         self.updater.start_polling(poll_interval=0.01)
         Thread(target=self.signalsender).start()
         self.updater.idle()
@@ -303,7 +336,7 @@ class MockBot:
                    network_delay=2.):
 
         if self.raise_error:
-            raise TelegramError('Test Error')
+            raise TelegramError('Test Error 2')
         elif self.send_messages >= 2:
             self.send_messages -= 2
             return self.mockUpdate(self.text), self.mockUpdate(self.text)
