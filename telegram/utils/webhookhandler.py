@@ -36,6 +36,7 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
     def shutdown(self):
         with self.shutdown_lock:
             if not self.is_running:
+                self.logger.warn("Webhook Server already stopped.")
                 return
             else:
                 super(WebhookServer, self).shutdown()
@@ -45,7 +46,7 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
 # WebhookHandler, process webhook calls
 # Based on: https://github.com/eternnoir/pyTelegramBotAPI/blob/master/
 # examples/webhook_examples/webhook_cpython_echo_bot.py
-class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler,    object):
+class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
     server_version = "WebhookHandler/1.0"
 
     def __init__(self, request, client_address, server):
