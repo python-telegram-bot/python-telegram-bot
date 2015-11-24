@@ -238,7 +238,7 @@ class Dispatcher:
         called if re.match(matcher, update.message.text) is True.
 
         Args:
-            matcher (__Regex): A regex string or compiled regex object that
+            matcher (str/__Regex): A regex string or compiled regex object that
                 matches on messages that handler should be listening to
             handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
@@ -271,7 +271,7 @@ class Dispatcher:
         called if re.match(matcher, string) is True.
 
         Args:
-            matcher (__Regex): A regex string or compiled regex object that
+            matcher (str/__Regex): A regex string or compiled regex object that
                 matches on the string input that handler should be listening to
             handler (function): A function that takes (Bot, Update, *args) as
                 arguments.
@@ -363,7 +363,7 @@ class Dispatcher:
         De-registers a regex handler.
 
         Args:
-            matcher (str): The regex matcher object
+            matcher (str/__Regex): The regex matcher object or string
             handler (any):
         """
 
@@ -389,7 +389,7 @@ class Dispatcher:
         De-registers a regex handler.
 
         Args:
-            matcher (str): The regex matcher object
+            matcher (str/__Regex): The regex matcher object or string
             handler (any):
         """
 
