@@ -292,11 +292,11 @@ class Bot(TelegramObject):
           token = "TOKEN"
           bot = telegram.Bot(token=token)
 
-          # assuming at least one pending chat message is waiting a photo reply.
+          # assuming at least one pending chat message is waits a photo reply.
           chat_id = bot.getUpdates()[-1].message.chat.id
 
           # to send a photo from a URL
-          remote_photo_url = "https://assets-cdn.github.com/images/modules/open_graph/github-octocat.png"
+          remote_photo_url = "http://www.example.com/image.png"
           bot.sendPhoto(chat_id=chat_id, photo=remote_photo_url)
 
           # to send a photo from the local disk
