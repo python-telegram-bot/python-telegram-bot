@@ -289,7 +289,7 @@ class Bot(TelegramObject):
         Examples:
 
           import telegram
-          token = "TOKEN
+          token = "TOKEN"
           bot = telegram.Bot(token=token)
 
           # assuming at least one pending chat message is waiting a photo reply.
