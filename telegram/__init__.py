@@ -47,10 +47,12 @@ from .parsemode import ParseMode
 from .message import Message
 from .update import Update
 from .bot import Bot
+from .dispatcher import Dispatcher
+from .updater import Updater
 
-__all__ = ['Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
-           'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
-           'UserProfilePhotos', 'ChatAction', 'Location', 'Contact',
-           'Video', 'Sticker', 'Document', 'File', 'Audio', 'PhotoSize',
-           'GroupChat', 'Update', 'ParseMode', 'Message', 'User',
-           'TelegramObject', 'NullHandler', 'Voice']
+__all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
+           'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
+           'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
+           'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
+           'Audio', 'PhotoSize', 'GroupChat', 'Update', 'ParseMode', 'Message',
+           'User', 'TelegramObject', 'NullHandler', 'Voice']
