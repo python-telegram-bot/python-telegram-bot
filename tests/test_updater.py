@@ -350,9 +350,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         # Select random port for travis
         port = randrange(1024, 49152)
         self.updater.start_webhook('127.0.0.1', port,
-                                   './tests/test_updater.py',
-                                   './tests/test_updater.py',
-                                   listen='127.0.0.1')
+                                   listen='127.0.0.1',
+                                   cert='./tests/test_updater.py',
+                                   key='./tests/test_updater.py')
         sleep(0.5)
         # SSL-Wrapping will fail, so we start the server without SSL
         Thread(target=self.updater.httpd.serve_forever).start()
@@ -384,7 +384,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test')
 
-        print("Test other webhook server functionalites...")
+        print("Test other webhook server functionalities...")
         request = Request('http://localhost:%d/webookhandler.py' % port)
         response = urlopen(request)
         self.assertEqual(b'', response.read())
@@ -400,6 +400,46 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.updater.httpd.shutdown()
         self.updater.httpd.shutdown()
         self.assertTrue(True)
+
+    def test_webhook_no_ssl(self):
+        print('Testing Webhook without SSL')
+        bot = MockBot('', messages=0)
+        self.updater.bot = bot
+        d = self.updater.dispatcher
+        d.addTelegramMessageHandler(
+            self.telegramHandlerTest)
+
+        # Select random port for travis
+        port = randrange(1024, 49152)
+        self.updater.start_webhook('127.0.0.1', port,
+                                   listen='127.0.0.1',)
+        sleep(0.5)
+
+        # Now, we send an update to the server via urlopen
+        message = Message(1, User(1, "Tester 2"), datetime.now(),
+                          GroupChat(1, "Test Group 2"))
+
+        message.text = "Webhook Test 2"
+        update = Update(1)
+        update.message = message
+
+        try:
+            payload = bytes(update.to_json(), encoding='utf-8')
+        except TypeError:
+            payload = bytes(update.to_json())
+
+        header = {
+            'content-type': 'application/json',
+            'content-length': str(len(payload))
+        }
+
+        r = Request('http://127.0.0.1:%d/' % port,
+                    data=payload,
+                    headers=header)
+
+        urlopen(r)
+        sleep(1)
+        self.assertEqual(self.received_message, 'Webhook Test 2')
 
     def signalsender(self):
         sleep(0.5)
