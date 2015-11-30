@@ -92,16 +92,19 @@ class Updater:
         # Return the update queue so the main thread can insert updates
         return self.update_queue
 
-    def start_webhook(self, host, port, cert, key, listen='0.0.0.0'):
+    def start_webhook(self, host, port, listen='0.0.0.0', cert=None, key=None):
         """
-        Starts a small http server to listen for updates via webhook
+        Starts a small http server to listen for updates via webhook. If cert
+        and key are not provided, the webhook will be started directly on
+        http://host:port/, so SSL can be handled by another application. Else,
+        the webhook will be started on https://host:port/<bot_token>
 
         Args:
             host (str): Hostname or IP of the bot
             port (int): Port the bot should be listening on
-            cert (str): Path to the SSL certificate file
-            key (str): Path to the SSL key file
             listen (Optional[str]): IP-Address to listen on
+            cert (Optional[str]): Path to the SSL certificate file
+            key (Optional[str]): Path to the SSL key file
 
         Returns:
             Queue: The update queue that can be filled from the main thread
@@ -112,7 +115,7 @@ class Updater:
                                    name="dispatcher")
         event_handler_thread = Thread(target=self._start_webhook,
                                       name="updater",
-                                      args=(host, port, cert, key, listen))
+                                      args=(host, port, listen, cert, key))
 
         self.running = True
 
@@ -167,45 +170,52 @@ class Updater:
 
         self.logger.info('Updater thread stopped')
 
-    def _start_webhook(self, host, port, cert, key, listen):
+    def _start_webhook(self, host, port, listen, cert, key):
         self.logger.info('Updater thread started')
+        use_ssl = cert is not None and key is not None
+
         url_base = "https://%s:%d" % (host, port)
-        url_path = "/%s" % self.bot.token
+        if use_ssl:
+            url_path = "/%s" % self.bot.token
+            certfile = open(cert, 'rb')
+        else:
+            url_path = "/"
+            certfile = None
 
         # Remove webhook
         self.bot.setWebhook(webhook_url=None)
 
         # Set webhook
         self.bot.setWebhook(webhook_url=url_base + url_path,
-                            certificate=open(cert, 'rb'))
+                            certificate=certfile)
 
-        # Start server
+        # Create and start server
         self.httpd = WebhookServer((listen, port), WebhookHandler,
                                    self.update_queue, url_path)
 
-        # Check SSL-Certificate with openssl, if possible
-        try:
-            DEVNULL = open(os.devnull, 'wb')
-            exit_code = subprocess.call(["openssl", "x509", "-text", "-noout",
-                                         "-in", cert],
-                                        stdout=DEVNULL,
-                                        stderr=subprocess.STDOUT)
-        except OSError:
-            exit_code = 0
-
-        if exit_code is 0:
+        if use_ssl:
+            # Check SSL-Certificate with openssl, if possible
             try:
-                self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
-                                                    certfile=cert,
-                                                    keyfile=key,
-                                                    server_side=True)
-                self.httpd.serve_forever(poll_interval=1)
-            except ssl.SSLError as error:
-                self.logger.error(str(error))
-            finally:
-                self.logger.info('Updater thread stopped')
-        else:
-            raise TelegramError('SSL Certificate invalid')
+                exit_code = subprocess.call(["openssl", "x509", "-text",
+                                             "-noout", "-in", cert],
+                                            stdout=open(os.devnull, 'wb'),
+                                            stderr=subprocess.STDOUT)
+            except OSError:
+                exit_code = 0
+
+            if exit_code is 0:
+                try:
+                    self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
+                                                        certfile=cert,
+                                                        keyfile=key,
+                                                        server_side=True)
+                except ssl.SSLError as error:
+                    raise TelegramError(str(error))
+            else:
+                raise TelegramError('SSL Certificate invalid')
+
+        self.httpd.serve_forever(poll_interval=1)
+        self.logger.info('Updater thread stopped')
 
     def stop(self):
         """
