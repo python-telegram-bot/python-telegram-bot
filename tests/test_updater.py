@@ -129,7 +129,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.updater.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
         self.updater.start_polling(0.0)
-        sleep(.5)
+        sleep(2)
         self.assertEqual(self.received_message, 'Multiple')
         self.assertEqual(self.message_count, 100)
 
