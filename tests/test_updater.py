@@ -350,7 +350,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         # Select random port for travis
         port = randrange(1024, 49152)
         self.updater.start_webhook('127.0.0.1', port,
-                                   listen='127.0.0.1',
+                                   url_path='TOKEN',
                                    cert='./tests/test_updater.py',
                                    key='./tests/test_updater.py')
         sleep(0.5)
@@ -411,8 +411,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         # Select random port for travis
         port = randrange(1024, 49152)
-        self.updater.start_webhook('127.0.0.1', port,
-                                   listen='127.0.0.1',)
+        self.updater.start_webhook('127.0.0.1', port)
         sleep(0.5)
 
         # Now, we send an update to the server via urlopen

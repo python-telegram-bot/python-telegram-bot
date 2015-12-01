@@ -54,11 +54,13 @@ Table of contents
 
   1. `API`_
 
-  2. `Logging`_
+  2. `The Updater class`_
+  
+  3. `Logging`_
 
-  3. `Examples`_
+  4. `Examples`_
 
-  4. `Documentation`_
+  5. `Documentation`_
 
 - `License`_
 
@@ -153,8 +155,70 @@ _`Getting started`
 View the last release API documentation at: https://core.telegram.org/bots/api
 
 ------
+_`The Updater class`
+------
+
+The ``Updater`` class is the new way to create bots with ``python-telegram-bot``. It provides an easy-to-use interface to the ``telegram.Bot`` by caring about getting new updates from telegram and forwarding them to the ``Dispatcher`` class. We can register handler functions in the ``Dispatcher`` to make our bot react to Telegram commands, messages and even arbitrary updates.
+
+As with the old method, we'll need an Access Token. To generate an Access Token, we have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
+
+First, we create an ``Updater`` object::
+
+   >>> from telegram import Updater
+   >>> updater = Updater(token='token')
+
+For quicker access to the ``Dispatcher`` used by our ``Updater``, we can introduce it locally::
+
+   >>> dispatcher = updater.dispatcher
+
+Now, we need to define a function that should process a specific type of update::
+
+   >>> def start(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+
+We want this function to be called on a Telegram message that contains the ``/start`` command, so we need to register it in the dispatcher::
+
+   >>> dispatcher.addTelegramCommandHandler('start', start)
+   
+The last step is to tell the ``Updater`` to start working::
+
+   >>> updater.start_polling()
+
+Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler function and register it::
+
+   >>> def echo(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
+   ...
+   >>> dispatcher.addTelegramMessageHandler(echo)
+
+Our bot should now reply to all messages that are not a command with a message that has the same content.
+
+People might try to send commands to the bot that it doesn't understand, so we should get that covered as well::
+
+   >>> def unknown(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+   ...
+   >>> dispatcher.addUnknownTelegramCommandHandler(unknown)
+
+Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to the command in the handler function simply by adding it to the parameter list::
+
+   >>> def caps(bot, update, args):
+   ...   text_caps = ' '.join(args).upper()
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text=text_caps)
+   ... 
+   >>> dispatcher.addTelegramCommandHandler('caps', caps)
+
+Now it's time to stop the bot::
+
+   >>> updater.stop()
+
+Check out more examples in the `examples folder <https://github.com/leandrotoledo/python-telegram-bot/tree/master/examples>`_!
+
+------
 _`API`
 ------
+
+Note: Using the ``Bot`` class directly is the 'old' method, but some of this is still important information, even if you're using the ``Updater`` class!
 
 The API is exposed via the ``telegram.Bot`` class.
 
