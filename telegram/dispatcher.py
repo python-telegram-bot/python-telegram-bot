@@ -138,6 +138,7 @@ class Dispatcher:
                     break
 
                 self.processUpdate(update)
+                self.logger.debug('Processed Update: %s' % update)
 
             # Dispatch any errors
             except TelegramError as te:
