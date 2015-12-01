@@ -106,7 +106,8 @@ def unknown_cli_command(bot, update):
 
 def main():
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater("TOKEN", workers=2)
+    token = 'token'
+    updater = Updater(token, workers=2)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -125,13 +126,23 @@ def main():
 
     # Start the Bot and store the update Queue, so we can insert updates
     update_queue = updater.start_polling(poll_interval=0.1, timeout=20)
+
     '''
     # Alternatively, run with webhook:
-    update_queue = updater.start_webhook('example.com',
+    updater.bot.setWebhook(webhook_url='https://example.com/%s' % token,
+                           certificate=open('cert.pem', 'wb'))
+
+    update_queue = updater.start_webhook('0.0.0.0',
                                          443,
-                                         'cert.pem',
-                                         'key.key',
-                                         listen='0.0.0.0')
+                                         url_path=token,
+                                         cert='cert.pem',
+                                         key='key.key')
+
+    # Or, if SSL is handled by a reverse proxy, the webhook URL is already set
+    # and the reverse proxy is configured to deliver directly to port 6000:
+
+    update_queue = updater.start_webhook('0.0.0.0',
+                                         6000)
     '''
 
     # Start CLI-Loop
