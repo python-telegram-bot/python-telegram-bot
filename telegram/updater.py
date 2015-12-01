@@ -91,12 +91,18 @@ class Updater:
         # Return the update queue so the main thread can insert updates
         return self.update_queue
 
-    def start_webhook(self, listen='127.0.0.1', port=80, url_path='', cert=None, key=None):
+    def start_webhook(self,
+                      listen='127.0.0.1',
+                      port=80,
+                      url_path='',
+                      cert=None,
+                      key=None):
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
-        http://listen:port/url_path, so SSL can be handled by another application. Else,
-        the webhook will be started on https://listen:port/url_path
+        http://listen:port/url_path, so SSL can be handled by another
+        application. Else, the webhook will be started on
+        https://listen:port/url_path
 
         Args:
             listen (Optional[str]): IP-Address to listen on
