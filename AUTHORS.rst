@@ -9,6 +9,7 @@ Contributors
 The following wonderful people contributed directly or indirectly to this project:
 
 - `Avanatiker <https://github.com/Avanatiker>`_
+- `Balduro <https://github.com/Balduro>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `franciscod <https://github.com/franciscod>`_

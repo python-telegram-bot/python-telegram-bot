@@ -11,7 +11,6 @@ from threading import Thread
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
-
 from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
                       NullHandler)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
@@ -92,17 +91,23 @@ class Updater:
         # Return the update queue so the main thread can insert updates
         return self.update_queue
 
-    def start_webhook(self, host, port, listen='0.0.0.0', cert=None, key=None):
+    def start_webhook(self,
+                      listen='127.0.0.1',
+                      port=80,
+                      url_path='',
+                      cert=None,
+                      key=None):
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
-        http://host:port/, so SSL can be handled by another application. Else,
-        the webhook will be started on https://host:port/<bot_token>
+        http://listen:port/url_path, so SSL can be handled by another
+        application. Else, the webhook will be started on
+        https://listen:port/url_path
 
         Args:
-            host (str): Hostname or IP of the bot
-            port (int): Port the bot should be listening on
             listen (Optional[str]): IP-Address to listen on
+            port (Optional[int]): Port the bot should be listening on
+            url_path (Optional[str]): Path inside url
             cert (Optional[str]): Path to the SSL certificate file
             key (Optional[str]): Path to the SSL key file
 
@@ -115,7 +120,7 @@ class Updater:
                                    name="dispatcher")
         event_handler_thread = Thread(target=self._start_webhook,
                                       name="updater",
-                                      args=(host, port, listen, cert, key))
+                                      args=(listen, port, url_path, cert, key))
 
         self.running = True
 
@@ -170,24 +175,10 @@ class Updater:
 
         self.logger.info('Updater thread stopped')
 
-    def _start_webhook(self, host, port, listen, cert, key):
+    def _start_webhook(self, listen, port, url_path, cert, key):
         self.logger.info('Updater thread started')
         use_ssl = cert is not None and key is not None
-
-        url_base = "https://%s:%d" % (host, port)
-        if use_ssl:
-            url_path = "/%s" % self.bot.token
-            certfile = open(cert, 'rb')
-        else:
-            url_path = "/"
-            certfile = None
-
-        # Remove webhook
-        self.bot.setWebhook(webhook_url=None)
-
-        # Set webhook
-        self.bot.setWebhook(webhook_url=url_base + url_path,
-                            certificate=certfile)
+        url_path = "/%s" % url_path
 
         # Create and start server
         self.httpd = WebhookServer((listen, port), WebhookHandler,
