@@ -1,3 +1,9 @@
+**2015-12-08**
+
+*Released 3.0.0*
+
+- Introducing the ``Updater`` and ``Dispatcher`` classes
+
 **2015-11-11**
 
 *Released 2.9.2*
