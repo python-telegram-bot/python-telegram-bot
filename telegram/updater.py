@@ -21,6 +21,11 @@ try:
 except ImportError:
     from queue import Queue
 
+try:
+    from urllib2 import URLError
+except ImportError:
+    from urllib.error import URLError
+
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
 
@@ -167,6 +172,8 @@ class Updater:
                 self.update_queue.put(te)
                 sleep(current_interval)
 
+            except URLError as e:
+                self.logger.error("Error while getting Updates: %s" % e)
                 # increase waiting times on subsequent errors up to 30secs
                 if current_interval < 30:
                     current_interval += current_interval / 2
