@@ -130,7 +130,7 @@ def main():
     '''
     # Alternatively, run with webhook:
     updater.bot.setWebhook(webhook_url='https://example.com/%s' % token,
-                           certificate=open('cert.pem', 'wb'))
+                           certificate=open('cert.pem', 'rb'))
 
     update_queue = updater.start_webhook('0.0.0.0',
                                          443,
