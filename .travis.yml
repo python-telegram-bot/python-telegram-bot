@@ -12,6 +12,6 @@ install:
 script:
   - nosetests --with-coverage --cover-package telegram/
   - flake8 telegram
-  - 'if [[ $TRAVIS_PYTHON_VERSION != 2.6 ]]; then pylint -E telegram; fi'
+  - 'if [[ $TRAVIS_PYTHON_VERSION != 2.6 ]]; then pylint -E telegram --disable=no-name-in-module,import-error; fi'
 after_success:
   coveralls
