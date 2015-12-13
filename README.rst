@@ -1,4 +1,6 @@
-Python Telegram Bot
+.. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-logo-text_768.png?raw=true
+   :align: center
+   :alt: python-telegram-bot Logo
 
 A Python wrapper around the Telegram Bot API.
 
