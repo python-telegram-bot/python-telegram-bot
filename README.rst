@@ -351,5 +351,3 @@ _`TODO`
 =======
 
 Patches and bug reports are `welcome <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
-
-- Add commands handler.
