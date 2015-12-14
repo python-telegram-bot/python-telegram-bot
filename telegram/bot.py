@@ -285,6 +285,24 @@ class Bot(TelegramObject):
 
         Returns:
           A telegram.Message instance representing the message posted.
+
+        Examples:
+
+          import telegram
+          token = "TOKEN"
+          bot = telegram.Bot(token=token)
+
+          # assuming at least one pending chat message is waits a photo reply.
+          chat_id = bot.getUpdates()[-1].message.chat.id
+
+          # to send a photo from a URL
+          remote_photo_url = "http://www.example.com/image.png"
+          bot.sendPhoto(chat_id=chat_id, photo=remote_photo_url)
+
+          # to send a photo from the local disk
+          local_photo_path = "/path/to/local/photo.jpg"
+          with open(local_photo_path, 'rb') as photo:
+            bot.sendPhoto(chat_id=chat_id, photo=photo)
         """
 
         url = '%s/sendPhoto' % self.base_url
