@@ -35,7 +35,7 @@ from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot' \
-             ' (https://github.com/leandrotoledo/python-telegram-bot)'
+             ' (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
 class InputFile(object):
