@@ -1,5 +1,6 @@
 .. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-logo-text_768.png?raw=true
    :align: center
+   :target: https://github.com/python-telegram-bot/logos
    :alt: python-telegram-bot Logo
 
 A Python wrapper around the Telegram Bot API.
@@ -54,9 +55,9 @@ Table of contents
 
 - `Getting started`_
 
-  1. `API`_
-
-  2. `The Updater class`_
+  1. `The Updater class`_
+  
+  2. `API`_
   
   3. `Logging`_
 
