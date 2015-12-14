@@ -7,8 +7,6 @@ A Python wrapper around the Telegram Bot API.
 
 *Stay tuned for library updates and new releases on our* `Telegram Channel <http://telegram.me/pythontelegrambotchannel>`_.
 
-By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
-
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: PyPi Package Version
@@ -25,16 +23,16 @@ By `Leandro Toledo <leandrotoledodesouza@gmail.com>`_
    :target: http://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://travis-ci.org/leandrotoledo/python-telegram-bot.svg?branch=master
-   :target: https://travis-ci.org/leandrotoledo/python-telegram-bot
+.. image:: https://travis-ci.org/python-telegram-bot/python-telegram-bot.svg?branch=master
+   :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
    :alt: Travis CI Status
 
-.. image:: https://codeclimate.com/github/leandrotoledo/python-telegram-bot/badges/gpa.svg
-   :target: https://codeclimate.com/github/leandrotoledo/python-telegram-bot
+.. image:: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot/badges/gpa.svg
+   :target: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot
    :alt: Code Climate
 
-.. image:: https://coveralls.io/repos/leandrotoledo/python-telegram-bot/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/leandrotoledo/python-telegram-bot?branch=master
+.. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
    :alt: Coveralls
 
 =================
@@ -136,11 +134,11 @@ Or upgrade to the latest version::
 _`Getting the code`
 ===================
 
-The code is hosted at https://github.com/leandrotoledo/python-telegram-bot
+The code is hosted at https://github.com/python-telegram-bot/python-telegram-bot
 
 Check out the latest development version anonymously with::
 
-    $ git clone https://github.com/leandrotoledo/python-telegram-bot
+    $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
 
 Run tests:
@@ -215,7 +213,7 @@ Now it's time to stop the bot::
 
    >>> updater.stop()
 
-Check out more examples in the `examples folder <https://github.com/leandrotoledo/python-telegram-bot/tree/master/examples>`_!
+Check out more examples in the `examples folder <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples>`_!
 
 ------
 _`API`
@@ -320,9 +318,9 @@ _`Examples`
 
 Here follows some examples to help you to get your own Bot up to speed:
 
-- `echobot <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/echobot.py>`_ replies back messages.
+- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot.py>`_ replies back messages.
 
-- `roboed <https://github.com/leandrotoledo/python-telegram-bot/blob/master/examples/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
+- `roboed <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
 
 - `Simple-Echo-Telegram-Bot <https://github.com/sooyhwang/Simple-Echo-Telegram-Bot>`_ simple Python Telegram bot that echoes your input with Flask microframework, setWebhook method, and Google App Engine (optional) - by @sooyhwang.
 
@@ -348,12 +346,10 @@ _`Contact`
 
 Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5TwgZiwfxMvBQ>`_.
 
-If you face trouble joining in the group please ping me `via Telegram <https://telegram.me/leandrotoledo>`_, I'll be glad to add you.
-
 =======
 _`TODO`
 =======
 
-Patches and bug reports are `welcome <https://github.com/leandrotoledo/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
+Patches and bug reports are `welcome <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
 
 - Add commands handler.

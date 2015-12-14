@@ -30,7 +30,7 @@ setup(
     author='Leandro Toledo',
     author_email='leandrotoledodesouza@gmail.com',
     license='LGPLv3',
-    url='https://github.com/leandrotoledo/python-telegram-bot',
+    url='https://github.com/python-telegram-bot/python-telegram-bot',
     keywords='python telegram bot api wrapper',
     description='A Python wrapper around the Telegram Bot API',
     long_description=(read('README.rst')),

@@ -35,5 +35,5 @@ If you have any question or concerns, feel free to reach out to me.
 .. _`Code of Conduct`: https://www.python.org/psf/codeofconduct/
 .. _`Google Python Style Guide`: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 .. _`Google Python Style Docstrings`: http://sphinx-doc.org/latest/ext/example_google.html
-.. _CHANGES: https://github.com/leandrotoledo/python-telegram-bot/blob/master/CHANGES
-.. _AUTHORS.rst: https://github.com/leandrotoledo/python-telegram-bot/blob/master/AUTHORS.rst
+.. _CHANGES: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/CHANGES
+.. _AUTHORS.rst: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/AUTHORS.rst
