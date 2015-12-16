@@ -1,3 +1,10 @@
+**2015-12-16**
+
+*Released 3.1.0*
+
+- The ``chat``-field in ``Message`` is now of type ``Chat``. (API update Oct 8 2015)
+- ``Message`` now contains the optional fields ``supergroup_chat_created``, ``migrate_to_chat_id``, ``migrate_from_chat_id`` and ``channel_chat_created``. (API update Nov 2015)
+
 **2015-12-08**
 
 *Released 3.0.0*

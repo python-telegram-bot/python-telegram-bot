@@ -9,13 +9,15 @@ Submodules
    telegram.audio
    telegram.base
    telegram.bot
+   telegram.updater
+   telegram.dispatcher
    telegram.chataction
    telegram.contact
    telegram.document
    telegram.emoji
    telegram.error
    telegram.forcereply
-   telegram.groupchat
+   telegram.chat
    telegram.inputfile
    telegram.location
    telegram.message

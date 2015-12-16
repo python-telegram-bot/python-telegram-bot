@@ -38,6 +38,7 @@ class UpdateTest(BaseTest, unittest.TestCase):
                                  'last_name': "S.",
                                  'username': "leandrotoledo"},
                         'chat': {'id': 12173560,
+                                 'type': 'private',
                                  'first_name': "Leandro",
                                  'last_name': "S.",
                                  'username': "leandrotoledo"},

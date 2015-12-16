@@ -249,7 +249,8 @@ class Updater:
         Args:
             stop_signals: Iterable containing signals from the signal module
                 that should be subscribed to. Updater.stop() will be called on
-                receiving one of those signals.
+                receiving one of those signals. Defaults to (SIGINT, SIGTERM,
+                SIGABRT)
         """
         for sig in stop_signals:
             signal(sig, self.signal_handler)
