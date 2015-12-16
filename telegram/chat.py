@@ -17,22 +17,25 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains a object that represents a Telegram GroupChat"""
+"""This module contains a object that represents a Telegram Chat"""
 
 from telegram import TelegramObject
 
 
-class GroupChat(TelegramObject):
-    """This object represents a Telegram GroupChat.
+class Chat(TelegramObject):
+    """This object represents a Telegram Chat.
 
     Attributes:
         id (int):
-        title (str):
-        type (str):
+        type (str): Can be 'private', 'group', 'supergroup' or 'channel'
+        title (str): Title, for channels and group chats
+        username (str): Username, for private chats and channels if available
+        first_name (str): First name of the other party in a private chat
+        last_name (str): Last name of the other party in a private chat
 
     Args:
         id (int):
-        title (str):
+        type (str):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
@@ -41,24 +44,27 @@ class GroupChat(TelegramObject):
 
     def __init__(self,
                  id,
-                 title,
+                 type,
                  **kwargs):
         # Required
         self.id = int(id)
-        self.title = title
+        self.type = type
         # Optionals
-        self.type = kwargs.get('type', '')
+        self.title = kwargs.get('title', '')
+        self.username = kwargs.get('username', '')
+        self.first_name = kwargs.get('first_name', '')
+        self.last_name = kwargs.get('last_name', '')
 
     @staticmethod
     def de_json(data):
         """
         Args:
-            data (str):
+            data (dict):
 
         Returns:
-            telegram.GroupChat:
+            telegram.Chat:
         """
         if not data:
             return None
 
-        return GroupChat(**data)
+        return Chat(**data)

@@ -38,7 +38,7 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError, User, GroupChat, Updater
+from telegram import Update, Message, TelegramError, User, Chat, Updater
 from telegram.dispatcher import run_async
 from tests.base import BaseTest
 from threading import Lock, Thread
@@ -359,7 +359,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         # Now, we send an update to the server via urlopen
         message = Message(1, User(1, "Tester"), datetime.now(),
-                          GroupChat(1, "Test Group"))
+                          Chat(1, "group", title="Test Group"))
 
         message.text = "Webhook Test"
         update = Update(1)
@@ -416,7 +416,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         # Now, we send an update to the server via urlopen
         message = Message(1, User(1, "Tester 2"), datetime.now(),
-                          GroupChat(1, "Test Group 2"))
+                          Chat(1, 'group', title="Test Group 2"))
 
         message.text = "Webhook Test 2"
         update = Update(1)

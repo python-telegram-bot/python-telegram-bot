@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains a object that represents Tests for Telegram GroupChat"""
+"""This module contains a object that represents Tests for Telegram Chat"""
 
 import os
 import unittest
@@ -27,8 +27,8 @@ import telegram
 from tests.base import BaseTest
 
 
-class GroupChatTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram GroupChat."""
+class ChatTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram Chat."""
 
     def setUp(self):
         self.id = -28767330
@@ -42,36 +42,36 @@ class GroupChatTest(BaseTest, unittest.TestCase):
         }
 
     def test_group_chat_de_json_empty_json(self):
-        """Test GroupChat.de_json() method"""
-        print('Testing GroupChat.de_json() - Empty JSON')
+        """Test Chat.de_json() method"""
+        print('Testing Chat.de_json() - Empty JSON')
 
-        group_chat = telegram.GroupChat.de_json({})
+        group_chat = telegram.Chat.de_json({})
 
         self.assertEqual(group_chat, None)
 
     def test_group_chat_de_json(self):
-        """Test GroupChat.de_json() method"""
-        print('Testing GroupChat.de_json()')
+        """Test Chat.de_json() method"""
+        print('Testing Chat.de_json()')
 
-        group_chat = telegram.GroupChat.de_json(self.json_dict)
+        group_chat = telegram.Chat.de_json(self.json_dict)
 
         self.assertEqual(group_chat.id, self.id)
         self.assertEqual(group_chat.title, self.title)
         self.assertEqual(group_chat.type, self.type)
 
     def test_group_chat_to_json(self):
-        """Test GroupChat.to_json() method"""
-        print('Testing GroupChat.to_json()')
+        """Test Chat.to_json() method"""
+        print('Testing Chat.to_json()')
 
-        group_chat = telegram.GroupChat.de_json(self.json_dict)
+        group_chat = telegram.Chat.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(group_chat.to_json()))
 
     def test_group_chat_to_dict(self):
-        """Test GroupChat.to_dict() method"""
-        print('Testing GroupChat.to_dict()')
+        """Test Chat.to_dict() method"""
+        print('Testing Chat.to_dict()')
 
-        group_chat = telegram.GroupChat.de_json(self.json_dict)
+        group_chat = telegram.Chat.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(group_chat.to_dict()))
         self.assertEqual(group_chat['id'], self.id)

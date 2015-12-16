@@ -23,7 +23,7 @@ __version__ = '3.0.0'
 
 from .base import TelegramObject
 from .user import User
-from .groupchat import GroupChat
+from .chat import Chat
 from .photosize import PhotoSize
 from .audio import Audio
 from .voice import Voice
@@ -54,5 +54,5 @@ __all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
            'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
-           'Audio', 'PhotoSize', 'GroupChat', 'Update', 'ParseMode', 'Message',
+           'Audio', 'PhotoSize', 'Chat', 'Update', 'ParseMode', 'Message',
            'User', 'TelegramObject', 'NullHandler', 'Voice']

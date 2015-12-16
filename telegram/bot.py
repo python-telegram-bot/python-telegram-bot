@@ -191,8 +191,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - telegram.User or
-            telegram.GroupChat id.
+            Unique identifier for the message recipient - telegram.Chat id.
           parse_mode:
             Send Markdown, if you want Telegram apps to show bold, italic and
             inline URLs in your bot's message. For the moment, only Telegram
@@ -234,10 +233,10 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           from_chat_id:
             Unique identifier for the chat where the original message was sent
-            - User or GroupChat id.
+            - Chat id.
           message_id:
             Unique message identifier.
 
@@ -268,7 +267,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           photo:
             Photo to send. You can either pass a file_id as String to resend a
             photo that is already on the Telegram servers, or upload a new
@@ -319,7 +318,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           audio:
             Audio file to send. You can either pass a file_id as String to
             resend an audio that is already on the Telegram servers, or upload
@@ -366,7 +365,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           document:
             File to send. You can either pass a file_id as String to resend a
             file that is already on the Telegram servers, or upload a new file
@@ -405,7 +404,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           sticker:
             Sticker to send. You can either pass a file_id as String to resend
             a sticker that is already on the Telegram servers, or upload a new
@@ -441,7 +440,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           video:
             Video to send. You can either pass a file_id as String to resend a
             video that is already on the Telegram servers, or upload a new
@@ -490,7 +489,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           voice:
             Audio file to send. You can either pass a file_id as String to
             resend an audio that is already on the Telegram servers, or upload
@@ -529,7 +528,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           latitude:
             Latitude of location.
           longitude:
@@ -565,7 +564,7 @@ class Bot(TelegramObject):
 
         Args:
           chat_id:
-            Unique identifier for the message recipient - User or GroupChat id.
+            Unique identifier for the message recipient - Chat id.
           action:
             Type of action to broadcast. Choose one, depending on what the user
             is about to receive:
