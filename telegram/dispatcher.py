@@ -61,22 +61,29 @@ def run_async(func):
 class Dispatcher:
     """
     This class dispatches all kinds of updates to its registered handlers.
+    A handler is a function that usually takes the following parameters
 
-    A handler is a function that usually takes the following parameters:
-        bot: The telegram.Bot instance that received the message
-        update: The update that should be handled by the handler
+        bot:
+            The telegram.Bot instance that received the message
+        update:
+            The update that should be handled by the handler
 
-    Error handlers take an additional parameter:
-        error: The TelegramError instance that was raised during processing the
+    Error handlers take an additional parameter
+
+        error:
+            The TelegramError instance that was raised during processing the
             update
 
     All handlers, except error handlers, can also request more information by
     appending one or more of the following arguments in their argument list for
-    convenience:
-        update_queue: The Queue instance which contains all new updates and is
+    convenience
+
+        update_queue:
+            The Queue instance which contains all new updates and is
             processed by the Dispatcher. Be careful with this - you might
             create an infinite loop.
-        args: If the update is an instance str or telegram.Update, this will be
+        args:
+            If the update is an instance str or telegram.Update, this will be
             a list that contains the content of the message split on spaces,
             except the first word (usually the command).
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
