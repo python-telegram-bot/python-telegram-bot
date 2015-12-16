@@ -344,7 +344,7 @@ You may copy, distribute and modify the software provided that modifications are
 _`Contact`
 ==========
 
-Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5TwgZiwfxMvBQ>`_.
+Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5R7Km9hdCgyng>`_.
 
 =======
 _`TODO`
