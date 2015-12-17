@@ -60,7 +60,7 @@ class Message(TelegramObject):
         message_id (int):
         from_user (:class:`telegram.User`):
         date (:class:`datetime.datetime`):
-        chat (:class:`telegram.User` or :class:`telegram.Chat`):
+        chat (:class:`telegram.Chat`):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
