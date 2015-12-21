@@ -1,3 +1,10 @@
+**2015-12-21**
+
+*Released 3.1.1*
+
+- Fix a bug where asynchronous handlers could not have additional arguments
+- Add ``groups`` and ``groupdict`` as additional arguments for regex-based handlers
+
 **2015-12-16**
 
 *Released 3.1.0*

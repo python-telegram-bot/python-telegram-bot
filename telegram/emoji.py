@@ -3,7 +3,7 @@
 # pylint: disable=C0103,C0301,R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by

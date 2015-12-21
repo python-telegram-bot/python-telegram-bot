@@ -26,9 +26,9 @@ def requirements():
 
 setup(
     name='python-telegram-bot',
-    version='3.1.0',
+    version='3.1.1',
     author='Leandro Toledo',
-    author_email='leandrotoledodesouza@gmail.com',
+    author_email='devs@python-telegram-bot.org',
     license='LGPLv3',
     url='https://github.com/python-telegram-bot/python-telegram-bot',
     keywords='python telegram bot api wrapper',

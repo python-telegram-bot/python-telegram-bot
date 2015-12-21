@@ -1,7 +1,7 @@
   #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
