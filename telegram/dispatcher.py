@@ -91,6 +91,16 @@ class Dispatcher:
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
             For other updates, args will be None
 
+    For regex-based handlers, you can also request information about the match.
+    For all other handlers, these will be None
+
+        groups:
+            A tuple that contains the result of
+            re.match(matcher, ...).groups()
+        groupdict:
+            A dictionary that contains the result of
+            re.match(matcher, ...).groupdict()
+
     Attributes:
 
     Args:
@@ -185,7 +195,7 @@ class Dispatcher:
             self.dispatchStringCommand(update)
             handled = True
         elif type(update) is str:
-            self.dispatchStringRegex(update)
+            self.dispatchRegex(update)
             handled = True
 
         # An error happened while polling
@@ -195,7 +205,7 @@ class Dispatcher:
 
         # Telegram update (regex)
         if isinstance(update, Update):
-            self.dispatchTelegramRegex(update)
+            self.dispatchRegex(update)
             handled = True
 
         # Telegram update (command)
@@ -469,25 +479,30 @@ class Dispatcher:
         else:
             self.dispatchTo(self.unknown_telegram_command_handlers, update)
 
-    def dispatchTelegramRegex(self, update):
+    def dispatchRegex(self, update):
         """
-        Dispatches an update to all regex handlers that match the message
-        string.
+        Dispatches an update to all string or telegram regex handlers that
+        match the string/message content.
 
         Args:
-            command (str): The command keyword
-            update (telegram.Update): The Telegram update that contains the
-                command
+            update (str, Update): The update that should be checked for matches
         """
 
-        matching_handlers = []
+        if isinstance(update, Update):
+            handlers = self.telegram_regex_handlers
+            to_match = update.message.text
+        elif isinstance(update, str):
+            handlers = self.string_regex_handlers
+            to_match = update
 
-        for matcher in self.telegram_regex_handlers:
-            if match(matcher, update.message.text):
-                for handler in self.telegram_regex_handlers[matcher]:
-                    matching_handlers.append(handler)
-
-        self.dispatchTo(matching_handlers, update)
+        for matcher in handlers:
+            m = match(matcher, to_match)
+            if m:
+                for handler in handlers[matcher]:
+                    self.call_handler(handler,
+                                      update,
+                                      groups=m.groups(),
+                                      groupdict=m.groupdict())
 
     def dispatchStringCommand(self, update):
         """
@@ -503,25 +518,6 @@ class Dispatcher:
             self.dispatchTo(self.string_command_handlers[command], update)
         else:
             self.dispatchTo(self.unknown_string_command_handlers, update)
-
-    def dispatchStringRegex(self, update):
-        """
-        Dispatches an update to all string regex handlers that match the
-        string.
-
-        Args:
-            command (str): The command keyword
-            update (str): The string that contains the command
-        """
-
-        matching_handlers = []
-
-        for matcher in self.string_regex_handlers:
-            if match(matcher, update):
-                for handler in self.string_regex_handlers[matcher]:
-                    matching_handlers.append(handler)
-
-        self.dispatchTo(matching_handlers, update)
 
     def dispatchType(self, update):
         """

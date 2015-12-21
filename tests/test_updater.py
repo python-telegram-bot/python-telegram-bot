@@ -89,6 +89,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = update
         self.message_count += 1
 
+    def regexGroupHandlerTest(self, bot, update, groups=None, groupdict=None):
+        self.received_message = (groups, groupdict)
+        self.message_count += 1
+
     def additionalArgsTest(self, bot, update, update_queue, args):
         self.received_message = update
         self.message_count += 1
@@ -347,6 +351,20 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEqual(self.received_message, '/test5 noresend')
         self.assertEqual(self.message_count, 2)
+
+    def test_regexGroupHandler(self):
+        print('Testing optional groups and groupdict parameters')
+        bot = MockBot('', messages=0)
+        self.updater.bot = bot
+        d = self.updater.dispatcher
+        d.addStringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
+                                self.regexGroupHandlerTest)
+        queue = self.updater.start_polling(0.01)
+        queue.put('This is a test message for regex group matching.')
+        sleep(.1)
+        self.assertEqual(self.received_message, (('This', 'regex group'),
+                                                 {'testgroup': 'regex group'}))
+
 
     def test_runAsyncWithAdditionalArgs(self):
         print('Testing @run_async with additional parameters')
