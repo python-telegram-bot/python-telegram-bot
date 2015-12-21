@@ -21,7 +21,9 @@ async_lock = Lock()
 
 def run_async(func):
     """
-    Function decorator that will run the function in a new thread.
+    Function decorator that will run the function in a new thread. A function
+    decorated with this will have to include **kwargs in their parameter list,
+    which will contain all optional parameters.
 
     Args:
         func (function): The function to run in the thread.
@@ -31,24 +33,24 @@ def run_async(func):
     """
 
     @wraps(func)
-    def pooled(*args, **kwargs):
+    def pooled(*pargs, **kwargs):
         """
         A wrapper to run a thread in a thread pool
         """
         global running_async, async_lock
-        result = func(*args, **kwargs)
+        result = func(*pargs, **kwargs)
         semaphore.release()
         with async_lock:
             running_async -= 1
         return result
 
     @wraps(func)
-    def async_func(*args, **kwargs):
+    def async_func(*pargs, **kwargs):
         """
         A wrapper to run a function in a thread
         """
         global running_async, async_lock
-        thread = Thread(target=pooled, args=args, kwargs=kwargs)
+        thread = Thread(target=pooled, args=pargs, kwargs=kwargs)
         semaphore.acquire()
         with async_lock:
             running_async += 1
@@ -509,8 +511,7 @@ class Dispatcher:
 
         Args:
             command (str): The command keyword
-            update (telegram.Update): The Telegram update that contains the
-                command
+            update (str): The string that contains the command
         """
 
         matching_handlers = []
@@ -560,7 +561,7 @@ class Dispatcher:
         for handler in self.error_handlers:
             handler(self.bot, update, error)
 
-    def dispatchTo(self, handlers, update):
+    def dispatchTo(self, handlers, update, **kwargs):
         """
         Dispatches an update to a list of handlers.
 
@@ -570,9 +571,9 @@ class Dispatcher:
         """
 
         for handler in handlers:
-            self.call_handler(handler, update)
+            self.call_handler(handler, update, **kwargs)
 
-    def call_handler(self, handler, update):
+    def call_handler(self, handler, update, **kwargs):
         """
         Calls an update handler. Checks the handler for keyword arguments and
         fills them, if possible.
@@ -581,13 +582,21 @@ class Dispatcher:
             handler (function): An update handler function
             update (any): An update
         """
-        kwargs = {}
+
+        target_kwargs = {}
         fargs = getargspec(handler).args
 
-        if 'update_queue' in fargs:
-            kwargs['update_queue'] = self.update_queue
+        '''
+        async handlers will receive all optional arguments, since we can't
+        their argument list.
+        '''
 
-        if 'args' in fargs:
+        is_async = 'pargs' == getargspec(handler).varargs
+
+        if is_async or 'update_queue' in fargs:
+            target_kwargs['update_queue'] = self.update_queue
+
+        if is_async or 'args' in fargs:
             if isinstance(update, Update):
                 args = update.message.text.split(' ')[1:]
             elif isinstance(update, str):
@@ -595,6 +604,12 @@ class Dispatcher:
             else:
                 args = None
 
-            kwargs['args'] = args
+            target_kwargs['args'] = args
 
-        handler(self.bot, update, **kwargs)
+        if is_async or 'groups' in fargs:
+            target_kwargs['groups'] = kwargs.get('groups', None)
+
+        if is_async or 'groupdict' in fargs:
+            target_kwargs['groupdict'] = kwargs.get('groupdict', None)
+
+        handler(self.bot, update, **target_kwargs)

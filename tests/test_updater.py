@@ -79,7 +79,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.message_count += 1
 
     @run_async
-    def asyncHandlerTest(self, bot, update):
+    def asyncHandlerTest(self, bot, update, **kwargs):
         sleep(1)
         with self.lock:
             self.received_message = update.message.text
@@ -96,6 +96,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             update_queue.put('/test5 noresend')
         elif args[0] == 'noresend':
             pass
+
+    @run_async
+    def asyncAdditionalHandlerTest(self, bot, update, update_queue=None,
+                                   **kwargs):
+        sleep(1)
+        with self.lock:
+            if update_queue is not None:
+                self.received_message = update.message.text
+                self.message_count += 1
 
     def errorRaisingHandlerTest(self, bot, update):
         raise TelegramError(update)
@@ -337,6 +346,18 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue.put('/test5 resend')
         sleep(.1)
         self.assertEqual(self.received_message, '/test5 noresend')
+        self.assertEqual(self.message_count, 2)
+
+    def test_runAsyncWithAdditionalArgs(self):
+        print('Testing @run_async with additional parameters')
+        bot = MockBot('Test6', messages=2)
+        self.updater.bot = bot
+        d = self.updater.dispatcher
+        d.addTelegramMessageHandler(
+            self.asyncAdditionalHandlerTest)
+        self.updater.start_polling(0.01)
+        sleep(1.2)
+        self.assertEqual(self.received_message, 'Test6')
         self.assertEqual(self.message_count, 2)
 
     def test_webhook(self):
