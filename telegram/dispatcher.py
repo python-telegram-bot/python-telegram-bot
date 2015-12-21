@@ -118,12 +118,11 @@ class Dispatcher:
             A dictionary that contains the result of
             re.match(matcher, ...).groupdict()
 
-    Attributes:
-
     Args:
         bot (telegram.Bot): The bot object that should be passed to the
-        handlers update_queue (queue.Queue): The synchronized queue that will
-        contain the updates.
+            handlers
+        update_queue (queue.Queue): The synchronized queue that will
+            contain the updates.
     """
     def __init__(self, bot, update_queue, workers=4):
         self.bot = bot
