@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Simple Bot to reply to Telegram messages
+# Example Bot to show some of the functionality of the library
 # Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,8 @@ Then, the bot is started and the CLI-Loop is entered, where all text inputs are
 inserted into the update queue for the bot to handle.
 
 Usage:
-Basic Echobot example, repeats messages. Reply to last chat from the command
-line by typing "/reply <text>"
+Repeats messages with a delay.
+Reply to last chat from the command line by typing "/reply <text>"
 Type 'stop' on the command line to stop the bot.
 """
 
@@ -36,24 +36,20 @@ from telegram import Updater
 from telegram.dispatcher import run_async
 from time import sleep
 import logging
-import sys
 
-root = logging.getLogger()
-root.setLevel(logging.INFO)
-
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.INFO)
-formatter = \
-    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
-
-last_chat_id = 0
+# Enable Logging
+logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
+# We use this var to save the last chat id, so we can reply to it
+last_chat_id = 0
 
-# Command Handlers
+
+# Define a few (command) handlers. These usually take the two arguments bot and
+# update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     """ Answer in Telegram """
     bot.sendMessage(update.message.chat_id, text='Hi!')
@@ -87,25 +83,20 @@ def message(bot, update, **kwargs):
     """
     Example for an asynchronous handler. It's not guaranteed that replies will
     be in order when using @run_async. Also, you have to include **kwargs in
-    your parameter list.
+    your parameter list. The kwargs contain all optional parameters that are
     """
-
-    print(kwargs)
 
     sleep(2)  # IO-heavy operation here
     bot.sendMessage(update.message.chat_id, text='Echo: %s' %
                                                  update.message.text)
 
 
-def error(bot, update, error):
-    """ Print error to console """
-    logger.warn('Update %s caused error %s' % (update, error))
-
-
+# These handlers are for updates of type str. We use them to react to inputs
+# on the command line interface
 def cli_reply(bot, update, args):
     """
-    For any update of type telegram.Update or str, you can get the argument
-    list by appending args to the function parameters.
+    For any update of type telegram.Update or str that contains a command, you
+    can get the argument list by appending args to the function parameters.
     Here, we reply to the last active chat with the text after the command.
     """
     if last_chat_id is not 0:
@@ -117,6 +108,9 @@ def cli_noncommand(bot, update, update_queue):
     You can also get the update queue as an argument in any handler by
     appending it to the argument list. Be careful with this though.
     Here, we put the input string back into the queue, but as a command.
+
+    To learn more about those optional handler parameters, read:
+    http://python-telegram-bot.readthedocs.org/en/latest/telegram.dispatcher.html
     """
     update_queue.put('/%s' % update)
 
@@ -125,28 +119,39 @@ def unknown_cli_command(bot, update):
     logger.warn("Command not found: %s" % update)
 
 
+def error(bot, update, error):
+    """ Print error to console """
+    logger.warn('Update %s caused error %s' % (update, error))
+
+
 def main():
     # Create the EventHandler and pass it your bot's token.
-    token = 'token'
-    updater = Updater(token, workers=2)
+    token = 'TOKEN'
+    updater = Updater(token, workers=10)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    # This is how we add handlers for Telegram messages
     dp.addTelegramCommandHandler("start", start)
     dp.addTelegramCommandHandler("help", help)
     dp.addUnknownTelegramCommandHandler(unknown_command)
+    # Message handlers only receive updates that don't contain commands
     dp.addTelegramMessageHandler(message)
+    # Regex handlers will receive all updates on which their regex matches
     dp.addTelegramRegexHandler('.*', any_message)
 
+    # String handlers work pretty much the same
     dp.addStringCommandHandler('reply', cli_reply)
     dp.addUnknownStringCommandHandler(unknown_cli_command)
     dp.addStringRegexHandler('[^/].*', cli_noncommand)
 
+    # All TelegramErrors are caught for you and delivered to the error
+    # handler(s). Other types of Errors are not caught.
     dp.addErrorHandler(error)
 
     # Start the Bot and store the update Queue, so we can insert updates
-    update_queue = updater.start_polling(poll_interval=0.1, timeout=20)
+    update_queue = updater.start_polling(poll_interval=0.1, timeout=10)
 
     '''
     # Alternatively, run with webhook:
@@ -178,9 +183,9 @@ def main():
             updater.stop()
             break
 
-        # else, put the text into the update queue
+        # else, put the text into the update queue to be handled by our handlers
         elif len(text) > 0:
-            update_queue.put(text)  # Put command into queue
+            update_queue.put(text)
 
 if __name__ == '__main__':
     main()

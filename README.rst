@@ -155,9 +155,9 @@ _`Getting started`
 
 View the last release API documentation at: https://core.telegram.org/bots/api
 
-------
+--------------------
 _`The Updater class`
-------
+--------------------
 
 The ``Updater`` class is the new way to create bots with ``python-telegram-bot``. It provides an easy-to-use interface to the ``telegram.Bot`` by caring about getting new updates from telegram and forwarding them to the ``Dispatcher`` class. We can register handler functions in the ``Dispatcher`` to make our bot react to Telegram commands, messages and even arbitrary updates.
 
@@ -298,9 +298,9 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
------------
+----------
 _`Logging`
------------
+----------
 
 You can get logs in your main application by calling `logging` and setting the log level you want::
 
@@ -318,13 +318,23 @@ _`Examples`
 
 Here follows some examples to help you to get your own Bot up to speed:
 
-- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot.py>`_ replies back messages.
+- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
 
-- `roboed <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
+- `clibot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/clibot.py>`_ has a command line interface.
+
+- `Welcome Bot <https://github.com/jh0ker/welcomebot>`_ greets everyone who joins a group chat.
+
+Legacy examples (pre-3.0):
+
+- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ replies back messages.
+
+- `roboed <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
 
 - `Simple-Echo-Telegram-Bot <https://github.com/sooyhwang/Simple-Echo-Telegram-Bot>`_ simple Python Telegram bot that echoes your input with Flask microframework, setWebhook method, and Google App Engine (optional) - by @sooyhwang.
 
 - `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
+
+Other notable examples:
 
 - `TwitterForwarderBot <https://github.com/franciscod/telegram-twitter-forwarder-bot>`_ forwards you tweets from people that you have subscribed to.
 
