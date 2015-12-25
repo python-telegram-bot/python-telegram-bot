@@ -45,7 +45,11 @@ def _parse(json_data):
     Returns:
       A JSON parsed as Python dict with results.
     """
-    data = json.loads(json_data.decode())
+    decoded_s = json_data.decode('utf-8')
+    try:
+        data = json.loads(decoded_s)
+    except ValueError:
+        raise TelegramError('Invalid server response; probably bad token')
 
     if not data.get('ok') and data.get('description'):
         return data['description']
