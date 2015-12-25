@@ -73,7 +73,7 @@ def _try_except_req(func):
             try:
                 message = _parse(error.read())
             except ValueError:
-                message = 'Unknown HTTPError'
+                message = 'Unknown HTTPError {0}'.format(error.getcode())
 
             raise TelegramError(message)
         except (SSLError, socket.timeout) as error:
