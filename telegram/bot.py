@@ -52,7 +52,7 @@ class Bot(TelegramObject):
     def __init__(self,
                  token,
                  base_url=None):
-        self.token = token
+        self.token = self._valid_token(token)
 
         if base_url is None:
             self.base_url = 'https://api.telegram.org/bot%s' % self.token
@@ -744,3 +744,11 @@ class Bot(TelegramObject):
     def __reduce__(self):
         return (self.__class__, (self.token,
                                  self.base_url.replace(self.token, '')))
+
+    @staticmethod
+    def _valid_token(token):
+        """a very basic validation on token"""
+        left, sep, _right = token.partition(':')
+        if (sep is None) or (not left.isdigit()) or (len(left) < 3):
+            raise TelegramError('Invalid token')
+        return token
