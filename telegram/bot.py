@@ -749,6 +749,6 @@ class Bot(TelegramObject):
     def _valid_token(token):
         """a very basic validation on token"""
         left, sep, _right = token.partition(':')
-        if (sep is None) or (not left.isdigit()) or (len(left) < 3):
+        if (not sep) or (not left.isdigit()) or (len(left) < 3):
             raise TelegramError('Invalid token')
         return token
