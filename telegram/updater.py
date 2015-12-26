@@ -64,15 +64,26 @@ class Updater:
     Attributes:
 
     Args:
-        token (str): The bots token given by the @BotFather
+        token (Optional[str]): The bot's token given by the @BotFather
         base_url (Optional[str]):
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
+        bot (Optional[Bot]):
+
+    Raises:
+        ValueError: If both `token` and `bot` are passed or none of them.
     """
 
-    def __init__(self, token, base_url=None, workers=4):
+    def __init__(self, token=None, base_url=None, workers=4, bot=None):
+        if (token is None) and (bot is None):
+            raise ValueError('`token` or `bot` must be passed')
+        if (token is not None) and (bot is not None):
+            raise ValueError('`token` and `bot` are mutually exclusive')
 
-        self.bot = Bot(token, base_url)
+        if bot is not None:
+            self.bot = bot
+        else:
+            self.bot = Bot(token, base_url)
         self.update_queue = Queue()
         self.dispatcher = Dispatcher(self.bot, self.update_queue,
                                      workers=workers)

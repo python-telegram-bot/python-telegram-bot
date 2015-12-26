@@ -137,5 +137,19 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(upf.photos[0][0].file_size, 12421)
 
+    def _test_invalid_token(self, token):
+        print('Testing invalid token: {0}'.format(token))
+        self.assertRaisesRegexp(telegram.TelegramError, 'Invalid token', telegram.Bot, token)
+
+    def testInvalidToken1(self):
+        self._test_invalid_token('123')
+
+    def testInvalidToken2(self):
+        self._test_invalid_token('12a:')
+
+    def testInvalidToken3(self):
+        self._test_invalid_token('12:')
+
+
 if __name__ == '__main__':
     unittest.main()
