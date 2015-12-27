@@ -74,7 +74,7 @@ class File(TelegramObject):
         url = self.file_path
 
         if custom_path:
-            filename = basename(custom_path)
+            filename = custom_path
         else:
             filename = basename(url)
 
