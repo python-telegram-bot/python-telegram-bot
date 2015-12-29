@@ -1,3 +1,10 @@
+**2015-12-29**
+
+*Released 3.1.2*
+
+- Fix custom path for file downloads
+- Don't stop the dispatcher thread on uncaught errors in handlers
+
 **2015-12-21**
 
 *Released 3.1.1*
