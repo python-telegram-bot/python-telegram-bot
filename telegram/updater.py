@@ -82,13 +82,13 @@ class Updater:
         self.is_idle = False
         self.httpd = None
 
-    def start_polling(self, poll_interval=1.0, timeout=10, network_delay=2):
+    def start_polling(self, poll_interval=0.0, timeout=10, network_delay=2):
         """
         Starts polling updates from Telegram.
 
         Args:
             poll_interval (Optional[float]): Time to wait between polling
-                updates from Telegram in seconds. Default is 1.0
+                updates from Telegram in seconds. Default is 0.0
             timeout (Optional[float]): Passed to Bot.getUpdates
             network_delay (Optional[float]): Passed to Bot.getUpdates
 
@@ -192,9 +192,11 @@ class Updater:
             except URLError as e:
                 self.logger.error("Error while getting Updates: %s" % e)
                 # increase waiting times on subsequent errors up to 30secs
-                if current_interval < 30:
+                if current_interval == 0:
+                    current_interval = 1
+                elif current_interval < 30:
                     current_interval += current_interval / 2
-                if current_interval > 30:
+                elif current_interval > 30:
                     current_interval = 30
 
         self.logger.info('Updater thread stopped')
