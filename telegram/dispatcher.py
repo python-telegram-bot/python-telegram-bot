@@ -25,6 +25,7 @@ from functools import wraps
 from inspect import getargspec
 from threading import Thread, BoundedSemaphore, Lock
 from re import match
+from traceback import print_exc
 
 from telegram import (TelegramError, Update, NullHandler)
 
@@ -179,6 +180,10 @@ class Dispatcher:
             except TelegramError as te:
                 self.logger.warn("Error was raised while processing Update.")
                 self.dispatchError(update, te)
+
+            # All other errors should not stop the thread, so just print them
+            except:
+                print_exc()
 
         self.logger.info('Dispatcher thread stopped')
 
