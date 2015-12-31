@@ -20,6 +20,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `njittam <https://github.com/njittam>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Roman Vetrov <https://github.com/rvetrov>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `wjt <https://github.com/wjt>`_
 

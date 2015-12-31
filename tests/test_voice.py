@@ -24,7 +24,7 @@ import sys
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, specific_bot_required
 
 
 class VoiceTest(BaseTest, unittest.TestCase):
@@ -110,6 +110,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.mime_type, self.mime_type)
         self.assertEqual(voice.file_size, self.file_size)
 
+    @specific_bot_required
     def test_send_voice_resend(self):
         """Test telegram.Bot sendVoice method"""
         print('Testing bot.sendVoice - Resend by file_id')

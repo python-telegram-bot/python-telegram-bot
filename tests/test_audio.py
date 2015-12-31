@@ -107,6 +107,24 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
+        print('Testing bot.sendAudio - Resend by file_id')
+
+        file_id = audio.file_id
+        message = self._bot.sendAudio(chat_id=self._chat_id,
+                                      audio=file_id,
+                                      duration=self.duration,
+                                      performer=self.performer,
+                                      title=self.title)
+
+        audio = message.audio
+
+        self.assertEqual(audio.file_id, file_id)
+        self.assertEqual(audio.duration, self.duration)
+        self.assertEqual(audio.performer, self.performer)
+        self.assertEqual(audio.title, self.title)
+        self.assertEqual(audio.mime_type, self.mime_type)
+        self.assertEqual(audio.file_size, self.file_size)
+
     def test_send_audio_mp3_file_custom_filename(self):
         """Test telegram.Bot sendAudio method"""
         print('Testing bot.sendAudio - MP3 File with custom filename')
@@ -127,24 +145,6 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
-
-    def test_send_audio_resend(self):
-        """Test telegram.Bot sendAudio method"""
-        print('Testing bot.sendAudio - Resend by file_id')
-
-        message = self._bot.sendAudio(chat_id=self._chat_id,
-                                      audio=self.audio_file_id,
-                                      duration=self.duration,
-                                      performer=self.performer,
-                                      title=self.title)
-
-        audio = message.audio
-
-        self.assertEqual(audio.file_id, self.audio_file_id)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
-        self.assertEqual(audio.mime_type, self.mime_type)
 
     def test_audio_de_json(self):
         """Test Audio.de_json() method"""

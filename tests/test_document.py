@@ -66,6 +66,19 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.mime_type, self.mime_type)
         self.assertEqual(document.file_size, self.file_size)
 
+        print('Testing bot.sendDocument - Resend by file_id')
+        document_file_id = document.file_id
+
+        message = self._bot.sendDocument(chat_id=self._chat_id,
+                                         document=document_file_id)
+
+        document = message.document
+
+        self.assertEqual(document.file_id, document_file_id)
+        self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
+        self.assertEqual(document.file_name, self.file_name)
+        self.assertEqual(document.mime_type, self.mime_type)
+
     def test_send_document_png_file_with_custom_file_name(self):
         """Test telegram.Bot sendDocument method"""
         print('Testing bot.sendDocument - PNG File with custom filename')
@@ -98,20 +111,6 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.file_name, 'image.gif')
         self.assertEqual(document.mime_type, 'image/gif')
         self.assertEqual(document.file_size, 3878)
-
-    def test_send_document_resend(self):
-        """Test telegram.Bot sendDocument method"""
-        print('Testing bot.sendDocument - Resend by file_id')
-
-        message = self._bot.sendDocument(chat_id=self._chat_id,
-                                         document=self.document_file_id)
-
-        document = message.document
-
-        self.assertEqual(document.file_id, self.document_file_id)
-        self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
-        self.assertEqual(document.file_name, self.file_name)
-        self.assertEqual(document.mime_type, self.mime_type)
 
     def test_document_de_json(self):
         """Test Document.de_json() method"""
