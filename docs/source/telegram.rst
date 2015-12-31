@@ -11,6 +11,7 @@ Submodules
    telegram.bot
    telegram.updater
    telegram.dispatcher
+   telegram.jobqueue
    telegram.chataction
    telegram.contact
    telegram.document
