@@ -25,7 +25,6 @@ from functools import wraps
 from inspect import getargspec
 from threading import Thread, BoundedSemaphore, Lock
 from re import match
-from traceback import print_exc
 
 from telegram import (TelegramError, Update, NullHandler)
 
