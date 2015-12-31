@@ -183,7 +183,7 @@ class Dispatcher:
 
             # All other errors should not stop the thread, so just print them
             except:
-                print_exc()
+                self.logger.exception()
 
         self.logger.info('Dispatcher thread stopped')
 
