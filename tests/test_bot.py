@@ -20,9 +20,14 @@
 """This module contains a object that represents Tests for Telegram Bot"""
 
 import os
-import unittest
 from datetime import datetime
 import sys
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
+
 sys.path.append('.')
 
 import telegram
