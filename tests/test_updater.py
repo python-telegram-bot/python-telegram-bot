@@ -22,7 +22,6 @@ This module contains a object that represents Tests for Updater, Dispatcher,
 WebhookServer and WebhookHandler
 """
 import logging
-import unittest
 import sys
 import re
 import os
@@ -30,6 +29,11 @@ import signal
 from random import randrange
 from time import sleep
 from datetime import datetime
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
 
 try:
     from urllib2 import urlopen, Request
@@ -481,6 +485,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1)
         self.updater.running = False
 
+    def test_createBot(self):
+        updater = Updater('123:abcd')
+        self.assertIsNotNone(updater.bot)
 
     def test_mutualExclusiveTokenBot(self):
         bot = Bot('123:zyxw')
@@ -488,6 +495,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_noTokenOrBot(self):
         self.assertRaises(ValueError, Updater)
+
 
 class MockBot:
 
