@@ -139,6 +139,7 @@ class Dispatcher:
         self.error_handlers = []
         self.logger = logging.getLogger(__name__)
         self.running = False
+        self.__lock = Lock()
 
         global semaphore
         if not semaphore:
@@ -159,41 +160,46 @@ class Dispatcher:
         the update queue.
         """
 
-        self.running = True
-        self.logger.info('Dispatcher thread started')
+        self.__lock.acquire()
+        if not self.running:
+            self.running = True
+            self.__lock.release()
+            self.logger.info('Dispatcher thread started')
 
-        while True:
-            update = None
+            while True:
+                update = None
 
-            try:
-                # Pop update from update queue.
-                # Blocks if no updates are available.
-                update = self.update_queue.get()
+                try:
+                    # Pop update from update queue.
+                    # Blocks if no updates are available.
+                    update = self.update_queue.get()
 
-                if type(update) is self._Stop:
-                    break
+                    if type(update) is self._Stop:
+                        break
 
-                self.processUpdate(update)
-                self.logger.debug('Processed Update: %s' % update)
+                    self.processUpdate(update)
+                    self.logger.debug('Processed Update: %s' % update)
 
-            # Dispatch any errors
-            except TelegramError as te:
-                self.logger.warn("Error was raised while processing Update.")
-                self.dispatchError(update, te)
+                # Dispatch any errors
+                except TelegramError as te:
+                    self.logger.warn("Error was raised while processing Update.")
+                    self.dispatchError(update, te)
 
-            # All other errors should not stop the thread, so just print them
-            except:
-                print_exc()
-
+                # All other errors should not stop the thread, so just print them
+                except:
+                    print_exc()
+        else:
+            self.__lock.release()
         self.logger.info('Dispatcher thread stopped')
 
     def stop(self):
         """
         Stops the thread
         """
-        if self.running:
-            self.running = False
-            self.update_queue.put(self._Stop())
+        with self.__lock:
+            if self.running:
+                self.running = False
+                self.update_queue.put(self._Stop())
 
     def processUpdate(self, update):
         """
