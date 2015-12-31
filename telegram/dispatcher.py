@@ -182,10 +182,11 @@ class Dispatcher:
 
                 # Dispatch any errors
                 except TelegramError as te:
-                    self.logger.warn("Error was raised while processing Update.")
+                    self.logger.warn("Error was raised while processing "
+                                     "Update.")
                     self.dispatchError(update, te)
 
-                # All other errors should not stop the thread, so just print them
+                # All other errors should not stop the thread, just print them
                 except:
                     print_exc()
         else:
