@@ -105,9 +105,10 @@ class Updater:
                 dispatcher_thread = Thread(target=self.dispatcher.start,
                                            name="dispatcher")
                 updater_thread = Thread(target=self._start_polling,
-                                              name="updater",
-                                              args=(poll_interval, timeout,
-                                                    network_delay))
+                                        name="updater",
+                                        args=(poll_interval,
+                                              timeout,
+                                              network_delay))
 
                 # Start threads
                 dispatcher_thread.start()
@@ -148,8 +149,12 @@ class Updater:
                 dispatcher_thread = Thread(target=self.dispatcher.start,
                                            name="dispatcher")
                 updater_thread = Thread(target=self._start_webhook,
-                                              name="updater",
-                                              args=(listen, port, url_path, cert, key))
+                                        name="updater",
+                                        args=(listen,
+                                              port,
+                                              url_path,
+                                              cert,
+                                              key))
 
                 # Start threads
                 dispatcher_thread.start()
