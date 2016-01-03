@@ -22,7 +22,7 @@ This module contains the class JobQueue
 
 import logging
 import time
-from threading import Lock
+from threading import Thread, Lock
 
 try:
     from queue import Queue, PriorityQueue
@@ -76,6 +76,8 @@ class JobQueue(object):
         if next_t is None:
             next_t = interval
 
+        next_t += time.time()
+
         self.logger.debug("Putting a {} with t={}".format(
                 job.name, next_t))
         self.queue.put((next_t, job))
@@ -95,8 +97,8 @@ class JobQueue(object):
             if t < now:
                 self.queue.get()
                 self.logger.debug("About time! running")
-                j.run()
-                self.put(j, now + j.interval)
+                j.run(self.bot)
+                self.put(j.run, j.interval)
                 continue
 
             self.logger.debug("Next task isn't due yet. Finished!")
@@ -104,18 +106,26 @@ class JobQueue(object):
 
     def start(self):
         """
-        Thread target of thread 'job_queue'. Runs in background and performs
-        ticks on the job queue.
+        Starts the job_queue thread.
         """
         self.__lock.acquire()
         if not self.running:
             self.running = True
             self.__lock.release()
-            while self.running:
-                self.tick()
-                time.sleep(self.tick_interval)
+            job_queue_thread = Thread(target=self._start,
+                                      name="job_queue")
+            job_queue_thread.start()
         else:
             self.__lock.release()
+
+    def _start(self):
+        """
+        Thread target of thread 'job_queue'. Runs in background and performs
+        ticks on the job queue.
+        """
+        while self.running:
+            self.tick()
+            time.sleep(self.tick_interval)
 
     def stop(self):
         """
