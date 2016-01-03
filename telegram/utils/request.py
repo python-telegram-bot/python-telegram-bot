@@ -19,6 +19,7 @@
 
 """This module contains methods to make POST and GET requests"""
 
+import functools
 import json
 import socket
 from ssl import SSLError
@@ -45,7 +46,11 @@ def _parse(json_data):
     Returns:
       A JSON parsed as Python dict with results.
     """
-    data = json.loads(json_data.decode())
+    decoded_s = json_data.decode('utf-8')
+    try:
+        data = json.loads(decoded_s)
+    except ValueError:
+        raise TelegramError('Invalid server response')
 
     if not data.get('ok') and data.get('description'):
         return data['description']
@@ -53,6 +58,34 @@ def _parse(json_data):
     return data['result']
 
 
+def _try_except_req(func):
+    """Decorator for requests to handle known exceptions"""
+    @functools.wraps(func)
+    def decorator(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except HTTPError as error:
+            if error.getcode() == 403:
+                raise TelegramError('Unauthorized')
+            if error.getcode() == 502:
+                raise TelegramError('Bad Gateway')
+
+            try:
+                message = _parse(error.read())
+            except ValueError:
+                message = 'Unknown HTTPError {0}'.format(error.getcode())
+
+            raise TelegramError(message)
+        except (SSLError, socket.timeout) as error:
+            if "operation timed out" in str(error):
+                raise TelegramError("Timed out")
+
+            raise TelegramError(str(error))
+
+    return decorator
+
+
+@_try_except_req
 def get(url):
     """Request an URL.
     Args:
@@ -67,6 +100,7 @@ def get(url):
     return _parse(result)
 
 
+@_try_except_req
 def post(url,
          data,
          network_delay=2.):
@@ -91,39 +125,22 @@ def post(url,
     else:
         timeout = None
 
-    try:
-        if InputFile.is_inputfile(data):
-            data = InputFile(data)
-            request = Request(url,
-                              data=data.to_form(),
-                              headers=data.headers)
-        else:
-            data = json.dumps(data)
-            request = Request(url,
-                              data=data.encode(),
-                              headers={'Content-Type': 'application/json'})
+    if InputFile.is_inputfile(data):
+        data = InputFile(data)
+        request = Request(url,
+                          data=data.to_form(),
+                          headers=data.headers)
+    else:
+        data = json.dumps(data)
+        request = Request(url,
+                          data=data.encode(),
+                          headers={'Content-Type': 'application/json'})
 
-        result = urlopen(request, timeout=timeout).read()
-    except HTTPError as error:
-        if error.getcode() == 403:
-            raise TelegramError('Unauthorized')
-        if error.getcode() == 502:
-            raise TelegramError('Bad Gateway')
-
-        try:
-            message = _parse(error.read())
-        except ValueError:
-            message = 'Unknown HTTPError'
-
-        raise TelegramError(message)
-    except (SSLError, socket.timeout) as error:
-        if "operation timed out" in str(error):
-            raise TelegramError("Timed out")
-
-        raise TelegramError(str(error))
+    result = urlopen(request, timeout=timeout).read()
     return _parse(result)
 
 
+@_try_except_req
 def download(url,
              filename):
     """Download a file by its URL.

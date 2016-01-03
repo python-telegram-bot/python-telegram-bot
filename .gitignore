@@ -61,3 +61,10 @@ target/
 
 # Sublime Text 2
 *.sublime*
+
+# unitests files
+telegram.mp3
+telegram.mp4
+telegram.ogg
+telegram.png
+telegram.webp
