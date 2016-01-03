@@ -22,7 +22,6 @@ This module contains a object that represents Tests for Updater, Dispatcher,
 WebhookServer and WebhookHandler
 """
 import logging
-import unittest
 import sys
 import re
 import os
@@ -31,6 +30,11 @@ from random import randrange
 from time import sleep
 from datetime import datetime
 
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
+
 try:
     from urllib2 import urlopen, Request
 except ImportError:
@@ -38,7 +42,7 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError, User, Chat, Updater
+from telegram import Update, Message, TelegramError, User, Chat, Updater, Bot
 from telegram.dispatcher import run_async
 from tests.base import BaseTest
 from threading import Lock, Thread
@@ -61,14 +65,18 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     """
 
     def setUp(self):
-        self.updater = Updater('', workers=2)
-
+        self.updater = None
         self.received_message = None
         self.message_count = 0
         self.lock = Lock()
 
+    def _setup_updater(self, *args, **kwargs):
+        bot = MockBot(*args, **kwargs)
+        self.updater = Updater(workers=2, bot=bot)
+
     def tearDown(self):
-        self.updater.stop()
+        if self.updater is not None:
+            self.updater.stop()
 
     def reset(self):
         self.message_count = 0
@@ -119,8 +127,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addRemoveTelegramMessageHandler(self):
         print('Testing add/removeTelegramMessageHandler')
-        bot = MockBot('Test')
-        self.updater.bot = bot
+        self._setup_updater('Test')
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
             self.telegramHandlerTest)
@@ -132,13 +139,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.removeTelegramMessageHandler(self.telegramHandlerTest)
         self.reset()
 
-        bot.send_messages = 1
+        self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         print('Testing addTelegramMessageHandler and send 100 messages...')
-        self.updater.bot = MockBot('Multiple', 100)
+        self._setup_updater('Multiple', 100)
         self.updater.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
         self.updater.start_polling(0.0)
@@ -148,8 +155,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addRemoveTelegramRegexHandler(self):
         print('Testing add/removeStringRegexHandler')
-        bot = MockBot('Test2')
-        self.updater.bot = bot
+        self._setup_updater('Test2')
         d = self.updater.dispatcher
         regobj = re.compile('Te.*')
         self.updater.dispatcher.addTelegramRegexHandler(regobj,
@@ -162,14 +168,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.removeTelegramRegexHandler(regobj, self.telegramHandlerTest)
         self.reset()
 
-        bot.send_messages = 1
+        self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveTelegramCommandHandler(self):
         print('Testing add/removeTelegramCommandHandler')
-        bot = MockBot('/test')
-        self.updater.bot = bot
+        self._setup_updater('/test')
         d = self.updater.dispatcher
         self.updater.dispatcher.addTelegramCommandHandler(
             'test', self.telegramHandlerTest)
@@ -181,14 +186,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.removeTelegramCommandHandler('test', self.telegramHandlerTest)
         self.reset()
 
-        bot.send_messages = 1
+        self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveUnknownTelegramCommandHandler(self):
         print('Testing add/removeUnknownTelegramCommandHandler')
-        bot = MockBot('/test2')
-        self.updater.bot = bot
+        self._setup_updater('/test2')
         d = self.updater.dispatcher
         self.updater.dispatcher.addUnknownTelegramCommandHandler(
             self.telegramHandlerTest)
@@ -200,14 +204,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.removeUnknownTelegramCommandHandler(self.telegramHandlerTest)
         self.reset()
 
-        bot.send_messages = 1
+        self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveStringRegexHandler(self):
         print('Testing add/removeStringRegexHandler')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringRegexHandler('Te.*', self.stringHandlerTest)
         queue = self.updater.start_polling(0.01)
@@ -225,8 +228,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addRemoveStringCommandHandler(self):
         print('Testing add/removeStringCommandHandler')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringCommandHandler(
             'test3', self.stringHandlerTest)
@@ -246,8 +248,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addRemoveUnknownStringCommandHandler(self):
         print('Testing add/removeUnknownStringCommandHandler')
-        bot = MockBot('/test')
-        self.updater.bot = bot
+        self._setup_updater('/test')
         d = self.updater.dispatcher
         d.addUnknownStringCommandHandler(
             self.stringHandlerTest)
@@ -260,14 +261,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.removeUnknownStringCommandHandler(self.stringHandlerTest)
         self.reset()
 
-        bot.send_messages = 1
+        self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveErrorHandler(self):
         print('Testing add/removeErrorHandler')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addErrorHandler(self.errorHandlerTest)
         queue = self.updater.start_polling(0.01)
@@ -286,8 +286,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_errorInHandler(self):
         print('Testing error in Handler')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringRegexHandler('.*',
                                                 self.errorRaisingHandlerTest)
@@ -300,8 +299,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_errorOnGetUpdates(self):
         print('Testing error on getUpdates')
-        bot = MockBot('', raise_error=True)
-        self.updater.bot = bot
+        self._setup_updater('', raise_error=True)
         d = self.updater.dispatcher
         d.addErrorHandler(self.errorHandlerTest)
         self.updater.start_polling(0.01)
@@ -310,8 +308,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addRemoveTypeHandler(self):
         print('Testing add/removeTypeHandler')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addTypeHandler(dict, self.stringHandlerTest)
         queue = self.updater.start_polling(0.01)
@@ -330,8 +327,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_runAsync(self):
         print('Testing @run_async')
-        bot = MockBot('Test5', messages=2)
-        self.updater.bot = bot
+        self._setup_updater('Test5', messages=2)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
             self.asyncHandlerTest)
@@ -342,7 +338,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_additionalArgs(self):
         print('Testing additional arguments for handlers')
-        self.updater.bot = MockBot('', messages=0)
+        self._setup_updater('', messages=0)
         self.updater.dispatcher.addStringCommandHandler(
             'test5', self.additionalArgsTest)
 
@@ -354,8 +350,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_regexGroupHandler(self):
         print('Testing optional groups and groupdict parameters')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
                                 self.regexGroupHandlerTest)
@@ -368,8 +363,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_runAsyncWithAdditionalArgs(self):
         print('Testing @run_async with additional parameters')
-        bot = MockBot('Test6', messages=2)
-        self.updater.bot = bot
+        self._setup_updater('Test6', messages=2)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
             self.asyncAdditionalHandlerTest)
@@ -380,8 +374,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_webhook(self):
         print('Testing Webhook')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
             self.telegramHandlerTest)
@@ -442,8 +435,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_webhook_no_ssl(self):
         print('Testing Webhook without SSL')
-        bot = MockBot('', messages=0)
-        self.updater.bot = bot
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
             self.telegramHandlerTest)
@@ -485,13 +477,24 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_idle(self):
         print('Testing idle')
-        self.updater.bot = MockBot('Test6', messages=0)
+        self._setup_updater('Test6', messages=0)
         self.updater.start_polling(poll_interval=0.01)
         Thread(target=self.signalsender).start()
         self.updater.idle()
         # If we get this far, idle() ran through
         sleep(1)
         self.updater.running = False
+
+    def test_createBot(self):
+        updater = Updater('123:abcd')
+        self.assertIsNotNone(updater.bot)
+
+    def test_mutualExclusiveTokenBot(self):
+        bot = Bot('123:zyxw')
+        self.assertRaises(ValueError, Updater, token='123:abcd', bot=bot)
+
+    def test_noTokenOrBot(self):
+        self.assertRaises(ValueError, Updater)
 
 
 class MockBot:

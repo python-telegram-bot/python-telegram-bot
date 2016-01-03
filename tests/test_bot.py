@@ -20,9 +20,14 @@
 """This module contains a object that represents Tests for Telegram Bot"""
 
 import os
-import unittest
 from datetime import datetime
 import sys
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -136,6 +141,34 @@ class BotTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(upf.photos[0][0].file_size, 12421)
+
+    def _test_invalid_token(self, token):
+        print('Testing invalid token: {0}'.format(token))
+        self.assertRaisesRegexp(telegram.TelegramError, 'Invalid token', telegram.Bot, token)
+
+    def testInvalidToken1(self):
+        self._test_invalid_token('123')
+
+    def testInvalidToken2(self):
+        self._test_invalid_token('12a:')
+
+    def testInvalidToken3(self):
+        self._test_invalid_token('12:')
+
+    def testUnauthToken(self):
+        print('Testing unauthorized token')
+        with self.assertRaisesRegexp(telegram.TelegramError, 'Unauthorized'):
+            bot = telegram.Bot('1234:abcd1234')
+            bot.getMe()
+
+    def testInvalidSrvResp(self):
+        print('Testing invalid server response')
+        with self.assertRaisesRegexp(telegram.TelegramError, 'Invalid server response'):
+            # bypass the valid token check
+            bot_cls = type('bot_cls', (telegram.Bot, ), {'_valid_token': lambda self, token: token})
+            bot = bot_cls('12')
+            bot.getMe()
+
 
 if __name__ == '__main__':
     unittest.main()

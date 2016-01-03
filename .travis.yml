@@ -9,6 +9,7 @@ python:
 install:
   - pip install pylint flake8 coveralls
   - pip install -r requirements.txt
+  - 'if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install unittest2; fi'
 script:
   - nosetests --with-coverage --cover-package telegram/
   - flake8 telegram

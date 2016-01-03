@@ -18,7 +18,22 @@
 
 """This module contains a object that represents a Telegram Error"""
 
-import re
+
+def _lstrip_str(in_s, lstr):
+    """
+    Args:
+        in_s (str): in string
+        lstr (str): substr to strip from left side
+
+    Returns:
+        str:
+
+    """
+    if in_s.startswith(lstr):
+        res = in_s[len(lstr):]
+    else:
+        res = in_s
+    return res
 
 
 class TelegramError(Exception):
@@ -26,16 +41,20 @@ class TelegramError(Exception):
 
     def __init__(self, message):
         """
+        Args:
+            message (str):
+
         Returns:
-            str:
+
         """
         super(TelegramError, self).__init__()
 
-        api_error = re.match(r'^Error: (?P<message>.*)', message)
-        if api_error:
-            self.message = api_error.group('message').capitalize()
-        else:
-            self.message = message
+        msg = _lstrip_str(message, 'Error: ')
+        msg = _lstrip_str(msg, '[Error]: ')
+        if msg != message:
+            # api_error - capitalize the msg...
+            msg = msg.capitalize()
+        self.message = msg
 
     def __str__(self):
         return '%s' % (self.message)
