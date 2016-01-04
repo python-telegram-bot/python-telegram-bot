@@ -1,5 +1,5 @@
-telegram.sticker module
-=======================
+telegram.jobqueue module
+========================
 
 .. automodule:: telegram.jobqueue
     :members:
