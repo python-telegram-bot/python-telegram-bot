@@ -130,6 +130,7 @@ class Dispatcher:
         self.bot = bot
         self.update_queue = update_queue
         self.telegram_message_handlers = []
+        self.telegram_inline_handlers = []
         self.telegram_command_handlers = {}
         self.telegram_regex_handlers = {}
         self.string_regex_handlers = {}
@@ -236,21 +237,23 @@ class Dispatcher:
             handled = True
 
         # Telegram update (regex)
-        if isinstance(update, Update):
+        if isinstance(update, Update) and update.message is not None:
             self.dispatchRegex(update)
             handled = True
 
-        # Telegram update (command)
-        if isinstance(update, Update) \
-                and update.message.text.startswith('/'):
-            self.dispatchTelegramCommand(update)
-            handled = True
+            # Telegram update (command)
+            if update.message.text.startswith('/'):
+                self.dispatchTelegramCommand(update)
 
-        # Telegram update (message)
-        elif isinstance(update, Update):
-            self.dispatchTelegramMessage(update)
-            handled = True
-
+            # Telegram update (message)
+            else:
+                self.dispatchTelegramMessage(update)
+                handled = True
+        elif isinstance(update, Update) and \
+                (update.inline_query is not None or
+                 update.chosen_inline_result is not None):
+                self.dispatchTelegramInline(update)
+                handled = True
         # Update not recognized
         if not handled:
             self.dispatchError(update, TelegramError(
@@ -267,6 +270,17 @@ class Dispatcher:
         """
 
         self.telegram_message_handlers.append(handler)
+
+    def addTelegramInlineHandler(self, handler):
+        """
+        Registers an inline query handler in the Dispatcher.
+
+        Args:
+            handler (function): A function that takes (Bot, Update, *args) as
+                arguments.
+        """
+
+        self.telegram_inline_handlers.append(handler)
 
     def addTelegramCommandHandler(self, command, handler):
         """
@@ -396,6 +410,17 @@ class Dispatcher:
 
         if handler in self.telegram_message_handlers:
             self.telegram_message_handlers.remove(handler)
+
+    def removeTelegramInlineHandler(self, handler):
+        """
+        De-registers an inline query handler.
+
+        Args:
+            handler (any):
+        """
+
+        if handler in self.telegram_inline_handlers:
+            self.telegram_inline_handlers.remove(handler)
 
     def removeTelegramCommandHandler(self, command, handler):
         """
@@ -573,6 +598,17 @@ class Dispatcher:
         """
 
         self.dispatchTo(self.telegram_message_handlers, update)
+
+    def dispatchTelegramInline(self, update):
+        """
+        Dispatches an update that contains an inline update.
+
+        Args:
+            update (telegram.Update): The Telegram update that contains the
+                message.
+        """
+
+        self.dispatchTo(self.telegram_inline_handlers, update)
 
     def dispatchError(self, update, error):
         """

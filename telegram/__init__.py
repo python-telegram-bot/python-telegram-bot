@@ -46,6 +46,10 @@ from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .message import Message
+from .inlinequery import InlineQuery
+from .choseninlineresult import ChosenInlineResult
+from .inlinequeryresult import InlineQueryResultArticle, InlineQueryResultGif,\
+    InlineQueryResultMpeg4Gif, InlineQueryResultPhoto, InlineQueryResultVideo
 from .update import Update
 from .bot import Bot
 from .dispatcher import Dispatcher
@@ -57,4 +61,7 @@ __all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
            'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
            'Audio', 'PhotoSize', 'Chat', 'Update', 'ParseMode', 'Message',
-           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue']
+           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue',
+           'InlineQuery', 'ChosenInlineResult', 'InlineQueryResultArticle',
+           'InlineQueryResultGif', 'InlineQueryResultPhoto',
+           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo']
