@@ -57,11 +57,13 @@ Table of contents
   
   2. `API`_
   
-  3. `Logging`_
+  3. `JobQueue`_
 
-  4. `Examples`_
+  4. `Logging`_
 
-  5. `Documentation`_
+  5. `Examples`_
+
+  6. `Documentation`_
 
 - `License`_
 
@@ -298,6 +300,40 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
+-----------
+_`JobQueue`
+-----------
+
+The ``JobQueue`` allows you to perform tasks with a delay or even periodically::
+
+    >>> from telegram import Bot, JobQueue
+    >>> bot = Bot('TOKEN')
+    >>> j = JobQueue(bot)
+
+If you're using the ``Updater``, use the bot created by it instead::
+
+    >>> from telegram import Updater, JobQueue
+    >>> updater = Updater('TOKEN')
+    >>> j = JobQueue(updater.bot)
+
+The job queue uses functions for tasks, so we define one and add it to the queue::
+
+    >>> def job1(bot):
+    ...     bot.sendMessage(chat_id='@examplechannel', text='One message every minute')
+    >>> j.put(job1, 60, next_t=0)
+
+You can also have a job that will not be executed repeatedly::
+
+    >>> def job2(bot):
+    ...     bot.sendMessage(chat_id='@examplechannel', text='A single message with 30s delay')
+    >>> j.put(job2, 30, repeat=False)
+
+Now, all you have to do is to start the queue. It runs in a seperate thread, so the ``start()`` call is non-blocking.::
+
+    >>> j.start()
+    [...]
+    >>> j.stop()
+
 ----------
 _`Logging`
 ----------
@@ -321,6 +357,8 @@ Here follows some examples to help you to get your own Bot up to speed:
 - `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
 
 - `clibot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/clibot.py>`_ has a command line interface.
+
+- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the ``JobQueue`` to send timed messages.
 
 - `Welcome Bot <https://github.com/jh0ker/welcomebot>`_ greets everyone who joins a group chat.
 
