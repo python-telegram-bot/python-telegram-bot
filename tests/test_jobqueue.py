@@ -76,8 +76,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         print('Testing basic job queue function')
         self.jq.put(self.job1, 0.1)
         self.jq.start()
-        sleep(1.05)
-        self.assertEqual(10, self.result)
+        sleep(1.5)
+        self.assertGreaterEqual(self.result, 10)
 
     def test_noRepeat(self):
         print('Testing job queue without repeat')
