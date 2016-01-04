@@ -25,9 +25,9 @@ import time
 from threading import Thread, Lock
 
 try:
-    from queue import Queue, PriorityQueue
+    from queue import PriorityQueue
 except ImportError:
-    from Queue import Queue, PriorityQueue
+    from Queue import PriorityQueue
 
 
 class JobQueue(object):
@@ -81,8 +81,7 @@ class JobQueue(object):
 
         next_t += time.time()
 
-        self.logger.debug("Putting a {} with t={}".format(
-                job.name, next_t))
+        self.logger.debug("Putting a %s with t=%f" % (job.name, next_t))
         self.queue.put((next_t, job))
 
     def tick(self):
@@ -91,20 +90,19 @@ class JobQueue(object):
         """
         now = time.time()
 
-        self.logger.debug("Ticking jobs with t={}".format(now))
+        self.logger.debug("Ticking jobs with t=%f" % now)
         while not self.queue.empty():
             t, j = self.queue.queue[0]
-            self.logger.debug("Peeked at {} with t={}".format(
-                    j.name, t))
+            self.logger.debug("Peeked at %s with t=%f" % (j.name, t))
 
             if t < now:
                 self.queue.get()
-                self.logger.info("Running job {}".format(j.name))
+                self.logger.info("Running job %s" % j.name)
                 try:
                     j.run(self.bot)
                 except:
                     self.logger.exception("An uncaught error was raised while "
-                                          "executing job {}".format(j.name))
+                                          "executing job %s" % j.name)
                 if j.repeat:
                     self.put(j.run, j.interval)
                 continue
