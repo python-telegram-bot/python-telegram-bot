@@ -585,6 +585,56 @@ class Bot(TelegramObject):
         return url, data
 
     @log
+    def answerInlineQuery(self,
+                          inline_query_id,
+                          results,
+                          cache_time=None,
+                          is_personal=None,
+                          next_offset=None):
+        """Use this method to reply to an inline query.
+
+        Args:
+            inline_query_id (int):
+                Unique identifier for answered query
+            results (list[InlineQueryResult]):
+                A list of results for the inline query
+
+        Keyword Args:
+            cache_time (Optional[int]): The maximum amount of time the result
+                of the inline query may be cached on the server
+            is_personal (Optional[bool]): Pass True, if results may be cached
+                on the server side only for the user that sent the query. By
+                default, results may be returned to any user who sends the same
+                query
+            next_offset (Optional[str]): Pass the offset that a client should
+                send in the next query with the same text to receive more
+                results. Pass an empty string if there are no more results or
+                if you don't support pagination. Offset length can't exceed 64
+                bytes.
+
+        Returns:
+            A boolean if answering was successful
+        """
+
+        url = '%s/answerInlineQuery' % self.base_url
+
+        results = [res.to_dict() for res in results]
+
+        data = {'inline_query_id': inline_query_id,
+                'results': results}
+
+        if cache_time is not None:
+            data['cache_time'] = cache_time
+        if is_personal is not None:
+            data['is_personal'] = is_personal
+        if next_offset is not None:
+            data['next_offset'] = next_offset
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
     def getUserProfilePhotos(self,
                              user_id,
                              offset=None,

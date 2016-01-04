@@ -12,6 +12,9 @@ Submodules
    telegram.updater
    telegram.dispatcher
    telegram.jobqueue
+   telegram.inlinequery
+   telegram.inlinequeryresult
+   telegram.choseninlineresult
    telegram.chataction
    telegram.contact
    telegram.document
