@@ -187,7 +187,8 @@ class Dispatcher:
 
                 # All other errors should not stop the thread, just print them
                 except:
-                    self.logger.exception()
+                    self.logger.exception("An uncaught error was raised while "
+                                          "processing an update")
         else:
             self.__lock.release()
         self.logger.info('Dispatcher thread stopped')
