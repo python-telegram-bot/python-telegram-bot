@@ -22,12 +22,7 @@ This module contains a object that represents Tests for JobQueue
 """
 import logging
 import sys
-import re
-import os
-import signal
-from random import randrange
 from time import sleep
-from datetime import datetime
 
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
@@ -55,7 +50,7 @@ ch.setFormatter(formatter)
 root.addHandler(ch)
 
 
-class UpdaterTest(BaseTest, unittest.TestCase):
+class JobQueueTest(BaseTest, unittest.TestCase):
     """
     This object represents Tests for Updater, Dispatcher, WebhookServer and
     WebhookHandler
@@ -115,5 +110,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.jq.start()
         sleep(0.4)
         self.assertEqual(1, self.result)
+
 if __name__ == '__main__':
     unittest.main()
