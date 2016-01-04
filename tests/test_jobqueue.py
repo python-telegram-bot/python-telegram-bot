@@ -72,6 +72,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def job1(self, bot):
         self.result += 1
 
+    def job2(self, bot):
+        raise Exception("Test Error")
+
     def test_basic(self):
         print('Testing basic job queue function')
         self.jq.put(self.job1, 0.1)
@@ -95,5 +98,22 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(0.1)
         self.assertEqual(1, self.result)
 
+    def test_multiple(self):
+        print('Testing job queue with multiple jobs')
+        self.jq.put(self.job1, 0.1, repeat=False)
+        self.jq.put(self.job1, 0.2, repeat=False)
+        self.jq.put(self.job1, 0.4)
+        self.jq.start()
+        sleep(1)
+        self.assertEqual(4, self.result)
+
+    def test_error(self):
+        print('Testing job queue starting twice with an erroneous job')
+        self.jq.put(self.job2, 0.1)
+        self.jq.put(self.job1, 0.2)
+        self.jq.start()
+        self.jq.start()
+        sleep(0.4)
+        self.assertEqual(1, self.result)
 if __name__ == '__main__':
     unittest.main()
