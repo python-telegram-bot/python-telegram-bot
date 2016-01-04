@@ -62,7 +62,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     """
 
     def setUp(self):
-        self.jq = JobQueue("Bot", tick_interval=0.001)
+        self.jq = JobQueue("Bot", tick_interval=0.005)
         self.result = 0
 
     def tearDown(self):
