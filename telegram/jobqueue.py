@@ -31,7 +31,8 @@ except ImportError:
 
 
 class JobQueue(object):
-    """This class allows you to periodically perform tasks with the bot.
+    """
+    This class allows you to periodically perform tasks with the bot.
 
     Attributes:
         tick_interval (float):
@@ -55,7 +56,7 @@ class JobQueue(object):
         self.__lock = Lock()
         self.running = False
 
-    def put(self, run, interval, next_t=None):
+    def put(self, run, interval, repeat=True, next_t=None):
         """
         Queue a new job.
 
@@ -63,6 +64,7 @@ class JobQueue(object):
             run (function): A function that takes the parameter `bot`
             interval (float): The interval in seconds in which `run` should be
                 executed
+            repeat (Optional[bool]): If false, job will only be executed once
             next_t (Optional[float]): Time in seconds in which run should be
                 executed first. Defaults to `interval`
         """
@@ -72,6 +74,7 @@ class JobQueue(object):
         job.run = run
         job.interval = interval
         job.name = name
+        job.repeat = repeat
 
         if next_t is None:
             next_t = interval
@@ -96,9 +99,14 @@ class JobQueue(object):
 
             if t < now:
                 self.queue.get()
-                self.logger.debug("About time! running")
-                j.run(self.bot)
-                self.put(j.run, j.interval)
+                self.logger.info("Running job {}".format(j.name))
+                try:
+                    j.run(self.bot)
+                except:
+                    self.logger.exception("An uncaught error was raised while "
+                                          "executing job {}".format(j.name))
+                if j.repeat:
+                    self.put(j.run, j.interval)
                 continue
 
             self.logger.debug("Next task isn't due yet. Finished!")
@@ -115,6 +123,7 @@ class JobQueue(object):
             job_queue_thread = Thread(target=self._start,
                                       name="job_queue")
             job_queue_thread.start()
+            self.logger.info('Job Queue thread started')
         else:
             self.__lock.release()
 
@@ -127,6 +136,8 @@ class JobQueue(object):
             self.tick()
             time.sleep(self.tick_interval)
 
+        self.logger.info('Job Queue thread stopped')
+
     def stop(self):
         """
         Stops the thread
@@ -138,6 +149,7 @@ class JobQueue(object):
         """ Inner class that represents a job """
         interval = None
         name = None
+        repeat = None
 
         def run(self):
             pass
