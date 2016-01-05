@@ -48,8 +48,8 @@ from .message import Message
 from .update import Update
 from .bot import Bot
 from .dispatcher import Dispatcher
-from .updater import Updater
 from .jobqueue import JobQueue
+from .updater import Updater
 
 __all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
