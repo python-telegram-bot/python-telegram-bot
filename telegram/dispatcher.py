@@ -558,9 +558,6 @@ class Dispatcher:
         for t in self.type_handlers:
             if isinstance(update, t):
                 self.dispatchTo(self.type_handlers[t], update)
-        else:
-            self.dispatchError(update, TelegramError(
-                "Received update of unknown type %s" % type(update)))
 
     def dispatchTelegramMessage(self, update):
         """
