@@ -18,7 +18,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram import Updater, JobQueue
+from telegram import Updater
 import logging
 
 # Enable logging
@@ -65,8 +65,8 @@ def error(bot, update, error):
 def main():
     global job_queue
 
-    updater = Updater("TOKEN")
-    job_queue = JobQueue(updater.bot, tick_interval=1)
+    updater = Updater("148447715:AAFj2qskb3_sMMzlDhgTuoP7VAABNHpT0BU")
+    job_queue = updater.job_queue
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -79,9 +79,6 @@ def main():
     # log all errors
     dp.addErrorHandler(error)
 
-    # start the job queue
-    job_queue.start()
-
     # Start the Bot
     updater.start_polling()
 
@@ -89,9 +86,6 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-
-    # After that, also stop the job queue
-    job_queue.stop()
 
 if __name__ == '__main__':
     main()
