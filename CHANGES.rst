@@ -1,3 +1,12 @@
+**2016-01-05**
+
+*Released 3.2.0*
+
+- Introducing ``JobQueue`` (original author: @franciscod)
+- Streamlining all exceptions to ``TelegramError`` (Special thanks to @tsnoam)
+- Proper locking of ``Updater`` and ``Dispatcher`` ``start`` and ``stop`` methods
+- Small bugfixes
+
 **2015-12-29**
 
 *Released 3.1.2*
