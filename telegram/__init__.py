@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -19,7 +20,7 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.1.2'
+__version__ = '3.2.0'
 
 from .base import TelegramObject
 from .user import User
@@ -52,8 +53,8 @@ from .inlinequeryresult import InlineQueryResultArticle, InlineQueryResultGif,\
 from .update import Update
 from .bot import Bot
 from .dispatcher import Dispatcher
-from .updater import Updater
 from .jobqueue import JobQueue
+from .updater import Updater
 
 __all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',

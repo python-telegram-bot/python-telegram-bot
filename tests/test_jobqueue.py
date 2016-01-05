@@ -2,7 +2,8 @@
 # encoding: utf-8
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +37,7 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import JobQueue
+from telegram import JobQueue, Updater
 from tests.base import BaseTest
 
 # Enable logging
@@ -73,21 +74,18 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     def test_basic(self):
         print('Testing basic job queue function')
         self.jq.put(self.job1, 0.1)
-        self.jq.start()
         sleep(1.5)
         self.assertGreaterEqual(self.result, 10)
 
     def test_noRepeat(self):
         print('Testing job queue without repeat')
         self.jq.put(self.job1, 0.1, repeat=False)
-        self.jq.start()
         sleep(0.5)
         self.assertEqual(1, self.result)
 
     def test_nextT(self):
         print('Testing job queue with a set next_t value')
         self.jq.put(self.job1, 0.1, next_t=0.5)
-        self.jq.start()
         sleep(0.45)
         self.assertEqual(0, self.result)
         sleep(0.1)
@@ -98,7 +96,6 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.jq.put(self.job1, 0.1, repeat=False)
         self.jq.put(self.job1, 0.2, repeat=False)
         self.jq.put(self.job1, 0.4)
-        self.jq.start()
         sleep(1)
         self.assertEqual(4, self.result)
 
@@ -107,7 +104,16 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.jq.put(self.job2, 0.1)
         self.jq.put(self.job1, 0.2)
         self.jq.start()
-        self.jq.start()
+        sleep(0.4)
+        self.assertEqual(1, self.result)
+
+    def test_inUpdater(self):
+        print('Testing job queue created by updater')
+        u = Updater(bot="MockBot", job_queue_tick_interval=0.005)
+        u.job_queue.put(self.job1, 0.1)
+        sleep(0.15)
+        self.assertEqual(1, self.result)
+        u.stop()
         sleep(0.4)
         self.assertEqual(1, self.result)
 

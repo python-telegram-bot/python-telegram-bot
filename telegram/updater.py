@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -29,7 +30,7 @@ from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
-                      NullHandler)
+                      NullHandler, JobQueue)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 # Adjust for differences in Python versions
@@ -74,7 +75,12 @@ class Updater:
         ValueError: If both `token` and `bot` are passed or none of them.
     """
 
-    def __init__(self, token=None, base_url=None, workers=4, bot=None):
+    def __init__(self,
+                 token=None,
+                 base_url=None,
+                 workers=4,
+                 bot=None,
+                 job_queue_tick_interval=1.0):
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
@@ -85,6 +91,7 @@ class Updater:
         else:
             self.bot = Bot(token, base_url)
         self.update_queue = Queue()
+        self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
         self.dispatcher = Dispatcher(self.bot, self.update_queue,
                                      workers=workers)
         self.last_update_id = 0
@@ -257,9 +264,10 @@ class Updater:
 
     def stop(self):
         """
-        Stops the polling/webhook thread and the dispatcher
+        Stops the polling/webhook thread, the dispatcher and the job queue
         """
 
+        self.job_queue.stop()
         with self.__lock:
             if self.running:
                 self.running = False

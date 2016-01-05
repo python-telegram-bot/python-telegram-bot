@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -56,17 +57,24 @@ class JobQueue(object):
         self.__lock = Lock()
         self.running = False
 
-    def put(self, run, interval, repeat=True, next_t=None):
+    def put(self,
+            run,
+            interval,
+            repeat=True,
+            next_t=None,
+            prevent_autostart=False):
         """
-        Queue a new job.
+        Queue a new job. If the JobQueue is not running, it will be started.
 
         Args:
             run (function): A function that takes the parameter `bot`
             interval (float): The interval in seconds in which `run` should be
                 executed
-            repeat (Optional[bool]): If false, job will only be executed once
+            repeat (Optional[bool]): If `False`, job will only be executed once
             next_t (Optional[float]): Time in seconds in which run should be
                 executed first. Defaults to `interval`
+            prevent_autostart (Optional[bool]): If `True`, the job queue will
+                not be started automatically if it is not running.
         """
         name = run.__name__
 
@@ -83,6 +91,10 @@ class JobQueue(object):
 
         self.logger.debug("Putting a %s with t=%f" % (job.name, next_t))
         self.queue.put((next_t, job))
+
+        if not self.running and not prevent_autostart:
+            self.logger.info("Auto-starting JobQueue")
+            self.start()
 
     def tick(self):
         """

@@ -304,23 +304,17 @@ There are many more API methods, to read the full API documentation::
 _`JobQueue`
 -----------
 
-The ``JobQueue`` allows you to perform tasks with a delay or even periodically::
+The ``JobQueue`` allows you to perform tasks with a delay or even periodically. The ``Updater`` will create one for you::
 
-    >>> from telegram import Bot, JobQueue
-    >>> bot = Bot('TOKEN')
-    >>> j = JobQueue(bot)
+    >>> from telegram import Updater
+    >>> u = Updater('TOKEN')
+    >>> j = u.job_queue
 
-If you're using the ``Updater``, use the bot created by it instead::
-
-    >>> from telegram import Updater, JobQueue
-    >>> updater = Updater('TOKEN')
-    >>> j = JobQueue(updater.bot)
-
-The job queue uses functions for tasks, so we define one and add it to the queue::
+The job queue uses functions for tasks, so we define one and add it to the queue. Usually, when the first job is added to the queue, it wil start automatically. We can prevent this by setting ``prevent_autostart=True``::
 
     >>> def job1(bot):
     ...     bot.sendMessage(chat_id='@examplechannel', text='One message every minute')
-    >>> j.put(job1, 60, next_t=0)
+    >>> j.put(job1, 60, next_t=0, prevent_autostart=True)
 
 You can also have a job that will not be executed repeatedly::
 
@@ -328,10 +322,12 @@ You can also have a job that will not be executed repeatedly::
     ...     bot.sendMessage(chat_id='@examplechannel', text='A single message with 30s delay')
     >>> j.put(job2, 30, repeat=False)
 
-Now, all you have to do is to start the queue. It runs in a seperate thread, so the ``start()`` call is non-blocking.::
+Now, because we didn't prevent the auto start this time, the queue will start ticking. It runs in a seperate thread, so it is non-blocking. When we stop the Updater, the related queue will be stopped as well::
 
-    >>> j.start()
-    [...]
+    >>> u.stop()
+
+We can also stop the job queue by itself::
+
     >>> j.stop()
 
 ----------
