@@ -90,7 +90,7 @@ class Updater:
         else:
             self.bot = Bot(token, base_url)
         self.update_queue = Queue()
-        self.job_queue = JobQueue(bot, job_queue_tick_interval)
+        self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
         self.dispatcher = Dispatcher(self.bot, self.update_queue,
                                      workers=workers)
         self.last_update_id = 0
