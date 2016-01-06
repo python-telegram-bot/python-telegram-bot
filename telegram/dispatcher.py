@@ -26,6 +26,7 @@ from functools import wraps
 from inspect import getargspec
 from threading import Thread, BoundedSemaphore, Lock
 from re import match
+from time import sleep
 
 from telegram import (TelegramError, Update, NullHandler)
 
@@ -175,6 +176,7 @@ class Dispatcher:
                     update = self.update_queue.get()
 
                     if type(update) is self._Stop:
+                        self.running = False
                         break
 
                     self.processUpdate(update)
@@ -200,8 +202,9 @@ class Dispatcher:
         """
         with self.__lock:
             if self.running:
-                self.running = False
                 self.update_queue.put(self._Stop())
+                while self.running:
+                    sleep(0.1)
 
     def processUpdate(self, update):
         """
