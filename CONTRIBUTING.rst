@@ -20,15 +20,15 @@ Setting things up
 
 4. Install dependencies:
 
-  ``$ pip install -r requirements.txt``
+   ``$ pip install -r requirements.txt``
 
-  ``$ pip install -r requirements-dev.txt``
+   ``$ pip install -r requirements-dev.txt``
 
 5. In order to run tests you need to set the following environment variables:
 
-  ``$ export CHAT_ID=your-chat-id``
+   ``$ export CHAT_ID=your-chat-id``
 
-  ``$ export TOKEN=your-bot-token``
+   ``$ export TOKEN=your-bot-token``
 
 Finding something to do
 -----------------------
@@ -72,13 +72,13 @@ Here's how to make a one-off code change.
 
    - Before making a commit ensure that all automated tests still pass:
 
-     ``$ make test``
+      ``$ make test``
 
    - To actually make the commit and push it to your GitHub fork, run:
 
-     ``$ git commit -a -m "your-commit-message-here"``
+      ``$ git commit -a -m "your-commit-message-here"``
 
-     ``$ git push origin your-branch-name``
+      ``$ git push origin your-branch-name``
 
 4. **When your feature is ready to merge, create a pull request.**
 
