@@ -7,8 +7,9 @@ python:
   - "pypy"
   - "pypy3"
 install:
-  - pip install pylint flake8 coveralls
+  - pip install coveralls
   - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
   - 'if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install unittest2; fi'
 script:
   - nosetests --with-coverage --cover-package telegram/
