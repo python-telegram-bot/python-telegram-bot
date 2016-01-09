@@ -108,6 +108,8 @@ class Dispatcher:
             a list that contains the content of the message split on spaces,
             except the first word (usually the command).
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
+            For updates that contain inline queries, they will contain the
+            whole query split on spaces.
             For other updates, args will be None
 
     For regex-based handlers, you can also request information about the match.
@@ -658,8 +660,10 @@ class Dispatcher:
             target_kwargs['update_queue'] = self.update_queue
 
         if is_async or 'args' in fargs:
-            if isinstance(update, Update):
+            if isinstance(update, Update) and update.message:
                 args = update.message.text.split(' ')[1:]
+            elif isinstance(update, Update) and update.inline_query:
+                args = update.inline_query.query.split(' ')
             elif isinstance(update, str):
                 args = update.split(' ')[1:]
             else:
