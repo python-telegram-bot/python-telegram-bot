@@ -34,6 +34,10 @@ A Python wrapper around the Telegram Bot API.
 .. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
    :alt: Coveralls
+   
+.. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
+   :target: https://telegram.me/joinchat/ALnA-AJQm5R7Km9hdCgyng
+   :alt: Telegram Group
 
 =================
 Table of contents
