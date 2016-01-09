@@ -1,3 +1,9 @@
+**2016-01-09**
+
+*Released 3.3b1*
+
+- Implement inline bots (beta)
+
 **2016-01-05**
 
 *Released 3.2.0*

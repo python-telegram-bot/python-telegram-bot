@@ -20,7 +20,7 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.2.0'
+__version__ = '3.3b1'
 
 from .base import TelegramObject
 from .user import User
