@@ -32,7 +32,7 @@ class InlineQueryResult(TelegramObject):
 
     Args:
         type (str):
-        id (str):
+        id (str): Unique identifier for this result, 1-64 Bytes
 
     """
 
@@ -75,7 +75,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_height (int):
 
     Args:
-        id (str):
+        id (str): Unique identifier for this result, 1-64 Bytes
         title (str):
         message_text (str):
 
@@ -147,14 +147,14 @@ class InlineQueryResultPhoto(InlineQueryResult):
         disable_web_page_preview (bool):
 
     Args:
-        id (str):
+        id (str): Unique identifier for this result, 1-64 Bytes
         photo_url (str):
+        thumb_url (str):
 
     Keyword Args:
         mime_type (Optional[str]):
         photo_width (Optional[int]):
         photo_height (Optional[int]):
-        thumb_url (Optional[str]):
         title (Optional[str]):
         description (Optional[str]):
         caption (Optional[str]):
@@ -166,10 +166,12 @@ class InlineQueryResultPhoto(InlineQueryResult):
     def __init__(self,
                  id,
                  photo_url,
+                 thumb_url,
                  **kwargs):
         # Required
         super(InlineQueryResultPhoto, self).__init__('photo', id)
         self.photo_url = photo_url
+        self.thumb_url = thumb_url
 
         # Optional
         self.mime_type = kwargs.get('mime_type', 'image/jpeg')
@@ -177,7 +179,6 @@ class InlineQueryResultPhoto(InlineQueryResult):
             self.photo_width = int(kwargs['photo_width'])
         if 'photo_height' in kwargs:
             self.photo_height = int(kwargs['photo_height'])
-        self.thumb_url = kwargs.get('thumb_url', '')
         self.title = kwargs.get('title', '')
         self.description = kwargs.get('description', '')
         self.caption = kwargs.get('caption', '')
@@ -217,13 +218,13 @@ class InlineQueryResultGif(InlineQueryResult):
         disable_web_page_preview (bool):
 
     Args:
-        id (str):
+        id (str): Unique identifier for this result, 1-64 Bytes
         gif_url (str):
+        thumb_url (str):
 
     Keyword Args:
         gif_width (Optional[int]):
         gif_height (Optional[int]):
-        thumb_url (Optional[str]):
         title (Optional[str]):
         caption (Optional[str]):
         message_text (Optional[str]):
@@ -234,17 +235,18 @@ class InlineQueryResultGif(InlineQueryResult):
     def __init__(self,
                  id,
                  gif_url,
+                 thumb_url,
                  **kwargs):
         # Required
         super(InlineQueryResultGif, self).__init__('gif', id)
         self.gif_url = gif_url
+        self.thumb_url = thumb_url
 
         # Optional
         if 'gif_width' in kwargs:
             self.gif_width = int(kwargs['gif_width'])
         if 'gif_height' in kwargs:
             self.gif_height = int(kwargs['gif_height'])
-        self.thumb_url = kwargs.get('thumb_url', '')
         self.title = kwargs.get('title', '')
         self.caption = kwargs.get('caption', '')
         self.message_text = kwargs.get('message_text', '')
@@ -283,13 +285,13 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         disable_web_page_preview (bool):
 
     Args:
-        id (str):
+        id (str): Unique identifier for this result, 1-64 Bytes
         mpeg4_url (str):
+        thumb_url (str):
 
     Keyword Args:
         mpeg4_width (Optional[int]):
         mpeg4_height (Optional[int]):
-        thumb_url (Optional[str]):
         title (Optional[str]):
         caption (Optional[str]):
         message_text (Optional[str]):
@@ -300,17 +302,18 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     def __init__(self,
                  id,
                  mpeg4_url,
+                 thumb_url,
                  **kwargs):
         # Required
         super(InlineQueryResultMpeg4Gif, self).__init__('mpeg4_gif', id)
         self.mpeg4_url = mpeg4_url
+        self.thumb_url = thumb_url
 
         # Optional
         if 'mpeg4_width' in kwargs:
             self.mpeg4_width = int(kwargs['mpeg4_width'])
         if 'mpeg4_height' in kwargs:
             self.mpeg4_height = int(kwargs['mpeg4_height'])
-        self.thumb_url = kwargs.get('thumb_url', '')
         self.title = kwargs.get('title', '')
         self.caption = kwargs.get('caption', '')
         self.message_text = kwargs.get('message_text', '')
@@ -352,19 +355,19 @@ class InlineQueryResultVideo(InlineQueryResult):
         disable_web_page_preview (bool):
 
     Args:
-        id (str):
+        id (str): Unique identifier for this result, 1-64 Bytes
         video_url (str):
         mime_type (str):
+        thumb_url (str):
+        title (str):
+        message_text (str):
 
     Keyword Args:
         video_width (Optional[int]):
         video_height (Optional[int]):
         video_duration (Optional[int]):
-        thumb_url (Optional[str]):
-        title (Optional[str]):
         description (Optional[str]):
         caption (Optional[str]):
-        message_text (Optional[str]):
         parse_mode (Optional[str]):
         disable_web_page_preview (Optional[bool]):
     """
@@ -373,11 +376,17 @@ class InlineQueryResultVideo(InlineQueryResult):
                  id,
                  video_url,
                  mime_type,
+                 thumb_url,
+                 title,
+                 message_text,
                  **kwargs):
         # Required
         super(InlineQueryResultVideo, self).__init__('video', id)
         self.video_url = video_url
         self.mime_type = mime_type
+        self.thumb_url = thumb_url
+        self.title = title
+        self.message_text = message_text
 
         # Optional
         if 'video_width' in kwargs:
@@ -386,11 +395,8 @@ class InlineQueryResultVideo(InlineQueryResult):
             self.video_height = int(kwargs['video_height'])
         if 'video_duration' in kwargs:
             self.video_duration = int(kwargs['video_duration'])
-        self.thumb_url = kwargs.get('thumb_url', '')
-        self.title = kwargs.get('title', '')
         self.description = kwargs.get('description', '')
         self.caption = kwargs.get('caption', '')
-        self.message_text = kwargs.get('message_text', '')
         self.parse_mode = kwargs.get('parse_mode', '')
         self.disable_web_page_preview = kwargs.get('disable_web_page_preview',
                                                    False)
