@@ -275,11 +275,11 @@ To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/
 
     >>> bot.sendMessage(chat_id=chat_id, text=telegram.Emoji.PILE_OF_POO)
 
-To post an image file via URL (right now only sendPhoto supports this)::
+To post an image file via URL::
 
     >>> bot.sendPhoto(chat_id=chat_id, photo='https://telegram.org/img/t_logo.png')
 
-To post a voice file::
+To post a voice file from disk::
 
     >>> bot.sendVoice(chat_id=chat_id, voice=open('tests/telegram.ogg', 'rb'))
 
