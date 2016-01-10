@@ -96,7 +96,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(document.file_id, str))
         self.assertNotEqual(document.file_id, '')
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
-        self.assertEqual(document.file_name, 'image.gif')
+        self.assertEqual(document.file_name, 'fff.gif')
         self.assertEqual(document.mime_type, 'image/gif')
         self.assertEqual(document.file_size, 3878)
 
