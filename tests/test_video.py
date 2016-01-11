@@ -34,6 +34,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.video_file = open('tests/data/telegram.mp4', 'rb')
         self.video_file_id = 'BAADAQADXwADHyP1BwJFTcmY2RYCAg'
+        self.video_file_url = 'https://github.com/python-telegram-bot/python-telegram-bot/blob/urls/tests/data/telegram.mp4'
         self.width = 360
         self.height = 640
         self.duration = 4
@@ -136,6 +137,28 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.thumb, None)
         self.assertEqual(video.mime_type, '')
         self.assertEqual(video.file_size, self.file_size)
+
+        self.assertEqual(message.caption, self.caption)
+
+    def test_send_video_mp4_file_url(self):
+        """Test telegram.Bot sendVideo method"""
+        print('Testing bot.sendVideo - MP4 File by URL')
+
+        message = self._bot.sendVideo(chat_id=self._chat_id,
+                                      video=self.video_file_url,
+                                      duration=self.duration,
+                                      caption=self.caption)
+
+        video = message.video
+
+        self.assertTrue(isinstance(video.file_id, str))
+        self.assertNotEqual(video.file_id, '')
+        self.assertEqual(video.width, 0)
+        self.assertEqual(video.height, 0)
+        self.assertEqual(video.duration, self.duration)
+        self.assertEqual(video.thumb, None)
+        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.file_size, 36315)
 
         self.assertEqual(message.caption, self.caption)
 

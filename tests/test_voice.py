@@ -34,6 +34,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.voice_file = open('tests/data/telegram.ogg', 'rb')
         self.voice_file_id = 'AwADAQADTgADHyP1B_mbw34svXPHAg'
+        self.voice_file_url = 'https://github.com/python-telegram-bot/python-telegram-bot/blob/urls/tests/data/telegram.ogg'
         self.duration = 0
         self.mime_type = 'audio/ogg'
         self.file_size = 9199
@@ -110,6 +111,22 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.duration, self.duration)
         self.assertEqual(voice.mime_type, self.mime_type)
         self.assertEqual(voice.file_size, self.file_size)
+
+    def test_send_voice_ogg_url_file(self):
+        """Test telegram.Bot sendVoice method"""
+        print('Testing bot.sendVoice - Ogg File by URL')
+
+        message = self._bot.sendVoice(chat_id=self._chat_id,
+                                      voice=self.voice_file_url,
+                                      duration=self.duration)
+
+        voice = message.voice
+
+        self.assertTrue(isinstance(voice.file_id, str))
+        self.assertNotEqual(voice.file_id, '')
+        self.assertEqual(voice.duration, self.duration)
+        self.assertEqual(voice.mime_type, self.mime_type)
+        self.assertEqual(voice.file_size, 36316)
 
     def test_send_voice_resend(self):
         """Test telegram.Bot sendVoice method"""
