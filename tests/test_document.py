@@ -34,7 +34,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.document_file = open('tests/data/telegram.png', 'rb')
         self.document_file_id = 'BQADAQADpAADHyP1B04ipZxJTe2BAg'
-        self.document_file_url = 'https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/data/telegram.gif'
+        self.document_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.gif'
         self.thumb = {'width': 90,
                       'height': 90,
                       'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
@@ -96,9 +96,9 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(document.file_id, str))
         self.assertNotEqual(document.file_id, '')
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
-        self.assertEqual(document.file_name, 'fff.gif')
+        self.assertEqual(document.file_name, 'telegram.gif')
         self.assertEqual(document.mime_type, 'image/gif')
-        self.assertEqual(document.file_size, self.file_size)
+        self.assertEqual(document.file_size, 3878)
 
     def test_send_document_resend(self):
         """Test telegram.Bot sendDocument method"""

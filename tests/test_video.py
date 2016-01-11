@@ -34,7 +34,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.video_file = open('tests/data/telegram.mp4', 'rb')
         self.video_file_id = 'BAADAQADXwADHyP1BwJFTcmY2RYCAg'
-        self.video_file_url = 'https://github.com/python-telegram-bot/python-telegram-bot/blob/urls/tests/data/telegram.mp4'
+        self.video_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp4'
         self.width = 360
         self.height = 640
         self.duration = 4

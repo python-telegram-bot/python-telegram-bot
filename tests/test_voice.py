@@ -34,7 +34,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.voice_file = open('tests/data/telegram.ogg', 'rb')
         self.voice_file_id = 'AwADAQADTgADHyP1B_mbw34svXPHAg'
-        self.voice_file_url = 'https://github.com/python-telegram-bot/python-telegram-bot/blob/urls/tests/data/telegram.ogg'
+        self.voice_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.ogg'
         self.duration = 0
         self.mime_type = 'audio/ogg'
         self.file_size = 9199

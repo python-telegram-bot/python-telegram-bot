@@ -34,7 +34,7 @@ class AudioTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.audio_file = open('tests/data/telegram.mp3', 'rb')
         self.audio_file_id = 'BQADAQADDwADHyP1B6PSPq2HjX8kAg'
-        self.audio_file_url = 'https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/data/telegram.mp3'
+        self.audio_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp3'
         self.duration = 4
         self.performer = 'Leandro Toledo'
         self.title = 'Teste'
