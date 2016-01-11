@@ -148,7 +148,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, 36320)
+        self.assertEqual(audio.file_size, self.file_size)
 
     def test_send_audio_resend(self):
         """Test telegram.Bot sendAudio method"""

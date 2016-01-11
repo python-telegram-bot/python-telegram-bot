@@ -126,7 +126,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(voice.file_id, '')
         self.assertEqual(voice.duration, self.duration)
         self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, 36316)
+        self.assertEqual(voice.file_size, self.file_size)
 
     def test_send_voice_resend(self):
         """Test telegram.Bot sendVoice method"""
