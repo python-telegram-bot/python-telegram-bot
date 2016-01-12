@@ -85,7 +85,7 @@ class InputFile(object):
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
                 self.filename = os.path.basename(self.input_file.url)\
-                                .split('?')[0].split('&')[0]
+                    .split('?')[0].split('&')[0]
 
             try:
                 self.mimetype = InputFile.is_image(self.input_file_content)
