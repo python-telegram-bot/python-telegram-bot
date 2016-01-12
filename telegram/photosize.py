@@ -47,7 +47,7 @@ class PhotoSize(TelegramObject):
                  height,
                  **kwargs):
         # Required
-        self.file_id = file_id
+        self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
         # Optionals
