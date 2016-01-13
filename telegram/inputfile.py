@@ -77,22 +77,23 @@ class InputFile(object):
             from_url = False
 
         if isinstance(self.input_file, file) or from_url:
+            self.filename = None
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
             elif isinstance(self.input_file, file):
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
-                self.filename = self.input_file.url.split('/')[-1].split('?')[0].split('&')[0]
+                self.filename = os.path.basename(self.input_file.url)\
+                    .split('?')[0].split('&')[0]
 
             try:
                 self.mimetype = InputFile.is_image(self.input_file_content)
-                if 'filename' not in dir(self):
+                if not self.filename or '.' not in self.filename:
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
                 self.mimetype = mimetypes.guess_type(self.filename)[0] or \
                     DEFAULT_MIME_TYPE
-
 
     @property
     def headers(self):
