@@ -19,9 +19,6 @@
 
 """A library that provides a Python interface to the Telegram Bot API"""
 
-__author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.2.0'
-
 from .base import TelegramObject
 from .user import User
 from .chat import Chat
@@ -52,6 +49,8 @@ from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
 from .updater import Updater
 
+__author__ = 'devs@python-telegram-bot.org'
+__version__ = '3.2.0'
 __all__ = ('Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
