@@ -27,6 +27,7 @@ try:
 except ImportError:
     from mimetools import choose_boundary
     from urllib2 import urlopen
+
 import mimetypes
 import os
 import sys
@@ -69,19 +70,30 @@ class InputFile(object):
             self.input_name = 'certificate'
             self.input_file = data.pop('certificate')
 
-        if isinstance(self.input_file, file):
+        if str(self.input_file).startswith('http'):
+            from_url = True
+            self.input_file = urlopen(self.input_file)
+        else:
+            from_url = False
+
+        if isinstance(self.input_file, file) or from_url:
+            self.filename = None
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
-            else:
+            elif isinstance(self.input_file, file):
                 self.filename = os.path.basename(self.input_file.name)
-            self.mimetype = mimetypes.guess_type(self.filename)[0] or \
-                DEFAULT_MIME_TYPE
+            elif from_url:
+                self.filename = os.path.basename(self.input_file.url)\
+                    .split('?')[0].split('&')[0]
 
-        if 'http' in self.input_file:
-            self.input_file_content = urlopen(self.input_file).read()
-            self.mimetype = InputFile.is_image(self.input_file_content)
-            self.filename = self.mimetype.replace('/', '.')
+            try:
+                self.mimetype = InputFile.is_image(self.input_file_content)
+                if not self.filename or '.' not in self.filename:
+                    self.filename = self.mimetype.replace('/', '.')
+            except TelegramError:
+                self.mimetype = mimetypes.guess_type(self.filename)[0] or \
+                    DEFAULT_MIME_TYPE
 
     @property
     def headers(self):
@@ -185,10 +197,7 @@ class InputFile(object):
             if file_type:
                 file_content = data[file_type[0]]
 
-                if file_type[0] == 'photo' or file_type[0] == 'document':
-                    return isinstance(file_content, file) or \
-                        str(file_content).startswith('http')
-
-                return isinstance(file_content, file)
+                return isinstance(file_content, file) or \
+                    str(file_content).startswith('http')
 
         return False

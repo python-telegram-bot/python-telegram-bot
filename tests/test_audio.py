@@ -34,6 +34,7 @@ class AudioTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.audio_file = open('tests/data/telegram.mp3', 'rb')
         self.audio_file_id = 'BQADAQADDwADHyP1B6PSPq2HjX8kAg'
+        self.audio_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp3'
         self.duration = 4
         self.performer = 'Leandro Toledo'
         self.title = 'Teste'
@@ -118,6 +119,26 @@ class AudioTest(BaseTest, unittest.TestCase):
                                       performer=self.performer,
                                       title=self.title,
                                       filename='telegram_custom.mp3')
+
+        audio = message.audio
+
+        self.assertTrue(isinstance(audio.file_id, str))
+        self.assertNotEqual(audio.file_id, '')
+        self.assertEqual(audio.duration, self.duration)
+        self.assertEqual(audio.performer, self.performer)
+        self.assertEqual(audio.title, self.title)
+        self.assertEqual(audio.mime_type, self.mime_type)
+        self.assertEqual(audio.file_size, self.file_size)
+
+    def test_send_audio_mp3_url_file(self):
+        """Test telegram.Bot sendAudio method"""
+        print('Testing bot.sendAudio - MP3 File by URL')
+
+        message = self._bot.sendAudio(chat_id=self._chat_id,
+                                      audio=self.audio_file_url,
+                                      duration=self.duration,
+                                      performer=self.performer,
+                                      title=self.title)
 
         audio = message.audio
 
