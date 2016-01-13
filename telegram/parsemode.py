@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains a object that represents a Telegram
-Message Parse Modes"""
+Message Parse Modes."""
 
 
 class ParseMode(object):

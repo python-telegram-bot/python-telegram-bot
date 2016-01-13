@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains a object that represents a Telegram
-ReplyKeyboardHide"""
+ReplyKeyboardHide."""
 
 from telegram import ReplyMarkup
 

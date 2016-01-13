@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains a object that represents a Telegram
-UserProfilePhotos"""
+UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
 

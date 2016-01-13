@@ -17,10 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains the Dispatcher class."""
 
-"""
-This module contains the Dispatcher class.
-"""
 import logging
 from functools import wraps
 from inspect import getargspec

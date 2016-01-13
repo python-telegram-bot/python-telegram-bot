@@ -52,9 +52,9 @@ from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
 from .updater import Updater
 
-__all__ = ['Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
+__all__ = ('Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
            'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
            'Audio', 'PhotoSize', 'Chat', 'Update', 'ParseMode', 'Message',
-           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue']
+           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue')
