@@ -1,4 +1,5 @@
 flake8
 nose
+pep257
 pylint
 unittest2
