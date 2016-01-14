@@ -18,10 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 
-"""
-This module contains the class Updater, which tries to make creating Telegram
-Bots intuitive!
-"""
+"""This module contains the class Updater, which tries to make creating
+Telegram bots intuitive."""
+
 import logging
 import os
 import ssl

@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""Base class for Telegram Objects"""
+"""Base class for Telegram Objects."""
 
 import json
 from abc import ABCMeta
 
 
 class TelegramObject(object):
-    """Base class for most telegram objects"""
+    """Base class for most telegram objects."""
 
     __metaclass__ = ABCMeta
 

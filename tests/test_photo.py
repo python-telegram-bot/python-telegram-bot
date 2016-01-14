@@ -138,13 +138,11 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(thumb, telegram.PhotoSize))
         self.assertEqual(thumb.width, self.thumb['width'])
         self.assertEqual(thumb.height, self.thumb['height'])
-        self.assertEqual(thumb.file_size, self.thumb['file_size'])
 
         self.assertEqual(photo.file_id, self.photo_file_id)
         self.assertTrue(isinstance(photo, telegram.PhotoSize))
         self.assertEqual(photo.width, self.width)
         self.assertEqual(photo.height, self.height)
-        self.assertEqual(photo.file_size, self.file_size)
 
     def test_photo_de_json(self):
         """Test Photo.de_json() method"""

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""Base class for Telegram ReplyMarkup Objects"""
+"""Base class for Telegram ReplyMarkup Objects."""
 
 from telegram import TelegramObject
 
