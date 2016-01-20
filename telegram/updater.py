@@ -29,14 +29,8 @@ from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
-                      NullHandler, JobQueue)
+                      NullHandler, JobQueue, UpdateQueue)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
-
-# Adjust for differences in Python versions
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
 
 try:
     from urllib2 import URLError
@@ -89,7 +83,7 @@ class Updater:
             self.bot = bot
         else:
             self.bot = Bot(token, base_url)
-        self.update_queue = Queue()
+        self.update_queue = UpdateQueue()
         self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
         self.dispatcher = Dispatcher(self.bot, self.update_queue,
                                      workers=workers)

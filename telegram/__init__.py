@@ -47,7 +47,9 @@ from .update import Update
 from .bot import Bot
 from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
+from .updatequeue import UpdateQueue
 from .updater import Updater
+
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '3.2.0'
@@ -56,4 +58,5 @@ __all__ = ('Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
            'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
            'Audio', 'PhotoSize', 'Chat', 'Update', 'ParseMode', 'Message',
-           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue')
+           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue',
+           'UpdateQueue')
