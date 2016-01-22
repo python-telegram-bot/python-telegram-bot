@@ -107,11 +107,13 @@ class Dispatcher:
             except the first word (usually the command).
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
             For other updates, args will be None
-
-    Sometimes to handle update you need some context data. You can define
-    handlers with context parameter. To produce context just queue in
-    update_queue.put(update,context=context) or
+            
+    In some cases handlers may need some context data to process the update. To
+    procedure just queue in  update_queue.put(update, context=context) or
     processUpdate(update,context=context).
+    
+        context:
+            Extra data for handling updates. 
 
     For regex-based handlers, you can also request information about the match.
     For all other handlers, these will be None
@@ -647,7 +649,7 @@ class Dispatcher:
         if is_async or 'groupdict' in fargs:
             target_kwargs['groupdict'] = kwargs.get('groupdict', None)
 
-        if 'context' in fargs:
+        if is_async or 'context' in fargs:
             target_kwargs['context'] = kwargs.get('context', None)
 
         handler(self.bot, update, **target_kwargs)

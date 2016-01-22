@@ -48,12 +48,12 @@ class UpdateQueue(Queue):
     def get(self, block=True, timeout=None, context=False):
         """
         Remove and return an item from the queue. A tuple of
-        (update, context) if required. Overrides standard Queue.get
+        (update, context) if requested. Overrides standard Queue.get
         method.
 
         Args:
-            update (any): handled by the dispatcher
-            context (any): extra data to use in handlers
+            context (boolean): set true to get (update, context)
+                
         """
         if not context:
             return Queue.get(self, block, timeout)[0]
