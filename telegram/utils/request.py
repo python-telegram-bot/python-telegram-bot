@@ -26,6 +26,13 @@ import socket
 from ssl import SSLError
 
 try:
+    # python2
+    from httplib import HTTPException
+except ImportError:
+    # python3
+    from http.client import HTTPException
+
+try:
     from urllib.request import urlopen, urlretrieve, Request
     from urllib.error import HTTPError
 except ImportError:
@@ -82,6 +89,8 @@ def _try_except_req(func):
                 raise TelegramError("Timed out")
 
             raise TelegramError(str(error))
+        except HTTPException as error:
+            raise TelegramError('HTTPException: {0!r}'.format(error))
 
     return decorator
 
