@@ -53,7 +53,6 @@ class UpdateQueue(Queue):
 
         Args:
             context (boolean): set true to get (update, context)
-                
         """
         if not context:
             return Queue.get(self, block, timeout)[0]

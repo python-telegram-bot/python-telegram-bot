@@ -107,13 +107,13 @@ class Dispatcher:
             except the first word (usually the command).
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
             For other updates, args will be None
-            
+
     In some cases handlers may need some context data to process the update. To
     procedure just queue in  update_queue.put(update, context=context) or
     processUpdate(update,context=context).
-    
+
         context:
-            Extra data for handling updates. 
+            Extra data for handling updates.
 
     For regex-based handlers, you can also request information about the match.
     For all other handlers, these will be None
