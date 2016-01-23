@@ -43,7 +43,7 @@ class Botan(object):
             request = Request(url,
                               data=data,
                               headers={'Content-Type': 'application/json'})
-            response = urlopen(request, json.dumps(data))
+            response = urlopen(request)
             if response.getcode() != 200:
                 return False
             return True
