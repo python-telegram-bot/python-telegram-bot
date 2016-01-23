@@ -33,11 +33,13 @@ except ImportError:
     from http.client import HTTPException
 
 try:
+    # python3
     from urllib.request import urlopen, urlretrieve, Request
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 except ImportError:
+    # python2
     from urllib import urlretrieve
-    from urllib2 import urlopen, Request
+    from urllib2 import urlopen, Request, URLError
     from urllib2 import HTTPError
 
 from telegram import (InputFile, TelegramError)
@@ -72,7 +74,10 @@ def _try_except_req(func):
     def decorator(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+
         except HTTPError as error:
+            # `HTTPError` inherits from `URLError` so `HTTPError` handling must
+            # come first.
             if error.getcode() == 403:
                 raise TelegramError('Unauthorized')
             if error.getcode() == 502:
@@ -84,11 +89,16 @@ def _try_except_req(func):
                 message = 'Unknown HTTPError {0}'.format(error.getcode())
 
             raise TelegramError(message)
+
+        except URLError as error:
+            raise TelegramError('URLError: {0!r}'.format(error))
+
         except (SSLError, socket.timeout) as error:
             if "operation timed out" in str(error):
                 raise TelegramError("Timed out")
 
             raise TelegramError(str(error))
+
         except HTTPException as error:
             raise TelegramError('HTTPException: {0!r}'.format(error))
 
