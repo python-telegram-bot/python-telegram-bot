@@ -5,11 +5,11 @@ import json
 try:
     from urllib.request import urlopen, Request
     from urllib.parse import quote
-    from urllib.error import URLError
+    from urllib.error import URLError, HTTPError
 except ImportError:
     from urllib2 import urlopen, Request
     from urllib import quote
-    from urllib2 import URLError
+    from urllib2 import URLError, HTTPError
 
 
 class Botan(object):
@@ -38,7 +38,9 @@ class Botan(object):
             if response.getcode() != 200:
                 return False
             return True
-        except URLError as error:
+        except HTTPError as error:
             print('botan track error ' + str(error.code) + ':' + error.reason)
-            print(url)
+            return False
+        except URLError as error:
+            print('botan track error ' + error.reason)
             return False
