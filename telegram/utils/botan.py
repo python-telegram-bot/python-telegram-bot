@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import json
+import logging
+from telegram import NullHandler
 
 try:
     from urllib.request import urlopen, Request
@@ -11,6 +13,9 @@ except ImportError:
     from urllib import quote
     from urllib2 import URLError, HTTPError
 
+H = NullHandler()
+logging.getLogger(__name__).addHandler(H)
+
 
 class Botan(object):
     token = ''
@@ -19,12 +24,13 @@ class Botan(object):
 
     def __init__(self, token):
         self.token = token
+        self.logger = logging.getLogger(__name__)
 
     def track(self, message, event_name='event'):
         try:
             uid = message.chat_id
         except AttributeError:
-            print('no chat_id in message')
+            self.logger.warn('No chat_id in message')
             return False
         data = json.dumps(message.__dict__)
         try:
@@ -39,8 +45,9 @@ class Botan(object):
                 return False
             return True
         except HTTPError as error:
-            print('botan track error ' + str(error.code) + ':' + error.reason)
+            self.logger.warn('Botan track error ' +
+                             str(error.code) + ':' + error.reason)
             return False
         except URLError as error:
-            print('botan track error ' + error.reason)
+            self.logger.warn('Botan track error ' + error.reason)
             return False
