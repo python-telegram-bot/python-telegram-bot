@@ -43,6 +43,7 @@ except ImportError:
     from urllib2 import HTTPError
 
 from telegram import (InputFile, TelegramError)
+from telegram.error import Unauthorized, NetworkError, TimedOut
 
 
 def _parse(json_data):
@@ -79,7 +80,7 @@ def _try_except_req(func):
             # `HTTPError` inherits from `URLError` so `HTTPError` handling must
             # come first.
             if error.getcode() == 403:
-                raise TelegramError('Unauthorized')
+                raise Unauthorized()
             if error.getcode() == 502:
                 raise TelegramError('Bad Gateway')
 
@@ -88,19 +89,20 @@ def _try_except_req(func):
             except ValueError:
                 message = 'Unknown HTTPError {0}'.format(error.getcode())
 
-            raise TelegramError(message)
+            raise NetworkError(message)
 
         except URLError as error:
-            raise TelegramError('URLError: {0!r}'.format(error))
+            raise NetworkError('URLError: {0!r}'.format(error))
 
         except (SSLError, socket.timeout) as error:
-            if "operation timed out" in str(error):
-                raise TelegramError("Timed out")
+            err_s = str(error)
+            if "operation timed out" in err_s:
+                raise TimedOut()
 
-            raise TelegramError(str(error))
+            raise NetworkError(err_s)
 
         except HTTPException as error:
-            raise TelegramError('HTTPException: {0!r}'.format(error))
+            raise NetworkError('HTTPException: {0!r}'.format(error))
 
     return decorator
 

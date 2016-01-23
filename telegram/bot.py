@@ -25,6 +25,7 @@ import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, File,
                       TelegramError, ReplyMarkup, TelegramObject, NullHandler)
+from telegram.error import InvalidToken
 from telegram.utils import request
 
 H = NullHandler()
@@ -751,5 +752,5 @@ class Bot(TelegramObject):
         """a very basic validation on token"""
         left, sep, _right = token.partition(':')
         if (not sep) or (not left.isdigit()) or (len(left) < 3):
-            raise TelegramError('Invalid token')
+            raise InvalidToken()
         return token
