@@ -41,7 +41,7 @@ class Botan(object):
                                            uid=str(uid),
                                            name=quote(event_name))
             request = Request(url,
-                              data=data,
+                              data=data.encode(),
                               headers={'Content-Type': 'application/json'})
             response = urlopen(request)
             if response.getcode() != 200:
