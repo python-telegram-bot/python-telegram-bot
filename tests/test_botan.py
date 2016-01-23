@@ -19,7 +19,7 @@ class MessageMock(object):
 class BotanTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Botan analytics integration."""
 
-    token = '26c6df87-56ea-4764-a588-0e25de3a64a9'
+    token = os.environ.get('BOTAN_TOKEN')
 
     def test_track(self):
         """Test sending event to botan"""
