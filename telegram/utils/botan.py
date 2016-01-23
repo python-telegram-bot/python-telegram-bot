@@ -14,7 +14,8 @@ except ImportError:
 
 class Botan(object):
     token = ''
-    url_template = 'https://api.botan.io/track?token={token}&uid={uid}&name={name}'
+    url_template = 'https://api.botan.io/track?' \
+                   'token={token}&uid={uid}&name={name}'
 
     def __init__(self, token):
         self.token = token
@@ -27,7 +28,9 @@ class Botan(object):
             return False
         data = json.dumps(message.__dict__)
         try:
-            url = self.url_template.format(token=str(self.token), uid=str(uid), name=quote(event_name))
+            url = self.url_template.format(token=str(self.token),
+                                           uid=str(uid),
+                                           name=quote(event_name))
             request = Request(url,
                               data=data,
                               headers={'Content-Type': 'application/json'})
@@ -39,4 +42,3 @@ class Botan(object):
             print('botan track error ' + str(error.code) + ':' + error.reason)
             print(url)
             return False
-
