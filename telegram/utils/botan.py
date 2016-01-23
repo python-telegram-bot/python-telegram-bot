@@ -18,9 +18,12 @@ logging.getLogger(__name__).addHandler(H)
 
 
 class Botan(object):
+    """This class helps to send incoming events in your botan analytics account.
+     See more: https://github.com/botanio/sdk#botan-sdk"""
+
     token = ''
-    url_template = 'https://api.botan.io/track?' \
-                   'token={token}&uid={uid}&name={name}'
+    url_template = 'https://api.botan.io/track?token={token}' \
+                   '&uid={uid}&name={name}&src=python-telegram-bot'
 
     def __init__(self, token):
         self.token = token
