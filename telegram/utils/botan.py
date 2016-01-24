@@ -43,9 +43,7 @@ class Botan(object):
             request = Request(url,
                               data=data.encode(),
                               headers={'Content-Type': 'application/json'})
-            response = urlopen(request)
-            if response.getcode() != 200:
-                return False
+            urlopen(request)
             return True
         except HTTPError as error:
             self.logger.warn('Botan track error ' +
@@ -53,5 +51,5 @@ class Botan(object):
                              ':' + error.read().decode('utf-8'))
             return False
         except URLError as error:
-            self.logger.warn('Botan track error ' + error.reason)
+            self.logger.warn('Botan track error ' + str(error.reason))
             return False
