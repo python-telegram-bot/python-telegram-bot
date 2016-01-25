@@ -109,6 +109,11 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             update_queue.put('/test5 noresend')
         elif args[0] == 'noresend':
             pass
+        
+    def contextTest(self, bot, update, context):
+        self.received_message = update
+        self.message_count += 1
+        self.context = context
 
     @run_async
     def asyncAdditionalHandlerTest(self, bot, update, update_queue=None,
@@ -348,6 +353,20 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEqual(self.received_message, '/test5 noresend')
         self.assertEqual(self.message_count, 2)
+        
+    def test_context(self):
+        print('Testing context for handlers')
+        context = "context_data"
+        self._setup_updater('', messages=0)
+        self.updater.dispatcher.addStringCommandHandler(
+            'test_context', self.contextTest)
+        
+        queue = self.updater.start_polling(0.01)
+        queue.put('/test_context', context=context)
+        sleep(.5)
+        self.assertEqual(self.received_message, '/test_context')
+        self.assertEqual(self.message_count, 1)
+        self.assertEqual(self.context, context)
 
     def test_regexGroupHandler(self):
         print('Testing optional groups and groupdict parameters')

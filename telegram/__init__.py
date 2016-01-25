@@ -51,7 +51,9 @@ from .update import Update
 from .bot import Bot
 from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
+from .updatequeue import UpdateQueue
 from .updater import Updater
+
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '3.3b1'
@@ -63,4 +65,5 @@ __all__ = ('Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue',
            'InlineQuery', 'ChosenInlineResult', 'InlineQueryResultArticle',
            'InlineQueryResultGif', 'InlineQueryResultPhoto',
-           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo')
+           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo',
+           'UpdateQueue')
