@@ -108,6 +108,13 @@ class Dispatcher:
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
             For other updates, args will be None
 
+    In some cases handlers may need some context data to process the update. To
+    procedure just queue in  update_queue.put(update, context=context) or
+    processUpdate(update,context=context).
+
+        context:
+            Extra data for handling updates.
+
     For regex-based handlers, you can also request information about the match.
     For all other handlers, these will be None
 
@@ -121,7 +128,7 @@ class Dispatcher:
     Args:
         bot (telegram.Bot): The bot object that should be passed to the
             handlers
-        update_queue (queue.Queue): The synchronized queue that will
+        update_queue (UpdateQueue): The synchronized queue that will
             contain the updates.
     """
     def __init__(self, bot, update_queue, workers=4):
@@ -171,14 +178,15 @@ class Dispatcher:
                 try:
                     # Pop update from update queue.
                     # Blocks if no updates are available.
-                    update = self.update_queue.get()
+                    update, context = self.update_queue.get(context=True)
 
                     if type(update) is self._Stop:
                         self.running = False
                         break
 
-                    self.processUpdate(update)
-                    self.logger.debug('Processed Update: %s' % update)
+                    self.processUpdate(update, context)
+                    self.logger.debug('Processed Update: %s with context %s'
+                                      % (update, context))
 
                 # Dispatch any errors
                 except TelegramError as te:
@@ -204,7 +212,7 @@ class Dispatcher:
                 while self.running:
                     sleep(0.1)
 
-    def processUpdate(self, update):
+    def processUpdate(self, update, context=None):
         """
         Processes a single update.
 
@@ -217,15 +225,15 @@ class Dispatcher:
         # Custom type handlers
         for t in self.type_handlers:
             if isinstance(update, t):
-                self.dispatchType(update)
+                self.dispatchType(update, context)
                 handled = True
 
         # string update
         if type(update) is str and update.startswith('/'):
-            self.dispatchStringCommand(update)
+            self.dispatchStringCommand(update, context)
             handled = True
         elif type(update) is str:
-            self.dispatchRegex(update)
+            self.dispatchRegex(update, context)
             handled = True
 
         # An error happened while polling
@@ -235,18 +243,18 @@ class Dispatcher:
 
         # Telegram update (regex)
         if isinstance(update, Update):
-            self.dispatchRegex(update)
+            self.dispatchRegex(update, context)
             handled = True
 
         # Telegram update (command)
         if isinstance(update, Update) \
                 and update.message.text.startswith('/'):
-            self.dispatchTelegramCommand(update)
+            self.dispatchTelegramCommand(update, context)
             handled = True
 
         # Telegram update (message)
         elif isinstance(update, Update):
-            self.dispatchTelegramMessage(update)
+            self.dispatchTelegramMessage(update, context)
             handled = True
 
         # Update not recognized
@@ -492,7 +500,7 @@ class Dispatcher:
                 and handler in self.type_handlers[the_type]:
             self.type_handlers[the_type].remove(handler)
 
-    def dispatchTelegramCommand(self, update):
+    def dispatchTelegramCommand(self, update, context=None):
         """
         Dispatches an update that contains a command.
 
@@ -505,11 +513,13 @@ class Dispatcher:
         command = update.message.text.split(' ')[0][1:].split('@')[0]
 
         if command in self.telegram_command_handlers:
-            self.dispatchTo(self.telegram_command_handlers[command], update)
+            self.dispatchTo(self.telegram_command_handlers[command], update,
+                            context=context)
         else:
-            self.dispatchTo(self.unknown_telegram_command_handlers, update)
+            self.dispatchTo(self.unknown_telegram_command_handlers, update,
+                            context=context)
 
-    def dispatchRegex(self, update):
+    def dispatchRegex(self, update, context=None):
         """
         Dispatches an update to all string or telegram regex handlers that
         match the string/message content.
@@ -532,9 +542,10 @@ class Dispatcher:
                     self.call_handler(handler,
                                       update,
                                       groups=m.groups(),
-                                      groupdict=m.groupdict())
+                                      groupdict=m.groupdict(),
+                                      context=context)
 
-    def dispatchStringCommand(self, update):
+    def dispatchStringCommand(self, update, context=None):
         """
         Dispatches a string-update that contains a command.
 
@@ -545,11 +556,13 @@ class Dispatcher:
         command = update.split(' ')[0][1:]
 
         if command in self.string_command_handlers:
-            self.dispatchTo(self.string_command_handlers[command], update)
+            self.dispatchTo(self.string_command_handlers[command], update,
+                            context=context)
         else:
-            self.dispatchTo(self.unknown_string_command_handlers, update)
+            self.dispatchTo(self.unknown_string_command_handlers, update,
+                            context=context)
 
-    def dispatchType(self, update):
+    def dispatchType(self, update, context=None):
         """
         Dispatches an update of any type.
 
@@ -559,9 +572,9 @@ class Dispatcher:
 
         for t in self.type_handlers:
             if isinstance(update, t):
-                self.dispatchTo(self.type_handlers[t], update)
+                self.dispatchTo(self.type_handlers[t], update, context=context)
 
-    def dispatchTelegramMessage(self, update):
+    def dispatchTelegramMessage(self, update, context=None):
         """
         Dispatches an update that contains a regular message.
 
@@ -570,7 +583,8 @@ class Dispatcher:
                 message.
         """
 
-        self.dispatchTo(self.telegram_message_handlers, update)
+        self.dispatchTo(self.telegram_message_handlers, update,
+                        context=context)
 
     def dispatchError(self, update, error):
         """
@@ -634,5 +648,8 @@ class Dispatcher:
 
         if is_async or 'groupdict' in fargs:
             target_kwargs['groupdict'] = kwargs.get('groupdict', None)
+
+        if is_async or 'context' in fargs:
+            target_kwargs['context'] = kwargs.get('context', None)
 
         handler(self.bot, update, **target_kwargs)
