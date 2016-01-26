@@ -38,7 +38,6 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         self.json_dict = {
             'hide_keyboard': self.hide_keyboard,
             'selective': self.selective,
-            
         }
         
     def test_send_message_with_reply_keyboard_hide(self):

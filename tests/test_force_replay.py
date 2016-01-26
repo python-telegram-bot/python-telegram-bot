@@ -38,7 +38,6 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         self.json_dict = {
             'force_reply': self.force_reply,
             'selective': self.selective,
-            
         }
         
     def test_send_message_with_force_reply(self):

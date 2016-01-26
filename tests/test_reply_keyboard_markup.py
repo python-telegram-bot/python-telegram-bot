@@ -42,7 +42,6 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
             'resize_keyboard': self.resize_keyboard,
             'one_time_keyboard': self.one_time_keyboard,
             'selective': self.selective,
-            
         }
         
     def test_send_message_with_reply_keyboard_markup(self):
