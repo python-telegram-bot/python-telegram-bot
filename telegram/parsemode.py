@@ -26,3 +26,4 @@ class ParseMode(object):
     """This object represents a Telegram Message Parse Modes."""
 
     MARKDOWN = 'Markdown'
+    HTML = 'HTML'
