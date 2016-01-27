@@ -271,6 +271,10 @@ To post a text message with markdown::
 
     >>> bot.sendMessage(chat_id=chat_id, text="*bold* _italic_ [link](http://google.com).", parse_mode=telegram.ParseMode.MARKDOWN)
 
+To post a text message with Html style::
+
+	>>> bot.sendMessage(chat_id=chat_id, text="<b>bold</b> <i>italic</i> <a href="http://google.com">link</a>.", parse_mode=telegram.ParseMode.HTML)
+
 To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/emoji/tables/unicode>`_)::
 
     >>> bot.sendMessage(chat_id=chat_id, text=telegram.Emoji.PILE_OF_POO)
