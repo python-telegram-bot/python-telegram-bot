@@ -87,6 +87,11 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = update.message.text
         self.message_count += 1
 
+    def telegramInlineHandlerTest(self, bot, update):
+        self.received_message = (update.inline_query,
+                                 update.chosen_inline_result)
+        self.message_count += 1
+
     @run_async
     def asyncHandlerTest(self, bot, update, **kwargs):
         sleep(1)
@@ -294,8 +299,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         print('Testing error in Handler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addStringRegexHandler('.*',
-                                                self.errorRaisingHandlerTest)
+        d.addStringRegexHandler('.*', self.errorRaisingHandlerTest)
         self.updater.dispatcher.addErrorHandler(self.errorHandlerTest)
         queue = self.updater.start_polling(0.01)
 
@@ -328,6 +332,30 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.reset()
 
         queue.put(payload)
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_addRemoveInlineHandlerQuery(self):
+        print('Testing add/removeInlineHandler')
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        d.addTelegramInlineHandler(self.telegramInlineHandlerTest)
+        queue = self.updater.start_polling(0.01)
+        update = Update(update_id=0, inline_query="testquery")
+        update2 = Update(update_id=0, chosen_inline_result="testresult")
+        queue.put(update)
+        sleep(.1)
+        self.assertEqual(self.received_message[0], "testquery")
+
+        queue.put(update2)
+        sleep(.1)
+        self.assertEqual(self.received_message[1], "testresult")
+
+        # Remove handler
+        d.removeTelegramInlineHandler(self.telegramInlineHandlerTest)
+        self.reset()
+
+        queue.put(update)
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
@@ -503,7 +531,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.updater.idle()
         # If we get this far, idle() ran through
         sleep(1)
-        self.updater.running = False
+        self.assertFalse(self.updater.running)
 
     def test_createBot(self):
         updater = Updater('123:abcd')
