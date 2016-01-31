@@ -100,13 +100,98 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertEqual(article['title'], self.title)
         self.assertEqual(article['message_text'], self.message_text)
         self.assertEqual(article['parse_mode'], self.parse_mode)
-        self.assertEqual(article['disable_web_page_preview'], self.disable_web_page_preview)
+        self.assertEqual(article['disable_web_page_preview'],
+                         self.disable_web_page_preview)
         self.assertEqual(article['url'], self.url)
         self.assertEqual(article['hide_url'], self.hide_url)
         self.assertEqual(article['description'], self.description)
         self.assertEqual(article['thumb_url'], self.thumb_url)
         self.assertEqual(article['thumb_height'], self.thumb_height)
         self.assertEqual(article['thumb_width'], self.thumb_width)
+
+
+class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultPhoto."""
+
+    def setUp(self):
+        self.id = 'id'
+        self.photo_url = 'photo url'
+        self.mime_type = 'mime type'
+        self.photo_width = 10
+        self.photo_height = 15
+        self.thumb_url = 'thumb url'
+        self.title = 'title'
+        self.caption = 'caption'
+        self.message_text = 'message text'
+        self.parse_mode = 'parse mode'
+        self.disable_web_page_preview = True
+
+        self.json_dict = {
+            'type': 'photo',
+            'id': self.id,
+            'photo_url': self.photo_url,
+            'mime_type': self.mime_type,
+            'photo_width': self.photo_width,
+            'photo_height': self.photo_height,
+            'thumb_url': self.thumb_url,
+            'title': self.title,
+            'caption': self.caption,
+            'message_text': self.message_text,
+            'parse_mode': self.parse_mode,
+            'disable_web_page_preview': self.disable_web_page_preview
+        }
+
+    def test_photo_de_json(self):
+        """Test InlineQueryResultPhoto.de_json() method"""
+        print('Testing InlineQueryResultPhoto.de_json()')
+
+        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
+
+        self.assertEqual(photo.type, 'photo')
+        self.assertEqual(photo.id, self.id)
+        self.assertEqual(photo.photo_url, self.photo_url)
+        self.assertEqual(photo.mime_type, self.mime_type)
+        self.assertEqual(photo.photo_width, self.photo_width)
+        self.assertEqual(photo.photo_height,
+                         self.photo_height)
+        self.assertEqual(photo.thumb_url, self.thumb_url)
+        self.assertEqual(photo.title, self.title)
+        self.assertEqual(photo.caption, self.caption)
+        self.assertEqual(photo.message_text, self.message_text)
+        self.assertEqual(photo.parse_mode, self.parse_mode)
+        self.assertEqual(photo.disable_web_page_preview,
+                         self.disable_web_page_preview)
+
+    def test_photo_to_json(self):
+        """Test InlineQueryResultPhoto.to_json() method"""
+        print('Testing InlineQueryResultPhoto.to_json()')
+
+        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
+
+        self.assertTrue(self.is_json(photo.to_json()))
+
+    def test_photo_to_dict(self):
+        """Test InlineQueryResultPhoto.to_dict() method"""
+        print('Testing InlineQueryResultPhoto.to_dict()')
+
+        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
+
+        self.assertTrue(self.is_dict(photo.to_dict()))
+        self.assertEqual(photo['type'], 'photo')
+        self.assertEqual(photo['id'], self.id)
+        self.assertEqual(photo['photo_url'], self.photo_url)
+        self.assertEqual(photo['mime_type'], self.mime_type)
+        self.assertEqual(photo['photo_width'], self.photo_width)
+        self.assertEqual(photo['photo_height'],
+                         self.photo_height)
+        self.assertEqual(photo['thumb_url'], self.thumb_url)
+        self.assertEqual(photo['title'], self.title)
+        self.assertEqual(photo['caption'], self.caption)
+        self.assertEqual(photo['message_text'], self.message_text)
+        self.assertEqual(photo['parse_mode'], self.parse_mode)
+        self.assertEqual(photo['disable_web_page_preview'],
+                         self.disable_web_page_preview)
+
 
 if __name__ == '__main__':
     unittest.main()
