@@ -193,5 +193,163 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
                          self.disable_web_page_preview)
 
 
+class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultGif."""
+
+    def setUp(self):
+        self.id = 'id'
+        self.gif_url = 'gif url'
+        self.gif_width = 10
+        self.gif_height = 15
+        self.thumb_url = 'thumb url'
+        self.title = 'title'
+        self.caption = 'caption'
+        self.message_text = 'message text'
+        self.parse_mode = 'parse mode'
+        self.disable_web_page_preview = True
+
+        self.json_dict = {
+            'type': 'gif',
+            'id': self.id,
+            'gif_url': self.gif_url,
+            'gif_width': self.gif_width,
+            'gif_height': self.gif_height,
+            'thumb_url': self.thumb_url,
+            'title': self.title,
+            'caption': self.caption,
+            'message_text': self.message_text,
+            'parse_mode': self.parse_mode,
+            'disable_web_page_preview': self.disable_web_page_preview
+        }
+
+    def test_gif_de_json(self):
+        """Test InlineQueryResultGif.de_json() method"""
+        print('Testing InlineQueryResultGif.de_json()')
+
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+
+        self.assertEqual(gif.type, 'gif')
+        self.assertEqual(gif.id, self.id)
+        self.assertEqual(gif.gif_url, self.gif_url)
+        self.assertEqual(gif.gif_width, self.gif_width)
+        self.assertEqual(gif.gif_height,
+                         self.gif_height)
+        self.assertEqual(gif.thumb_url, self.thumb_url)
+        self.assertEqual(gif.title, self.title)
+        self.assertEqual(gif.caption, self.caption)
+        self.assertEqual(gif.message_text, self.message_text)
+        self.assertEqual(gif.parse_mode, self.parse_mode)
+        self.assertEqual(gif.disable_web_page_preview,
+                         self.disable_web_page_preview)
+
+    def test_gif_to_json(self):
+        """Test InlineQueryResultGif.to_json() method"""
+        print('Testing InlineQueryResultGif.to_json()')
+
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+
+        self.assertTrue(self.is_json(gif.to_json()))
+
+    def test_gif_to_dict(self):
+        """Test InlineQueryResultGif.to_dict() method"""
+        print('Testing InlineQueryResultGif.to_dict()')
+
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+
+        self.assertTrue(self.is_dict(gif.to_dict()))
+        self.assertEqual(gif['type'], 'gif')
+        self.assertEqual(gif['id'], self.id)
+        self.assertEqual(gif['gif_url'], self.gif_url)
+        self.assertEqual(gif['gif_width'], self.gif_width)
+        self.assertEqual(gif['gif_height'],
+                         self.gif_height)
+        self.assertEqual(gif['thumb_url'], self.thumb_url)
+        self.assertEqual(gif['title'], self.title)
+        self.assertEqual(gif['caption'], self.caption)
+        self.assertEqual(gif['message_text'], self.message_text)
+        self.assertEqual(gif['parse_mode'], self.parse_mode)
+        self.assertEqual(gif['disable_web_page_preview'],
+                         self.disable_web_page_preview)
+
+
+class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultMpeg4Gif."""
+
+    def setUp(self):
+        self.id = 'id'
+        self.mpeg4_url = 'mpeg4 url'
+        self.mpeg4_width = 10
+        self.mpeg4_height = 15
+        self.thumb_url = 'thumb url'
+        self.title = 'title'
+        self.caption = 'caption'
+        self.message_text = 'message text'
+        self.parse_mode = 'parse mode'
+        self.disable_web_page_preview = True
+
+        self.json_dict = {
+            'type': 'gif',
+            'id': self.id,
+            'mpeg4_url': self.mpeg4_url,
+            'mpeg4_width': self.mpeg4_width,
+            'mpeg4_height': self.mpeg4_height,
+            'thumb_url': self.thumb_url,
+            'title': self.title,
+            'caption': self.caption,
+            'message_text': self.message_text,
+            'parse_mode': self.parse_mode,
+            'disable_web_page_preview': self.disable_web_page_preview
+        }
+
+    def test_mpeg4_de_json(self):
+        """Test InlineQueryResultMpeg4Gif.de_json() method"""
+        print('Testing InlineQueryResultMpeg4Gif.de_json()')
+
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+
+        self.assertEqual(mpeg4.type, 'mpeg4_gif')
+        self.assertEqual(mpeg4.id, self.id)
+        self.assertEqual(mpeg4.mpeg4_url, self.mpeg4_url)
+        self.assertEqual(mpeg4.mpeg4_width, self.mpeg4_width)
+        self.assertEqual(mpeg4.mpeg4_height,
+                         self.mpeg4_height)
+        self.assertEqual(mpeg4.thumb_url, self.thumb_url)
+        self.assertEqual(mpeg4.title, self.title)
+        self.assertEqual(mpeg4.caption, self.caption)
+        self.assertEqual(mpeg4.message_text, self.message_text)
+        self.assertEqual(mpeg4.parse_mode, self.parse_mode)
+        self.assertEqual(mpeg4.disable_web_page_preview,
+                         self.disable_web_page_preview)
+
+    def test_mpeg4_to_json(self):
+        """Test InlineQueryResultMpeg4Gif.to_json() method"""
+        print('Testing InlineQueryResultMpeg4Gif.to_json()')
+
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+
+        self.assertTrue(self.is_json(mpeg4.to_json()))
+
+    def test_mpeg4_to_dict(self):
+        """Test InlineQueryResultMpeg4Gif.to_dict() method"""
+        print('Testing InlineQueryResultMpeg4Gif.to_dict()')
+
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+
+        self.assertTrue(self.is_dict(mpeg4.to_dict()))
+        self.assertEqual(mpeg4['type'], 'mpeg4_gif')
+        self.assertEqual(mpeg4['id'], self.id)
+        self.assertEqual(mpeg4['mpeg4_url'], self.mpeg4_url)
+        self.assertEqual(mpeg4['mpeg4_width'], self.mpeg4_width)
+        self.assertEqual(mpeg4['mpeg4_height'],
+                         self.mpeg4_height)
+        self.assertEqual(mpeg4['thumb_url'], self.thumb_url)
+        self.assertEqual(mpeg4['title'], self.title)
+        self.assertEqual(mpeg4['caption'], self.caption)
+        self.assertEqual(mpeg4['message_text'], self.message_text)
+        self.assertEqual(mpeg4['parse_mode'], self.parse_mode)
+        self.assertEqual(mpeg4['disable_web_page_preview'],
+                         self.disable_web_page_preview)
+
+
 if __name__ == '__main__':
     unittest.main()
