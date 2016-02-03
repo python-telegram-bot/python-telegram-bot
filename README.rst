@@ -36,7 +36,7 @@ A Python wrapper around the Telegram Bot API.
    :alt: Coveralls
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
-   :target: https://telegram.me/joinchat/ALnA-AJQm5R7Km9hdCgyng
+   :target: https://telegram.me/joinchat/ALnA-AJQm5SV4thqGgN9KA
    :alt: Telegram Group
 
 =================
@@ -404,7 +404,7 @@ You may copy, distribute and modify the software provided that modifications are
 _`Contact`
 ==========
 
-Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5R7Km9hdCgyng>`_.
+Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5SV4thqGgN9KA>`_.
 
 =======
 _`TODO`
