@@ -50,6 +50,9 @@ def run_async(func):
         function:
     """
 
+    # TODO: handle exception in async threads
+    #       set a threading.Event to notify caller thread
+
     @wraps(func)
     def pooled(*pargs, **kwargs):
         """
@@ -132,7 +135,7 @@ class Dispatcher:
         update_queue (telegram.UpdateQueue): The synchronized queue that will
             contain the updates.
     """
-    def __init__(self, bot, update_queue, workers=4):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None):
         self.bot = bot
         self.update_queue = update_queue
         self.telegram_message_handlers = []
@@ -147,6 +150,7 @@ class Dispatcher:
         self.logger = logging.getLogger(__name__)
         self.running = False
         self.__stop_event = Event()
+        self.__exception_event = exception_event or Event()
 
         global semaphore
         if not semaphore:
@@ -164,6 +168,11 @@ class Dispatcher:
             self.logger.warning('already running')
             return
 
+        if self.__exception_event.is_set():
+            msg = 'reusing dispatcher after exception event is forbidden'
+            self.logger.error(msg)
+            raise TelegramError(msg)
+
         self.running = True
         self.logger.info('Dispatcher started')
 
@@ -173,6 +182,11 @@ class Dispatcher:
                 update, context = self.update_queue.get(True, 1, True)
             except Empty:
                 if self.__stop_event.is_set():
+                    self.logger.info('orderly stopping')
+                    break
+                elif self.__stop_event.is_set():
+                    self.logger.critical(
+                        'stopping due to exception in another thread')
                     break
                 continue
 

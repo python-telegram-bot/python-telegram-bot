@@ -24,7 +24,7 @@ Telegram bots intuitive."""
 import logging
 import os
 import ssl
-from threading import Thread, Lock
+from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
@@ -80,8 +80,9 @@ class Updater:
             self.bot = Bot(token, base_url)
         self.update_queue = UpdateQueue()
         self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
-        self.dispatcher = Dispatcher(self.bot, self.update_queue,
-                                     workers=workers)
+        self.__exception_event = Event()
+        self.dispatcher = Dispatcher(self.bot, self.update_queue, workers,
+                                     self.__exception_event)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
@@ -107,21 +108,29 @@ class Updater:
             if not self.running:
                 self.running = True
 
-                # Create Thread objects
-                dispatcher_thread = Thread(target=self.dispatcher.start,
-                                           name="dispatcher")
-                updater_thread = Thread(target=self._start_polling,
-                                        name="updater",
-                                        args=(poll_interval,
-                                              timeout,
-                                              network_delay))
-
-                # Start threads
-                dispatcher_thread.start()
-                updater_thread.start()
+                # Create & start threads
+                self._init_thread(self.dispatcher.start, "dispatcher")
+                self._init_thread(self._start_polling, "updater",
+                                  poll_interval, timeout, network_delay)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
+
+    def _init_thread(self, target, name, *args, **kwargs):
+        thr = Thread(target=self._thread_wrapper, name=name,
+                     args=(target,) + args, kwargs=kwargs)
+        thr.start()
+
+    def _thread_wrapper(self, target, *args, **kwargs):
+        thr_name = current_thread()
+        self.logger.debug('{0} - started'.format(thr_name))
+        try:
+            target(*args, **kwargs)
+        except Exception:
+            self.__exception_event.set()
+            self.logger.exception('unhandled exception')
+            raise
+        self.logger.debug('{0} - ended'.format(thr_name))
 
     def start_webhook(self,
                       listen='127.0.0.1',
