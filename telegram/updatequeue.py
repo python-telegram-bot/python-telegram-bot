@@ -23,9 +23,10 @@ Queue."""
 
 # Adjust for differences in Python versions
 try:
-    from queue import Queue
+    # loading Empty here so it can be imported by users of updatequeue
+    from queue import Queue, Empty  # flake8: noqa
 except ImportError:
-    from Queue import Queue
+    from Queue import Queue, Empty  # flake8: noqa
 
 
 class UpdateQueue(Queue):
