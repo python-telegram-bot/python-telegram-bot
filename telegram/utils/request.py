@@ -79,9 +79,11 @@ def _try_except_req(func):
         except HTTPError as error:
             # `HTTPError` inherits from `URLError` so `HTTPError` handling must
             # come first.
-            if error.getcode() == 403:
+            errcode = error.getcode()
+
+            if errcode in (401, 403):
                 raise Unauthorized()
-            if error.getcode() == 502:
+            if errcode == 502:
                 raise TelegramError('Bad Gateway')
 
             try:
@@ -89,7 +91,7 @@ def _try_except_req(func):
             except ValueError:
                 message = 'Unknown HTTPError {0}'.format(error.getcode())
 
-            raise NetworkError(message)
+            raise NetworkError('{0} ({1})'.format(message, errcode))
 
         except URLError as error:
             raise NetworkError('URLError: {0!r}'.format(error))
