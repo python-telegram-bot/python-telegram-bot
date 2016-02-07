@@ -165,6 +165,14 @@ _`Getting started`
 
 View the last release API documentation at: https://core.telegram.org/bots/api
 
+This library uses the `logging` module. To set up logging to standard output, put::
+
+    import logging
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+at the beginning of your script.
+
 --------------------
 _`The Updater class`
 --------------------
