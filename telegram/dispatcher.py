@@ -198,7 +198,13 @@ class Dispatcher:
             # Dispatch any errors
             except TelegramError as te:
                 self.logger.warn("Error was raised while processing Update.")
-                self.dispatchError(update, te)
+
+                try:
+                    self.dispatchError(update, te)
+                # Log errors in error handlers
+                except:
+                    self.logger.exception("An uncaught error was raised while "
+                                          "handling the error")
 
             # All other errors should not stop the thread, just print them
             except:
