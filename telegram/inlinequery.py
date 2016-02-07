@@ -29,7 +29,7 @@ class InlineQuery(TelegramObject):
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (int):
+        id (str):
         from_user (:class:`telegram.User`):
         query (str):
         offset (str):
@@ -48,7 +48,7 @@ class InlineQuery(TelegramObject):
                  query,
                  offset):
         # Required
-        self.id = int(id)
+        self.id = id
         self.from_user = from_user
         self.query = query
         self.offset = offset
