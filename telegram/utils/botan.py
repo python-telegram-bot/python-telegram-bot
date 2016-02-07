@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import json
 import logging
 from telegram import NullHandler
 
