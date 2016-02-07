@@ -17,6 +17,9 @@ class MessageMock(object):
     def __init__(self, chat_id):
         self.chat_id = chat_id
 
+    def to_json(self):
+        return "{}"
+
 
 class BotanTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Botan analytics integration."""

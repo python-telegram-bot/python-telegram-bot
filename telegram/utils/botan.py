@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import json
 import logging
 from telegram import NullHandler
 
@@ -35,7 +34,7 @@ class Botan(object):
         except AttributeError:
             self.logger.warn('No chat_id in message')
             return False
-        data = json.dumps(message.__dict__)
+        data = message.to_json()
         try:
             url = self.url_template.format(token=str(self.token),
                                            uid=str(uid),

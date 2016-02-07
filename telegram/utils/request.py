@@ -33,14 +33,17 @@ except ImportError:
     from http.client import HTTPException
 
 try:
+    # python3
     from urllib.request import urlopen, urlretrieve, Request
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 except ImportError:
+    # python2
     from urllib import urlretrieve
-    from urllib2 import urlopen, Request
+    from urllib2 import urlopen, Request, URLError
     from urllib2 import HTTPError
 
 from telegram import (InputFile, TelegramError)
+from telegram.error import Unauthorized, NetworkError, TimedOut
 
 
 def _parse(json_data):
@@ -72,10 +75,15 @@ def _try_except_req(func):
     def decorator(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+
         except HTTPError as error:
-            if error.getcode() == 403:
-                raise TelegramError('Unauthorized')
-            if error.getcode() == 502:
+            # `HTTPError` inherits from `URLError` so `HTTPError` handling must
+            # come first.
+            errcode = error.getcode()
+
+            if errcode in (401, 403):
+                raise Unauthorized()
+            if errcode == 502:
                 raise TelegramError('Bad Gateway')
 
             try:
@@ -83,14 +91,20 @@ def _try_except_req(func):
             except ValueError:
                 message = 'Unknown HTTPError {0}'.format(error.getcode())
 
-            raise TelegramError(message)
-        except (SSLError, socket.timeout) as error:
-            if "operation timed out" in str(error):
-                raise TelegramError("Timed out")
+            raise NetworkError('{0} ({1})'.format(message, errcode))
 
-            raise TelegramError(str(error))
+        except URLError as error:
+            raise NetworkError('URLError: {0!r}'.format(error))
+
+        except (SSLError, socket.timeout) as error:
+            err_s = str(error)
+            if "operation timed out" in err_s:
+                raise TimedOut()
+
+            raise NetworkError(err_s)
+
         except HTTPException as error:
-            raise TelegramError('HTTPException: {0!r}'.format(error))
+            raise NetworkError('HTTPException: {0!r}'.format(error))
 
     return decorator
 

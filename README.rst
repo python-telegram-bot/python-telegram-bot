@@ -34,9 +34,9 @@ A Python wrapper around the Telegram Bot API.
 .. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
    :alt: Coveralls
-   
+
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
-   :target: https://telegram.me/joinchat/ALnA-AJQm5R7Km9hdCgyng
+   :target: https://telegram.me/joinchat/ALnA-AJQm5SV4thqGgN9KA
    :alt: Telegram Group
 
 =================
@@ -58,9 +58,9 @@ Table of contents
 - `Getting started`_
 
   1. `The Updater class`_
-  
+
   2. `API`_
-  
+
   3. `JobQueue`_
 
   4. `Logging`_
@@ -165,6 +165,14 @@ _`Getting started`
 
 View the last release API documentation at: https://core.telegram.org/bots/api
 
+This library uses the `logging` module. To set up logging to standard output, put::
+
+    import logging
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+at the beginning of your script.
+
 --------------------
 _`The Updater class`
 --------------------
@@ -190,7 +198,7 @@ Now, we need to define a function that should process a specific type of update:
 We want this function to be called on a Telegram message that contains the ``/start`` command, so we need to register it in the dispatcher::
 
    >>> dispatcher.addTelegramCommandHandler('start', start)
-   
+
 The last step is to tell the ``Updater`` to start working::
 
    >>> updater.start_polling()
@@ -216,7 +224,7 @@ Let's add some functionality to our bot. We want to add the ``/caps`` command, t
    >>> def caps(bot, update, args):
    ...   text_caps = ' '.join(args).upper()
    ...   bot.sendMessage(chat_id=update.message.chat_id, text=text_caps)
-   ... 
+   ...
    >>> dispatcher.addTelegramCommandHandler('caps', caps)
 
 Now it's time to stop the bot::
@@ -282,6 +290,10 @@ To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/
 To post an image file via URL::
 
     >>> bot.sendPhoto(chat_id=chat_id, photo='https://telegram.org/img/t_logo.png')
+
+To post an image file from disk::
+
+    >>> bot.sendPhoto(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
 
 To post a voice file from disk::
 
@@ -400,7 +412,7 @@ You may copy, distribute and modify the software provided that modifications are
 _`Contact`
 ==========
 
-Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5R7Km9hdCgyng>`_.
+Feel free to join to our `Telegram group <https://telegram.me/joinchat/ALnA-AJQm5SV4thqGgN9KA>`_.
 
 =======
 _`TODO`

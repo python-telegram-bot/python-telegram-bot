@@ -24,18 +24,13 @@ Telegram bots intuitive."""
 import logging
 import os
 import ssl
-from threading import Thread, Lock
+from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
                       NullHandler, JobQueue, UpdateQueue)
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
-
-try:
-    from urllib2 import URLError
-except ImportError:
-    from urllib.error import URLError
 
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
@@ -85,8 +80,9 @@ class Updater:
             self.bot = Bot(token, base_url)
         self.update_queue = UpdateQueue()
         self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
-        self.dispatcher = Dispatcher(self.bot, self.update_queue,
-                                     workers=workers)
+        self.__exception_event = Event()
+        self.dispatcher = Dispatcher(self.bot, self.update_queue, workers,
+                                     self.__exception_event)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
@@ -112,21 +108,29 @@ class Updater:
             if not self.running:
                 self.running = True
 
-                # Create Thread objects
-                dispatcher_thread = Thread(target=self.dispatcher.start,
-                                           name="dispatcher")
-                updater_thread = Thread(target=self._start_polling,
-                                        name="updater",
-                                        args=(poll_interval,
-                                              timeout,
-                                              network_delay))
-
-                # Start threads
-                dispatcher_thread.start()
-                updater_thread.start()
+                # Create & start threads
+                self._init_thread(self.dispatcher.start, "dispatcher")
+                self._init_thread(self._start_polling, "updater",
+                                  poll_interval, timeout, network_delay)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
+
+    def _init_thread(self, target, name, *args, **kwargs):
+        thr = Thread(target=self._thread_wrapper, name=name,
+                     args=(target,) + args, kwargs=kwargs)
+        thr.start()
+
+    def _thread_wrapper(self, target, *args, **kwargs):
+        thr_name = current_thread()
+        self.logger.debug('{0} - started'.format(thr_name))
+        try:
+            target(*args, **kwargs)
+        except Exception:
+            self.__exception_event.set()
+            self.logger.exception('unhandled exception')
+            raise
+        self.logger.debug('{0} - ended'.format(thr_name))
 
     def start_webhook(self,
                       listen='127.0.0.1',
@@ -181,7 +185,7 @@ class Updater:
         Dispatcher.
         """
 
-        current_interval = poll_interval
+        cur_interval = poll_interval
         self.logger.info('Updater thread started')
 
         # Remove webhook
@@ -192,35 +196,43 @@ class Updater:
                 updates = self.bot.getUpdates(self.last_update_id,
                                               timeout=timeout,
                                               network_delay=network_delay)
+            except TelegramError as te:
+                self.logger.error(
+                    "Error while getting Updates: {0}".format(te))
+
+                # Put the error into the update queue and let the Dispatcher
+                # broadcast it
+                self.update_queue.put(te)
+
+                cur_interval = self._increase_poll_interval(cur_interval)
+            else:
                 if not self.running:
                     if len(updates) > 0:
                         self.logger.info('Updates ignored and will be pulled '
                                          'again on restart.')
                     break
 
-                for update in updates:
-                    self.update_queue.put(update)
-                    self.last_update_id = update.update_id + 1
-                    current_interval = poll_interval
+                if updates:
+                    for update in updates:
+                        self.update_queue.put(update)
+                    self.last_update_id = updates[-1].update_id + 1
 
-                sleep(current_interval)
-            except TelegramError as te:
-                # Put the error into the update queue and let the Dispatcher
-                # broadcast it
-                self.update_queue.put(te)
-                sleep(current_interval)
+                cur_interval = poll_interval
 
-            except URLError as e:
-                self.logger.error("Error while getting Updates: %s" % e)
-                # increase waiting times on subsequent errors up to 30secs
-                if current_interval == 0:
-                    current_interval = 1
-                elif current_interval < 30:
-                    current_interval += current_interval / 2
-                elif current_interval > 30:
-                    current_interval = 30
+            sleep(cur_interval)
 
         self.logger.info('Updater thread stopped')
+
+    @staticmethod
+    def _increase_poll_interval(current_interval):
+        # increase waiting times on subsequent errors up to 30secs
+        if current_interval == 0:
+            current_interval = 1
+        elif current_interval < 30:
+            current_interval += current_interval / 2
+        elif current_interval > 30:
+            current_interval = 30
+        return current_interval
 
     def _start_webhook(self, listen, port, url_path, cert, key):
         self.logger.info('Updater thread started')
@@ -248,6 +260,7 @@ class Updater:
                                                         keyfile=key,
                                                         server_side=True)
                 except ssl.SSLError as error:
+                    self.logger.exception('failed to init SSL socket')
                     raise TelegramError(str(error))
             else:
                 raise TelegramError('SSL Certificate invalid')
