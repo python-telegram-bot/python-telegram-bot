@@ -145,7 +145,7 @@ class BotTest(BaseTest, unittest.TestCase):
 
     def _test_invalid_token(self, token):
         print('Testing invalid token: {0}'.format(token))
-        self.assertRaisesRegexp(telegram.TelegramError, 'Invalid token', telegram.Bot, token)
+        self.assertRaisesRegexp(telegram.error.InvalidToken, 'Invalid token', telegram.Bot, token)
 
     def testInvalidToken1(self):
         self._test_invalid_token('123')
@@ -158,7 +158,7 @@ class BotTest(BaseTest, unittest.TestCase):
 
     def testUnauthToken(self):
         print('Testing unauthorized token')
-        with self.assertRaisesRegexp(telegram.TelegramError, 'Unauthorized'):
+        with self.assertRaisesRegexp(telegram.error.Unauthorized, 'Unauthorized'):
             bot = telegram.Bot('1234:abcd1234')
             bot.getMe()
 

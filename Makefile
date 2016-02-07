@@ -1,5 +1,11 @@
 .PHONY: clean pep8 lint test install
 
+PYLINT          := pylint
+NOSETESTS       := nosetests
+PEP257          := pep257
+PEP8            := flake8
+PIP             := pip
+
 clean:
 	rm -fr build
 	rm -fr dist
@@ -8,19 +14,19 @@ clean:
 	find . -name '*~' -exec rm -f {} \;
 
 pep257:
-	pep257 telegram
+	$(PEP257) telegram
 
 pep8:
-	flake8 telegram
+	$(PEP8)  telegram
 
 lint:
-	pylint -E telegram --disable=no-name-in-module,import-error
+	$(PYLINT) -E telegram --disable=no-name-in-module,import-error
 
 test:
-	nosetests
+	$(NOSETESTS) -v
 
 install:
-	pip install -r requirements.txt
+	$(PIP)  install -r requirements.txt
 
 help:
 	@echo "Available targets:"
@@ -29,3 +35,10 @@ help:
 	@echo "- pep8        Check style with flake8"
 	@echo "- lint        Check style with pylint"
 	@echo "- test        Run tests"
+	@echo
+	@echo "Available variables:"
+	@echo "- PYLINT      default: $(PYLINT)"
+	@echo "- NOSETESTS   default: $(NOSETESTS)"
+	@echo "- PEP257      default: $(PEP257)"
+	@echo "- PEP8        default: $(PEP8)"
+	@echo "- PIP         default: $(PIP)"
