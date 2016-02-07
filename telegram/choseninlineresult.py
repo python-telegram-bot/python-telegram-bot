@@ -32,12 +32,12 @@ class ChosenInlineResult(TelegramObject):
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        result_id (int):
+        result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
 
     Args:
-        result_id (int):
+        result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
 
