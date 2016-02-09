@@ -122,7 +122,7 @@ class Updater:
         thr.start()
 
     def _thread_wrapper(self, target, *args, **kwargs):
-        thr_name = current_thread()
+        thr_name = current_thread().name
         self.logger.debug('{0} - started'.format(thr_name))
         try:
             target(*args, **kwargs)
