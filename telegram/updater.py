@@ -160,20 +160,10 @@ class Updater:
             if not self.running:
                 self.running = True
 
-                # Create Thread objects
-                dispatcher_thread = Thread(target=self.dispatcher.start,
-                                           name="dispatcher")
-                updater_thread = Thread(target=self._start_webhook,
-                                        name="updater",
-                                        args=(listen,
-                                              port,
-                                              url_path,
-                                              cert,
-                                              key))
-
-                # Start threads
-                dispatcher_thread.start()
-                updater_thread.start()
+                # Create & start threads
+                self._init_thread(self.dispatcher.start, "dispatcher"),
+                self._init_thread(self._start_webhook, "updater", listen,
+                                  port, url_path, cert, key)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
