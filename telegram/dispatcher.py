@@ -143,10 +143,12 @@ class Dispatcher:
         self.telegram_regex_handlers = {}
         self.string_regex_handlers = {}
         self.string_command_handlers = {}
+        self.conversation_handlers = {}
         self.type_handlers = {}
         self.unknown_telegram_command_handlers = []
         self.unknown_string_command_handlers = []
         self.error_handlers = []
+        self.conversations = {}
         self.logger = logging.getLogger(__name__)
         self.running = False
         self.__stop_event = Event()
@@ -237,8 +239,9 @@ class Dispatcher:
         # Custom type handlers
         for t in self.type_handlers:
             if isinstance(update, t):
-                self.dispatchType(update, context)
-                handled = True
+                if not (t == Update and update.message.chat_id not in self.conversations):
+                    self.dispatchType(update, context)
+                    handled = True
 
         # string update
         if type(update) is str and update.startswith('/'):
@@ -254,18 +257,27 @@ class Dispatcher:
             handled = True
 
         # Telegram update (regex)
-        if isinstance(update, Update):
+        if isinstance(update, Update) and update.message.chat_id not in self.conversations:
             self.dispatchRegex(update, context)
             handled = True
 
         # Telegram update (command)
         if isinstance(update, Update) \
-                and update.message.text.startswith('/'):
+                and update.message.text.startswith('/') and update.message.chat_id not in self.conversations:
             self.dispatchTelegramCommand(update, context)
             handled = True
 
+        # Telegram update (conversation)
+        if isinstance(update, Update):
+            if update.message.chat_id in self.conversations:
+                self.dispatchConversation(update, context)
+                handled = True
+            elif update.message.text.startswith('/') and update.message.chat_id not in self.conversations:
+                self.dispatchConversation(update, context)
+                handled = True
+
         # Telegram update (message)
-        elif isinstance(update, Update):
+        elif isinstance(update, Update) and update.message.chat_id not in self.conversations:
             self.dispatchTelegramMessage(update, context)
             handled = True
 
@@ -351,6 +363,22 @@ class Dispatcher:
             self.string_regex_handlers[matcher] = []
 
         self.string_regex_handlers[matcher].append(handler)
+
+    def addConversationHandler(self, initiator_command, handler):
+        """
+        Registers a conversation handler in the Dispatcher, that will receive all messages from a user after they have
+        initiated a conversation with a command.
+        Warning: this overrides all other handlers that accept an Update in its args.
+
+        Args:
+            initiator_command(str): The command keyword that initiates the conversation.
+            handler (class): A class  that takes (chat_id, str, *args, **kwargs) as
+                arguments in its __init__ and takes (Bot, Update, *args, **kwargs) in its __call__ method.
+                The __call__ method returns True if the conversation is over. Otherwise return False.
+        """
+        if initiator_command in self.conversation_handlers:
+            raise TelegramError('this initiator_command is already handled') # only one handler for a initiator_command because it might override itself.
+        self.conversation_handlers[initiator_command] = handler
 
     def addUnknownTelegramCommandHandler(self, handler):
         """
@@ -466,6 +494,16 @@ class Dispatcher:
         if matcher in self.string_regex_handlers \
                 and handler in self.string_regex_handlers[matcher]:
             self.string_regex_handlers[matcher].remove(handler)
+
+    def removeConversationHandler(self, initiator_command):
+        """
+        De-registers a conversation-command handler.
+
+        Args:
+            initiator_command (str): The command that needs to be de-registered.
+        """
+        if initiator_command in self.conversation_handlers:
+            del self.conversation_handlers[initiator_command]
 
     def removeUnknownTelegramCommandHandler(self, handler):
         """
@@ -603,12 +641,28 @@ class Dispatcher:
         Dispatches an error.
 
         Args:
-            update (any): The pdate that caused the error
+            update (any): The update that caused the error
             error (telegram.TelegramError): The Telegram error that was raised.
         """
 
         for handler in self.error_handlers:
             handler(self.bot, update, error)
+
+    def dispatchConversation(self, update, context=None):
+        """
+        Dispatches a Conversation.
+
+        Args:
+            update (telegram.Update): The Update
+        """
+        command = update.message.text.split(' ')[0][1:].split('@')[0]
+        if command in self.conversation_handlers or update.message.chat_id in self.conversations:
+            if update.message.chat_id not in self.conversations:
+                new_conversation = self.conversation_handlers[command](update.message.chat_id, command)
+                self.conversations[update.message.chat_id] = new_conversation
+            if self.dispatchTo([self.conversations[update.message.chat_id]], update, context=context)[0]: # the conversation is over
+                del self.conversations[update.message.chat_id]
+
 
     def dispatchTo(self, handlers, update, **kwargs):
         """
@@ -618,9 +672,10 @@ class Dispatcher:
             handlers (list): A list of handler-functions.
             update (any): The update to be dispatched
         """
-
+        r_list = []
         for handler in handlers:
-            self.call_handler(handler, update, **kwargs)
+            r_list.append(self.call_handler(handler, update, **kwargs))
+        return r_list
 
     def call_handler(self, handler, update, **kwargs):
         """
@@ -664,4 +719,4 @@ class Dispatcher:
         if is_async or 'context' in fargs:
             target_kwargs['context'] = kwargs.get('context', None)
 
-        handler(self.bot, update, **target_kwargs)
+        return handler(self.bot, update, **target_kwargs)
