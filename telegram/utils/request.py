@@ -84,7 +84,7 @@ def _try_except_req(func):
             if errcode in (401, 403):
                 raise Unauthorized()
             if errcode == 502:
-                raise TelegramError('Bad Gateway')
+                raise NetworkError('Bad Gateway')
 
             try:
                 message = _parse(error.read())
