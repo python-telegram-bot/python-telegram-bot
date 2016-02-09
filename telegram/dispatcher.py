@@ -22,7 +22,7 @@
 import logging
 from functools import wraps
 from inspect import getargspec
-from threading import Thread, BoundedSemaphore, Lock, Event
+from threading import Thread, BoundedSemaphore, Lock, Event, current_thread
 from re import match
 from time import sleep
 
@@ -33,7 +33,8 @@ H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
 
 semaphore = None
-running_async = 0
+async_threads = set()
+""":type: set[Thread]"""
 async_lock = Lock()
 
 
@@ -58,11 +59,10 @@ def run_async(func):
         """
         A wrapper to run a thread in a thread pool
         """
-        global running_async, async_lock
         result = func(*pargs, **kwargs)
         semaphore.release()
         with async_lock:
-            running_async -= 1
+            async_threads.remove(current_thread())
         return result
 
     @wraps(func)
@@ -70,11 +70,10 @@ def run_async(func):
         """
         A wrapper to run a function in a thread
         """
-        global running_async, async_lock
         thread = Thread(target=pooled, args=pargs, kwargs=kwargs)
         semaphore.acquire()
         with async_lock:
-            running_async += 1
+            async_threads.add(thread)
         thread.start()
         return thread
 
