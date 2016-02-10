@@ -6,12 +6,8 @@
 
 import logging
 import telegram
+from telegram.error import NetworkError, Unauthorized
 from time import sleep
-
-try:
-    from urllib.error import URLError
-except ImportError:
-    from urllib2 import URLError  # python 2
 
 
 def main():
@@ -31,18 +27,11 @@ def main():
     while True:
         try:
             update_id = echo(bot, update_id)
-        except telegram.TelegramError as e:
-            # These are network problems with Telegram.
-            if e.message in ("Bad Gateway", "Timed out"):
-                sleep(1)
-            elif e.message == "Unauthorized":
-                # The user has removed or blocked the bot.
-                update_id += 1
-            else:
-                raise e
-        except URLError as e:
-            # These are network problems on our end.
+        except NetworkError:
             sleep(1)
+        except Unauthorized:
+            # The user has removed or blocked the bot.
+            update_id += 1
 
 
 def echo(bot, update_id):
