@@ -30,6 +30,7 @@ import signal
 from random import randrange
 from time import sleep
 from datetime import datetime
+from future.builtins import bytes
 
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
@@ -37,9 +38,12 @@ else:
     import unittest
 
 try:
-    from urllib2 import urlopen, Request
+    # python2
+    from urllib2 import urlopen, Request, HTTPError
 except ImportError:
+    # python3
     from urllib.request import Request, urlopen
+    from urllib.error import HTTPError
 
 sys.path.append('.')
 
@@ -399,9 +403,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.addTelegramMessageHandler(
             self.telegramHandlerTest)
 
-        # Select random port for travis
-        port = randrange(1024, 49152)
-        self.updater.start_webhook('127.0.0.1', port,
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port for travis
+        self.updater.start_webhook(ip, port,
                                    url_path='TOKEN',
                                    cert='./tests/test_updater.py',
                                    key='./tests/test_updater.py')
@@ -417,34 +421,19 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         update = Update(1)
         update.message = message
 
-        try:
-            payload = bytes(update.to_json(), encoding='utf-8')
-        except TypeError:
-            payload = bytes(update.to_json())
-
-        header = {
-            'content-type': 'application/json',
-            'content-length': str(len(payload))
-        }
-
-        r = Request('http://127.0.0.1:%d/TOKEN' % port,
-                    data=payload,
-                    headers=header)
-
-        urlopen(r)
+        self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
 
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test')
 
         print("Test other webhook server functionalities...")
-        request = Request('http://localhost:%d/webookhandler.py' % port)
-        response = urlopen(request)
+        response = self._send_webhook_msg(ip, port, None, 'webookhandler.py')
         self.assertEqual(b'', response.read())
         self.assertEqual(200, response.code)
 
-        request.get_method = lambda: 'HEAD'
+        response = self._send_webhook_msg(ip, port, None, 'webookhandler.py',
+                                          get_method=lambda: 'HEAD')
 
-        response = urlopen(request)
         self.assertEqual(b'', response.read())
         self.assertEqual(200, response.code)
 
@@ -460,9 +449,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.addTelegramMessageHandler(
             self.telegramHandlerTest)
 
-        # Select random port for travis
-        port = randrange(1024, 49152)
-        self.updater.start_webhook('127.0.0.1', port)
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port for travis
+        self.updater.start_webhook(ip, port)
         sleep(0.5)
 
         # Now, we send an update to the server via urlopen
@@ -473,23 +462,77 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         update = Update(1)
         update.message = message
 
-        try:
-            payload = bytes(update.to_json(), encoding='utf-8')
-        except TypeError:
-            payload = bytes(update.to_json())
-
-        header = {
-            'content-type': 'application/json',
-            'content-length': str(len(payload))
-        }
-
-        r = Request('http://127.0.0.1:%d/' % port,
-                    data=payload,
-                    headers=header)
-
-        urlopen(r)
+        self._send_webhook_msg(ip, port, update.to_json())
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test 2')
+
+    def test_webhook_invalid_posts(self):
+        self._setup_updater('', messages=0)
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # select random port for travis
+        thr = Thread(target=self.updater._start_webhook,
+                     args=(ip, port, '', None, None))
+        thr.start()
+
+        sleep(0.5)
+
+        try:
+            with self.assertRaises(HTTPError) as ctx:
+                self._send_webhook_msg(ip, port,
+                                       '<root><bla>data</bla></root>',
+                                       content_type='application/xml')
+            self.assertEqual(ctx.exception.code, 403)
+
+            with self.assertRaises(HTTPError) as ctx:
+                self._send_webhook_msg(ip, port, 'dummy-payload',
+                                       content_len=-2)
+            self.assertEqual(ctx.exception.code, 403)
+
+            # TODO: prevent urllib or the underlying from adding content-length
+            # with self.assertRaises(HTTPError) as ctx:
+            #     self._send_webhook_msg(ip, port, 'dummy-payload',
+            #                            content_len=None)
+            # self.assertEqual(ctx.exception.code, 411)
+
+            with self.assertRaises(HTTPError) as ctx:
+                self._send_webhook_msg(ip, port, 'dummy-payload',
+                                       content_len='not-a-number')
+            self.assertEqual(ctx.exception.code, 403)
+
+        finally:
+            self.updater._stop_httpd()
+            thr.join()
+
+    def _send_webhook_msg(self, ip, port, payload_str, url_path='',
+                          content_len=-1, content_type='application/json',
+                          get_method=None):
+        headers = {
+            'content-type': content_type,
+        }
+
+        if not payload_str:
+            content_len = None
+            payload = None
+        else:
+            payload = bytes(payload_str, encoding='utf-8')
+
+        if content_len == -1:
+            content_len = len(payload)
+
+        if content_len is not None:
+            headers['content-length'] = str(content_len)
+
+        url = 'http://{ip}:{port}/{path}'.format(ip=ip, port=port,
+                                                 path=url_path)
+
+        req = Request(url, data=payload, headers=headers)
+
+
+        if get_method is not None:
+            req.get_method = get_method
+
+        return urlopen(req)
 
     def signalsender(self):
         sleep(0.5)
