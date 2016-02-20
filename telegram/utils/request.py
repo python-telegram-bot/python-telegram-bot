@@ -94,7 +94,7 @@ def _try_except_req(func):
             raise NetworkError('{0} ({1})'.format(message, errcode))
 
         except URLError as error:
-            raise NetworkError('URLError: {0!r}'.format(error))
+            raise NetworkError('URLError: {0}'.format(error.reason))
 
         except (SSLError, socket.timeout) as error:
             err_s = str(error)
