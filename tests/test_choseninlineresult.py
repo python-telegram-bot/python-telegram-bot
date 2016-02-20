@@ -20,9 +20,13 @@
 """This module contains a object that represents Tests for Telegram
 ChosenInlineResult"""
 
-import os
-import unittest
 import sys
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -53,7 +57,8 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
         result = telegram.ChosenInlineResult.de_json(self.json_dict)
 
         self.assertEqual(result.result_id, self.result_id)
-        self.assertEqual(result.from_user.to_dict(), self.from_user.to_dict())
+        self.assertDictEqual(result.from_user.to_dict(),
+                             self.from_user.to_dict())
         self.assertEqual(result.query, self.query)
 
     def test_choseninlineresult_to_json(self):

@@ -18,6 +18,7 @@
 
 """
 This module contains the classes that represent Telegram InlineQueryResults
+https://core.telegram.org/bots/api#inline-mode
 """
 
 from telegram import TelegramObject

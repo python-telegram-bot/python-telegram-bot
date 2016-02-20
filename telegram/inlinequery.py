@@ -65,9 +65,10 @@ class InlineQuery(TelegramObject):
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.pop('from'))
+        data_ = data.copy()  # Copy data so we can pop 'from'
+        data_['from_user'] = User.de_json(data_.pop('from'))
 
-        return InlineQuery(**data)
+        return InlineQuery(**data_)
 
     def to_dict(self):
         """

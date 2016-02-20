@@ -20,9 +20,13 @@
 """This module contains a object that represents Tests for Telegram
 InlineQuery"""
 
-import os
-import unittest
 import sys
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -55,7 +59,8 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
         inlinequery = telegram.InlineQuery.de_json(self.json_dict)
 
         self.assertEqual(inlinequery.id, self.id)
-        self.assertEqual(inlinequery.from_user.to_dict(), self.from_user.to_dict())
+        self.assertDictEqual(inlinequery.from_user.to_dict(),
+                             self.from_user.to_dict())
         self.assertEqual(inlinequery.query, self.query)
         self.assertEqual(inlinequery.offset, self.offset)
 
@@ -74,10 +79,7 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
         inlinequery = telegram.InlineQuery.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(inlinequery))
-        self.assertEqual(inlinequery['id'], self.id)
-        self.assertEqual(inlinequery['from'], self.from_user.to_dict())
-        self.assertEqual(inlinequery['query'], self.query)
-        self.assertEqual(inlinequery['offset'], self.offset)
+        self.assertDictEqual(inlinequery, self.json_dict)
 
 
 if __name__ == '__main__':

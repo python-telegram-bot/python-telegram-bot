@@ -20,9 +20,13 @@
 """This module contains a object that represents Tests for Telegram
 InlineResults"""
 
-import os
-import unittest
 import sys
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -34,6 +38,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.id = 'id'
+        self.type = 'article'
         self.title = 'title'
         self.message_text = 'message text'
         self.parse_mode = 'HTML'
@@ -46,7 +51,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.thumb_width = 15
 
         self.json_dict = {
-            'type': 'article',
+            'type': self.type,
             'id': self.id,
             'title': self.title,
             'message_text': self.message_text,
@@ -66,7 +71,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
 
         article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
 
-        self.assertEqual(article.type, 'article')
+        self.assertEqual(article.type, self.type)
         self.assertEqual(article.id, self.id)
         self.assertEqual(article.title, self.title)
         self.assertEqual(article.message_text, self.message_text)
@@ -96,19 +101,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
             telegram.InlineQueryResultArticle.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(article))
-        self.assertEqual(article['type'], 'article')
-        self.assertEqual(article['id'], self.id)
-        self.assertEqual(article['title'], self.title)
-        self.assertEqual(article['message_text'], self.message_text)
-        self.assertEqual(article['parse_mode'], self.parse_mode)
-        self.assertEqual(article['disable_web_page_preview'],
-                         self.disable_web_page_preview)
-        self.assertEqual(article['url'], self.url)
-        self.assertEqual(article['hide_url'], self.hide_url)
-        self.assertEqual(article['description'], self.description)
-        self.assertEqual(article['thumb_url'], self.thumb_url)
-        self.assertEqual(article['thumb_height'], self.thumb_height)
-        self.assertEqual(article['thumb_width'], self.thumb_width)
+        self.assertDictEqual(self.json_dict, article)
 
 
 class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
@@ -116,6 +109,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.id = 'id'
+        self.type = 'photo'
         self.photo_url = 'photo url'
         self.mime_type = 'mime type'
         self.photo_width = 10
@@ -128,7 +122,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         self.disable_web_page_preview = True
 
         self.json_dict = {
-            'type': 'photo',
+            'type': self.type,
             'id': self.id,
             'photo_url': self.photo_url,
             'mime_type': self.mime_type,
@@ -148,7 +142,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
 
         photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
 
-        self.assertEqual(photo.type, 'photo')
+        self.assertEqual(photo.type, self.type)
         self.assertEqual(photo.id, self.id)
         self.assertEqual(photo.photo_url, self.photo_url)
         self.assertEqual(photo.mime_type, self.mime_type)
@@ -178,19 +172,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
             telegram.InlineQueryResultPhoto.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(photo))
-        self.assertEqual(photo['type'], 'photo')
-        self.assertEqual(photo['id'], self.id)
-        self.assertEqual(photo['photo_url'], self.photo_url)
-        self.assertEqual(photo['mime_type'], self.mime_type)
-        self.assertEqual(photo['photo_width'], self.photo_width)
-        self.assertEqual(photo['photo_height'], self.photo_height)
-        self.assertEqual(photo['thumb_url'], self.thumb_url)
-        self.assertEqual(photo['title'], self.title)
-        self.assertEqual(photo['caption'], self.caption)
-        self.assertEqual(photo['message_text'], self.message_text)
-        self.assertEqual(photo['parse_mode'], self.parse_mode)
-        self.assertEqual(photo['disable_web_page_preview'],
-                         self.disable_web_page_preview)
+        self.assertDictEqual(self.json_dict, photo)
 
 
 class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
@@ -198,6 +180,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.id = 'id'
+        self.type = 'gif'
         self.gif_url = 'gif url'
         self.gif_width = 10
         self.gif_height = 15
@@ -209,7 +192,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.disable_web_page_preview = True
 
         self.json_dict = {
-            'type': 'gif',
+            'type': self.type,
             'id': self.id,
             'gif_url': self.gif_url,
             'gif_width': self.gif_width,
@@ -228,7 +211,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
 
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
 
-        self.assertEqual(gif.type, 'gif')
+        self.assertEqual(gif.type, self.type)
         self.assertEqual(gif.id, self.id)
         self.assertEqual(gif.gif_url, self.gif_url)
         self.assertEqual(gif.gif_width, self.gif_width)
@@ -256,18 +239,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(gif))
-        self.assertEqual(gif['type'], 'gif')
-        self.assertEqual(gif['id'], self.id)
-        self.assertEqual(gif['gif_url'], self.gif_url)
-        self.assertEqual(gif['gif_width'], self.gif_width)
-        self.assertEqual(gif['gif_height'], self.gif_height)
-        self.assertEqual(gif['thumb_url'], self.thumb_url)
-        self.assertEqual(gif['title'], self.title)
-        self.assertEqual(gif['caption'], self.caption)
-        self.assertEqual(gif['message_text'], self.message_text)
-        self.assertEqual(gif['parse_mode'], self.parse_mode)
-        self.assertEqual(gif['disable_web_page_preview'],
-                         self.disable_web_page_preview)
+        self.assertDictEqual(self.json_dict, gif)
 
 
 class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
@@ -275,6 +247,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.id = 'id'
+        self.type = 'mpeg4_gif'
         self.mpeg4_url = 'mpeg4 url'
         self.mpeg4_width = 10
         self.mpeg4_height = 15
@@ -286,7 +259,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.disable_web_page_preview = True
 
         self.json_dict = {
-            'type': 'gif',
+            'type': self.type,
             'id': self.id,
             'mpeg4_url': self.mpeg4_url,
             'mpeg4_width': self.mpeg4_width,
@@ -305,7 +278,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
 
         mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
 
-        self.assertEqual(mpeg4.type, 'mpeg4_gif')
+        self.assertEqual(mpeg4.type, self.type)
         self.assertEqual(mpeg4.id, self.id)
         self.assertEqual(mpeg4.mpeg4_url, self.mpeg4_url)
         self.assertEqual(mpeg4.mpeg4_width, self.mpeg4_width)
@@ -334,18 +307,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
             telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(mpeg4))
-        self.assertEqual(mpeg4['type'], 'mpeg4_gif')
-        self.assertEqual(mpeg4['id'], self.id)
-        self.assertEqual(mpeg4['mpeg4_url'], self.mpeg4_url)
-        self.assertEqual(mpeg4['mpeg4_width'], self.mpeg4_width)
-        self.assertEqual(mpeg4['mpeg4_height'], self.mpeg4_height)
-        self.assertEqual(mpeg4['thumb_url'], self.thumb_url)
-        self.assertEqual(mpeg4['title'], self.title)
-        self.assertEqual(mpeg4['caption'], self.caption)
-        self.assertEqual(mpeg4['message_text'], self.message_text)
-        self.assertEqual(mpeg4['parse_mode'], self.parse_mode)
-        self.assertEqual(mpeg4['disable_web_page_preview'],
-                         self.disable_web_page_preview)
+        self.assertDictEqual(self.json_dict, mpeg4)
 
 
 class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
@@ -353,7 +315,8 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.id = 'id'
-        self.video_url = 'mpeg4 url'
+        self.type = 'video'
+        self.video_url = 'video url'
         self.mime_type = 'mime type'
         self.video_width = 10
         self.video_height = 15
@@ -367,7 +330,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         self.disable_web_page_preview = True
 
         self.json_dict = {
-            'type': 'video',
+            'type': self.type,
             'id': self.id,
             'video_url': self.video_url,
             'mime_type': self.mime_type,
@@ -389,7 +352,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
 
         video = telegram.InlineQueryResultVideo.de_json(self.json_dict)
 
-        self.assertEqual(video.type, 'video')
+        self.assertEqual(video.type, self.type)
         self.assertEqual(video.id, self.id)
         self.assertEqual(video.video_url, self.video_url)
         self.assertEqual(video.mime_type, self.mime_type)
@@ -421,21 +384,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
             telegram.InlineQueryResultVideo.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(video))
-        self.assertEqual(video['type'], 'video')
-        self.assertEqual(video['id'], self.id)
-        self.assertEqual(video['video_url'], self.video_url)
-        self.assertEqual(video['mime_type'], self.mime_type)
-        self.assertEqual(video['video_width'], self.video_width)
-        self.assertEqual(video['video_height'], self.video_height)
-        self.assertEqual(video['video_duration'], self.video_duration)
-        self.assertEqual(video['thumb_url'], self.thumb_url)
-        self.assertEqual(video['title'], self.title)
-        self.assertEqual(video['description'], self.description)
-        self.assertEqual(video['caption'], self.caption)
-        self.assertEqual(video['message_text'], self.message_text)
-        self.assertEqual(video['parse_mode'], self.parse_mode)
-        self.assertEqual(video['disable_web_page_preview'],
-                         self.disable_web_page_preview)
+        self.assertDictEqual(self.json_dict, video)
 
 
 if __name__ == '__main__':
