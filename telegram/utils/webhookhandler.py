@@ -1,7 +1,7 @@
 import logging
 
 from telegram import Update, NullHandler
-from future.utils import bytes_to_native_str as n
+from future.utils import bytes_to_native_str
 from threading import Lock
 import json
 try:
@@ -12,6 +12,13 @@ except ImportError:
 
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
+
+
+class _InvalidPost(Exception):
+
+    def __init__(self, http_code):
+        self.http_code = http_code
+        super(_InvalidPost, self).__init__()
 
 
 class WebhookServer(BaseHTTPServer.HTTPServer, object):
@@ -63,12 +70,15 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
     def do_POST(self):
         self.logger.debug("Webhook triggered")
-        if self.path == self.server.webhook_path and \
-           'content-type' in self.headers and \
-           'content-length' in self.headers and \
-           self.headers['content-type'] == 'application/json':
-            json_string = \
-                n(self.rfile.read(int(self.headers['content-length'])))
+        try:
+            self._validate_post()
+            clen = self._get_content_len()
+        except _InvalidPost as e:
+            self.send_error(e.http_code)
+            self.end_headers()
+        else:
+            buf = self.rfile.read(clen)
+            json_string = bytes_to_native_str(buf)
 
             self.send_response(200)
             self.end_headers()
@@ -80,6 +90,20 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                              update.update_id)
             self.server.update_queue.put(update)
 
-        else:
-            self.send_error(403)
-            self.end_headers()
+    def _validate_post(self):
+        if not (self.path == self.server.webhook_path and
+                'content-type' in self.headers and
+                self.headers['content-type'] == 'application/json'):
+            raise _InvalidPost(403)
+
+    def _get_content_len(self):
+        clen = self.headers.get('content-length')
+        if clen is None:
+            raise _InvalidPost(411)
+        try:
+            clen = int(clen)
+        except ValueError:
+            raise _InvalidPost(403)
+        if clen < 0:
+            raise _InvalidPost(403)
+        return clen

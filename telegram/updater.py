@@ -89,6 +89,8 @@ class Updater:
         self.is_idle = False
         self.httpd = None
         self.__lock = Lock()
+        self.__threads = []
+        """:type: list[Thread]"""
 
     def start_polling(self, poll_interval=0.0, timeout=10, network_delay=2):
         """
@@ -120,9 +122,10 @@ class Updater:
         thr = Thread(target=self._thread_wrapper, name=name,
                      args=(target,) + args, kwargs=kwargs)
         thr.start()
+        self.__threads.append(thr)
 
     def _thread_wrapper(self, target, *args, **kwargs):
-        thr_name = current_thread()
+        thr_name = current_thread().name
         self.logger.debug('{0} - started'.format(thr_name))
         try:
             target(*args, **kwargs)
@@ -160,20 +163,10 @@ class Updater:
             if not self.running:
                 self.running = True
 
-                # Create Thread objects
-                dispatcher_thread = Thread(target=self.dispatcher.start,
-                                           name="dispatcher")
-                updater_thread = Thread(target=self._start_webhook,
-                                        name="updater",
-                                        args=(listen,
-                                              port,
-                                              url_path,
-                                              cert,
-                                              key))
-
-                # Start threads
-                dispatcher_thread.start()
-                updater_thread.start()
+                # Create & start threads
+                self._init_thread(self.dispatcher.start, "dispatcher"),
+                self._init_thread(self._start_webhook, "updater", listen,
+                                  port, url_path, cert, key)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -221,8 +214,6 @@ class Updater:
 
             sleep(cur_interval)
 
-        self.logger.info('Updater thread stopped')
-
     @staticmethod
     def _increase_poll_interval(current_interval):
         # increase waiting times on subsequent errors up to 30secs
@@ -266,7 +257,6 @@ class Updater:
                 raise TelegramError('SSL Certificate invalid')
 
         self.httpd.serve_forever(poll_interval=1)
-        self.logger.info('Updater thread stopped')
 
     def stop(self):
         """
@@ -276,25 +266,49 @@ class Updater:
         self.job_queue.stop()
         with self.__lock:
             if self.running:
-                self.running = False
                 self.logger.info('Stopping Updater and Dispatcher...')
-                self.logger.debug('This might take a long time if you set a '
-                                  'high value as polling timeout.')
 
-                if self.httpd:
-                    self.logger.info(
-                        'Waiting for current webhook connection to be '
-                        'closed... Send a Telegram message to the bot to exit '
-                        'immediately.')
-                    self.httpd.shutdown()
-                    self.httpd = None
+                self.running = False
 
-                self.logger.debug("Requesting Dispatcher to stop...")
-                self.dispatcher.stop()
-                while dispatcher.running_async > 0:
-                    sleep(1)
+                self._stop_httpd()
+                self._stop_dispatcher()
+                self._join_threads()
+                # async threads must be join()ed only after the dispatcher
+                # thread was joined, otherwise we can still have new async
+                # threads dispatched
+                self._join_async_threads()
 
-                self.logger.debug("Dispatcher stopped.")
+    def _stop_httpd(self):
+        if self.httpd:
+            self.logger.info(
+                'Waiting for current webhook connection to be '
+                'closed... Send a Telegram message to the bot to exit '
+                'immediately.')
+            self.httpd.shutdown()
+            self.httpd = None
+
+    def _stop_dispatcher(self):
+        self.logger.debug("Requesting Dispatcher to stop...")
+        self.dispatcher.stop()
+
+    def _join_async_threads(self):
+        with dispatcher.async_lock:
+            threads = list(dispatcher.async_threads)
+        total = len(threads)
+        for i, thr in enumerate(threads):
+            self.logger.info(
+                'Waiting for async thread {0}/{1} to end'.format(i, total))
+            thr.join()
+            self.logger.debug(
+                'async thread {0}/{1} has ended'.format(i, total))
+
+    def _join_threads(self):
+        for thr in self.__threads:
+            self.logger.info(
+                'Waiting for {0} thread to end'.format(thr.name))
+            thr.join()
+            self.logger.debug('{0} thread has ended'.format(thr.name))
+        self.__threads = []
 
     def signal_handler(self, signum, frame):
         self.is_idle = False
