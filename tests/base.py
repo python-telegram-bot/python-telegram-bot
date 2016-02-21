@@ -24,7 +24,7 @@ import sys
 import signal
 import traceback
 
-from nose.tools import make_decorator, TimeExpired
+from nose.tools import make_decorator
 
 sys.path.append('.')
 
@@ -64,8 +64,7 @@ class BaseTest(object):
 class TestTimedOut(AssertionError):
 
     def __init__(self, time_limit, frame):
-        super(TestTimedOut, self).__init__('time_limit={0}\n{1}'.format(
-            time_limit, ''.join(traceback.format_stack(frame))))
+        super(TestTimedOut, self).__init__('time_limit={0}'.format(time_limit))
         self.time_limit = time_limit
         self.frame = frame
 

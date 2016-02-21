@@ -55,7 +55,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
             'file_size': self.file_size
         }
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_sendphotoo_all_args(self):
         """Test telegram.Bot sendAudio method"""
@@ -83,7 +83,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(message.caption, self.caption)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_photo_jpg_file(self):
         """Test telegram.Bot sendPhoto method"""
@@ -108,7 +108,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.height, self.height)
         self.assertEqual(photo.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_photo_url_jpg_file(self):
         """Test telegram.Bot sendPhoto method"""
@@ -133,7 +133,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.height, self.height)
         self.assertEqual(photo.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_photo_resend(self):
         """Test telegram.Bot sendPhoto method"""
@@ -187,7 +187,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo['height'], self.height)
         self.assertEqual(photo['file_size'], self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_photo_empty_file(self):
         print('Testing bot.sendPhoto - Null file')
@@ -201,7 +201,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendPhoto(chat_id=self._chat_id,
                                                       **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_photo_empty_file_id(self):
         print('Testing bot.sendPhoto - Empty file_id')
@@ -215,7 +215,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendPhoto(chat_id=self._chat_id,
                                                       **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_photo_without_required_args(self):
         print('Testing bot.sendPhoto - Without required arguments')

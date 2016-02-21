@@ -51,12 +51,12 @@ class StickerTest(BaseTest, unittest.TestCase):
             'file_size': self.file_size
         }
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_sticker_file(self):
         pass
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_sticker_resend(self):
         """Test telegram.Bot sendSticker method"""
@@ -105,7 +105,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(sticker['thumb'], telegram.PhotoSize))
         self.assertEqual(sticker['file_size'], self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_sticker_empty_file(self):
         print('Testing bot.sendSticker - Null file')
@@ -119,7 +119,7 @@ class StickerTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendSticker(chat_id=self._chat_id,
                                                         **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_sticker_empty_file_id(self):
         print('Testing bot.sendSticker - Empty file_id')
@@ -133,7 +133,7 @@ class StickerTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendSticker(chat_id=self._chat_id,
                                                          **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_sticker_without_required_args(self):
         print('Testing bot.sendSticker - Without required arguments')

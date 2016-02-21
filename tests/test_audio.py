@@ -52,7 +52,7 @@ class AudioTest(BaseTest, unittest.TestCase):
             'file_size': self.file_size
         }
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_audio_required_args_only(self):
         """Test telegram.Bot sendAudio method"""
@@ -71,7 +71,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_audio_all_args(self):
         """Test telegram.Bot sendAudio method"""
@@ -95,7 +95,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_audio_mp3_file(self):
         """Test telegram.Bot sendAudio method"""
@@ -117,7 +117,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_audio_mp3_file_custom_filename(self):
         """Test telegram.Bot sendAudio method"""
@@ -140,7 +140,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_audio_mp3_url_file(self):
         """Test telegram.Bot sendAudio method"""
@@ -162,7 +162,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_audio_resend(self):
         """Test telegram.Bot sendAudio method"""
@@ -217,7 +217,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio['mime_type'], self.mime_type)
         self.assertEqual(audio['file_size'], self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_audio_empty_file(self):
         print('Testing bot.sendAudio - Null file')
@@ -231,7 +231,7 @@ class AudioTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendAudio(chat_id=self._chat_id,
                                                       **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_audio_empty_file_id(self):
         print('Testing bot.sendAudio - Empty file_id')
@@ -245,7 +245,7 @@ class AudioTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendAudio(chat_id=self._chat_id,
                                                       **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_audio_without_required_args(self):
         print('Testing bot.sendAudio - Without required arguments')

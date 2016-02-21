@@ -39,7 +39,7 @@ from tests.base import BaseTest, timeout
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testGetMe(self):
         '''Test the telegram.Bot getMe method'''
@@ -53,7 +53,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(bot.username, 'PythonTelegramBot')
         self.assertEqual(bot.name, '@PythonTelegramBot')
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testSendMessage(self):
         '''Test the telegram.Bot sendMessage method'''
@@ -65,7 +65,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
         self.assertTrue(isinstance(message.date, datetime))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''
@@ -76,7 +76,7 @@ class BotTest(BaseTest, unittest.TestCase):
             self.assertTrue(self.is_json(updates[0].to_json()))
             self.assertTrue(isinstance(updates[0], telegram.Update))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''
@@ -90,7 +90,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.forward_from.username, 'leandrotoledo')
         self.assertTrue(isinstance(message.forward_date, datetime))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -103,7 +103,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.photo[0].file_size, 1451)
         self.assertEqual(message.caption, 'testSendPhoto')
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testResendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -114,7 +114,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_id, 'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testSendJPGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -125,7 +125,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 822)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testSendPNGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -136,7 +136,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testSendGIFURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
@@ -147,7 +147,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testSendChatAction(self):
         '''Test the telegram.Bot sendChatAction method'''
@@ -156,7 +156,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
                                  chat_id=self._chat_id)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def testGetUserProfilePhotos(self):
         '''Test the telegram.Bot getUserProfilePhotos method'''

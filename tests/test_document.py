@@ -53,7 +53,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
             'file_size': self.file_size
         }
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file(self):
         """Test telegram.Bot sendDocument method"""
@@ -71,7 +71,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.mime_type, self.mime_type)
         self.assertEqual(document.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file_with_custom_file_name(self):
         """Test telegram.Bot sendDocument method"""
@@ -90,7 +90,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.mime_type, self.mime_type)
         self.assertEqual(document.file_size, self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_document_url_gif_file(self):
         """Test telegram.Bot sendDocument method"""
@@ -108,7 +108,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.mime_type, 'image/gif')
         self.assertEqual(document.file_size, 3878)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_send_document_resend(self):
         """Test telegram.Bot sendDocument method"""
@@ -157,7 +157,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document['mime_type'], self.mime_type)
         self.assertEqual(document['file_size'], self.file_size)
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_document_empty_file(self):
         print('Testing bot.sendDocument - Null file')
@@ -171,7 +171,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendDocument(chat_id=self._chat_id,
                                                          **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_send_document_empty_file_id(self):
         print('Testing bot.sendDocument - Empty file_id')
@@ -185,7 +185,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendDocument(chat_id=self._chat_id,
                                                          **json_dict))
 
-    @flaky
+    @flaky(3, 1)
     @timeout(10)
     def test_error_document_without_required_args(self):
         print('Testing bot.sendDocument - Without required arguments')
