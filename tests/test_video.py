@@ -22,13 +22,12 @@
 import os
 import unittest
 import sys
-from nose.tools import timed
 from flaky import flaky
 
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, timeout
 
 
 class VideoTest(BaseTest, unittest.TestCase):
@@ -59,7 +58,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         }
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_video_required_args_only(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - With required arguments only')
@@ -79,7 +78,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.file_size, self.file_size)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_video_all_args(self):
         """Test telegram.Bot sendAudio method"""
         print('Testing bot.sendVideo - With all arguments')
@@ -103,7 +102,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.caption, self.caption)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_video_mp4_file(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - MP4 File')
@@ -127,7 +126,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.caption, self.caption)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_video_mp4_file_with_custom_filename(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - MP4 File with custom filename')
@@ -152,7 +151,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.caption, self.caption)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_video_mp4_file_url(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - MP4 File by URL')
@@ -176,7 +175,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.caption, self.caption)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_video_resend(self):
         """Test telegram.Bot sendVideo method"""
         print('Testing bot.sendVideo - Resend by file_id')
@@ -232,7 +231,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video['file_size'], self.file_size)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_send_video_empty_file(self):
         print('Testing bot.sendVideo - Null file')
 
@@ -246,7 +245,7 @@ class VideoTest(BaseTest, unittest.TestCase):
                                                       **json_dict))
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_send_video_empty_file_id(self):
         print('Testing bot.sendVideo - Empty file_id')
 
@@ -260,7 +259,7 @@ class VideoTest(BaseTest, unittest.TestCase):
                                                       **json_dict))
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_video_without_required_args(self):
         print('Testing bot.sendVideo - Without required arguments')
 

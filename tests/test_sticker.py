@@ -22,13 +22,12 @@
 import os
 import unittest
 import sys
-from nose.tools import timed
 from flaky import flaky
 
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, timeout
 
 
 class StickerTest(BaseTest, unittest.TestCase):
@@ -53,12 +52,12 @@ class StickerTest(BaseTest, unittest.TestCase):
         }
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_sticker_file(self):
         pass
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_sticker_resend(self):
         """Test telegram.Bot sendSticker method"""
         print('Testing bot.sendSticker - Resend by file_id')
@@ -107,7 +106,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker['file_size'], self.file_size)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_send_sticker_empty_file(self):
         print('Testing bot.sendSticker - Null file')
 
@@ -121,7 +120,7 @@ class StickerTest(BaseTest, unittest.TestCase):
                                                         **json_dict))
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_send_sticker_empty_file_id(self):
         print('Testing bot.sendSticker - Empty file_id')
 
@@ -135,7 +134,7 @@ class StickerTest(BaseTest, unittest.TestCase):
                                                          **json_dict))
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_sticker_without_required_args(self):
         print('Testing bot.sendSticker - Without required arguments')
 

@@ -22,13 +22,12 @@
 import os
 import unittest
 import sys
-from nose.tools import timed
 from flaky import flaky
 
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, timeout
 
 
 class DocumentTest(BaseTest, unittest.TestCase):
@@ -55,7 +54,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         }
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_document_png_file(self):
         """Test telegram.Bot sendDocument method"""
         print('Testing bot.sendDocument - PNG File')
@@ -73,7 +72,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.file_size, self.file_size)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_document_png_file_with_custom_file_name(self):
         """Test telegram.Bot sendDocument method"""
         print('Testing bot.sendDocument - PNG File with custom filename')
@@ -92,7 +91,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.file_size, self.file_size)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_document_url_gif_file(self):
         """Test telegram.Bot sendDocument method"""
         print('Testing bot.sendDocument - GIF File by URL')
@@ -110,7 +109,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.file_size, 3878)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_send_document_resend(self):
         """Test telegram.Bot sendDocument method"""
         print('Testing bot.sendDocument - Resend by file_id')
@@ -159,7 +158,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document['file_size'], self.file_size)
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_send_document_empty_file(self):
         print('Testing bot.sendDocument - Null file')
 
@@ -173,7 +172,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
                                                          **json_dict))
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_send_document_empty_file_id(self):
         print('Testing bot.sendDocument - Empty file_id')
 
@@ -187,7 +186,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
                                                          **json_dict))
 
     @flaky
-    @timed(10)
+    @timeout(10)
     def test_error_document_without_required_args(self):
         print('Testing bot.sendDocument - Without required arguments')
 
