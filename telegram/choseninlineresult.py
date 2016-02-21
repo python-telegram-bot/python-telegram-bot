@@ -46,8 +46,7 @@ class ChosenInlineResult(TelegramObject):
     def __init__(self,
                  result_id,
                  from_user,
-                 query,
-                 **kwargs):
+                 query):
         # Required
         self.result_id = result_id
         self.from_user = from_user
@@ -64,8 +63,8 @@ class ChosenInlineResult(TelegramObject):
         """
         if not data:
             return None
-
-        data['from_user'] = User.de_json(data.get('from'))
+        data = data.copy()
+        data['from_user'] = User.de_json(data.pop('from'))
 
         return ChosenInlineResult(**data)
 

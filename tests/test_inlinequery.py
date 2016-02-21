@@ -53,9 +53,6 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
         }
 
     def test_inlinequery_de_json(self):
-        """Test InlineQuery.de_json() method"""
-        print('Testing InlineQuery.de_json()')
-
         inlinequery = telegram.InlineQuery.de_json(self.json_dict)
 
         self.assertEqual(inlinequery.id, self.id)
@@ -65,17 +62,11 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
         self.assertEqual(inlinequery.offset, self.offset)
 
     def test_inlinequery_to_json(self):
-        """Test InlineQuery.to_json() method"""
-        print('Testing InlineQuery.to_json()')
-
         inlinequery = telegram.InlineQuery.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(inlinequery.to_json()))
 
     def test_inlinequery_to_dict(self):
-        """Test InlineQuery.to_dict() method"""
-        print('Testing InlineQuery.to_dict()')
-
         inlinequery = telegram.InlineQuery.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(inlinequery))

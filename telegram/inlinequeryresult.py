@@ -22,6 +22,7 @@ https://core.telegram.org/bots/api#inline-mode
 """
 
 from telegram import TelegramObject
+from telegram.utils.validate import validate_string
 
 
 class InlineQueryResult(TelegramObject):
@@ -95,25 +96,38 @@ class InlineQueryResultArticle(InlineQueryResult):
                  id,
                  title,
                  message_text,
-                 **kwargs):
+                 parse_mode=None,
+                 disable_web_page_preview=None,
+                 url=None,
+                 hide_url=None,
+                 description=None,
+                 thumb_url=None,
+                 thumb_width=None,
+                 thumb_height=None):
+
+        validate_string(title, 'title')
+        validate_string(message_text, 'message_text')
+        validate_string(url, 'url')
+        validate_string(description, 'description')
+        validate_string(thumb_url, 'thumb_url')
+        validate_string(parse_mode, 'parse_mode')
+
         # Required
         super(InlineQueryResultArticle, self).__init__('article', id)
         self.title = title
         self.message_text = message_text
 
         # Optional
-        self.parse_mode = kwargs.get('parse_mode', '')
-        self.disable_web_page_preview = kwargs.get('disable_web_page_preview',
-                                                   False)
-        self.url = kwargs.get('url', '')
-        self.hide_url = kwargs.get('hide_url', False)
-        self.description = kwargs.get('description', '')
-        self.thumb_url = kwargs.get('thumb_url', '')
-        self.parse_mode = kwargs.get('parse_mode', '')
-        if 'thumb_width' in kwargs:
-            self.thumb_width = int(kwargs['thumb_width'])
-        if 'thumb_height' in kwargs:
-            self.thumb_height = int(kwargs['thumb_height'])
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = bool(disable_web_page_preview)
+        self.url = url
+        self.hide_url = bool(hide_url)
+        self.description = description
+        self.thumb_url = thumb_url
+        if thumb_width is not None:
+            self.thumb_width = int(thumb_width)
+        if thumb_height is not None:
+            self.thumb_height = int(thumb_height)
 
     @staticmethod
     def de_json(data):
@@ -126,6 +140,8 @@ class InlineQueryResultArticle(InlineQueryResult):
         """
         if not data:
             return None
+        data = data.copy()
+        data.pop('type', None)
 
         return InlineQueryResultArticle(**data)
 
@@ -168,25 +184,42 @@ class InlineQueryResultPhoto(InlineQueryResult):
                  id,
                  photo_url,
                  thumb_url,
-                 **kwargs):
+                 mime_type=None,
+                 photo_width=None,
+                 photo_height=None,
+                 title=None,
+                 description=None,
+                 caption=None,
+                 message_text=None,
+                 parse_mode=None,
+                 disable_web_page_preview=None):
+
+        validate_string(photo_url, 'photo_url')
+        validate_string(thumb_url, 'thumb_url')
+        validate_string(mime_type, 'mime_type')
+        validate_string(title, 'title')
+        validate_string(description, 'description')
+        validate_string(caption, 'caption')
+        validate_string(message_text, 'message_text')
+        validate_string(parse_mode, 'parse_mode')
+
         # Required
         super(InlineQueryResultPhoto, self).__init__('photo', id)
         self.photo_url = photo_url
         self.thumb_url = thumb_url
 
         # Optional
-        self.mime_type = kwargs.get('mime_type', 'image/jpeg')
-        if 'photo_width' in kwargs:
-            self.photo_width = int(kwargs['photo_width'])
-        if 'photo_height' in kwargs:
-            self.photo_height = int(kwargs['photo_height'])
-        self.title = kwargs.get('title', '')
-        self.description = kwargs.get('description', '')
-        self.caption = kwargs.get('caption', '')
-        self.message_text = kwargs.get('message_text', '')
-        self.parse_mode = kwargs.get('parse_mode', '')
-        self.disable_web_page_preview = kwargs.get('disable_web_page_preview',
-                                                   False)
+        self.mime_type = mime_type
+        if photo_width is not None:
+            self.photo_width = int(photo_width)
+        if photo_height is not None:
+            self.photo_height = int(photo_height)
+        self.title = title
+        self.description = description
+        self.caption = caption
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = bool(disable_web_page_preview)
 
     @staticmethod
     def de_json(data):
@@ -199,6 +232,8 @@ class InlineQueryResultPhoto(InlineQueryResult):
         """
         if not data:
             return None
+        data = data.copy()
+        data.pop('type', None)
 
         return InlineQueryResultPhoto(**data)
 
@@ -237,23 +272,36 @@ class InlineQueryResultGif(InlineQueryResult):
                  id,
                  gif_url,
                  thumb_url,
-                 **kwargs):
+                 gif_width=None,
+                 gif_height=None,
+                 title=None,
+                 caption=None,
+                 message_text=None,
+                 parse_mode=None,
+                 disable_web_page_preview=None):
+
+        validate_string(gif_url, 'gif_url')
+        validate_string(thumb_url, 'thumb_url')
+        validate_string(title, 'title')
+        validate_string(caption, 'caption')
+        validate_string(message_text, 'message_text')
+        validate_string(parse_mode, 'parse_mode')
+
         # Required
         super(InlineQueryResultGif, self).__init__('gif', id)
         self.gif_url = gif_url
         self.thumb_url = thumb_url
 
         # Optional
-        if 'gif_width' in kwargs:
-            self.gif_width = int(kwargs['gif_width'])
-        if 'gif_height' in kwargs:
-            self.gif_height = int(kwargs['gif_height'])
-        self.title = kwargs.get('title', '')
-        self.caption = kwargs.get('caption', '')
-        self.message_text = kwargs.get('message_text', '')
-        self.parse_mode = kwargs.get('parse_mode', '')
-        self.disable_web_page_preview = kwargs.get('disable_web_page_preview',
-                                                   False)
+        if gif_width is not None:
+            self.gif_width = int(gif_width)
+        if gif_height is not None:
+            self.gif_height = int(gif_height)
+        self.title = title
+        self.caption = caption
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = bool(disable_web_page_preview)
 
     @staticmethod
     def de_json(data):
@@ -266,6 +314,8 @@ class InlineQueryResultGif(InlineQueryResult):
         """
         if not data:
             return None
+        data = data.copy()
+        data.pop('type', None)
 
         return InlineQueryResultGif(**data)
 
@@ -304,23 +354,36 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  id,
                  mpeg4_url,
                  thumb_url,
-                 **kwargs):
+                 mpeg4_width=None,
+                 mpeg4_height=None,
+                 title=None,
+                 caption=None,
+                 message_text=None,
+                 parse_mode=None,
+                 disable_web_page_preview=None):
+
+        validate_string(mpeg4_url, 'mpeg4_url')
+        validate_string(thumb_url, 'thumb_url')
+        validate_string(title, 'title')
+        validate_string(caption, 'caption')
+        validate_string(message_text, 'message_text')
+        validate_string(parse_mode, 'parse_mode')
+
         # Required
         super(InlineQueryResultMpeg4Gif, self).__init__('mpeg4_gif', id)
         self.mpeg4_url = mpeg4_url
         self.thumb_url = thumb_url
 
         # Optional
-        if 'mpeg4_width' in kwargs:
-            self.mpeg4_width = int(kwargs['mpeg4_width'])
-        if 'mpeg4_height' in kwargs:
-            self.mpeg4_height = int(kwargs['mpeg4_height'])
-        self.title = kwargs.get('title', '')
-        self.caption = kwargs.get('caption', '')
-        self.message_text = kwargs.get('message_text', '')
-        self.parse_mode = kwargs.get('parse_mode', '')
-        self.disable_web_page_preview = kwargs.get('disable_web_page_preview',
-                                                   False)
+        if mpeg4_width is not None:
+            self.mpeg4_width = int(mpeg4_width)
+        if mpeg4_height is not None:
+            self.mpeg4_height = int(mpeg4_height)
+        self.title = title
+        self.caption = caption
+        self.message_text = message_text
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = bool(disable_web_page_preview)
 
     @staticmethod
     def de_json(data):
@@ -333,6 +396,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         """
         if not data:
             return None
+        data = data.copy()
+        data.pop('type', None)
 
         return InlineQueryResultMpeg4Gif(**data)
 
@@ -380,7 +445,23 @@ class InlineQueryResultVideo(InlineQueryResult):
                  thumb_url,
                  title,
                  message_text,
-                 **kwargs):
+                 video_width=None,
+                 video_height=None,
+                 video_duration=None,
+                 description=None,
+                 caption=None,
+                 parse_mode=None,
+                 disable_web_page_preview=None):
+
+        validate_string(video_url, 'video_url')
+        validate_string(mime_type, 'mime_type')
+        validate_string(thumb_url, 'thumb_url')
+        validate_string(title, 'title')
+        validate_string(message_text, 'message_text')
+        validate_string(description, 'description')
+        validate_string(caption, 'caption')
+        validate_string(parse_mode, 'parse_mode')
+
         # Required
         super(InlineQueryResultVideo, self).__init__('video', id)
         self.video_url = video_url
@@ -390,17 +471,16 @@ class InlineQueryResultVideo(InlineQueryResult):
         self.message_text = message_text
 
         # Optional
-        if 'video_width' in kwargs:
-            self.video_width = int(kwargs['video_width'])
-        if 'video_height' in kwargs:
-            self.video_height = int(kwargs['video_height'])
-        if 'video_duration' in kwargs:
-            self.video_duration = int(kwargs['video_duration'])
-        self.description = kwargs.get('description', '')
-        self.caption = kwargs.get('caption', '')
-        self.parse_mode = kwargs.get('parse_mode', '')
-        self.disable_web_page_preview = kwargs.get('disable_web_page_preview',
-                                                   False)
+        if video_width is not None:
+            self.video_width = int(video_width)
+        if video_height is not None:
+            self.video_height = int(video_height)
+        if video_duration is not None:
+            self.video_duration = int(video_duration)
+        self.description = description
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = bool(disable_web_page_preview)
 
     @staticmethod
     def de_json(data):
@@ -413,5 +493,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         """
         if not data:
             return None
+        data = data.copy()
+        data.pop('type', None)
 
         return InlineQueryResultVideo(**data)

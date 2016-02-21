@@ -66,9 +66,6 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         }
 
     def test_article_de_json(self):
-        """Test InlineQueryResultArticle.de_json() method"""
-        print('Testing InlineQueryResultArticle.de_json()')
-
         article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
 
         self.assertEqual(article.type, self.type)
@@ -86,17 +83,11 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertEqual(article.thumb_width, self.thumb_width)
 
     def test_article_to_json(self):
-        """Test InlineQueryResultArticle.to_json() method"""
-        print('Testing InlineQueryResultArticle.to_json()')
-
         article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(article.to_json()))
 
     def test_article_to_dict(self):
-        """Test InlineQueryResultArticle.to_dict() method"""
-        print('Testing InlineQueryResultArticle.to_dict()')
-
         article = \
             telegram.InlineQueryResultArticle.de_json(self.json_dict).to_dict()
 
@@ -137,9 +128,6 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         }
 
     def test_photo_de_json(self):
-        """Test InlineQueryResultPhoto.de_json() method"""
-        print('Testing InlineQueryResultPhoto.de_json()')
-
         photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
 
         self.assertEqual(photo.type, self.type)
@@ -157,17 +145,11 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
                          self.disable_web_page_preview)
 
     def test_photo_to_json(self):
-        """Test InlineQueryResultPhoto.to_json() method"""
-        print('Testing InlineQueryResultPhoto.to_json()')
-
         photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(photo.to_json()))
 
     def test_photo_to_dict(self):
-        """Test InlineQueryResultPhoto.to_dict() method"""
-        print('Testing InlineQueryResultPhoto.to_dict()')
-
         photo = \
             telegram.InlineQueryResultPhoto.de_json(self.json_dict).to_dict()
 
@@ -206,9 +188,6 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         }
 
     def test_gif_de_json(self):
-        """Test InlineQueryResultGif.de_json() method"""
-        print('Testing InlineQueryResultGif.de_json()')
-
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
 
         self.assertEqual(gif.type, self.type)
@@ -225,17 +204,11 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
                          self.disable_web_page_preview)
 
     def test_gif_to_json(self):
-        """Test InlineQueryResultGif.to_json() method"""
-        print('Testing InlineQueryResultGif.to_json()')
-
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(gif.to_json()))
 
     def test_gif_to_dict(self):
-        """Test InlineQueryResultGif.to_dict() method"""
-        print('Testing InlineQueryResultGif.to_dict()')
-
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(gif))
@@ -273,9 +246,6 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         }
 
     def test_mpeg4_de_json(self):
-        """Test InlineQueryResultMpeg4Gif.de_json() method"""
-        print('Testing InlineQueryResultMpeg4Gif.de_json()')
-
         mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
 
         self.assertEqual(mpeg4.type, self.type)
@@ -292,17 +262,11 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
                          self.disable_web_page_preview)
 
     def test_mpeg4_to_json(self):
-        """Test InlineQueryResultMpeg4Gif.to_json() method"""
-        print('Testing InlineQueryResultMpeg4Gif.to_json()')
-
         mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(mpeg4.to_json()))
 
     def test_mpeg4_to_dict(self):
-        """Test InlineQueryResultMpeg4Gif.to_dict() method"""
-        print('Testing InlineQueryResultMpeg4Gif.to_dict()')
-
         mpeg4 = \
             telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict).to_dict()
 
@@ -347,9 +311,6 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         }
 
     def test_video_de_json(self):
-        """Test InlineQueryResultVideo.de_json() method"""
-        print('Testing InlineQueryResultVideo.de_json()')
-
         video = telegram.InlineQueryResultVideo.de_json(self.json_dict)
 
         self.assertEqual(video.type, self.type)
@@ -369,17 +330,11 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
                          self.disable_web_page_preview)
 
     def test_video_to_json(self):
-        """Test InlineQueryResultVideo.to_json() method"""
-        print('Testing InlineQueryResultVideo.to_json()')
-
         video = telegram.InlineQueryResultVideo.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(video.to_json()))
 
     def test_video_to_dict(self):
-        """Test InlineQueryResultVideo.to_dict() method"""
-        print('Testing InlineQueryResultVideo.to_dict()')
-
         video = \
             telegram.InlineQueryResultVideo.de_json(self.json_dict).to_dict()
 

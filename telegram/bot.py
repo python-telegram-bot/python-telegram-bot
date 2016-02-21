@@ -27,6 +27,7 @@ from telegram import (User, Message, Update, UserProfilePhotos, File,
                       TelegramError, ReplyMarkup, TelegramObject, NullHandler)
 from telegram.error import InvalidToken
 from telegram.utils import request
+from telegram.utils.validate import validate_string
 
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
@@ -595,7 +596,7 @@ class Bot(TelegramObject):
         """Use this method to reply to an inline query.
 
         Args:
-            inline_query_id (int):
+            inline_query_id (str):
                 Unique identifier for answered query
             results (list[InlineQueryResult]):
                 A list of results for the inline query
@@ -617,6 +618,9 @@ class Bot(TelegramObject):
             A boolean if answering was successful
         """
 
+        validate_string(inline_query_id, 'inline_query_id')
+        validate_string(inline_query_id, 'next_offset')
+
         url = '%s/answerInlineQuery' % self.base_url
 
         results = [res.to_dict() for res in results]
@@ -625,9 +629,9 @@ class Bot(TelegramObject):
                 'results': results}
 
         if cache_time is not None:
-            data['cache_time'] = cache_time
+            data['cache_time'] = int(cache_time)
         if is_personal is not None:
-            data['is_personal'] = is_personal
+            data['is_personal'] = bool(is_personal)
         if next_offset is not None:
             data['next_offset'] = next_offset
 

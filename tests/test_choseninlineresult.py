@@ -51,9 +51,6 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
         }
 
     def test_choseninlineresult_de_json(self):
-        """Test ChosenInlineResult.de_json() method"""
-        print('Testing ChosenInlineResult.de_json()')
-
         result = telegram.ChosenInlineResult.de_json(self.json_dict)
 
         self.assertEqual(result.result_id, self.result_id)
@@ -62,17 +59,11 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
         self.assertEqual(result.query, self.query)
 
     def test_choseninlineresult_to_json(self):
-        """Test ChosenInlineResult.to_json() method"""
-        print('Testing ChosenInlineResult.to_json()')
-
         result = telegram.ChosenInlineResult.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(result.to_json()))
 
     def test_choseninlineresult_to_dict(self):
-        """Test ChosenInlineResult.to_dict() method"""
-        print('Testing ChosenInlineResult.to_dict()')
-
         result = telegram.ChosenInlineResult.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(result))
