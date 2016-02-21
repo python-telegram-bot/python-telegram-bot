@@ -23,6 +23,7 @@
 import os
 from datetime import datetime
 import sys
+from flaky import flaky
 
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
@@ -33,11 +34,14 @@ sys.path.append('.')
 
 import telegram
 from tests.base import BaseTest
+from nose.tools import timed
 
 
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
 
+    @flaky
+    @timed(10)
     def testGetMe(self):
         '''Test the telegram.Bot getMe method'''
         print('Testing getMe')
@@ -50,6 +54,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(bot.username, 'PythonTelegramBot')
         self.assertEqual(bot.name, '@PythonTelegramBot')
 
+    @flaky
+    @timed(10)
     def testSendMessage(self):
         '''Test the telegram.Bot sendMessage method'''
         print('Testing sendMessage')
@@ -60,6 +66,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
         self.assertTrue(isinstance(message.date, datetime))
 
+    @flaky
+    @timed(10)
     def testGetUpdates(self):
         '''Test the telegram.Bot getUpdates method'''
         print('Testing getUpdates')
@@ -69,6 +77,8 @@ class BotTest(BaseTest, unittest.TestCase):
             self.assertTrue(self.is_json(updates[0].to_json()))
             self.assertTrue(isinstance(updates[0], telegram.Update))
 
+    @flaky
+    @timed(10)
     def testForwardMessage(self):
         '''Test the telegram.Bot forwardMessage method'''
         print('Testing forwardMessage')
@@ -81,6 +91,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.forward_from.username, 'leandrotoledo')
         self.assertTrue(isinstance(message.forward_date, datetime))
 
+    @flaky
+    @timed(10)
     def testSendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing sendPhoto - File')
@@ -92,6 +104,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.photo[0].file_size, 1451)
         self.assertEqual(message.caption, 'testSendPhoto')
 
+    @flaky
+    @timed(10)
     def testResendPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing sendPhoto - Resend')
@@ -101,6 +115,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_id, 'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
 
+    @flaky
+    @timed(10)
     def testSendJPGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing testSendJPGURLPhoto - URL')
@@ -110,6 +126,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 822)
 
+    @flaky
+    @timed(10)
     def testSendPNGURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing testSendPNGURLPhoto - URL')
@@ -119,6 +137,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
+    @flaky
+    @timed(10)
     def testSendGIFURLPhoto(self):
         '''Test the telegram.Bot sendPhoto method'''
         print('Testing testSendGIFURLPhoto - URL')
@@ -128,6 +148,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
+    @flaky
+    @timed(10)
     def testSendChatAction(self):
         '''Test the telegram.Bot sendChatAction method'''
         print('Testing sendChatAction - ChatAction.TYPING')
@@ -135,6 +157,8 @@ class BotTest(BaseTest, unittest.TestCase):
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
                                  chat_id=self._chat_id)
 
+    @flaky
+    @timed(10)
     def testGetUserProfilePhotos(self):
         '''Test the telegram.Bot getUserProfilePhotos method'''
         print('Testing getUserProfilePhotos')

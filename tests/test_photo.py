@@ -22,6 +22,9 @@
 import os
 import unittest
 import sys
+from nose.tools import timed
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -53,6 +56,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
             'file_size': self.file_size
         }
 
+    @flaky
+    @timed(10)
     def test_sendphotoo_all_args(self):
         """Test telegram.Bot sendAudio method"""
         print('Testing bot.sendPhoto - With all arguments')
@@ -79,6 +84,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(message.caption, self.caption)
 
+    @flaky
+    @timed(10)
     def test_send_photo_jpg_file(self):
         """Test telegram.Bot sendPhoto method"""
         print('Testing bot.sendPhoto - JPG File')
@@ -102,6 +109,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.height, self.height)
         self.assertEqual(photo.file_size, self.file_size)
 
+    @flaky
+    @timed(10)
     def test_send_photo_url_jpg_file(self):
         """Test telegram.Bot sendPhoto method"""
         print('Testing bot.sendPhoto - JPG File by URL')
@@ -125,6 +134,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.height, self.height)
         self.assertEqual(photo.file_size, self.file_size)
 
+    @flaky
+    @timed(10)
     def test_send_photo_resend(self):
         """Test telegram.Bot sendPhoto method"""
         print('Testing bot.sendPhoto - Resend by file_id')
@@ -177,6 +188,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo['height'], self.height)
         self.assertEqual(photo['file_size'], self.file_size)
 
+    @flaky
+    @timed(10)
     def test_error_send_photo_empty_file(self):
         print('Testing bot.sendPhoto - Null file')
 
@@ -189,6 +202,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendPhoto(chat_id=self._chat_id,
                                                       **json_dict))
 
+    @flaky
+    @timed(10)
     def test_error_send_photo_empty_file_id(self):
         print('Testing bot.sendPhoto - Empty file_id')
 
@@ -201,6 +216,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendPhoto(chat_id=self._chat_id,
                                                       **json_dict))
 
+    @flaky
+    @timed(10)
     def test_error_photo_without_required_args(self):
         print('Testing bot.sendPhoto - Without required arguments')
 
