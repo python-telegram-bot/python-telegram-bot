@@ -47,9 +47,6 @@ class UserTest(BaseTest, unittest.TestCase):
         }
 
     def test_user_de_json(self):
-        """Test User.de_json() method"""
-        print('Testing User.de_json()')
-
         user = telegram.User.de_json(self.json_dict)
 
         self.assertEqual(user.id, self.id)
@@ -61,9 +58,6 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.name, '@leandrotoledo')
 
     def test_user_de_json_without_username(self):
-        """Test User.de_json() method"""
-        print('Testing User.de_json() - Without username')
-
         json_dict = self.json_dict
 
         del(json_dict['username'])
@@ -79,9 +73,6 @@ class UserTest(BaseTest, unittest.TestCase):
 
 
     def test_user_de_json_without_username_and_lastname(self):
-        """Test User.de_json() method"""
-        print('Testing User.de_json() - Without username and last_name')
-
         json_dict = self.json_dict
 
         del(json_dict['username'])
@@ -95,17 +86,11 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.name, self.first_name)
 
     def test_user_to_json(self):
-        """Test User.to_json() method"""
-        print('Testing User.to_json()')
-
         user = telegram.User.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(user.to_json()))
 
     def test_user_to_dict(self):
-        """Test User.to_dict() method"""
-        print('Testing User.to_dict()')
-
         user = telegram.User.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(user.to_dict()))

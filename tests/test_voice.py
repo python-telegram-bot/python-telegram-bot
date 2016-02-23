@@ -51,9 +51,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_required_args_only(self):
-        """Test telegram.Bot sendVoice method"""
-        print('Testing bot.sendVoice - With required arguments only')
-
         message = self._bot.sendVoice(self._chat_id,
                                       self.voice_file)
 
@@ -68,9 +65,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_all_args(self):
-        """Test telegram.Bot sendAudio method"""
-        print('Testing bot.sendVoice - With all arguments')
-
         message = self._bot.sendVoice(self._chat_id,
                                       self.voice_file,
                                       self.duration,
@@ -88,9 +82,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_file(self):
-        """Test telegram.Bot sendVoice method"""
-        print('Testing bot.sendVoice - Ogg File')
-
         message = self._bot.sendVoice(chat_id=self._chat_id,
                                       voice=self.voice_file,
                                       duration=self.duration)
@@ -106,9 +97,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_file_with_custom_filename(self):
-        """Test telegram.Bot sendVoice method"""
-        print('Testing bot.sendVoice - Ogg File with custom filename')
-
         message = self._bot.sendVoice(chat_id=self._chat_id,
                                       voice=self.voice_file,
                                       duration=self.duration,
@@ -125,9 +113,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_url_file(self):
-        """Test telegram.Bot sendVoice method"""
-        print('Testing bot.sendVoice - Ogg File by URL')
-
         message = self._bot.sendVoice(chat_id=self._chat_id,
                                       voice=self.voice_file_url,
                                       duration=self.duration)
@@ -143,9 +128,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_resend(self):
-        """Test telegram.Bot sendVoice method"""
-        print('Testing bot.sendVoice - Resend by file_id')
-
         message = self._bot.sendVoice(chat_id=self._chat_id,
                                       voice=self.voice_file_id,
                                       duration=self.duration)
@@ -157,9 +139,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.mime_type, self.mime_type)
 
     def test_voice_de_json(self):
-        """Test Voice.de_json() method"""
-        print('Testing Voice.de_json()')
-
         voice = telegram.Voice.de_json(self.json_dict)
 
         self.assertEqual(voice.file_id, self.voice_file_id)
@@ -168,17 +147,11 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.file_size, self.file_size)
 
     def test_voice_to_json(self):
-        """Test Voice.to_json() method"""
-        print('Testing Voice.to_json()')
-
         voice = telegram.Voice.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(voice.to_json()))
 
     def test_voice_to_dict(self):
-        """Test Voice.to_dict() method"""
-        print('Testing Voice.to_dict()')
-
         voice = telegram.Voice.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(voice.to_dict()))
@@ -190,8 +163,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_error_send_voice_empty_file(self):
-        print('Testing bot.sendVoice - Null file')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])
@@ -204,8 +175,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_error_send_voice_empty_file_id(self):
-        print('Testing bot.sendVoice - Empty file_id')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])
@@ -218,8 +187,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_error_voice_without_required_args(self):
-        print('Testing bot.sendVoice - Without required arguments')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])

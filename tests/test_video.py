@@ -60,9 +60,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_required_args_only(self):
-        """Test telegram.Bot sendVideo method"""
-        print('Testing bot.sendVideo - With required arguments only')
-
         message = self._bot.sendVideo(self._chat_id,
                                       self.video_file)
 
@@ -80,9 +77,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_all_args(self):
-        """Test telegram.Bot sendAudio method"""
-        print('Testing bot.sendVideo - With all arguments')
-
         message = self._bot.sendVideo(self._chat_id,
                                       self.video_file,
                                       duration=self.duration,
@@ -104,9 +98,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file(self):
-        """Test telegram.Bot sendVideo method"""
-        print('Testing bot.sendVideo - MP4 File')
-
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file,
                                       duration=self.duration,
@@ -128,9 +119,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file_with_custom_filename(self):
-        """Test telegram.Bot sendVideo method"""
-        print('Testing bot.sendVideo - MP4 File with custom filename')
-
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file,
                                       duration=self.duration,
@@ -153,9 +141,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file_url(self):
-        """Test telegram.Bot sendVideo method"""
-        print('Testing bot.sendVideo - MP4 File by URL')
-
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file_url,
                                       duration=self.duration,
@@ -177,9 +162,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_resend(self):
-        """Test telegram.Bot sendVideo method"""
-        print('Testing bot.sendVideo - Resend by file_id')
-
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file_id,
                                       duration=self.duration,
@@ -195,9 +177,6 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.caption, self.caption)
 
     def test_video_de_json(self):
-        """Test Video.de_json() method"""
-        print('Testing Video.de_json()')
-
         video = telegram.Video.de_json(self.json_dict)
 
         self.assertEqual(video.file_id, self.video_file_id)
@@ -209,17 +188,11 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.file_size, self.file_size)
 
     def test_video_to_json(self):
-        """Test Video.to_json() method"""
-        print('Testing Video.to_json()')
-
         video = telegram.Video.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(video.to_json()))
 
     def test_video_to_dict(self):
-        """Test Video.to_dict() method"""
-        print('Testing Video.to_dict()')
-
         video = telegram.Video.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(video.to_dict()))
@@ -233,8 +206,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_error_send_video_empty_file(self):
-        print('Testing bot.sendVideo - Null file')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])
@@ -247,8 +218,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_error_send_video_empty_file_id(self):
-        print('Testing bot.sendVideo - Empty file_id')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])
@@ -261,8 +230,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_error_video_without_required_args(self):
-        print('Testing bot.sendVideo - Without required arguments')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])

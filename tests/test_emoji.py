@@ -33,9 +33,6 @@ class EmojiTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Emoji."""
 
     def test_emoji(self):
-        """Test Emoji class"""
-        print('Testing Emoji class')
-        
         for attr in dir(Emoji):
             if attr[0] != '_':  # TODO: dirty way to filter out functions
                 self.assertTrue(type(getattr(Emoji, attr)) is str)

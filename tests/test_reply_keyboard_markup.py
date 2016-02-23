@@ -45,9 +45,6 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         }
         
     def test_send_message_with_reply_keyboard_markup(self):
-        """Test telegram.Bot sendMessage method with ReplyKeyboardMarkup"""
-        print('Testing bot.sendMessage - with ReplyKeyboardMarkup')
-
         message = self._bot.sendMessage(self._chat_id,
                                         'Моё судно на воздушной подушке полно угрей',
                                         reply_markup=telegram.ReplyKeyboardMarkup.de_json(self.json_dict))
@@ -56,9 +53,6 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_reply_keyboard_markup_de_json(self):
-        """Test ReplyKeboardMarkup.de_json() method"""
-        print('Testing ReplyKeyboardMarkup.de_json()')
-
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
         self.assertEqual(reply_keyboard_markup.keyboard, self.keyboard)
@@ -67,17 +61,11 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         self.assertEqual(reply_keyboard_markup.selective, self.selective)
         
     def test_reply_keyboard_markup_to_json(self):
-        """Test ReplyKeyboardMarkup.to_json() method"""
-        print('Testing ReplyKeyboardMarkup.to_json()')
-
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(reply_keyboard_markup.to_json()))
         
     def test_reply_keyboard_markup_to_dict(self):
-        """Test ReplyKeyboardMarkup.to_dict() method"""
-        print('Testing ReplyKeyboardMarkup.to_dict()')
-
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
         self.assertEqual(reply_keyboard_markup['keyboard'], self.keyboard)

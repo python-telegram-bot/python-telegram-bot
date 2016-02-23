@@ -45,9 +45,6 @@ class ContactTest(BaseTest, unittest.TestCase):
         }
 
     def test_contact_de_json(self):
-        """Test Contact.de_json() method"""
-        print('Testing Contact.de_json()')
-
         contact = telegram.Contact.de_json(self.json_dict)
 
         self.assertEqual(contact.phone_number, self.phone_number)
@@ -56,17 +53,11 @@ class ContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact.user_id, self.user_id)
 
     def test_contact_to_json(self):
-        """Test Contact.to_json() method"""
-        print('Testing Contact.to_json()')
-
         contact = telegram.Contact.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(contact.to_json()))
 
     def test_contact_to_dict(self):
-        """Test Contact.to_dict() method"""
-        print('Testing Contact.to_dict()')
-
         contact = telegram.Contact.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(contact.to_dict()))

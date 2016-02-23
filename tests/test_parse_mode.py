@@ -36,8 +36,6 @@ class ParseMode(BaseTest, unittest.TestCase):
         self.formatted_text_formatted = u'bold italic link.'
                 
     def test_send_message_with_parse_mode_markdown(self):
-        '''Test the telegram.Bot sendMessage method with markdown parse mode'''
-        print('Testing sendMessage - with markdown parsemode')
         message = self._bot.sendMessage(chat_id=self._chat_id,
                                         text=self.markdown_text,
                                         parse_mode=telegram.ParseMode.MARKDOWN)
@@ -46,8 +44,6 @@ class ParseMode(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, self.formatted_text_formatted)
         
     def test_send_message_with_parse_mode_html(self):
-        '''Test the telegram.Bot sendMessage method with html parse mode'''
-        print('Testing sendMessage - with html parse mode')
         message = self._bot.sendMessage(chat_id=self._chat_id,
                                         text=self.html_text,
                                         parse_mode=telegram.ParseMode.HTML)
