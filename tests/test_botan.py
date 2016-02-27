@@ -5,6 +5,8 @@
 import os
 import unittest
 import sys
+from flaky import flaky
+
 sys.path.append('.')
 
 from telegram.utils.botan import Botan
@@ -21,6 +23,7 @@ class MessageMock(object):
         return "{}"
 
 
+@flaky(3, 1)
 class BotanTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Botan analytics integration."""
 
