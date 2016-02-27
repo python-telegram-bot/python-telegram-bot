@@ -65,7 +65,8 @@ class VideoTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def test_send_video_required_args_only(self):
         message = self._bot.sendVideo(self._chat_id,
-                                      self.video_file)
+                                      self.video_file,
+                                      timeout=10)
 
         video = message.video
 
@@ -83,6 +84,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_send_video_all_args(self):
         message = self._bot.sendVideo(self._chat_id,
                                       self.video_file,
+                                      timeout=10,
                                       duration=self.duration,
                                       caption=self.caption)
 
@@ -104,6 +106,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_send_video_mp4_file(self):
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file,
+                                      timeout=10,
                                       duration=self.duration,
                                       caption=self.caption)
 
@@ -125,6 +128,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_send_video_mp4_file_with_custom_filename(self):
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file,
+                                      timeout=10,
                                       duration=self.duration,
                                       caption=self.caption,
                                       filename='telegram_custom.mp4')
@@ -147,6 +151,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_send_video_mp4_file_url(self):
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file_url,
+                                      timeout=10,
                                       duration=self.duration,
                                       caption=self.caption)
 
@@ -167,6 +172,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_send_video_resend(self):
         message = self._bot.sendVideo(chat_id=self._chat_id,
                                       video=self.video_file_id,
+                                      timeout=10,
                                       duration=self.duration,
                                       caption=self.caption)
 
@@ -216,6 +222,7 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         self.assertRaises(telegram.TelegramError,
                           lambda: self._bot.sendVideo(chat_id=self._chat_id,
+                                                      timeout=10,
                                                       **json_dict))
 
     @flaky(3, 1)
@@ -228,6 +235,7 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         self.assertRaises(telegram.TelegramError,
                           lambda: self._bot.sendVideo(chat_id=self._chat_id,
+                                                      timeout=10,
                                                       **json_dict))
 
     @flaky(3, 1)
@@ -240,6 +248,7 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendVideo(chat_id=self._chat_id,
+                                                      timeout=10,
                                                       **json_dict))
 
 if __name__ == '__main__':
