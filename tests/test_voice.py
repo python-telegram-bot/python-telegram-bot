@@ -37,7 +37,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.voice_file = open('tests/data/telegram.ogg', 'rb')
         self.voice_file_id = 'AwADAQADTgADHyP1B_mbw34svXPHAg'
         self.voice_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.ogg'
-        self.duration = 0
+        self.duration = 3
         self.mime_type = 'audio/ogg'
         self.file_size = 9199
 
@@ -135,7 +135,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
         voice = message.voice
 
         self.assertEqual(voice.file_id, self.voice_file_id)
-        self.assertEqual(voice.duration, self.duration)
+        self.assertEqual(voice.duration, 0)
         self.assertEqual(voice.mime_type, self.mime_type)
 
     def test_voice_de_json(self):
