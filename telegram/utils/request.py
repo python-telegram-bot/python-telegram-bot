@@ -170,9 +170,7 @@ def post(url,
                           data=data.encode(),
                           headers={'Content-Type': 'application/json'})
 
-    with urlopen(request, **urlopen_kwargs) as handle:
-        result = handle.read()
-
+    result = urlopen(request, **urlopen_kwargs).read()
     return _parse(result)
 
 
