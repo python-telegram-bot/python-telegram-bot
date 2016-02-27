@@ -5,6 +5,8 @@
 import os
 import unittest
 import sys
+from flaky import flaky
+
 sys.path.append('.')
 
 from telegram.utils.botan import Botan
@@ -21,22 +23,19 @@ class MessageMock(object):
         return "{}"
 
 
+@flaky(3, 1)
 class BotanTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Botan analytics integration."""
 
     token = os.environ.get('BOTAN_TOKEN')
 
     def test_track(self):
-        """Test sending event to botan"""
-        print('Test sending event to botan')
         botan = Botan(self.token)
         message = MessageMock(self._chat_id)
         result = botan.track(message, 'named event')
         self.assertTrue(result)
 
     def test_track_fail(self):
-        """Test fail when sending event to botan"""
-        print('Test fail when sending event to botan')
         botan = Botan(self.token)
         botan.url_template = 'https://api.botan.io/traccc?token={token}&uid={uid}&name={name}'
         message = MessageMock(self._chat_id)
@@ -44,8 +43,6 @@ class BotanTest(BaseTest, unittest.TestCase):
         self.assertFalse(result)
 
     def test_wrong_message(self):
-        """Test sending wrong message"""
-        print('Test sending wrong message')
         botan = Botan(self.token)
         message = MessageMock(self._chat_id)
         message = delattr(message, 'chat_id')
@@ -53,8 +50,6 @@ class BotanTest(BaseTest, unittest.TestCase):
         self.assertFalse(result)
 
     def test_wrong_endpoint(self):
-        """Test wrong endpoint"""
-        print('Test wrong endpoint')
         botan = Botan(self.token)
         botan.url_template = 'https://api.botaaaaan.io/traccc?token={token}&uid={uid}&name={name}'
         message = MessageMock(self._chat_id)
