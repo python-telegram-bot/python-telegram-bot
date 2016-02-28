@@ -227,6 +227,20 @@ Let's add some functionality to our bot. We want to add the ``/caps`` command, t
    ...
    >>> dispatcher.addTelegramCommandHandler('caps', caps)
 
+To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather)::
+
+   >>> from telegram import InlineQueryResultArticle
+   >>> def inline_caps(bot, update):
+   ...   # If you activated inline feedback, updates might either contain
+   ...   # inline_query or chosen_inline_result, the other one will be None
+   ...   if update.inline_query:
+   ...     query = bot.update.inline_query.query
+   ...     results = list()
+   ...     results.append(InlineQueryResultArticle(query.upper(), 'Caps', text_caps))
+   ...     bot.answerInlineQuery(update.inline_query.id, results)
+   ...
+   >>> dispatcher.addTelegramInlineHandler(inline_caps)
+
 Now it's time to stop the bot::
 
    >>> updater.stop()
