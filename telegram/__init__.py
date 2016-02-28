@@ -56,7 +56,7 @@ from .updater import Updater
 
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.3b1'
+__version__ = '3.3'
 __all__ = ('Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
            'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
            'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
