@@ -104,11 +104,11 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def test_inUpdater(self):
         u = Updater(bot="MockBot", job_queue_tick_interval=0.005)
-        u.job_queue.put(self.job1, 0.11)
-        sleep(0.2)
+        u.job_queue.put(self.job1, 0.5)
+        sleep(0.75)
         self.assertEqual(1, self.result)
         u.stop()
-        sleep(0.4)
+        sleep(2)
         self.assertEqual(1, self.result)
 
 if __name__ == '__main__':
