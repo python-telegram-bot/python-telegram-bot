@@ -143,28 +143,38 @@ class Bot(TelegramObject):
             decorator
             """
             url, data = func(self, *args, **kwargs)
-
-            if not data.get('chat_id'):
-                raise TelegramError('Invalid chat_id')
-
-            if kwargs.get('reply_to_message_id'):
-                reply_to_message_id = kwargs.get('reply_to_message_id')
-                data['reply_to_message_id'] = reply_to_message_id
-
-            if kwargs.get('reply_markup'):
-                reply_markup = kwargs.get('reply_markup')
-                if isinstance(reply_markup, ReplyMarkup):
-                    data['reply_markup'] = reply_markup.to_json()
-                else:
-                    data['reply_markup'] = reply_markup
-
-            result = request.post(url, data)
-
-            if result is True:
-                return result
-
-            return Message.de_json(result)
+            return Bot._post_message(url, data, kwargs)
         return decorator
+
+    @staticmethod
+    def _post_message(url, data, kwargs, timeout=None, network_delay=2.):
+        """Posts a message to the telegram servers.
+
+        Returns:
+            telegram.Message
+
+        """
+        if not data.get('chat_id'):
+            raise TelegramError('Invalid chat_id')
+
+        if kwargs.get('reply_to_message_id'):
+            reply_to_message_id = kwargs.get('reply_to_message_id')
+            data['reply_to_message_id'] = reply_to_message_id
+
+        if kwargs.get('reply_markup'):
+            reply_markup = kwargs.get('reply_markup')
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = request.post(url, data, timeout=timeout,
+                              network_delay=network_delay)
+
+        if result is True:
+            return result
+
+        return Message.de_json(result)
 
     @log
     def getMe(self):
@@ -431,12 +441,12 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @message
     def sendVideo(self,
                   chat_id,
                   video,
                   duration=None,
                   caption=None,
+                  timeout=None,
                   **kwargs):
         """Use this method to send video files, Telegram clients support mp4
         videos (other formats may be sent as telegram.Document).
@@ -453,6 +463,9 @@ class Bot(TelegramObject):
           caption:
             Video caption (may also be used when resending videos by file_id).
             [Optional]
+          timeout:
+            float. If this value is specified, use it as the definitive timeout
+            (in seconds) for urlopen() operations. [Optional]
           reply_to_message_id:
             If the message is a reply, ID of the original message. [Optional]
           reply_markup:
@@ -474,7 +487,7 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._post_message(url, data, kwargs, timeout=timeout)
 
     @log
     @message

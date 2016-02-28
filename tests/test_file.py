@@ -46,9 +46,6 @@ class FileTest(BaseTest, unittest.TestCase):
         }
 
     def test_get_and_download_file_audio(self):
-        """Test telegram.Bot getFile method - Audio"""
-        print('Testing bot.getFile - With Audio.file_id')
-
         newFile = self._bot.getFile(self.audio_file_id)
 
         self.assertEqual(newFile.file_size, 28232)
@@ -60,9 +57,6 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.mp3'))
 
     def test_get_and_download_file_document(self):
-        """Test telegram.Bot getFile method - Document"""
-        print('Testing bot.getFile - With Document.file_id')
-
         newFile = self._bot.getFile(self.document_file_id)
 
         self.assertEqual(newFile.file_size, 12948)
@@ -74,9 +68,6 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.png'))
 
     def test_get_and_download_file_sticker(self):
-        """Test telegram.Bot getFile method - Sticker"""
-        print('Testing bot.getFile - With Sticker.file_id')
-
         newFile = self._bot.getFile(self.sticker_file_id)
 
         self.assertEqual(newFile.file_size, 39518)
@@ -88,9 +79,6 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.webp'))
 
     def test_get_and_download_file_video(self):
-        """Test telegram.Bot getFile method - Video"""
-        print('Testing bot.getFile - With Video.file_id')
-
         newFile = self._bot.getFile(self.video_file_id)
 
         self.assertEqual(newFile.file_size, 326534)
@@ -102,9 +90,6 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.mp4'))
 
     def test_get_and_download_file_voice(self):
-        """Test telegram.Bot getFile method - Voice"""
-        print('Testing bot.getFile - With Voice.file_id')
-
         newFile = self._bot.getFile(self.voice_file_id)
 
         self.assertEqual(newFile.file_size, 9199)
@@ -116,9 +101,6 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.ogg'))
 
     def test_file_de_json(self):
-        """Test File.de_json() method"""
-        print('Testing File.de_json()')
-
         newFile = telegram.File.de_json(self.json_dict)
 
         self.assertEqual(newFile.file_id, self.json_dict['file_id'])
@@ -126,17 +108,11 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertEqual(newFile.file_size, self.json_dict['file_size'])
 
     def test_file_to_json(self):
-        """Test File.to_json() method"""
-        print('Testing File.to_json()')
-
         newFile = telegram.File.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(newFile.to_json()))
 
     def test_file_to_dict(self):
-        """Test File.to_dict() method"""
-        print('Testing File.to_dict()')
-
         newFile = telegram.File.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(newFile.to_dict()))
@@ -145,10 +121,7 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertEqual(newFile['file_size'], self.json_dict['file_size'])
 
     def test_error_get_empty_file_id(self):
-        print('Testing bot.getFile - Null file_id')
-
         json_dict = self.json_dict
-
         json_dict['file_id'] = ''
         del(json_dict['file_path'])
         del(json_dict['file_size'])
@@ -157,8 +130,6 @@ class FileTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.getFile(**json_dict))
 
     def test_error_file_without_required_args(self):
-        print('Testing bot.getFile - Without required arguments')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])

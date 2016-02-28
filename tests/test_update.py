@@ -52,26 +52,17 @@ class UpdateTest(BaseTest, unittest.TestCase):
         }
 
     def test_update_de_json(self):
-        """Test Update.de_json() method"""
-        print('Testing Update.de_json()')
-
         update = telegram.Update.de_json(self.json_dict)
 
         self.assertEqual(update.update_id, self.update_id)
         self.assertTrue(isinstance(update.message, telegram.Message))
 
     def test_update_to_json(self):
-        """Test Update.to_json() method"""
-        print('Testing Update.to_json()')
-
         update = telegram.Update.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(update.to_json()))
 
     def test_update_to_dict(self):
-        """Test Update.to_dict() method"""
-        print('Testing Update.to_dict()')
-
         update = telegram.Update.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(update.to_dict()))

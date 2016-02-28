@@ -41,9 +41,6 @@ class LocationTest(BaseTest, unittest.TestCase):
         }
 
     def test_send_location_implicit_args(self):
-        """Test telegram.Bot sendLocation method"""
-        print('Testing bot.sendLocation - Implicit arguments')
-
         message = self._bot.sendLocation(self._chat_id,
                                          self.latitude,
                                          self.longitude)
@@ -54,9 +51,6 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.longitude, self.longitude)
 
     def test_send_location_explicit_args(self):
-        """Test telegram.Bot sendLocation method"""
-        print('Testing bot.sendLocation - Explicit arguments')
-
         message = self._bot.sendLocation(chat_id=self._chat_id,
                                          latitude=self.latitude,
                                          longitude=self.longitude)
@@ -67,34 +61,23 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.longitude, self.longitude)
 
     def test_location_de_json(self):
-        """Test Location.de_json() method"""
-        print('Testing Location.de_json()')
-
         location = telegram.Location.de_json(self.json_dict)
 
         self.assertEqual(location.latitude, self.latitude)
         self.assertEqual(location.longitude, self.longitude)
 
     def test_location_to_json(self):
-        """Test Location.to_json() method"""
-        print('Testing Location.to_json()')
-
         location = telegram.Location.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(location.to_json()))
 
     def test_location_to_dict(self):
-        """Test Location.to_dict() method"""
-        print('Testing Location.to_dict()')
-
         location = telegram.Location.de_json(self.json_dict)
 
         self.assertEqual(location['latitude'], self.latitude)
         self.assertEqual(location['longitude'], self.longitude)
 
     def test_error_send_location_empty_args(self):
-        print('Testing bot.sendLocation - Empty arguments')
-
         json_dict = self.json_dict
 
         json_dict['latitude'] = ''
@@ -105,8 +88,6 @@ class LocationTest(BaseTest, unittest.TestCase):
                                                          **json_dict))
 
     def test_error_location_without_required_args(self):
-        print('Testing bot.sendLocation - Without required arguments')
-
         json_dict = self.json_dict
 
         del(json_dict['latitude'])

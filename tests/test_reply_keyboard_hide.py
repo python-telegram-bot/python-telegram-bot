@@ -41,9 +41,6 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         }
         
     def test_send_message_with_reply_keyboard_hide(self):
-        """Test telegram.Bot sendMessage method with ReplyKeyboardHide"""
-        print('Testing bot.sendMessage - with ReplyKeyboardHide')
-
         message = self._bot.sendMessage(self._chat_id,
                                         'Моё судно на воздушной подушке полно угрей',
                                         reply_markup=telegram.ReplyKeyboardHide.de_json(self.json_dict))
@@ -52,26 +49,17 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_reply_keyboard_hide_de_json(self):
-        """Test ReplyKeboardHide.de_json() method"""
-        print('Testing ReplyKeyboardHide.de_json()')
-
         reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
 
         self.assertEqual(reply_keyboard_hide.hide_keyboard, self.hide_keyboard)
         self.assertEqual(reply_keyboard_hide.selective, self.selective)
         
     def test_reply_keyboard_hide_to_json(self):
-        """Test ReplyKeyboardHide.to_json() method"""
-        print('Testing ReplyKeyboardHide.to_json()')
-
         reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(reply_keyboard_hide.to_json()))
         
     def test_reply_keyboard_hide_to_dict(self):
-        """Test ReplyKeyboardHide.to_dict() method"""
-        print('Testing ReplyKeyboardHide.to_dict()')
-
         reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
 
         self.assertEqual(reply_keyboard_hide['hide_keyboard'], self.hide_keyboard)
