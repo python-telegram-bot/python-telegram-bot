@@ -21,6 +21,11 @@
 
 import os
 import sys
+import signal
+import traceback
+
+from nose.tools import make_decorator
+
 sys.path.append('.')
 
 import json
@@ -54,3 +59,32 @@ class BaseTest(object):
             return True
 
         return False
+
+
+class TestTimedOut(AssertionError):
+
+    def __init__(self, time_limit, frame):
+        super(TestTimedOut, self).__init__('time_limit={0}'.format(time_limit))
+        self.time_limit = time_limit
+        self.frame = frame
+
+
+def timeout(time_limit):
+    def decorator(func):
+        def timed_out(_signum, frame):
+            raise TestTimedOut(time_limit, frame)
+
+        def newfunc(*args, **kwargs):
+            orig_handler = signal.signal(signal.SIGALRM, timed_out)
+            signal.alarm(time_limit)
+            try:
+                rc = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+                signal.signal(signal.SIGALRM, orig_handler)
+            return rc
+
+        newfunc = make_decorator(func)(newfunc)
+        return newfunc
+
+    return decorator

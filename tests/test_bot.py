@@ -23,6 +23,7 @@
 import os
 from datetime import datetime
 import sys
+from flaky import flaky
 
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
@@ -32,15 +33,15 @@ else:
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, timeout
 
 
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
 
+    @flaky(3, 1)
+    @timeout(10)
     def testGetMe(self):
-        '''Test the telegram.Bot getMe method'''
-        print('Testing getMe')
         bot = self._bot.getMe()
 
         self.assertTrue(self.is_json(bot.to_json()))
@@ -50,9 +51,9 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(bot.username, 'PythonTelegramBot')
         self.assertEqual(bot.name, '@PythonTelegramBot')
 
+    @flaky(3, 1)
+    @timeout(10)
     def testSendMessage(self):
-        '''Test the telegram.Bot sendMessage method'''
-        print('Testing sendMessage')
         message = self._bot.sendMessage(chat_id=self._chat_id,
                                         text='Моё судно на воздушной подушке полно угрей')
 
@@ -60,18 +61,18 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
         self.assertTrue(isinstance(message.date, datetime))
 
+    @flaky(3, 1)
+    @timeout(10)
     def testGetUpdates(self):
-        '''Test the telegram.Bot getUpdates method'''
-        print('Testing getUpdates')
         updates = self._bot.getUpdates()
 
         if updates:
             self.assertTrue(self.is_json(updates[0].to_json()))
             self.assertTrue(isinstance(updates[0], telegram.Update))
 
+    @flaky(3, 1)
+    @timeout(10)
     def testForwardMessage(self):
-        '''Test the telegram.Bot forwardMessage method'''
-        print('Testing forwardMessage')
         message = self._bot.forwardMessage(chat_id=self._chat_id,
                                            from_chat_id=self._chat_id,
                                            message_id=2398)
@@ -81,9 +82,9 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.forward_from.username, 'leandrotoledo')
         self.assertTrue(isinstance(message.forward_date, datetime))
 
+    @flaky(3, 1)
+    @timeout(10)
     def testSendPhoto(self):
-        '''Test the telegram.Bot sendPhoto method'''
-        print('Testing sendPhoto - File')
         message = self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
                                       caption='testSendPhoto',
                                       chat_id=self._chat_id)
@@ -92,59 +93,57 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.photo[0].file_size, 1451)
         self.assertEqual(message.caption, 'testSendPhoto')
 
+    @flaky(3, 1)
+    @timeout(10)
     def testResendPhoto(self):
-        '''Test the telegram.Bot sendPhoto method'''
-        print('Testing sendPhoto - Resend')
         message = self._bot.sendPhoto(photo='AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI',
                                       chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_id, 'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
 
+    @flaky(3, 1)
+    @timeout(10)
     def testSendJPGURLPhoto(self):
-        '''Test the telegram.Bot sendPhoto method'''
-        print('Testing testSendJPGURLPhoto - URL')
         message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram',
                                       chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 822)
 
+    @flaky(3, 1)
+    @timeout(10)
     def testSendPNGURLPhoto(self):
-        '''Test the telegram.Bot sendPhoto method'''
-        print('Testing testSendPNGURLPhoto - URL')
         message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.png&text=telegram',
                                       chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
+    @flaky(3, 1)
+    @timeout(10)
     def testSendGIFURLPhoto(self):
-        '''Test the telegram.Bot sendPhoto method'''
-        print('Testing testSendGIFURLPhoto - URL')
         message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram',
                                       chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
 
+    @flaky(3, 1)
+    @timeout(10)
     def testSendChatAction(self):
-        '''Test the telegram.Bot sendChatAction method'''
-        print('Testing sendChatAction - ChatAction.TYPING')
-
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
                                  chat_id=self._chat_id)
 
+    @flaky(3, 1)
+    @timeout(10)
     def testGetUserProfilePhotos(self):
-        '''Test the telegram.Bot getUserProfilePhotos method'''
-        print('Testing getUserProfilePhotos')
         upf = self._bot.getUserProfilePhotos(user_id=self._chat_id)
 
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(upf.photos[0][0].file_size, 12421)
 
     def _test_invalid_token(self, token):
-        print('Testing invalid token: {0}'.format(token))
         self.assertRaisesRegexp(telegram.error.InvalidToken, 'Invalid token', telegram.Bot, token)
 
     def testInvalidToken1(self):
@@ -157,13 +156,11 @@ class BotTest(BaseTest, unittest.TestCase):
         self._test_invalid_token('12:')
 
     def testUnauthToken(self):
-        print('Testing unauthorized token')
         with self.assertRaisesRegexp(telegram.error.Unauthorized, 'Unauthorized'):
             bot = telegram.Bot('1234:abcd1234')
             bot.getMe()
 
     def testInvalidSrvResp(self):
-        print('Testing invalid server response')
         with self.assertRaisesRegexp(telegram.TelegramError, 'Invalid server response'):
             # bypass the valid token check
             bot_cls = type('bot_cls', (telegram.Bot, ), {'_valid_token': lambda self, token: token})

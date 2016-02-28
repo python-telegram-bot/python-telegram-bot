@@ -41,9 +41,6 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         }
         
     def test_send_message_with_force_reply(self):
-        """Test telegram.Bot sendMessage method with ForceReply"""
-        print('Testing bot.sendMessage - with ForceReply')
-
         message = self._bot.sendMessage(self._chat_id,
                                         'Моё судно на воздушной подушке полно угрей',
                                         reply_markup=telegram.ForceReply.de_json(self.json_dict))
@@ -52,26 +49,17 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_force_reply_de_json(self):
-        """Test ForceReply.de_json() method"""
-        print('Testing ForceReply.de_json()')
-
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 
         self.assertEqual(force_reply.force_reply, self.force_reply)
         self.assertEqual(force_reply.selective, self.selective)
         
     def test_force_reply_to_json(self):
-        """Test ForceReply.to_json() method"""
-        print('Testing ForceReply.to_json()')
-
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(force_reply.to_json()))
         
     def test_force_reply_to_dict(self):
-        """Test ForceReply.to_dict() method"""
-        print('Testing ForceReply.to_dict()')
-
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 
         self.assertEqual(force_reply['force_reply'], self.force_reply)

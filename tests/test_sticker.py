@@ -22,10 +22,12 @@
 import os
 import unittest
 import sys
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, timeout
 
 
 class StickerTest(BaseTest, unittest.TestCase):
@@ -49,13 +51,14 @@ class StickerTest(BaseTest, unittest.TestCase):
             'file_size': self.file_size
         }
 
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_sticker_file(self):
         pass
 
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_sticker_resend(self):
-        """Test telegram.Bot sendSticker method"""
-        print('Testing bot.sendSticker - Resend by file_id')
-
         message = self._bot.sendSticker(chat_id=self._chat_id,
                                          sticker=self.sticker_file_id)
 
@@ -68,9 +71,6 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
-        """Test Sticker.de_json() method"""
-        print('Testing Sticker.de_json()')
-
         sticker = telegram.Sticker.de_json(self.json_dict)
 
         self.assertEqual(sticker.file_id, self.sticker_file_id)
@@ -80,17 +80,11 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_to_json(self):
-        """Test Sticker.to_json() method"""
-        print('Testing Sticker.to_json()')
-
         sticker = telegram.Sticker.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        """Test Sticker.to_dict() method"""
-        print('Testing Sticker.to_dict()')
-
         sticker = telegram.Sticker.de_json(self.json_dict)
 
         self.assertEqual(sticker['file_id'], self.sticker_file_id)
@@ -99,9 +93,9 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(sticker['thumb'], telegram.PhotoSize))
         self.assertEqual(sticker['file_size'], self.file_size)
 
+    @flaky(3, 1)
+    @timeout(10)
     def test_error_send_sticker_empty_file(self):
-        print('Testing bot.sendSticker - Null file')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])
@@ -111,9 +105,9 @@ class StickerTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendSticker(chat_id=self._chat_id,
                                                         **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
     def test_error_send_sticker_empty_file_id(self):
-        print('Testing bot.sendSticker - Empty file_id')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])
@@ -123,9 +117,9 @@ class StickerTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendSticker(chat_id=self._chat_id,
                                                          **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
     def test_error_sticker_without_required_args(self):
-        print('Testing bot.sendSticker - Without required arguments')
-
         json_dict = self.json_dict
 
         del(json_dict['file_id'])

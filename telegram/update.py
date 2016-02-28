@@ -19,7 +19,7 @@
 
 """This module contains a object that represents a Telegram Update."""
 
-from telegram import Message, TelegramObject
+from telegram import Message, TelegramObject, InlineQuery, ChosenInlineResult
 
 
 class Update(TelegramObject):
@@ -28,6 +28,8 @@ class Update(TelegramObject):
     Attributes:
         update_id (int):
         message (:class:`telegram.Message`):
+        inline_query (:class:`telegram.InlineQuery`):
+        chosen_inline_result (:class:`telegram.ChosenInlineResult`):
 
     Args:
         update_id (int):
@@ -35,6 +37,8 @@ class Update(TelegramObject):
 
     Keyword Args:
         message (Optional[:class:`telegram.Message`]):
+        inline_query (Optional[:class:`telegram.InlineQuery`]):
+        chosen_inline_result (Optional[:class:`telegram.ChosenInlineResult`])
     """
     def __init__(self,
                  update_id,
@@ -43,12 +47,14 @@ class Update(TelegramObject):
         self.update_id = int(update_id)
         # Optionals
         self.message = kwargs.get('message')
+        self.inline_query = kwargs.get('inline_query')
+        self.chosen_inline_result = kwargs.get('chosen_inline_result')
 
     @staticmethod
     def de_json(data):
         """
         Args:
-            data (str):
+            data (dict):
 
         Returns:
             telegram.Update:
@@ -56,6 +62,9 @@ class Update(TelegramObject):
         if not data:
             return None
 
-        data['message'] = Message.de_json(data['message'])
+        data['message'] = Message.de_json(data.get('message'))
+        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'))
+        data['chosen_inline_result'] = \
+            ChosenInlineResult.de_json(data.get('chosen_inline_result'))
 
         return Update(**data)

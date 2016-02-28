@@ -72,19 +72,16 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         raise Exception("Test Error")
 
     def test_basic(self):
-        print('Testing basic job queue function')
         self.jq.put(self.job1, 0.1)
         sleep(1.5)
         self.assertGreaterEqual(self.result, 10)
 
     def test_noRepeat(self):
-        print('Testing job queue without repeat')
         self.jq.put(self.job1, 0.1, repeat=False)
         sleep(0.5)
         self.assertEqual(1, self.result)
 
     def test_nextT(self):
-        print('Testing job queue with a set next_t value')
         self.jq.put(self.job1, 0.1, next_t=0.5)
         sleep(0.45)
         self.assertEqual(0, self.result)
@@ -92,7 +89,6 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.assertEqual(1, self.result)
 
     def test_multiple(self):
-        print('Testing job queue with multiple jobs')
         self.jq.put(self.job1, 0.1, repeat=False)
         self.jq.put(self.job1, 0.2, repeat=False)
         self.jq.put(self.job1, 0.4)
@@ -100,7 +96,6 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.assertEqual(4, self.result)
 
     def test_error(self):
-        print('Testing job queue starting twice with an erroneous job')
         self.jq.put(self.job2, 0.1)
         self.jq.put(self.job1, 0.2)
         self.jq.start()
@@ -108,10 +103,9 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.assertEqual(1, self.result)
 
     def test_inUpdater(self):
-        print('Testing job queue created by updater')
         u = Updater(bot="MockBot", job_queue_tick_interval=0.005)
-        u.job_queue.put(self.job1, 0.1)
-        sleep(0.15)
+        u.job_queue.put(self.job1, 0.11)
+        sleep(0.2)
         self.assertEqual(1, self.result)
         u.stop()
         sleep(0.4)

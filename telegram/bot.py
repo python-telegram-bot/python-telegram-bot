@@ -27,6 +27,7 @@ from telegram import (User, Message, Update, UserProfilePhotos, File,
                       TelegramError, ReplyMarkup, TelegramObject, NullHandler)
 from telegram.error import InvalidToken
 from telegram.utils import request
+from telegram.utils.validate import validate_string
 
 H = NullHandler()
 logging.getLogger(__name__).addHandler(H)
@@ -142,28 +143,38 @@ class Bot(TelegramObject):
             decorator
             """
             url, data = func(self, *args, **kwargs)
-
-            if not data.get('chat_id'):
-                raise TelegramError('Invalid chat_id')
-
-            if kwargs.get('reply_to_message_id'):
-                reply_to_message_id = kwargs.get('reply_to_message_id')
-                data['reply_to_message_id'] = reply_to_message_id
-
-            if kwargs.get('reply_markup'):
-                reply_markup = kwargs.get('reply_markup')
-                if isinstance(reply_markup, ReplyMarkup):
-                    data['reply_markup'] = reply_markup.to_json()
-                else:
-                    data['reply_markup'] = reply_markup
-
-            result = request.post(url, data)
-
-            if result is True:
-                return result
-
-            return Message.de_json(result)
+            return Bot._post_message(url, data, kwargs)
         return decorator
+
+    @staticmethod
+    def _post_message(url, data, kwargs, timeout=None, network_delay=2.):
+        """Posts a message to the telegram servers.
+
+        Returns:
+            telegram.Message
+
+        """
+        if not data.get('chat_id'):
+            raise TelegramError('Invalid chat_id')
+
+        if kwargs.get('reply_to_message_id'):
+            reply_to_message_id = kwargs.get('reply_to_message_id')
+            data['reply_to_message_id'] = reply_to_message_id
+
+        if kwargs.get('reply_markup'):
+            reply_markup = kwargs.get('reply_markup')
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = request.post(url, data, timeout=timeout,
+                              network_delay=network_delay)
+
+        if result is True:
+            return result
+
+        return Message.de_json(result)
 
     @log
     def getMe(self):
@@ -430,12 +441,12 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @message
     def sendVideo(self,
                   chat_id,
                   video,
                   duration=None,
                   caption=None,
+                  timeout=None,
                   **kwargs):
         """Use this method to send video files, Telegram clients support mp4
         videos (other formats may be sent as telegram.Document).
@@ -452,6 +463,9 @@ class Bot(TelegramObject):
           caption:
             Video caption (may also be used when resending videos by file_id).
             [Optional]
+          timeout:
+            float. If this value is specified, use it as the definitive timeout
+            (in seconds) for urlopen() operations. [Optional]
           reply_to_message_id:
             If the message is a reply, ID of the original message. [Optional]
           reply_markup:
@@ -473,7 +487,7 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._post_message(url, data, kwargs, timeout=timeout)
 
     @log
     @message
@@ -584,6 +598,59 @@ class Bot(TelegramObject):
                 'action': action}
 
         return url, data
+
+    @log
+    def answerInlineQuery(self,
+                          inline_query_id,
+                          results,
+                          cache_time=None,
+                          is_personal=None,
+                          next_offset=None):
+        """Use this method to reply to an inline query.
+
+        Args:
+            inline_query_id (str):
+                Unique identifier for answered query
+            results (list[InlineQueryResult]):
+                A list of results for the inline query
+
+        Keyword Args:
+            cache_time (Optional[int]): The maximum amount of time the result
+                of the inline query may be cached on the server
+            is_personal (Optional[bool]): Pass True, if results may be cached
+                on the server side only for the user that sent the query. By
+                default, results may be returned to any user who sends the same
+                query
+            next_offset (Optional[str]): Pass the offset that a client should
+                send in the next query with the same text to receive more
+                results. Pass an empty string if there are no more results or
+                if you don't support pagination. Offset length can't exceed 64
+                bytes.
+
+        Returns:
+            A boolean if answering was successful
+        """
+
+        validate_string(inline_query_id, 'inline_query_id')
+        validate_string(inline_query_id, 'next_offset')
+
+        url = '%s/answerInlineQuery' % self.base_url
+
+        results = [res.to_dict() for res in results]
+
+        data = {'inline_query_id': inline_query_id,
+                'results': results}
+
+        if cache_time is not None:
+            data['cache_time'] = int(cache_time)
+        if is_personal is not None:
+            data['is_personal'] = bool(is_personal)
+        if next_offset is not None:
+            data['next_offset'] = next_offset
+
+        result = request.post(url, data)
+
+        return result
 
     @log
     def getUserProfilePhotos(self,

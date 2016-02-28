@@ -91,6 +91,11 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = update.message.text
         self.message_count += 1
 
+    def telegramInlineHandlerTest(self, bot, update):
+        self.received_message = (update.inline_query,
+                                 update.chosen_inline_result)
+        self.message_count += 1
+
     @run_async
     def asyncHandlerTest(self, bot, update, **kwargs):
         sleep(1)
@@ -136,7 +141,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.message_count += 1
 
     def test_addRemoveTelegramMessageHandler(self):
-        print('Testing add/removeTelegramMessageHandler')
         self._setup_updater('Test')
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
@@ -154,7 +158,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
-        print('Testing addTelegramMessageHandler and send 100 messages...')
         self._setup_updater('Multiple', 100)
         self.updater.dispatcher.addTelegramMessageHandler(
             self.telegramHandlerTest)
@@ -164,7 +167,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.message_count, 100)
 
     def test_addRemoveTelegramRegexHandler(self):
-        print('Testing add/removeStringRegexHandler')
         self._setup_updater('Test2')
         d = self.updater.dispatcher
         regobj = re.compile('Te.*')
@@ -183,7 +185,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveTelegramCommandHandler(self):
-        print('Testing add/removeTelegramCommandHandler')
         self._setup_updater('/test')
         d = self.updater.dispatcher
         self.updater.dispatcher.addTelegramCommandHandler(
@@ -201,7 +202,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveUnknownTelegramCommandHandler(self):
-        print('Testing add/removeUnknownTelegramCommandHandler')
         self._setup_updater('/test2')
         d = self.updater.dispatcher
         self.updater.dispatcher.addUnknownTelegramCommandHandler(
@@ -219,7 +219,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveStringRegexHandler(self):
-        print('Testing add/removeStringRegexHandler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringRegexHandler('Te.*', self.stringHandlerTest)
@@ -237,7 +236,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveStringCommandHandler(self):
-        print('Testing add/removeStringCommandHandler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringCommandHandler(
@@ -257,7 +255,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveUnknownStringCommandHandler(self):
-        print('Testing add/removeUnknownStringCommandHandler')
         self._setup_updater('/test')
         d = self.updater.dispatcher
         d.addUnknownStringCommandHandler(
@@ -276,7 +273,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveErrorHandler(self):
-        print('Testing add/removeErrorHandler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addErrorHandler(self.errorHandlerTest)
@@ -295,11 +291,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_errorInHandler(self):
-        print('Testing error in Handler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addStringRegexHandler('.*',
-                                                self.errorRaisingHandlerTest)
+        d.addStringRegexHandler('.*', self.errorRaisingHandlerTest)
         self.updater.dispatcher.addErrorHandler(self.errorHandlerTest)
         queue = self.updater.start_polling(0.01)
 
@@ -308,7 +302,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message, 'Test Error 1')
 
     def test_errorOnGetUpdates(self):
-        print('Testing error on getUpdates')
         self._setup_updater('', raise_error=True)
         d = self.updater.dispatcher
         d.addErrorHandler(self.errorHandlerTest)
@@ -317,7 +310,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message, "Test Error 2")
 
     def test_addRemoveTypeHandler(self):
-        print('Testing add/removeTypeHandler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addTypeHandler(dict, self.stringHandlerTest)
@@ -335,8 +327,31 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
+    def test_addRemoveInlineHandlerQuery(self):
+        print('Testing add/removeInlineHandler')
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        d.addTelegramInlineHandler(self.telegramInlineHandlerTest)
+        queue = self.updater.start_polling(0.01)
+        update = Update(update_id=0, inline_query="testquery")
+        update2 = Update(update_id=0, chosen_inline_result="testresult")
+        queue.put(update)
+        sleep(.1)
+        self.assertEqual(self.received_message[0], "testquery")
+
+        queue.put(update2)
+        sleep(.1)
+        self.assertEqual(self.received_message[1], "testresult")
+
+        # Remove handler
+        d.removeTelegramInlineHandler(self.telegramInlineHandlerTest)
+        self.reset()
+
+        queue.put(update)
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
     def test_runAsync(self):
-        print('Testing @run_async')
         self._setup_updater('Test5', messages=2)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
@@ -347,7 +362,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.message_count, 2)
 
     def test_additionalArgs(self):
-        print('Testing additional arguments for handlers')
         self._setup_updater('', messages=0)
         self.updater.dispatcher.addStringCommandHandler(
             'test5', self.additionalArgsTest)
@@ -359,7 +373,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.message_count, 2)
         
     def test_context(self):
-        print('Testing context for handlers')
         context = "context_data"
         self._setup_updater('', messages=0)
         self.updater.dispatcher.addStringCommandHandler(
@@ -373,7 +386,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.context, context)
 
     def test_regexGroupHandler(self):
-        print('Testing optional groups and groupdict parameters')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addStringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
@@ -386,7 +398,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
 
     def test_runAsyncWithAdditionalArgs(self):
-        print('Testing @run_async with additional parameters')
         self._setup_updater('Test6', messages=2)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
@@ -397,7 +408,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.message_count, 2)
 
     def test_webhook(self):
-        print('Testing Webhook')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
@@ -443,7 +453,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(True)
 
     def test_webhook_no_ssl(self):
-        print('Testing Webhook without SSL')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         d.addTelegramMessageHandler(
@@ -539,14 +548,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         os.kill(os.getpid(), signal.SIGTERM)
 
     def test_idle(self):
-        print('Testing idle')
         self._setup_updater('Test6', messages=0)
         self.updater.start_polling(poll_interval=0.01)
         Thread(target=self.signalsender).start()
         self.updater.idle()
         # If we get this far, idle() ran through
         sleep(1)
-        self.updater.running = False
+        self.assertFalse(self.updater.running)
 
     def test_createBot(self):
         updater = Updater('123:abcd')

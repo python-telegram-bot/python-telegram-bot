@@ -43,17 +43,11 @@ class ChatTest(BaseTest, unittest.TestCase):
         }
 
     def test_group_chat_de_json_empty_json(self):
-        """Test Chat.de_json() method"""
-        print('Testing Chat.de_json() - Empty JSON')
-
         group_chat = telegram.Chat.de_json({})
 
         self.assertEqual(group_chat, None)
 
     def test_group_chat_de_json(self):
-        """Test Chat.de_json() method"""
-        print('Testing Chat.de_json()')
-
         group_chat = telegram.Chat.de_json(self.json_dict)
 
         self.assertEqual(group_chat.id, self.id)
@@ -61,17 +55,11 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.assertEqual(group_chat.type, self.type)
 
     def test_group_chat_to_json(self):
-        """Test Chat.to_json() method"""
-        print('Testing Chat.to_json()')
-
         group_chat = telegram.Chat.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(group_chat.to_json()))
 
     def test_group_chat_to_dict(self):
-        """Test Chat.to_dict() method"""
-        print('Testing Chat.to_dict()')
-
         group_chat = telegram.Chat.de_json(self.json_dict)
 
         self.assertTrue(self.is_dict(group_chat.to_dict()))

@@ -109,6 +109,8 @@ class Dispatcher:
             a list that contains the content of the message split on spaces,
             except the first word (usually the command).
             Example: '/add item1 item2 item3' -> ['item1', 'item2', 'item3']
+            For updates that contain inline queries, they will contain the
+            whole query split on spaces.
             For other updates, args will be None
 
     In some cases handlers may need some context data to process the update. To
@@ -138,6 +140,7 @@ class Dispatcher:
         self.bot = bot
         self.update_queue = update_queue
         self.telegram_message_handlers = []
+        self.telegram_inline_handlers = []
         self.telegram_command_handlers = {}
         self.telegram_regex_handlers = {}
         self.string_regex_handlers = {}
@@ -253,21 +256,23 @@ class Dispatcher:
             handled = True
 
         # Telegram update (regex)
-        if isinstance(update, Update):
+        if isinstance(update, Update) and update.message is not None:
             self.dispatchRegex(update, context)
             handled = True
 
-        # Telegram update (command)
-        if isinstance(update, Update) \
-                and update.message.text.startswith('/'):
-            self.dispatchTelegramCommand(update, context)
-            handled = True
+            # Telegram update (command)
+            if update.message.text.startswith('/'):
+                self.dispatchTelegramCommand(update, context)
 
-        # Telegram update (message)
-        elif isinstance(update, Update):
-            self.dispatchTelegramMessage(update, context)
-            handled = True
-
+            # Telegram update (message)
+            else:
+                self.dispatchTelegramMessage(update, context)
+                handled = True
+        elif isinstance(update, Update) and \
+                (update.inline_query is not None or
+                 update.chosen_inline_result is not None):
+                self.dispatchTelegramInline(update, context)
+                handled = True
         # Update not recognized
         if not handled:
             self.dispatchError(update, TelegramError(
@@ -284,6 +289,17 @@ class Dispatcher:
         """
 
         self.telegram_message_handlers.append(handler)
+
+    def addTelegramInlineHandler(self, handler):
+        """
+        Registers an inline query handler in the Dispatcher.
+
+        Args:
+            handler (function): A function that takes (Bot, Update, *args) as
+                arguments.
+        """
+
+        self.telegram_inline_handlers.append(handler)
 
     def addTelegramCommandHandler(self, command, handler):
         """
@@ -413,6 +429,17 @@ class Dispatcher:
 
         if handler in self.telegram_message_handlers:
             self.telegram_message_handlers.remove(handler)
+
+    def removeTelegramInlineHandler(self, handler):
+        """
+        De-registers an inline query handler.
+
+        Args:
+            handler (any):
+        """
+
+        if handler in self.telegram_inline_handlers:
+            self.telegram_inline_handlers.remove(handler)
 
     def removeTelegramCommandHandler(self, command, handler):
         """
@@ -597,6 +624,17 @@ class Dispatcher:
         self.dispatchTo(self.telegram_message_handlers, update,
                         context=context)
 
+    def dispatchTelegramInline(self, update, context=None):
+        """
+        Dispatches an update that contains an inline update.
+
+        Args:
+            update (telegram.Update): The Telegram update that contains the
+                message.
+        """
+
+        self.dispatchTo(self.telegram_inline_handlers, update, context=None)
+
     def dispatchError(self, update, error):
         """
         Dispatches an error.
@@ -645,8 +683,10 @@ class Dispatcher:
             target_kwargs['update_queue'] = self.update_queue
 
         if is_async or 'args' in fargs:
-            if isinstance(update, Update):
+            if isinstance(update, Update) and update.message:
                 args = update.message.text.split(' ')[1:]
+            elif isinstance(update, Update) and update.inline_query:
+                args = update.inline_query.query.split(' ')
             elif isinstance(update, str):
                 args = update.split(' ')[1:]
             else:
