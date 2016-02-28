@@ -1,3 +1,16 @@
+**2016-02-28**
+
+*Released 3.3*
+
+- Inline bots
+- Send any file by URL
+- Specialized exceptions: ``Unauthorized``, ``InvalidToken``, ``NetworkError`` and ``TimedOut``
+- Integration for botan.io (thanks to @ollmer)
+- HTML Parsemode (thanks to @jlmadurga)
+- Bugfixes and under-the-hood improvements
+
+**Very special thanks to Noam Meltzer (@tsnoam) for all of his work!**
+
 **2016-01-09**
 
 *Released 3.3b1*
