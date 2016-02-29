@@ -199,6 +199,7 @@ class Bot(TelegramObject):
                     text,
                     parse_mode=None,
                     disable_web_page_preview=None,
+                    disable_notification=None,
                     **kwargs):
         """Use this method to send text messages.
 
@@ -213,6 +214,9 @@ class Bot(TelegramObject):
             Text of the message to be sent.
           disable_web_page_preview:
             Disables link previews for links in this message. [Optional]
+          disable_notification:
+            Sends the message silently. iOS users will not receive a notification,
+            Android users will receive a notification with no sound. [Optional]
           reply_to_message_id:
             If the message is a reply, ID of the original message. [Optional]
           reply_markup:
@@ -233,6 +237,8 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
+        if disable_notification:
+            data['disable_notification'] = disable_notification
 
         return url, data
 
