@@ -301,6 +301,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEqual(self.received_message, 'Test Error 1')
 
+    def test_cleanBeforeStart(self):
+        self._setup_updater('')
+        d = self.updater.dispatcher
+        d.addTelegramMessageHandler(self.telegramHandlerTest)
+        self.updater.start_polling(0.01, clean=True)
+        sleep(.1)
+        self.assertEqual(self.message_count, 0)
+        self.assertIsNone(self.received_message)
+
     def test_errorOnGetUpdates(self):
         self._setup_updater('', raise_error=True)
         d = self.updater.dispatcher
@@ -395,7 +404,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEqual(self.received_message, (('This', 'regex group'),
                                                  {'testgroup': 'regex group'}))
-
 
     def test_runAsyncWithAdditionalArgs(self):
         self._setup_updater('Test6', messages=2)

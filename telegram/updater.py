@@ -94,7 +94,8 @@ class Updater:
         self.__threads = []
         """:type: list[Thread]"""
 
-    def start_polling(self, poll_interval=0.0, timeout=10, network_delay=2):
+    def start_polling(self, poll_interval=0.0, timeout=10, network_delay=2,
+                      clean=False):
         """
         Starts polling updates from Telegram.
 
@@ -103,14 +104,19 @@ class Updater:
                 updates from Telegram in seconds. Default is 0.0
             timeout (Optional[float]): Passed to Bot.getUpdates
             network_delay (Optional[float]): Passed to Bot.getUpdates
+            clean (Optional[bool]): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is
+                False.
 
         Returns:
             Queue: The update queue that can be filled from the main thread
-        """
 
+        """
         with self.__lock:
             if not self.running:
                 self.running = True
+                if clean:
+                    self._clean_updates()
 
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher")
@@ -142,7 +148,8 @@ class Updater:
                       port=80,
                       url_path='',
                       cert=None,
-                      key=None):
+                      key=None,
+                      clean=False):
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
@@ -156,6 +163,10 @@ class Updater:
             url_path (Optional[str]): Path inside url
             cert (Optional[str]): Path to the SSL certificate file
             key (Optional[str]): Path to the SSL key file
+            clean (Optional[bool]): Whether to clean any pending updates on
+                Telegram servers before actually starting the webhook. Default
+                is False.
+
 
         Returns:
             Queue: The update queue that can be filled from the main thread
@@ -164,6 +175,8 @@ class Updater:
         with self.__lock:
             if not self.running:
                 self.running = True
+                if clean:
+                    self._clean_updates()
 
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher"),
@@ -259,6 +272,12 @@ class Updater:
                 raise TelegramError('SSL Certificate invalid')
 
         self.httpd.serve_forever(poll_interval=1)
+
+    def _clean_updates(self):
+        self.logger.info('Cleaning updates from Telegram server')
+        updates = self.bot.getUpdates()
+        while updates:
+            updates = self.bot.getUpdates(updates[-1].update_id + 1)
 
     def stop(self):
         """
