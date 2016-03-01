@@ -41,10 +41,9 @@ class JobQueue(object):
 
     Args:
         bot (Bot): The bot instance that should be passed to the jobs
-
-    Keyword Args:
         tick_interval (Optional[float]): The interval this queue should check
             the newest task in seconds. Defaults to 1.0
+
     """
 
     def __init__(self, bot, tick_interval=1.0):
