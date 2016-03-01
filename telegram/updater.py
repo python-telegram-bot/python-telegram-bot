@@ -58,6 +58,8 @@ class Updater:
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
         bot (Optional[Bot]):
+        job_queue_tick_interval(Optional[float]): The interval the queue should
+            be checked for new tasks. Defaults to 1.0
 
     Raises:
         ValueError: If both `token` and `bot` are passed or none of them.
