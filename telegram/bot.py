@@ -206,11 +206,11 @@ class Bot(TelegramObject):
           chat_id:
             Unique identifier for the message recipient - telegram.Chat id.
           parse_mode:
-            Send Markdown, if you want Telegram apps to show bold, italic and
-            inline URLs in your bot's message. For the moment, only Telegram
-            for Android supports this. [Optional]
+            Send 'Markdown', if you want Telegram apps to show bold, italic and
+            inline URLs in your bot's message. [Optional]
           text:
-            Text of the message to be sent.
+            Text of the message to be sent. The current maximum length is 4096
+            UTF8 characters.
           disable_web_page_preview:
             Disables link previews for links in this message. [Optional]
           reply_to_message_id:
