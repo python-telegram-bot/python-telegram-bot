@@ -54,7 +54,7 @@ Here's how to make a one-off code change.
 
    ``$ git checkout master``
 
-   ``$ git checkout merge upstream/master``
+   ``$ git merge upstream/master``
 
    ``$ git checkout -b your-branch-name``
 
