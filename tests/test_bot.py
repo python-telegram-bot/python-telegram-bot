@@ -63,6 +63,17 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def testSilentSendMessage(self):
+        message = self._bot.sendMessage(chat_id=self._chat_id,
+                                        text='Моё судно на воздушной подушке полно угрей',
+                                        disable_notification=True)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
+        self.assertTrue(isinstance(message.date, datetime))
+
+    @flaky(3, 1)
+    @timeout(10)
     def testGetUpdates(self):
         updates = self._bot.getUpdates()
 
@@ -88,6 +99,18 @@ class BotTest(BaseTest, unittest.TestCase):
         message = self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
                                       caption='testSendPhoto',
                                       chat_id=self._chat_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.photo[0].file_size, 1451)
+        self.assertEqual(message.caption, 'testSendPhoto')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testSilentSendPhoto(self):
+        message = self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
+                                      caption='testSendPhoto',
+                                      chat_id=self._chat_id,
+                                      disable_notification=True)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 1451)
