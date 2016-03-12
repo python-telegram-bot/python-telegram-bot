@@ -548,7 +548,7 @@ class Dispatcher:
                 command
         """
 
-        command = update.message.text.split(' ')[0][1:].split('@')[0]
+        command = update.message.text.decode('utf-8').split()[0][1:].split('@')[0]
 
         if command in self.telegram_command_handlers:
             self.dispatchTo(self.telegram_command_handlers[command], update,
