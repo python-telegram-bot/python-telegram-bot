@@ -81,7 +81,8 @@ class InputFile(object):
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
-            elif isinstance(self.input_file, file):
+            elif isinstance(self.input_file, file) and \
+                    hasattr(self.input_file, 'name'):
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
                 self.filename = os.path.basename(self.input_file.url)\
@@ -134,7 +135,7 @@ class InputFile(object):
             form_boundary,
             'Content-Disposition: form-data; name="%s"; filename="%s"' % (
                 self.input_name, self.filename
-                ),
+            ),
             'Content-Type: %s' % self.mimetype,
             '',
             self.input_file_content
