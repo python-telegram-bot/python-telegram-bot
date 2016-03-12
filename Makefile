@@ -12,6 +12,7 @@ clean:
 	find . -name '*.pyc' -exec rm -f {} \;
 	find . -name '*.pyo' -exec rm -f {} \;
 	find . -name '*~' -exec rm -f {} \;
+	find . -regex "./telegram.\(mp3\|mp4\|ogg\|png\|webp\)" -exec rm {} \;
 
 pep257:
 	$(PEP257) telegram
