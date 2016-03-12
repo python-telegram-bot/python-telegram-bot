@@ -52,7 +52,12 @@ from .bot import Bot
 from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
 from .updatequeue import UpdateQueue
-from .updater import Updater
+
+
+def Updater(*args, **kwargs):
+    """Load the updater module on invocation and return an Updater instance."""
+    from .updater import Updater as Up
+    return Up(*args, **kwargs)
 
 
 __author__ = 'devs@python-telegram-bot.org'
