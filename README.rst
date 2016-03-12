@@ -107,6 +107,7 @@ getUpdates                Yes
 getUserProfilePhotos      Yes
 getFile                   Yes
 setWebhook                Yes
+answerInlineQuery         Yes
 ========================= ============
 
 -------------------------
