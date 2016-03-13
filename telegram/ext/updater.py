@@ -155,7 +155,9 @@ class Updater:
                       url_path='',
                       cert=None,
                       key=None,
-                      clean=False):
+                      clean=False,
+                      bootstrap_retries=0,
+                      webhook_url=None):
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
@@ -172,12 +174,19 @@ class Updater:
             clean (Optional[bool]): Whether to clean any pending updates on
                 Telegram servers before actually starting the webhook. Default
                 is False.
-
+            bootstrap_retries (Optional[int[): Whether the bootstrapping phase
+                of the `Updater` will retry on failures on the Telegram server.
+                < 0 - retry indefinitely
+                  0 - no retries (default)
+                > 0 - retry up to X times
+            webhook_url (Optional[str]): Explicitly specifiy the webhook url.
+                Useful behind NAT, reverse proxy, etc. Default is derived from
+                `listen`, `port` & `url_path`.
 
         Returns:
             Queue: The update queue that can be filled from the main thread
-        """
 
+        """
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -187,7 +196,8 @@ class Updater:
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher"),
                 self._init_thread(self._start_webhook, "updater", listen,
-                                  port, url_path, cert, key)
+                                  port, url_path, cert, key, bootstrap_retries,
+                                  webhook_url)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -267,7 +277,8 @@ class Updater:
             current_interval = 30
         return current_interval
 
-    def _start_webhook(self, listen, port, url_path, cert, key):
+    def _start_webhook(self, listen, port, url_path, cert, key,
+                       bootstrap_retries, webhook_url):
         self.logger.debug('Updater thread started')
         use_ssl = cert is not None and key is not None
         url_path = "/%s" % url_path
@@ -275,6 +286,10 @@ class Updater:
         # Create and start server
         self.httpd = WebhookServer((listen, port), WebhookHandler,
                                    self.update_queue, url_path)
+        if not webhook_url:
+            webhook_url = self._gen_webhook_url(listen, port, url_path,
+                                                use_ssl)
+        self._set_webhook(webhook_url, bootstrap_retries)
 
         if use_ssl:
             # Check SSL-Certificate with openssl, if possible
@@ -299,6 +314,13 @@ class Updater:
                 raise TelegramError('SSL Certificate invalid')
 
         self.httpd.serve_forever(poll_interval=1)
+
+    def _gen_webhook_url(self, listen, port, url_path, use_ssl):
+        return '{proto}://{listen}:{port}{path}'.format(
+            proto='https' if use_ssl else 'http',
+            listen=listen,
+            port=port,
+            path=url_path)
 
     def _clean_updates(self):
         self.logger.debug('Cleaning updates from Telegram server')
