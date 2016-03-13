@@ -30,6 +30,7 @@ import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from telegram import Bot, TelegramError, NullHandler
 from telegram.ext import dispatcher, Dispatcher, JobQueue, UpdateQueue
+from telegram.error import Unauthorized, InvalidToken
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 logging.getLogger(__name__).addHandler(NullHandler())
@@ -94,7 +95,7 @@ class Updater:
         """:type: list[Thread]"""
 
     def start_polling(self, poll_interval=0.0, timeout=10, network_delay=2,
-                      clean=False):
+                      clean=False, bootstrap_retries=0):
         """
         Starts polling updates from Telegram.
 
@@ -106,6 +107,11 @@ class Updater:
             clean (Optional[bool]): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is
                 False.
+            bootstrap_retries (Optional[int[): Whether the bootstrapping phase
+                of the `Updater` will retry on failures on the Telegram server.
+                < 0 - retry indefinitely
+                  0 - no retries (default)
+                > 0 - retry up to X times
 
         Returns:
             Queue: The update queue that can be filled from the main thread
@@ -120,7 +126,8 @@ class Updater:
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_polling, "updater",
-                                  poll_interval, timeout, network_delay)
+                                  poll_interval, timeout, network_delay,
+                                  bootstrap_retries)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -185,18 +192,18 @@ class Updater:
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
-    def _start_polling(self, poll_interval, timeout, network_delay):
+    def _start_polling(self, poll_interval, timeout, network_delay,
+                       bootstrap_retries):
         """
         Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
         Dispatcher.
-        """
 
+        """
         cur_interval = poll_interval
         self.logger.debug('Updater thread started')
 
-        # Remove webhook
-        self.bot.setWebhook(webhook_url=None)
+        self._set_webhook(None, bootstrap_retries)
 
         while self.running:
             try:
@@ -227,6 +234,27 @@ class Updater:
                 cur_interval = poll_interval
 
             sleep(cur_interval)
+
+    def _set_webhook(self, webhook_url, max_retries):
+        retries = 0
+        while 1:
+            try:
+                # Remove webhook
+                self.bot.setWebhook(webhook_url=webhook_url)
+            except (Unauthorized, InvalidToken):
+                raise
+            except TelegramError:
+                msg = 'failed to set webhook; try={0} max_retries={1}'.format(
+                    retries, max_retries)
+                if max_retries < 0 or retries < max_retries:
+                    self.logger.info(msg)
+                    retries += 1
+                else:
+                    self.logger.exception(msg)
+                    raise
+            else:
+                break
+            sleep(1)
 
     @staticmethod
     def _increase_poll_interval(current_interval):
