@@ -23,7 +23,7 @@ import logging
 from functools import wraps
 from inspect import getargspec
 from threading import Thread, BoundedSemaphore, Lock, Event, current_thread
-from re import match
+from re import match, split
 from time import sleep
 
 from telegram import (TelegramError, Update, NullHandler)
@@ -548,7 +548,7 @@ class Dispatcher:
                 command
         """
 
-        command = update.message.text.split(' ')[0][1:].split('@')[0]
+        command = split('\W', update.message.text[1:])[0]
 
         if command in self.telegram_command_handlers:
             self.dispatchTo(self.telegram_command_handlers[command], update,
