@@ -49,6 +49,7 @@ sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Updater, Bot
 from telegram.ext.dispatcher import run_async
+from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
 from threading import Lock, Thread
 
@@ -483,13 +484,46 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test 2')
 
+    def test_bootstrap_retries_success(self):
+        retries = 3
+        self._setup_updater('', messages=0, bootstrap_retries=retries)
+
+        self.updater._set_webhook('path', retries)
+        self.assertEqual(self.updater.bot.bootstrap_attempts, retries)
+
+    def test_bootstrap_retries_unauth(self):
+        retries = 3
+        self._setup_updater('', messages=0, bootstrap_retries=retries,
+                            bootstrap_err=Unauthorized())
+
+        self.assertRaises(Unauthorized, self.updater._set_webhook, 'path',
+                          retries)
+        self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
+
+    def test_bootstrap_retries_invalid_token(self):
+        retries = 3
+        self._setup_updater('', messages=0, bootstrap_retries=retries,
+                            bootstrap_err=InvalidToken())
+
+        self.assertRaises(InvalidToken, self.updater._set_webhook, 'path',
+                          retries)
+        self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
+
+    def test_bootstrap_retries_fail(self):
+        retries = 1
+        self._setup_updater('', messages=0, bootstrap_retries=retries)
+
+        self.assertRaisesRegexp(TelegramError, 'test',
+                                self.updater._set_webhook, 'path', retries - 1)
+        self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
+
     def test_webhook_invalid_posts(self):
         self._setup_updater('', messages=0)
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
         thr = Thread(target=self.updater._start_webhook,
-                     args=(ip, port, '', None, None))
+                     args=(ip, port, '', None, None, 0, None))
         thr.start()
 
         sleep(0.5)
@@ -578,12 +612,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
 class MockBot:
 
-    def __init__(self, text, messages=1, raise_error=False):
+    def __init__(self, text, messages=1, raise_error=False,
+                 bootstrap_retries=None, bootstrap_err=TelegramError('test')):
         self.text = text
         self.send_messages = messages
         self.raise_error = raise_error
         self.token = "TOKEN"
-        pass
+        self.bootstrap_retries = bootstrap_retries
+        self.bootstrap_attempts = 0
+        self.bootstrap_err = bootstrap_err
 
     @staticmethod
     def mockUpdate(text):
@@ -594,7 +631,12 @@ class MockBot:
         return update
 
     def setWebhook(self, webhook_url=None, certificate=None):
-        pass
+        if self.bootstrap_retries is None:
+            return
+
+        if self.bootstrap_attempts < self.bootstrap_retries:
+            self.bootstrap_attempts += 1
+            raise self.bootstrap_err
 
     def getUpdates(self,
                    offset=None,
