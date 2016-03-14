@@ -53,6 +53,9 @@ from .bot import Bot
 
 def Updater(*args, **kwargs):
     """Load the updater module on invocation and return an Updater instance."""
+    import warnings
+    warnings.warn("telegram.Updater is being deprecated, please use "
+                  "telegram.ext.Updater from now on.")
     from .ext.updater import Updater as Up
     return Up(*args, **kwargs)
 
