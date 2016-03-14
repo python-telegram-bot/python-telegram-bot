@@ -37,7 +37,7 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import JobQueue, Updater
+from telegram.ext import JobQueue, Updater
 from tests.base import BaseTest
 
 # Enable logging

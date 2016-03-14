@@ -49,21 +49,24 @@ from .inlinequeryresult import InlineQueryResultArticle, InlineQueryResultGif,\
     InlineQueryResultMpeg4Gif, InlineQueryResultPhoto, InlineQueryResultVideo
 from .update import Update
 from .bot import Bot
-from .dispatcher import Dispatcher
-from .jobqueue import JobQueue
-from .updatequeue import UpdateQueue
-from .updater import Updater
+
+
+def Updater(*args, **kwargs):
+    """Load the updater module on invocation and return an Updater instance."""
+    import warnings
+    warnings.warn("telegram.Updater is being deprecated, please use "
+                  "telegram.ext.Updater from now on.")
+    from .ext.updater import Updater as Up
+    return Up(*args, **kwargs)
 
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '3.3'
-__all__ = ('Bot', 'Updater', 'Dispatcher', 'Emoji', 'TelegramError',
-           'InputFile', 'ReplyMarkup', 'ForceReply', 'ReplyKeyboardHide',
-           'ReplyKeyboardMarkup', 'UserProfilePhotos', 'ChatAction',
-           'Location', 'Contact', 'Video', 'Sticker', 'Document', 'File',
-           'Audio', 'PhotoSize', 'Chat', 'Update', 'ParseMode', 'Message',
-           'User', 'TelegramObject', 'NullHandler', 'Voice', 'JobQueue',
-           'InlineQuery', 'ChosenInlineResult', 'InlineQueryResultArticle',
+__all__ = ('Audio', 'Bot', 'Chat', 'Emoji', 'TelegramError', 'InputFile',
+           'Contact', 'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
+           'UserProfilePhotos', 'ChatAction', 'Location', 'Video', 'Document',
+           'Sticker', 'File', 'PhotoSize', 'Update', 'ParseMode', 'Message',
+           'User', 'TelegramObject', 'NullHandler', 'Voice', 'InlineQuery',
+           'ReplyMarkup', 'ChosenInlineResult', 'InlineQueryResultArticle',
            'InlineQueryResultGif', 'InlineQueryResultPhoto',
-           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo',
-           'UpdateQueue')
+           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo')
