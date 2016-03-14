@@ -59,11 +59,11 @@ def Updater(*args, **kwargs):
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '3.3'
-__all__ = ('Audio', 'Bot', 'Emoji', 'TelegramError', 'InputFile', 'ReplyMarkup',
+__all__ = ('Audio', 'Bot', 'Chat', 'Emoji', 'TelegramError', 'InputFile',
            'Contact', 'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Video', 'Document',
            'Sticker', 'File', 'PhotoSize', 'Update', 'ParseMode', 'Message',
            'User', 'TelegramObject', 'NullHandler', 'Voice', 'InlineQuery',
-           'Chat', 'ChosenInlineResult', 'InlineQueryResultArticle',
+           'ReplyMarkup', 'ChosenInlineResult', 'InlineQueryResultArticle',
            'InlineQueryResultGif', 'InlineQueryResultPhoto',
            'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo')
