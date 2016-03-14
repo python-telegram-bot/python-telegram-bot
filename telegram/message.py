@@ -56,6 +56,10 @@ class Message(TelegramObject):
         new_chat_photo (List[:class:`telegram.PhotoSize`]):
         delete_chat_photo (bool):
         group_chat_created (bool):
+        supergroup_chat_created (bool):
+        migrate_to_chat_id (int):
+        migrate_from_chat_id (int):
+        channel_chat_created (bool):
 
     Args:
         message_id (int):
@@ -84,6 +88,10 @@ class Message(TelegramObject):
         new_chat_photo (Optional[List[:class:`telegram.PhotoSize`]):
         delete_chat_photo (Optional[bool]):
         group_chat_created (Optional[bool]):
+        supergroup_chat_created (Optional[bool]):
+        migrate_to_chat_id (Optional[int]):
+        migrate_from_chat_id (Optional[int]):
+        channel_chat_created (Optional[bool]):
     """
 
     def __init__(self,
