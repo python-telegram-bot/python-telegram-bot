@@ -28,8 +28,8 @@ from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
-from telegram import (Bot, TelegramError, dispatcher, Dispatcher,
-                      NullHandler, JobQueue, UpdateQueue)
+from telegram import Bot, TelegramError, NullHandler
+from telegram.ext import dispatcher, Dispatcher, JobQueue, UpdateQueue
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 H = NullHandler()
