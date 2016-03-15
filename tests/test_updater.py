@@ -47,7 +47,8 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError, User, Chat, Updater, Bot
+from telegram import Update, Message, TelegramError, User, Chat, Bot
+from telegram.ext.updater import Updater
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
