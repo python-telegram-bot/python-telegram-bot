@@ -12,8 +12,7 @@ except ImportError:
     from urllib import quote
     from urllib2 import URLError, HTTPError
 
-H = NullHandler()
-logging.getLogger(__name__).addHandler(H)
+logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class Botan(object):

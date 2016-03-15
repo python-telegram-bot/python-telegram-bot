@@ -86,11 +86,11 @@ class JobQueue(object):
 
         next_t += time.time()
 
-        self.logger.debug("Putting a %s with t=%f" % (job.name, next_t))
+        self.logger.debug('Putting a %s with t=%f' % (job.name, next_t))
         self.queue.put((next_t, job))
 
         if not self.running and not prevent_autostart:
-            self.logger.info("Auto-starting JobQueue")
+            self.logger.debug('Auto-starting JobQueue')
             self.start()
 
     def tick(self):
@@ -99,24 +99,24 @@ class JobQueue(object):
         """
         now = time.time()
 
-        self.logger.debug("Ticking jobs with t=%f" % now)
+        self.logger.debug('Ticking jobs with t=%f' % now)
         while not self.queue.empty():
             t, j = self.queue.queue[0]
-            self.logger.debug("Peeked at %s with t=%f" % (j.name, t))
+            self.logger.debug('Peeked at %s with t=%f' % (j.name, t))
 
             if t < now:
                 self.queue.get()
-                self.logger.info("Running job %s" % j.name)
+                self.logger.debug('Running job %s' % j.name)
                 try:
                     j.run(self.bot)
                 except:
-                    self.logger.exception("An uncaught error was raised while "
-                                          "executing job %s" % j.name)
+                    self.logger.exception('An uncaught error was raised while '
+                                          'executing job %s' % j.name)
                 if j.repeat:
                     self.put(j.run, j.interval)
                 continue
 
-            self.logger.debug("Next task isn't due yet. Finished!")
+            self.logger.debug('Next task isn\'t due yet. Finished!')
             break
 
     def start(self):
@@ -130,7 +130,7 @@ class JobQueue(object):
             job_queue_thread = Thread(target=self._start,
                                       name="job_queue")
             job_queue_thread.start()
-            self.logger.info('Job Queue thread started')
+            self.logger.debug('Job Queue thread started')
         else:
             self.__lock.release()
 
@@ -143,7 +143,7 @@ class JobQueue(object):
             self.tick()
             time.sleep(self.tick_interval)
 
-        self.logger.info('Job Queue thread stopped')
+        self.logger.debug('Job Queue thread stopped')
 
     def stop(self):
         """

@@ -98,7 +98,7 @@ def _try_except_req(func):
 
         except (SSLError, socket.timeout) as error:
             err_s = str(error)
-            if "operation timed out" in err_s:
+            if 'operation timed out' in err_s:
                 raise TimedOut()
 
             raise NetworkError(err_s)

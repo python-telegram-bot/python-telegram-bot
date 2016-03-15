@@ -32,8 +32,7 @@ from telegram import Bot, TelegramError, NullHandler
 from telegram.ext import dispatcher, Dispatcher, JobQueue, UpdateQueue
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
-H = NullHandler()
-logging.getLogger(__name__).addHandler(H)
+logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class Updater:
@@ -194,7 +193,7 @@ class Updater:
         """
 
         cur_interval = poll_interval
-        self.logger.info('Updater thread started')
+        self.logger.debug('Updater thread started')
 
         # Remove webhook
         self.bot.setWebhook(webhook_url=None)
@@ -216,8 +215,8 @@ class Updater:
             else:
                 if not self.running:
                     if len(updates) > 0:
-                        self.logger.info('Updates ignored and will be pulled '
-                                         'again on restart.')
+                        self.logger.debug('Updates ignored and will be pulled '
+                                          'again on restart.')
                     break
 
                 if updates:
@@ -241,7 +240,7 @@ class Updater:
         return current_interval
 
     def _start_webhook(self, listen, port, url_path, cert, key):
-        self.logger.info('Updater thread started')
+        self.logger.debug('Updater thread started')
         use_ssl = cert is not None and key is not None
         url_path = "/%s" % url_path
 
@@ -274,7 +273,7 @@ class Updater:
         self.httpd.serve_forever(poll_interval=1)
 
     def _clean_updates(self):
-        self.logger.info('Cleaning updates from Telegram server')
+        self.logger.debug('Cleaning updates from Telegram server')
         updates = self.bot.getUpdates()
         while updates:
             updates = self.bot.getUpdates(updates[-1].update_id + 1)
@@ -287,7 +286,7 @@ class Updater:
         self.job_queue.stop()
         with self.__lock:
             if self.running:
-                self.logger.info('Stopping Updater and Dispatcher...')
+                self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
 
@@ -301,7 +300,7 @@ class Updater:
 
     def _stop_httpd(self):
         if self.httpd:
-            self.logger.info(
+            self.logger.debug(
                 'Waiting for current webhook connection to be '
                 'closed... Send a Telegram message to the bot to exit '
                 'immediately.')
@@ -309,7 +308,7 @@ class Updater:
             self.httpd = None
 
     def _stop_dispatcher(self):
-        self.logger.debug("Requesting Dispatcher to stop...")
+        self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
 
     def _join_async_threads(self):
@@ -317,7 +316,7 @@ class Updater:
             threads = list(dispatcher.async_threads)
         total = len(threads)
         for i, thr in enumerate(threads):
-            self.logger.info(
+            self.logger.debug(
                 'Waiting for async thread {0}/{1} to end'.format(i, total))
             thr.join()
             self.logger.debug(
@@ -325,7 +324,7 @@ class Updater:
 
     def _join_threads(self):
         for thr in self.__threads:
-            self.logger.info(
+            self.logger.debug(
                 'Waiting for {0} thread to end'.format(thr.name))
             thr.join()
             self.logger.debug('{0} thread has ended'.format(thr.name))

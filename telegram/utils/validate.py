@@ -35,4 +35,4 @@ def validate_string(arg, name):
         name (str): The name of the argument, for the error message
     """
     if not isinstance(arg, basestring) and arg is not None:
-        raise ValueError(name + " is not a string")
+        raise ValueError(name + ' is not a string')

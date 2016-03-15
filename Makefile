@@ -1,3 +1,4 @@
+.DEFAULT_GOAL := help
 .PHONY: clean pep8 lint test install
 
 PYLINT          := pylint
