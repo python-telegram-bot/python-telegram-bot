@@ -10,8 +10,7 @@ except ImportError:
     import http.server as BaseHTTPServer
 
 
-H = NullHandler()
-logging.getLogger(__name__).addHandler(H)
+logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class _InvalidPost(Exception):
@@ -36,14 +35,14 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
     def serve_forever(self, poll_interval=0.5):
         with self.server_lock:
             self.is_running = True
-            self.logger.info("Webhook Server started.")
+            self.logger.debug('Webhook Server started.')
             super(WebhookServer, self).serve_forever(poll_interval)
-            self.logger.info("Webhook Server stopped.")
+            self.logger.debug('Webhook Server stopped.')
 
     def shutdown(self):
         with self.shutdown_lock:
             if not self.is_running:
-                self.logger.warn("Webhook Server already stopped.")
+                self.logger.warn('Webhook Server already stopped.')
                 return
             else:
                 super(WebhookServer, self).shutdown()
@@ -54,7 +53,7 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
 # Based on: https://github.com/eternnoir/pyTelegramBotAPI/blob/master/
 # examples/webhook_examples/webhook_cpython_echo_bot.py
 class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
-    server_version = "WebhookHandler/1.0"
+    server_version = 'WebhookHandler/1.0'
 
     def __init__(self, request, client_address, server):
         self.logger = logging.getLogger(__name__)
@@ -69,7 +68,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         self.end_headers()
 
     def do_POST(self):
-        self.logger.debug("Webhook triggered")
+        self.logger.debug('Webhook triggered')
         try:
             self._validate_post()
             clen = self._get_content_len()
@@ -83,11 +82,11 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.send_response(200)
             self.end_headers()
 
-            self.logger.debug("Webhook received data: " + json_string)
+            self.logger.debug('Webhook received data: ' + json_string)
 
             update = Update.de_json(json.loads(json_string))
-            self.logger.info("Received Update with ID %d on Webhook" %
-                             update.update_id)
+            self.logger.debug('Received Update with ID %d on Webhook' %
+                              update.update_id)
             self.server.update_queue.put(update)
 
     def _validate_post(self):

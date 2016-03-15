@@ -29,8 +29,7 @@ from time import sleep
 from telegram import (TelegramError, Update, NullHandler)
 from telegram.ext.updatequeue import Empty
 
-H = NullHandler()
-logging.getLogger(__name__).addHandler(H)
+logging.getLogger(__name__).addHandler(NullHandler())
 
 semaphore = None
 async_threads = set()
@@ -158,7 +157,7 @@ class Dispatcher:
         if not semaphore:
             semaphore = BoundedSemaphore(value=workers)
         else:
-            self.logger.info("Semaphore already initialized, skipping.")
+            self.logger.debug('Semaphore already initialized, skipping.')
 
     def start(self):
         """
@@ -176,7 +175,7 @@ class Dispatcher:
             raise TelegramError(msg)
 
         self.running = True
-        self.logger.info('Dispatcher started')
+        self.logger.debug('Dispatcher started')
 
         while 1:
             try:
@@ -184,7 +183,7 @@ class Dispatcher:
                 update, context = self.update_queue.get(True, 1, True)
             except Empty:
                 if self.__stop_event.is_set():
-                    self.logger.info('orderly stopping')
+                    self.logger.debug('orderly stopping')
                     break
                 elif self.__stop_event.is_set():
                     self.logger.critical(
@@ -214,7 +213,7 @@ class Dispatcher:
                                       "processing an update")
 
         self.running = False
-        self.logger.info('Dispatcher thread stopped')
+        self.logger.debug('Dispatcher thread stopped')
 
     def stop(self):
         """

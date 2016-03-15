@@ -29,8 +29,7 @@ from telegram.error import InvalidToken
 from telegram.utils import request
 from telegram.utils.validate import validate_string
 
-H = NullHandler()
-logging.getLogger(__name__).addHandler(H)
+logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class Bot(TelegramObject):
@@ -797,7 +796,7 @@ class Bot(TelegramObject):
         result = request.post(url, data, network_delay=network_delay)
 
         if result:
-            self.logger.info(
+            self.logger.debug(
                 'Getting updates: %s', [u['update_id'] for u in result])
         else:
             self.logger.debug('No new updates found.')
