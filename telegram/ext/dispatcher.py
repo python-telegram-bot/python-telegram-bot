@@ -327,7 +327,7 @@ class Dispatcher:
         for command, handler in commands_dict.items():
             self.addTelegramCommandHandler(command, handler)
 
-def addTelegramRegexHandler(self, matcher, handler):
+    def addTelegramRegexHandler(self, matcher, handler):
         """
         Registers a regex handler in the Dispatcher. If handlers will be
         called if re.match(matcher, update.message.text) is True.
