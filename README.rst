@@ -59,7 +59,7 @@ Table of contents
 
   1. `API`_
 
-  2. `telegram.ext`_
+  2. `Extensions`_
 
   3. `JobQueue`_
 
@@ -174,6 +174,8 @@ This library uses the `logging` module. To set up logging to standard output, pu
 
 at the beginning of your script.
 
+**Note:** The ``telegram.ext`` module will catch errors that would cause the bot to crash. All these are logged to the ``logging`` module, so it's recommended to use this if you are looking for error causes.
+
 ------
 _`API`
 ------
@@ -265,13 +267,13 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
----------------
-_`telegram.ext`
----------------
+-------------
+_`Extensions`
+-------------
 
 The ``telegram.ext`` submodule is built on top of the bare-metal API. It provides an easy-to-use interface to the ``telegram.Bot`` by caring about getting new updates with the ``Updater`` class from telegram and forwarding them to the ``Dispatcher`` class. We can register handler functions in the ``Dispatcher`` to make our bot react to Telegram commands, messages and even arbitrary updates.
 
-We'll need an Access Token. __Note:__ If you have done this in the previous step, you can use that one. To generate an Access Token, we have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
+We'll need an Access Token. **Note:** If you have done this in the previous step, you can use that one. To generate an Access Token, we have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
 
 First, we create an ``Updater`` object::
 
