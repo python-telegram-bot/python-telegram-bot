@@ -57,9 +57,9 @@ Table of contents
 
 - `Getting started`_
 
-  1. `The Updater class`_
+  1. `API`_
 
-  2. `API`_
+  2. `telegram.ext`_
 
   3. `JobQueue`_
 
@@ -174,85 +174,11 @@ This library uses the `logging` module. To set up logging to standard output, pu
 
 at the beginning of your script.
 
---------------------
-_`The Updater class`
---------------------
-
-The ``Updater`` class is the new way to create bots with ``python-telegram-bot``. It provides an easy-to-use interface to the ``telegram.Bot`` by caring about getting new updates from telegram and forwarding them to the ``Dispatcher`` class. We can register handler functions in the ``Dispatcher`` to make our bot react to Telegram commands, messages and even arbitrary updates.
-
-As with the old method, we'll need an Access Token. To generate an Access Token, we have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
-
-First, we create an ``Updater`` object::
-
-   >>> from telegram import Updater
-   >>> updater = Updater(token='token')
-
-For quicker access to the ``Dispatcher`` used by our ``Updater``, we can introduce it locally::
-
-   >>> dispatcher = updater.dispatcher
-
-Now, we need to define a function that should process a specific type of update::
-
-   >>> def start(bot, update):
-   ...   bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
-
-We want this function to be called on a Telegram message that contains the ``/start`` command, so we need to register it in the dispatcher::
-
-   >>> dispatcher.addTelegramCommandHandler('start', start)
-
-The last step is to tell the ``Updater`` to start working::
-
-   >>> updater.start_polling()
-
-Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler function and register it::
-
-   >>> def echo(bot, update):
-   ...   bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
-   ...
-   >>> dispatcher.addTelegramMessageHandler(echo)
-
-Our bot should now reply to all messages that are not a command with a message that has the same content.
-
-People might try to send commands to the bot that it doesn't understand, so we should get that covered as well::
-
-   >>> def unknown(bot, update):
-   ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
-   ...
-   >>> dispatcher.addUnknownTelegramCommandHandler(unknown)
-
-Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to the command in the handler function simply by adding it to the parameter list::
-
-   >>> def caps(bot, update, args):
-   ...   text_caps = ' '.join(args).upper()
-   ...   bot.sendMessage(chat_id=update.message.chat_id, text=text_caps)
-   ...
-   >>> dispatcher.addTelegramCommandHandler('caps', caps)
-
-To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather)::
-
-   >>> from telegram import InlineQueryResultArticle
-   >>> def inline_caps(bot, update):
-   ...   # If you activated inline feedback, updates might either contain
-   ...   # inline_query or chosen_inline_result, the other one will be None
-   ...   if update.inline_query:
-   ...     query = bot.update.inline_query.query
-   ...     results = list()
-   ...     results.append(InlineQueryResultArticle(query.upper(), 'Caps', text_caps))
-   ...     bot.answerInlineQuery(update.inline_query.id, results)
-   ...
-   >>> dispatcher.addTelegramInlineHandler(inline_caps)
-
-Now it's time to stop the bot::
-
-   >>> updater.stop()
-
-Check out more examples in the `examples folder <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples>`_!
-
 ------
 _`API`
 ------
 
-Note: Using the ``Bot`` class directly is the 'old' method, but some of this is still important information, even if you're using the ``Updater`` class!
+Note: Using the ``Bot`` class directly is the 'old' method, but almost all of this is still important information, even if you're using the ``telegram.ext`` submodule!
 
 The API is exposed via the ``telegram.Bot`` class.
 
@@ -339,13 +265,87 @@ There are many more API methods, to read the full API documentation::
 
     $ pydoc telegram.Bot
 
+---------------
+_`telegram.ext`
+---------------
+
+The ``telegram.ext`` submodule is built on top of the bare-metal API. It provides an easy-to-use interface to the ``telegram.Bot`` by caring about getting new updates with the ``Updater`` class from telegram and forwarding them to the ``Dispatcher`` class. We can register handler functions in the ``Dispatcher`` to make our bot react to Telegram commands, messages and even arbitrary updates.
+
+We'll need an Access Token. __Note:__ If you have done this in the previous step, you can use that one. To generate an Access Token, we have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
+
+First, we create an ``Updater`` object::
+
+   >>> from telegram.ext import Updater
+   >>> updater = Updater(token='token')
+
+For quicker access to the ``Dispatcher`` used by our ``Updater``, we can introduce it locally::
+
+   >>> dispatcher = updater.dispatcher
+
+Now, we need to define a function that should process a specific type of update::
+
+   >>> def start(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+
+We want this function to be called on a Telegram message that contains the ``/start`` command, so we need to register it in the dispatcher::
+
+   >>> dispatcher.addTelegramCommandHandler('start', start)
+
+The last step is to tell the ``Updater`` to start working::
+
+   >>> updater.start_polling()
+
+Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler function and register it::
+
+   >>> def echo(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
+   ...
+   >>> dispatcher.addTelegramMessageHandler(echo)
+
+Our bot should now reply to all messages that are not a command with a message that has the same content.
+
+People might try to send commands to the bot that it doesn't understand, so we should get that covered as well::
+
+   >>> def unknown(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+   ...
+   >>> dispatcher.addUnknownTelegramCommandHandler(unknown)
+
+Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to the command in the handler function simply by adding it to the parameter list::
+
+   >>> def caps(bot, update, args):
+   ...   text_caps = ' '.join(args).upper()
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text=text_caps)
+   ...
+   >>> dispatcher.addTelegramCommandHandler('caps', caps)
+
+To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather)::
+
+   >>> from telegram import InlineQueryResultArticle
+   >>> def inline_caps(bot, update):
+   ...   # If you activated inline feedback, updates might either contain
+   ...   # inline_query or chosen_inline_result, the other one will be None
+   ...   if update.inline_query:
+   ...     query = bot.update.inline_query.query
+   ...     results = list()
+   ...     results.append(InlineQueryResultArticle(query.upper(), 'Caps', text_caps))
+   ...     bot.answerInlineQuery(update.inline_query.id, results)
+   ...
+   >>> dispatcher.addTelegramInlineHandler(inline_caps)
+
+Now it's time to stop the bot::
+
+   >>> updater.stop()
+
+Check out more examples in the `examples folder <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples>`_!
+
 -----------
 _`JobQueue`
 -----------
 
 The ``JobQueue`` allows you to perform tasks with a delay or even periodically. The ``Updater`` will create one for you::
 
-    >>> from telegram import Updater
+    >>> from telegram.ext import Updater
     >>> u = Updater('TOKEN')
     >>> j = u.job_queue
 
