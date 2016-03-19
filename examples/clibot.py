@@ -18,8 +18,8 @@ Reply to last chat from the command line by typing "/reply <text>"
 Type 'stop' on the command line to stop the bot.
 """
 
-from telegram import Updater
-from telegram.dispatcher import run_async
+from telegram.ext import Updater
+from telegram.ext.dispatcher import run_async
 from time import sleep
 import logging
 
