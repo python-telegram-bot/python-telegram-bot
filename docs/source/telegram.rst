@@ -9,8 +9,8 @@ Submodules
    telegram.audio
    telegram.base
    telegram.bot
-   telegram.updater
-   telegram.dispatcher
+   telegram.ext.updater
+   telegram.ext.dispatcher
    telegram.jobqueue
    telegram.inlinequery
    telegram.inlinequeryresult

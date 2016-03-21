@@ -20,7 +20,8 @@ from random import getrandbits
 
 import re
 
-from telegram import Updater, Update, InlineQueryResultArticle, ParseMode
+from telegram import InlineQueryResultArticle, ParseMode
+from telegram.ext import Updater
 import logging
 
 # Enable logging

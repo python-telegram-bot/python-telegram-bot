@@ -18,7 +18,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram import Updater
+from telegram.ext import Updater
 import logging
 
 # Enable logging
