@@ -121,6 +121,7 @@ Python Version *Supported?*
 2.7            Yes
 3.3            Yes
 3.4            Yes
+3.5            Yes
 PyPy           Yes
 PyPy3          Yes
 ============== ============
