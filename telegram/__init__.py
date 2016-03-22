@@ -52,12 +52,36 @@ from .bot import Bot
 
 
 def Updater(*args, **kwargs):
-    """Load the updater module on invocation and return an Updater instance."""
+    """
+    Load the updater module on invocation and return an Updater instance.
+    """
     import warnings
     warnings.warn("telegram.Updater is being deprecated, please use "
                   "telegram.ext.Updater from now on.")
     from .ext.updater import Updater as Up
     return Up(*args, **kwargs)
+
+
+def Dispatcher(*args, **kwargs):
+    """
+    Load the dispatcher module on invocation and return an Dispatcher instance.
+    """
+    import warnings
+    warnings.warn("telegram.Dispatcher is being deprecated, please use "
+                  "telegram.ext.Dispatcher from now on.")
+    from .ext.dispatcher import Dispatcher as Dis
+    return Dis(*args, **kwargs)
+
+
+def JobQueue(*args, **kwargs):
+    """
+    Load the jobqueue module on invocation and return a JobQueue instance.
+    """
+    import warnings
+    warnings.warn("telegram.JobQueue is being deprecated, please use "
+                  "telegram.ext.JobQueue from now on.")
+    from .ext.jobqueue import JobQueue as JobQ
+    return JobQ(*args, **kwargs)
 
 
 __author__ = 'devs@python-telegram-bot.org'
