@@ -21,8 +21,6 @@
 
 from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
-from .updatequeue import UpdateQueue
 from .updater import Updater
 
-
-__all__ = ('Dispatcher', 'JobQueue', 'UpdateQueue', 'Updater')
+__all__ = ('Dispatcher', 'JobQueue', 'Updater')

@@ -27,7 +27,7 @@ from re import match, split
 from time import sleep
 
 from telegram import (TelegramError, Update, NullHandler)
-from telegram.ext.updatequeue import Empty
+from telegram.utils.updatequeue import Empty
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
