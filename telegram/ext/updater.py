@@ -29,8 +29,9 @@ from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from telegram import Bot, TelegramError, NullHandler
-from telegram.ext import dispatcher, Dispatcher, JobQueue, UpdateQueue
+from telegram.ext import dispatcher, Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
+from telegram.utils.updatequeue import UpdateQueue
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 logging.getLogger(__name__).addHandler(NullHandler())
