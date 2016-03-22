@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
+#
 # Basic example for a bot that awaits an answer from the user
 # This program is dedicated to the public domain under the CC0 license.
 
