@@ -142,6 +142,26 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = error.message
         self.message_count += 1
 
+    def test_importLegacyUpdater(self):
+        from telegram import Updater as legacyUpdater
+
+        lu = legacyUpdater(workers=2, bot=Bot('123:abcd'))
+
+        self.assertIsInstance(lu, Updater)
+
+        lu.stop()
+
+    def test_importLegacyDispatcher(self):
+        from telegram.ext import Dispatcher
+        from telegram.utils.updatequeue import UpdateQueue
+        from telegram import Dispatcher as legacyDispatcher
+
+        lp = legacyDispatcher(bot=Bot('123:abcd'), update_queue=UpdateQueue())
+
+        self.assertIsInstance(lp, Dispatcher)
+
+        lp.stop()
+
     def test_addRemoveTelegramMessageHandler(self):
         self._setup_updater('Test')
         d = self.updater.dispatcher
