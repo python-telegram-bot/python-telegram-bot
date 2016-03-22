@@ -1,3 +1,13 @@
+**2016-03-22**
+
+*Released 3.4*
+
+- Move ``Updater``, ``Dispatcher`` and ``JobQueue`` to new ``telegram.ext`` submodule (thanks to @rahiel)
+- Add ``disable_notification`` parameter (thanks to @aidarbiktimirov)
+- Fix bug where commands sent by Telegram Web would not be recognized (thanks to @shelomentsevd)
+- Add option to skip old updates on bot startup
+- Send files from ``BufferedReader``
+
 **2016-02-28**
 
 *Released 3.3*

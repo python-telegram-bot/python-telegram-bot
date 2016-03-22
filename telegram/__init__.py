@@ -85,7 +85,7 @@ def JobQueue(*args, **kwargs):
 
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.3'
+__version__ = '3.4'
 __all__ = ('Audio', 'Bot', 'Chat', 'Emoji', 'TelegramError', 'InputFile',
            'Contact', 'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Video', 'Document',
