@@ -47,9 +47,9 @@ Table of contents
 
 - `Status`_
 
-  1. `Telegram API support`_
+  #. `Telegram API support`_
 
-  2. `Python Version support`_
+  #. `Python Version support`_
 
 - `Installing`_
 
@@ -57,17 +57,17 @@ Table of contents
 
 - `Getting started`_
 
-  1. `API`_
+  #. `Learning by example`_
 
-  2. `Extensions`_
+  #. `API`_
 
-  3. `JobQueue`_
+  #. `Extensions`_
 
-  4. `Logging`_
+  #. `JobQueue`_
 
-  5. `Examples`_
+  #. `Logging`_
 
-  6. `Documentation`_
+  #. `Documentation`_
 
 - `License`_
 
@@ -176,6 +176,36 @@ This library uses the `logging` module. To set up logging to standard output, pu
 at the beginning of your script.
 
 **Note:** The ``telegram.ext`` module will catch errors that would cause the bot to crash. All these are logged to the ``logging`` module, so it's recommended to use this if you are looking for error causes.
+
+----------------------
+_`Learning by example`
+----------------------
+
+| We believe that the best way to learn & understand this simple package is by example. So here are some examples for you to review.
+| Even if it's not your approach for learning, please take a look at ``echobot2`` (below), it is de facto the base for most of the bots out there.
+
+- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
+
+- `clibot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/clibot.py>`_ has a command line interface.
+
+- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the ``JobQueue`` to send timed messages.
+
+- `Welcome Bot <https://github.com/jh0ker/welcomebot>`_ greets everyone who joins a group chat.
+
+Legacy examples (pre-3.0):
+
+- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ replies back messages.
+
+- `roboed <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
+
+- `Simple-Echo-Telegram-Bot <https://github.com/sooyhwang/Simple-Echo-Telegram-Bot>`_ simple Python Telegram bot that echoes your input with Flask microframework, setWebhook method, and Google App Engine (optional) - by @sooyhwang.
+
+- `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
+
+Other notable examples:
+
+- `TwitterForwarderBot <https://github.com/franciscod/telegram-twitter-forwarder-bot>`_ forwards you tweets from people that you have subscribed to.
+
 
 ------
 _`API`
@@ -386,33 +416,6 @@ If you want DEBUG logs instead::
 
     >>> logger.setLevel(logging.DEBUG)
 
------------
-_`Examples`
------------
-
-Here follows some examples to help you to get your own Bot up to speed:
-
-- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
-
-- `clibot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/clibot.py>`_ has a command line interface.
-
-- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the ``JobQueue`` to send timed messages.
-
-- `Welcome Bot <https://github.com/jh0ker/welcomebot>`_ greets everyone who joins a group chat.
-
-Legacy examples (pre-3.0):
-
-- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ replies back messages.
-
-- `roboed <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
-
-- `Simple-Echo-Telegram-Bot <https://github.com/sooyhwang/Simple-Echo-Telegram-Bot>`_ simple Python Telegram bot that echoes your input with Flask microframework, setWebhook method, and Google App Engine (optional) - by @sooyhwang.
-
-- `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
-
-Other notable examples:
-
-- `TwitterForwarderBot <https://github.com/franciscod/telegram-twitter-forwarder-bot>`_ forwards you tweets from people that you have subscribed to.
 
 ================
 _`Documentation`

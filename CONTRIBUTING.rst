@@ -64,15 +64,23 @@ Here's how to make a one-off code change.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_. In addition, code should be formatted consistently with other code around it.
 
+   - The following exceptions to the above (Google's) style guides applies:
+
+        - Documenting types of global variables and complex types of class members can be done using the Sphinx docstring convention.
+
    - Please ensure that the code you write is well-tested.
 
    - Don’t break backward compatibility.
 
    - Add yourself to the AUTHORS.rst_ file in an alphabetical fashion.
 
-   - Before making a commit ensure that all automated tests still pass:
+   - Before making a commit ensure that all automated tests, pep8 & lint validations still pass:
 
       ``$ make test``
+
+      ``$ make pep8``
+
+      ``$ make lint``
 
    - To actually make the commit and push it to your GitHub fork, run:
 
