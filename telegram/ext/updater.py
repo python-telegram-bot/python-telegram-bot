@@ -284,7 +284,7 @@ class Updater:
         self.logger.debug('Updater thread started')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
-            url_path = '/' + url_path
+            url_path = '/{0}'.format(url_path)
 
         # Create and start server
         self.httpd = WebhookServer((listen, port), WebhookHandler,
