@@ -509,7 +509,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         retries = 3
         self._setup_updater('', messages=0, bootstrap_retries=retries)
 
-        self.updater._set_webhook('path', retries)
+        self.updater._set_webhook('path', retries, None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, retries)
 
     def test_bootstrap_retries_unauth(self):
@@ -518,7 +518,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                             bootstrap_err=Unauthorized())
 
         self.assertRaises(Unauthorized, self.updater._set_webhook, 'path',
-                          retries)
+                          retries, None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_invalid_token(self):
@@ -527,7 +527,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                             bootstrap_err=InvalidToken())
 
         self.assertRaises(InvalidToken, self.updater._set_webhook, 'path',
-                          retries)
+                          retries, None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_fail(self):
@@ -535,7 +535,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self._setup_updater('', messages=0, bootstrap_retries=retries)
 
         self.assertRaisesRegexp(TelegramError, 'test',
-                                self.updater._set_webhook, 'path', retries - 1)
+                                self.updater._set_webhook, 'path', retries - 1,
+                                None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_webhook_invalid_posts(self):
