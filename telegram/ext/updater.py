@@ -40,7 +40,7 @@ logging.getLogger(__name__).addHandler(NullHandler())
 class Updater:
     """
     This class, which employs the Dispatcher class, provides a frontend to
-    telegram.Bot to the programmer, so they can focus on coding the bot. It's
+    telegram.Bot to the programmer, so they can focus on coding the bot. Its
     purpose is to receive the updates from Telegram and to deliver them to said
     dispatcher. It also runs in a separate thread, so the user can interact
     with the bot, for example on the command line. The dispatcher supports
