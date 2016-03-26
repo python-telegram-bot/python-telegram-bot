@@ -5,7 +5,8 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 import logging
-from telegram import Updater, ReplyKeyboardMarkup, Emoji, ForceReply
+from telegram import Emoji, ForceReply, ReplyKeyboardMarkup
+from telegram.ext import Updater
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - '
                            '%(message)s',
