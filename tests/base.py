@@ -38,8 +38,8 @@ class BaseTest(object):
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
 
-        bot = telegram.Bot(os.environ.get('TOKEN'))
-        chat_id = os.environ.get('CHAT_ID')
+        bot = telegram.Bot(os.environ.get('TOKEN', '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
+        chat_id = os.environ.get('CHAT_ID', '12173560')
 
         self._bot = bot
         self._chat_id = chat_id
