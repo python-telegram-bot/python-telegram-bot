@@ -639,7 +639,7 @@ class Dispatcher:
         Dispatches an error.
 
         Args:
-            update (any): The pdate that caused the error
+            update (any): The update that caused the error
             error (telegram.TelegramError): The Telegram error that was raised.
         """
 

@@ -226,7 +226,7 @@ To create an instance of the ``telegram.Bot``::
 
 To see if your credentials are successful::
 
-    >>> print bot.getMe()
+    >>> print(bot.getMe())
     {"first_name": "Toledo's Palace Bot", "username": "ToledosPalaceBot"}
 
 Bots can't initiate conversations with users. A user must either add them to a group or send them a message first. People can use ``telegram.me/<bot_username>`` links or username search to find your bot.
@@ -234,12 +234,12 @@ Bots can't initiate conversations with users. A user must either add them to a g
 To fetch text messages sent to your Bot::
 
     >>> updates = bot.getUpdates()
-    >>> print [u.message.text for u in updates]
+    >>> print([u.message.text for u in updates])
 
 To fetch images sent to your Bot::
 
     >>> updates = bot.getUpdates()
-    >>> print [u.message.photo for u in updates if u.message.photo]
+    >>> print([u.message.photo for u in updates if u.message.photo])
 
 To reply messages you'll always need the chat_id::
 
