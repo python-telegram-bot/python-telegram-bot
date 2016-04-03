@@ -5,7 +5,7 @@
 
 A Python wrapper around the Telegram Bot API.
 
-*Stay tuned for library updates and new releases on our* `Telegram Channel <http://telegram.me/pythontelegrambotchannel>`_.
+*Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
@@ -20,7 +20,7 @@ A Python wrapper around the Telegram Bot API.
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
-   :target: http://www.gnu.org/licenses/lgpl-3.0.html
+   :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
 .. image:: https://travis-ci.org/python-telegram-bot/python-telegram-bot.svg?branch=master
@@ -73,7 +73,7 @@ Table of contents
 
 - `Contact`_
 
-- `TODO`_
+- `Contributing`_
 
 ===============
 _`Introduction`
@@ -181,37 +181,31 @@ at the beginning of your script.
 _`Learning by example`
 ----------------------
 
-| We believe that the best way to learn & understand this simple package is by example. So here are some examples for you to review.
-| Even if it's not your approach for learning, please take a look at ``echobot2`` (below), it is de facto the base for most of the bots out there.
-
-- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
+We believe that the best way to learn and understand this simple package is by example. So here are some examples for you to review. Even if it's not your approach for learning, please take a look at ``echobot2`` (below), it is de facto the base for most of the bots out there. Best of all, the code for these examples are released to the public domain, so you can start by grabbing the code and building on top of it.
 
 - `clibot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/clibot.py>`_ has a command line interface.
 
+- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
+
+- `inlinebot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_ basic example of an `inline bot <https://core.telegram.org/bots/inline>`_
+
+- `state machine bot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/state_machine_bot.py>`_ keeps the state for individual users, useful for multipart conversations
+
 - `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the ``JobQueue`` to send timed messages.
 
-- `Welcome Bot <https://github.com/jh0ker/welcomebot>`_ greets everyone who joins a group chat.
-
-Legacy examples (pre-3.0):
+Examples using only the API:
 
 - `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ replies back messages.
 
 - `roboed <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/roboed.py>`_ talks to `Robô Ed <http://www.ed.conpet.gov.br/br/converse.php>`_.
 
-- `Simple-Echo-Telegram-Bot <https://github.com/sooyhwang/Simple-Echo-Telegram-Bot>`_ simple Python Telegram bot that echoes your input with Flask microframework, setWebhook method, and Google App Engine (optional) - by @sooyhwang.
-
-- `DevOps Reaction Bot <https://github.com/leandrotoledo/gae-devops-reaction-telegram-bot>`_ sends latest or random posts from `DevOps Reaction <http://devopsreactions.tumblr.com/>`_. Running on `Google App Engine <https://cloud.google.com/appengine>`_ (billing has to be enabled for fully Socket API support).
-
-Other notable examples:
-
-- `TwitterForwarderBot <https://github.com/franciscod/telegram-twitter-forwarder-bot>`_ forwards you tweets from people that you have subscribed to.
-
+Look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
 
 ------
 _`API`
 ------
 
-Note: Using the ``Bot`` class directly is the 'old' method, but almost all of this is still important information, even if you're using the ``telegram.ext`` submodule!
+Note: Using the ``Bot`` class directly is the 'old' method, we have an easier way to make bots described in the next section.  All of this is however still important information, even if you're using the ``telegram.ext`` submodule!
 
 The API is exposed via the ``telegram.Bot`` class.
 
@@ -226,7 +220,7 @@ To create an instance of the ``telegram.Bot``::
 
 To see if your credentials are successful::
 
-    >>> print bot.getMe()
+    >>> print(bot.getMe())
     {"first_name": "Toledo's Palace Bot", "username": "ToledosPalaceBot"}
 
 Bots can't initiate conversations with users. A user must either add them to a group or send them a message first. People can use ``telegram.me/<bot_username>`` links or username search to find your bot.
@@ -234,14 +228,14 @@ Bots can't initiate conversations with users. A user must either add them to a g
 To fetch text messages sent to your Bot::
 
     >>> updates = bot.getUpdates()
-    >>> print [u.message.text for u in updates]
+    >>> print([u.message.text for u in updates])
 
 To fetch images sent to your Bot::
 
     >>> updates = bot.getUpdates()
-    >>> print [u.message.photo for u in updates if u.message.photo]
+    >>> print([u.message.photo for u in updates if u.message.photo])
 
-To reply messages you'll always need the chat_id::
+To reply messages you'll always need the ``chat_id``::
 
     >>> chat_id = bot.getUpdates()[-1].message.chat_id
 
@@ -288,7 +282,7 @@ To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
     >>> reply_markup = telegram.ReplyKeyboardHide()
     >>> bot.sendMessage(chat_id=chat_id, text="I'm back.", reply_markup=reply_markup)
 
-To download a file (you will need its file_id)::
+To download a file (you will need its ``file_id``)::
 
     >>> file_id = message.voice.file_id
     >>> newFile = bot.getFile(file_id)
@@ -421,13 +415,13 @@ If you want DEBUG logs instead::
 _`Documentation`
 ================
 
-``python-telegram-bot``'s documentation lives at `Read the Docs <http://python-telegram-bot.readthedocs.org/en/latest/>`_.
+``python-telegram-bot``'s documentation lives at `Read the Docs <https://python-telegram-bot.readthedocs.org/en/latest/>`_.
 
 ==========
 _`License`
 ==========
 
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <http://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <http://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
+You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
 
 ==========
 _`Contact`
@@ -435,8 +429,8 @@ _`Contact`
 
 Feel free to join to our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_.
 
-=======
-_`TODO`
-=======
+===============
+_`Contributing`
+===============
 
-Patches and bug reports are `welcome <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_, just please keep the style consistent with the original source.
+Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
