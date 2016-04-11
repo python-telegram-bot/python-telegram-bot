@@ -44,7 +44,7 @@ def set(bot, update, args):
         # args[0] should contain the time for the timer in seconds
         due = int(args[0])
         if due < 0:
-                bot.sendMessage(chat_id,text='Sorry we can not go back to future!')
+                bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
         def alarm(bot):
             """ Inner function to send the alarm message """
             bot.sendMessage(chat_id, text='Beep!')
