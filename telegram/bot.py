@@ -753,6 +753,64 @@ class Bot(TelegramObject):
         return File.de_json(result)
 
     @log
+    def kickChatMember(self,
+                       chat_id,
+                       user_id):
+        """Use this method to kick a user from a group or a supergroup. In the
+        case of supergroups, the user will not be able to return to the group
+        on their own using invite links, etc., unless unbanned first. The bot
+        must be an administrator in the group for this to work.
+
+        Args:
+          chat_id:
+            Unique identifier for the target group or username of the target
+            supergroup (in the format @supergroupusername).
+          user_id:
+            Unique identifier of the target user.
+
+        Returns:
+          True on success.
+        """
+
+        url = '%s/kickChatMember' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'user_id': user_id}
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
+    def unbanChatMember(self,
+                        chat_id,
+                        user_id):
+        """Use this method to unban a previously kicked user in a supergroup.
+        The user will not return to the group automatically, but will be able
+        to join via link, etc. The bot must be an administrator in the group
+        for this to work.
+
+        Args:
+          chat_id:
+            Unique identifier for the target group or username of the target
+            supergroup (in the format @supergroupusername).
+          user_id:
+            Unique identifier of the target user.
+
+        Returns:
+          True on success.
+        """
+
+        url = '%s/unbanChatMember' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'user_id': user_id}
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
     def getUpdates(self,
                    offset=None,
                    limit=100,
