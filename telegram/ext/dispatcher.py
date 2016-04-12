@@ -316,6 +316,17 @@ class Dispatcher:
 
         self.telegram_command_handlers[command].append(handler)
 
+    def addTelegramCommandHandlers(self, commands_dict):
+        """
+        Registers several command handlers in the Dispatcher.
+
+        Args:
+            commands_dict (dict): The key is command keyword and the value is handler (function)
+        """
+
+        for command, handler in commands_dict.items():
+            self.addTelegramCommandHandler(command, handler)
+
     def addTelegramRegexHandler(self, matcher, handler):
         """
         Registers a regex handler in the Dispatcher. If handlers will be
