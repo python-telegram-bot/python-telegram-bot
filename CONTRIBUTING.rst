@@ -24,12 +24,6 @@ Setting things up
 
    ``$ pip install -r requirements-dev.txt``
 
-5. In order to run tests you need to set the following environment variables:
-
-   ``$ export CHAT_ID=your-chat-id``
-
-   ``$ export TOKEN=your-bot-token``
-
 Finding something to do
 -----------------------
 
