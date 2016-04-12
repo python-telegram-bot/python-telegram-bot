@@ -50,8 +50,8 @@ class Message(TelegramObject):
         caption (str):
         contact (:class:`telegram.Contact`):
         location (:class:`telegram.Location`):
-        new_chat_participant (:class:`telegram.User`):
-        left_chat_participant (:class:`telegram.User`):
+        new_chat_member (:class:`telegram.User`):
+        left_chat_member (:class:`telegram.User`):
         new_chat_title (str):
         new_chat_photo (List[:class:`telegram.PhotoSize`]):
         delete_chat_photo (bool):
@@ -82,8 +82,8 @@ class Message(TelegramObject):
         caption (Optional[str]):
         contact (Optional[:class:`telegram.Contact`]):
         location (Optional[:class:`telegram.Location`]):
-        new_chat_participant (Optional[:class:`telegram.User`]):
-        left_chat_participant (Optional[:class:`telegram.User`]):
+        new_chat_member (Optional[:class:`telegram.User`]):
+        left_chat_member (Optional[:class:`telegram.User`]):
         new_chat_title (Optional[str]):
         new_chat_photo (Optional[List[:class:`telegram.PhotoSize`]):
         delete_chat_photo (Optional[bool]):
@@ -119,8 +119,8 @@ class Message(TelegramObject):
         self.caption = kwargs.get('caption', '')
         self.contact = kwargs.get('contact')
         self.location = kwargs.get('location')
-        self.new_chat_participant = kwargs.get('new_chat_participant')
-        self.left_chat_participant = kwargs.get('left_chat_participant')
+        self.new_chat_member = kwargs.get('new_chat_member')
+        self.left_chat_member = kwargs.get('left_chat_member')
         self.new_chat_title = kwargs.get('new_chat_title', '')
         self.new_chat_photo = kwargs.get('new_chat_photo')
         self.delete_chat_photo = bool(kwargs.get('delete_chat_photo', False))
@@ -174,10 +174,10 @@ class Message(TelegramObject):
             Contact.de_json(data.get('contact'))
         data['location'] = \
             Location.de_json(data.get('location'))
-        data['new_chat_participant'] = \
-            User.de_json(data.get('new_chat_participant'))
-        data['left_chat_participant'] = \
-            User.de_json(data.get('left_chat_participant'))
+        data['new_chat_member'] = \
+            User.de_json(data.get('new_chat_member'))
+        data['left_chat_member'] = \
+            User.de_json(data.get('left_chat_member'))
         data['new_chat_photo'] = \
             PhotoSize.de_list(data.get('new_chat_photo'))
 
