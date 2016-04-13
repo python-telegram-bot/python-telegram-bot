@@ -16,3 +16,92 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+from telegram import InlineQueryResult
+from telegram.utils.validate import validate_string
+
+
+class InlineQueryResultArticle(InlineQueryResult):
+    """This object represents a Telegram InlineQueryResultArticle.
+
+    Attributes:
+        id (str):
+        title (str):
+        message_text (str):
+        parse_mode (str):
+        disable_web_page_preview (bool):
+        url (str):
+        hide_url (bool):
+        description (str):
+        thumb_url (str):
+        thumb_width (int):
+        thumb_height (int):
+
+    Args:
+        id (str): Unique identifier for this result, 1-64 Bytes
+        title (str):
+        message_text (str):
+
+    Keyword Args:
+        parse_mode (Optional[str]):
+        disable_web_page_preview (Optional[bool]):
+        url (Optional[str]):
+        hide_url (Optional[bool]):
+        description (Optional[str]):
+        thumb_url (Optional[str]):
+        thumb_width (Optional[int]):
+        thumb_height (Optional[int]):
+    """
+
+    def __init__(self,
+                 id,
+                 title,
+                 message_text,
+                 parse_mode=None,
+                 disable_web_page_preview=None,
+                 url=None,
+                 hide_url=None,
+                 description=None,
+                 thumb_url=None,
+                 thumb_width=None,
+                 thumb_height=None):
+
+        validate_string(title, 'title')
+        validate_string(message_text, 'message_text')
+        validate_string(url, 'url')
+        validate_string(description, 'description')
+        validate_string(thumb_url, 'thumb_url')
+        validate_string(parse_mode, 'parse_mode')
+
+        # Required
+        super(InlineQueryResultArticle, self).__init__('article', id)
+        self.title = title
+        self.message_text = message_text
+
+        # Optional
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = bool(disable_web_page_preview)
+        self.url = url
+        self.hide_url = bool(hide_url)
+        self.description = description
+        self.thumb_url = thumb_url
+        if thumb_width is not None:
+            self.thumb_width = int(thumb_width)
+        if thumb_height is not None:
+            self.thumb_height = int(thumb_height)
+
+    @staticmethod
+    def de_json(data):
+        """
+        Args:
+            data (dict):
+
+        Returns:
+            telegram.InlineQueryResultArticle:
+        """
+        if not data:
+            return None
+        data = data.copy()
+        data.pop('type', None)
+
+        return InlineQueryResultArticle(**data)

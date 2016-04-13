@@ -16,3 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+from telegram import InlineQueryResult
+from telegram.utils.validate import validate_string
+
+
+class InlineQueryResultCachedPhoto(InlineQueryResult):
+    pass

@@ -43,10 +43,28 @@ from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .message import Message
-from .inlinequery import InlineQuery
 from .choseninlineresult import ChosenInlineResult
-from .inlinequeryresult import InlineQueryResultArticle, InlineQueryResultGif,\
-    InlineQueryResultMpeg4Gif, InlineQueryResultPhoto, InlineQueryResultVideo
+from .inlinequery import InlineQuery
+from .inlinequeryresult import InlineQueryResult
+from .inlinequeryresultarticle import InlineQueryResultArticle
+from .inlinequeryresultaudio import InlineQueryResultAudio
+from .inlinequeryresultcachedaudio import InlineQueryResultCachedAudio
+from .inlinequeryresultcacheddocument import InlineQueryResultCachedDocument
+from .inlinequeryresultcachedgif import InlineQueryResultCachedGif
+from .inlinequeryresultcachedmpeg4gif import InlineQueryResultCachedMpeg4Gif
+from .inlinequeryresultcachedphoto import InlineQueryResultCachedPhoto
+from .inlinequeryresultcachedsticker import InlineQueryResultCachedSticker
+from .inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
+from .inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
+from .inlinequeryresultcontact import InlineQueryResultContact
+from .inlinequeryresultdocument import InlineQueryResultDocument
+from .inlinequeryresultgif import InlineQueryResultGif
+from .inlinequeryresultlocation import InlineQueryResultLocation
+from .inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
+from .inlinequeryresultphoto import InlineQueryResultPhoto
+from .inlinequeryresultvenue import InlineQueryResultVenue
+from .inlinequeryresultvideo import InlineQueryResultVideo
+from .inlinequeryresultvoice import InlineQueryResultVoice
 from .update import Update
 from .bot import Bot
 
@@ -91,6 +109,14 @@ __all__ = ('Audio', 'Bot', 'Chat', 'Emoji', 'TelegramError', 'InputFile',
            'UserProfilePhotos', 'ChatAction', 'Location', 'Video', 'Document',
            'Sticker', 'File', 'PhotoSize', 'Update', 'ParseMode', 'Message',
            'User', 'TelegramObject', 'NullHandler', 'Voice', 'InlineQuery',
-           'ReplyMarkup', 'ChosenInlineResult', 'InlineQueryResultArticle',
-           'InlineQueryResultGif', 'InlineQueryResultPhoto',
-           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo')
+           'ReplyMarkup', 'ChosenInlineResult', 'InlineQueryResult',
+           'InlineQueryResult', 'InlineQueryResultArticle',
+           'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
+           'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
+           'InlineQueryResultCachedMpeg4Gif', 'InlineQueryResultCachedPhoto',
+           'InlineQueryResultCachedSticker', 'InlineQueryResultCachedVideo',
+           'InlineQueryResultCachedVoice', 'InlineQueryResultContact',
+           'InlineQueryResultDocument', 'InlineQueryResultGif',
+           'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif',
+           'InlineQueryResultPhoto', 'InlineQueryResultVenue',
+           'InlineQueryResultVideo', 'InlineQueryResultVoice')
