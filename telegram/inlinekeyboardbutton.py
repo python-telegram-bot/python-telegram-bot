@@ -45,3 +45,15 @@ class InlineKeyboardButton(TelegramObject):
             return None
 
         return InlineKeyboardButton(**data)
+
+    @staticmethod
+    def de_list(data):
+        if not data:
+            return []
+
+        inline_keyboard = list()
+        for inline_keyboard in data:
+            inline_keyboard.append(InlineKeyboardButton.
+                                   de_json(inline_keyboard))
+
+        return inline_keyboard

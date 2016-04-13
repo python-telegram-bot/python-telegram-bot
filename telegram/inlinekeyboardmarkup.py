@@ -16,3 +16,38 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+"""This module contains a object that represents a Telegram
+InlineKeyboardMarkup"""
+
+from telegram import ReplyMarkup, InlineKeyboardButton
+
+
+class InlineKeyboardMarkup(ReplyMarkup):
+    """This object represents a Telegram InlineKeyboardMarkup."""
+
+    def __init__(self,
+                 inline_keyboard):
+        # Required
+        self.inline_keyboard = inline_keyboard
+
+    @staticmethod
+    def de_json(data):
+        if not data:
+            return None
+
+        data['inline_keyboard'] = \
+            [InlineKeyboardButton.de_list(inline_keyboard) for inline_keyboard
+             in data['inline_keyboard']]
+
+        return InlineKeyboardMarkup(**data)
+
+    def to_dict(self):
+        data = super(InlineKeyboardMarkup, self).to_dict()
+
+        data['inline_keyboard'] = []
+        for inline_keyboard in self.inline_keyboard:
+            data['inline_keyboard'].append(
+                [x.to_dict() for x in inline_keyboard])
+
+        return data
