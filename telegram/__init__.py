@@ -45,6 +45,7 @@ from .parsemode import ParseMode
 from .message import Message
 from .choseninlineresult import ChosenInlineResult
 from .inlinekeyboardbutton import InlineKeyboardButton
+from .inlinekeyboardmarkup import InlineKeyboardMarkup
 from .inlinequery import InlineQuery
 from .inlinequeryresult import InlineQueryResult
 from .inlinequeryresultarticle import InlineQueryResultArticle
@@ -121,6 +122,7 @@ __all__ = ('Audio',
            'File',
            'ForceReply',
            'InlineKeyboardButton',
+           'InlineKeyboardMarkup',
            'InlineQuery',
            'InlineQueryResult',
            'InlineQueryResult',
