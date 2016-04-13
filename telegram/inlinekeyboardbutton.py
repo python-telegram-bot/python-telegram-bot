@@ -16,3 +16,32 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+"""This module contains a object that represents a Telegram
+InlineKeyboardButton"""
+
+from telegram import TelegramObject
+
+
+class InlineKeyboardButton(TelegramObject):
+    """This object represents a Telegram InlineKeyboardButton."""
+
+    def __init__(self,
+                 text,
+                 url=None,
+                 callback_data=None,
+                 switch_inline_query=None):
+        # Required
+        self.text = text
+
+        # Optionals
+        self.url = url
+        self.callback_data = callback_data
+        self.switch_inline_query = switch_inline_query
+
+    @staticmethod
+    def de_json(data):
+        if not data:
+            return None
+
+        return InlineKeyboardButton(**data)

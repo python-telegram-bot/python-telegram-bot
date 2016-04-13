@@ -39,7 +39,6 @@ class InlineQuery(TelegramObject):
         from_user (:class:`telegram.User`):
         query (str):
         offset (str):
-
     """
 
     def __init__(self,
