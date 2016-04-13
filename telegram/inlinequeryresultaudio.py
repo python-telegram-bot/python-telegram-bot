@@ -17,9 +17,33 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+"""This module contains the classes that represent Telegram
+InlineQueryResultAudio"""
+
 from telegram import InlineQueryResult
 from telegram.utils.validate import validate_string
 
 
 class InlineQueryResultAudio(InlineQueryResult):
-    pass
+
+    def __init__(self,
+                 id,
+                 audio_url,
+                 title,
+                 performer=None,
+                 audio_duration=None,
+                 reply_markup=None,
+                 input_message_content=None):
+
+        # Required
+        super(InlineQueryResultAudio, self).__init__('audio', id)
+        self.audio_url = audio_url
+        self.title = title
+
+        # Optional
+        self.performer = performer
+        self.audio_duration = audio_duration
+        if reply_markup is not None:
+            self.reply_markup = 'ReplyMarkup' # TODO
+        if input_message_content is not None:
+            self.input_message_content = 'InputMessageContent'

@@ -16,3 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+"""This module contains the classes that represent Telegram
+InputVenueMessageContent"""
+
+from telegram import InputMessageContent
+
+
+class InputVenueMessageContent(InputMessageContent):
+    pass

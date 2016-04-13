@@ -16,3 +16,16 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+"""This module contains the classes that represent Telegram
+InputMessageContent"""
+
+from telegram import TelegramObject
+
+
+class InputMessageContent(TelegramObject):
+    """Base class for Telegram InputMessageContent Objects"""
+
+    @staticmethod
+    def de_json(data):
+        pass

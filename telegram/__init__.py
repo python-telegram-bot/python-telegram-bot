@@ -65,6 +65,11 @@ from .inlinequeryresultphoto import InlineQueryResultPhoto
 from .inlinequeryresultvenue import InlineQueryResultVenue
 from .inlinequeryresultvideo import InlineQueryResultVideo
 from .inlinequeryresultvoice import InlineQueryResultVoice
+from .inputmessagecontent import InputMessageContent
+from .inputtextmessagecontent import InputTextMessageContent
+from .inputlocationmessagecontent import InputLocationMessageContent
+from .inputvenuemessagecontent import InputVenueMessageContent
+from .inputcontactmessagecontent import InputContactMessageContent
 from .update import Update
 from .bot import Bot
 
@@ -119,4 +124,7 @@ __all__ = ('Audio', 'Bot', 'Chat', 'Emoji', 'TelegramError', 'InputFile',
            'InlineQueryResultDocument', 'InlineQueryResultGif',
            'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif',
            'InlineQueryResultPhoto', 'InlineQueryResultVenue',
-           'InlineQueryResultVideo', 'InlineQueryResultVoice')
+           'InlineQueryResultVideo', 'InlineQueryResultVoice',
+           'InputMessageContent', 'InputTextMessageContent',
+           'InputLocationMessageContent', 'InputVenueMessageContent',
+           'InputContactMessageContent')
