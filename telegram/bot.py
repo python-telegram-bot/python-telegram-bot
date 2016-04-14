@@ -811,6 +811,42 @@ class Bot(TelegramObject):
         return result
 
     @log
+    def answerCallbackQuery(self,
+                            callback_query_id,
+                            text=None,
+                            show_alert=None):
+        """Use this method to send answers to callback queries sent from inline
+        keyboards. The answer will be displayed to the user as a notification
+        at the top of the chat screen or as an alert.
+
+        Args:
+          callback_query_id:
+            Unique identifier for the query to be answered.
+          text:
+            Text of the notification. If not specified, nothing will be shown
+            to the user.
+          show_alert:
+            If true, an alert will be shown by the client instead of a
+            notification at the top of the chat screen. Defaults to false.
+
+        Returns:
+          True on success.
+        """
+
+        url = '%s/answerCallbackQuery' % self.base_url
+
+        data = {'callback_query_id': callback_query_id}
+
+        if text:
+            data['text'] = text
+        if show_alert:
+            data['show_alert'] = show_alert
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
     def getUpdates(self,
                    offset=None,
                    limit=100,
