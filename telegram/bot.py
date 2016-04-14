@@ -847,6 +847,145 @@ class Bot(TelegramObject):
         return result
 
     @log
+    def editMessageText(self,
+                        text,
+                        chat_id=None,
+                        message_id=None,
+                        inline_message_id=None,
+                        parse_mode=None,
+                        disable_web_page_preview=None,
+                        reply_markup=None):
+        """Use this method to edit text messages sent by the bot or via the bot
+        (for inline bots).
+
+        Args:
+          text:
+            New text of the message.
+          chat_id:
+            Required if inline_message_id is not specified. Unique identifier
+            for the target chat or username of the target channel (in the
+            format @channelusername).
+          message_id:
+            Required if inline_message_id is not specified. Unique identifier
+            of the sent message.
+          inline_message_id:
+            Required if chat_id and message_id are not specified. Identifier of
+            the inline message.
+          parse_mode:
+            Send Markdown or HTML, if you want Telegram apps to show bold,
+            italic, fixed-width text or inline URLs in your bot's message.
+          disable_web_page_preview:
+            Disables link previews for links in this message.
+          reply_markup:
+            A JSON-serialized object for an inline keyboard.
+
+        Returns:
+          Returns a telegram.Message object.
+        """
+
+        url = '%s/editMessage' % self.base_url
+
+        data = {}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        result = request.post(url, data)
+
+        return Message.de_json(result)
+
+    @log
+    def editMessageCaption(self,
+                           caption,
+                           chat_id=None,
+                           message_id=None,
+                           inline_message_id=None,
+                           reply_markup=None):
+        """Use this method to edit captions of messages sent by the bot or via
+        the bot (for inline bots).
+
+        Args:
+          caption:
+            New caption of the message.
+          chat_id:
+            Required if inline_message_id is not specified. Unique identifier
+            for the target chat or username of the target channel (in the
+            format @channelusername).
+          message_id:
+            Required if inline_message_id is not specified. Unique identifier
+            of the sent message.
+          inline_message_id:
+            Required if chat_id and message_id are not specified. Identifier of
+            the inline message.
+          reply_markup:
+            A JSON-serialized object for an inline keyboard.
+
+        Returns:
+          Returns a telegram.Message object.
+        """
+
+        url = '%s/editMessage' % self.base_url
+
+        data = {}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        result = request.post(url, data)
+
+        return Message.de_json(result)
+
+    @log
+    def editMessageReplyMarkup(self,
+                               reply_markup,
+                               chat_id=None,
+                               message_id=None,
+                               inline_message_id=None):
+        """Use this method to edit only the reply markup of messages sent by
+        the bot or via the bot (for inline bots).
+
+        Args:
+          reply_markup:
+            A JSON-serialized object for an inline keyboard.
+          chat_id:
+            Required if inline_message_id is not specified. Unique identifier
+            for the target chat or username of the target channel (in the
+            format @channelusername).
+          message_id:
+            Required if inline_message_id is not specified. Unique identifier
+            of the sent message.
+          inline_message_id:
+            Required if chat_id and message_id are not specified. Identifier of
+            the inline message.
+
+        Returns:
+          Returns a telegram.Message object.
+        """
+
+        url = '%s/editMessage' % self.base_url
+
+        data = {}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        result = request.post(url, data)
+
+        return Message.de_json(result)
+
+    @log
     def getUpdates(self,
                    offset=None,
                    limit=100,
