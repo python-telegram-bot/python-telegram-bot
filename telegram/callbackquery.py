@@ -29,7 +29,8 @@ class CallbackQuery(TelegramObject):
     def __init__(self,
                  id,
                  from_user,
-                 data):
+                 data,
+                 **kwargs):
         # Required
         self.id = id
         self.from_user = from_user

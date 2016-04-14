@@ -198,7 +198,7 @@ class InputFile(object):
             if file_type:
                 file_content = data[file_type[0]]
 
-                return isinstance(file_content, file) or \
-                       str(file_content).startswith('http')
+                return isinstance(file_content, file) or str(
+                    file_content).startswith('http')
 
         return False

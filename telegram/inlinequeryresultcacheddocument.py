@@ -21,7 +21,6 @@
 InlineQueryResultCachedDocument"""
 
 from telegram import InlineQueryResult
-from telegram.utils.validate import validate_string
 
 
 class InlineQueryResultCachedDocument(InlineQueryResult):
