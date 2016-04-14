@@ -20,14 +20,14 @@
 """This module contains a object that represents a Telegram
 ReplyKeyboardMarkup."""
 
-from telegram import ReplyMarkup
+from telegram import ReplyMarkup, KeyboardButton
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
     """This object represents a Telegram ReplyKeyboardMarkup.
 
     Attributes:
-        keyboard (List[List[str]]):
+        keyboard (List[List[:class:`telegram.KeyboardButton`]]):
         resize_keyboard (bool):
         one_time_keyboard (bool):
         selective (bool):
@@ -64,4 +64,16 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
+        data['keyboard'] = [KeyboardButton.de_list(keyboard) for keyboard in
+                            data['keyboard']]
+
         return ReplyKeyboardMarkup(**data)
+
+    def to_dict(self):
+        data = super(ReplyKeyboardMarkup, self).to_dict()
+
+        data['keyboard'] = []
+        for keyboard in self.keyboard:
+            data['keyboard'].append([x.to_dict() for x in keyboard])
+
+        return data

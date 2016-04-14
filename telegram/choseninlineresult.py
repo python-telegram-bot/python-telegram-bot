@@ -21,7 +21,6 @@
 This module contains a object that represents a Telegram ChosenInlineResult
 """
 
-
 from telegram import TelegramObject, User
 
 

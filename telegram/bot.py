@@ -33,7 +33,6 @@ logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class Bot(TelegramObject):
-
     """This object represents a Telegram Bot.
 
     Attributes:
@@ -71,6 +70,7 @@ class Bot(TelegramObject):
         """
         Returns:
         """
+
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             """
@@ -81,6 +81,7 @@ class Bot(TelegramObject):
 
             result = func(self, *args, **kwargs)
             return result
+
         return decorator
 
     @property
@@ -129,6 +130,7 @@ class Bot(TelegramObject):
             logger.debug(result)
             logger.debug('Exiting: %s', func.__name__)
             return result
+
         return decorator
 
     def message(func):
@@ -136,6 +138,7 @@ class Bot(TelegramObject):
         Returns:
           A telegram.Message instance representing the message posted.
         """
+
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             """
@@ -143,6 +146,7 @@ class Bot(TelegramObject):
             """
             url, data = func(self, *args, **kwargs)
             return Bot._post_message(url, data, kwargs)
+
         return decorator
 
     @staticmethod

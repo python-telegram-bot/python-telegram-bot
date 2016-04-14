@@ -25,7 +25,6 @@ from telegram.utils.validate import validate_string
 
 
 class InlineQueryResultAudio(InlineQueryResult):
-
     def __init__(self,
                  id,
                  audio_url,
@@ -44,6 +43,6 @@ class InlineQueryResultAudio(InlineQueryResult):
         self.performer = performer
         self.audio_duration = audio_duration
         if reply_markup is not None:
-            self.reply_markup = 'ReplyMarkup' # TODO
+            self.reply_markup = 'ReplyMarkup'  # TODO
         if input_message_content is not None:
             self.input_message_content = 'InputMessageContent'

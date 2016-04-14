@@ -73,6 +73,7 @@ from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
+from .keyboardbutton import KeyboardButton
 from .update import Update
 from .bot import Bot
 
@@ -112,7 +113,7 @@ def JobQueue(*args, **kwargs):
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '3.4'
-__all__ = ('Audio',
+__all__ = ['Audio',
            'Bot',
            'Chat',
            'ChatAction',
@@ -153,6 +154,7 @@ __all__ = ('Audio',
            'InputMessageContent',
            'InputTextMessageContent',
            'InputVenueMessageContent',
+           'KeyboardButton',
            'Location',
            'Message',
            'NullHandler',
@@ -168,4 +170,4 @@ __all__ = ('Audio',
            'User',
            'UserProfilePhotos',
            'Video',
-           'Voice',)
+           'Voice']

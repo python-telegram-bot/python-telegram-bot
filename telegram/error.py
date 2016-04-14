@@ -62,13 +62,11 @@ class TelegramError(Exception):
 
 
 class Unauthorized(TelegramError):
-
     def __init__(self):
         super(Unauthorized, self).__init__('Unauthorized')
 
 
 class InvalidToken(TelegramError):
-
     def __init__(self):
         super(InvalidToken, self).__init__('Invalid token')
 
@@ -78,6 +76,5 @@ class NetworkError(TelegramError):
 
 
 class TimedOut(NetworkError):
-
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')

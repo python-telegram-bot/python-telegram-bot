@@ -17,43 +17,50 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains a object that represents a Telegram
-InlineKeyboardButton"""
+"""This module contains a object that represents a Telegram KeyboardButton."""
 
 from telegram import TelegramObject
 
 
-class InlineKeyboardButton(TelegramObject):
-    """This object represents a Telegram InlineKeyboardButton."""
+class KeyboardButton(TelegramObject):
+    """
+    This object represents one button of the reply keyboard. For simple
+    text buttons String can be used instead of this object to specify text
+    of the button.
+
+    Args:
+        text (str):
+        request_location (Optional[bool]):
+        request_contact (Optional[bool]):
+    """
 
     def __init__(self,
                  text,
-                 url=None,
-                 callback_data=None,
-                 switch_inline_query=None):
+                 request_contact=None,
+                 request_location=None):
         # Required
         self.text = text
-
         # Optionals
-        self.url = url
-        self.callback_data = callback_data
-        self.switch_inline_query = switch_inline_query
+        if request_contact:
+            self.request_contact = request_contact
+        if request_location:
+            self.request_location = request_location
 
     @staticmethod
     def de_json(data):
         if not data:
             return None
 
-        return InlineKeyboardButton(**data)
+        return KeyboardButton(**data)
 
     @staticmethod
     def de_list(data):
         if not data:
             return []
 
-        inline_keyboards = list()
-        for inline_keyboard in data:
-            inline_keyboards.append(InlineKeyboardButton.
-                                    de_json(inline_keyboard))
+        keyboards = list()
+        for keyboard in data:
+            keyboards.append(KeyboardButton.
+                             de_json(keyboard))
 
-        return inline_keyboards
+        return keyboards
