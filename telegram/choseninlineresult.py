@@ -21,7 +21,7 @@
 This module contains a object that represents a Telegram ChosenInlineResult
 """
 
-from telegram import TelegramObject, User
+from telegram import TelegramObject, User, Location
 
 
 class ChosenInlineResult(TelegramObject):
@@ -45,11 +45,16 @@ class ChosenInlineResult(TelegramObject):
     def __init__(self,
                  result_id,
                  from_user,
-                 query):
+                 query,
+                 location=None,
+                 inline_message_id=None):
         # Required
         self.result_id = result_id
         self.from_user = from_user
         self.query = query
+        # Optionals
+        self.location = location
+        self.inline_message_id = inline_message_id
 
     @staticmethod
     def de_json(data):
@@ -64,6 +69,7 @@ class ChosenInlineResult(TelegramObject):
             return None
         data = data.copy()
         data['from_user'] = User.de_json(data.pop('from'))
+        data['location'] = Location.de_json(data['location'])
 
         return ChosenInlineResult(**data)
 
