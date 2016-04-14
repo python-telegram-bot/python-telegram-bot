@@ -67,7 +67,8 @@ class InlineQueryResultArticle(InlineQueryResult):
                  description=None,
                  thumb_url=None,
                  thumb_width=None,
-                 thumb_height=None):
+                 thumb_height=None,
+                 **kwargs):
 
         validate_string(title, 'title')
         validate_string(message_text, 'message_text')
@@ -104,7 +105,5 @@ class InlineQueryResultArticle(InlineQueryResult):
         """
         if not data:
             return None
-        data = data.copy()
-        data.pop('type', None)
 
         return InlineQueryResultArticle(**data)

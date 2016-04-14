@@ -73,7 +73,8 @@ class InlineQueryResultVideo(InlineQueryResult):
                  description=None,
                  caption=None,
                  parse_mode=None,
-                 disable_web_page_preview=None):
+                 disable_web_page_preview=None,
+                 **kwargs):
 
         validate_string(video_url, 'video_url')
         validate_string(mime_type, 'mime_type')
@@ -115,7 +116,5 @@ class InlineQueryResultVideo(InlineQueryResult):
         """
         if not data:
             return None
-        data = data.copy()
-        data.pop('type', None)
 
         return InlineQueryResultVideo(**data)

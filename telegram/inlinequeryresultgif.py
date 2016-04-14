@@ -64,7 +64,8 @@ class InlineQueryResultGif(InlineQueryResult):
                  caption=None,
                  message_text=None,
                  parse_mode=None,
-                 disable_web_page_preview=None):
+                 disable_web_page_preview=None,
+                 **kwargs):
 
         validate_string(gif_url, 'gif_url')
         validate_string(thumb_url, 'thumb_url')
@@ -100,7 +101,5 @@ class InlineQueryResultGif(InlineQueryResult):
         """
         if not data:
             return None
-        data = data.copy()
-        data.pop('type', None)
 
         return InlineQueryResultGif(**data)

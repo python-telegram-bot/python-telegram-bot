@@ -32,13 +32,15 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram ReplyKeyboardMarkup."""
 
     def setUp(self):
-        self.keyboard = [['button1', 'button2']]
+        self.keyboard = [[telegram.KeyboardButton('button1'),
+                          telegram.KeyboardButton('button2')]]
         self.resize_keyboard = True
         self.one_time_keyboard = True
         self.selective = True
 
         self.json_dict = {
-            'keyboard': self.keyboard,
+            'keyboard': [[self.keyboard[0][0].to_dict(),
+                          self.keyboard[0][1].to_dict()]],
             'resize_keyboard': self.resize_keyboard,
             'one_time_keyboard': self.one_time_keyboard,
             'selective': self.selective,
@@ -55,7 +57,9 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
     def test_reply_keyboard_markup_de_json(self):
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
-        self.assertEqual(reply_keyboard_markup.keyboard, self.keyboard)
+        self.assertIsInstance(reply_keyboard_markup.keyboard, list)
+        self.assertIsInstance(reply_keyboard_markup.keyboard[0][0],
+                              telegram.KeyboardButton)
         self.assertEqual(reply_keyboard_markup.resize_keyboard, self.resize_keyboard)
         self.assertEqual(reply_keyboard_markup.one_time_keyboard, self.one_time_keyboard)
         self.assertEqual(reply_keyboard_markup.selective, self.selective)
@@ -68,7 +72,9 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
     def test_reply_keyboard_markup_to_dict(self):
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
-        self.assertEqual(reply_keyboard_markup['keyboard'], self.keyboard)
+        self.assertIsInstance(reply_keyboard_markup.keyboard, list)
+        self.assertIsInstance(reply_keyboard_markup.keyboard[0][0],
+                              telegram.KeyboardButton)
         self.assertEqual(reply_keyboard_markup['resize_keyboard'], self.resize_keyboard)
         self.assertEqual(reply_keyboard_markup['one_time_keyboard'], self.one_time_keyboard)
         self.assertEqual(reply_keyboard_markup['selective'], self.selective)

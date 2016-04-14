@@ -70,7 +70,8 @@ class InlineQueryResultPhoto(InlineQueryResult):
                  caption=None,
                  message_text=None,
                  parse_mode=None,
-                 disable_web_page_preview=None):
+                 disable_web_page_preview=None,
+                 **kwargs):
 
         validate_string(photo_url, 'photo_url')
         validate_string(thumb_url, 'thumb_url')
@@ -110,7 +111,5 @@ class InlineQueryResultPhoto(InlineQueryResult):
         """
         if not data:
             return None
-        data = data.copy()
-        data.pop('type', None)
 
         return InlineQueryResultPhoto(**data)
