@@ -45,39 +45,39 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
             'one_time_keyboard': self.one_time_keyboard,
             'selective': self.selective,
         }
-        
+
     def test_send_message_with_reply_keyboard_markup(self):
         message = self._bot.sendMessage(self._chat_id,
                                         'Моё судно на воздушной подушке полно угрей',
                                         reply_markup=telegram.ReplyKeyboardMarkup.de_json(self.json_dict))
-        
+
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_reply_keyboard_markup_de_json(self):
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
-        self.assertIsInstance(reply_keyboard_markup.keyboard, list)
-        self.assertIsInstance(reply_keyboard_markup.keyboard[0][0],
-                              telegram.KeyboardButton)
+        self.assertTrue(isinstance(reply_keyboard_markup.keyboard, list))
+        self.assertTrue(isinstance(reply_keyboard_markup.keyboard[0][0],
+                                    telegram.KeyboardButton))
         self.assertEqual(reply_keyboard_markup.resize_keyboard, self.resize_keyboard)
         self.assertEqual(reply_keyboard_markup.one_time_keyboard, self.one_time_keyboard)
         self.assertEqual(reply_keyboard_markup.selective, self.selective)
-        
+
     def test_reply_keyboard_markup_to_json(self):
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(reply_keyboard_markup.to_json()))
-        
+
     def test_reply_keyboard_markup_to_dict(self):
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
 
-        self.assertIsInstance(reply_keyboard_markup.keyboard, list)
-        self.assertIsInstance(reply_keyboard_markup.keyboard[0][0],
-                              telegram.KeyboardButton)
+        self.assertTrue(isinstance(reply_keyboard_markup.keyboard, list))
+        self.assertTrue(isinstance(reply_keyboard_markup.keyboard[0][0],
+                                    telegram.KeyboardButton))
         self.assertEqual(reply_keyboard_markup['resize_keyboard'], self.resize_keyboard)
         self.assertEqual(reply_keyboard_markup['one_time_keyboard'], self.one_time_keyboard)
         self.assertEqual(reply_keyboard_markup['selective'], self.selective)
-                       
+
 if __name__ == '__main__':
     unittest.main()
