@@ -43,6 +43,7 @@ from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .message import Message
+from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
 from .inlinekeyboardbutton import InlineKeyboardButton
 from .inlinekeyboardmarkup import InlineKeyboardMarkup
@@ -116,6 +117,7 @@ __all__ = ('Audio',
            'Chat',
            'ChatAction',
            'ChosenInlineResult',
+           'CallbackQuery',
            'Contact',
            'Document',
            'Emoji',
