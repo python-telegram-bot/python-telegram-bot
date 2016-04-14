@@ -696,11 +696,11 @@ class Bot(TelegramObject):
         data = {'inline_query_id': inline_query_id,
                 'results': results}
 
-        if cache_time is not None:
+        if cache_time:
             data['cache_time'] = int(cache_time)
-        if is_personal is not None:
+        if is_personal:
             data['is_personal'] = bool(is_personal)
-        if next_offset is not None:
+        if next_offset:
             data['next_offset'] = next_offset
         if switch_pm_text:
             data['switch_pm_text'] = switch_pm_text
