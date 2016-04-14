@@ -22,5 +22,10 @@
 from .dispatcher import Dispatcher
 from .jobqueue import JobQueue
 from .updater import Updater
+from .handler import Handler
+from .commandhandler import CommandHandler
+from .messagehandler import MessageHandler
+from .regexhandler import RegexHandler
 
-__all__ = ('Dispatcher', 'JobQueue', 'Updater')
+__all__ = ('Dispatcher', 'JobQueue', 'Updater', 'Handler', 'CommandHandler',
+           'MessageHandler', 'RegexHandler')
