@@ -79,7 +79,7 @@ def run_async(func):
     return async_func
 
 
-class Dispatcher:
+class Dispatcher(object):
     """
     This class dispatches all kinds of updates to its registered handlers.
     A handler is a function that usually takes the following parameters
