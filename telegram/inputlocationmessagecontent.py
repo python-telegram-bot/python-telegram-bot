@@ -24,4 +24,18 @@ from telegram import InputMessageContent
 
 
 class InputLocationMessageContent(InputMessageContent):
-    pass
+    """Base class for Telegram InputLocationMessageContent Objects"""
+
+    def __init__(self,
+                 latitude,
+                 longitude):
+        # Required
+        self.latitude = latitude
+        self.longitude = longitude
+
+    @staticmethod
+    def de_json(data):
+        data = super(InputLocationMessageContent,
+                     InputLocationMessageContent).de_json(data)
+
+        return InputLocationMessageContent(**data)
