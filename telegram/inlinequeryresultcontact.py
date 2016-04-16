@@ -20,8 +20,48 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultContact"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultContact(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 phone_number,
+                 first_name,
+                 last_name=None,
+                 reply_markup=None,
+                 input_message_content=None,
+                 thumb_url=None,
+                 thumb_width=None,
+                 thumb_height=None):
+        # Required
+        super(InlineQueryResultContact, self).__init__('contact', id)
+        self.phone_number = phone_number
+        self.first_name = first_name
+
+        # Optionals
+        if last_name:
+            self.last_name = last_name
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+        if thumb_url:
+            self.thumb_url = thumb_url
+        if thumb_width:
+            self.thumb_width = thumb_width
+        if thumb_height:
+            self.thumb_height = thumb_height
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultContact,
+                     InlineQueryResultContact).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return InlineQueryResultContact(**data)

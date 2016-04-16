@@ -47,7 +47,7 @@ class MessageEntity(TelegramObject):
         self.url = url
 
     @staticmethod
-    def de_json(self):
+    def de_json(data):
         data = super(MessageEntity, MessageEntity).de_json(data)
 
         return MessageEntity(**data)

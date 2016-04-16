@@ -20,70 +20,24 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultVideo"""
 
-from telegram import InlineQueryResult
-from telegram.utils.validate import validate_string
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultVideo(InlineQueryResult):
-    """This object represents a Telegram InlineQueryResultVideo.
-
-    Attributes:
-        id (str):
-        video_url (str):
-        mime_type (str):
-        video_width (int):
-        video_height (int):
-        video_duration (int):
-        thumb_url (str):
-        title (str):
-        description (str):
-        caption (str):
-        message_text (str):
-        parse_mode (str):
-        disable_web_page_preview (bool):
-
-    Args:
-        id (str): Unique identifier for this result, 1-64 Bytes
-        video_url (str):
-        mime_type (str):
-        thumb_url (str):
-        title (str):
-        message_text (str):
-
-    Keyword Args:
-        video_width (Optional[int]):
-        video_height (Optional[int]):
-        video_duration (Optional[int]):
-        description (Optional[str]):
-        caption (Optional[str]):
-        parse_mode (Optional[str]):
-        disable_web_page_preview (Optional[bool]):
-    """
-
     def __init__(self,
                  id,
                  video_url,
                  mime_type,
                  thumb_url,
                  title,
-                 message_text,
+                 caption=None,
                  video_width=None,
                  video_height=None,
                  video_duration=None,
                  description=None,
-                 caption=None,
-                 parse_mode=None,
-                 disable_web_page_preview=None,
-                 **kwargs):
-
-        validate_string(video_url, 'video_url')
-        validate_string(mime_type, 'mime_type')
-        validate_string(thumb_url, 'thumb_url')
-        validate_string(title, 'title')
-        validate_string(message_text, 'message_text')
-        validate_string(description, 'description')
-        validate_string(caption, 'caption')
-        validate_string(parse_mode, 'parse_mode')
+                 reply_markup=None,
+                 input_message_content=None):
 
         # Required
         super(InlineQueryResultVideo, self).__init__('video', id)
@@ -91,30 +45,31 @@ class InlineQueryResultVideo(InlineQueryResult):
         self.mime_type = mime_type
         self.thumb_url = thumb_url
         self.title = title
-        self.message_text = message_text
 
         # Optional
-        if video_width is not None:
-            self.video_width = int(video_width)
-        if video_height is not None:
-            self.video_height = int(video_height)
-        if video_duration is not None:
-            self.video_duration = int(video_duration)
-        self.description = description
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = bool(disable_web_page_preview)
+        if caption:
+            self.caption = caption
+        if video_width:
+            self.video_width = video_width
+        if video_height:
+            self.video_height = video_height
+        if video_duration:
+            self.video_duration = video_duration
+        if description:
+            self.description = description
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
 
     @staticmethod
     def de_json(data):
-        """
-        Args:
-            data (dict):
+        data = super(InlineQueryResultVideo,
+                     InlineQueryResultVideo).de_json(data)
 
-        Returns:
-            telegram.InlineQueryResultVideo:
-        """
-        if not data:
-            return None
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
 
         return InlineQueryResultVideo(**data)

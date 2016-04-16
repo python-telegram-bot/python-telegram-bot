@@ -613,6 +613,107 @@ class Bot(TelegramObject):
 
     @log
     @message
+    def sendVenue(self,
+                  chat_id,
+                  latitude,
+                  longitude,
+                  title,
+                  address,
+                  foursquare_id=None,
+                  **kwargs):
+        """
+        Use this method to send information about a venue.
+
+        Args:
+            chat_id:
+                Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
+            latitude:
+                Latitude of the venue.
+            longitude:
+                Longitude of the venue.
+            title:
+                Name of the venue.
+            address:
+                Address of the venue.
+            foursquare_id:
+                Foursquare identifier of the venue.
+            disable_notification:
+                Sends the message silently. iOS users will not receive a
+                notification, Android users will receive a notification with no
+                sound.
+            reply_to_message_id:
+                If the message is a reply, ID of the original message.
+            reply_markup:
+                Additional interface options. A JSON-serialized object for an
+                inline keyboard, custom reply keyboard, instructions to hide
+                reply keyboard or to force a reply from the user.
+
+        Returns:
+            A telegram.Message instance representing the message posted.
+        """
+
+        url = '%s/sendVenue' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'latitude': latitude,
+                'longitude': longitude,
+                'address': address,
+                'title': title}
+
+        if foursquare_id:
+            data['foursquare_id'] = foursquare_id
+
+        return url, data
+
+    @log
+    @message
+    def sendContact(self,
+                    chat_id,
+                    phone_number,
+                    first_name,
+                    last_name=None,
+                    **kwargs):
+        """
+        Use this method to send phone contacts.
+
+        Args:
+            chat_id:
+                Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
+            phone_number:
+                Contact's phone number.
+            first_name:
+                Contact's first name.
+            last_name:
+                Contact's last name.
+            disable_notification:
+                Sends the message silently. iOS users will not receive a
+                notification, Android users will receive a notification with no
+                sound.
+            reply_to_message_id:
+                If the message is a reply, ID of the original message.
+            reply_markup:
+                Additional interface options. A JSON-serialized object for an
+                inline keyboard, custom reply keyboard, instructions to hide
+                reply keyboard or to force a reply from the user.
+
+        Returns:
+            A telegram.Message instance representing the message posted.
+        """
+        url = '%s/sendContact' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'phone_number': phone_number,
+                'first_name': first_name}
+
+        if last_name:
+            data['last_name'] = last_name
+
+        return url, data
+
+    @log
+    @message
     def sendChatAction(self,
                        chat_id,
                        action):

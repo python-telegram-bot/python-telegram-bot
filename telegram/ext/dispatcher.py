@@ -77,7 +77,7 @@ def run_async(func):
     return async_func
 
 
-class Dispatcher:
+class Dispatcher(object):
     """
     This class dispatches all kinds of updates to its registered handlers.
 
@@ -131,7 +131,7 @@ class Dispatcher:
                 if self.__stop_event.is_set():
                     self.logger.debug('orderly stopping')
                     break
-                elif self.__stop_event.is_set():
+                elif self.__exception_event.is_set():
                     self.logger.critical(
                         'stopping due to exception in another thread')
                     break

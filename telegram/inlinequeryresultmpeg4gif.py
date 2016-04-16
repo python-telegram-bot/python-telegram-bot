@@ -20,40 +20,11 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultMpeg4Gif"""
 
-from telegram import InlineQueryResult
-from telegram.utils.validate import validate_string
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
-    """This object represents a Telegram InlineQueryResultMpeg4Gif.
-
-    Attributes:
-        id (str):
-        mpeg4_url (str):
-        mpeg4_width (int):
-        mpeg4_height (int):
-        thumb_url (str):
-        title (str):
-        caption (str):
-        message_text (str):
-        parse_mode (str):
-        disable_web_page_preview (bool):
-
-    Args:
-        id (str): Unique identifier for this result, 1-64 Bytes
-        mpeg4_url (str):
-        thumb_url (str):
-
-    Keyword Args:
-        mpeg4_width (Optional[int]):
-        mpeg4_height (Optional[int]):
-        title (Optional[str]):
-        caption (Optional[str]):
-        message_text (Optional[str]):
-        parse_mode (Optional[str]):
-        disable_web_page_preview (Optional[bool]):
-    """
-
     def __init__(self,
                  id,
                  mpeg4_url,
@@ -62,17 +33,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  mpeg4_height=None,
                  title=None,
                  caption=None,
-                 message_text=None,
-                 parse_mode=None,
-                 disable_web_page_preview=None,
-                 **kwargs):
-
-        validate_string(mpeg4_url, 'mpeg4_url')
-        validate_string(thumb_url, 'thumb_url')
-        validate_string(title, 'title')
-        validate_string(caption, 'caption')
-        validate_string(message_text, 'message_text')
-        validate_string(parse_mode, 'parse_mode')
+                 reply_markup=None,
+                 input_message_content=None):
 
         # Required
         super(InlineQueryResultMpeg4Gif, self).__init__('mpeg4_gif', id)
@@ -80,26 +42,27 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         self.thumb_url = thumb_url
 
         # Optional
-        if mpeg4_width is not None:
-            self.mpeg4_width = int(mpeg4_width)
-        if mpeg4_height is not None:
-            self.mpeg4_height = int(mpeg4_height)
-        self.title = title
-        self.caption = caption
-        self.message_text = message_text
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = bool(disable_web_page_preview)
+        if mpeg4_width:
+            self.mpeg4_width = mpeg4_width
+        if mpeg4_height:
+            self.mpeg4_height = mpeg4_height
+        if title:
+            self.title = title
+        if caption:
+            self.caption = caption
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
 
     @staticmethod
     def de_json(data):
-        """
-        Args:
-            data (dict):
+        data = super(InlineQueryResultMpeg4Gif,
+                     InlineQueryResultMpeg4Gif).de_json(data)
 
-        Returns:
-            telegram.InlineQueryResultMpeg4Gif:
-        """
-        if not data:
-            return None
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
 
         return InlineQueryResultMpeg4Gif(**data)

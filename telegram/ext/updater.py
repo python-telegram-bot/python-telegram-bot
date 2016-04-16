@@ -43,7 +43,7 @@ from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
-class Updater:
+class Updater(object):
     """
     This class, which employs the Dispatcher class, provides a frontend to
     telegram.Bot to the programmer, so they can focus on coding the bot. Its

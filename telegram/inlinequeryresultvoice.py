@@ -20,8 +20,40 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultVoice"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultVoice(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 voice_url,
+                 title,
+                 voice_duration=None,
+                 reply_markup=None,
+                 input_message_content=None):
+
+        # Required
+        super(InlineQueryResultVoice, self).__init__('voice', id)
+        self.voice_url = voice_url
+        self.title = title
+
+        # Optional
+        if voice_duration:
+            self.voice_duration = voice_duration
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultVoice,
+                     InlineQueryResultVoice).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return InlineQueryResultVoice(**data)
