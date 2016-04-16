@@ -24,4 +24,25 @@ from telegram import InputMessageContent
 
 
 class InputVenueMessageContent(InputMessageContent):
-    pass
+    """Base class for Telegram InputVenueMessageContent Objects"""
+
+    def __init__(self,
+                 latitude,
+                 longitude,
+                 title,
+                 address,
+                 foursquare_id=None):
+        # Required
+        self.latitude = latitude
+        self.longitude = longitude
+        self.title = title
+        self.address = address
+        # Optionals
+        self.foursquare_id = foursquare_id
+
+    @staticmethod
+    def de_json(data):
+        data = super(InputVenueMessageContent,
+                     InputVenueMessageContent).de_json(data)
+
+        return InputVenueMessageContent(**data)

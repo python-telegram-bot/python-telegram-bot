@@ -24,4 +24,21 @@ from telegram import InputMessageContent
 
 
 class InputTextMessageContent(InputMessageContent):
-    pass
+    """Base class for Telegram InputTextMessageContent Objects"""
+
+    def __init__(self,
+                 message_text,
+                 parse_mode=None,
+                 disable_web_page_preview=None):
+        # Required
+        self.message_text = message_text
+        # Optionals
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
+
+    @staticmethod
+    def de_json(data):
+        data = super(InputTextMessageContent,
+                     InputTextMessageContent).de_json(data)
+
+        return InputTextMessageContent(**data)
