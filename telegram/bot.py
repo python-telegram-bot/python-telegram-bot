@@ -1004,7 +1004,7 @@ class Bot(TelegramObject):
           Returns a telegram.Message object.
         """
 
-        url = '%s/editMessage' % self.base_url
+        url = '%s/editMessageText' % self.base_url
 
         data = {}
 
