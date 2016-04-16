@@ -96,9 +96,9 @@ def confirm_value(bot, update):
 # Handler for the /cancel command.
 # Sets the state back to MENU and clears the context
 def cancel(bot, update):
-    chat_id = update.message.chat_id
-    del state[chat_id]
-    del context[chat_id]
+    user_id = update.message.from_user.id
+    del state[user_id]
+    del context[user_id]
 
 
 def help(bot, update):
