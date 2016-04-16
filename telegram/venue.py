@@ -46,7 +46,7 @@ class Venue(TelegramObject):
         self.foursquare_id = foursquare_id
 
     @staticmethod
-    def de_json(self):
+    def de_json(data):
         data = super(Venue, Venue).de_json(data)
 
         data['location'] = Location.de_json(data.get('location'))
