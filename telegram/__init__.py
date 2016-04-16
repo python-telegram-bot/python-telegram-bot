@@ -44,6 +44,7 @@ from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .message import Message
+from .messageentity import MessageEntity
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
 from .inlinekeyboardbutton import InlineKeyboardButton
@@ -74,6 +75,7 @@ from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
+from .venue import Venue
 from .update import Update
 from .bot import Bot
 
@@ -157,6 +159,7 @@ __all__ = ['Audio',
            'KeyboardButton',
            'Location',
            'Message',
+           'MessageEntity',
            'NullHandler',
            'ParseMode',
            'PhotoSize',
@@ -169,5 +172,6 @@ __all__ = ['Audio',
            'Update',
            'User',
            'UserProfilePhotos',
+           'Venue',
            'Video',
            'Voice']

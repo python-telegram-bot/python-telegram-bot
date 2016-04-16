@@ -16,3 +16,38 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
+"""This module contains a object that represents a Telegram MessageEntity."""
+
+from telegram import TelegramObject
+
+
+class MessageEntity(TelegramObject):
+    """
+    This object represents one special entity in a text message. For example,
+    hashtags, usernames, URLs, etc.
+
+    Args:
+        type (str):
+        offset (int):
+        length (int):
+        url (Optional[str]):
+    """
+
+    def __init__(self,
+                 type,
+                 offset,
+                 length,
+                 url=None):
+        # Required
+        self.type = type
+        self.offset = offset
+        self.length = length
+        # Optionals
+        self.url = url
+
+    @staticmethod
+    def de_json(self):
+        data = super(MessageEntity, MessageEntity).de_json(data)
+
+        return MessageEntity(**data)
