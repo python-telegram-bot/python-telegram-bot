@@ -20,8 +20,47 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultLocation"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultLocation(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 latitude,
+                 longitude,
+                 title,
+                 reply_markup=None,
+                 input_message_content=None,
+                 thumb_url=None,
+                 thumb_width=None,
+                 thumb_height=None):
+        # Required
+        super(InlineQueryResultLocation, self).__init__('location', id)
+        self.latitude = latitude
+        self.longitude = longitude
+        self.title = title
+
+        # Optionals
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+        if thumb_url:
+            self.thumb_url = thumb_url
+        if thumb_width:
+            self.thumb_width = thumb_width
+        if thumb_height:
+            self.thumb_height = thumb_height
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultLocation,
+                     InlineQueryResultLocation).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return InlineQueryResultLocation(**data)
