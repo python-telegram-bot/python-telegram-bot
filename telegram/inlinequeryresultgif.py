@@ -34,7 +34,8 @@ class InlineQueryResultGif(InlineQueryResult):
                  title=None,
                  caption=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
 
         # Required
         super(InlineQueryResultGif, self).__init__('gif', id)

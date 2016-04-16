@@ -32,7 +32,8 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
                  description=None,
                  caption=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedDocument, self).__init__('document', id)
         self.title = title

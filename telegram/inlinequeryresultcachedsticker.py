@@ -29,7 +29,8 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
                  id,
                  sticker_file_id,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedSticker, self).__init__('sticker', id)
         self.sticker_file_id = sticker_file_id

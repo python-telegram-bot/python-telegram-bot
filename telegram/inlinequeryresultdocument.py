@@ -36,7 +36,8 @@ class InlineQueryResultDocument(InlineQueryResult):
                  input_message_content=None,
                  thumb_url=None,
                  thumb_width=None,
-                 thumb_height=None):
+                 thumb_height=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultDocument, self).__init__('document', id)
         self.document_url = document_url

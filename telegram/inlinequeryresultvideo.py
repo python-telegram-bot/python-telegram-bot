@@ -37,7 +37,8 @@ class InlineQueryResultVideo(InlineQueryResult):
                  video_duration=None,
                  description=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
 
         # Required
         super(InlineQueryResultVideo, self).__init__('video', id)

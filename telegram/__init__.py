@@ -45,6 +45,7 @@ from .emoji import Emoji
 from .parsemode import ParseMode
 from .message import Message
 from .messageentity import MessageEntity
+from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
 from .inlinekeyboardbutton import InlineKeyboardButton
@@ -70,7 +71,6 @@ from .inlinequeryresultphoto import InlineQueryResultPhoto
 from .inlinequeryresultvenue import InlineQueryResultVenue
 from .inlinequeryresultvideo import InlineQueryResultVideo
 from .inlinequeryresultvoice import InlineQueryResultVoice
-from .inputmessagecontent import InputMessageContent
 from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
