@@ -27,6 +27,23 @@ from .filters import *
 
 
 class MessageHandler(Handler):
+    """
+    Handler class to handle telegram messages. Messages are Telegram Updates
+    that do not contain a command. They might contain text, media or status
+    updates.
+
+    Args:
+        filters (list): A list of filters defined in ``telegram.ext.filters``.
+            All messages that match at least one of those filters will be
+            accepted. If ``bool(filters)`` evaluates to ``False``, messages are
+            not filtered.
+        callback (function): A function that takes ``bot, update`` as
+            positional arguments. It will be called when the ``checkUpdate``
+            has determined that an update should be processed by this handler.
+        pass_update_queue (optional[bool]): If the handler should be passed the
+            update queue as a keyword argument called ``update_queue``. It can
+            be used to insert updates. Default is ``False``
+    """
 
     def __init__(self, filters, callback, pass_update_queue=False):
         super(Handler).__init__(callback, pass_update_queue)

@@ -26,6 +26,27 @@ from .handler import Handler
 
 
 class RegexHandler(Handler):
+    """
+    Handler class to handle string updates based on a regex. It uses a
+    regular expression to check update content. Read the documentation of the
+    ``re`` module for more information. The ``re.match`` function is used to
+    determine if an update should be handled by this handler.
+
+    Args:
+        pattern (str or Pattern): The regex pattern.
+        callback (function): A function that takes ``bot, update`` as
+            positional arguments. It will be called when the ``checkUpdate``
+            has determined that an update should be processed by this handler.
+        pass_groups (optional[bool]): If the callback should be passed the
+            result of ``re.match(pattern, update).groups()`` as a keyword
+            argument called ``groups``. Default is ``False``
+        pass_groupdict (optional[bool]): If the callback should be passed the
+            result of ``re.match(pattern, update).groupdict()`` as a keyword
+            argument called ``groupdict``. Default is ``False``
+        pass_update_queue (optional[bool]): If the handler should be passed the
+            update queue as a keyword argument called ``update_queue``. It can
+            be used to insert updates. Default is ``False``
+    """
 
     def __init__(self, pattern, callback, pass_groups=False,
                  pass_groupdict=False, pass_update_queue=False):

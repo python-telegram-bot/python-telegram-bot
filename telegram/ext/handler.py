@@ -22,6 +22,18 @@ Dispatcher """
 
 
 class Handler(object):
+    """
+    The base class for all update handlers. You can create your own handlers
+    by inheriting from this class.
+
+    Args:
+        callback (function): A function that takes ``bot, update`` as
+            positional arguments. It will be called when the ``checkUpdate``
+            has determined that an update should be processed by this handler.
+        pass_update_queue (optional[bool]): If the callback should be passed
+            the update queue as a keyword argument called ``update_queue``. It
+            can be used to insert updates. Default is ``False``
+    """
 
     def __init__(self, callback, pass_update_queue=False):
         self.callback = callback
