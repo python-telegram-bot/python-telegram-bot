@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-""" This module contains the base class for handlers as used by the
-Dispatcher """
+""" This module contains the StringCommandHandler class """
 
 from .handler import Handler
 
@@ -44,7 +43,7 @@ class StringCommandHandler(Handler):
 
     def __init__(self, command, callback, pass_args=False,
                  pass_update_queue=False):
-        super(Handler).__init__(callback, pass_update_queue)
+        super(StringCommandHandler, self).__init__(callback, pass_update_queue)
         self.command = command
         self.pass_args = pass_args
 

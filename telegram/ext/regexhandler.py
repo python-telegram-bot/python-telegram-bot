@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-""" This module contains the base class for handlers as used by the
-Dispatcher """
+""" This module contains the RegexHandler class """
 
 import re
 
@@ -51,7 +50,7 @@ class RegexHandler(Handler):
 
     def __init__(self, pattern, callback, pass_groups=False,
                  pass_groupdict=False, pass_update_queue=False):
-        super(Handler).__init__(callback, pass_update_queue)
+        super(RegexHandler, self).__init__(callback, pass_update_queue)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)

@@ -45,7 +45,7 @@ class CommandHandler(Handler):
 
     def __init__(self, command, callback, pass_args=False,
                  pass_update_queue=False):
-        super(Handler).__init__(callback, pass_update_queue)
+        super(CommandHandler, self).__init__(callback, pass_update_queue)
         self.command = command
         self.pass_args = pass_args
 
