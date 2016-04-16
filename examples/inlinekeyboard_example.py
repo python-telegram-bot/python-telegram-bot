@@ -43,8 +43,7 @@ def set_value(bot, update):
     if user_state == MENU:
         state[user_id] = AWAIT_INPUT  # set the state
         bot.sendMessage(chat_id,
-                        text="Please enter your settings value or send "
-                             "/cancel to abort",
+                        text="Please enter your settings value",
                         reply_markup=ForceReply())
 
 
@@ -93,14 +92,6 @@ def confirm_value(bot, update):
                                 query.message.message_id)
 
 
-# Handler for the /cancel command.
-# Sets the state back to MENU and clears the context
-def cancel(bot, update):
-    user_id = update.message.from_user.id
-    del state[user_id]
-    del context[user_id]
-
-
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text="Use /set to test this bot.")
 
@@ -117,7 +108,6 @@ updater.dispatcher.addHandler(CommandHandler('set', set_value))
 updater.dispatcher.addHandler(MessageHandler([filters.TEXT], entered_value))
 # The confirmation
 updater.dispatcher.addHandler(CallbackQueryHandler(confirm_value))
-updater.dispatcher.addHandler(CommandHandler('cancel', cancel))
 updater.dispatcher.addHandler(CommandHandler('start', help))
 updater.dispatcher.addHandler(CommandHandler('help', help))
 updater.dispatcher.addErrorHandler(error)
