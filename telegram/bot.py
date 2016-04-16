@@ -1006,7 +1006,7 @@ class Bot(TelegramObject):
 
         url = '%s/editMessageText' % self.base_url
 
-        data = {}
+        data = {'text': text}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -1014,6 +1014,12 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
+        if reply_markup:
+            data['parse_mode'] = parse_mode
+        if reply_markup:
+            data['disable_web_page_preview'] = disable_web_page_preview
+        if reply_markup:
+            data['reply_markup'] = reply_markup
 
         result = request.post(url, data)
 
@@ -1049,9 +1055,9 @@ class Bot(TelegramObject):
           Returns a telegram.Message object.
         """
 
-        url = '%s/editMessage' % self.base_url
+        url = '%s/editMessageCaption' % self.base_url
 
-        data = {}
+        data = {'caption': caption}
 
         if chat_id:
             data['chat_id'] = chat_id
@@ -1059,6 +1065,8 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
+        if reply_markup:
+            data['reply_markup'] = reply_markup
 
         result = request.post(url, data)
 
@@ -1091,9 +1099,9 @@ class Bot(TelegramObject):
           Returns a telegram.Message object.
         """
 
-        url = '%s/editMessage' % self.base_url
+        url = '%s/editMessageReplyMarkup' % self.base_url
 
-        data = {}
+        data = {'reply_markup': reply_markup}
 
         if chat_id:
             data['chat_id'] = chat_id
