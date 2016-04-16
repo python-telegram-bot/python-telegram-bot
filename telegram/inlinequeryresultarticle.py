@@ -20,8 +20,8 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultArticle"""
 
-from telegram import InlineQueryResult
-from telegram.utils.validate import validate_string
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultArticle(InlineQueryResult):
@@ -30,9 +30,8 @@ class InlineQueryResultArticle(InlineQueryResult):
     Attributes:
         id (str):
         title (str):
-        message_text (str):
-        parse_mode (str):
-        disable_web_page_preview (bool):
+        input_message_content (telegram.InputMessageContent):
+        reply_markup (telegram.ReplyMarkup):
         url (str):
         hide_url (bool):
         description (str):
@@ -43,11 +42,9 @@ class InlineQueryResultArticle(InlineQueryResult):
     Args:
         id (str): Unique identifier for this result, 1-64 Bytes
         title (str):
-        message_text (str):
+        reply_markup (telegram.ReplyMarkup):
 
     Keyword Args:
-        parse_mode (Optional[str]):
-        disable_web_page_preview (Optional[bool]):
         url (Optional[str]):
         hide_url (Optional[bool]):
         description (Optional[str]):
@@ -59,51 +56,44 @@ class InlineQueryResultArticle(InlineQueryResult):
     def __init__(self,
                  id,
                  title,
-                 message_text,
-                 parse_mode=None,
-                 disable_web_page_preview=None,
+                 input_message_content,
+                 reply_markup=None,
                  url=None,
                  hide_url=None,
                  description=None,
                  thumb_url=None,
                  thumb_width=None,
-                 thumb_height=None,
-                 **kwargs):
-
-        validate_string(title, 'title')
-        validate_string(message_text, 'message_text')
-        validate_string(url, 'url')
-        validate_string(description, 'description')
-        validate_string(thumb_url, 'thumb_url')
-        validate_string(parse_mode, 'parse_mode')
+                 thumb_height=None):
 
         # Required
         super(InlineQueryResultArticle, self).__init__('article', id)
         self.title = title
-        self.message_text = message_text
+        self.input_message_content = input_message_content
 
         # Optional
-        self.parse_mode = parse_mode
-        self.disable_web_page_preview = bool(disable_web_page_preview)
-        self.url = url
-        self.hide_url = bool(hide_url)
-        self.description = description
-        self.thumb_url = thumb_url
-        if thumb_width is not None:
-            self.thumb_width = int(thumb_width)
-        if thumb_height is not None:
-            self.thumb_height = int(thumb_height)
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if url:
+            self.url = url
+        if hide_url:
+            self.hide_url = hide_url
+        if description:
+            self.description = description
+        if thumb_url:
+            self.thumb_url = thumb_url
+        if thumb_width:
+            self.thumb_width = thumb_width
+        if thumb_height:
+            self.thumb_height = thumb_height
 
     @staticmethod
     def de_json(data):
-        """
-        Args:
-            data (dict):
+        data = super(InlineQueryResultArticle,
+                     InlineQueryResultArticle).de_json(data)
 
-        Returns:
-            telegram.InlineQueryResultArticle:
-        """
-        if not data:
-            return None
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
 
-        return InlineQueryResultArticle(**data)
+        return data
