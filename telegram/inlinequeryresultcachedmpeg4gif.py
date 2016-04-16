@@ -20,8 +20,40 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultMpeg4Gif"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 mpeg4_file_id,
+                 title=None,
+                 caption=None,
+                 reply_markup=None,
+                 input_message_content=None):
+        # Required
+        super(InlineQueryResultCachedMpeg4Gif, self).__init__('mpeg4_gif', id)
+        self.mpeg4_file_id = mpeg4_file_id
+
+        # Optionals
+        if title:
+            self.title = title
+        if caption:
+            self.caption = caption
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultCachedMpeg4Gif,
+                     InlineQueryResultCachedMpeg4Gif).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return data
