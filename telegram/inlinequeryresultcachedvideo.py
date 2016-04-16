@@ -20,8 +20,42 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultCachedVideo"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultCachedVideo(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 video_file_id,
+                 title,
+                 description=None,
+                 caption=None,
+                 reply_markup=None,
+                 input_message_content=None):
+        # Required
+        super(InlineQueryResultCachedVideo, self).__init__('video', id)
+        self.video_file_id = video_file_id
+        self.title = title
+
+        # Optionals
+        if description:
+            self.description = description
+        if caption:
+            self.caption = caption
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultCachedVideo,
+                     InlineQueryResultCachedVideo).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return data
