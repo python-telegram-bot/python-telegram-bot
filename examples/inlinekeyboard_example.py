@@ -67,30 +67,30 @@ def entered_value(bot, update):
 
 
 def confirm_value(bot, update):
-    chat_id = update.callback_query.message.chat_id
-    user_id = update.callback_query.from_user.id
-    text = update.callback_query.data
+    query = update.callback_query
+    chat_id = query.message.chat_id
+    user_id = query.from_user.id
+    text = query.data
     user_state = state.get(user_id, MENU)
     user_context = context.get(user_id, None)
-
-    logging.info("user_state: %d\nuser_context: %s\ntext: %s" % (user_state, user_context, text))
 
     # Check if we are waiting for confirmation and the right user answered
     if user_state == AWAIT_CONFIRMATION:
         del state[user_id]
         del context[user_id]
+        bot.answerCallbackQuery(query.id, text="Ok!")
         if text == YES:
             values[user_id] = user_context
             bot.editMessageText(text="Changed value to %s." % values[user_id],
                                 chat_id=chat_id,
                                 message_id=
-                                update.callback_query.message.message_id)
+                                query.message.message_id)
         else:
             bot.editMessageText(text="Alright, value is still %s."
                                      % values[user_id],
                                 chat_id=chat_id,
                                 message_id=
-                                update.callback_query.message.message_id)
+                                query.message.message_id)
 
 
 # Handler for the /cancel command.
@@ -106,10 +106,10 @@ def help(bot, update):
 
 
 def error(bot, update, error):
-    print('Update "%s" caused error "%s"' % (update, error))
+    logging.warning('Update "%s" caused error "%s"' % (update, error))
 
 # Create the Updater and pass it your bot's token.
-updater = Updater("148447715:AAH4M0gzPG11_mdQS1Qeb0Ex30I5-rw9bMY")
+updater = Updater("TOKEN")
 
 # The command
 updater.dispatcher.addHandler(CommandHandler('set', set_value))
