@@ -87,7 +87,7 @@ def confirm_value(bot, update):
                                 query.message.message_id)
         else:
             bot.editMessageText(text="Alright, value is still %s."
-                                     % values[user_id],
+                                     % values.get(user_id, 'not set'),
                                 chat_id=chat_id,
                                 message_id=
                                 query.message.message_id)
@@ -109,7 +109,7 @@ def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
 
 # Create the Updater and pass it your bot's token.
-updater = Updater("TOKEN")
+updater = Updater("148447715:AAH4M0gzPG11_mdQS1Qeb0Ex30I5-rw9bMY")
 
 # The command
 updater.dispatcher.addHandler(CommandHandler('set', set_value))
