@@ -25,7 +25,7 @@ import re
 from .handler import Handler
 
 
-class RegexHandler(Handler):
+class StringRegexHandler(Handler):
     """
     Handler class to handle string updates based on a regex. It uses a
     regular expression to check update content. Read the documentation of the
