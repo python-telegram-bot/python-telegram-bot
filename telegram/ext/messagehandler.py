@@ -25,6 +25,7 @@ from telegram import Update
 
 from .filters import *
 
+
 class MessageHandler(Handler):
 
     def __init__(self, filters, callback, pass_update_queue=False):
@@ -35,7 +36,8 @@ class MessageHandler(Handler):
         filters = self.filters
         if isinstance(update, Update) and update.message:
             message = update.message
-            return (TEXT in filters and message.text and
+            return (not filters or  # If filters is empty, accept all messages
+                    TEXT in filters and message.text and
                     not message.text.startswith('/') or
                     AUDIO in filters and message.audio or
                     DOCUMENT in filters and message.document or
