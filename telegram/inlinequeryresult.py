@@ -45,14 +45,4 @@ class InlineQueryResult(TelegramObject):
 
     @staticmethod
     def de_json(data):
-        """
-        Args:
-            data (dict):
-
-        Returns:
-            telegram.InlineQueryResult:
-        """
-        if not data:
-            return None
-
-        return InlineQueryResult(**data)
+        return super(InlineQueryResult, InlineQueryResult).de_json(data)

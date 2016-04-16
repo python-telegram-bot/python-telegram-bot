@@ -20,8 +20,34 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultCachedAudio"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultCachedAudio(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 audio_file_id,
+                 reply_markup=None,
+                 input_message_content=None):
+        # Required
+        super(InlineQueryResultCachedAudio, self).__init__('audio', id)
+        self.audio_file_id = audio_file_id
+
+        # Optionals
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultCachedAudio,
+                     InlineQueryResultCachedAudio).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return data
