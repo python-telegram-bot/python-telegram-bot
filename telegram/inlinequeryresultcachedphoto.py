@@ -20,8 +20,43 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultPhoto"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultCachedPhoto(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 photo_file_id,
+                 title=None,
+                 description=None,
+                 caption=None,
+                 reply_markup=None,
+                 input_message_content=None):
+        # Required
+        super(InlineQueryResultCachedPhoto, self).__init__('photo', id)
+        self.photo_file_id = photo_file_id
+
+        # Optionals
+        if title:
+            self.title = title
+        if description:
+            self.description = description
+        if caption:
+            self.caption = caption
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultCachedPhoto,
+                     InlineQueryResultCachedPhoto).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return data
