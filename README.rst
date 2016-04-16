@@ -358,7 +358,7 @@ To enable our bot to respond to inline queries, we can add the following (you wi
    >>> inline_caps_handler = InlineQueryHandler(inline_caps)
    >>> dispatcher.addHandler(inline_caps_handler)
 
-People might try to send commands to the bot that it doesn't understand, so we can use a ``RegexHandler`` to recognize all commands that were not recognized by the previous handlers. **Note:** This handler has to be added last, else it will be triggered before the ``CommandHandler``s had a chance to look at the update::
+People might try to send commands to the bot that it doesn't understand, so we can use a ``RegexHandler`` to recognize all commands that were not recognized by the previous handlers. **Note:** This handler has to be added last, else it will be triggered before the ``CommandHandlers`` had a chance to look at the update::
 
    >>> def unknown(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
