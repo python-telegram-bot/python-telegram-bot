@@ -56,4 +56,4 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         data['input_message_content'] = InputMessageContent.de_json(
             data.get('input_message_content'))
 
-        return data
+        return InlineQueryResultCachedMpeg4Gif(**data)

@@ -64,4 +64,4 @@ class InlineQueryResultContact(InlineQueryResult):
         data['input_message_content'] = InputMessageContent.de_json(
             data.get('input_message_content'))
 
-        return data
+        return InlineQueryResultContact(**data)
