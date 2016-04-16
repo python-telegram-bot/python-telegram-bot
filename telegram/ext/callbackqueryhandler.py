@@ -40,7 +40,7 @@ class CallbackQueryHandler(Handler):
         super(CallbackQueryHandler, self).__init__(callback, pass_update_queue)
 
     def checkUpdate(self, update):
-        return isinstance(update, Update) and update.inline_query
+        return isinstance(update, Update) and update.callback_query
 
     def handleUpdate(self, update, dispatcher):
         optional_args = self.collectOptionalArgs(dispatcher)
