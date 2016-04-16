@@ -20,7 +20,8 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultAudio"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultAudio(InlineQueryResult):
@@ -38,10 +39,24 @@ class InlineQueryResultAudio(InlineQueryResult):
         self.audio_url = audio_url
         self.title = title
 
-        # Optional
-        self.performer = performer
-        self.audio_duration = audio_duration
-        if reply_markup is not None:
-            self.reply_markup = 'ReplyMarkup'  # TODO
-        if input_message_content is not None:
-            self.input_message_content = 'InputMessageContent'
+        # Optionals
+        if performer:
+            self.performer = performer
+        if audio_duration:
+            self.audio_duration = audio_duration
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultAudio,
+                     InlineQueryResultAudio).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return data
