@@ -31,7 +31,8 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
                  title=None,
                  caption=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedMpeg4Gif, self).__init__('mpeg4_gif', id)
         self.mpeg4_file_id = mpeg4_file_id

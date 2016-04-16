@@ -34,7 +34,8 @@ class InlineQueryResultContact(InlineQueryResult):
                  input_message_content=None,
                  thumb_url=None,
                  thumb_width=None,
-                 thumb_height=None):
+                 thumb_height=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultContact, self).__init__('contact', id)
         self.phone_number = phone_number

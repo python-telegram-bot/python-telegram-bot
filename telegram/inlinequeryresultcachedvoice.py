@@ -31,7 +31,8 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
                  title,
                  description=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedVoice, self).__init__('voice', id)
         self.voice_file_id = voice_file_id

@@ -32,7 +32,8 @@ class InlineQueryResultAudio(InlineQueryResult):
                  performer=None,
                  audio_duration=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
 
         # Required
         super(InlineQueryResultAudio, self).__init__('audio', id)

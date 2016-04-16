@@ -32,7 +32,8 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
                  description=None,
                  caption=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedVideo, self).__init__('video', id)
         self.video_file_id = video_file_id

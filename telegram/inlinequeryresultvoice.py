@@ -31,7 +31,8 @@ class InlineQueryResultVoice(InlineQueryResult):
                  title,
                  voice_duration=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
 
         # Required
         super(InlineQueryResultVoice, self).__init__('voice', id)

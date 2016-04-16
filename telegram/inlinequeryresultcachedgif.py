@@ -31,7 +31,8 @@ class InlineQueryResultCachedGif(InlineQueryResult):
                  title=None,
                  caption=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedGif, self).__init__('gif', id)
         self.gif_file_id = gif_file_id

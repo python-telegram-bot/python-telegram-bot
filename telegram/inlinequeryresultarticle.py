@@ -63,7 +63,8 @@ class InlineQueryResultArticle(InlineQueryResult):
                  description=None,
                  thumb_url=None,
                  thumb_width=None,
-                 thumb_height=None):
+                 thumb_height=None,
+                 **kwargs):
 
         # Required
         super(InlineQueryResultArticle, self).__init__('article', id)

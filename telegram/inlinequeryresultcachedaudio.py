@@ -29,7 +29,8 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
                  id,
                  audio_file_id,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedAudio, self).__init__('audio', id)
         self.audio_file_id = audio_file_id

@@ -34,7 +34,8 @@ class InlineQueryResultLocation(InlineQueryResult):
                  input_message_content=None,
                  thumb_url=None,
                  thumb_width=None,
-                 thumb_height=None):
+                 thumb_height=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultLocation, self).__init__('location', id)
         self.latitude = latitude

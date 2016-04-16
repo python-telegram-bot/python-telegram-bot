@@ -35,7 +35,8 @@ class InlineQueryResultPhoto(InlineQueryResult):
                  description=None,
                  caption=None,
                  reply_markup=None,
-                 input_message_content=None):
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultPhoto, self).__init__('photo', id)
         self.photo_url = photo_url
