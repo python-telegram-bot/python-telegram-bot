@@ -632,7 +632,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertRaises(ValueError, Updater)
 
 
-class MockBot:
+class MockBot(object):
 
     def __init__(self, text, messages=1, raise_error=False,
                  bootstrap_retries=None, bootstrap_err=TelegramError('test')):
