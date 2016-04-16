@@ -5,8 +5,8 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 import logging
-from telegram import Emoji, ForceReply, ReplyKeyboardMarkup
-from telegram.ext import Updater
+from telegram import Emoji, ForceReply, ReplyKeyboardMarkup, KeyboardButton
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - '
                            '%(message)s',
@@ -55,14 +55,16 @@ def set_value(bot, update):
 
         # Save the user id and the answer to context
         context[chat_id] = (user_id, update.message.text)
-        reply_markup = ReplyKeyboardMarkup([[YES, NO]], one_time_keyboard=True)
+        reply_markup = ReplyKeyboardMarkup(
+            [[KeyboardButton(YES), KeyboardButton(NO)]],
+            one_time_keyboard=True)
         bot.sendMessage(chat_id, text="Are you sure?",
                         reply_markup=reply_markup)
 
     # If we are waiting for confirmation and the right user answered
     elif chat_state == AWAIT_CONFIRMATION and chat_context[0] == user_id:
-        state[chat_id] = MENU
-        context[chat_id] = None
+        del state[chat_id]
+        del context[chat_id]
         if text == YES:
             values[chat_id] = chat_context[1]
             bot.sendMessage(chat_id,
@@ -77,8 +79,8 @@ def set_value(bot, update):
 # Sets the state back to MENU and clears the context
 def cancel(bot, update):
     chat_id = update.message.chat_id
-    state[chat_id] = MENU
-    context[chat_id] = None
+    del state[chat_id]
+    del context[chat_id]
 
 
 def help(bot, update):
@@ -89,12 +91,12 @@ def help(bot, update):
 updater = Updater("TOKEN")
 
 # The command
-updater.dispatcher.addTelegramCommandHandler('set', set_value)
+updater.dispatcher.addHandler(CommandHandler('set', set_value))
 # The answer and confirmation
-updater.dispatcher.addTelegramMessageHandler(set_value)
-updater.dispatcher.addTelegramCommandHandler('cancel', cancel)
-updater.dispatcher.addTelegramCommandHandler('start', help)
-updater.dispatcher.addTelegramCommandHandler('help', help)
+updater.dispatcher.addHandler(MessageHandler([filters.TEXT], set_value))
+updater.dispatcher.addHandler(CommandHandler('cancel', cancel))
+updater.dispatcher.addHandler(CommandHandler('start', help))
+updater.dispatcher.addHandler(CommandHandler('help', help))
 
 # Start the Bot
 updater.start_polling()

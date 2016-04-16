@@ -16,12 +16,13 @@ Basic inline bot example. Applies different text transformations.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
-from random import getrandbits
+from uuid import uuid4
 
 import re
 
-from telegram import InlineQueryResultArticle, ParseMode
-from telegram.ext import Updater
+from telegram import InlineQueryResultArticle, ParseMode, \
+    InputTextMessageContent
+from telegram.ext import Updater, InlineQueryHandler, CommandHandler
 import logging
 
 # Enable logging
@@ -54,24 +55,25 @@ def inlinequery(bot, update):
         results = list()
 
         results.append(InlineQueryResultArticle(
-                id=hex(getrandbits(64))[2:],
+                id=uuid4(),
                 title="Caps",
-                message_text=query.upper()))
+                input_message_content=InputTextMessageContent(query.upper())))
 
         results.append(InlineQueryResultArticle(
-                id=hex(getrandbits(64))[2:],
+                id=uuid4(),
                 title="Bold",
-                message_text="*%s*" % escape_markdown(query),
-                parse_mode=ParseMode.MARKDOWN))
+                input_message_content=InputTextMessageContent(
+                    "*%s*" % escape_markdown(query),
+                    parse_mode=ParseMode.MARKDOWN)))
 
         results.append(InlineQueryResultArticle(
-                id=hex(getrandbits(64))[2:],
+                id=uuid4(),
                 title="Italic",
-                message_text="_%s_" % escape_markdown(query),
-                parse_mode=ParseMode.MARKDOWN))
+                input_message_content=InputTextMessageContent(
+                    "_%s_" % escape_markdown(query),
+                    parse_mode=ParseMode.MARKDOWN)))
 
         bot.answerInlineQuery(update.inline_query.id, results=results)
-
 
 
 def error(bot, update, error):
@@ -86,11 +88,11 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.addTelegramCommandHandler("start", start)
-    dp.addTelegramCommandHandler("help", help)
+    dp.addHandler(CommandHandler("start", start))
+    dp.addHandler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.addTelegramInlineHandler(inlinequery)
+    dp.addHandler(InlineQueryHandler(inlinequery))
 
     # log all errors
     dp.addErrorHandler(error)
