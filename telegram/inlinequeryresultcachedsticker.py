@@ -20,8 +20,34 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultCachedSticker"""
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup, \
+    InputMessageContent
 
 
 class InlineQueryResultCachedSticker(InlineQueryResult):
-    pass
+    def __init__(self,
+                 id,
+                 sticker_file_id,
+                 reply_markup=None,
+                 input_message_content=None):
+        # Required
+        super(InlineQueryResultCachedSticker, self).__init__('sticker', id)
+        self.sticker_file_id = sticker_file_id
+
+        # Optionals
+        if reply_markup:
+            self.reply_markup = reply_markup
+        if input_message_content:
+            self.input_message_content = input_message_content
+
+    @staticmethod
+    def de_json(data):
+        data = super(InlineQueryResultCachedSticker,
+                     InlineQueryResultCachedSticker).de_json(data)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(
+            data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
+
+        return data
