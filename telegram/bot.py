@@ -1019,7 +1019,10 @@ class Bot(TelegramObject):
         if reply_markup:
             data['disable_web_page_preview'] = disable_web_page_preview
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         result = request.post(url, data)
 
@@ -1066,7 +1069,10 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
         if reply_markup:
-            data['reply_markup'] = reply_markup
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
 
         result = request.post(url, data)
 
@@ -1100,6 +1106,9 @@ class Bot(TelegramObject):
         """
 
         url = '%s/editMessageReplyMarkup' % self.base_url
+
+        if isinstance(reply_markup, ReplyMarkup):
+            reply_markup = reply_markup.to_json()
 
         data = {'reply_markup': reply_markup}
 
