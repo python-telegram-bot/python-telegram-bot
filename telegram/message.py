@@ -24,7 +24,8 @@ from datetime import datetime
 from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize,
-                      Sticker, TelegramObject, User, Video, Voice)
+                      Sticker, TelegramObject, User, Video, Voice, Venue,
+                      MessageEntity)
 
 
 class Message(TelegramObject):
@@ -110,6 +111,7 @@ class Message(TelegramObject):
         self.forward_date = kwargs.get('forward_date')
         self.reply_to_message = kwargs.get('reply_to_message')
         self.text = kwargs.get('text', '')
+        self.entities = kwargs.get('entities', list())
         self.audio = kwargs.get('audio')
         self.document = kwargs.get('document')
         self.photo = kwargs.get('photo')
@@ -119,6 +121,7 @@ class Message(TelegramObject):
         self.caption = kwargs.get('caption', '')
         self.contact = kwargs.get('contact')
         self.location = kwargs.get('location')
+        self.venue = kwargs.get('venue')
         self.new_chat_member = kwargs.get('new_chat_member')
         self.left_chat_member = kwargs.get('left_chat_member')
         self.new_chat_title = kwargs.get('new_chat_title', '')
@@ -131,6 +134,7 @@ class Message(TelegramObject):
         self.migrate_from_chat_id = int(kwargs.get('migrate_from_chat_id', 0))
         self.channel_chat_created = bool(kwargs.get('channel_chat_created',
                                                     False))
+        self.pinned_message = kwargs.get('pinned_message')
 
     @property
     def chat_id(self):
@@ -152,34 +156,24 @@ class Message(TelegramObject):
         data['from_user'] = User.de_json(data.get('from'))
         data['date'] = datetime.fromtimestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'))
-        data['forward_from'] = \
-            User.de_json(data.get('forward_from'))
-        data['forward_date'] = \
-            Message._fromtimestamp(data.get('forward_date'))
+        data['entities'] = MessageEntity.de_list(data.get('entities'))
+        data['forward_from'] = User.de_json(data.get('forward_from'))
+        data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
         data['reply_to_message'] = \
             Message.de_json(data.get('reply_to_message'))
-        data['audio'] = \
-            Audio.de_json(data.get('audio'))
-        data['document'] = \
-            Document.de_json(data.get('document'))
-        data['photo'] = \
-            PhotoSize.de_list(data.get('photo'))
-        data['sticker'] = \
-            Sticker.de_json(data.get('sticker'))
-        data['video'] = \
-            Video.de_json(data.get('video'))
-        data['voice'] = \
-            Voice.de_json(data.get('voice'))
-        data['contact'] = \
-            Contact.de_json(data.get('contact'))
-        data['location'] = \
-            Location.de_json(data.get('location'))
-        data['new_chat_member'] = \
-            User.de_json(data.get('new_chat_member'))
-        data['left_chat_member'] = \
-            User.de_json(data.get('left_chat_member'))
-        data['new_chat_photo'] = \
-            PhotoSize.de_list(data.get('new_chat_photo'))
+        data['audio'] = Audio.de_json(data.get('audio'))
+        data['document'] = Document.de_json(data.get('document'))
+        data['photo'] = PhotoSize.de_list(data.get('photo'))
+        data['sticker'] = Sticker.de_json(data.get('sticker'))
+        data['video'] = Video.de_json(data.get('video'))
+        data['voice'] = Voice.de_json(data.get('voice'))
+        data['contact'] = Contact.de_json(data.get('contact'))
+        data['location'] = Location.de_json(data.get('location'))
+        data['venue'] = Venue.de_json(data.get('venue'))
+        data['new_chat_member'] = User.de_json(data.get('new_chat_member'))
+        data['left_chat_member'] = User.de_json(data.get('left_chat_member'))
+        data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'))
+        data['pinned_message'] = Message.de_json(data.get('pinned_message'))
 
         return Message(**data)
 
