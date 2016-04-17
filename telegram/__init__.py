@@ -30,6 +30,7 @@ from .sticker import Sticker
 from .video import Video
 from .contact import Contact
 from .location import Location
+from .venue import Venue
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
@@ -43,8 +44,8 @@ from .file import File
 from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
-from .message import Message
 from .messageentity import MessageEntity
+from .message import Message
 from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
@@ -75,7 +76,6 @@ from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
-from .venue import Venue
 from .update import Update
 from .bot import Bot
 

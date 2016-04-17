@@ -51,3 +51,21 @@ class MessageEntity(TelegramObject):
         data = super(MessageEntity, MessageEntity).de_json(data)
 
         return MessageEntity(**data)
+
+    @staticmethod
+    def de_list(data):
+        """
+        Args:
+            data (list):
+
+        Returns:
+            List<telegram.MessageEntity>:
+        """
+        if not data:
+            return list()
+
+        entities = list()
+        for entity in data:
+            entities.append(MessageEntity.de_json(entity))
+
+        return entities

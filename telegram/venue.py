@@ -47,6 +47,9 @@ class Venue(TelegramObject):
 
     @staticmethod
     def de_json(data):
+        if not data:
+            return None
+
         data = super(Venue, Venue).de_json(data)
 
         data['location'] = Location.de_json(data.get('location'))
