@@ -183,7 +183,7 @@ def download(url,
         The web location we want to retrieve.
 
       filename:
-        The filename wihtin the path to download the file.
+        The filename within the path to download the file.
     """
 
     urlretrieve(url, filename)

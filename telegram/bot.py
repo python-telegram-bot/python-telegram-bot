@@ -747,7 +747,7 @@ class Bot(TelegramObject):
     def answerInlineQuery(self,
                           inline_query_id,
                           results,
-                          cache_time=None,
+                          cache_time=300,
                           is_personal=None,
                           next_offset=None,
                           switch_pm_text=None,
@@ -801,7 +801,7 @@ class Bot(TelegramObject):
             data['cache_time'] = int(cache_time)
         if is_personal:
             data['is_personal'] = bool(is_personal)
-        if next_offset:
+        if next_offset or next_offset == '':
             data['next_offset'] = next_offset
         if switch_pm_text:
             data['switch_pm_text'] = switch_pm_text
@@ -935,7 +935,7 @@ class Bot(TelegramObject):
     def answerCallbackQuery(self,
                             callback_query_id,
                             text=None,
-                            show_alert=None):
+                            show_alert=False):
         """Use this method to send answers to callback queries sent from inline
         keyboards. The answer will be displayed to the user as a notification
         at the top of the chat screen or as an alert.
@@ -1161,7 +1161,7 @@ class Bot(TelegramObject):
             data['offset'] = offset
         if limit:
             data['limit'] = limit
-        if timeout:
+        if timeout or timeout == 0:
             data['timeout'] = timeout
 
         result = request.post(url, data, network_delay=network_delay)
@@ -1195,7 +1195,7 @@ class Bot(TelegramObject):
         url = '%s/setWebhook' % self.base_url
 
         data = {}
-        if webhook_url:
+        if webhook_url or webhook_url == '':
             data['url'] = webhook_url
         if certificate:
             data['certificate'] = certificate
