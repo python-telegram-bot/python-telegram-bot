@@ -38,7 +38,8 @@ class ChosenInlineResultHandler(Handler):
     """
 
     def __init__(self, callback, pass_update_queue=False):
-        super(ChosenInlineResultHandler, self).__init__(callback, pass_update_queue)
+        super(ChosenInlineResultHandler, self).__init__(callback,
+                                                        pass_update_queue)
 
     def checkUpdate(self, update):
         return isinstance(update, Update) and update.chosen_inline_result

@@ -116,9 +116,10 @@ class Updater(object):
                 False.
             bootstrap_retries (Optional[int[): Whether the bootstrapping phase
                 of the `Updater` will retry on failures on the Telegram server.
-                < 0 - retry indefinitely
-                  0 - no retries (default)
-                > 0 - retry up to X times
+
+                |   < 0 - retry indefinitely
+                |   0 - no retries (default)
+                |   > 0 - retry up to X times
 
         Returns:
             Queue: The update queue that can be filled from the main thread
@@ -183,9 +184,10 @@ class Updater(object):
                 is False.
             bootstrap_retries (Optional[int[): Whether the bootstrapping phase
                 of the `Updater` will retry on failures on the Telegram server.
-                < 0 - retry indefinitely
-                  0 - no retries (default)
-                > 0 - retry up to X times
+
+                |   < 0 - retry indefinitely
+                |   0 - no retries (default)
+                |   > 0 - retry up to X times
             webhook_url (Optional[str]): Explicitly specifiy the webhook url.
                 Useful behind NAT, reverse proxy, etc. Default is derived from
                 `listen`, `port` & `url_path`.

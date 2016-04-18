@@ -22,7 +22,7 @@
 from .handler import Handler
 from telegram import Update
 
-from .filters import *
+from .filters import *  # flake8: noqa
 
 
 class MessageHandler(Handler):

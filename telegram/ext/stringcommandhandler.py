@@ -34,8 +34,8 @@ class StringCommandHandler(Handler):
             has determined that an update should be processed by this handler.
         pass_args (optional[bool]): If the handler should be passed the
             arguments passed to the command as a keyword argument called `
-            `args``. It will contain a list of strings, which is the text
-             following the command split on spaces. Default is ``False``
+            ``args``. It will contain a list of strings, which is the text
+            following the command split on spaces. Default is ``False``
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
             be used to insert updates. Default is ``False``

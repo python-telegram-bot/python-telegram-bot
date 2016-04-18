@@ -89,8 +89,8 @@ class Dispatcher(object):
     Args:
         bot (telegram.Bot): The bot object that should be passed to the
             handlers
-        update_queue (telegram.UpdateQueue): The synchronized queue that will
-            contain the updates.
+        update_queue (Queue): The synchronized queue that will contain the
+            updates.
     """
     def __init__(self, bot, update_queue, workers=4, exception_event=None):
         self.bot = bot
@@ -163,7 +163,7 @@ class Dispatcher(object):
         Processes a single update.
 
         Args:
-            update (any):
+            update (object):
         """
 
         # An error happened while polling
@@ -212,7 +212,7 @@ class Dispatcher(object):
 
         Args:
             handler (Handler): A Handler instance
-            group (object): The group identifier
+            group (optional[object]): The group identifier. Default is 0
         """
 
         if not isinstance(handler, Handler):
@@ -229,7 +229,7 @@ class Dispatcher(object):
 
         Args:
             handler (Handler): A Handler instance
-            group (object): The group identifier
+            group (optional[object]): The group identifier. Default is 0
         """
         if handler in self.handlers[group]:
             self.handlers[group].remove(handler)
@@ -239,8 +239,8 @@ class Dispatcher(object):
         Registers an error handler in the Dispatcher.
 
         Args:
-            handler (function): A function that takes (Bot, TelegramError) as
-                arguments.
+            handler (function): A function that takes ``Bot, Update,
+                TelegramError`` as arguments.
         """
 
         self.error_handlers.append(callback)
@@ -250,7 +250,7 @@ class Dispatcher(object):
         De-registers an error handler.
 
         Args:
-            handler (any):
+            handler (function):
         """
 
         if callback in self.error_handlers:
@@ -261,7 +261,7 @@ class Dispatcher(object):
         Dispatches an error.
 
         Args:
-            update (any): The update that caused the error
+            update (object): The update that caused the error
             error (telegram.TelegramError): The Telegram error that was raised.
         """
 
