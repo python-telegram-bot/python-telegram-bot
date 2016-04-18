@@ -797,7 +797,7 @@ class Bot(TelegramObject):
         data = {'inline_query_id': inline_query_id,
                 'results': results}
 
-        if cache_time:
+        if cache_time or cache_time == 0:
             data['cache_time'] = int(cache_time)
         if is_personal:
             data['is_personal'] = bool(is_personal)
