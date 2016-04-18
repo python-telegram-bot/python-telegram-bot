@@ -198,6 +198,8 @@ class Message(TelegramObject):
             data['forward_date'] = self._totimestamp(self.forward_date)
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
+        if self.entities:
+            data['entities'] = [e.to_dict() for e in self.entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
 
