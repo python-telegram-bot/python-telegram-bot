@@ -172,17 +172,16 @@ class Dispatcher(object):
 
         else:
             for group in self.handlers.values():
-                handler_triggered = False
-
                 for handler in group:
                     try:
                         if handler.checkUpdate(update):
-                            handler_triggered = True
                             handler.handleUpdate(update, self)
+                            break
                     # Dispatch any errors
                     except TelegramError as te:
                         self.logger.warn(
-                            'Error was raised while processing Update.')
+                            'A TelegramError was raised while processing the '
+                            'Update.')
 
                         try:
                             self.dispatchError(update, te)
@@ -190,16 +189,15 @@ class Dispatcher(object):
                             self.logger.exception(
                                 'An uncaught error was raised while '
                                 'handling the error')
+                        finally:
+                            break
 
                     # Errors should not stop the thread
                     except:
                         self.logger.exception(
                             'An uncaught error was raised while '
                             'processing the update')
-
-                    finally:
-                        if handler_triggered:
-                            break
+                        break
 
     def addHandler(self, handler, group=DEFAULT_GROUP):
         """
