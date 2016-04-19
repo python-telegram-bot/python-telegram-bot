@@ -17,32 +17,37 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains the classes that represent Telegram
-InlineQueryResult"""
+"""This module contains a object that represents a Telegram
+InlineKeyboardMarkup"""
 
-from telegram import TelegramObject
+from telegram import ReplyMarkup, InlineKeyboardButton
 
 
-class InlineQueryResult(TelegramObject):
-    """This object represents a Telegram InlineQueryResult.
-
-    Attributes:
-        type (str):
-        id (str):
-
-    Args:
-        type (str):
-        id (str): Unique identifier for this result, 1-64 Bytes
-
-    """
+class InlineKeyboardMarkup(ReplyMarkup):
+    """This object represents a Telegram InlineKeyboardMarkup."""
 
     def __init__(self,
-                 type,
-                 id):
+                 inline_keyboard):
         # Required
-        self.type = str(type)
-        self.id = str(id)
+        self.inline_keyboard = inline_keyboard
 
     @staticmethod
     def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+        if not data:
+            return None
+
+        data['inline_keyboard'] = \
+            [InlineKeyboardButton.de_list(inline_keyboard) for inline_keyboard
+             in data['inline_keyboard']]
+
+        return InlineKeyboardMarkup(**data)
+
+    def to_dict(self):
+        data = super(InlineKeyboardMarkup, self).to_dict()
+
+        data['inline_keyboard'] = []
+        for inline_keyboard in self.inline_keyboard:
+            data['inline_keyboard'].append(
+                [x.to_dict() for x in inline_keyboard])
+
+        return data

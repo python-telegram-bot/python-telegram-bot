@@ -24,7 +24,7 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, File,
-                      TelegramError, ReplyMarkup, TelegramObject, NullHandler)
+                      ReplyMarkup, TelegramObject, NullHandler)
 from telegram.error import InvalidToken
 from telegram.utils import request
 from telegram.utils.validate import validate_string
@@ -33,7 +33,6 @@ logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class Bot(TelegramObject):
-
     """This object represents a Telegram Bot.
 
     Attributes:
@@ -53,15 +52,21 @@ class Bot(TelegramObject):
 
     def __init__(self,
                  token,
-                 base_url=None):
+                 base_url=None,
+                 base_file_url=None):
         self.token = self._valid_token(token)
 
-        if base_url is None:
-            self.base_url = 'https://api.telegram.org/bot%s' % self.token
+        if not base_url:
+            self.base_url = 'https://api.telegram.org/bot%s' % \
+                            self.token
         else:
             self.base_url = base_url + self.token
 
-        self.base_file_url = 'https://api.telegram.org/file/bot%s' % self.token
+        if not base_file_url:
+            self.base_file_url = 'https://api.telegram.org/file/bot%s' % \
+                                 self.token
+        else:
+            self.base_file_url = base_file_url + self.token
 
         self.bot = None
 
@@ -71,6 +76,7 @@ class Bot(TelegramObject):
         """
         Returns:
         """
+
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             """
@@ -81,6 +87,7 @@ class Bot(TelegramObject):
 
             result = func(self, *args, **kwargs)
             return result
+
         return decorator
 
     @property
@@ -129,6 +136,7 @@ class Bot(TelegramObject):
             logger.debug(result)
             logger.debug('Exiting: %s', func.__name__)
             return result
+
         return decorator
 
     def message(func):
@@ -136,48 +144,39 @@ class Bot(TelegramObject):
         Returns:
           A telegram.Message instance representing the message posted.
         """
+
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             """
             decorator
             """
             url, data = func(self, *args, **kwargs)
-            return Bot._post_message(url, data, kwargs)
+
+            if kwargs.get('reply_to_message_id'):
+                data['reply_to_message_id'] = \
+                    kwargs.get('reply_to_message_id')
+
+            if kwargs.get('disable_notification'):
+                data['disable_notification'] = \
+                    kwargs.get('disable_notification')
+
+            if kwargs.get('reply_markup'):
+                reply_markup = kwargs.get('reply_markup')
+                if isinstance(reply_markup, ReplyMarkup):
+                    data['reply_markup'] = reply_markup.to_json()
+                else:
+                    data['reply_markup'] = reply_markup
+
+            result = request.post(url, data,
+                                  timeout=kwargs.get('timeout'),
+                                  network_delay=kwargs.get('network_delay'))
+
+            if result is True:
+                return result
+
+            return Message.de_json(result)
+
         return decorator
-
-    @staticmethod
-    def _post_message(url, data, kwargs, timeout=None, network_delay=2.):
-        """Posts a message to the telegram servers.
-
-        Returns:
-            telegram.Message
-
-        """
-        if not data.get('chat_id'):
-            raise TelegramError('Invalid chat_id')
-
-        if kwargs.get('reply_to_message_id'):
-            reply_to_message_id = kwargs.get('reply_to_message_id')
-            data['reply_to_message_id'] = reply_to_message_id
-
-        if kwargs.get('disable_notification'):
-            disable_notification = kwargs.get('disable_notification')
-            data['disable_notification'] = disable_notification
-
-        if kwargs.get('reply_markup'):
-            reply_markup = kwargs.get('reply_markup')
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
-
-        result = request.post(url, data, timeout=timeout,
-                              network_delay=network_delay)
-
-        if result is True:
-            return result
-
-        return Message.de_json(result)
 
     @log
     def getMe(self):
@@ -206,29 +205,36 @@ class Bot(TelegramObject):
         """Use this method to send text messages.
 
         Args:
-          chat_id:
-            Unique identifier for the message recipient - telegram.Chat id.
-          parse_mode:
-            Send 'Markdown', if you want Telegram apps to show bold, italic and
-            inline URLs in your bot's message. [Optional]
-          text:
-            Text of the message to be sent. The current maximum length is 4096
-            UTF8 characters.
-          disable_web_page_preview:
-            Disables link previews for links in this message. [Optional]
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a custom
-            reply keyboard, instructions to hide keyboard or to force a reply
-            from the user. [Optional]
+            chat_id (str): Unique identifier for the target chat or
+                username of the target channel (in the format
+                @channelusername).
+            text (str): Text of the message to be sent. The current maximum
+                length is 4096 UTF-8 characters.
+            parse_mode (Optional[str]): Send Markdown or HTML, if you want
+                Telegram apps to show bold, italic, fixed-width text or inline
+                URLs in your bot's message.
+            disable_web_page_preview (Optional[bool]): Disables link previews
+                for links in this message.
+            **kwargs (dict): Arbitrary keyword arguments.
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, the sent message is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendMessage' % self.base_url
@@ -271,6 +277,7 @@ class Bot(TelegramObject):
         url = '%s/forwardMessage' % self.base_url
 
         data = {}
+
         if chat_id:
             data['chat_id'] = chat_id
         if from_chat_id:
@@ -468,12 +475,12 @@ class Bot(TelegramObject):
         return url, data
 
     @log
+    @message
     def sendVideo(self,
                   chat_id,
                   video,
                   duration=None,
                   caption=None,
-                  timeout=None,
                   **kwargs):
         """Use this method to send video files, Telegram clients support mp4
         videos (other formats may be sent as telegram.Document).
@@ -518,7 +525,7 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return self._post_message(url, data, kwargs, timeout=timeout)
+        return url, data
 
     @log
     @message
@@ -609,6 +616,107 @@ class Bot(TelegramObject):
 
     @log
     @message
+    def sendVenue(self,
+                  chat_id,
+                  latitude,
+                  longitude,
+                  title,
+                  address,
+                  foursquare_id=None,
+                  **kwargs):
+        """
+        Use this method to send information about a venue.
+
+        Args:
+            chat_id:
+                Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
+            latitude:
+                Latitude of the venue.
+            longitude:
+                Longitude of the venue.
+            title:
+                Name of the venue.
+            address:
+                Address of the venue.
+            foursquare_id:
+                Foursquare identifier of the venue.
+            disable_notification:
+                Sends the message silently. iOS users will not receive a
+                notification, Android users will receive a notification with no
+                sound.
+            reply_to_message_id:
+                If the message is a reply, ID of the original message.
+            reply_markup:
+                Additional interface options. A JSON-serialized object for an
+                inline keyboard, custom reply keyboard, instructions to hide
+                reply keyboard or to force a reply from the user.
+
+        Returns:
+            A telegram.Message instance representing the message posted.
+        """
+
+        url = '%s/sendVenue' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'latitude': latitude,
+                'longitude': longitude,
+                'address': address,
+                'title': title}
+
+        if foursquare_id:
+            data['foursquare_id'] = foursquare_id
+
+        return url, data
+
+    @log
+    @message
+    def sendContact(self,
+                    chat_id,
+                    phone_number,
+                    first_name,
+                    last_name=None,
+                    **kwargs):
+        """
+        Use this method to send phone contacts.
+
+        Args:
+            chat_id:
+                Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
+            phone_number:
+                Contact's phone number.
+            first_name:
+                Contact's first name.
+            last_name:
+                Contact's last name.
+            disable_notification:
+                Sends the message silently. iOS users will not receive a
+                notification, Android users will receive a notification with no
+                sound.
+            reply_to_message_id:
+                If the message is a reply, ID of the original message.
+            reply_markup:
+                Additional interface options. A JSON-serialized object for an
+                inline keyboard, custom reply keyboard, instructions to hide
+                reply keyboard or to force a reply from the user.
+
+        Returns:
+            A telegram.Message instance representing the message posted.
+        """
+        url = '%s/sendContact' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'phone_number': phone_number,
+                'first_name': first_name}
+
+        if last_name:
+            data['last_name'] = last_name
+
+        return url, data
+
+    @log
+    @message
     def sendChatAction(self,
                        chat_id,
                        action):
@@ -642,32 +750,42 @@ class Bot(TelegramObject):
     def answerInlineQuery(self,
                           inline_query_id,
                           results,
-                          cache_time=None,
+                          cache_time=300,
                           is_personal=None,
-                          next_offset=None):
-        """Use this method to reply to an inline query.
+                          next_offset=None,
+                          switch_pm_text=None,
+                          switch_pm_parameter=None):
+        """Use this method to send answers to an inline query. No more than
+        50 results per query are allowed.
 
         Args:
-            inline_query_id (str):
-                Unique identifier for answered query
-            results (list[InlineQueryResult]):
-                A list of results for the inline query
-
-        Keyword Args:
-            cache_time (Optional[int]): The maximum amount of time the result
-                of the inline query may be cached on the server
-            is_personal (Optional[bool]): Pass True, if results may be cached
-                on the server side only for the user that sent the query. By
-                default, results may be returned to any user who sends the same
-                query
-            next_offset (Optional[str]): Pass the offset that a client should
-                send in the next query with the same text to receive more
-                results. Pass an empty string if there are no more results or
-                if you don't support pagination. Offset length can't exceed 64
-                bytes.
+            inline_query_id (str): Unique identifier for the answered query.
+            results (list[:class:`telegram.InlineQueryResult`]): A list of
+                results for the inline query.
+            cache_time (Optional[int]): The maximum amount of time the
+                result of the inline query may be cached on the server.
+            is_personal (Optional[bool]): Pass `True`, if results may be
+                cached on the server side only for the user that sent the
+                query. By default, results may be returned to any user who
+                sends the same query.
+            next_offset (Optional[str]): Pass the offset that a client
+                should send in the next query with the same text to receive
+                more results. Pass an empty string if there are no more
+                results or if you don't support pagination. Offset length
+                can't exceed 64 bytes.
+            switch_pm_text (Optional[str]): If passed, clients will display
+                a button with specified text that switches the user to a
+                private chat with the bot and sends the bot a start message
+                with the parameter switch_pm_parameter.
+            switch_pm_parameter (Optional[str]): Parameter for the start
+                message sent to the bot when user presses the switch button.
 
         Returns:
-            A boolean if answering was successful
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         validate_string(inline_query_id, 'inline_query_id')
@@ -680,12 +798,16 @@ class Bot(TelegramObject):
         data = {'inline_query_id': inline_query_id,
                 'results': results}
 
-        if cache_time is not None:
+        if cache_time or cache_time == 0:
             data['cache_time'] = int(cache_time)
-        if is_personal is not None:
+        if is_personal:
             data['is_personal'] = bool(is_personal)
-        if next_offset is not None:
+        if next_offset or next_offset == '':
             data['next_offset'] = next_offset
+        if switch_pm_text:
+            data['switch_pm_text'] = switch_pm_text
+        if switch_pm_parameter:
+            data['switch_pm_parameter'] = switch_pm_parameter
 
         result = request.post(url, data)
 
@@ -753,6 +875,263 @@ class Bot(TelegramObject):
         return File.de_json(result)
 
     @log
+    def kickChatMember(self,
+                       chat_id,
+                       user_id):
+        """Use this method to kick a user from a group or a supergroup. In the
+        case of supergroups, the user will not be able to return to the group
+        on their own using invite links, etc., unless unbanned first. The bot
+        must be an administrator in the group for this to work.
+
+        Args:
+          chat_id:
+            Unique identifier for the target group or username of the target
+            supergroup (in the format @supergroupusername).
+          user_id:
+            Unique identifier of the target user.
+
+        Returns:
+          True on success.
+        """
+
+        url = '%s/kickChatMember' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'user_id': user_id}
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
+    def unbanChatMember(self,
+                        chat_id,
+                        user_id):
+        """Use this method to unban a previously kicked user in a supergroup.
+        The user will not return to the group automatically, but will be able
+        to join via link, etc. The bot must be an administrator in the group
+        for this to work.
+
+        Args:
+          chat_id:
+            Unique identifier for the target group or username of the target
+            supergroup (in the format @supergroupusername).
+          user_id:
+            Unique identifier of the target user.
+
+        Returns:
+          True on success.
+        """
+
+        url = '%s/unbanChatMember' % self.base_url
+
+        data = {'chat_id': chat_id,
+                'user_id': user_id}
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
+    def answerCallbackQuery(self,
+                            callback_query_id,
+                            text=None,
+                            show_alert=False):
+        """Use this method to send answers to callback queries sent from
+        inline keyboards. The answer will be displayed to the user as a
+        notification at the top of the chat screen or as an alert.
+
+        Args:
+            callback_query_id (str): Unique identifier for the query to be
+                answered.
+            text (Optional[str]): Text of the notification. If not
+                specified, nothing will be shown to the user.
+            show_alert (Optional[bool]): If `True`, an alert will be shown
+                by the client instead of a notification at the top of the chat
+                screen. Defaults to `False`.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '%s/answerCallbackQuery' % self.base_url
+
+        data = {'callback_query_id': callback_query_id}
+
+        if text:
+            data['text'] = text
+        if show_alert:
+            data['show_alert'] = show_alert
+
+        result = request.post(url, data)
+
+        return result
+
+    @log
+    def editMessageText(self,
+                        text,
+                        chat_id=None,
+                        message_id=None,
+                        inline_message_id=None,
+                        parse_mode=None,
+                        disable_web_page_preview=None,
+                        reply_markup=None):
+        """Use this method to edit text messages sent by the bot or via the bot
+        (for inline bots).
+
+        Args:
+          text:
+            New text of the message.
+          chat_id:
+            Required if inline_message_id is not specified. Unique identifier
+            for the target chat or username of the target channel (in the
+            format @channelusername).
+          message_id:
+            Required if inline_message_id is not specified. Unique identifier
+            of the sent message.
+          inline_message_id:
+            Required if chat_id and message_id are not specified. Identifier of
+            the inline message.
+          parse_mode:
+            Send Markdown or HTML, if you want Telegram apps to show bold,
+            italic, fixed-width text or inline URLs in your bot's message.
+          disable_web_page_preview:
+            Disables link previews for links in this message.
+          reply_markup:
+            A JSON-serialized object for an inline keyboard.
+
+        Returns:
+          Returns a telegram.Message object.
+        """
+
+        url = '%s/editMessageText' % self.base_url
+
+        data = {'text': text}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+        if parse_mode:
+            data['parse_mode'] = parse_mode
+        if disable_web_page_preview:
+            data['disable_web_page_preview'] = disable_web_page_preview
+        if reply_markup:
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = request.post(url, data)
+
+        return Message.de_json(result)
+
+    @log
+    @message
+    def editMessageCaption(self,
+                           chat_id=None,
+                           message_id=None,
+                           inline_message_id=None,
+                           caption=None,
+                           **kwargs):
+        """Use this method to edit captions of messages sent by the bot or
+        via the bot (for inline bots).
+
+        Args:
+            chat_id (Optional[str]): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of
+                the target channel (in the format @channelusername).
+            message_id (Optional[str]): Required if inline_message_id is not
+                specified. Unique identifier of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and
+                message_id are not specified. Identifier of the inline message.
+            caption (Optional[str]): New caption of the message.
+            **kwargs (Optional[dict]): Arbitrary keyword arguments.
+
+        Keyword Args:
+            reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+                A JSON-serialized object for an inline keyboard.
+
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by
+            the bot, the edited Message is returned, otherwise `True` is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '%s/editMessageCaption' % self.base_url
+
+        data = {}
+
+        if caption:
+            data['caption'] = caption
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        return url, data
+
+    @log
+    @message
+    def editMessageReplyMarkup(self,
+                               chat_id=None,
+                               message_id=None,
+                               inline_message_id=None,
+                               **kwargs):
+        """Use this method to edit only the reply markup of messages sent by
+        the bot or via the bot (for inline bots).
+
+        Args:
+            chat_id (Optional[str]): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of
+                the target channel (in the format @channelusername).
+            message_id (Optional[str]): Required if inline_message_id is not
+                specified. Unique identifier of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and
+                message_id are not specified. Identifier of the inline message.
+            **kwargs (Optional[dict]): Arbitrary keyword arguments.
+
+        Keyword Args:
+            reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+                A JSON-serialized object for an inline keyboard.
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by
+            the bot, the edited message is returned, otherwise `True` is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '%s/editMessageReplyMarkup' % self.base_url
+
+        data = {}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        return url, data
+
+    @log
     def getUpdates(self,
                    offset=None,
                    limit=100,
@@ -786,11 +1165,12 @@ class Bot(TelegramObject):
         url = '%s/getUpdates' % self.base_url
 
         data = {}
+
         if offset:
             data['offset'] = offset
         if limit:
             data['limit'] = limit
-        if timeout:
+        if timeout or timeout == 0:
             data['timeout'] = timeout
 
         result = request.post(url, data, network_delay=network_delay)
@@ -824,7 +1204,8 @@ class Bot(TelegramObject):
         url = '%s/setWebhook' % self.base_url
 
         data = {}
-        if webhook_url:
+
+        if webhook_url or webhook_url == '':
             data['url'] = webhook_url
         if certificate:
             data['certificate'] = certificate

@@ -18,31 +18,27 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains the classes that represent Telegram
-InlineQueryResult"""
+InputTextMessageContent"""
 
-from telegram import TelegramObject
+from telegram import InputMessageContent
 
 
-class InlineQueryResult(TelegramObject):
-    """This object represents a Telegram InlineQueryResult.
-
-    Attributes:
-        type (str):
-        id (str):
-
-    Args:
-        type (str):
-        id (str): Unique identifier for this result, 1-64 Bytes
-
-    """
+class InputTextMessageContent(InputMessageContent):
+    """Base class for Telegram InputTextMessageContent Objects"""
 
     def __init__(self,
-                 type,
-                 id):
+                 message_text,
+                 parse_mode=None,
+                 disable_web_page_preview=None):
         # Required
-        self.type = str(type)
-        self.id = str(id)
+        self.message_text = message_text
+        # Optionals
+        self.parse_mode = parse_mode
+        self.disable_web_page_preview = disable_web_page_preview
 
     @staticmethod
     def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+        data = super(InputTextMessageContent,
+                     InputTextMessageContent).de_json(data)
+
+        return InputTextMessageContent(**data)

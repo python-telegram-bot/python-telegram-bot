@@ -39,14 +39,14 @@ class InlineQuery(TelegramObject):
         from_user (:class:`telegram.User`):
         query (str):
         offset (str):
-
     """
 
     def __init__(self,
                  id,
                  from_user,
                  query,
-                 offset):
+                 offset,
+                 **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
@@ -64,8 +64,8 @@ class InlineQuery(TelegramObject):
         """
         if not data:
             return None
-        data = data.copy()
-        data['from_user'] = User.de_json(data.pop('from'))
+
+        data['from_user'] = User.de_json(data.get('from'))
 
         return InlineQuery(**data)
 

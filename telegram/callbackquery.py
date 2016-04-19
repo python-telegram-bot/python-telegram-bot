@@ -17,32 +17,34 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains the classes that represent Telegram
-InlineQueryResult"""
+"""This module contains a object that represents a Telegram
+CallbackQuery"""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, Message, User
 
 
-class InlineQueryResult(TelegramObject):
-    """This object represents a Telegram InlineQueryResult.
-
-    Attributes:
-        type (str):
-        id (str):
-
-    Args:
-        type (str):
-        id (str): Unique identifier for this result, 1-64 Bytes
-
-    """
+class CallbackQuery(TelegramObject):
+    """This object represents a Telegram CallbackQuery."""
 
     def __init__(self,
-                 type,
-                 id):
+                 id,
+                 from_user,
+                 data,
+                 **kwargs):
         # Required
-        self.type = str(type)
-        self.id = str(id)
+        self.id = id
+        self.from_user = from_user
+        self.data = data
+        # Optionals
+        self.message = kwargs.get('message')
+        self.inline_message_id = kwargs.get('inline_message_id', '')
 
     @staticmethod
     def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+        if not data:
+            return None
+
+        data['from_user'] = User.de_json(data.get('from'))
+        data['message'] = Message.de_json(data.get('message'))
+
+        return CallbackQuery(**data)

@@ -17,32 +17,55 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains the classes that represent Telegram
-InlineQueryResult"""
+"""This module contains a object that represents a Telegram MessageEntity."""
 
 from telegram import TelegramObject
 
 
-class InlineQueryResult(TelegramObject):
-    """This object represents a Telegram InlineQueryResult.
-
-    Attributes:
-        type (str):
-        id (str):
+class MessageEntity(TelegramObject):
+    """
+    This object represents one special entity in a text message. For example,
+    hashtags, usernames, URLs, etc.
 
     Args:
         type (str):
-        id (str): Unique identifier for this result, 1-64 Bytes
-
+        offset (int):
+        length (int):
+        url (Optional[str]):
     """
 
     def __init__(self,
                  type,
-                 id):
+                 offset,
+                 length,
+                 url=None):
         # Required
-        self.type = str(type)
-        self.id = str(id)
+        self.type = type
+        self.offset = offset
+        self.length = length
+        # Optionals
+        self.url = url
 
     @staticmethod
     def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+        data = super(MessageEntity, MessageEntity).de_json(data)
+
+        return MessageEntity(**data)
+
+    @staticmethod
+    def de_list(data):
+        """
+        Args:
+            data (list):
+
+        Returns:
+            List<telegram.MessageEntity>:
+        """
+        if not data:
+            return list()
+
+        entities = list()
+        for entity in data:
+            entities.append(MessageEntity.de_json(entity))
+
+        return entities

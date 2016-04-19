@@ -17,32 +17,41 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-"""This module contains the classes that represent Telegram
-InlineQueryResult"""
+"""This module contains a object that represents a Telegram Venue."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, Location
 
 
-class InlineQueryResult(TelegramObject):
-    """This object represents a Telegram InlineQueryResult.
-
-    Attributes:
-        type (str):
-        id (str):
+class Venue(TelegramObject):
+    """
+    This object represents a venue.
 
     Args:
-        type (str):
-        id (str): Unique identifier for this result, 1-64 Bytes
-
+        location (:class:`telegram.Location`):
+        title (str):
+        address (str):
+        foursquare_id (Optional[str]):
     """
 
     def __init__(self,
-                 type,
-                 id):
+                 location,
+                 title,
+                 address,
+                 foursquare_id=None):
         # Required
-        self.type = str(type)
-        self.id = str(id)
+        self.location = location
+        self.title = title
+        self.address = address
+        # Optionals
+        self.foursquare_id = foursquare_id
 
     @staticmethod
     def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+        if not data:
+            return None
+
+        data = super(Venue, Venue).de_json(data)
+
+        data['location'] = Location.de_json(data.get('location'))
+
+        return Venue(**data)
