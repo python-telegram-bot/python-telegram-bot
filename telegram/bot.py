@@ -24,7 +24,7 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, File,
-                      TelegramError, ReplyMarkup, TelegramObject, NullHandler)
+                      ReplyMarkup, TelegramObject, NullHandler)
 from telegram.error import InvalidToken
 from telegram.utils import request
 from telegram.utils.validate import validate_string
