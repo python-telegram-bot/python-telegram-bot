@@ -62,6 +62,8 @@ class InlineQuery(TelegramObject):
         Returns:
             telegram.InlineQuery:
         """
+        data = super(InlineQuery, InlineQuery).de_json(data)
+
         if not data:
             return None
 
