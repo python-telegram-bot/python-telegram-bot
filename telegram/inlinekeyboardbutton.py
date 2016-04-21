@@ -50,9 +50,9 @@ class InlineKeyboardButton(TelegramObject):
         self.text = text
 
         # Optionals
-        self.url = kwargs.get('url', '')
-        self.callback_data = kwargs.get('callback_data', '')
-        self.switch_inline_query = kwargs.get('switch_inline_query', '')
+        self.url = kwargs.get('url')
+        self.callback_data = kwargs.get('callback_data')
+        self.switch_inline_query = kwargs.get('switch_inline_query')
 
     @staticmethod
     def de_json(data):
