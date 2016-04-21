@@ -99,6 +99,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                                  update.chosen_inline_result)
         self.message_count += 1
 
+    def telegramCallbackHandlerTest(self, bot, update):
+        self.received_message = update.callback_query
+        self.message_count += 1
+
     @run_async
     def asyncHandlerTest(self, bot, update):
         sleep(1)
@@ -304,7 +308,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveInlineQueryHandler(self):
-        print('Testing add/remove InlineQueryHandler')
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         handler = InlineQueryHandler(self.telegramInlineHandlerTest)
@@ -325,6 +328,25 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         # Remove handler
         d.removeHandler(handler)
         d.removeHandler(handler2)
+        self.reset()
+
+        queue.put(update)
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_addRemoveCallbackQueryHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CallbackQueryHandler(self.telegramCallbackHandlerTest)
+        d.addHandler(handler)
+        queue = self.updater.start_polling(0.01)
+        update = Update(update_id=0, callback_query="testcallback")
+        queue.put(update)
+        sleep(.1)
+        self.assertEqual(self.received_message, "testcallback")
+
+        # Remove handler
+        d.removeHandler(handler)
         self.reset()
 
         queue.put(update)
@@ -388,7 +410,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.updater.start_webhook(ip, port,
                                    url_path='TOKEN',
                                    cert='./tests/test_updater.py',
-                                   key='./tests/test_updater.py')
+                                   key='./tests/test_updater.py',
+                                   webhook_url=None)
         sleep(0.5)
         # SSL-Wrapping will fail, so we start the server without SSL
         Thread(target=self.updater.httpd.serve_forever).start()
@@ -430,7 +453,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port for travis
-        self.updater.start_webhook(ip, port)
+        self.updater.start_webhook(ip, port, webhook_url=None)
         sleep(0.5)
 
         # Now, we send an update to the server via urlopen
@@ -444,6 +467,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self._send_webhook_msg(ip, port, update.to_json())
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test 2')
+
+    def test_start_dispatcher_twice(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        self.updater.start_polling(0.1)
+        d.start()
 
     def test_bootstrap_retries_success(self):
         retries = 3
