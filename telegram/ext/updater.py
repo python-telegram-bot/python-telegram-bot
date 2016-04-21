@@ -301,11 +301,11 @@ class Updater(object):
         if use_ssl:
             self._check_ssl_cert(cert, key)
 
-            if not webhook_url:
-                webhook_url = self._gen_webhook_url(listen, port, url_path)
+        if not webhook_url:
+            webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._set_webhook(webhook_url, bootstrap_retries,
-                              open(cert, 'rb'))
+        self._set_webhook(webhook_url, bootstrap_retries,
+                          open(cert, 'rb') if use_ssl else None)
 
         self.httpd.serve_forever(poll_interval=1)
 
