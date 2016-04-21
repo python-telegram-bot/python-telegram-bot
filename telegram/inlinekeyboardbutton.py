@@ -56,6 +56,8 @@ class InlineKeyboardButton(TelegramObject):
 
     @staticmethod
     def de_json(data):
+        data = super(InlineKeyboardButton, InlineKeyboardButton).de_json(data)
+
         if not data:
             return None
 
