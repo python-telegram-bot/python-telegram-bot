@@ -36,10 +36,10 @@ class Bot(TelegramObject):
 
     Attributes:
         id (int): Unique identifier for this bot.
-        first_name (str): Bot’s first name.
-        last_name (str): Bot’s last name.
-        username (str): Bot’s username.
-        name (str): Bot’s @username.
+        first_name (str): Bot's first name.
+        last_name (str): Bot's last name.
+        username (str): Bot's username.
+        name (str): Bot's @username.
 
     Args:
         token (str): Bot's unique authentication.
