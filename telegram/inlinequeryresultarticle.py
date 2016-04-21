@@ -30,8 +30,8 @@ class InlineQueryResultArticle(InlineQueryResult):
     Attributes:
         id (str):
         title (str):
-        input_message_content (telegram.InputMessageContent):
-        reply_markup (telegram.ReplyMarkup):
+        input_message_content (:class:`telegram.InputMessageContent`):
+        reply_markup (:class:`telegram.ReplyMarkup`):
         url (str):
         hide_url (bool):
         description (str):
@@ -42,7 +42,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     Args:
         id (str): Unique identifier for this result, 1-64 Bytes
         title (str):
-        reply_markup (telegram.ReplyMarkup):
+        reply_markup (:class:`telegram.ReplyMarkup`):
 
     Keyword Args:
         url (Optional[str]):
