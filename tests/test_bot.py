@@ -187,7 +187,7 @@ class BotTest(BaseTest, unittest.TestCase):
         with self.assertRaisesRegexp(telegram.TelegramError, 'Invalid server response'):
             # bypass the valid token check
             bot = telegram.Bot.__new__(telegram.Bot)
-            bot.base_url = 'https://api.telegram.org/bot{}'.format('12')
+            bot.base_url = 'https://api.telegram.org/bot{0}'.format('12')
 
             bot.getMe()
 

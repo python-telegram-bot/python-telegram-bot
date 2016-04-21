@@ -57,13 +57,13 @@ class Bot(TelegramObject):
         self.token = validate_token(token)
 
         if not base_url:
-            self.base_url = 'https://api.telegram.org/bot{}'.format(
+            self.base_url = 'https://api.telegram.org/bot{0}'.format(
                 self.token)
         else:
             self.base_url = base_url + self.token
 
         if not base_file_url:
-            self.base_file_url = 'https://api.telegram.org/file/bot{}'.format(
+            self.base_file_url = 'https://api.telegram.org/file/bot{0}'.format(
                 self.token)
         else:
             self.base_file_url = base_file_url + self.token
@@ -105,7 +105,7 @@ class Bot(TelegramObject):
 
     @property
     def name(self):
-        return '@{}'.format(self.username)
+        return '@{0}'.format(self.username)
 
     def log(func):
         logger = logging.getLogger(func.__module__)
@@ -165,7 +165,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/getMe'.format(self.base_url)
+        url = '{0}/getMe'.format(self.base_url)
 
         result = request.get(url)
 
@@ -222,7 +222,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendMessage'.format(self.base_url)
+        url = '{0}/sendMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'text': text}
@@ -272,7 +272,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/forwardMessage'.format(self.base_url)
+        url = '{0}/forwardMessage'.format(self.base_url)
 
         data = {}
 
@@ -331,7 +331,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendPhoto'.format(self.base_url)
+        url = '{0}/sendPhoto'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'photo': photo}
@@ -401,7 +401,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendAudio'.format(self.base_url)
+        url = '{0}/sendAudio'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'audio': audio}
@@ -461,7 +461,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendDocument'.format(self.base_url)
+        url = '{0}/sendDocument'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'document': document}
@@ -513,7 +513,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendSticker'.format(self.base_url)
+        url = '{0}/sendSticker'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'sticker': sticker}
@@ -570,7 +570,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendVideo'.format(self.base_url)
+        url = '{0}/sendVideo'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'video': video}
@@ -632,7 +632,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendVoice'.format(self.base_url)
+        url = '{0}/sendVoice'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'voice': voice}
@@ -685,7 +685,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendLocation'.format(self.base_url)
+        url = '{0}/sendLocation'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'latitude': latitude,
@@ -747,7 +747,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendVenue'.format(self.base_url)
+        url = '{0}/sendVenue'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'latitude': latitude,
@@ -808,7 +808,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/sendContact'.format(self.base_url)
+        url = '{0}/sendContact'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'phone_number': phone_number,
@@ -843,7 +843,7 @@ class Bot(TelegramObject):
             - ChatAction.FIND_LOCATION for location data.
         """
 
-        url = '{}/sendChatAction'.format(self.base_url)
+        url = '{0}/sendChatAction'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'action': action}
@@ -892,7 +892,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/answerInlineQuery'.format(self.base_url)
+        url = '{0}/answerInlineQuery'.format(self.base_url)
 
         results = [res.to_dict() for res in results]
 
@@ -940,7 +940,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/getUserProfilePhotos'.format(self.base_url)
+        url = '{0}/getUserProfilePhotos'.format(self.base_url)
 
         data = {'user_id': user_id}
 
@@ -973,7 +973,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/getFile'.format(self.base_url)
+        url = '{0}/getFile'.format(self.base_url)
 
         data = {'file_id': file_id}
 
@@ -1009,7 +1009,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/kickChatMember'.format(self.base_url)
+        url = '{0}/kickChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'user_id': user_id}
@@ -1042,7 +1042,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/unbanChatMember'.format(self.base_url)
+        url = '{0}/unbanChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id,
                 'user_id': user_id}
@@ -1077,7 +1077,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/answerCallbackQuery'.format(self.base_url)
+        url = '{0}/answerCallbackQuery'.format(self.base_url)
 
         data = {'callback_query_id': callback_query_id}
 
@@ -1133,7 +1133,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/editMessageText'.format(self.base_url)
+        url = '{0}/editMessageText'.format(self.base_url)
 
         data = {'text': text}
 
@@ -1199,7 +1199,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/editMessageCaption'.format(self.base_url)
+        url = '{0}/editMessageCaption'.format(self.base_url)
 
         data = {}
 
@@ -1254,7 +1254,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/editMessageReplyMarkup'.format(self.base_url)
+        url = '{0}/editMessageReplyMarkup'.format(self.base_url)
 
         data = {}
 
@@ -1303,7 +1303,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/getUpdates'.format(self.base_url)
+        url = '{0}/getUpdates'.format(self.base_url)
 
         data = {}
 
@@ -1347,7 +1347,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{}/setWebhook'.format(self.base_url)
+        url = '{0}/setWebhook'.format(self.base_url)
 
         data = {}
 
