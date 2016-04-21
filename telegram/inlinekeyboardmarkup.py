@@ -24,7 +24,15 @@ from telegram import ReplyMarkup, InlineKeyboardButton
 
 
 class InlineKeyboardMarkup(ReplyMarkup):
-    """This object represents a Telegram InlineKeyboardMarkup."""
+    """This object represents a Telegram InlineKeyboardMarkup.
+
+    Attributes:
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardMarkup`]]):
+
+    Args:
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardMarkup`]]):
+
+    """
 
     def __init__(self,
                  inline_keyboard):

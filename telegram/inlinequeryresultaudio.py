@@ -25,6 +25,32 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, \
 
 
 class InlineQueryResultAudio(InlineQueryResult):
+    """Represents a link to an mp3 audio file. By default, this audio file will
+    be sent by the user. Alternatively, you can use input_message_content to
+    send a message with the specified content instead of the audio.
+
+    Attributes:
+        id (str):
+        audio_url (str):
+        title (str):
+        performer (Optional[str]):
+        audio_duration (Optional[str]):
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+        input_message_content (Optional[
+            :class:`telegram.input_message_content`]):
+
+    Args:
+        audio_url (str):
+        title (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        performer (Optional[str]):
+        audio_duration (Optional[str]):
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+        input_message_content (Optional[
+            :class:`telegram.input_message_content`]):
+    """
     def __init__(self,
                  id,
                  audio_url,
