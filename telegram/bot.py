@@ -25,9 +25,8 @@ import logging
 
 from telegram import (User, Message, Update, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, NullHandler)
-from telegram.error import InvalidToken
 from telegram.utils import request
-from telegram.utils.validate import validate_string
+from telegram.utils.validate import validate_token
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -36,25 +35,26 @@ class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
     Attributes:
-        id (int):
-        first_name (str):
-        last_name (str):
-        username (str):
-        name (str):
+        id (int): Unique identifier for this bot.
+        first_name (str): Bot’s first name.
+        last_name (str): Bot’s last name.
+        username (str): Bot’s username.
+        name (str): Bot’s @username.
 
     Args:
-        token (str):
+        token (str): Bot's unique authentication.
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
-        base_url (Optional[str]):
+        base_url (Optional[str]): Telegram Bot API service URL.
+        base_file_url (Optional[str]): Telegram Bot API file URL.
     """
 
     def __init__(self,
                  token,
                  base_url=None,
                  base_file_url=None):
-        self.token = self._valid_token(token)
+        self.token = validate_token(token)
 
         if not base_url:
             self.base_url = 'https://api.telegram.org/bot%s' % \
@@ -73,15 +73,8 @@ class Bot(TelegramObject):
         self.logger = logging.getLogger(__name__)
 
     def info(func):
-        """
-        Returns:
-        """
-
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
-            """
-            decorator
-            """
             if not self.bot:
                 self.getMe()
 
@@ -93,44 +86,32 @@ class Bot(TelegramObject):
     @property
     @info
     def id(self):
-        """int: """
         return self.bot.id
 
     @property
     @info
     def first_name(self):
-        """str: """
         return self.bot.first_name
 
     @property
     @info
     def last_name(self):
-        """str: """
         return self.bot.last_name
 
     @property
     @info
     def username(self):
-        """str: """
         return self.bot.username
 
     @property
     def name(self):
-        """str: """
         return '@%s' % self.username
 
     def log(func):
-        """
-        Returns:
-          A telegram.Message instance representing the message posted.
-        """
         logger = logging.getLogger(func.__module__)
 
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
-            """
-            decorator
-            """
             logger.debug('Entering: %s', func.__name__)
             result = func(self, *args, **kwargs)
             logger.debug(result)
@@ -140,16 +121,8 @@ class Bot(TelegramObject):
         return decorator
 
     def message(func):
-        """
-        Returns:
-          A telegram.Message instance representing the message posted.
-        """
-
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
-            """
-            decorator
-            """
             url, data = func(self, *args, **kwargs)
 
             if kwargs.get('reply_to_message_id'):
@@ -183,9 +156,15 @@ class Bot(TelegramObject):
         """A simple method for testing your bot's auth token.
 
         Returns:
-          A telegram.User instance representing that bot if the
-          credentials are valid, None otherwise.
+            :class:`telegram.User`: A :class:`telegram.User` instance
+            representing that bot if the credentials are valid, `None`
+            otherwise.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
+
         url = '%s/getMe' % self.base_url
 
         result = request.get(url)
@@ -227,6 +206,12 @@ class Bot(TelegramObject):
                 interface options. A JSON-serialized object for an inline
                 keyboard, custom reply keyboard, instructions to hide reply
                 keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is
@@ -254,7 +239,8 @@ class Bot(TelegramObject):
     def forwardMessage(self,
                        chat_id,
                        from_chat_id,
-                       message_id):
+                       message_id,
+                       **kwargs):
         """Use this method to forward messages of any kind.
 
         Args:
@@ -265,13 +251,25 @@ class Bot(TelegramObject):
             - Chat id.
           message_id:
             Unique message identifier.
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message forwarded.
+            :class:`telegram.Message`: On success, instance representing the
+            message forwarded.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/forwardMessage' % self.base_url
@@ -306,19 +304,31 @@ class Bot(TelegramObject):
           caption:
             Photo caption (may also be used when resending photos by file_id).
             [Optional]
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a custom
-            reply keyboard, instructions to hide keyboard or to force a reply
-            from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendPhoto' % self.base_url
@@ -364,19 +374,31 @@ class Bot(TelegramObject):
             Performer of sent audio. [Optional]
           title:
             Title of sent audio. [Optional]
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a
-            custom reply keyboard, instructions to hide keyboard or to force a
-            reply from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendAudio' % self.base_url
@@ -412,19 +434,31 @@ class Bot(TelegramObject):
           filename:
             File name that shows in telegram message (it is usefull when you
             send file generated by temp module, for example). [Optional]
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a
-            custom reply keyboard, instructions to hide keyboard or to force a
-            reply from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendDocument' % self.base_url
@@ -452,19 +486,31 @@ class Bot(TelegramObject):
             Sticker to send. You can either pass a file_id as String to resend
             a sticker that is already on the Telegram servers, or upload a new
             sticker using multipart/form-data.
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a
-            custom reply keyboard, instructions to hide keyboard or to force a
-            reply from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendSticker' % self.base_url
@@ -497,22 +543,31 @@ class Bot(TelegramObject):
           caption:
             Video caption (may also be used when resending videos by file_id).
             [Optional]
-          timeout:
-            float. If this value is specified, use it as the definitive timeout
-            (in seconds) for urlopen() operations. [Optional]
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a
-            custom reply keyboard, instructions to hide keyboard or to force a
-            reply from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendVideo' % self.base_url
@@ -550,19 +605,31 @@ class Bot(TelegramObject):
             a new audio file using multipart/form-data.
           duration:
             Duration of sent audio in seconds. [Optional]
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a
-            custom reply keyboard, instructions to hide keyboard or to force a
-            reply from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendVoice' % self.base_url
@@ -591,19 +658,31 @@ class Bot(TelegramObject):
             Latitude of location.
           longitude:
             Longitude of location.
-          disable_notification:
-            Sends the message silently. iOS users will not receive
-            a notification, Android users will receive a notification
-            with no sound. Other apps coming soon. [Optional]
-          reply_to_message_id:
-            If the message is a reply, ID of the original message. [Optional]
-          reply_markup:
-            Additional interface options. A JSON-serialized object for a
-            custom reply keyboard, instructions to hide keyboard or to force a
-            reply from the user. [Optional]
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-          A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendLocation' % self.base_url
@@ -641,19 +720,31 @@ class Bot(TelegramObject):
                 Address of the venue.
             foursquare_id:
                 Foursquare identifier of the venue.
-            disable_notification:
-                Sends the message silently. iOS users will not receive a
-                notification, Android users will receive a notification with no
-                sound.
-            reply_to_message_id:
-                If the message is a reply, ID of the original message.
-            reply_markup:
-                Additional interface options. A JSON-serialized object for an
-                inline keyboard, custom reply keyboard, instructions to hide
-                reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-            A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/sendVenue' % self.base_url
@@ -690,20 +781,33 @@ class Bot(TelegramObject):
                 Contact's first name.
             last_name:
                 Contact's last name.
-            disable_notification:
-                Sends the message silently. iOS users will not receive a
-                notification, Android users will receive a notification with no
-                sound.
-            reply_to_message_id:
-                If the message is a reply, ID of the original message.
-            reply_markup:
-                Additional interface options. A JSON-serialized object for an
-                inline keyboard, custom reply keyboard, instructions to hide
-                reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
-            A telegram.Message instance representing the message posted.
+            :class:`telegram.Message`: On success, instance representing the
+            message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
+
         url = '%s/sendContact' % self.base_url
 
         data = {'chat_id': chat_id,
@@ -788,9 +892,6 @@ class Bot(TelegramObject):
 
         """
 
-        validate_string(inline_query_id, 'inline_query_id')
-        validate_string(inline_query_id, 'next_offset')
-
         url = '%s/answerInlineQuery' % self.base_url
 
         results = [res.to_dict() for res in results]
@@ -799,9 +900,9 @@ class Bot(TelegramObject):
                 'results': results}
 
         if cache_time or cache_time == 0:
-            data['cache_time'] = int(cache_time)
+            data['cache_time'] = cache_time
         if is_personal:
-            data['is_personal'] = bool(is_personal)
+            data['is_personal'] = is_personal
         if next_offset or next_offset == '':
             data['next_offset'] = next_offset
         if switch_pm_text:
@@ -831,7 +932,12 @@ class Bot(TelegramObject):
             are accepted. Defaults to 100. [Optional]
 
         Returns:
-          Returns a telegram.UserProfilePhotos object.
+            list[:class:`telegram.UserProfilePhotos`]: A list of
+            :class:`telegram.UserProfilePhotos` objects are returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/getUserProfilePhotos' % self.base_url
@@ -859,7 +965,12 @@ class Bot(TelegramObject):
             File identifier to get info about.
 
         Returns:
-          Returns a telegram.File object
+            :class:`telegram.File`: On success, a :class:`telegram.File`
+            object is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/getFile' % self.base_url
@@ -891,7 +1002,11 @@ class Bot(TelegramObject):
             Unique identifier of the target user.
 
         Returns:
-          True on success.
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/kickChatMember' % self.base_url
@@ -920,7 +1035,11 @@ class Bot(TelegramObject):
             Unique identifier of the target user.
 
         Returns:
-          True on success.
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/unbanChatMember' % self.base_url
@@ -1005,7 +1124,13 @@ class Bot(TelegramObject):
             A JSON-serialized object for an inline keyboard.
 
         Returns:
-          Returns a telegram.Message object.
+            :class:`telegram.Message`: On success, if edited message is sent by
+            the bot, the edited message is returned, otherwise `True` is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/editMessageText' % self.base_url
@@ -1057,11 +1182,16 @@ class Bot(TelegramObject):
         Keyword Args:
             reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
                 A JSON-serialized object for an inline keyboard.
-
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by
-            the bot, the edited Message is returned, otherwise `True` is
+            the bot, the edited message is returned, otherwise `True` is
             returned.
 
         Raises:
@@ -1107,6 +1237,12 @@ class Bot(TelegramObject):
         Keyword Args:
             reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
                 A JSON-serialized object for an inline keyboard.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay  (Optional[float]): If using the timeout  (which
+                is a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by
@@ -1159,7 +1295,12 @@ class Bot(TelegramObject):
             long for data to be transmitted from and to the Telegram servers.
 
         Returns:
-          A list of telegram.Update objects are returned.
+            list[:class:`telegram.Message`]: A list of :class:`telegram.Update`
+            objects are returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
 
         url = '%s/getUpdates' % self.base_url
@@ -1199,8 +1340,13 @@ class Bot(TelegramObject):
             Use an empty string to remove webhook integration
 
         Returns:
-          True if successful else TelegramError was raised
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
         """
+
         url = '%s/setWebhook' % self.base_url
 
         data = {}
@@ -1216,28 +1362,20 @@ class Bot(TelegramObject):
 
     @staticmethod
     def de_json(data):
-        pass
+        data = super(Bot, Bot).de_json(data)
+
+        return Bot(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = {'id': self.id,
                 'username': self.username,
                 'first_name': self.username}
+
         if self.last_name:
             data['last_name'] = self.last_name
+
         return data
 
     def __reduce__(self):
         return (self.__class__, (self.token,
                                  self.base_url.replace(self.token, '')))
-
-    @staticmethod
-    def _valid_token(token):
-        """a very basic validation on token"""
-        left, sep, _right = token.partition(':')
-        if (not sep) or (not left.isdigit()) or (len(left) < 3):
-            raise InvalidToken()
-        return token
