@@ -26,7 +26,6 @@ from telegram.utils.request import download as _download
 
 
 class File(TelegramObject):
-
     """This object represents a Telegram File.
 
     Attributes:

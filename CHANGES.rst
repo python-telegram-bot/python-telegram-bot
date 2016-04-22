@@ -1,3 +1,11 @@
+**2016-04-22**
+
+*Released 4.0rc1*
+
+- Implement Bot API 2.0
+- Almost complete recode of ``Dispatcher``
+- Please read the `Transistion Guide to 4.0 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transistion-guide-to-Version-4.0>`_
+
 **2016-03-22**
 
 *Released 3.4*

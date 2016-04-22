@@ -71,15 +71,6 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     def job2(self, bot):
         raise Exception("Test Error")
 
-    def test_legacy_import(self):
-        from telegram import JobQueue as legacyJobQueue
-
-        ljq = legacyJobQueue("Bot", tick_interval=0.005)
-
-        self.assertIsInstance(ljq, JobQueue)
-
-        ljq.stop()
-
     def test_basic(self):
         self.jq.put(self.job1, 0.1)
         sleep(1.5)

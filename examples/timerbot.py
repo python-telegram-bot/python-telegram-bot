@@ -18,7 +18,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater
+from telegram.ext import Updater, CommandHandler
 import logging
 
 # Enable logging
@@ -73,9 +73,9 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.addTelegramCommandHandler("start", start)
-    dp.addTelegramCommandHandler("help", start)
-    dp.addTelegramCommandHandler("set", set)
+    dp.addHandler(CommandHandler("start", start))
+    dp.addHandler(CommandHandler("help", start))
+    dp.addHandler(CommandHandler("set", set))
 
     # log all errors
     dp.addErrorHandler(error)

@@ -108,6 +108,13 @@ getUserProfilePhotos      Yes
 getFile                   Yes
 setWebhook                Yes
 answerInlineQuery         Yes
+kickChatMember            Yes
+unbanChatMember           Yes
+answerCallbackQuery       Yes
+editMessageText           Yes
+editMessageCaption        Yes
+editMessageReplyMarkup    Yes
+answerCallbackQuery       Yes
 ========================= ============
 
 -------------------------
@@ -273,7 +280,8 @@ To tell the user that something is happening on bot's side::
 
 To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
 
-    >>> custom_keyboard = [[ telegram.Emoji.THUMBS_UP_SIGN, telegram.Emoji.THUMBS_DOWN_SIGN ]]
+    >>> custom_keyboard = [[ telegram.KeyboardButton(telegram.Emoji.THUMBS_UP_SIGN),
+    ...     telegram.KeyboardButton(telegram.Emoji.THUMBS_DOWN_SIGN) ]]
     >>> reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     >>> bot.sendMessage(chat_id=chat_id, text="Stay here, I'll be back.", reply_markup=reply_markup)
 
@@ -314,53 +322,60 @@ Now, we need to define a function that should process a specific type of update:
    >>> def start(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
 
-We want this function to be called on a Telegram message that contains the ``/start`` command, so we need to register it in the dispatcher::
+We want this function to be called on a Telegram message that contains the ``/start`` command. To do that, we have to use a ``CommandHandler`` object and register it in the dispatcher::
 
-   >>> dispatcher.addTelegramCommandHandler('start', start)
+   >>> from telegram.ext import CommandHandler
+   >>> start_handler = CommandHandler('start', start)
+   >>> dispatcher.addHandler(start_handler)
 
 The last step is to tell the ``Updater`` to start working::
 
    >>> updater.start_polling()
 
-Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler function and register it::
+Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler that listens for regular messages. We're using the `MessageHandler` here to echo to all text messages::
 
    >>> def echo(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
    ...
-   >>> dispatcher.addTelegramMessageHandler(echo)
+   >>> from telegram.ext import MessageHandler
+   >>> from telegram.ext import filters
+   >>> echo_handler = MessageHandler([filters.TEXT], echo)
+   >>> dispatcher.addHandler(echo_handler)
 
-Our bot should now reply to all messages that are not a command with a message that has the same content.
+Our bot should now reply to all text messages that are not a command with a message that has the same content.
 
-People might try to send commands to the bot that it doesn't understand, so we should get that covered as well::
-
-   >>> def unknown(bot, update):
-   ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
-   ...
-   >>> dispatcher.addUnknownTelegramCommandHandler(unknown)
-
-Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to the command in the handler function simply by adding it to the parameter list::
+Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to a command in the handler function::
 
    >>> def caps(bot, update, args):
    ...   text_caps = ' '.join(args).upper()
    ...   bot.sendMessage(chat_id=update.message.chat_id, text=text_caps)
    ...
-   >>> dispatcher.addTelegramCommandHandler('caps', caps)
+   >>> caps_handler = CommandHandler('caps', caps, pass_args=True)
+   >>> dispatcher.addHandler(caps_handler)
 
 To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather)::
 
    >>> from telegram import InlineQueryResultArticle
    >>> def inline_caps(bot, update):
-   ...   # If you activated inline feedback, updates might either contain
-   ...   # inline_query or chosen_inline_result, the other one will be None
-   ...   if update.inline_query:
-   ...     query = bot.update.inline_query.query
-   ...     results = list()
-   ...     results.append(InlineQueryResultArticle(query.upper(), 'Caps', query.upper()))
-   ...     bot.answerInlineQuery(update.inline_query.id, results)
+   ...   query = bot.update.inline_query.query
+   ...   results = list()
+   ...   results.append(InlineQueryResultArticle(query.upper(), 'Caps', query.upper()))
+   ...   bot.answerInlineQuery(update.inline_query.id, results)
    ...
-   >>> dispatcher.addTelegramInlineHandler(inline_caps)
+   >>> from telegram.ext import InlineQueryHandler
+   >>> inline_caps_handler = InlineQueryHandler(inline_caps)
+   >>> dispatcher.addHandler(inline_caps_handler)
 
-Now it's time to stop the bot::
+People might try to send commands to the bot that it doesn't understand, so we can use a ``RegexHandler`` to recognize all commands that were not recognized by the previous handlers. **Note:** This handler has to be added last, else it will be triggered before the ``CommandHandlers`` had a chance to look at the update::
+
+   >>> def unknown(bot, update):
+   ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+   ...
+   >>> from telegram.ext import RegexHandler
+   >>> unknown_handler = RegexHandler(r'/.*', unknown)
+   >>> dispatcher.addHandler(unknown_handler)
+
+If you're done playing around, stop the bot with this::
 
    >>> updater.stop()
 

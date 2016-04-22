@@ -18,7 +18,8 @@ Reply to last chat from the command line by typing "/reply <text>"
 Type 'stop' on the command line to stop the bot.
 """
 
-from telegram.ext import Updater
+from telegram.ext import Updater, StringCommandHandler, StringRegexHandler, \
+    MessageHandler, CommandHandler, RegexHandler, filters
 from telegram.ext.dispatcher import run_async
 from time import sleep
 import logging
@@ -34,8 +35,9 @@ logger = logging.getLogger(__name__)
 last_chat_id = 0
 
 
-# Define a few (command) handlers. These usually take the two arguments bot and
-# update. Error handlers also receive the raised TelegramError object in error.
+# Define a few (command) handler callback functions. These usually take the
+# two arguments bot and update. Error handlers also receive the raised
+# TelegramError object in error.
 def start(bot, update):
     """ Answer in Telegram """
     bot.sendMessage(update.message.chat_id, text='Hi!')
@@ -59,13 +61,8 @@ def any_message(bot, update):
                  update.message.text))
 
 
-def unknown_command(bot, update):
-    """ Answer in Telegram """
-    bot.sendMessage(update.message.chat_id, text='Command not recognized!')
-
-
 @run_async
-def message(bot, update, **kwargs):
+def message(bot, update):
     """
     Example for an asynchronous handler. It's not guaranteed that replies will
     be in order when using @run_async. Also, you have to include **kwargs in
@@ -95,14 +92,10 @@ def cli_noncommand(bot, update, update_queue):
     appending it to the argument list. Be careful with this though.
     Here, we put the input string back into the queue, but as a command.
 
-    To learn more about those optional handler parameters, read:
-    http://python-telegram-bot.readthedocs.org/en/latest/telegram.dispatcher.html
+    To learn more about those optional handler parameters, read the
+    documentation of the Handler classes.
     """
     update_queue.put('/%s' % update)
-
-
-def unknown_cli_command(bot, update):
-    logger.warn("Command not found: %s" % update)
 
 
 def error(bot, update, error):
@@ -119,42 +112,43 @@ def main():
     dp = updater.dispatcher
 
     # This is how we add handlers for Telegram messages
-    dp.addTelegramCommandHandler("start", start)
-    dp.addTelegramCommandHandler("help", help)
-    dp.addUnknownTelegramCommandHandler(unknown_command)
+    dp.addHandler(CommandHandler("start", start))
+    dp.addHandler(CommandHandler("help", help))
     # Message handlers only receive updates that don't contain commands
-    dp.addTelegramMessageHandler(message)
-    # Regex handlers will receive all updates on which their regex matches
-    dp.addTelegramRegexHandler('.*', any_message)
+    dp.addHandler(MessageHandler([filters.TEXT], message))
+    # Regex handlers will receive all updates on which their regex matches,
+    # but we have to add it in a separate group, since in one group,
+    # only one handler will be executed
+    dp.addHandler(RegexHandler('.*', any_message), group='log')
 
-    # String handlers work pretty much the same
-    dp.addStringCommandHandler('reply', cli_reply)
-    dp.addUnknownStringCommandHandler(unknown_cli_command)
-    dp.addStringRegexHandler('[^/].*', cli_noncommand)
+    # String handlers work pretty much the same. Note that we have to tell
+    # the handler to pass the args or update_queue parameter
+    dp.addHandler(StringCommandHandler('reply', cli_reply, pass_args=True))
+    dp.addHandler(StringRegexHandler('[^/].*', cli_noncommand,
+                                     pass_update_queue=True))
 
     # All TelegramErrors are caught for you and delivered to the error
     # handler(s). Other types of Errors are not caught.
     dp.addErrorHandler(error)
 
     # Start the Bot and store the update Queue, so we can insert updates
-    update_queue = updater.start_polling(poll_interval=0.1, timeout=10)
+    update_queue = updater.start_polling(timeout=10)
 
     '''
     # Alternatively, run with webhook:
-    updater.bot.setWebhook(webhook_url='https://example.com/%s' % token,
-                           certificate=open('cert.pem', 'rb'))
 
     update_queue = updater.start_webhook('0.0.0.0',
                                          443,
                                          url_path=token,
                                          cert='cert.pem',
-                                         key='key.key')
+                                         key='key.key',
+                                         webhook_url='https://example.com/%s'
+                                             % token)
 
     # Or, if SSL is handled by a reverse proxy, the webhook URL is already set
     # and the reverse proxy is configured to deliver directly to port 6000:
 
-    update_queue = updater.start_webhook('0.0.0.0',
-                                         6000)
+    update_queue = updater.start_webhook('0.0.0.0', 6000)
     '''
 
     # Start CLI-Loop

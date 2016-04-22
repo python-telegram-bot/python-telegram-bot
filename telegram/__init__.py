@@ -30,8 +30,10 @@ from .sticker import Sticker
 from .video import Video
 from .contact import Contact
 from .location import Location
+from .venue import Venue
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
+from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardhide import ReplyKeyboardHide
@@ -42,55 +44,101 @@ from .file import File
 from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
+from .messageentity import MessageEntity
 from .message import Message
-from .inlinequery import InlineQuery
+from .inputmessagecontent import InputMessageContent
+from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
-from .inlinequeryresult import InlineQueryResultArticle, InlineQueryResultGif,\
-    InlineQueryResultMpeg4Gif, InlineQueryResultPhoto, InlineQueryResultVideo
+from .inlinekeyboardbutton import InlineKeyboardButton
+from .inlinekeyboardmarkup import InlineKeyboardMarkup
+from .inlinequery import InlineQuery
+from .inlinequeryresult import InlineQueryResult
+from .inlinequeryresultarticle import InlineQueryResultArticle
+from .inlinequeryresultaudio import InlineQueryResultAudio
+from .inlinequeryresultcachedaudio import InlineQueryResultCachedAudio
+from .inlinequeryresultcacheddocument import InlineQueryResultCachedDocument
+from .inlinequeryresultcachedgif import InlineQueryResultCachedGif
+from .inlinequeryresultcachedmpeg4gif import InlineQueryResultCachedMpeg4Gif
+from .inlinequeryresultcachedphoto import InlineQueryResultCachedPhoto
+from .inlinequeryresultcachedsticker import InlineQueryResultCachedSticker
+from .inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
+from .inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
+from .inlinequeryresultcontact import InlineQueryResultContact
+from .inlinequeryresultdocument import InlineQueryResultDocument
+from .inlinequeryresultgif import InlineQueryResultGif
+from .inlinequeryresultlocation import InlineQueryResultLocation
+from .inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
+from .inlinequeryresultphoto import InlineQueryResultPhoto
+from .inlinequeryresultvenue import InlineQueryResultVenue
+from .inlinequeryresultvideo import InlineQueryResultVideo
+from .inlinequeryresultvoice import InlineQueryResultVoice
+from .inputtextmessagecontent import InputTextMessageContent
+from .inputlocationmessagecontent import InputLocationMessageContent
+from .inputvenuemessagecontent import InputVenueMessageContent
+from .inputcontactmessagecontent import InputContactMessageContent
 from .update import Update
 from .bot import Bot
 
 
-def Updater(*args, **kwargs):
-    """
-    Load the updater module on invocation and return an Updater instance.
-    """
-    import warnings
-    warnings.warn("telegram.Updater is being deprecated, please use "
-                  "telegram.ext.Updater from now on.")
-    from .ext.updater import Updater as Up
-    return Up(*args, **kwargs)
-
-
-def Dispatcher(*args, **kwargs):
-    """
-    Load the dispatcher module on invocation and return an Dispatcher instance.
-    """
-    import warnings
-    warnings.warn("telegram.Dispatcher is being deprecated, please use "
-                  "telegram.ext.Dispatcher from now on.")
-    from .ext.dispatcher import Dispatcher as Dis
-    return Dis(*args, **kwargs)
-
-
-def JobQueue(*args, **kwargs):
-    """
-    Load the jobqueue module on invocation and return a JobQueue instance.
-    """
-    import warnings
-    warnings.warn("telegram.JobQueue is being deprecated, please use "
-                  "telegram.ext.JobQueue from now on.")
-    from .ext.jobqueue import JobQueue as JobQ
-    return JobQ(*args, **kwargs)
-
-
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.4'
-__all__ = ('Audio', 'Bot', 'Chat', 'Emoji', 'TelegramError', 'InputFile',
-           'Contact', 'ForceReply', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
-           'UserProfilePhotos', 'ChatAction', 'Location', 'Video', 'Document',
-           'Sticker', 'File', 'PhotoSize', 'Update', 'ParseMode', 'Message',
-           'User', 'TelegramObject', 'NullHandler', 'Voice', 'InlineQuery',
-           'ReplyMarkup', 'ChosenInlineResult', 'InlineQueryResultArticle',
-           'InlineQueryResultGif', 'InlineQueryResultPhoto',
-           'InlineQueryResultMpeg4Gif', 'InlineQueryResultVideo')
+__version__ = '4.0rc1'
+__all__ = ['Audio',
+           'Bot',
+           'Chat',
+           'ChatAction',
+           'ChosenInlineResult',
+           'CallbackQuery',
+           'Contact',
+           'Document',
+           'Emoji',
+           'File',
+           'ForceReply',
+           'InlineKeyboardButton',
+           'InlineKeyboardMarkup',
+           'InlineQuery',
+           'InlineQueryResult',
+           'InlineQueryResult',
+           'InlineQueryResultArticle',
+           'InlineQueryResultAudio',
+           'InlineQueryResultCachedAudio',
+           'InlineQueryResultCachedDocument',
+           'InlineQueryResultCachedGif',
+           'InlineQueryResultCachedMpeg4Gif',
+           'InlineQueryResultCachedPhoto',
+           'InlineQueryResultCachedSticker',
+           'InlineQueryResultCachedVideo',
+           'InlineQueryResultCachedVoice',
+           'InlineQueryResultContact',
+           'InlineQueryResultDocument',
+           'InlineQueryResultGif',
+           'InlineQueryResultLocation',
+           'InlineQueryResultMpeg4Gif',
+           'InlineQueryResultPhoto',
+           'InlineQueryResultVenue',
+           'InlineQueryResultVideo',
+           'InlineQueryResultVoice',
+           'InputContactMessageContent',
+           'InputFile',
+           'InputLocationMessageContent',
+           'InputMessageContent',
+           'InputTextMessageContent',
+           'InputVenueMessageContent',
+           'KeyboardButton',
+           'Location',
+           'Message',
+           'MessageEntity',
+           'NullHandler',
+           'ParseMode',
+           'PhotoSize',
+           'ReplyKeyboardHide',
+           'ReplyKeyboardMarkup',
+           'ReplyMarkup',
+           'Sticker',
+           'TelegramError',
+           'TelegramObject',
+           'Update',
+           'User',
+           'UserProfilePhotos',
+           'Venue',
+           'Video',
+           'Voice']

@@ -28,10 +28,16 @@ from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
+
+# Adjust for differences in Python versions
+try:
+    from queue import Queue  # flake8: noqa
+except ImportError:
+    from Queue import Queue  # flake8: noqa
+
 from telegram import Bot, TelegramError, NullHandler
 from telegram.ext import dispatcher, Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
-from telegram.utils.updatequeue import UpdateQueue
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 logging.getLogger(__name__).addHandler(NullHandler())
@@ -81,7 +87,7 @@ class Updater(object):
             self.bot = bot
         else:
             self.bot = Bot(token, base_url)
-        self.update_queue = UpdateQueue()
+        self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
         self.__exception_event = Event()
         self.dispatcher = Dispatcher(self.bot, self.update_queue, workers,
@@ -110,9 +116,10 @@ class Updater(object):
                 False.
             bootstrap_retries (Optional[int[): Whether the bootstrapping phase
                 of the `Updater` will retry on failures on the Telegram server.
-                < 0 - retry indefinitely
-                  0 - no retries (default)
-                > 0 - retry up to X times
+
+                |   < 0 - retry indefinitely
+                |   0 - no retries (default)
+                |   > 0 - retry up to X times
 
         Returns:
             Queue: The update queue that can be filled from the main thread
@@ -177,9 +184,10 @@ class Updater(object):
                 is False.
             bootstrap_retries (Optional[int[): Whether the bootstrapping phase
                 of the `Updater` will retry on failures on the Telegram server.
-                < 0 - retry indefinitely
-                  0 - no retries (default)
-                > 0 - retry up to X times
+
+                |   < 0 - retry indefinitely
+                |   0 - no retries (default)
+                |   > 0 - retry up to X times
             webhook_url (Optional[str]): Explicitly specifiy the webhook url.
                 Useful behind NAT, reverse proxy, etc. Default is derived from
                 `listen`, `port` & `url_path`.
@@ -293,11 +301,11 @@ class Updater(object):
         if use_ssl:
             self._check_ssl_cert(cert, key)
 
-            if not webhook_url:
-                webhook_url = self._gen_webhook_url(listen, port, url_path)
+        if not webhook_url:
+            webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._set_webhook(webhook_url, bootstrap_retries,
-                              open(cert, 'rb'))
+        self._set_webhook(webhook_url, bootstrap_retries,
+                          open(cert, 'rb') if use_ssl else None)
 
         self.httpd.serve_forever(poll_interval=1)
 

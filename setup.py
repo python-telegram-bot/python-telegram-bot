@@ -26,7 +26,7 @@ def requirements():
 
 setup(
     name='python-telegram-bot',
-    version='3.4',
+    version='4.0rc1',
     author='Leandro Toledo',
     author_email='devs@python-telegram-bot.org',
     license='LGPLv3',

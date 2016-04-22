@@ -48,7 +48,7 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Bot
-from telegram.ext import Updater
+from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
@@ -60,7 +60,8 @@ root.setLevel(logging.INFO)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.WARN)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s '
+                              '- %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
@@ -98,8 +99,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                                  update.chosen_inline_result)
         self.message_count += 1
 
+    def telegramCallbackHandlerTest(self, bot, update):
+        self.received_message = update.callback_query
+        self.message_count += 1
+
     @run_async
-    def asyncHandlerTest(self, bot, update, **kwargs):
+    def asyncHandlerTest(self, bot, update):
         sleep(1)
         with self.lock:
             self.received_message = update.message.text
@@ -109,7 +114,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = update
         self.message_count += 1
 
-    def regexGroupHandlerTest(self, bot, update, groups=None, groupdict=None):
+    def regexGroupHandlerTest(self, bot, update, groups, groupdict):
         self.received_message = (groups, groupdict)
         self.message_count += 1
 
@@ -120,15 +125,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             update_queue.put('/test5 noresend')
         elif args[0] == 'noresend':
             pass
-        
-    def contextTest(self, bot, update, context):
-        self.received_message = update
-        self.message_count += 1
-        self.context = context
 
     @run_async
-    def asyncAdditionalHandlerTest(self, bot, update, update_queue=None,
-                                   **kwargs):
+    def asyncAdditionalHandlerTest(self, bot, update, update_queue=None):
         sleep(1)
         with self.lock:
             if update_queue is not None:
@@ -142,37 +141,18 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = error.message
         self.message_count += 1
 
-    def test_importLegacyUpdater(self):
-        from telegram import Updater as legacyUpdater
-
-        lu = legacyUpdater(workers=2, bot=Bot('123:abcd'))
-
-        self.assertIsInstance(lu, Updater)
-
-        lu.stop()
-
-    def test_importLegacyDispatcher(self):
-        from telegram.ext import Dispatcher
-        from telegram.utils.updatequeue import UpdateQueue
-        from telegram import Dispatcher as legacyDispatcher
-
-        lp = legacyDispatcher(bot=Bot('123:abcd'), update_queue=UpdateQueue())
-
-        self.assertIsInstance(lp, Dispatcher)
-
-        lp.stop()
-
     def test_addRemoveTelegramMessageHandler(self):
         self._setup_updater('Test')
         d = self.updater.dispatcher
-        d.addTelegramMessageHandler(
-            self.telegramHandlerTest)
+        from telegram.ext import filters
+        handler = MessageHandler([filters.TEXT], self.telegramHandlerTest)
+        d.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test')
 
         # Remove handler
-        d.removeTelegramMessageHandler(self.telegramHandlerTest)
+        d.removeHandler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -181,8 +161,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         self._setup_updater('Multiple', 100)
-        self.updater.dispatcher.addTelegramMessageHandler(
-            self.telegramHandlerTest)
+        self.updater.dispatcher.addHandler(
+            MessageHandler([], self.telegramHandlerTest))
         self.updater.start_polling(0.0)
         sleep(2)
         self.assertEqual(self.received_message, 'Multiple')
@@ -192,14 +172,14 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self._setup_updater('Test2')
         d = self.updater.dispatcher
         regobj = re.compile('Te.*')
-        self.updater.dispatcher.addTelegramRegexHandler(regobj,
-                                                        self.telegramHandlerTest)
+        handler = RegexHandler(regobj, self.telegramHandlerTest)
+        self.updater.dispatcher.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test2')
 
         # Remove handler
-        d.removeTelegramRegexHandler(regobj, self.telegramHandlerTest)
+        d.removeHandler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -209,31 +189,14 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_addRemoveTelegramCommandHandler(self):
         self._setup_updater('/test')
         d = self.updater.dispatcher
-        self.updater.dispatcher.addTelegramCommandHandler(
-            'test', self.telegramHandlerTest)
+        handler = CommandHandler('test', self.telegramHandlerTest)
+        self.updater.dispatcher.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, '/test')
 
         # Remove handler
-        d.removeTelegramCommandHandler('test', self.telegramHandlerTest)
-        self.reset()
-
-        self.updater.bot.send_messages = 1
-        sleep(.1)
-        self.assertTrue(None is self.received_message)
-
-    def test_addRemoveUnknownTelegramCommandHandler(self):
-        self._setup_updater('/test2')
-        d = self.updater.dispatcher
-        self.updater.dispatcher.addUnknownTelegramCommandHandler(
-            self.telegramHandlerTest)
-        self.updater.start_polling(0.01)
-        sleep(.1)
-        self.assertEqual(self.received_message, '/test2')
-
-        # Remove handler
-        d.removeUnknownTelegramCommandHandler(self.telegramHandlerTest)
+        d.removeHandler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -243,14 +206,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_addRemoveStringRegexHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addStringRegexHandler('Te.*', self.stringHandlerTest)
+        handler = StringRegexHandler('Te.*', self.stringHandlerTest)
+        d.addHandler(handler)
         queue = self.updater.start_polling(0.01)
         queue.put('Test3')
         sleep(.1)
         self.assertEqual(self.received_message, 'Test3')
 
         # Remove handler
-        d.removeStringRegexHandler('Te.*', self.stringHandlerTest)
+        d.removeHandler(handler)
         self.reset()
 
         queue.put('Test3')
@@ -260,8 +224,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_addRemoveStringCommandHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addStringCommandHandler(
-            'test3', self.stringHandlerTest)
+        handler = StringCommandHandler('test3', self.stringHandlerTest)
+        d.addHandler(handler)
 
         queue = self.updater.start_polling(0.01)
         queue.put('/test3')
@@ -269,28 +233,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message, '/test3')
 
         # Remove handler
-        d.removeStringCommandHandler('test3', self.stringHandlerTest)
+        d.removeHandler(handler)
         self.reset()
 
         queue.put('/test3')
-        sleep(.1)
-        self.assertTrue(None is self.received_message)
-
-    def test_addRemoveUnknownStringCommandHandler(self):
-        self._setup_updater('/test')
-        d = self.updater.dispatcher
-        d.addUnknownStringCommandHandler(
-            self.stringHandlerTest)
-        queue = self.updater.start_polling(0.01)
-        queue.put('/test4')
-        sleep(.1)
-        self.assertEqual(self.received_message, '/test4')
-
-        # Remove handler
-        d.removeUnknownStringCommandHandler(self.stringHandlerTest)
-        self.reset()
-
-        self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
@@ -315,7 +261,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_errorInHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addStringRegexHandler('.*', self.errorRaisingHandlerTest)
+        handler = StringRegexHandler('.*', self.errorRaisingHandlerTest)
+        d.addHandler(handler)
         self.updater.dispatcher.addErrorHandler(self.errorHandlerTest)
         queue = self.updater.start_polling(0.01)
 
@@ -326,7 +273,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_cleanBeforeStart(self):
         self._setup_updater('')
         d = self.updater.dispatcher
-        d.addTelegramMessageHandler(self.telegramHandlerTest)
+        handler = MessageHandler([], self.telegramHandlerTest)
+        d.addHandler(handler)
         self.updater.start_polling(0.01, clean=True)
         sleep(.1)
         self.assertEqual(self.message_count, 0)
@@ -343,7 +291,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_addRemoveTypeHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addTypeHandler(dict, self.stringHandlerTest)
+        handler = TypeHandler(dict, self.stringHandlerTest)
+        d.addHandler(handler)
         queue = self.updater.start_polling(0.01)
         payload = {"Test": 42}
         queue.put(payload)
@@ -351,18 +300,20 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message, payload)
 
         # Remove handler
-        d.removeTypeHandler(dict, self.stringHandlerTest)
+        d.removeHandler(handler)
         self.reset()
 
         queue.put(payload)
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
-    def test_addRemoveInlineHandlerQuery(self):
-        print('Testing add/removeInlineHandler')
+    def test_addRemoveInlineQueryHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addTelegramInlineHandler(self.telegramInlineHandlerTest)
+        handler = InlineQueryHandler(self.telegramInlineHandlerTest)
+        handler2 = ChosenInlineResultHandler(self.telegramInlineHandlerTest)
+        d.addHandler(handler)
+        d.addHandler(handler2)
         queue = self.updater.start_polling(0.01)
         update = Update(update_id=0, inline_query="testquery")
         update2 = Update(update_id=0, chosen_inline_result="testresult")
@@ -375,7 +326,27 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message[1], "testresult")
 
         # Remove handler
-        d.removeTelegramInlineHandler(self.telegramInlineHandlerTest)
+        d.removeHandler(handler)
+        d.removeHandler(handler2)
+        self.reset()
+
+        queue.put(update)
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_addRemoveCallbackQueryHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CallbackQueryHandler(self.telegramCallbackHandlerTest)
+        d.addHandler(handler)
+        queue = self.updater.start_polling(0.01)
+        update = Update(update_id=0, callback_query="testcallback")
+        queue.put(update)
+        sleep(.1)
+        self.assertEqual(self.received_message, "testcallback")
+
+        # Remove handler
+        d.removeHandler(handler)
         self.reset()
 
         queue.put(update)
@@ -385,8 +356,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_runAsync(self):
         self._setup_updater('Test5', messages=2)
         d = self.updater.dispatcher
-        d.addTelegramMessageHandler(
-            self.asyncHandlerTest)
+        handler = MessageHandler([], self.asyncHandlerTest)
+        d.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(1.2)
         self.assertEqual(self.received_message, 'Test5')
@@ -394,33 +365,23 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)
-        self.updater.dispatcher.addStringCommandHandler(
-            'test5', self.additionalArgsTest)
+        handler = StringCommandHandler('test5', self.additionalArgsTest,
+                                       pass_update_queue=True, pass_args=True)
+        self.updater.dispatcher.addHandler(handler)
 
         queue = self.updater.start_polling(0.01)
         queue.put('/test5 resend')
         sleep(.1)
         self.assertEqual(self.received_message, '/test5 noresend')
         self.assertEqual(self.message_count, 2)
-        
-    def test_context(self):
-        context = "context_data"
-        self._setup_updater('', messages=0)
-        self.updater.dispatcher.addStringCommandHandler(
-            'test_context', self.contextTest)
-        
-        queue = self.updater.start_polling(0.01)
-        queue.put('/test_context', context=context)
-        sleep(.5)
-        self.assertEqual(self.received_message, '/test_context')
-        self.assertEqual(self.message_count, 1)
-        self.assertEqual(self.context, context)
 
     def test_regexGroupHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addStringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
-                                self.regexGroupHandlerTest)
+        handler = StringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
+                                     self.regexGroupHandlerTest,
+                                     pass_groupdict=True, pass_groups=True)
+        d.addHandler(handler)
         queue = self.updater.start_polling(0.01)
         queue.put('This is a test message for regex group matching.')
         sleep(.1)
@@ -430,8 +391,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_runAsyncWithAdditionalArgs(self):
         self._setup_updater('Test6', messages=2)
         d = self.updater.dispatcher
-        d.addTelegramMessageHandler(
-            self.asyncAdditionalHandlerTest)
+        handler = MessageHandler([], self.asyncAdditionalHandlerTest,
+                                 pass_update_queue=True)
+        d.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(1.2)
         self.assertEqual(self.received_message, 'Test6')
@@ -440,15 +402,16 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_webhook(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addTelegramMessageHandler(
-            self.telegramHandlerTest)
+        handler = MessageHandler([], self.telegramHandlerTest)
+        d.addHandler(handler)
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port for travis
         self.updater.start_webhook(ip, port,
                                    url_path='TOKEN',
                                    cert='./tests/test_updater.py',
-                                   key='./tests/test_updater.py')
+                                   key='./tests/test_updater.py',
+                                   webhook_url=None)
         sleep(0.5)
         # SSL-Wrapping will fail, so we start the server without SSL
         Thread(target=self.updater.httpd.serve_forever).start()
@@ -485,12 +448,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_webhook_no_ssl(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        d.addTelegramMessageHandler(
-            self.telegramHandlerTest)
+        handler = MessageHandler([], self.telegramHandlerTest)
+        d.addHandler(handler)
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port for travis
-        self.updater.start_webhook(ip, port)
+        self.updater.start_webhook(ip, port, webhook_url=None)
         sleep(0.5)
 
         # Now, we send an update to the server via urlopen
@@ -504,6 +467,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self._send_webhook_msg(ip, port, update.to_json())
         sleep(1)
         self.assertEqual(self.received_message, 'Webhook Test 2')
+
+    def test_start_dispatcher_twice(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        self.updater.start_polling(0.1)
+        d.start()
 
     def test_bootstrap_retries_success(self):
         retries = 3

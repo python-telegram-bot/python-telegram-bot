@@ -85,7 +85,7 @@ class InputFile(object):
                     hasattr(self.input_file, 'name'):
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
-                self.filename = os.path.basename(self.input_file.url)\
+                self.filename = os.path.basename(self.input_file.url) \
                     .split('?')[0].split('&')[0]
 
             try:
@@ -94,7 +94,7 @@ class InputFile(object):
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
                 self.mimetype = mimetypes.guess_type(self.filename)[0] or \
-                    DEFAULT_MIME_TYPE
+                                DEFAULT_MIME_TYPE
 
     @property
     def headers(self):
@@ -198,7 +198,7 @@ class InputFile(object):
             if file_type:
                 file_content = data[file_type[0]]
 
-                return isinstance(file_content, file) or \
-                    str(file_content).startswith('http')
+                return isinstance(file_content, file) or str(
+                    file_content).startswith('http')
 
         return False
