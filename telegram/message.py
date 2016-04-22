@@ -62,6 +62,13 @@ class Message(TelegramObject):
         migrate_from_chat_id (int):
         channel_chat_created (bool):
 
+    Deprecated: 4.0
+        new_chat_participant (:class:`telegram.User`): Use `new_chat_member`
+        instead.
+
+        left_chat_participant  (:class:`telegram.User`): Use `left_chat_member`
+        instead.
+
     Args:
         message_id (int):
         from_user (:class:`telegram.User`):

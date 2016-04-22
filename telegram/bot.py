@@ -208,8 +208,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -258,8 +258,8 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -317,8 +317,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -387,8 +387,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -447,8 +447,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -499,8 +499,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -556,8 +556,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -618,8 +618,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -671,8 +671,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -733,8 +733,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -794,8 +794,8 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -1184,8 +1184,8 @@ class Bot(TelegramObject):
                 A JSON-serialized object for an inline keyboard.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
@@ -1239,8 +1239,8 @@ class Bot(TelegramObject):
                 A JSON-serialized object for an inline keyboard.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay  (Optional[float]): If using the timeout  (which
-                is a `timeout` for the Telegram servers operation),
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
                 then `network_delay` as an extra delay (in seconds) to
                 compensate for network latency. Defaults to 2.
 
