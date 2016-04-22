@@ -108,6 +108,13 @@ getUserProfilePhotos      Yes
 getFile                   Yes
 setWebhook                Yes
 answerInlineQuery         Yes
+kickChatMember            Yes
+unbanChatMember           Yes
+answerCallbackQuery       Yes
+editMessageText           Yes
+editMessageCaption        Yes
+editMessageReplyMarkup    Yes
+answerCallbackQuery       Yes
 ========================= ============
 
 -------------------------
@@ -273,7 +280,8 @@ To tell the user that something is happening on bot's side::
 
 To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
 
-    >>> custom_keyboard = [[ telegram.Emoji.THUMBS_UP_SIGN, telegram.Emoji.THUMBS_DOWN_SIGN ]]
+    >>> custom_keyboard = [[ telegram.KeyboardButton(telegram.Emoji.THUMBS_UP_SIGN),
+    ...     telegram.KeyboardButton(telegram.Emoji.THUMBS_DOWN_SIGN) ]]
     >>> reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     >>> bot.sendMessage(chat_id=chat_id, text="Stay here, I'll be back.", reply_markup=reply_markup)
 
