@@ -81,7 +81,7 @@ from .bot import Bot
 
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '3.4'
+__version__ = '4.0rc1'
 __all__ = ['Audio',
            'Bot',
            'Chat',
