@@ -1,7 +1,7 @@
-telegram.jobqueue module
+telegram.ext.jobqueue module
 ========================
 
-.. automodule:: telegram.jobqueue
+.. automodule:: telegram.ext.jobqueue
     :members:
     :undoc-members:
     :show-inheritance:

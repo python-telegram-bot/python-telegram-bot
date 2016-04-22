@@ -39,6 +39,14 @@ class InlineQueryResultAudio(InlineQueryResult):
         input_message_content (Optional[
             :class:`telegram.input_message_content`]):
 
+    Deprecated: 4.0
+        message_text (str): Use :class:`InputTextMessageContent` instead.
+
+        parse_mode (str): Use :class:`InputTextMessageContent` instead.
+
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
+        instead.
+
     Args:
         audio_url (str):
         title (str):
