@@ -100,7 +100,7 @@ def error(bot, update, error):
     logging.warning('Update "%s" caused error "%s"' % (update, error))
 
 # Create the Updater and pass it your bot's token.
-updater = Updater("148447715:AAH4M0gzPG11_mdQS1Qeb0Ex30I5-rw9bMY")
+updater = Updater("TOKEN")
 
 # The command
 updater.dispatcher.addHandler(CommandHandler('set', set_value))
