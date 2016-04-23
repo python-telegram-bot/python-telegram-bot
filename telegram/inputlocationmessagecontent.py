@@ -35,7 +35,4 @@ class InputLocationMessageContent(InputMessageContent):
 
     @staticmethod
     def de_json(data):
-        data = super(InputLocationMessageContent,
-                     InputLocationMessageContent).de_json(data)
-
         return InputLocationMessageContent(**data)

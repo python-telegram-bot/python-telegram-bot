@@ -40,6 +40,10 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.id = 'id'
         self.type = 'article'
         self.title = 'title'
+        self.input_message_content = telegram.InputTextMessageContent(
+            'input_message_content')
+        self.reply_markup = telegram.InlineKeyboardMarkup([[
+            telegram.InlineKeyboardButton('reply_markup')]])
         self.url = 'url'
         self.hide_url = True
         self.description = 'description'
@@ -51,6 +55,8 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
             'type': self.type,
             'id': self.id,
             'title': self.title,
+            'input_message_content': self.input_message_content.to_dict(),
+            'reply_markup': self.reply_markup.to_dict(),
             'url': self.url,
             'hide_url': self.hide_url,
             'description': self.description,
@@ -65,6 +71,10 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertEqual(article.type, self.type)
         self.assertEqual(article.id, self.id)
         self.assertEqual(article.title, self.title)
+        self.assertDictEqual(article.input_message_content.to_dict(),
+                             self.input_message_content.to_dict())
+        self.assertDictEqual(article.reply_markup.to_dict(),
+                             self.reply_markup.to_dict())
         self.assertEqual(article.url, self.url)
         self.assertEqual(article.hide_url, self.hide_url)
         self.assertEqual(article.description, self.description)
