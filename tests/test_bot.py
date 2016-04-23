@@ -154,6 +154,16 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def testSendBufferedReaderPhoto(self):
+        photo = open('tests/data/telegram.png', 'rb')
+        message = self._bot.sendPhoto(photo=photo,
+                                      chat_id=self._chat_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.photo[0].file_size, 1451)
+
+    @flaky(3, 1)
+    @timeout(10)
     def testSendChatAction(self):
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
                                  chat_id=self._chat_id)
