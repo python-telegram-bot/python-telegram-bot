@@ -20,6 +20,7 @@
 
 """This module contains a object that represents Tests for Telegram Bot"""
 
+import io
 import os
 from datetime import datetime
 import sys
@@ -151,6 +152,17 @@ class BotTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testSendBufferedReaderPhoto(self):
+        photo = open('tests/data/telegram.png', 'rb')
+        br_photo = io.BufferedReader(io.BytesIO(photo.read()))
+        message = self._bot.sendPhoto(photo=br_photo,
+                                      chat_id=self._chat_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.photo[0].file_size, 1451)
 
     @flaky(3, 1)
     @timeout(10)
