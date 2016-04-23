@@ -139,11 +139,11 @@ _`Installing`
 
 You can install python-telegram-bot using::
 
-    $ pip install python-telegram-bot
+    $ pip install python-telegram-bot==4.0rc1
 
 Or upgrade to the latest version::
 
-    $ pip install python-telegram-bot --upgrade
+    $ pip install python-telegram-bot==4.0rc1 --upgrade
 
 ===================
 _`Getting the code`
