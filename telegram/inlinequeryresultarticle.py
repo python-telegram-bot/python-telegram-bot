@@ -30,8 +30,8 @@ class InlineQueryResultArticle(InlineQueryResult):
     Attributes:
         id (str):
         title (str):
-        input_message_content (telegram.InputMessageContent):
-        reply_markup (telegram.ReplyMarkup):
+        input_message_content (:class:`telegram.InputMessageContent`):
+        reply_markup (:class:`telegram.ReplyMarkup`):
         url (str):
         hide_url (bool):
         description (str):
@@ -39,10 +39,18 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_width (int):
         thumb_height (int):
 
+    Deprecated: 4.0
+        message_text (str): Use :class:`InputTextMessageContent` instead.
+
+        parse_mode (str): Use :class:`InputTextMessageContent` instead.
+
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
+        instead.
+
     Args:
         id (str): Unique identifier for this result, 1-64 Bytes
         title (str):
-        reply_markup (telegram.ReplyMarkup):
+        reply_markup (:class:`telegram.ReplyMarkup`):
 
     Keyword Args:
         url (Optional[str]):

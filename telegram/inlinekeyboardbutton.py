@@ -24,23 +24,40 @@ from telegram import TelegramObject
 
 
 class InlineKeyboardButton(TelegramObject):
-    """This object represents a Telegram InlineKeyboardButton."""
+    """This object represents a Telegram InlineKeyboardButton.
+
+    Attributes:
+        text (str):
+        url (str):
+        callback_data (str):
+        switch_inline_query (str):
+
+    Args:
+        text (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        url (Optional[str]):
+        callback_data (Optional[str]):
+        switch_inline_query (Optional[str]):
+
+    """
 
     def __init__(self,
                  text,
-                 url=None,
-                 callback_data=None,
-                 switch_inline_query=None):
+                 **kwargs):
         # Required
         self.text = text
 
         # Optionals
-        self.url = url
-        self.callback_data = callback_data
-        self.switch_inline_query = switch_inline_query
+        self.url = kwargs.get('url')
+        self.callback_data = kwargs.get('callback_data')
+        self.switch_inline_query = kwargs.get('switch_inline_query')
 
     @staticmethod
     def de_json(data):
+        data = super(InlineKeyboardButton, InlineKeyboardButton).de_json(data)
+
         if not data:
             return None
 

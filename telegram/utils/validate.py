@@ -19,6 +19,8 @@
 
 """This module contains functions to validate function arguments"""
 
+from telegram.error import InvalidToken
+
 try:
     type(basestring)
 except NameError:
@@ -36,3 +38,11 @@ def validate_string(arg, name):
     """
     if not isinstance(arg, basestring) and arg is not None:
         raise ValueError(name + ' is not a string')
+
+
+def validate_token(token):
+    """a very basic validation on token"""
+    left, sep, _right = token.partition(':')
+    if (not sep) or (not left.isdigit()) or (len(left) < 3):
+        raise InvalidToken()
+    return token
