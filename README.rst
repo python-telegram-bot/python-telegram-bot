@@ -3,7 +3,7 @@
    :target: https://github.com/python-telegram-bot/logos
    :alt: python-telegram-bot Logo
 
-A Python wrapper around the Telegram Bot API.
+Not **just** a Python wrapper around the Telegram Bot API
 
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
