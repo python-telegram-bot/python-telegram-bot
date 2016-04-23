@@ -44,7 +44,12 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         self.photo_height = 15
         self.thumb_url = 'thumb url'
         self.title = 'title'
+        self.description = 'description'
         self.caption = 'caption'
+        self.input_message_content = telegram.InputTextMessageContent(
+            'input_message_content')
+        self.reply_markup = telegram.InlineKeyboardMarkup([[
+            telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -54,7 +59,10 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
             'photo_height': self.photo_height,
             'thumb_url': self.thumb_url,
             'title': self.title,
+            'description': self.description,
             'caption': self.caption,
+            'input_message_content': self.input_message_content.to_dict(),
+            'reply_markup': self.reply_markup.to_dict(),
         }
 
     def test_photo_de_json(self):
@@ -67,7 +75,12 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.photo_height, self.photo_height)
         self.assertEqual(photo.thumb_url, self.thumb_url)
         self.assertEqual(photo.title, self.title)
+        self.assertEqual(photo.description, self.description)
         self.assertEqual(photo.caption, self.caption)
+        self.assertDictEqual(photo.input_message_content.to_dict(),
+                             self.input_message_content.to_dict())
+        self.assertDictEqual(photo.reply_markup.to_dict(),
+                             self.reply_markup.to_dict())
 
     def test_photo_to_json(self):
         photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)

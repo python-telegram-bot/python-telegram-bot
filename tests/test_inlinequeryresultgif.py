@@ -45,6 +45,10 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.thumb_url = 'thumb url'
         self.title = 'title'
         self.caption = 'caption'
+        self.input_message_content = telegram.InputTextMessageContent(
+            'input_message_content')
+        self.reply_markup = telegram.InlineKeyboardMarkup([[
+            telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -55,6 +59,8 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
             'thumb_url': self.thumb_url,
             'title': self.title,
             'caption': self.caption,
+            'input_message_content': self.input_message_content.to_dict(),
+            'reply_markup': self.reply_markup.to_dict(),
         }
 
     def test_gif_de_json(self):
@@ -68,6 +74,10 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.assertEqual(gif.thumb_url, self.thumb_url)
         self.assertEqual(gif.title, self.title)
         self.assertEqual(gif.caption, self.caption)
+        self.assertDictEqual(gif.input_message_content.to_dict(),
+                             self.input_message_content.to_dict())
+        self.assertDictEqual(gif.reply_markup.to_dict(),
+                             self.reply_markup.to_dict())
 
     def test_gif_to_json(self):
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
