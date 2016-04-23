@@ -388,12 +388,7 @@ class Updater(object):
 
     def signal_handler(self, signum, frame):
         self.is_idle = False
-        if self.running:
-            self.stop()
-        else:
-            self.logger.warning('Exiting immediately!')
-            import os
-            os._exit(1)
+        self.stop()
 
     def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
         """

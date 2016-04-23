@@ -106,9 +106,6 @@ def _try_except_req(func):
         except HTTPException as error:
             raise NetworkError('HTTPException: {0!r}'.format(error))
 
-        except socket.error as error:
-            raise NetworkError('socket.error: {0!r}'.format(error))
-
     return decorator
 
 

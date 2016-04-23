@@ -363,7 +363,7 @@ To enable our bot to respond to inline queries, we can add the following (you wi
    ...   if update.inline_query:
    ...     query = bot.update.inline_query.query
    ...     results = list()
-   ...     results.append(InlineQueryResultArticle(query.upper(), 'Caps', query.upper()))
+   ...     results.append(InlineQueryResultArticle(query.upper(), 'Caps', text_caps))
    ...     bot.answerInlineQuery(update.inline_query.id, results)
    ...
    >>> dispatcher.addTelegramInlineHandler(inline_caps)
