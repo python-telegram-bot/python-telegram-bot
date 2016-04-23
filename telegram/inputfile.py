@@ -23,7 +23,6 @@
 try:
     from email.generator import _make_boundary as choose_boundary
     from urllib.request import urlopen
-    from io import BufferedReader as file
 except ImportError:
     from mimetools import choose_boundary
     from urllib2 import urlopen
@@ -76,13 +75,12 @@ class InputFile(object):
         else:
             from_url = False
 
-        if isinstance(self.input_file, file) or from_url:
+        if hasattr(self.input_file, 'read') or from_url:
             self.filename = None
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
-            elif isinstance(self.input_file, file) and \
-                    hasattr(self.input_file, 'name'):
+            elif hasattr(self.input_file, 'name'):
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
                 self.filename = os.path.basename(self.input_file.url) \
@@ -198,7 +196,7 @@ class InputFile(object):
             if file_type:
                 file_content = data[file_type[0]]
 
-                return isinstance(file_content, file) or str(
+                return hasattr(file_content, 'read') or str(
                     file_content).startswith('http')
 
         return False
