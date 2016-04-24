@@ -61,10 +61,13 @@ def run_async(func):
         """
         A wrapper to run a thread in a thread pool
         """
-        result = func(*pargs, **kwargs)
-        semaphore.release()
-        with async_lock:
-            async_threads.remove(current_thread())
+        try:
+            result = func(*pargs, **kwargs)
+        finally:
+            semaphore.release()
+
+            with async_lock:
+                async_threads.remove(current_thread())
         return result
 
     @wraps(func)
