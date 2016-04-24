@@ -69,11 +69,11 @@ Table of contents
 
   #. `Documentation`_
 
-- `License`_
-
 - `Getting help`_
 
 - `Contributing`_
+
+- `License`_
 
 ===============
 _`Introduction`
@@ -409,12 +409,6 @@ _`Documentation`
 ``python-telegram-bot``'s documentation lives at `Read the Docs <https://python-telegram-bot.readthedocs.org/en/latest/>`_.
 
 ==========
-_`License`
-==========
-
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
-
-==========
 _`Getting help`
 ==========
 
@@ -432,3 +426,9 @@ _`Contributing`
 ===============
 
 Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
+
+==========
+_`License`
+==========
+
+You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
