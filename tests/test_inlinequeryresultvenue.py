@@ -42,7 +42,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.latitude = 'latitude'
         self.longitude = 'longitude'
         self.title = 'title'
-        self.address = 'address'
+        self._address = 'address'
         self.foursquare_id = 'foursquare id'
         self.thumb_url = 'thumb url'
         self.thumb_width = 10
@@ -57,7 +57,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
             'latitude': self.latitude,
             'longitude': self.longitude,
             'title': self.title,
-            'address': self.address,
+            'address': self._address,
             'foursquare_id': self.foursquare_id,
             'thumb_url': self.thumb_url,
             'thumb_width': self.thumb_width,
@@ -74,7 +74,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.assertEqual(venue.latitude, self.latitude)
         self.assertEqual(venue.longitude, self.longitude)
         self.assertEqual(venue.title, self.title)
-        self.assertEqual(venue.address, self.address)
+        self.assertEqual(venue.address, self._address)
         self.assertEqual(venue.foursquare_id, self.foursquare_id)
         self.assertEqual(venue.thumb_url, self.thumb_url)
         self.assertEqual(venue.thumb_width, self.thumb_width)
