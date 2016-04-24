@@ -421,7 +421,7 @@ class Bot(TelegramObject):
                      chat_id,
                      document,
                      filename=None,
-                     caption=None
+                     caption=None,
                      **kwargs):
         """Use this method to send general files.
 
