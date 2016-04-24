@@ -21,8 +21,8 @@
 """This module contains a object that represents a Telegram Bot."""
 
 import logging
-import functools
 
+import functools
 from telegram import User, Message, Update, UserProfilePhotos, File, \
     ReplyMarkup, TelegramObject, NullHandler
 from telegram.utils import request
@@ -823,7 +823,8 @@ class Bot(TelegramObject):
     @message
     def sendChatAction(self,
                        chat_id,
-                       action):
+                       action,
+                       **kwargs):
         """Use this method when you need to tell the user that something is
         happening on the bot's side. The status is set for 5 seconds or less
         (when a message arrives from your bot, Telegram clients clear its
@@ -858,7 +859,8 @@ class Bot(TelegramObject):
                           is_personal=None,
                           next_offset=None,
                           switch_pm_text=None,
-                          switch_pm_parameter=None):
+                          switch_pm_parameter=None,
+                          **kwargs):
         """Use this method to send answers to an inline query. No more than
         50 results per query are allowed.
 
@@ -883,6 +885,14 @@ class Bot(TelegramObject):
                 with the parameter switch_pm_parameter.
             switch_pm_parameter (Optional[str]): Parameter for the start
                 message sent to the bot when user presses the switch button.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -910,7 +920,9 @@ class Bot(TelegramObject):
         if switch_pm_parameter:
             data['switch_pm_parameter'] = switch_pm_parameter
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return result
 
@@ -918,7 +930,8 @@ class Bot(TelegramObject):
     def getUserProfilePhotos(self,
                              user_id,
                              offset=None,
-                             limit=100):
+                             limit=100,
+                             **kwargs):
         """Use this method to get a list of profile pictures for a user.
 
         Args:
@@ -930,6 +943,14 @@ class Bot(TelegramObject):
           limit:
             Limits the number of photos to be retrieved. Values between 1-100
             are accepted. Defaults to 100. [Optional]
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             list[:class:`telegram.UserProfilePhotos`]: A list of
@@ -949,13 +970,16 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return UserProfilePhotos.de_json(result)
 
     @log
     def getFile(self,
-                file_id):
+                file_id,
+                **kwargs):
         """Use this method to get basic info about a file and prepare it for
         downloading. For the moment, bots can download files of up to 20MB in
         size.
@@ -963,6 +987,14 @@ class Bot(TelegramObject):
         Args:
           file_id:
             File identifier to get info about.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.File`: On success, a :class:`telegram.File`
@@ -977,7 +1009,9 @@ class Bot(TelegramObject):
 
         data = {'file_id': file_id}
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url,
@@ -988,7 +1022,8 @@ class Bot(TelegramObject):
     @log
     def kickChatMember(self,
                        chat_id,
-                       user_id):
+                       user_id,
+                       **kwargs):
         """Use this method to kick a user from a group or a supergroup. In the
         case of supergroups, the user will not be able to return to the group
         on their own using invite links, etc., unless unbanned first. The bot
@@ -1000,6 +1035,14 @@ class Bot(TelegramObject):
             supergroup (in the format @supergroupusername).
           user_id:
             Unique identifier of the target user.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1014,14 +1057,17 @@ class Bot(TelegramObject):
         data = {'chat_id': chat_id,
                 'user_id': user_id}
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return result
 
     @log
     def unbanChatMember(self,
                         chat_id,
-                        user_id):
+                        user_id,
+                        **kwargs):
         """Use this method to unban a previously kicked user in a supergroup.
         The user will not return to the group automatically, but will be able
         to join via link, etc. The bot must be an administrator in the group
@@ -1033,6 +1079,14 @@ class Bot(TelegramObject):
             supergroup (in the format @supergroupusername).
           user_id:
             Unique identifier of the target user.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1047,7 +1101,9 @@ class Bot(TelegramObject):
         data = {'chat_id': chat_id,
                 'user_id': user_id}
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return result
 
@@ -1055,7 +1111,8 @@ class Bot(TelegramObject):
     def answerCallbackQuery(self,
                             callback_query_id,
                             text=None,
-                            show_alert=False):
+                            show_alert=False,
+                            **kwargs):
         """Use this method to send answers to callback queries sent from
         inline keyboards. The answer will be displayed to the user as a
         notification at the top of the chat screen or as an alert.
@@ -1068,6 +1125,14 @@ class Bot(TelegramObject):
             show_alert (Optional[bool]): If `True`, an alert will be shown
                 by the client instead of a notification at the top of the chat
                 screen. Defaults to `False`.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1086,7 +1151,9 @@ class Bot(TelegramObject):
         if show_alert:
             data['show_alert'] = show_alert
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return result
 
@@ -1098,7 +1165,8 @@ class Bot(TelegramObject):
                         inline_message_id=None,
                         parse_mode=None,
                         disable_web_page_preview=None,
-                        reply_markup=None):
+                        reply_markup=None,
+                        **kwargs):
         """Use this method to edit text messages sent by the bot or via the bot
         (for inline bots).
 
@@ -1122,6 +1190,14 @@ class Bot(TelegramObject):
             Disables link previews for links in this message.
           reply_markup:
             A JSON-serialized object for an inline keyboard.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by
@@ -1153,7 +1229,9 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return Message.de_json(result)
 
@@ -1271,8 +1349,7 @@ class Bot(TelegramObject):
     def getUpdates(self,
                    offset=None,
                    limit=100,
-                   timeout=0,
-                   network_delay=2.):
+                   **kwargs):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -1285,14 +1362,14 @@ class Bot(TelegramObject):
           limit:
             Limits the number of updates to be retrieved. Values between 1-100
             are accepted. Defaults to 100.
-          timeout:
-            Timeout in seconds for long polling. Defaults to 0, i.e. usual
-            short polling.
-          network_delay:
-            Additional timeout in seconds to allow the response from Telegram
-            to take some time when using long polling. Defaults to 2, which
-            should be enough for most connections. Increase it if it takes very
-            long for data to be transmitted from and to the Telegram servers.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             list[:class:`telegram.Message`]: A list of :class:`telegram.Update`
@@ -1311,10 +1388,10 @@ class Bot(TelegramObject):
             data['offset'] = offset
         if limit:
             data['limit'] = limit
-        if timeout or timeout == 0:
-            data['timeout'] = timeout
 
-        result = request.post(url, data, network_delay=network_delay)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         if result:
             self.logger.debug(
@@ -1327,7 +1404,8 @@ class Bot(TelegramObject):
     @log
     def setWebhook(self,
                    webhook_url=None,
-                   certificate=None):
+                   certificate=None,
+                   **kwargs):
         """Use this method to specify a url and receive incoming updates via an
         outgoing webhook. Whenever there is an update for the bot, we will send
         an HTTPS POST request to the specified url, containing a
@@ -1335,9 +1413,17 @@ class Bot(TelegramObject):
         give up after a reasonable amount of attempts.
 
         Args:
-          url:
+          webhook_url:
             HTTPS url to send updates to.
             Use an empty string to remove webhook integration
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+            network_delay (Optional[float]): If using the timeout (which is
+                a `timeout` for the Telegram servers operation),
+                then `network_delay` as an extra delay (in seconds) to
+                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1356,7 +1442,9 @@ class Bot(TelegramObject):
         if certificate:
             data['certificate'] = certificate
 
-        result = request.post(url, data)
+        result = request.post(url, data,
+                              timeout=kwargs.get('timeout'),
+                              network_delay=kwargs.get('network_delay'))
 
         return result
 
