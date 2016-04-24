@@ -60,7 +60,8 @@ class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
         json_dict = self.json_dict
 
         del (json_dict['longitude'])
-        del (json_dict['latitude'])
+        # If none args are sent it will fall in a different condition
+        # del (json_dict['latitude'])
 
         ilmc = telegram.InputMessageContent.de_json(json_dict)
 
