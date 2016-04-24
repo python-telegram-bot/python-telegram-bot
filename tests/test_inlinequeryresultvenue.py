@@ -42,7 +42,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.latitude = 'latitude'
         self.longitude = 'longitude'
         self.title = 'title'
-        self._address = 'address'
+        self._address = 'address'  # nose binds self.address for testing
         self.foursquare_id = 'foursquare id'
         self.thumb_url = 'thumb url'
         self.thumb_width = 10

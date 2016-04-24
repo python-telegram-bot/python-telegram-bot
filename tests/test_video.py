@@ -19,9 +19,10 @@
 
 """This module contains a object that represents Tests for Telegram Video"""
 
-import os
-import unittest
 import sys
+import unittest
+
+import os
 from flaky import flaky
 
 sys.path.append('.')
@@ -217,7 +218,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_error_send_video_empty_file(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['video'] = open(os.devnull, 'rb')
 
         self.assertRaises(telegram.TelegramError,
@@ -230,7 +231,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_error_send_video_empty_file_id(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['video'] = ''
 
         self.assertRaises(telegram.TelegramError,
@@ -243,13 +244,14 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_error_video_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
-        del(json_dict['duration'])
+        del (json_dict['file_id'])
+        del (json_dict['duration'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendVideo(chat_id=self._chat_id,
                                                       timeout=10,
                                                       **json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -19,9 +19,10 @@
 
 """This module contains a object that represents Tests for Telegram Photo"""
 
-import os
-import unittest
 import sys
+import unittest
+
+import os
 from flaky import flaky
 
 sys.path.append('.')
@@ -171,7 +172,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     def test_error_send_photo_empty_file(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['photo'] = open(os.devnull, 'rb')
 
         self.assertRaises(telegram.TelegramError,
@@ -183,7 +184,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     def test_error_send_photo_empty_file_id(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['photo'] = ''
 
         self.assertRaises(telegram.TelegramError,
@@ -195,13 +196,14 @@ class PhotoTest(BaseTest, unittest.TestCase):
     def test_error_photo_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
-        del(json_dict['width'])
-        del(json_dict['height'])
+        del (json_dict['file_id'])
+        del (json_dict['width'])
+        del (json_dict['height'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendPhoto(chat_id=self._chat_id,
                                                       **json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()

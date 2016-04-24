@@ -66,7 +66,6 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
             'reply_markup': self.reply_markup.to_dict(),
         }
 
-
     def test_document_de_json(self):
         document = telegram.InlineQueryResultDocument.de_json(self.json_dict)
 

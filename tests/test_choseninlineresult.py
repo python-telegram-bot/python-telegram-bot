@@ -37,7 +37,6 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram ChosenInlineResult."""
 
     def setUp(self):
-
         user = telegram.User(1, 'First name')
 
         self.result_id = 'result id'

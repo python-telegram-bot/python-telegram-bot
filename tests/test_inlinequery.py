@@ -37,7 +37,6 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQuery."""
 
     def setUp(self):
-
         user = telegram.User(1, 'First name')
 
         self.id = 'id'

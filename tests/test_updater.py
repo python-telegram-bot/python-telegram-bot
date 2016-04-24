@@ -23,14 +23,15 @@ This module contains a object that represents Tests for Updater, Dispatcher,
 WebhookServer and WebhookHandler
 """
 import logging
-import sys
-import re
-import os
 import signal
-from random import randrange
-from time import sleep
+import sys
 from datetime import datetime
+from time import sleep
+
+import os
+import re
 from future.builtins import bytes
+from random import randrange
 
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
@@ -570,7 +571,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         req = Request(url, data=payload, headers=headers)
 
-
         if get_method is not None:
             req.get_method = get_method
 
@@ -602,7 +602,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
 
 class MockBot(object):
-
     def __init__(self, text, messages=1, raise_error=False,
                  bootstrap_retries=None, bootstrap_err=TelegramError('test')):
         self.text = text
@@ -645,6 +644,7 @@ class MockBot(object):
             return self.mockUpdate(self.text),
         else:
             return []
+
 
 if __name__ == '__main__':
     unittest.main()

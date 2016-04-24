@@ -20,8 +20,9 @@
 
 """This module contains a object that represents Tests for Telegram ForceReply"""
 
-import unittest
 import sys
+import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -39,31 +40,34 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
             'force_reply': self.force_reply,
             'selective': self.selective,
         }
-        
+
     def test_send_message_with_force_reply(self):
         message = self._bot.sendMessage(self._chat_id,
                                         'Моё судно на воздушной подушке полно угрей',
-                                        reply_markup=telegram.ForceReply.de_json(self.json_dict))
-        
+                                        reply_markup=telegram.ForceReply.de_json(
+                                            self.json_dict))
+
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
+        self.assertEqual(message.text,
+                         u'Моё судно на воздушной подушке полно угрей')
 
     def test_force_reply_de_json(self):
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 
         self.assertEqual(force_reply.force_reply, self.force_reply)
         self.assertEqual(force_reply.selective, self.selective)
-        
+
     def test_force_reply_to_json(self):
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(force_reply.to_json()))
-        
+
     def test_force_reply_to_dict(self):
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 
         self.assertEqual(force_reply['force_reply'], self.force_reply)
         self.assertEqual(force_reply['selective'], self.selective)
-                        
+
+
 if __name__ == '__main__':
     unittest.main()

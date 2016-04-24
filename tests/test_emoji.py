@@ -19,12 +19,11 @@
 
 """This module contains a object that represents Tests for Telegram Emoji"""
 
-import os
-import unittest
 import sys
+import unittest
+
 sys.path.append('.')
 
-import telegram
 from telegram.emoji import Emoji
 from tests.base import BaseTest
 

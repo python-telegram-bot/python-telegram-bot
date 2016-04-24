@@ -19,9 +19,10 @@
 
 """This module contains a object that represents Tests for Telegram Voice"""
 
-import os
-import unittest
 import sys
+import unittest
+
+import os
 from flaky import flaky
 
 sys.path.append('.')
@@ -165,7 +166,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
     def test_error_send_voice_empty_file(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['voice'] = open(os.devnull, 'rb')
 
         self.assertRaises(telegram.TelegramError,
@@ -177,7 +178,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
     def test_error_send_voice_empty_file_id(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['voice'] = ''
 
         self.assertRaises(telegram.TelegramError,
@@ -189,12 +190,13 @@ class VoiceTest(BaseTest, unittest.TestCase):
     def test_error_voice_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
-        del(json_dict['duration'])
+        del (json_dict['file_id'])
+        del (json_dict['duration'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendVoice(chat_id=self._chat_id,
                                                       **json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()
