@@ -1158,6 +1158,7 @@ class Bot(TelegramObject):
         return result
 
     @log
+    @message
     def editMessageText(self,
                         text,
                         chat_id=None,
@@ -1188,10 +1189,10 @@ class Bot(TelegramObject):
             italic, fixed-width text or inline URLs in your bot's message.
           disable_web_page_preview:
             Disables link previews for links in this message.
-          reply_markup:
-            A JSON-serialized object for an inline keyboard.
 
         Keyword Args:
+            reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+                A JSON-serialized object for an inline keyboard.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
             network_delay (Optional[float]): If using the timeout (which is
@@ -1223,17 +1224,8 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
 
-        result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
-
-        return Message.de_json(result)
+        return url, data
 
     @log
     @message
