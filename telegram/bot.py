@@ -1166,7 +1166,6 @@ class Bot(TelegramObject):
                         inline_message_id=None,
                         parse_mode=None,
                         disable_web_page_preview=None,
-                        reply_markup=None,
                         **kwargs):
         """Use this method to edit text messages sent by the bot or via the bot
         (for inline bots).
