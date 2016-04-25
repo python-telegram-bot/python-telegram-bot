@@ -96,6 +96,9 @@ class Dispatcher(object):
         self.update_queue = update_queue
 
         self.handlers = {}
+        """:type: dict[int, list[Handler]"""
+        self.groups = []
+        """:type: list[int]"""
         self.error_handlers = []
 
         self.logger = logging.getLogger(__name__)
@@ -170,8 +173,8 @@ class Dispatcher(object):
             self.dispatchError(None, update)
 
         else:
-            for group in self.handlers.values():
-                for handler in group:
+            for group in self.groups:
+                for handler in self.handlers[group]:
                     try:
                         if handler.checkUpdate(update):
                             handler.handleUpdate(update, self)
@@ -220,6 +223,8 @@ class Dispatcher(object):
 
         if group not in self.handlers:
             self.handlers[group] = list()
+            self.groups.append(group)
+            self.groups = sorted(self.groups)
 
         self.handlers[group].append(handler)
 
