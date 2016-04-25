@@ -46,6 +46,9 @@ class Handler(object):
 
         Args:
             update (object): The update to be tested
+
+        Returns:
+            bool
         """
         raise NotImplementedError
 
