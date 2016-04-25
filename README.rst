@@ -11,6 +11,10 @@ Not **just** a Python wrapper around the Telegram Bot API
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: PyPi Package Version
 
+.. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot.svg
+   :target: https://pypi.python.org/pypi/python-telegram-bot
+   :alt: Supported python versions
+
 .. image:: https://img.shields.io/pypi/dm/python-telegram-bot.svg
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: PyPi Package Monthly Download
@@ -45,11 +49,7 @@ Table of contents
 
 - `Introduction`_
 
-- `Status`_
-
-  #. `Telegram API support`_
-
-  #. `Python Version support`_
+- `Telegram API support`_
 
 - `Installing`_
 
@@ -69,11 +69,11 @@ Table of contents
 
   #. `Documentation`_
 
-- `License`_
-
-- `Contact`_
+- `Getting help`_
 
 - `Contributing`_
+
+- `License`_
 
 ===============
 _`Introduction`
@@ -81,13 +81,9 @@ _`Introduction`
 
 This library provides a pure Python interface for the `Telegram Bot API <https://core.telegram.org/bots/api>`_. It works with Python versions from 2.6+. It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
 
-=========
-_`Status`
-=========
-
------------------------
+=======================
 _`Telegram API support`
------------------------
+=======================
 
 ========================= ============
 Telegram Bot API Method   *Supported?*
@@ -117,31 +113,11 @@ editMessageReplyMarkup    Yes
 answerCallbackQuery       Yes
 ========================= ============
 
--------------------------
-_`Python Version support`
--------------------------
-
-============== ============
-Python Version *Supported?*
-============== ============
-2.6            Yes
-2.7            Yes
-3.3            Yes
-3.4            Yes
-3.5            Yes
-PyPy           Yes
-PyPy3          Yes
-============== ============
-
 =============
 _`Installing`
 =============
 
-You can install python-telegram-bot using::
-
-    $ pip install python-telegram-bot==4.0rc1
-
-Or upgrade to the latest version::
+You can install or upgrade python-telegram-bot with::
 
     $ pip install python-telegram-bot==4.0rc1 --upgrade
 
@@ -216,7 +192,7 @@ Note: Using the ``Bot`` class directly is the 'old' method, we have an easier wa
 
 The API is exposed via the ``telegram.Bot`` class.
 
-To generate an Access Token you have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
+To generate an Access Token you have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#6-botfather>`_).
 
 For full details see the `Bots: An introduction for developers <https://core.telegram.org/bots>`_.
 
@@ -433,19 +409,26 @@ _`Documentation`
 ``python-telegram-bot``'s documentation lives at `Read the Docs <https://python-telegram-bot.readthedocs.org/en/latest/>`_.
 
 ==========
-_`License`
+_`Getting help`
 ==========
 
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
+You can get help in several ways:
 
-==========
-_`Contact`
-==========
+1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
+   
+2. You can ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
+   
+3. As last resort, the developers are ready to help you with `serious issues <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
 
-Feel free to join to our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_.
 
 ===============
 _`Contributing`
 ===============
 
 Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
+
+==========
+_`License`
+==========
+
+You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
