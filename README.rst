@@ -117,7 +117,9 @@ answerCallbackQuery       Yes
 _`Installing`
 =============
 
-You can install or upgrade python-telegram-bot with::
+You can install or upgrade python-telegram-bot with:
+
+.. code:: shell
 
     $ pip install python-telegram-bot==4.0rc1 --upgrade
 
@@ -127,22 +129,28 @@ _`Getting the code`
 
 The code is hosted at https://github.com/python-telegram-bot/python-telegram-bot
 
-Check out the latest development version anonymously with::
+Check out the latest development version anonymously with:
+
+.. code:: shell
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
 
 Install dependencies:
 
-    $ pip install -r requirements.txt
-    
-    $ pip install -r requirements-dev.txt
+.. code:: shell
+
+    $ pip install -r requirements.txt -r requirements-dev.txt
 
 Run tests:
 
+.. code:: shell
+
     $ make test
 
-To see other options available, run:
+To see other available options, run:
+
+.. code:: shell
 
     $ make help
 
@@ -152,7 +160,9 @@ _`Getting started`
 
 View the last release API documentation at: https://core.telegram.org/bots/api
 
-This library uses the `logging` module. To set up logging to standard output, put::
+This library uses the `logging` module. To set up logging to standard output, put:
+
+.. code:: python
 
     import logging
     logging.basicConfig(level=logging.DEBUG,
@@ -198,83 +208,117 @@ To generate an Access Token you have to talk to `BotFather <https://telegram.me/
 
 For full details see the `Bots: An introduction for developers <https://core.telegram.org/bots>`_.
 
-To create an instance of the ``telegram.Bot``::
+To create an instance of the ``telegram.Bot``:
+
+.. code:: python
 
     >>> import telegram
     >>> bot = telegram.Bot(token='token')
 
-To see if your credentials are successful::
+To see if your credentials are successful:
+
+.. code:: python
 
     >>> print(bot.getMe())
     {"first_name": "Toledo's Palace Bot", "username": "ToledosPalaceBot"}
 
 Bots can't initiate conversations with users. A user must either add them to a group or send them a message first. People can use ``telegram.me/<bot_username>`` links or username search to find your bot.
 
-To fetch text messages sent to your Bot::
+To fetch text messages sent to your Bot:
+
+.. code:: python
 
     >>> updates = bot.getUpdates()
     >>> print([u.message.text for u in updates])
 
-To fetch images sent to your Bot::
+To fetch images sent to your Bot:
+
+.. code:: python
 
     >>> updates = bot.getUpdates()
     >>> print([u.message.photo for u in updates if u.message.photo])
 
-To reply messages you'll always need the ``chat_id``::
+To reply messages you'll always need the ``chat_id``:
+
+.. code:: python
 
     >>> chat_id = bot.getUpdates()[-1].message.chat_id
 
-To post a text message::
+To post a text message:
+
+.. code:: python
 
     >>> bot.sendMessage(chat_id=chat_id, text="I'm sorry Dave I'm afraid I can't do that.")
 
-To post a text message with markdown::
+To post a text message with markdown:
+
+.. code:: python
 
     >>> bot.sendMessage(chat_id=chat_id, text="*bold* _italic_ [link](http://google.com).", parse_mode=telegram.ParseMode.MARKDOWN)
 
-To post a text message with Html style::
+To post a text message with Html style:
 
-	>>> bot.sendMessage(chat_id=chat_id, text="<b>bold</b> <i>italic</i> <a href="http://google.com">link</a>.", parse_mode=telegram.ParseMode.HTML)
+.. code:: python
 
-To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/emoji/tables/unicode>`_)::
+	>>> bot.sendMessage(chat_id=chat_id, text='<b>bold</b> <i>italic</i> <a href="http://google.com">link</a>.', parse_mode=telegram.ParseMode.HTML)
+
+To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/emoji/tables/unicode>`_):
+
+.. code:: python
 
     >>> bot.sendMessage(chat_id=chat_id, text=telegram.Emoji.PILE_OF_POO)
 
-To post an image file via URL::
+To post an image file via URL:
+
+.. code:: python
 
     >>> bot.sendPhoto(chat_id=chat_id, photo='https://telegram.org/img/t_logo.png')
 
-To post an image file from disk::
+To post an image file from disk:
+
+.. code:: python
 
     >>> bot.sendPhoto(chat_id=chat_id, photo=open('tests/test.png', 'rb'))
 
-To post a voice file from disk::
+To post a voice file from disk:
+
+.. code:: python
 
     >>> bot.sendVoice(chat_id=chat_id, voice=open('tests/telegram.ogg', 'rb'))
 
-To tell the user that something is happening on bot's side::
+To tell the user that something is happening on bot's side:
+
+.. code:: python
 
     >>> bot.sendChatAction(chat_id=chat_id, action=telegram.ChatAction.TYPING)
 
-To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
+To create `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_:
+
+.. code:: python
 
     >>> custom_keyboard = [[ telegram.KeyboardButton(telegram.Emoji.THUMBS_UP_SIGN),
     ...     telegram.KeyboardButton(telegram.Emoji.THUMBS_DOWN_SIGN) ]]
     >>> reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     >>> bot.sendMessage(chat_id=chat_id, text="Stay here, I'll be back.", reply_markup=reply_markup)
 
-To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_::
+To hide `Custom Keyboards <https://core.telegram.org/bots#keyboards>`_:
+
+.. code:: python
 
     >>> reply_markup = telegram.ReplyKeyboardHide()
     >>> bot.sendMessage(chat_id=chat_id, text="I'm back.", reply_markup=reply_markup)
 
-To download a file (you will need its ``file_id``)::
+To download a file (you will need its ``file_id``):
+
+.. code:: python
 
     >>> file_id = message.voice.file_id
     >>> newFile = bot.getFile(file_id)
     >>> newFile.download('voice.ogg')
 
-There are many more API methods, to read the full API documentation::
+There are many more API methods, to read the full API documentation:
+
+.. code:: shell
 
     $ pydoc telegram.Bot
 
@@ -286,31 +330,43 @@ The ``telegram.ext`` submodule is built on top of the bare-metal API. It provide
 
 We'll need an Access Token. **Note:** If you have done this in the previous step, you can use that one. To generate an Access Token, we have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#botfather>`_).
 
-First, we create an ``Updater`` object::
+First, we create an ``Updater`` object:
+
+.. code:: python
 
    >>> from telegram.ext import Updater
    >>> updater = Updater(token='token')
 
-For quicker access to the ``Dispatcher`` used by our ``Updater``, we can introduce it locally::
+For quicker access to the ``Dispatcher`` used by our ``Updater``, we can introduce it locally:
+
+.. code:: python
 
    >>> dispatcher = updater.dispatcher
 
-Now, we need to define a function that should process a specific type of update::
+Now, we need to define a function that should process a specific type of update:
+
+.. code:: python
 
    >>> def start(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
 
-We want this function to be called on a Telegram message that contains the ``/start`` command. To do that, we have to use a ``CommandHandler`` object and register it in the dispatcher::
+We want this function to be called on a Telegram message that contains the ``/start`` command. To do that, we have to use a ``CommandHandler`` object and register it in the dispatcher:
+
+.. code:: python
 
    >>> from telegram.ext import CommandHandler
    >>> start_handler = CommandHandler('start', start)
    >>> dispatcher.addHandler(start_handler)
 
-The last step is to tell the ``Updater`` to start working::
+The last step is to tell the ``Updater`` to start working:
+
+.. code:: python
 
    >>> updater.start_polling()
 
-Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler that listens for regular messages. We're using the `MessageHandler` here to echo to all text messages::
+Our bot is now up and running (go ahead and try it)! It's not doing anything yet, besides answering to the ``/start`` command. Let's add another handler that listens for regular messages. We're using the `MessageHandler` here to echo to all text messages:
+
+.. code:: python
 
    >>> def echo(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
@@ -322,7 +378,9 @@ Our bot is now up and running (go ahead and try it)! It's not doing anything yet
 
 Our bot should now reply to all text messages that are not a command with a message that has the same content.
 
-Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to a command in the handler function::
+Let's add some functionality to our bot. We want to add the ``/caps`` command, that will take some text as parameter and return it in all caps. We can get the arguments that were passed to a command in the handler function:
+
+.. code:: python
 
    >>> def caps(bot, update, args):
    ...   text_caps = ' '.join(args).upper()
@@ -331,7 +389,9 @@ Let's add some functionality to our bot. We want to add the ``/caps`` command, t
    >>> caps_handler = CommandHandler('caps', caps, pass_args=True)
    >>> dispatcher.addHandler(caps_handler)
 
-To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather)::
+To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather):
+
+.. code:: python
 
    >>> from telegram import InlineQueryResultArticle
    >>> def inline_caps(bot, update):
@@ -344,7 +404,9 @@ To enable our bot to respond to inline queries, we can add the following (you wi
    >>> inline_caps_handler = InlineQueryHandler(inline_caps)
    >>> dispatcher.addHandler(inline_caps_handler)
 
-People might try to send commands to the bot that it doesn't understand, so we can use a ``RegexHandler`` to recognize all commands that were not recognized by the previous handlers. **Note:** This handler has to be added last, else it will be triggered before the ``CommandHandlers`` had a chance to look at the update::
+People might try to send commands to the bot that it doesn't understand, so we can use a ``RegexHandler`` to recognize all commands that were not recognized by the previous handlers. **Note:** This handler has to be added last, else it will be triggered before the ``CommandHandlers`` had a chance to look at the update:
+
+.. code:: python
 
    >>> def unknown(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
@@ -353,7 +415,9 @@ People might try to send commands to the bot that it doesn't understand, so we c
    >>> unknown_handler = RegexHandler(r'/.*', unknown)
    >>> dispatcher.addHandler(unknown_handler)
 
-If you're done playing around, stop the bot with this::
+If you're done playing around, stop the bot with this:
+
+.. code:: python
 
    >>> updater.stop()
 
@@ -363,29 +427,39 @@ Check out more examples in the `examples folder <https://github.com/python-teleg
 _`JobQueue`
 -----------
 
-The ``JobQueue`` allows you to perform tasks with a delay or even periodically. The ``Updater`` will create one for you::
+The ``JobQueue`` allows you to perform tasks with a delay or even periodically. The ``Updater`` will create one for you:
+
+.. code:: python
 
     >>> from telegram.ext import Updater
     >>> u = Updater('TOKEN')
     >>> j = u.job_queue
 
-The job queue uses functions for tasks, so we define one and add it to the queue. Usually, when the first job is added to the queue, it wil start automatically. We can prevent this by setting ``prevent_autostart=True``::
+The job queue uses functions for tasks, so we define one and add it to the queue. Usually, when the first job is added to the queue, it wil start automatically. We can prevent this by setting ``prevent_autostart=True``:
+
+.. code:: python
 
     >>> def job1(bot):
     ...     bot.sendMessage(chat_id='@examplechannel', text='One message every minute')
     >>> j.put(job1, 60, next_t=0, prevent_autostart=True)
 
-You can also have a job that will not be executed repeatedly::
+You can also have a job that will not be executed repeatedly:
+
+.. code:: python
 
     >>> def job2(bot):
     ...     bot.sendMessage(chat_id='@examplechannel', text='A single message with 30s delay')
     >>> j.put(job2, 30, repeat=False)
 
-Now, because we didn't prevent the auto start this time, the queue will start ticking. It runs in a seperate thread, so it is non-blocking. When we stop the Updater, the related queue will be stopped as well::
+Now, because we didn't prevent the auto start this time, the queue will start ticking. It runs in a seperate thread, so it is non-blocking. When we stop the Updater, the related queue will be stopped as well:
+
+.. code:: python
 
     >>> u.stop()
 
-We can also stop the job queue by itself::
+We can also stop the job queue by itself:
+
+.. code:: python
 
     >>> j.stop()
 
@@ -393,13 +467,17 @@ We can also stop the job queue by itself::
 _`Logging`
 ----------
 
-You can get logs in your main application by calling `logging` and setting the log level you want::
+You can get logs in your main application by calling `logging` and setting the log level you want:
+
+.. code:: python
 
     >>> import logging
     >>> logger = logging.getLogger()
     >>> logger.setLevel(logging.INFO)
 
-If you want DEBUG logs instead::
+If you want DEBUG logs instead:
+
+.. code:: python
 
     >>> logger.setLevel(logging.DEBUG)
 
