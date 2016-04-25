@@ -203,18 +203,27 @@ class Dispatcher(object):
 
     def addHandler(self, handler, group=DEFAULT_GROUP):
         """
-        Register a handler. A handler must be an instance of a subclass of
-        telegram.ext.Handler. All handlers are organized in groups, the default
-        group is int(0), but any object can identify a group. Every update will
-        be tested against each handler in each group from first-added to last-
-        added. If the update has been handled in one group, it will not be
-        tested against other handlers in that group. That means an update can
-        only be handled 0 or 1 times per group, but multiple times across all
-        groups.
+        Register a handler.
+
+        TL;DR: Order and priority counts. 0 or 1 handlers per group will be
+        used.
+
+        A handler must be an instance of a subclass of
+        telegram.ext.Handler. All handlers are organized in groups with a
+        numeric value. The default group is 0. All groups will be evaluated for
+        handling an update, but only 0 or 1 handler per group will be used.
+
+        The priority/order of handlers is determined as follows:
+
+          * Priority of the group (lower group number == higher priority)
+
+          * The first handler in a group which should handle an update will be
+            used. Other handlers from the group will not be used. The order in
+            which handlers were added to the group defines the priority.
 
         Args:
             handler (Handler): A Handler instance
-            group (optional[object]): The group identifier. Default is 0
+            group (Optional[int]): The group identifier. Default is 0
         """
 
         if not isinstance(handler, Handler):
