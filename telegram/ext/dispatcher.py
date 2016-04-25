@@ -24,11 +24,7 @@ from functools import wraps
 from threading import Thread, BoundedSemaphore, Lock, Event, current_thread
 from time import sleep
 
-# Adjust for differences in Python versions
-try:
-    from queue import Empty  # flake8: noqa
-except ImportError:
-    from Queue import Empty  # flake8: noqa
+from queue import Empty
 
 from telegram import (TelegramError, NullHandler)
 from telegram.ext.handler import Handler

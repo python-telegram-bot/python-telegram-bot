@@ -28,12 +28,7 @@ from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
-
-# Adjust for differences in Python versions
-try:
-    from queue import Queue  # flake8: noqa
-except ImportError:
-    from Queue import Queue  # flake8: noqa
+from queue import Queue
 
 from telegram import Bot, TelegramError, NullHandler
 from telegram.ext import dispatcher, Dispatcher, JobQueue
