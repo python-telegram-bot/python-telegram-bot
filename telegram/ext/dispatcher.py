@@ -219,7 +219,8 @@ class Dispatcher(object):
         """
 
         if not isinstance(handler, Handler):
-            raise TypeError('Handler is no instance of telegram.ext.Handler')
+            raise TypeError(
+                'handler is not an instance of {0}'.format(Handler.__name__))
 
         if group not in self.handlers:
             self.handlers[group] = list()
