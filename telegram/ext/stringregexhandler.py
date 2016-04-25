@@ -21,6 +21,8 @@
 
 import re
 
+from future.utils import string_types
+
 from .handler import Handler
 
 
@@ -51,7 +53,7 @@ class StringRegexHandler(Handler):
                  pass_groupdict=False, pass_update_queue=False):
         super(StringRegexHandler, self).__init__(callback, pass_update_queue)
 
-        if isinstance(pattern, str):
+        if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
@@ -59,11 +61,8 @@ class StringRegexHandler(Handler):
         self.pass_groupdict = pass_groupdict
 
     def checkUpdate(self, update):
-        if isinstance(update, str):
-            match = re.match(self.pattern, update)
-            return bool(match)
-        else:
-            return False
+        return isinstance(update, string_types) and bool(
+            re.match(self.pattern, update))
 
     def handleUpdate(self, update, dispatcher):
         optional_args = self.collectOptionalArgs(dispatcher)
