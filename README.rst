@@ -371,9 +371,8 @@ Our bot is now up and running (go ahead and try it)! It's not doing anything yet
    >>> def echo(bot, update):
    ...   bot.sendMessage(chat_id=update.message.chat_id, text=update.message.text)
    ...
-   >>> from telegram.ext import MessageHandler
-   >>> from telegram.ext import filters
-   >>> echo_handler = MessageHandler([filters.TEXT], echo)
+   >>> from telegram.ext import MessageHandler, Filters
+   >>> echo_handler = MessageHandler([Filters.text], echo)
    >>> dispatcher.addHandler(echo_handler)
 
 Our bot should now reply to all text messages that are not a command with a message that has the same content.

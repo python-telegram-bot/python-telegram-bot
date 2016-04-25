@@ -6,7 +6,7 @@
 
 import logging
 from telegram import Emoji, ForceReply, ReplyKeyboardMarkup, KeyboardButton
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - '
                            '%(message)s',
@@ -93,7 +93,7 @@ updater = Updater("TOKEN")
 # The command
 updater.dispatcher.addHandler(CommandHandler('set', set_value))
 # The answer and confirmation
-updater.dispatcher.addHandler(MessageHandler([filters.TEXT], set_value))
+updater.dispatcher.addHandler(MessageHandler([Filters.text], set_value))
 updater.dispatcher.addHandler(CommandHandler('cancel', cancel))
 updater.dispatcher.addHandler(CommandHandler('start', help))
 updater.dispatcher.addHandler(CommandHandler('help', help))

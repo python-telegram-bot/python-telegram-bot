@@ -17,7 +17,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 
 # Enable logging
@@ -58,7 +58,7 @@ def main():
     dp.addHandler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.addHandler(MessageHandler([filters.TEXT], echo))
+    dp.addHandler(MessageHandler([Filters.text], echo))
 
     # log all errors
     dp.addErrorHandler(error)

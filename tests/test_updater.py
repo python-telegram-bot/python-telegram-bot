@@ -144,8 +144,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_addRemoveTelegramMessageHandler(self):
         self._setup_updater('Test')
         d = self.updater.dispatcher
-        from telegram.ext import filters
-        handler = MessageHandler([filters.TEXT], self.telegramHandlerTest)
+        from telegram.ext import Filters
+        handler = MessageHandler([Filters.text], self.telegramHandlerTest)
         d.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)

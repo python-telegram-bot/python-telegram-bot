@@ -22,7 +22,71 @@
 from .handler import Handler
 from telegram import Update
 
-from .filters import *  # flake8: noqa
+
+class Filters(object):
+    """
+    Convenient namespace (class) & methods for the filter funcs of the
+    MessageHandler class.
+    """
+
+    @staticmethod
+    def text(update):
+        return update.message.text and not update.message.text.startswith('/')
+
+    @staticmethod
+    def command(update):
+        return update.message.text and update.message.text.startswith('/')
+
+    @staticmethod
+    def audio(update):
+        return bool(update.message.audio)
+
+    @staticmethod
+    def document(update):
+        return bool(update.message.document)
+
+    @staticmethod
+    def photo(update):
+        return bool(update.message.photo)
+
+    @staticmethod
+    def sticker(update):
+        return bool(update.message.sticker)
+
+    @staticmethod
+    def video(update):
+        return bool(update.message.video)
+
+    @staticmethod
+    def voice(update):
+        return bool(update.message.voice)
+
+    @staticmethod
+    def contact(update):
+        return bool(update.message.contact)
+
+    @staticmethod
+    def location(update):
+        return bool(update.message.location)
+
+    @staticmethod
+    def venue(update):
+        return bool(update.message.venue)
+
+    @staticmethod
+    def status_update(update):
+        return bool(
+            update.message.new_chat_member or
+            update.message.left_chat_member or
+            update.message.new_chat_title or
+            update.message.new_chat_photo or
+            update.message.delete_chat_photo or
+            update.message.group_chat_created or
+            update.message.supergroup_chat_created or
+            update.message.channel_chat_created or
+            update.message.migrate_to_chat_id or
+            update.message.migrate_from_chat_id or
+            update.message.pinned_message)
 
 
 class MessageHandler(Handler):
@@ -32,8 +96,10 @@ class MessageHandler(Handler):
     updates.
 
     Args:
-        filters (list): A list of filters defined in ``telegram.ext.filters``.
-            All messages that match at least one of those filters will be
+        filters (list[function]): A list of filter functions. Standard filters
+            can be found in the Filters class above.
+          | Each `function` takes ``Update`` as arg and returns ``bool``.
+          | All messages that match at least one of those filters will be
             accepted. If ``bool(filters)`` evaluates to ``False``, messages are
             not filtered.
         callback (function): A function that takes ``bot, update`` as
@@ -49,36 +115,14 @@ class MessageHandler(Handler):
         self.filters = filters
 
     def checkUpdate(self, update):
-        filters = self.filters
         if isinstance(update, Update) and update.message:
-            message = update.message
-            return (not filters or  # If filters is empty, accept all messages
-                    TEXT in filters and message.text and
-                    not message.text.startswith('/') or
-                    AUDIO in filters and message.audio or
-                    DOCUMENT in filters and message.document or
-                    PHOTO in filters and message.photo or
-                    STICKER in filters and message.sticker or
-                    VIDEO in filters and message.video or
-                    VOICE in filters and message.voice or
-                    CONTACT in filters and message.contact or
-                    LOCATION in filters and message.location or
-                    VENUE in filters and message.venue or
-                    STATUS_UPDATE in filters and (
-                        message.new_chat_member or
-                        message.left_chat_member or
-                        message.new_chat_title or
-                        message.new_chat_photo or
-                        message.delete_chat_photo or
-                        message.group_chat_created or
-                        message.supergroup_chat_created or
-                        message.channel_chat_created or
-                        message.migrate_to_chat_id or
-                        message.migrate_from_chat_id or
-                        message.pinned_message)
-                    )
+            if not self.filters:
+                res = True
+            else:
+                res = any(func(update) for func in self.filters)
         else:
-            return False
+            res = False
+        return res
 
     def handleUpdate(self, update, dispatcher):
         optional_args = self.collectOptionalArgs(dispatcher)
