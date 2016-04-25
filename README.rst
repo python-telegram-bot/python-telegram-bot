@@ -135,6 +135,8 @@ Check out the latest development version anonymously with::
 Install dependencies:
 
     $ pip install -r requirements.txt
+    
+    $ pip install -r requirements-dev.txt
 
 Run tests:
 
