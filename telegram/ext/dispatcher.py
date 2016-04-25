@@ -220,6 +220,8 @@ class Dispatcher(object):
         if not isinstance(handler, Handler):
             raise TypeError(
                 'handler is not an instance of {0}'.format(Handler.__name__))
+        if not isinstance(group, int):
+            raise TypeError('group is not int')
 
         if group not in self.handlers:
             self.handlers[group] = list()
