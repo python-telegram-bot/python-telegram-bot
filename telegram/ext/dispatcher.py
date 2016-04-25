@@ -238,6 +238,9 @@ class Dispatcher(object):
         """
         if handler in self.handlers[group]:
             self.handlers[group].remove(handler)
+            if not self.handlers[group]:
+                del self.handlers[group]
+                self.groups.remove(group)
 
     def addErrorHandler(self, callback):
         """
