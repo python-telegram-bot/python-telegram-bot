@@ -117,7 +117,9 @@ answerCallbackQuery       Yes
 _`Installing`
 =============
 
-You can install or upgrade python-telegram-bot with::
+You can install or upgrade python-telegram-bot with:
+
+.. code:: shell
 
     $ pip install python-telegram-bot==4.0rc1 --upgrade
 
@@ -127,22 +129,28 @@ _`Getting the code`
 
 The code is hosted at https://github.com/python-telegram-bot/python-telegram-bot
 
-Check out the latest development version anonymously with::
+Check out the latest development version anonymously with:
+
+.. code:: shell
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
 
 Install dependencies:
 
-    $ pip install -r requirements.txt
-    
-    $ pip install -r requirements-dev.txt
+.. code:: shell
+
+    $ pip install -r requirements.txt -r requirements-dev.txt
 
 Run tests:
 
+.. code:: shell
+
     $ make test
 
-To see other options available, run:
+To see other available options, run:
+
+.. code:: shell
 
     $ make help
 
@@ -308,7 +316,9 @@ To download a file (you will need its ``file_id``):
     >>> newFile = bot.getFile(file_id)
     >>> newFile.download('voice.ogg')
 
-There are many more API methods, to read the full API documentation::
+There are many more API methods, to read the full API documentation:
+
+.. code:: shell
 
     $ pydoc telegram.Bot
 
