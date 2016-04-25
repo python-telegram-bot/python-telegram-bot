@@ -410,9 +410,9 @@ _`Documentation`
 
 ``python-telegram-bot``'s documentation lives at `Read the Docs <https://python-telegram-bot.readthedocs.org/en/latest/>`_.
 
-==========
+===============
 _`Getting help`
-==========
+===============
 
 You can get help in several ways:
 
