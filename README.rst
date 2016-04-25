@@ -252,7 +252,7 @@ To post a text message with Html style:
 
 .. code:: python
 
-	>>> bot.sendMessage(chat_id=chat_id, text="<b>bold</b> <i>italic</i> <a href="http://google.com">link</a>.", parse_mode=telegram.ParseMode.HTML)
+	>>> bot.sendMessage(chat_id=chat_id, text='<b>bold</b> <i>italic</i> <a href="http://google.com">link</a>.', parse_mode=telegram.ParseMode.HTML)
 
 To post an Emoji (special thanks to `Tim Whitlock <http://apps.timwhitlock.info/emoji/tables/unicode>`_):
 
