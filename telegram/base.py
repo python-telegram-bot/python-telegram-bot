@@ -66,7 +66,7 @@ class TelegramObject(object):
 
         for key in iter(self.__dict__):
             value = self.__dict__[key]
-            if value or value == '':
+            if value is not None:
                 if hasattr(value, 'to_dict'):
                     data[key] = value.to_dict()
                 else:
