@@ -19,7 +19,6 @@
 
 """This module contains a object that represents Tests for Telegram Chat"""
 
-import os
 import unittest
 import sys
 sys.path.append('.')

@@ -21,7 +21,6 @@
 """This module contains a object that represents Tests for Telegram Bot"""
 
 import io
-import os
 from datetime import datetime
 import sys
 from flaky import flaky

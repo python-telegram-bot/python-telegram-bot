@@ -30,11 +30,6 @@ if sys.version_info[0:2] == (2, 6):
 else:
     import unittest
 
-try:
-    from urllib2 import urlopen, Request
-except ImportError:
-    from urllib.request import Request, urlopen
-
 sys.path.append('.')
 
 from telegram.ext import JobQueue, Updater

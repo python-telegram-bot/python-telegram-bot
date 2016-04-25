@@ -22,7 +22,6 @@
 import os
 import sys
 import signal
-import traceback
 
 from nose.tools import make_decorator
 
