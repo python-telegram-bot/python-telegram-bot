@@ -187,7 +187,7 @@ class Dispatcher(object):
 
                         try:
                             self.dispatchError(update, te)
-                        except:
+                        except Exception:
                             self.logger.exception(
                                 'An uncaught error was raised while '
                                 'handling the error')
@@ -195,7 +195,7 @@ class Dispatcher(object):
                             break
 
                     # Errors should not stop the thread
-                    except:
+                    except Exception:
                         self.logger.exception(
                             'An uncaught error was raised while '
                             'processing the update')
