@@ -1,4 +1,4 @@
-  #!/usr/bin/env python
+#!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """
 This module contains a object that represents Tests for MessageHandler.Filters
 """
@@ -151,6 +150,7 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.pinned_message = 'test'
         self.assertTrue(Filters.status_update(self.update))
         self.message.pinned_message = None
+
 
 if __name__ == '__main__':
     unittest.main()
