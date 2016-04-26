@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """
 This module contains a object that represents Tests for JobQueue
 """
@@ -46,7 +45,8 @@ root.setLevel(logging.INFO)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.WARN)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
@@ -110,6 +110,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         u.stop()
         sleep(2)
         self.assertEqual(1, self.result)
+
 
 if __name__ == '__main__':
     unittest.main()

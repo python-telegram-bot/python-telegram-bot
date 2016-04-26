@@ -24,4 +24,18 @@ from telegram import InputMessageContent
 
 
 class InputContactMessageContent(InputMessageContent):
-    pass
+    """Base class for Telegram InputContactMessageContent Objects"""
+
+    def __init__(self,
+                 phone_number,
+                 first_name,
+                 last_name=None):
+        # Required
+        self.phone_number = phone_number
+        self.first_name = first_name
+        # Optionals
+        self.last_name = last_name
+
+    @staticmethod
+    def de_json(data):
+        return InputContactMessageContent(**data)

@@ -42,7 +42,4 @@ class InputVenueMessageContent(InputMessageContent):
 
     @staticmethod
     def de_json(data):
-        data = super(InputVenueMessageContent,
-                     InputVenueMessageContent).de_json(data)
-
         return InputVenueMessageContent(**data)

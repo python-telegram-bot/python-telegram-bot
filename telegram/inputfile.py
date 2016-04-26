@@ -20,17 +20,17 @@
 
 """This module contains a object that represents a Telegram InputFile."""
 
+import mimetypes
+import os
+import sys
+import imghdr
+
 try:
     from email.generator import _make_boundary as choose_boundary
     from urllib.request import urlopen
 except ImportError:
     from mimetools import choose_boundary
     from urllib2 import urlopen
-
-import mimetypes
-import os
-import sys
-import imghdr
 
 from telegram import TelegramError
 

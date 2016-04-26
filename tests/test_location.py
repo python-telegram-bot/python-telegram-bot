@@ -16,12 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Location"""
 
-import os
-import unittest
 import sys
+import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -41,8 +40,7 @@ class LocationTest(BaseTest, unittest.TestCase):
         }
 
     def test_send_location_implicit_args(self):
-        message = self._bot.sendLocation(self._chat_id,
-                                         self.latitude,
+        message = self._bot.sendLocation(self._chat_id, self.latitude,
                                          self.longitude)
 
         location = message.location
@@ -90,12 +88,13 @@ class LocationTest(BaseTest, unittest.TestCase):
     def test_error_location_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['latitude'])
-        del(json_dict['longitude'])
+        del (json_dict['latitude'])
+        del (json_dict['longitude'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendLocation(chat_id=self._chat_id,
                                                          **json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()

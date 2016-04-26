@@ -41,6 +41,8 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     @staticmethod
     def de_json(data):
+        data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data)
+
         if not data:
             return None
 

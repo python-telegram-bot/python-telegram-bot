@@ -38,7 +38,4 @@ class InputTextMessageContent(InputMessageContent):
 
     @staticmethod
     def de_json(data):
-        data = super(InputTextMessageContent,
-                     InputTextMessageContent).de_json(data)
-
         return InputTextMessageContent(**data)

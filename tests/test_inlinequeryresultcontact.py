@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a object that represents Tests for Telegram
-InlineQueryResultGif"""
+InlineQueryResultContact"""
 
 import sys
 
@@ -32,63 +32,63 @@ import telegram
 from tests.base import BaseTest
 
 
-class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultGif."""
+class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultContact."""
 
     def setUp(self):
         self.id = 'id'
-        self.type = 'gif'
-        self.gif_url = 'gif url'
-        self.gif_width = 10
-        self.gif_height = 15
+        self.type = 'contact'
+        self.phone_number = 'phone_number'
+        self.first_name = 'first_name'
+        self.last_name = 'last_name'
         self.thumb_url = 'thumb url'
-        self.title = 'title'
-        self.caption = 'caption'
+        self.thumb_width = 10
+        self.thumb_height = 15
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
-
         self.json_dict = {
-            'type': self.type,
             'id': self.id,
-            'gif_url': self.gif_url,
-            'gif_width': self.gif_width,
-            'gif_height': self.gif_height,
+            'type': self.type,
+            'phone_number': self.phone_number,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
             'thumb_url': self.thumb_url,
-            'title': self.title,
-            'caption': self.caption,
+            'thumb_width': self.thumb_width,
+            'thumb_height': self.thumb_height,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
 
-    def test_gif_de_json(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+    def test_contact_de_json(self):
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
 
-        self.assertEqual(gif.type, self.type)
-        self.assertEqual(gif.id, self.id)
-        self.assertEqual(gif.gif_url, self.gif_url)
-        self.assertEqual(gif.gif_width, self.gif_width)
-        self.assertEqual(gif.gif_height, self.gif_height)
-        self.assertEqual(gif.thumb_url, self.thumb_url)
-        self.assertEqual(gif.title, self.title)
-        self.assertEqual(gif.caption, self.caption)
-        self.assertDictEqual(gif.input_message_content.to_dict(),
+        self.assertEqual(contact.id, self.id)
+        self.assertEqual(contact.type, self.type)
+        self.assertEqual(contact.phone_number, self.phone_number)
+        self.assertEqual(contact.first_name, self.first_name)
+        self.assertEqual(contact.last_name, self.last_name)
+        self.assertEqual(contact.thumb_url, self.thumb_url)
+        self.assertEqual(contact.thumb_width, self.thumb_width)
+        self.assertEqual(contact.thumb_height, self.thumb_height)
+        self.assertDictEqual(contact.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(gif.reply_markup.to_dict(),
+        self.assertDictEqual(contact.reply_markup.to_dict(),
                              self.reply_markup.to_dict())
 
-    def test_gif_to_json(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+    def test_contact_to_json(self):
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
 
-        self.assertTrue(self.is_json(gif.to_json()))
+        self.assertTrue(self.is_json(contact.to_json()))
 
-    def test_gif_to_dict(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict).to_dict()
+    def test_contact_to_dict(self):
+        contact = telegram.InlineQueryResultContact.de_json(
+            self.json_dict).to_dict()
 
-        self.assertTrue(self.is_dict(gif))
-        self.assertDictEqual(self.json_dict, gif)
+        self.assertTrue(self.is_dict(contact))
+        self.assertDictEqual(self.json_dict, contact)
 
 
 if __name__ == '__main__':
