@@ -121,7 +121,7 @@ You can install or upgrade python-telegram-bot with:
 
 .. code:: shell
 
-    $ pip install python-telegram-bot==4.0rc1 --upgrade
+    $ pip install python-telegram-bot --upgrade
 
 ===================
 _`Getting the code`
