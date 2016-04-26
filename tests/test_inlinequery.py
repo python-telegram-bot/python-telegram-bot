@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram
 InlineQuery"""
 
@@ -37,7 +36,6 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQuery."""
 
     def setUp(self):
-
         user = telegram.User(1, 'First name')
 
         self.id = 'id'

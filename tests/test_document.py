@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Document"""
 
-import os
-import unittest
 import sys
+import unittest
+import os
+
 from flaky import flaky
 
 sys.path.append('.')
@@ -56,8 +56,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file(self):
-        message = self._bot.sendDocument(self._chat_id,
-                                         self.document_file)
+        message = self._bot.sendDocument(self._chat_id, self.document_file)
 
         document = message.document
 
@@ -87,8 +86,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_url_gif_file(self):
-        message = self._bot.sendDocument(self._chat_id,
-                                         self.document_file_url)
+        message = self._bot.sendDocument(self._chat_id, self.document_file_url)
 
         document = message.document
 
@@ -141,7 +139,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     def test_error_send_document_empty_file(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['document'] = open(os.devnull, 'rb')
 
         self.assertRaises(telegram.TelegramError,
@@ -153,7 +151,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     def test_error_send_document_empty_file_id(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['document'] = ''
 
         self.assertRaises(telegram.TelegramError,
@@ -165,11 +163,12 @@ class DocumentTest(BaseTest, unittest.TestCase):
     def test_error_document_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendDocument(chat_id=self._chat_id,
                                                          **json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()

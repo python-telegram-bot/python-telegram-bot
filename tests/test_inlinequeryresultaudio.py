@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a object that represents Tests for Telegram
-InlineQueryResultArticle"""
+InlineQueryResultAudio"""
 
 import sys
 
@@ -32,67 +32,58 @@ import telegram
 from tests.base import BaseTest
 
 
-class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultArticle."""
+class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultAudio."""
 
     def setUp(self):
         self.id = 'id'
-        self.type = 'article'
+        self.type = 'audio'
+        self.audio_url = 'audio url'
         self.title = 'title'
+        self.performer = 'performer'
+        self.audio_duration = 'audio_duration'
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
-        self.url = 'url'
-        self.hide_url = True
-        self.description = 'description'
-        self.thumb_url = 'thumb url'
-        self.thumb_height = 10
-        self.thumb_width = 15
 
         self.json_dict = {
             'type': self.type,
             'id': self.id,
+            'audio_url': self.audio_url,
             'title': self.title,
+            'performer': self.performer,
+            'audio_duration': self.audio_duration,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
-            'url': self.url,
-            'hide_url': self.hide_url,
-            'description': self.description,
-            'thumb_url': self.thumb_url,
-            'thumb_height': self.thumb_height,
-            'thumb_width': self.thumb_width
         }
 
-    def test_article_de_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+    def test_audio_de_json(self):
+        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict)
 
-        self.assertEqual(article.type, self.type)
-        self.assertEqual(article.id, self.id)
-        self.assertEqual(article.title, self.title)
-        self.assertDictEqual(article.input_message_content.to_dict(),
+        self.assertEqual(audio.type, self.type)
+        self.assertEqual(audio.id, self.id)
+        self.assertEqual(audio.audio_url, self.audio_url)
+        self.assertEqual(audio.title, self.title)
+        self.assertEqual(audio.performer, self.performer)
+        self.assertEqual(audio.audio_duration, self.audio_duration)
+        self.assertDictEqual(audio.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(article.reply_markup.to_dict(),
+        self.assertDictEqual(audio.reply_markup.to_dict(),
                              self.reply_markup.to_dict())
-        self.assertEqual(article.url, self.url)
-        self.assertEqual(article.hide_url, self.hide_url)
-        self.assertEqual(article.description, self.description)
-        self.assertEqual(article.thumb_url, self.thumb_url)
-        self.assertEqual(article.thumb_height, self.thumb_height)
-        self.assertEqual(article.thumb_width, self.thumb_width)
 
-    def test_article_to_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+    def test_audio_to_json(self):
+        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict)
 
-        self.assertTrue(self.is_json(article.to_json()))
+        self.assertTrue(self.is_json(audio.to_json()))
 
-    def test_article_to_dict(self):
-        article = telegram.InlineQueryResultArticle.de_json(
+    def test_audio_to_dict(self):
+        audio = telegram.InlineQueryResultAudio.de_json(
             self.json_dict).to_dict()
 
-        self.assertTrue(self.is_dict(article))
-        self.assertDictEqual(self.json_dict, article)
+        self.assertTrue(self.is_dict(audio))
+        self.assertDictEqual(self.json_dict, audio)
 
 
 if __name__ == '__main__':

@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Sticker"""
 
-import os
-import unittest
 import sys
+import unittest
+import os
+
 from flaky import flaky
 
 sys.path.append('.')
@@ -60,7 +60,7 @@ class StickerTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def test_send_sticker_resend(self):
         message = self._bot.sendSticker(chat_id=self._chat_id,
-                                         sticker=self.sticker_file_id)
+                                        sticker=self.sticker_file_id)
 
         sticker = message.sticker
 
@@ -98,7 +98,7 @@ class StickerTest(BaseTest, unittest.TestCase):
     def test_error_send_sticker_empty_file(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['sticker'] = open(os.devnull, 'rb')
 
         self.assertRaises(telegram.TelegramError,
@@ -110,23 +110,24 @@ class StickerTest(BaseTest, unittest.TestCase):
     def test_error_send_sticker_empty_file_id(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
         json_dict['sticker'] = ''
 
         self.assertRaises(telegram.TelegramError,
                           lambda: self._bot.sendSticker(chat_id=self._chat_id,
-                                                         **json_dict))
+                                                        **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
     def test_error_sticker_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
+        del (json_dict['file_id'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.sendSticker(chat_id=self._chat_id,
-                                                         **json_dict))
+                                                        **json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()

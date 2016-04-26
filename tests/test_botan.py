@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
 """This module contains a object that represents Tests for Botan analytics integration"""
 
-import os
-import unittest
 import sys
+import unittest
+import os
+
 from flaky import flaky
 
 sys.path.append('.')
@@ -55,6 +55,7 @@ class BotanTest(BaseTest, unittest.TestCase):
         message = MessageMock(self._chat_id)
         result = botan.track(message, 'named event')
         self.assertFalse(result)
+
 
 if __name__ == '__main__':
     unittest.main()

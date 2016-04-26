@@ -16,24 +16,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Emoji"""
+"""This module contains a object that represents Tests for Telegram
+InputMessageContent"""
 
 import sys
-import unittest
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
 
 sys.path.append('.')
 
-from telegram.emoji import Emoji
+import telegram
 from tests.base import BaseTest
 
 
-class EmojiTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Emoji."""
+class InputMessageContentTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InputMessageContent."""
 
-    def test_emoji(self):
-        for attr in dir(Emoji):
-            if attr[0] != '_':  # TODO: dirty way to filter out functions
-                self.assertTrue(type(getattr(Emoji, attr)) is str)
+    def test_imc_de_json(self):
+        imc = telegram.InputMessageContent.de_json(None)
+
+        self.assertFalse(imc)
 
 
 if __name__ == '__main__':
