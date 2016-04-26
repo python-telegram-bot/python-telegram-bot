@@ -1,6 +1,6 @@
 **2016-04-27**
 
-*Released 4.0*
+*Released 4.0.1*
 
 - Implement Bot API 2.0
 - Almost complete recode of ``Dispatcher``
@@ -8,6 +8,7 @@
 - **Changes from 4.0rc1**
     - The syntax of filters for ``MessageHandler`` (upper/lower cases)
     - Handler groups are now identified by ``int`` only, and ordered
+- **Note:** v4.0 has been skipped due to a PyPI accident
 
 **2016-04-22**
 
