@@ -43,28 +43,28 @@ class KeyboardButtonTest(BaseTest, unittest.TestCase):
             'request_contact': self.request_contact,
         }
 
-    def test_inline_keyboard_button_de_json(self):
-        inline_keyboard_button = telegram.KeyboardButton.de_json(
+    def test_keyboard_button_de_json(self):
+        keyboard_button = telegram.KeyboardButton.de_json(
             self.json_dict)
 
-        self.assertEqual(inline_keyboard_button.text, self.text)
-        self.assertEqual(inline_keyboard_button.request_location,
+        self.assertEqual(keyboard_button.text, self.text)
+        self.assertEqual(keyboard_button.request_location,
                          self.request_location)
-        self.assertEqual(inline_keyboard_button.request_contact,
+        self.assertEqual(keyboard_button.request_contact,
                          self.request_contact)
 
-    def test_inline_keyboard_button_to_json(self):
-        inline_keyboard_button = telegram.KeyboardButton.de_json(
+    def test_keyboard_button_to_json(self):
+        keyboard_button = telegram.KeyboardButton.de_json(
             self.json_dict)
 
-        self.assertTrue(self.is_json(inline_keyboard_button.to_json()))
+        self.assertTrue(self.is_json(keyboard_button.to_json()))
 
-    def test_inline_keyboard_button_to_dict(self):
-        inline_keyboard_button = telegram.KeyboardButton.de_json(
+    def test_keyboard_button_to_dict(self):
+        keyboard_button = telegram.KeyboardButton.de_json(
             self.json_dict).to_dict()
 
-        self.assertTrue(self.is_dict(inline_keyboard_button))
-        self.assertDictEqual(self.json_dict, inline_keyboard_button)
+        self.assertTrue(self.is_dict(keyboard_button))
+        self.assertDictEqual(self.json_dict, keyboard_button)
 
 
 if __name__ == '__main__':
