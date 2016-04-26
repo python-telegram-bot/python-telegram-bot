@@ -43,11 +43,9 @@ class Bot(TelegramObject):
 
     Args:
         token (str): Bot's unique authentication.
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         base_url (Optional[str]): Telegram Bot API service URL.
         base_file_url (Optional[str]): Telegram Bot API file URL.
+
     """
 
     def __init__(self,
