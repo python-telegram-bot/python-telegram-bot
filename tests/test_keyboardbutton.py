@@ -21,7 +21,11 @@
 KeyboardButton"""
 
 import sys
-import unittest
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
 
 sys.path.append('.')
 

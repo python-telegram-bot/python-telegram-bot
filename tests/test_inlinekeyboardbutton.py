@@ -20,7 +20,11 @@
 """This module contains a object that represents Tests for Telegram InlineKeyboardButton"""
 
 import sys
-import unittest
+
+if sys.version_info[0:2] == (2, 6):
+    import unittest2 as unittest
+else:
+    import unittest
 
 sys.path.append('.')
 
