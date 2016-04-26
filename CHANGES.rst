@@ -1,3 +1,14 @@
+**2016-04-27**
+
+*Released 4.0*
+
+- Implement Bot API 2.0
+- Almost complete recode of ``Dispatcher``
+- Please read the `Transistion Guide to 4.0 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transistion-guide-to-Version-4.0>`_
+- **Changes from 4.0rc1**
+    - The syntax of filters for ``MessageHandler`` (upper/lower cases)
+    - Handler groups are now identified by ``int`` only, and ordered
+
 **2016-04-22**
 
 *Released 4.0rc1*
