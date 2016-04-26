@@ -21,8 +21,8 @@
 
 import sys
 from datetime import datetime
-
 import io
+
 from flaky import flaky
 
 if sys.version_info[0:2] == (2, 6):

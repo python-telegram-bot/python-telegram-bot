@@ -21,8 +21,8 @@
 """This module contains a object that represents a Telegram Bot."""
 
 import logging
-
 import functools
+
 from telegram import User, Message, Update, UserProfilePhotos, File, \
     ReplyMarkup, TelegramObject, NullHandler
 from telegram.utils import request

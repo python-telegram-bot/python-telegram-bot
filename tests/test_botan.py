@@ -3,8 +3,8 @@
 
 import sys
 import unittest
-
 import os
+
 from flaky import flaky
 
 sys.path.append('.')

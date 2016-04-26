@@ -20,9 +20,10 @@
 This module contains a object that represents Tests for MessageHandler.Filters
 """
 
-import unittest
 import sys
+import unittest
 from datetime import datetime
+
 sys.path.append('.')
 
 from telegram import Update, Message, User, Chat

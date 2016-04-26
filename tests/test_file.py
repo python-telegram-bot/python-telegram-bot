@@ -20,7 +20,6 @@
 
 import sys
 import unittest
-
 import os
 
 sys.path.append('.')

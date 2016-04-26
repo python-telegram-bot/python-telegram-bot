@@ -24,13 +24,13 @@ WebhookServer and WebhookHandler
 import logging
 import signal
 import sys
-from datetime import datetime
-from time import sleep
-
 import os
 import re
-from future.builtins import bytes
+from datetime import datetime
+from time import sleep
 from random import randrange
+
+from future.builtins import bytes
 
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
