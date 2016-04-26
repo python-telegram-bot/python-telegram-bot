@@ -21,6 +21,8 @@
 
 import re
 
+from future.utils import string_types
+
 from .handler import Handler
 from telegram import Update
 
@@ -52,7 +54,7 @@ class RegexHandler(Handler):
                  pass_groupdict=False, pass_update_queue=False):
         super(RegexHandler, self).__init__(callback, pass_update_queue)
 
-        if isinstance(pattern, str):
+        if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
 
         self.pattern = pattern

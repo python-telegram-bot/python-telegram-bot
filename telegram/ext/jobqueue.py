@@ -22,11 +22,7 @@
 import logging
 import time
 from threading import Thread, Lock
-
-try:
-    from queue import PriorityQueue
-except ImportError:
-    from Queue import PriorityQueue
+from queue import PriorityQueue
 
 
 class JobQueue(object):

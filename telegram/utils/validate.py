@@ -21,24 +21,6 @@
 
 from telegram.error import InvalidToken
 
-try:
-    type(basestring)
-except NameError:
-    basestring = str
-
-
-def validate_string(arg, name):
-    """
-    Validate a string argument. Raises a ValueError if `arg` is neither an
-    instance of basestring (Python 2) or str (Python 3) nor None.
-
-    Args:
-        arg (basestring): The value to be tested
-        name (str): The name of the argument, for the error message
-    """
-    if not isinstance(arg, basestring) and arg is not None:
-        raise ValueError(name + ' is not a string')
-
 
 def validate_token(token):
     """a very basic validation on token"""

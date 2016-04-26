@@ -64,8 +64,9 @@ class TelegramObject(object):
         """
         data = dict()
 
-        for key, value in self.__dict__.items():
-            if value or value == '':
+        for key in iter(self.__dict__):
+            value = self.__dict__[key]
+            if value is not None:
                 if hasattr(value, 'to_dict'):
                     data[key] = value.to_dict()
                 else:

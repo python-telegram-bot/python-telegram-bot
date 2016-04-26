@@ -919,7 +919,7 @@ class Bot(TelegramObject):
             data['cache_time'] = cache_time
         if is_personal:
             data['is_personal'] = is_personal
-        if next_offset or next_offset == '':
+        if next_offset is not None:
             data['next_offset'] = next_offset
         if switch_pm_text:
             data['switch_pm_text'] = switch_pm_text
@@ -1443,7 +1443,7 @@ class Bot(TelegramObject):
 
         data = {}
 
-        if webhook_url or webhook_url == '':
+        if webhook_url is not None:
             data['url'] = webhook_url
         if certificate:
             data['certificate'] = certificate

@@ -19,7 +19,7 @@ Type 'stop' on the command line to stop the bot.
 """
 
 from telegram.ext import Updater, StringCommandHandler, StringRegexHandler, \
-    MessageHandler, CommandHandler, RegexHandler, filters
+    MessageHandler, CommandHandler, RegexHandler, Filters
 from telegram.ext.dispatcher import run_async
 from time import sleep
 import logging
@@ -115,7 +115,7 @@ def main():
     dp.addHandler(CommandHandler("start", start))
     dp.addHandler(CommandHandler("help", help))
     # Message handlers only receive updates that don't contain commands
-    dp.addHandler(MessageHandler([filters.TEXT], message))
+    dp.addHandler(MessageHandler([Filters.text], message))
     # Regex handlers will receive all updates on which their regex matches,
     # but we have to add it in a separate group, since in one group,
     # only one handler will be executed
