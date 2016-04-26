@@ -47,9 +47,9 @@ class FiltersTest(BaseTest, unittest.TestCase):
 
     def test_filters_command(self):
         self.message.text = 'test'
-        self.assertFalse(Filters.text(self.update))
+        self.assertFalse(Filters.command(self.update))
         self.message.text = '/test'
-        self.assertTrue(Filters.text(self.update))
+        self.assertTrue(Filters.command(self.update))
 
     def test_filters_audio(self):
         self.message.audio = 'test'
