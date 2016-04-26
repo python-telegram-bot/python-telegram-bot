@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
-MessageEntity"""
+"""This module contains a object that represents Tests for Telegram Venue"""
 
 import sys
 
@@ -32,37 +31,37 @@ import telegram
 from tests.base import BaseTest
 
 
-class MessageEntityTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram MessageEntity."""
+class VenueTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram Venue."""
 
     def setUp(self):
-        self.type = 'type'
-        self.offset = 1
-        self.length = 2
-        self.url = 'url'
+        self.location = telegram.Location(longitude=1., latitude=0.)
+        self.title = 'title'
+        self.address = 'address'
+        self.foursquare_id = 'foursquare id'
 
         self.json_dict = {
-            'type': self.type,
-            'offset': self.offset,
-            'length': self.length,
-            'url': self.url
+            'location': self.location.to_dict(),
+            'title': self.title,
+            'address': self.address,
+            'foursquare_id': self.foursquare_id
         }
 
     def test_sticker_de_json(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict)
+        sticker = telegram.Venue.de_json(self.json_dict)
 
-        self.assertEqual(sticker.type, self.type)
-        self.assertEqual(sticker.offset, self.offset)
-        self.assertEqual(sticker.length, self.length)
-        self.assertEqual(sticker.url, self.url)
+        self.assertTrue(isinstance(sticker.location, telegram.Location))
+        self.assertEqual(sticker.title, self.title)
+        self.assertEqual(sticker.address, self.address)
+        self.assertEqual(sticker.foursquare_id, self.foursquare_id)
 
     def test_sticker_to_json(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict)
+        sticker = telegram.Venue.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict).to_dict()
+        sticker = telegram.Venue.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)
