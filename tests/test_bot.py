@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Bot"""
 
 import sys
@@ -55,8 +54,9 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendMessage(self):
-        message = self._bot.sendMessage(chat_id=self._chat_id,
-                                        text='Моё судно на воздушной подушке полно угрей')
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id,
+            text='Моё судно на воздушной подушке полно угрей')
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text,
@@ -66,9 +66,10 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSilentSendMessage(self):
-        message = self._bot.sendMessage(chat_id=self._chat_id,
-                                        text='Моё судно на воздушной подушке полно угрей',
-                                        disable_notification=True)
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id,
+            text='Моё судно на воздушной подушке полно угрей',
+            disable_notification=True)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text,
@@ -129,8 +130,9 @@ class BotTest(BaseTest, unittest.TestCase):
             chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_id,
-                         'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
+        self.assertEqual(
+            message.photo[0].file_id,
+            'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
 
     @flaky(3, 1)
     @timeout(10)
@@ -167,8 +169,7 @@ class BotTest(BaseTest, unittest.TestCase):
     def testSendBufferedReaderPhoto(self):
         photo = open('tests/data/telegram.png', 'rb')
         br_photo = io.BufferedReader(io.BytesIO(photo.read()))
-        message = self._bot.sendPhoto(photo=br_photo,
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(photo=br_photo, chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 1451)

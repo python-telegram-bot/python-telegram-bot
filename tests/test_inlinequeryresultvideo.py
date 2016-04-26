@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram
 InlineQueryResultVideo"""
 
@@ -51,7 +50,8 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')]])
+            telegram.InlineKeyboardButton('reply_markup')
+        ]])
 
         self.json_dict = {
             'type': self.type,
@@ -94,8 +94,8 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(video.to_json()))
 
     def test_video_to_dict(self):
-        video = \
-            telegram.InlineQueryResultVideo.de_json(self.json_dict).to_dict()
+        video = telegram.InlineQueryResultVideo.de_json(
+            self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(video))
         self.assertDictEqual(self.json_dict, video)

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Audio"""
 
 import sys
@@ -56,8 +55,7 @@ class AudioTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_audio_required_args_only(self):
-        message = self._bot.sendAudio(self._chat_id,
-                                      self.audio_file)
+        message = self._bot.sendAudio(self._chat_id, self.audio_file)
 
         audio = message.audio
 

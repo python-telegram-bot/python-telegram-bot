@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """
 This module contains a object that represents Tests for Updater, Dispatcher,
 WebhookServer and WebhookHandler
@@ -162,8 +161,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         self._setup_updater('Multiple', 100)
-        self.updater.dispatcher.addHandler(
-            MessageHandler([], self.telegramHandlerTest))
+        self.updater.dispatcher.addHandler(MessageHandler(
+            [], self.telegramHandlerTest))
         self.updater.start_polling(0.0)
         sleep(2)
         self.assertEqual(self.received_message, 'Multiple')
@@ -366,8 +365,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)
-        handler = StringCommandHandler('test5', self.additionalArgsTest,
-                                       pass_update_queue=True, pass_args=True)
+        handler = StringCommandHandler('test5',
+                                       self.additionalArgsTest,
+                                       pass_update_queue=True,
+                                       pass_args=True)
         self.updater.dispatcher.addHandler(handler)
 
         queue = self.updater.start_polling(0.01)
@@ -381,7 +382,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d = self.updater.dispatcher
         handler = StringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
                                      self.regexGroupHandlerTest,
-                                     pass_groupdict=True, pass_groups=True)
+                                     pass_groupdict=True,
+                                     pass_groups=True)
         d.addHandler(handler)
         queue = self.updater.start_polling(0.01)
         queue.put('This is a test message for regex group matching.')
@@ -392,7 +394,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_runAsyncWithAdditionalArgs(self):
         self._setup_updater('Test6', messages=2)
         d = self.updater.dispatcher
-        handler = MessageHandler([], self.asyncAdditionalHandlerTest,
+        handler = MessageHandler([],
+                                 self.asyncAdditionalHandlerTest,
                                  pass_update_queue=True)
         d.addHandler(handler)
         self.updater.start_polling(0.01)
@@ -408,7 +411,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port for travis
-        self.updater.start_webhook(ip, port,
+        self.updater.start_webhook(ip,
+                                   port,
                                    url_path='TOKEN',
                                    cert='./tests/test_updater.py',
                                    key='./tests/test_updater.py',
@@ -418,7 +422,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         Thread(target=self.updater.httpd.serve_forever).start()
 
         # Now, we send an update to the server via urlopen
-        message = Message(1, User(1, "Tester"), datetime.now(),
+        message = Message(1,
+                          User(1, "Tester"),
+                          datetime.now(),
                           Chat(1, "group", title="Test Group"))
 
         message.text = "Webhook Test"
@@ -435,8 +441,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(b'', response.read())
         self.assertEqual(200, response.code)
 
-        response = self._send_webhook_msg(ip, port, None, 'webookhandler.py',
-                                          get_method=lambda: 'HEAD')
+        response = self._send_webhook_msg(
+            ip, port,
+            None, 'webookhandler.py',
+            get_method=lambda: 'HEAD')
 
         self.assertEqual(b'', response.read())
         self.assertEqual(200, response.code)
@@ -458,7 +466,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(0.5)
 
         # Now, we send an update to the server via urlopen
-        message = Message(1, User(1, "Tester 2"), datetime.now(),
+        message = Message(1,
+                          User(1, "Tester 2"),
+                          datetime.now(),
                           Chat(1, 'group', title="Test Group 2"))
 
         message.text = "Webhook Test 2"
@@ -484,7 +494,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_bootstrap_retries_unauth(self):
         retries = 3
-        self._setup_updater('', messages=0, bootstrap_retries=retries,
+        self._setup_updater('',
+                            messages=0,
+                            bootstrap_retries=retries,
                             bootstrap_err=Unauthorized())
 
         self.assertRaises(Unauthorized, self.updater._set_webhook, 'path',
@@ -493,7 +505,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_bootstrap_retries_invalid_token(self):
         retries = 3
-        self._setup_updater('', messages=0, bootstrap_retries=retries,
+        self._setup_updater('',
+                            messages=0,
+                            bootstrap_retries=retries,
                             bootstrap_err=InvalidToken())
 
         self.assertRaises(InvalidToken, self.updater._set_webhook, 'path',
@@ -522,14 +536,16 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         try:
             with self.assertRaises(HTTPError) as ctx:
-                self._send_webhook_msg(ip, port,
+                self._send_webhook_msg(ip,
+                                       port,
                                        '<root><bla>data</bla></root>',
                                        content_type='application/xml')
             self.assertEqual(ctx.exception.code, 403)
 
             with self.assertRaises(HTTPError) as ctx:
-                self._send_webhook_msg(ip, port, 'dummy-payload',
-                                       content_len=-2)
+                self._send_webhook_msg(
+                    ip, port, 'dummy-payload',
+                    content_len=-2)
             self.assertEqual(ctx.exception.code, 403)
 
             # TODO: prevent urllib or the underlying from adding content-length
@@ -539,7 +555,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             # self.assertEqual(ctx.exception.code, 411)
 
             with self.assertRaises(HTTPError) as ctx:
-                self._send_webhook_msg(ip, port, 'dummy-payload',
+                self._send_webhook_msg(ip,
+                                       port,
+                                       'dummy-payload',
                                        content_len='not-a-number')
             self.assertEqual(ctx.exception.code, 403)
 
@@ -547,12 +565,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             self.updater._stop_httpd()
             thr.join()
 
-    def _send_webhook_msg(self, ip, port, payload_str, url_path='',
-                          content_len=-1, content_type='application/json',
+    def _send_webhook_msg(self,
+                          ip,
+                          port,
+                          payload_str,
+                          url_path='',
+                          content_len=-1,
+                          content_type='application/json',
                           get_method=None):
-        headers = {
-            'content-type': content_type,
-        }
+        headers = {'content-type': content_type, }
 
         if not payload_str:
             content_len = None
@@ -566,8 +587,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         if content_len is not None:
             headers['content-length'] = str(content_len)
 
-        url = 'http://{ip}:{port}/{path}'.format(ip=ip, port=port,
-                                                 path=url_path)
+        url = 'http://{ip}:{port}/{path}'.format(
+            ip=ip, port=port, path=url_path)
 
         req = Request(url, data=payload, headers=headers)
 
@@ -602,8 +623,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
 
 class MockBot(object):
-    def __init__(self, text, messages=1, raise_error=False,
-                 bootstrap_retries=None, bootstrap_err=TelegramError('test')):
+    def __init__(self,
+                 text,
+                 messages=1,
+                 raise_error=False,
+                 bootstrap_retries=None,
+                 bootstrap_err=TelegramError('test')):
         self.text = text
         self.send_messages = messages
         self.raise_error = raise_error
@@ -628,11 +653,7 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def getUpdates(self,
-                   offset=None,
-                   limit=100,
-                   timeout=0,
-                   network_delay=2.):
+    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=2.):
 
         if self.raise_error:
             raise TelegramError('Test Error 2')

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Voice"""
 
 import sys
@@ -52,8 +51,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_required_args_only(self):
-        message = self._bot.sendVoice(self._chat_id,
-                                      self.voice_file)
+        message = self._bot.sendVoice(self._chat_id, self.voice_file)
 
         voice = message.voice
 

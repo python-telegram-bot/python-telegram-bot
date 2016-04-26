@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram
 InlineQueryResultCachedDocument"""
 
@@ -47,7 +46,8 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')]])
+            telegram.InlineKeyboardButton('reply_markup')
+        ]])
         self.json_dict = {
             'id': self.id,
             'type': self.type,
@@ -81,9 +81,8 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(document.to_json()))
 
     def test_document_to_dict(self):
-        document = \
-            telegram.InlineQueryResultCachedDocument.de_json(
-                self.json_dict).to_dict()
+        document = telegram.InlineQueryResultCachedDocument.de_json(
+            self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(document))
         self.assertDictEqual(self.json_dict, document)

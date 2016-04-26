@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram
 InlineQueryResultCachedAudio"""
 
@@ -44,7 +43,8 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')]])
+            telegram.InlineKeyboardButton('reply_markup')
+        ]])
 
         self.json_dict = {
             'type': self.type,
@@ -71,9 +71,8 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(audio.to_json()))
 
     def test_audio_to_dict(self):
-        audio = \
-            telegram.InlineQueryResultCachedAudio.de_json(
-                self.json_dict).to_dict()
+        audio = telegram.InlineQueryResultCachedAudio.de_json(
+            self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(audio))
         self.assertDictEqual(self.json_dict, audio)

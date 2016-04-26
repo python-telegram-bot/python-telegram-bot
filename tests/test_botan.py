@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """This module contains a object that represents Tests for Botan analytics integration"""
 
 import sys

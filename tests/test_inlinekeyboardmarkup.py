@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram InlineKeyboardMarkup"""
 
 import sys
@@ -33,11 +32,10 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram KeyboardButton."""
 
     def setUp(self):
-        self.inline_keyboard = \
-            [[telegram.InlineKeyboardButton(text='button1',
-                                            callback_data='data1'),
-              telegram.InlineKeyboardButton(text='button2',
-                                            callback_data='data2')]]
+        self.inline_keyboard = [[telegram.InlineKeyboardButton(
+            text='button1',
+            callback_data='data1'), telegram.InlineKeyboardButton(
+                text='button2', callback_data='data2')]]
 
         self.json_dict = {
             'inline_keyboard': [[self.inline_keyboard[0][0].to_dict(),
@@ -45,11 +43,10 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         }
 
     def test_send_message_with_inline_keyboard_markup(self):
-        message = self._bot.sendMessage(self._chat_id,
-                                        'Testing InlineKeyboardMarkup',
-                                        reply_markup=
-                                        telegram.InlineKeyboardMarkup(
-                                            self.inline_keyboard))
+        message = self._bot.sendMessage(
+            self._chat_id,
+            'Testing InlineKeyboardMarkup',
+            reply_markup=telegram.InlineKeyboardMarkup(self.inline_keyboard))
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, 'Testing InlineKeyboardMarkup')
@@ -58,9 +55,10 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(
             self.json_dict)
 
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][0],
-                                   telegram.InlineKeyboardButton))
+        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard,
+                                   list))
+        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][
+            0], telegram.InlineKeyboardButton))
 
     def test_inline_keyboard_markup_to_json(self):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(
@@ -72,9 +70,10 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(
             self.json_dict)
 
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][0],
-                                   telegram.InlineKeyboardButton))
+        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard,
+                                   list))
+        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][
+            0], telegram.InlineKeyboardButton))
 
 
 if __name__ == '__main__':

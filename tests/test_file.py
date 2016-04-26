@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram File"""
 
 import sys
@@ -42,7 +41,8 @@ class FileTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'file_id': self.audio_file_id,
-            'file_path': 'https://api.telegram.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3',
+            'file_path':
+            'https://api.telegram.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3',
             'file_size': 28232
         }
 
@@ -137,8 +137,7 @@ class FileTest(BaseTest, unittest.TestCase):
         del (json_dict['file_path'])
         del (json_dict['file_size'])
 
-        self.assertRaises(TypeError,
-                          lambda: self._bot.getFile(**json_dict))
+        self.assertRaises(TypeError, lambda: self._bot.getFile(**json_dict))
 
 
 if __name__ == '__main__':

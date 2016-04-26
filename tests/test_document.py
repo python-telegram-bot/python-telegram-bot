@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Document"""
 
 import sys
@@ -57,8 +56,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file(self):
-        message = self._bot.sendDocument(self._chat_id,
-                                         self.document_file)
+        message = self._bot.sendDocument(self._chat_id, self.document_file)
 
         document = message.document
 
@@ -88,8 +86,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_url_gif_file(self):
-        message = self._bot.sendDocument(self._chat_id,
-                                         self.document_file_url)
+        message = self._bot.sendDocument(self._chat_id, self.document_file_url)
 
         document = message.document
 

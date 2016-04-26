@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Photo"""
 
 import sys
@@ -40,10 +39,13 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
         self.width = 300
         self.height = 300
-        self.thumb = {'width': 90,
-                      'height': 90,
-                      'file_id': 'AgADAQADvb8xGx8j9QcpZDKxYoFK3bfX1i8ABBxRLXFhLnhIQ-gAAgI',
-                      'file_size': 1478}
+        self.thumb = {
+            'width': 90,
+            'height': 90,
+            'file_id':
+            'AgADAQADvb8xGx8j9QcpZDKxYoFK3bfX1i8ABBxRLXFhLnhIQ-gAAgI',
+            'file_size': 1478
+        }
         self.file_size = 10209
 
         # caption is part of sendPhoto method but not Photo object
@@ -84,8 +86,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_photo_jpg_file(self):
-        message = self._bot.sendPhoto(self._chat_id,
-                                      self.photo_file)
+        message = self._bot.sendPhoto(self._chat_id, self.photo_file)
 
         thumb, photo = message.photo
 
@@ -106,8 +107,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_photo_url_jpg_file(self):
-        message = self._bot.sendPhoto(self._chat_id,
-                                      self.photo_file_url)
+        message = self._bot.sendPhoto(self._chat_id, self.photo_file_url)
 
         thumb, photo = message.photo
 

@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram ReplyKeyboardMarkup"""
 
 import sys
@@ -48,10 +47,10 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         }
 
     def test_send_message_with_reply_keyboard_markup(self):
-        message = self._bot.sendMessage(self._chat_id,
-                                        'Моё судно на воздушной подушке полно угрей',
-                                        reply_markup=telegram.ReplyKeyboardMarkup.de_json(
-                                            self.json_dict))
+        message = self._bot.sendMessage(
+            self._chat_id,
+            'Моё судно на воздушной подушке полно угрей',
+            reply_markup=telegram.ReplyKeyboardMarkup.de_json(self.json_dict))
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text,

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram
 InlineQueryResultVoice"""
 
@@ -45,7 +44,8 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')]])
+            telegram.InlineKeyboardButton('reply_markup')
+        ]])
 
         self.json_dict = {
             'type': self.type,
@@ -76,8 +76,8 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(voice.to_json()))
 
     def test_voice_to_dict(self):
-        voice = \
-            telegram.InlineQueryResultVoice.de_json(self.json_dict).to_dict()
+        voice = telegram.InlineQueryResultVoice.de_json(
+            self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(voice))
         self.assertDictEqual(self.json_dict, voice)

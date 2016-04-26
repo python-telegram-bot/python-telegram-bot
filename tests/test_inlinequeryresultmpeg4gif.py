@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram
 InlineQueryResultMpeg4Gif"""
 
@@ -48,7 +47,8 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')]])
+            telegram.InlineKeyboardButton('reply_markup')
+        ]])
 
         self.json_dict = {
             'type': self.type,
@@ -85,9 +85,8 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(mpeg4.to_json()))
 
     def test_mpeg4_to_dict(self):
-        mpeg4 = \
-            telegram.InlineQueryResultMpeg4Gif.de_json(
-                self.json_dict).to_dict()
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(
+            self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(mpeg4))
         self.assertDictEqual(self.json_dict, mpeg4)

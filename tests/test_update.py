@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Update"""
 
 import sys
@@ -46,10 +45,7 @@ class UpdateTest(BaseTest, unittest.TestCase):
                         'date': 1441644592,
                         'text': "Update Test"}
 
-        self.json_dict = {
-            'update_id': self.update_id,
-            'message': self.message
-        }
+        self.json_dict = {'update_id': self.update_id, 'message': self.message}
 
     def test_update_de_json(self):
         update = telegram.Update.de_json(self.json_dict)
