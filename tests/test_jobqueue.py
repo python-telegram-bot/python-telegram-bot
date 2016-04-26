@@ -46,7 +46,8 @@ root.setLevel(logging.INFO)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.WARN)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
@@ -110,6 +111,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         u.stop()
         sleep(2)
         self.assertEqual(1, self.result)
+
 
 if __name__ == '__main__':
     unittest.main()

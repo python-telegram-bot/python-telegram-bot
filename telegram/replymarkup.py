@@ -27,4 +27,9 @@ class ReplyMarkup(TelegramObject):
 
     @staticmethod
     def de_json(data):
-        pass
+        data = super(ReplyMarkup, ReplyMarkup).de_json(data)
+
+        if not data:
+            return None
+
+        return data

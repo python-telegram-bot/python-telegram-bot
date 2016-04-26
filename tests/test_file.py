@@ -19,9 +19,11 @@
 
 """This module contains a object that represents Tests for Telegram File"""
 
-import os
-import unittest
 import sys
+import unittest
+
+import os
+
 sys.path.append('.')
 
 import telegram
@@ -37,7 +39,6 @@ class FileTest(BaseTest, unittest.TestCase):
         self.sticker_file_id = 'BQADAQADHAADyIsGAAFZfq1bphjqlgI'
         self.video_file_id = 'BAADAQADXwADHyP1BwJFTcmY2RYCAg'
         self.voice_file_id = 'AwADAQADTgADHyP1B_mbw34svXPHAg'
-
 
         self.json_dict = {
             'file_id': self.audio_file_id,
@@ -123,8 +124,8 @@ class FileTest(BaseTest, unittest.TestCase):
     def test_error_get_empty_file_id(self):
         json_dict = self.json_dict
         json_dict['file_id'] = ''
-        del(json_dict['file_path'])
-        del(json_dict['file_size'])
+        del (json_dict['file_path'])
+        del (json_dict['file_size'])
 
         self.assertRaises(telegram.TelegramError,
                           lambda: self._bot.getFile(**json_dict))
@@ -132,12 +133,13 @@ class FileTest(BaseTest, unittest.TestCase):
     def test_error_file_without_required_args(self):
         json_dict = self.json_dict
 
-        del(json_dict['file_id'])
-        del(json_dict['file_path'])
-        del(json_dict['file_size'])
+        del (json_dict['file_id'])
+        del (json_dict['file_path'])
+        del (json_dict['file_size'])
 
         self.assertRaises(TypeError,
                           lambda: self._bot.getFile(**json_dict))
+
 
 if __name__ == '__main__':
     unittest.main()

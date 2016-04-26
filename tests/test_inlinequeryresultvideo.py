@@ -48,6 +48,10 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.caption = 'caption'
         self.description = 'description'
+        self.input_message_content = telegram.InputTextMessageContent(
+            'input_message_content')
+        self.reply_markup = telegram.InlineKeyboardMarkup([[
+            telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -61,6 +65,8 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
             'title': self.title,
             'caption': self.caption,
             'description': self.description,
+            'input_message_content': self.input_message_content.to_dict(),
+            'reply_markup': self.reply_markup.to_dict(),
         }
 
     def test_video_de_json(self):
@@ -77,6 +83,10 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.title, self.title)
         self.assertEqual(video.description, self.description)
         self.assertEqual(video.caption, self.caption)
+        self.assertDictEqual(video.input_message_content.to_dict(),
+                             self.input_message_content.to_dict())
+        self.assertDictEqual(video.reply_markup.to_dict(),
+                             self.reply_markup.to_dict())
 
     def test_video_to_json(self):
         video = telegram.InlineQueryResultVideo.de_json(self.json_dict)

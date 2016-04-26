@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains a object that represents Tests for Telegram
-InlineQueryResultMpeg4Gif"""
+InlineQueryResultCachedAudio"""
 
 import sys
 
@@ -33,18 +33,14 @@ import telegram
 from tests.base import BaseTest
 
 
-class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultMpeg4Gif."""
+class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram
+    InlineQueryResultCachedAudio."""
 
     def setUp(self):
         self.id = 'id'
-        self.type = 'mpeg4_gif'
-        self.mpeg4_url = 'mpeg4 url'
-        self.mpeg4_width = 10
-        self.mpeg4_height = 15
-        self.thumb_url = 'thumb url'
-        self.title = 'title'
-        self.caption = 'caption'
+        self.type = 'audio'
+        self.audio_file_id = 'audio file id'
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
@@ -53,44 +49,34 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.json_dict = {
             'type': self.type,
             'id': self.id,
-            'mpeg4_url': self.mpeg4_url,
-            'mpeg4_width': self.mpeg4_width,
-            'mpeg4_height': self.mpeg4_height,
-            'thumb_url': self.thumb_url,
-            'title': self.title,
-            'caption': self.caption,
+            'audio_file_id': self.audio_file_id,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
 
-    def test_mpeg4_de_json(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+    def test_audio_de_json(self):
+        audio = telegram.InlineQueryResultCachedAudio.de_json(self.json_dict)
 
-        self.assertEqual(mpeg4.type, self.type)
-        self.assertEqual(mpeg4.id, self.id)
-        self.assertEqual(mpeg4.mpeg4_url, self.mpeg4_url)
-        self.assertEqual(mpeg4.mpeg4_width, self.mpeg4_width)
-        self.assertEqual(mpeg4.mpeg4_height, self.mpeg4_height)
-        self.assertEqual(mpeg4.thumb_url, self.thumb_url)
-        self.assertEqual(mpeg4.title, self.title)
-        self.assertEqual(mpeg4.caption, self.caption)
-        self.assertDictEqual(mpeg4.input_message_content.to_dict(),
+        self.assertEqual(audio.type, self.type)
+        self.assertEqual(audio.id, self.id)
+        self.assertEqual(audio.audio_file_id, self.audio_file_id)
+        self.assertDictEqual(audio.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(mpeg4.reply_markup.to_dict(),
+        self.assertDictEqual(audio.reply_markup.to_dict(),
                              self.reply_markup.to_dict())
 
-    def test_mpeg4_to_json(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+    def test_audio_to_json(self):
+        audio = telegram.InlineQueryResultCachedAudio.de_json(self.json_dict)
 
-        self.assertTrue(self.is_json(mpeg4.to_json()))
+        self.assertTrue(self.is_json(audio.to_json()))
 
-    def test_mpeg4_to_dict(self):
-        mpeg4 = \
-            telegram.InlineQueryResultMpeg4Gif.de_json(
+    def test_audio_to_dict(self):
+        audio = \
+            telegram.InlineQueryResultCachedAudio.de_json(
                 self.json_dict).to_dict()
 
-        self.assertTrue(self.is_dict(mpeg4))
-        self.assertDictEqual(self.json_dict, mpeg4)
+        self.assertTrue(self.is_dict(audio))
+        self.assertDictEqual(self.json_dict, audio)
 
 
 if __name__ == '__main__':

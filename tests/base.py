@@ -19,11 +19,10 @@
 
 """This module contains a object that represents a Base class for tests"""
 
-import os
-import sys
 import signal
-import traceback
+import sys
 
+import os
 from nose.tools import make_decorator
 
 sys.path.append('.')
@@ -38,7 +37,8 @@ class BaseTest(object):
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
 
-        bot = telegram.Bot(os.environ.get('TOKEN', '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
+        bot = telegram.Bot(os.environ.get('TOKEN',
+                                          '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
         chat_id = os.environ.get('CHAT_ID', '12173560')
 
         self._bot = bot
@@ -62,7 +62,6 @@ class BaseTest(object):
 
 
 class TestTimedOut(AssertionError):
-
     def __init__(self, time_limit, frame):
         super(TestTimedOut, self).__init__('time_limit={0}'.format(time_limit))
         self.time_limit = time_limit

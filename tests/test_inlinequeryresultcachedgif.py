@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains a object that represents Tests for Telegram
-InlineQueryResultArticle"""
+InlineQueryResultCachedGif"""
 
 import sys
 
@@ -33,66 +33,54 @@ import telegram
 from tests.base import BaseTest
 
 
-class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultArticle."""
+class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultCachedGif."""
 
     def setUp(self):
         self.id = 'id'
-        self.type = 'article'
+        self.type = 'gif'
+        self.gif_file_id = 'gif file id'
         self.title = 'title'
+        self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')]])
-        self.url = 'url'
-        self.hide_url = True
-        self.description = 'description'
-        self.thumb_url = 'thumb url'
-        self.thumb_height = 10
-        self.thumb_width = 15
 
         self.json_dict = {
             'type': self.type,
             'id': self.id,
+            'gif_file_id': self.gif_file_id,
             'title': self.title,
+            'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
-            'url': self.url,
-            'hide_url': self.hide_url,
-            'description': self.description,
-            'thumb_url': self.thumb_url,
-            'thumb_height': self.thumb_height,
-            'thumb_width': self.thumb_width
         }
 
-    def test_article_de_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+    def test_gif_de_json(self):
+        gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict)
 
-        self.assertEqual(article.type, self.type)
-        self.assertEqual(article.id, self.id)
-        self.assertEqual(article.title, self.title)
-        self.assertDictEqual(article.input_message_content.to_dict(),
+        self.assertEqual(gif.type, self.type)
+        self.assertEqual(gif.id, self.id)
+        self.assertEqual(gif.gif_file_id, self.gif_file_id)
+        self.assertEqual(gif.title, self.title)
+        self.assertEqual(gif.caption, self.caption)
+        self.assertDictEqual(gif.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(article.reply_markup.to_dict(),
+        self.assertDictEqual(gif.reply_markup.to_dict(),
                              self.reply_markup.to_dict())
-        self.assertEqual(article.url, self.url)
-        self.assertEqual(article.hide_url, self.hide_url)
-        self.assertEqual(article.description, self.description)
-        self.assertEqual(article.thumb_url, self.thumb_url)
-        self.assertEqual(article.thumb_height, self.thumb_height)
-        self.assertEqual(article.thumb_width, self.thumb_width)
 
-    def test_article_to_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+    def test_gif_to_json(self):
+        gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict)
 
-        self.assertTrue(self.is_json(article.to_json()))
+        self.assertTrue(self.is_json(gif.to_json()))
 
-    def test_article_to_dict(self):
-        article = \
-            telegram.InlineQueryResultArticle.de_json(self.json_dict).to_dict()
+    def test_gif_to_dict(self):
+        gif = telegram.InlineQueryResultCachedGif.de_json(
+            self.json_dict).to_dict()
 
-        self.assertTrue(self.is_dict(article))
-        self.assertDictEqual(self.json_dict, article)
+        self.assertTrue(self.is_dict(gif))
+        self.assertDictEqual(self.json_dict, gif)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-  #!/usr/bin/env python
+# !/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -19,9 +19,9 @@
 
 """This module contains a object that represents Tests for Telegram Update"""
 
-import os
-import unittest
 import sys
+import unittest
+
 sys.path.append('.')
 
 import telegram
@@ -68,6 +68,7 @@ class UpdateTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(update.to_dict()))
         self.assertEqual(update['update_id'], self.update_id)
         self.assertTrue(isinstance(update['message'], telegram.Message))
+
 
 if __name__ == '__main__':
     unittest.main()

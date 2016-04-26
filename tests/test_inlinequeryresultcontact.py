@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 """This module contains a object that represents Tests for Telegram
-InlineQueryResultMpeg4Gif"""
+InlineQueryResultContact"""
 
 import sys
 
@@ -33,64 +33,63 @@ import telegram
 from tests.base import BaseTest
 
 
-class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultMpeg4Gif."""
+class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for Telegram InlineQueryResultContact."""
 
     def setUp(self):
         self.id = 'id'
-        self.type = 'mpeg4_gif'
-        self.mpeg4_url = 'mpeg4 url'
-        self.mpeg4_width = 10
-        self.mpeg4_height = 15
+        self.type = 'contact'
+        self.phone_number = 'phone_number'
+        self.first_name = 'first_name'
+        self.last_name = 'last_name'
         self.thumb_url = 'thumb url'
-        self.title = 'title'
-        self.caption = 'caption'
+        self.thumb_width = 10
+        self.thumb_height = 15
         self.input_message_content = telegram.InputTextMessageContent(
             'input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')]])
-
         self.json_dict = {
-            'type': self.type,
             'id': self.id,
-            'mpeg4_url': self.mpeg4_url,
-            'mpeg4_width': self.mpeg4_width,
-            'mpeg4_height': self.mpeg4_height,
+            'type': self.type,
+            'phone_number': self.phone_number,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
             'thumb_url': self.thumb_url,
-            'title': self.title,
-            'caption': self.caption,
+            'thumb_width': self.thumb_width,
+            'thumb_height': self.thumb_height,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
 
-    def test_mpeg4_de_json(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+    def test_contact_de_json(self):
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
 
-        self.assertEqual(mpeg4.type, self.type)
-        self.assertEqual(mpeg4.id, self.id)
-        self.assertEqual(mpeg4.mpeg4_url, self.mpeg4_url)
-        self.assertEqual(mpeg4.mpeg4_width, self.mpeg4_width)
-        self.assertEqual(mpeg4.mpeg4_height, self.mpeg4_height)
-        self.assertEqual(mpeg4.thumb_url, self.thumb_url)
-        self.assertEqual(mpeg4.title, self.title)
-        self.assertEqual(mpeg4.caption, self.caption)
-        self.assertDictEqual(mpeg4.input_message_content.to_dict(),
+        self.assertEqual(contact.id, self.id)
+        self.assertEqual(contact.type, self.type)
+        self.assertEqual(contact.phone_number, self.phone_number)
+        self.assertEqual(contact.first_name, self.first_name)
+        self.assertEqual(contact.last_name, self.last_name)
+        self.assertEqual(contact.thumb_url, self.thumb_url)
+        self.assertEqual(contact.thumb_width, self.thumb_width)
+        self.assertEqual(contact.thumb_height, self.thumb_height)
+        self.assertDictEqual(contact.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(mpeg4.reply_markup.to_dict(),
+        self.assertDictEqual(contact.reply_markup.to_dict(),
                              self.reply_markup.to_dict())
 
-    def test_mpeg4_to_json(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+    def test_contact_to_json(self):
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
 
-        self.assertTrue(self.is_json(mpeg4.to_json()))
+        self.assertTrue(self.is_json(contact.to_json()))
 
-    def test_mpeg4_to_dict(self):
-        mpeg4 = \
-            telegram.InlineQueryResultMpeg4Gif.de_json(
+    def test_contact_to_dict(self):
+        contact = \
+            telegram.InlineQueryResultContact.de_json(
                 self.json_dict).to_dict()
 
-        self.assertTrue(self.is_dict(mpeg4))
-        self.assertDictEqual(self.json_dict, mpeg4)
+        self.assertTrue(self.is_dict(contact))
+        self.assertDictEqual(self.json_dict, contact)
 
 
 if __name__ == '__main__':
