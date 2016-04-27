@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module,unused-import
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -25,22 +24,9 @@ import json
 import socket
 from ssl import SSLError
 
-try:
-    # python2
-    from httplib import HTTPException
-except ImportError:
-    # python3
-    from http.client import HTTPException
-
-try:
-    # python3
-    from urllib.request import urlopen, urlretrieve, Request
-    from urllib.error import HTTPError, URLError
-except ImportError:
-    # python2
-    from urllib import urlretrieve
-    from urllib2 import urlopen, Request, URLError
-    from urllib2 import HTTPError
+from future.moves.http.client import HTTPException
+from future.moves.urllib.error import HTTPError, URLError
+from future.moves.urllib.request import urlopen, urlretrieve, Request
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut
