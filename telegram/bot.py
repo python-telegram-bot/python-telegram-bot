@@ -139,8 +139,7 @@ class Bot(TelegramObject):
                     data['reply_markup'] = reply_markup
 
             result = request.post(url, data,
-                                  timeout=kwargs.get('timeout'),
-                                  network_delay=kwargs.get('network_delay'))
+                                  timeout=kwargs.get('timeout'))
 
             if result is True:
                 return result
@@ -206,10 +205,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is
@@ -256,10 +251,6 @@ class Bot(TelegramObject):
                 receive a notification with no sound.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -315,10 +306,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -385,10 +372,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -449,10 +432,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -503,10 +482,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -560,10 +535,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -622,10 +593,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -675,10 +642,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -737,10 +700,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -798,10 +757,6 @@ class Bot(TelegramObject):
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the
@@ -893,10 +848,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -925,8 +876,7 @@ class Bot(TelegramObject):
             data['switch_pm_parameter'] = switch_pm_parameter
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return result
 
@@ -951,10 +901,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             list[:class:`telegram.UserProfilePhotos`]: A list of
@@ -975,8 +921,7 @@ class Bot(TelegramObject):
             data['limit'] = limit
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return UserProfilePhotos.de_json(result)
 
@@ -995,10 +940,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.File`: On success, a :class:`telegram.File`
@@ -1014,8 +955,7 @@ class Bot(TelegramObject):
         data = {'file_id': file_id}
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url,
@@ -1043,10 +983,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1062,8 +998,7 @@ class Bot(TelegramObject):
                 'user_id': user_id}
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1087,10 +1022,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1106,8 +1037,7 @@ class Bot(TelegramObject):
                 'user_id': user_id}
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1133,10 +1063,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1156,8 +1082,7 @@ class Bot(TelegramObject):
             data['show_alert'] = show_alert
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1198,10 +1123,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by
@@ -1234,8 +1155,7 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return Message.de_json(result)
 
@@ -1266,10 +1186,6 @@ class Bot(TelegramObject):
                 A JSON-serialized object for an inline keyboard.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by
@@ -1321,10 +1237,6 @@ class Bot(TelegramObject):
                 A JSON-serialized object for an inline keyboard.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by
@@ -1353,7 +1265,8 @@ class Bot(TelegramObject):
     def getUpdates(self,
                    offset=None,
                    limit=100,
-                   **kwargs):
+                   timeout=0,
+                   network_delay=.2):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -1366,14 +1279,14 @@ class Bot(TelegramObject):
           limit:
             Limits the number of updates to be retrieved. Values between 1-100
             are accepted. Defaults to 100.
-
-        Keyword Args:
-            timeout (Optional[float]): If this value is specified, use it as
-                the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
+          timeout:
+            Timeout in seconds for long polling. Defaults to 0, i.e. usual
+            short polling.
+          network_delay:
+            Additional timeout in seconds to allow the response from Telegram
+            to take some time when using long polling. Defaults to 2, which
+            should be enough for most connections. Increase it if it takes very
+            long for data to be transmitted from and to the Telegram servers.
 
         Returns:
             list[:class:`telegram.Message`]: A list of :class:`telegram.Update`
@@ -1386,16 +1299,16 @@ class Bot(TelegramObject):
 
         url = '{0}/getUpdates'.format(self.base_url)
 
-        data = {}
+        data = {'timeout': timeout}
 
         if offset:
             data['offset'] = offset
         if limit:
             data['limit'] = limit
 
-        result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+        urlopen_timeout = timeout + network_delay
+
+        result = request.post(url, data, timeout=urlopen_timeout)
 
         if result:
             self.logger.debug(
@@ -1424,10 +1337,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1447,8 +1356,7 @@ class Bot(TelegramObject):
             data['certificate'] = certificate
 
         result = request.post(url, data,
-                              timeout=kwargs.get('timeout'),
-                              network_delay=kwargs.get('network_delay'))
+                              timeout=kwargs.get('timeout'))
 
         return result
 

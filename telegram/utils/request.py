@@ -116,8 +116,7 @@ def get(url):
 @_try_except_req
 def post(url,
          data,
-         timeout=None,
-         network_delay=2.):
+         timeout=None):
     """Request an URL.
     Args:
       url:
@@ -127,11 +126,6 @@ def post(url,
       timeout:
         float. If this value is specified, use it as the definitive timeout (in
         seconds) for urlopen() operations. [Optional]
-      network_delay:
-        float. If using the timeout specified in `data` (which is a timeout for
-        the Telegram servers operation), then `network_delay` as an extra delay
-        (in seconds) to compensate for network latency.
-        default: 2 [Optional]
 
     Notes:
       If neither `timeout` nor `data['timeout']` is specified. The underlying
@@ -145,8 +139,6 @@ def post(url,
 
     if timeout is not None:
         urlopen_kwargs['timeout'] = timeout
-    elif 'timeout' in data:
-        urlopen_kwargs['timeout'] = data['timeout'] + network_delay
 
     if InputFile.is_inputfile(data):
         data = InputFile(data)
