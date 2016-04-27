@@ -56,6 +56,11 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         self.assertEqual(force_reply.force_reply, self.force_reply)
         self.assertEqual(force_reply.selective, self.selective)
 
+    def test_force_reply_de_json_empty(self):
+        force_reply = telegram.ForceReply.de_json(None)
+
+        self.assertFalse(force_reply)
+
     def test_force_reply_to_json(self):
         force_reply = telegram.ForceReply.de_json(self.json_dict)
 

@@ -51,6 +51,11 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, 'Testing InlineKeyboardMarkup')
 
+    def test_inline_keyboard_markup_de_json_empty(self):
+        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(None)
+
+        self.assertFalse(inline_keyboard_markup)
+
     def test_inline_keyboard_markup_de_json(self):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(
             self.json_dict)

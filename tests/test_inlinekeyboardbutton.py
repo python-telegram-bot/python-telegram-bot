@@ -59,6 +59,16 @@ class InlineKeyboardButtonTest(BaseTest, unittest.TestCase):
         self.assertEqual(inline_keyboard_button.switch_inline_query,
                          self.switch_inline_query)
 
+    def test_inline_keyboard_button_de_json_empty(self):
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(None)
+
+        self.assertFalse(inline_keyboard_button)
+
+    def test_inline_keyboard_button_de_list_empty(self):
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_list(None)
+
+        self.assertFalse(inline_keyboard_button)
+
     def test_inline_keyboard_button_to_json(self):
         inline_keyboard_button = telegram.InlineKeyboardButton.de_json(
             self.json_dict)

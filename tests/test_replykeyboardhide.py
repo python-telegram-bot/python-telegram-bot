@@ -57,6 +57,11 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         self.assertEqual(reply_keyboard_hide.hide_keyboard, self.hide_keyboard)
         self.assertEqual(reply_keyboard_hide.selective, self.selective)
 
+    def test_reply_keyboard_hide_de_json_empty(self):
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(None)
+
+        self.assertFalse(reply_keyboard_hide)
+
     def test_reply_keyboard_hide_to_json(self):
         reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(
             self.json_dict)

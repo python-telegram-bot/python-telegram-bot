@@ -56,6 +56,11 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text,
                          u'Моё судно на воздушной подушке полно угрей')
 
+    def test_reply_markup_empty_de_json_empty(self):
+        reply_markup_empty = telegram.ReplyKeyboardMarkup.de_json(None)
+
+        self.assertFalse(reply_markup_empty)
+
     def test_reply_keyboard_markup_de_json(self):
         reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(
             self.json_dict)

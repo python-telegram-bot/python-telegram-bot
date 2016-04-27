@@ -55,6 +55,16 @@ class KeyboardButtonTest(BaseTest, unittest.TestCase):
                          self.request_location)
         self.assertEqual(keyboard_button.request_contact, self.request_contact)
 
+    def test_keyboard_button_de_json_empty(self):
+        keyboard_button = telegram.KeyboardButton.de_json(None)
+
+        self.assertFalse(keyboard_button)
+
+    def test_keyboard_button_de_list_empty(self):
+        keyboard_button = telegram.KeyboardButton.de_list(None)
+
+        self.assertFalse(keyboard_button)
+
     def test_keyboard_button_to_json(self):
         keyboard_button = telegram.KeyboardButton.de_json(self.json_dict)
 

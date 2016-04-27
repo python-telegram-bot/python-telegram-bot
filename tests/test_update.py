@@ -53,6 +53,11 @@ class UpdateTest(BaseTest, unittest.TestCase):
         self.assertEqual(update.update_id, self.update_id)
         self.assertTrue(isinstance(update.message, telegram.Message))
 
+    def test_update_de_json_empty(self):
+        update = telegram.Update.de_json(None)
+
+        self.assertFalse(update)
+
     def test_update_to_json(self):
         update = telegram.Update.de_json(self.json_dict)
 
