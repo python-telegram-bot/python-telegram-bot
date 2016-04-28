@@ -24,6 +24,8 @@ from telegram.ext.dispatcher import run_async
 from time import sleep
 import logging
 
+from future.builtins import input
+
 # Enable Logging
 logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -153,10 +155,7 @@ def main():
 
     # Start CLI-Loop
     while True:
-        try:
-            text = raw_input()
-        except NameError:
-            text = input()
+        text = input()
 
         # Gracefully stop the event handler
         if text == 'stop':
