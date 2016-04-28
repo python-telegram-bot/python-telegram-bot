@@ -112,24 +112,24 @@ def main():
     dp = updater.dispatcher
 
     # This is how we add handlers for Telegram messages
-    dp.addHandler(CommandHandler("start", start))
-    dp.addHandler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", help))
     # Message handlers only receive updates that don't contain commands
-    dp.addHandler(MessageHandler([Filters.text], message))
+    dp.add_handler(MessageHandler([Filters.text], message))
     # Regex handlers will receive all updates on which their regex matches,
     # but we have to add it in a separate group, since in one group,
     # only one handler will be executed
-    dp.addHandler(RegexHandler('.*', any_message), group=1)
+    dp.add_handler(RegexHandler('.*', any_message), group=1)
 
     # String handlers work pretty much the same. Note that we have to tell
     # the handler to pass the args or update_queue parameter
-    dp.addHandler(StringCommandHandler('reply', cli_reply, pass_args=True))
-    dp.addHandler(StringRegexHandler('[^/].*', cli_noncommand,
-                                     pass_update_queue=True))
+    dp.add_handler(StringCommandHandler('reply', cli_reply, pass_args=True))
+    dp.add_handler(StringRegexHandler('[^/].*', cli_noncommand,
+                                      pass_update_queue=True))
 
     # All TelegramErrors are caught for you and delivered to the error
     # handler(s). Other types of Errors are not caught.
-    dp.addErrorHandler(error)
+    dp.add_error_handler(error)
 
     # Start the Bot and store the update Queue, so we can insert updates
     update_queue = updater.start_polling(timeout=10)

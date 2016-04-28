@@ -73,12 +73,12 @@ def main():
     dp = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dp.addHandler(CommandHandler("start", start))
-    dp.addHandler(CommandHandler("help", start))
-    dp.addHandler(CommandHandler("set", set))
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", start))
+    dp.add_handler(CommandHandler("set", set))
 
     # log all errors
-    dp.addErrorHandler(error)
+    dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()
