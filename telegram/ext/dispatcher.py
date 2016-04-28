@@ -286,3 +286,9 @@ class Dispatcher(object):
 
         for callback in self.error_handlers:
             callback(self.bot, update, error)
+
+    # snake_case (PEP8) aliases
+    add_handler = addHandler
+    remove_handler = removeHandler
+    add_error_handler = addErrorHandler
+    remove_error_handler = removeErrorHandler

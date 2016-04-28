@@ -1465,3 +1465,29 @@ class Bot(TelegramObject):
         return (self.__class__, (self.token,
                                  self.base_url.replace(self.token, ''),
                                  self.base_file_url.replace(self.token, '')))
+
+    # snake_case (PEP8) aliases
+    get_me = getMe
+    send_message = sendMessage
+    forward_message = forwardMessage
+    send_photo = sendPhoto
+    send_audio = sendAudio
+    send_document = sendDocument
+    send_sticker = sendSticker
+    send_video = sendVideo
+    send_voice = sendVoice
+    send_location = sendLocation
+    send_venue = sendVenue
+    send_contact = sendContact
+    send_chat_action = sendChatAction
+    answer_inline_query = answerInlineQuery
+    get_user_profile_photos = getUserProfilePhotos
+    get_file = getFile
+    kick_chat_member = kickChatMember
+    unban_chat_member = unbanChatMember
+    answer_callback_query = answerCallbackQuery
+    edit_message_text = editMessageText
+    edit_message_caption = editMessageCaption
+    edit_message_reply_markup = editMessageReplyMarkup
+    get_updates = getUpdates
+    set_webhook = setWebhook
