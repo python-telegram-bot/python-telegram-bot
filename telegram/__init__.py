@@ -19,6 +19,8 @@
 
 """A library that provides a Python interface to the Telegram Bot API"""
 
+from sys import version_info
+
 from .base import TelegramObject
 from .user import User
 from .chat import Chat
@@ -142,3 +144,9 @@ __all__ = ['Audio',
            'Venue',
            'Video',
            'Voice']
+
+
+if version_info < (2, 7):
+    from warnings import warn
+    warn("python-telegram-bot will stop supporting Python 2.6 in a future release. "
+         "Please upgrade your Python!")
