@@ -20,7 +20,7 @@
 """ This module contains the base class for handlers as used by the
 Dispatcher """
 
-from telegram.deprecate import deprecate
+from telegram.utils.deprecate import deprecate
 
 
 class Handler(object):
