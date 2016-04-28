@@ -202,7 +202,7 @@ _`API`
 
 Note: Using the ``Bot`` class directly is the 'old' method, we have an easier way to make bots described in the next section.  All of this is however still important information, even if you're using the ``telegram.ext`` submodule!
 
-The API is exposed via the ``telegram.Bot`` class.
+The API is exposed via the ``telegram.Bot`` class. The methods have names as described in the official `Telegram Bot API <https://core.telegram.org/bots/api>`_, but equivalent snake_case methods are available for `PEP8 <https://www.python.org/dev/peps/pep-0008/>`_ enthusiasts. So for example `telegram.Bot.send_message` is the same as `telegram.Bot.sendMessage`.
 
 To generate an Access Token you have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#6-botfather>`_).
 
