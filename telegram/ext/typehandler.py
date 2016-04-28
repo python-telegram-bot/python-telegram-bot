@@ -20,6 +20,7 @@
 """ This module contains the TypeHandler class """
 
 from .handler import Handler
+from telegram.utils.deprecate import deprecate
 
 
 class TypeHandler(Handler):
@@ -30,7 +31,7 @@ class TypeHandler(Handler):
         type (type): The ``type`` of updates this handler should process, as
             determined by ``isinstance``
         callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``checkUpdate``
+            positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         strict (optional[bool]): Use ``type`` instead of ``isinstance``.
             Default is ``False``
@@ -44,13 +45,18 @@ class TypeHandler(Handler):
         self.type = type
         self.strict = strict
 
-    def checkUpdate(self, update):
+    def check_update(self, update):
         if not self.strict:
             return isinstance(update, self.type)
         else:
             return type(update) is self.type
 
-    def handleUpdate(self, update, dispatcher):
-        optional_args = self.collectOptionalArgs(dispatcher)
+    def handle_update(self, update, dispatcher):
+        optional_args = self.collect_optional_args(dispatcher)
 
         self.callback(dispatcher.bot, update, **optional_args)
+
+    # old non-PEP8 Handler methods
+    m = "telegram.TypeHandler."
+    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
+    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

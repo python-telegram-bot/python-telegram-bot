@@ -21,6 +21,7 @@
 
 from .handler import Handler
 from telegram import Update
+from telegram.utils.deprecate import deprecate
 
 
 class Filters(object):
@@ -103,7 +104,7 @@ class MessageHandler(Handler):
             accepted. If ``bool(filters)`` evaluates to ``False``, messages are
             not filtered.
         callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``checkUpdate``
+            positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
@@ -114,7 +115,7 @@ class MessageHandler(Handler):
         super(MessageHandler, self).__init__(callback, pass_update_queue)
         self.filters = filters
 
-    def checkUpdate(self, update):
+    def check_update(self, update):
         if isinstance(update, Update) and update.message:
             if not self.filters:
                 res = True
@@ -124,7 +125,12 @@ class MessageHandler(Handler):
             res = False
         return res
 
-    def handleUpdate(self, update, dispatcher):
-        optional_args = self.collectOptionalArgs(dispatcher)
+    def handle_update(self, update, dispatcher):
+        optional_args = self.collect_optional_args(dispatcher)
 
         self.callback(dispatcher.bot, update, **optional_args)
+
+    # old non-PEP8 Handler methods
+    m = "telegram.MessageHandler."
+    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
+    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

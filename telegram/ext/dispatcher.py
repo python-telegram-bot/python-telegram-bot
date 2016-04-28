@@ -28,6 +28,7 @@ from queue import Empty
 
 from telegram import (TelegramError, NullHandler)
 from telegram.ext.handler import Handler
+from telegram.utils.deprecate import deprecate
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -201,7 +202,7 @@ class Dispatcher(object):
                             'processing the update')
                         break
 
-    def addHandler(self, handler, group=DEFAULT_GROUP):
+    def add_handler(self, handler, group=DEFAULT_GROUP):
         """
         Register a handler.
 
@@ -239,7 +240,7 @@ class Dispatcher(object):
 
         self.handlers[group].append(handler)
 
-    def removeHandler(self, handler, group=DEFAULT_GROUP):
+    def remove_handler(self, handler, group=DEFAULT_GROUP):
         """
         Remove a handler from the specified group
 
@@ -253,7 +254,7 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def addErrorHandler(self, callback):
+    def add_error_handler(self, callback):
         """
         Registers an error handler in the Dispatcher.
 
@@ -264,7 +265,7 @@ class Dispatcher(object):
 
         self.error_handlers.append(callback)
 
-    def removeErrorHandler(self, callback):
+    def remove_error_handler(self, callback):
         """
         De-registers an error handler.
 
@@ -287,8 +288,10 @@ class Dispatcher(object):
         for callback in self.error_handlers:
             callback(self.bot, update, error)
 
-    # snake_case (PEP8) aliases
-    add_handler = addHandler
-    remove_handler = removeHandler
-    add_error_handler = addErrorHandler
-    remove_error_handler = removeErrorHandler
+    # old non-PEP8 Dispatcher methods
+    m = "telegram.dispatcher."
+    addHandler = deprecate(add_handler, m + "AddHandler", m + "add_handler")
+    removeHandler = deprecate(remove_handler, m + "removeHandler", m + "remove_handler")
+    addErrorHandler = deprecate(add_error_handler, m + "addErrorHandler", m + "add_error_handler")
+    removeErrorHandler = deprecate(remove_error_handler,
+                                   m + "removeErrorHandler", m + "remove_error_handler")

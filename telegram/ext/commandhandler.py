@@ -21,6 +21,7 @@
 
 from .handler import Handler
 from telegram import Update
+from telegram.utils.deprecate import deprecate
 
 
 class CommandHandler(Handler):
@@ -32,7 +33,7 @@ class CommandHandler(Handler):
     Args:
         command (str): The name of the command this handler should listen for.
         callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``checkUpdate``
+            positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         pass_args (optional[bool]): If the handler should be passed the
             arguments passed to the command as a keyword argument called `
@@ -49,7 +50,7 @@ class CommandHandler(Handler):
         self.command = command
         self.pass_args = pass_args
 
-    def checkUpdate(self, update):
+    def check_update(self, update):
         return (isinstance(update, Update) and
                 update.message and
                 update.message.text and
@@ -57,10 +58,15 @@ class CommandHandler(Handler):
                 update.message.text[1:].split(' ')[0].split('@')[0] ==
                 self.command)
 
-    def handleUpdate(self, update, dispatcher):
-        optional_args = self.collectOptionalArgs(dispatcher)
+    def handle_update(self, update, dispatcher):
+        optional_args = self.collect_optional_args(dispatcher)
 
         if self.pass_args:
             optional_args['args'] = update.message.text.split(' ')[1:]
 
         self.callback(dispatcher.bot, update, **optional_args)
+
+    # old non-PEP8 Handler methods
+    m = "telegram.CommandHandler."
+    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
+    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
