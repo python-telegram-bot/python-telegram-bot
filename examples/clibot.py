@@ -119,7 +119,7 @@ def main():
     # Regex handlers will receive all updates on which their regex matches,
     # but we have to add it in a separate group, since in one group,
     # only one handler will be executed
-    dp.addHandler(RegexHandler('.*', any_message), group='log')
+    dp.addHandler(RegexHandler('.*', any_message), group=1)
 
     # String handlers work pretty much the same. Note that we have to tell
     # the handler to pass the args or update_queue parameter
