@@ -73,7 +73,12 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         data = super(ReplyKeyboardMarkup, self).to_dict()
 
         data['keyboard'] = []
-        for keyboard in self.keyboard:
-            data['keyboard'].append([x.to_dict() for x in keyboard])
-
+        for row in self.keyboard:
+            r = []
+            for button in row:
+                if hasattr(button, 'to_dict'):
+                    r.append(button.to_dict())  # telegram.KeyboardButton
+                else:
+                    r.append(button)            # str
+            data['keyboard'].append(r)
         return data
