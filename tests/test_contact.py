@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+  #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -16,11 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 """This module contains a object that represents Tests for Telegram Contact"""
 
-import sys
 import unittest
-
+import sys
 sys.path.append('.')
 
 import telegram
@@ -64,7 +64,6 @@ class ContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact['first_name'], self.first_name)
         self.assertEqual(contact['last_name'], self.last_name)
         self.assertEqual(contact['user_id'], self.user_id)
-
 
 if __name__ == '__main__':
     unittest.main()
