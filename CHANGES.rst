@@ -3,6 +3,7 @@
 *Released 4.0.2*
 
 - Bugfixes
+- ``KeyboardReplyMarkup`` now accepts ``str`` again
 
 **2016-04-27**
 
