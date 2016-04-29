@@ -20,17 +20,19 @@
 
 """This module contains a object that represents a Telegram InputFile."""
 
+try:
+    # python 3
+    from email.generator import _make_boundary as choose_boundary
+except ImportError:
+    # python 2
+    from mimetools import choose_boundary
+
+import imghdr
 import mimetypes
 import os
 import sys
-import imghdr
 
-try:
-    from email.generator import _make_boundary as choose_boundary
-    from urllib.request import urlopen
-except ImportError:
-    from mimetools import choose_boundary
-    from urllib2 import urlopen
+from future.moves.urllib.request import urlopen
 
 from telegram import TelegramError
 
@@ -81,6 +83,8 @@ class InputFile(object):
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
             elif hasattr(self.input_file, 'name'):
+                # on py2.7, pylint fails to understand this properly
+                # pylint: disable=E1101
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
                 self.filename = os.path.basename(self.input_file.url) \

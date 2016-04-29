@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module,unused-import
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -25,22 +24,9 @@ import json
 import socket
 from ssl import SSLError
 
-try:
-    # python2
-    from httplib import HTTPException
-except ImportError:
-    # python3
-    from http.client import HTTPException
-
-try:
-    # python3
-    from urllib.request import urlopen, urlretrieve, Request
-    from urllib.error import HTTPError, URLError
-except ImportError:
-    # python2
-    from urllib import urlretrieve
-    from urllib2 import urlopen, Request, URLError
-    from urllib2 import HTTPError
+from future.moves.http.client import HTTPException
+from future.moves.urllib.error import HTTPError, URLError
+from future.moves.urllib.request import urlopen, urlretrieve, Request
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut
@@ -130,8 +116,7 @@ def get(url):
 @_try_except_req
 def post(url,
          data,
-         timeout=None,
-         network_delay=2.):
+         timeout=None):
     """Request an URL.
     Args:
       url:
@@ -141,11 +126,6 @@ def post(url,
       timeout:
         float. If this value is specified, use it as the definitive timeout (in
         seconds) for urlopen() operations. [Optional]
-      network_delay:
-        float. If using the timeout specified in `data` (which is a timeout for
-        the Telegram servers operation), then `network_delay` as an extra delay
-        (in seconds) to compensate for network latency.
-        default: 2 [Optional]
 
     Notes:
       If neither `timeout` nor `data['timeout']` is specified. The underlying
@@ -159,8 +139,6 @@ def post(url,
 
     if timeout is not None:
         urlopen_kwargs['timeout'] = timeout
-    elif 'timeout' in data:
-        urlopen_kwargs['timeout'] = data['timeout'] + network_delay
 
     if InputFile.is_inputfile(data):
         data = InputFile(data)

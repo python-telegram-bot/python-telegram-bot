@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 """This module contains a object that represents Tests for Telegram Emoji"""
 
-import sys
 import unittest
-
+import sys
 sys.path.append('.')
 
+import telegram
 from telegram.emoji import Emoji
 from tests.base import BaseTest
 
