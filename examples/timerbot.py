@@ -75,7 +75,7 @@ def main():
     # on different commands - answer in Telegram
     dp.addHandler(CommandHandler("start", start))
     dp.addHandler(CommandHandler("help", start))
-    dp.addHandler(CommandHandler("set", set))
+    dp.addHandler(CommandHandler("set", set, pass_args=True))
 
     # log all errors
     dp.addErrorHandler(error)
