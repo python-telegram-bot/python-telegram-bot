@@ -16,12 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 """This module contains a object that represents a Base class for tests"""
 
-import signal
-import sys
-
 import os
+import sys
+import signal
+
 from nose.tools import make_decorator
 
 sys.path.append('.')
@@ -61,6 +62,7 @@ class BaseTest(object):
 
 
 class TestTimedOut(AssertionError):
+
     def __init__(self, time_limit, frame):
         super(TestTimedOut, self).__init__('time_limit={0}'.format(time_limit))
         self.time_limit = time_limit

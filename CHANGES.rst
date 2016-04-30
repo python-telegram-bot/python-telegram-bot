@@ -1,3 +1,10 @@
+**2016-04-29**
+
+*Released 4.0.2*
+
+- Bugfixes
+- ``KeyboardReplyMarkup`` now accepts ``str`` again
+
 **2016-04-27**
 
 *Released 4.0.1*
