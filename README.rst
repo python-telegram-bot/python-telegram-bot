@@ -110,7 +110,6 @@ answerCallbackQuery       Yes
 editMessageText           Yes
 editMessageCaption        Yes
 editMessageReplyMarkup    Yes
-answerCallbackQuery       Yes
 ========================= ============
 
 =============
