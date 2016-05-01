@@ -19,7 +19,7 @@
 
 """This module contains a object that represents a Telegram InlineQuery"""
 
-from telegram import TelegramObject, User
+from telegram import TelegramObject, User, Location
 
 
 class InlineQuery(TelegramObject):
@@ -39,6 +39,10 @@ class InlineQuery(TelegramObject):
         from_user (:class:`telegram.User`):
         query (str):
         offset (str):
+        **kwargs: Arbitrary keyword arguments.
+
+    Keyword Args:
+        location (optional[:class:`telegram.Location`]):
     """
 
     def __init__(self,
@@ -52,6 +56,9 @@ class InlineQuery(TelegramObject):
         self.from_user = from_user
         self.query = query
         self.offset = offset
+
+        # Optional
+        self.location = kwargs.get('location')
 
     @staticmethod
     def de_json(data):
@@ -68,6 +75,7 @@ class InlineQuery(TelegramObject):
             return None
 
         data['from_user'] = User.de_json(data.get('from'))
+        data['location'] = Location.de_json(data.get('location'))
 
         return InlineQuery(**data)
 
