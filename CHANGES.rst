@@ -1,3 +1,9 @@
+**2016-05-01**
+
+*Released 4.0.3*
+
+- Add missing attribute ``location`` to ``InlineQuery``
+
 **2016-04-29**
 
 *Released 4.0.2*
