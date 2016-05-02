@@ -1293,7 +1293,7 @@ class Bot(TelegramObject):
             long for data to be transmitted from and to the Telegram servers.
 
         Returns:
-            list[:class:`telegram.Message`]: A list of :class:`telegram.Update`
+            list[:class:`telegram.Update`]: A list of :class:`telegram.Update`
             objects are returned.
 
         Raises:

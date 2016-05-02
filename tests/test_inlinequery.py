@@ -37,17 +37,20 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         user = telegram.User(1, 'First name')
+        location = telegram.Location(8.8, 53.1)
 
         self.id = 'id'
         self.from_user = user
         self.query = 'query text'
         self.offset = 'offset'
+        self.location = location
 
         self.json_dict = {
             'id': self.id,
             'from': self.from_user.to_dict(),
             'query': self.query,
-            'offset': self.offset
+            'offset': self.offset,
+            'location': self.location.to_dict()
         }
 
     def test_inlinequery_de_json(self):
@@ -56,6 +59,8 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
         self.assertEqual(inlinequery.id, self.id)
         self.assertDictEqual(inlinequery.from_user.to_dict(),
                              self.from_user.to_dict())
+        self.assertDictEqual(inlinequery.location.to_dict(),
+                             self.location.to_dict())
         self.assertEqual(inlinequery.query, self.query)
         self.assertEqual(inlinequery.offset, self.offset)
 
