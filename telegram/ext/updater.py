@@ -124,7 +124,7 @@ class Updater(object):
             if not self.running:
                 self.running = True
                 if clean:
-                    self._clean_updates()
+                    self._clean_updates(timeout=10)
 
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher")
@@ -332,11 +332,11 @@ class Updater(object):
             port=port,
             path=url_path)
 
-    def _clean_updates(self):
+    def _clean_updates(self, timeout=10):
         self.logger.debug('Cleaning updates from Telegram server')
-        updates = self.bot.getUpdates()
+        updates = self.bot.getUpdates(timeout=10)
         while updates:
-            updates = self.bot.getUpdates(updates[-1].update_id + 1)
+            updates = self.bot.getUpdates(updates[-1].update_id + 1, timeout=10)
 
     def stop(self):
         """
