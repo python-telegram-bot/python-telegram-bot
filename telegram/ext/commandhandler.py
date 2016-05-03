@@ -62,5 +62,6 @@ class CommandHandler(Handler):
 
         if self.pass_args:
             optional_args['args'] = update.message.text.split(' ')[1:]
+            optional_args['command'] = self.command
 
         self.callback(dispatcher.bot, update, **optional_args)
