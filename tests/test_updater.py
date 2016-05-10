@@ -489,7 +489,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         retries = 3
         self._setup_updater('', messages=0, bootstrap_retries=retries)
 
-        self.updater._set_webhook('path', retries, None)
+        self.updater._bootstrap(retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, retries)
 
     def test_bootstrap_retries_unauth(self):
@@ -499,8 +499,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                             bootstrap_retries=retries,
                             bootstrap_err=Unauthorized())
 
-        self.assertRaises(Unauthorized, self.updater._set_webhook, 'path',
-                          retries, None)
+        self.assertRaises(Unauthorized, self.updater._bootstrap,
+                          retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_invalid_token(self):
@@ -510,17 +510,16 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                             bootstrap_retries=retries,
                             bootstrap_err=InvalidToken())
 
-        self.assertRaises(InvalidToken, self.updater._set_webhook, 'path',
-                          retries, None)
+        self.assertRaises(InvalidToken, self.updater._bootstrap,
+                          retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_fail(self):
         retries = 1
         self._setup_updater('', messages=0, bootstrap_retries=retries)
 
-        self.assertRaisesRegexp(TelegramError, 'test',
-                                self.updater._set_webhook, 'path', retries - 1,
-                                None)
+        self.assertRaisesRegexp(TelegramError, 'test', self.updater._bootstrap,
+                                retries - 1, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_webhook_invalid_posts(self):
@@ -529,7 +528,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
         thr = Thread(target=self.updater._start_webhook,
-                     args=(ip, port, '', None, None, 0, None))
+                     args=(ip, port, '', None, None, 0, False, None))
         thr.start()
 
         sleep(0.5)
