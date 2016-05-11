@@ -56,7 +56,7 @@ class Sticker(TelegramObject):
         self.height = int(height)
         # Optionals
         self.thumb = kwargs.get('thumb')
-        self.emoji = str(kwargs.get('emoji', ''))
+        self.emoji = kwargs.get('emoji', '')
         self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
