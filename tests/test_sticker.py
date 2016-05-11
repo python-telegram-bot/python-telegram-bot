@@ -70,7 +70,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.width, self.width)
         self.assertEqual(sticker.height, self.height)
         self.assertTrue(isinstance(sticker.thumb, telegram.PhotoSize))
-        self.assertEqual(sticker.emoji, self.emoji)
+        self.assertEqual(sticker.emoji, self.emoji.decode('utf-8'))
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
