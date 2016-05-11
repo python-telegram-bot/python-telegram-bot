@@ -30,6 +30,7 @@ class Sticker(TelegramObject):
         width (int):
         height (int):
         thumb (:class:`telegram.PhotoSize`):
+        emoji (str):
         file_size (int):
 
     Args:
@@ -40,6 +41,7 @@ class Sticker(TelegramObject):
 
     Keyword Args:
         thumb (Optional[:class:`telegram.PhotoSize`]):
+        emoji (Optional[str]):
         file_size (Optional[int]):
     """
 
@@ -54,6 +56,7 @@ class Sticker(TelegramObject):
         self.height = int(height)
         # Optionals
         self.thumb = kwargs.get('thumb')
+        self.emoji = str(kwargs.get('emoji', ''))
         self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod

@@ -41,6 +41,7 @@ class StickerTest(BaseTest, unittest.TestCase):
                       'height': 90,
                       'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
                       'file_size': 2364}
+        self.emoji = telegram.Emoji.FLEXED_BICEPS
         self.file_size = 39518
 
         self.json_dict = {
@@ -48,6 +49,7 @@ class StickerTest(BaseTest, unittest.TestCase):
             'width': self.width,
             'height': self.height,
             'thumb': self.thumb,
+            'emoji': self.emoji,
             'file_size': self.file_size
         }
 
@@ -68,6 +70,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.width, self.width)
         self.assertEqual(sticker.height, self.height)
         self.assertTrue(isinstance(sticker.thumb, telegram.PhotoSize))
+        self.assertEqual(sticker.emoji, self.emoji)
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
@@ -77,6 +80,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.width, self.width)
         self.assertEqual(sticker.height, self.height)
         self.assertTrue(isinstance(sticker.thumb, telegram.PhotoSize))
+        self.assertEqual(sticker.emoji, self.emoji)
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_to_json(self):
@@ -91,6 +95,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker['width'], self.width)
         self.assertEqual(sticker['height'], self.height)
         self.assertTrue(isinstance(sticker['thumb'], telegram.PhotoSize))
+        self.assertEqual(sticker['emoji'], self.emoji)
         self.assertEqual(sticker['file_size'], self.file_size)
 
     @flaky(3, 1)
