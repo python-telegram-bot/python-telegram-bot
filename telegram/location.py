@@ -23,7 +23,7 @@ from telegram import TelegramObject
 
 
 class Location(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """This object represents a Telegram Location.
 
     Attributes:
         longitude (float):
