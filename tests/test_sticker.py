@@ -23,6 +23,7 @@ import unittest
 import os
 
 from flaky import flaky
+from future.utils import text_to_native_str
 
 sys.path.append('.')
 
@@ -70,7 +71,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.width, self.width)
         self.assertEqual(sticker.height, self.height)
         self.assertTrue(isinstance(sticker.thumb, telegram.PhotoSize))
-        self.assertEqual(sticker.emoji, self.emoji.decode('utf-8'))
+        self.assertEqual(sticker.emoji, text_to_native_str(self.emoji))
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
