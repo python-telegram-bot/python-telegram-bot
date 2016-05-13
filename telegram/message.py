@@ -39,6 +39,7 @@ class Message(TelegramObject):
         from_user (:class:`telegram.User`):
         date (:class:`datetime.datetime`):
         forward_from (:class:`telegram.User`):
+        forward_from_chat (:class:`telegram.Chat`):
         forward_date (:class:`datetime.datetime`):
         reply_to_message (:class:`telegram.Message`):
         text (str):
@@ -78,6 +79,7 @@ class Message(TelegramObject):
 
     Keyword Args:
         forward_from (Optional[:class:`telegram.User`]):
+        forward_from_chat (:class:`telegram.Chat`):
         forward_date (Optional[:class:`datetime.datetime`]):
         reply_to_message (Optional[:class:`telegram.Message`]):
         text (Optional[str]):
@@ -115,6 +117,7 @@ class Message(TelegramObject):
         self.chat = chat
         # Optionals
         self.forward_from = kwargs.get('forward_from')
+        self.forward_from_chat = kwargs.get('forward_from_chat')
         self.forward_date = kwargs.get('forward_date')
         self.reply_to_message = kwargs.get('reply_to_message')
         self.text = kwargs.get('text', '')
@@ -165,6 +168,7 @@ class Message(TelegramObject):
         data['chat'] = Chat.de_json(data.get('chat'))
         data['entities'] = MessageEntity.de_list(data.get('entities'))
         data['forward_from'] = User.de_json(data.get('forward_from'))
+        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'))
         data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
         data['reply_to_message'] = \
             Message.de_json(data.get('reply_to_message'))
