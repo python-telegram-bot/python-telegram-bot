@@ -197,7 +197,7 @@ _`API`
 
 Note: Using the ``Bot`` class directly is the 'old' method, we have an easier way to make bots described in the next section.  All of this is however still important information, even if you're using the ``telegram.ext`` submodule!
 
-The API is exposed via the ``telegram.Bot`` class.
+The API is exposed via the ``telegram.Bot`` class. The methods have names as described in the official `Telegram Bot API <https://core.telegram.org/bots/api>`_, but equivalent snake_case methods are available for `PEP8 <https://www.python.org/dev/peps/pep-0008/>`_ enthusiasts. So for example `telegram.Bot.send_message` is the same as `telegram.Bot.sendMessage`.
 
 To generate an Access Token you have to talk to `BotFather <https://telegram.me/botfather>`_ and follow a few simple steps (described `here <https://core.telegram.org/bots#6-botfather>`_).
 
@@ -351,7 +351,7 @@ We want this function to be called on a Telegram message that contains the ``/st
 
    >>> from telegram.ext import CommandHandler
    >>> start_handler = CommandHandler('start', start)
-   >>> dispatcher.addHandler(start_handler)
+   >>> dispatcher.add_handler(start_handler)
 
 The last step is to tell the ``Updater`` to start working:
 
@@ -368,7 +368,7 @@ Our bot is now up and running (go ahead and try it)! It's not doing anything yet
    ...
    >>> from telegram.ext import MessageHandler, Filters
    >>> echo_handler = MessageHandler([Filters.text], echo)
-   >>> dispatcher.addHandler(echo_handler)
+   >>> dispatcher.add_handler(echo_handler)
 
 Our bot should now reply to all text messages that are not a command with a message that has the same content.
 
@@ -381,7 +381,7 @@ Let's add some functionality to our bot. We want to add the ``/caps`` command, t
    ...   bot.sendMessage(chat_id=update.message.chat_id, text=text_caps)
    ...
    >>> caps_handler = CommandHandler('caps', caps, pass_args=True)
-   >>> dispatcher.addHandler(caps_handler)
+   >>> dispatcher.add_handler(caps_handler)
 
 To enable our bot to respond to inline queries, we can add the following (you will also have to talk to BotFather):
 
@@ -396,7 +396,7 @@ To enable our bot to respond to inline queries, we can add the following (you wi
    ...
    >>> from telegram.ext import InlineQueryHandler
    >>> inline_caps_handler = InlineQueryHandler(inline_caps)
-   >>> dispatcher.addHandler(inline_caps_handler)
+   >>> dispatcher.add_handler(inline_caps_handler)
 
 People might try to send commands to the bot that it doesn't understand, so we can use a ``RegexHandler`` to recognize all commands that were not recognized by the previous handlers. **Note:** This handler has to be added last, else it will be triggered before the ``CommandHandlers`` had a chance to look at the update:
 
@@ -407,7 +407,7 @@ People might try to send commands to the bot that it doesn't understand, so we c
    ...
    >>> from telegram.ext import RegexHandler
    >>> unknown_handler = RegexHandler(r'/.*', unknown)
-   >>> dispatcher.addHandler(unknown_handler)
+   >>> dispatcher.add_handler(unknown_handler)
 
 If you're done playing around, stop the bot with this:
 

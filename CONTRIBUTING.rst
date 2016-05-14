@@ -20,9 +20,7 @@ Setting things up
 
 4. Install dependencies:
 
-   ``$ pip install -r requirements.txt``
-
-   ``$ pip install -r requirements-dev.txt``
+   ``$ pip install -r requirements.txt -r requirements-dev.txt``
 
 Finding something to do
 -----------------------
@@ -55,6 +53,8 @@ Here's how to make a one-off code change.
 3. **Make a commit to your feature branch**. Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
 
    - You can refer to relevant issues in the commit message by writing, e.g., "#105".
+
+   - Your code should adhere to the `PEP 8 Style Guide`_, with the exception that we have a maximum line length of 99.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_. In addition, code should be formatted consistently with other code around it.
 
@@ -116,7 +116,7 @@ Here's how to make a one-off code change.
 
    - At the end, the reviewer will merge the pull request.
 
-6. **Tidy up!** Delete the feature branch from your both your local clone and the GitHub repository:
+6. **Tidy up!** Delete the feature branch from both your local clone and the GitHub repository:
 
    ``$ git branch -D your-branch-name``
 
@@ -127,6 +127,7 @@ Here's how to make a one-off code change.
 .. _`Code of Conduct`: https://www.python.org/psf/codeofconduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
 .. _`developers' mailing list`: mailto:devs@python-telegram-bot.org
+.. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
 .. _`Google Python Style Guide`: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 .. _`Google Python Style Docstrings`: http://sphinx-doc.org/latest/ext/example_google.html
 .. _AUTHORS.rst: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/AUTHORS.rst

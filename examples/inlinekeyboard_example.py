@@ -105,12 +105,12 @@ updater = Updater("TOKEN")
 # The command
 updater.dispatcher.addHandler(CommandHandler('set', set_value))
 # The answer
-updater.dispatcher.addHandler(MessageHandler([Filters.text], entered_value))
+updater.dispatcher.add_handler(MessageHandler([Filters.text], entered_value))
 # The confirmation
-updater.dispatcher.addHandler(CallbackQueryHandler(confirm_value))
-updater.dispatcher.addHandler(CommandHandler('start', help))
-updater.dispatcher.addHandler(CommandHandler('help', help))
-updater.dispatcher.addErrorHandler(error)
+updater.dispatcher.add_handler(CallbackQueryHandler(confirm_value))
+updater.dispatcher.add_handler(CommandHandler('start', help))
+updater.dispatcher.add_handler(CommandHandler('help', help))
+updater.dispatcher.add_error_handler(error)
 
 # Start the Bot
 updater.start_polling()

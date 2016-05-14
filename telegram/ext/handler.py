@@ -20,6 +20,8 @@
 """ This module contains the base class for handlers as used by the
 Dispatcher """
 
+from telegram.utils.deprecate import deprecate
+
 
 class Handler(object):
     """
@@ -28,7 +30,7 @@ class Handler(object):
 
     Args:
         callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``checkUpdate``
+            positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         pass_update_queue (optional[bool]): If the callback should be passed
             the update queue as a keyword argument called ``update_queue``. It
@@ -39,7 +41,7 @@ class Handler(object):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
 
-    def checkUpdate(self, update):
+    def check_update(self, update):
         """
         This method is called to determine if an update should be handled by
         this handler instance. It should always be overridden.
@@ -52,7 +54,7 @@ class Handler(object):
         """
         raise NotImplementedError
 
-    def handleUpdate(self, update, dispatcher):
+    def handle_update(self, update, dispatcher):
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. It should also be overridden, but in most
@@ -65,7 +67,7 @@ class Handler(object):
         """
         raise NotImplementedError
 
-    def collectOptionalArgs(self, dispatcher):
+    def collect_optional_args(self, dispatcher):
         """
         Prepares the optional arguments that are the same for all types of
         handlers
@@ -78,3 +80,10 @@ class Handler(object):
             optional_args['update_queue'] = dispatcher.update_queue
 
         return optional_args
+
+    # old non-PEP8 Handler methods
+    m = "telegram.Handler."
+    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
+    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
+    collectOptionalArgs = deprecate(collect_optional_args,
+                                    m + "collectOptionalArgs", m + "collect_optional_args")

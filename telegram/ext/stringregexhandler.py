@@ -24,6 +24,7 @@ import re
 from future.utils import string_types
 
 from .handler import Handler
+from telegram.utils.deprecate import deprecate
 
 
 class StringRegexHandler(Handler):
@@ -36,7 +37,7 @@ class StringRegexHandler(Handler):
     Args:
         pattern (str or Pattern): The regex pattern.
         callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``checkUpdate``
+            positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         pass_groups (optional[bool]): If the callback should be passed the
             result of ``re.match(pattern, update).groups()`` as a keyword
@@ -60,12 +61,12 @@ class StringRegexHandler(Handler):
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
-    def checkUpdate(self, update):
+    def check_update(self, update):
         return isinstance(update, string_types) and bool(
             re.match(self.pattern, update))
 
-    def handleUpdate(self, update, dispatcher):
-        optional_args = self.collectOptionalArgs(dispatcher)
+    def handle_update(self, update, dispatcher):
+        optional_args = self.collect_optional_args(dispatcher)
         match = re.match(self.pattern, update)
 
         if self.pass_groups:
@@ -74,3 +75,8 @@ class StringRegexHandler(Handler):
             optional_args['groupdict'] = match.groupdict()
 
         self.callback(dispatcher.bot, update, **optional_args)
+
+    # old non-PEP8 Handler methods
+    m = "telegram.StringRegexHandler."
+    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
+    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

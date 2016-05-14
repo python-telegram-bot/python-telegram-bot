@@ -21,6 +21,7 @@
 
 from .handler import Handler
 from telegram import Update
+from telegram.utils.deprecate import deprecate
 
 
 class ChosenInlineResultHandler(Handler):
@@ -30,7 +31,7 @@ class ChosenInlineResultHandler(Handler):
 
     Args:
         callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``checkUpdate``
+            positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
@@ -41,10 +42,15 @@ class ChosenInlineResultHandler(Handler):
         super(ChosenInlineResultHandler, self).__init__(callback,
                                                         pass_update_queue)
 
-    def checkUpdate(self, update):
+    def check_update(self, update):
         return isinstance(update, Update) and update.chosen_inline_result
 
-    def handleUpdate(self, update, dispatcher):
-        optional_args = self.collectOptionalArgs(dispatcher)
+    def handle_update(self, update, dispatcher):
+        optional_args = self.collect_optional_args(dispatcher)
 
         self.callback(dispatcher.bot, update, **optional_args)
+
+    # old non-PEP8 Handler methods
+    m = "telegram.ChosenInlineResultHandler."
+    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
+    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

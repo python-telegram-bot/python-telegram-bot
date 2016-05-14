@@ -91,12 +91,12 @@ def help(bot, update):
 updater = Updater("TOKEN")
 
 # The command
-updater.dispatcher.addHandler(CommandHandler('set', set_value))
+updater.dispatcher.add_handler(CommandHandler('set', set_value))
 # The answer and confirmation
-updater.dispatcher.addHandler(MessageHandler([Filters.text], set_value))
-updater.dispatcher.addHandler(CommandHandler('cancel', cancel))
-updater.dispatcher.addHandler(CommandHandler('start', help))
-updater.dispatcher.addHandler(CommandHandler('help', help))
+updater.dispatcher.add_handler(MessageHandler([Filters.text], set_value))
+updater.dispatcher.add_handler(CommandHandler('cancel', cancel))
+updater.dispatcher.add_handler(CommandHandler('start', help))
+updater.dispatcher.add_handler(CommandHandler('help', help))
 
 # Start the Bot
 updater.start_polling()
