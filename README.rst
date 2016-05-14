@@ -15,10 +15,6 @@ Not **just** a Python wrapper around the Telegram Bot API
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: Supported python versions
 
-.. image:: https://img.shields.io/pypi/dm/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
-   :alt: PyPi Package Monthly Download
-
 .. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=latest
    :target: https://readthedocs.org/projects/python-telegram-bot/?badge=latest
    :alt: Documentation Status
