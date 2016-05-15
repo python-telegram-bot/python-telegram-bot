@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InputLocationMessageContent"""
 
@@ -26,9 +25,7 @@ from telegram import InputMessageContent
 class InputLocationMessageContent(InputMessageContent):
     """Base class for Telegram InputLocationMessageContent Objects"""
 
-    def __init__(self,
-                 latitude,
-                 longitude):
+    def __init__(self, latitude, longitude):
         # Required
         self.latitude = latitude
         self.longitude = longitude

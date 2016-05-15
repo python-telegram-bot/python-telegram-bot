@@ -16,15 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultPhoto"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, \
-    InputMessageContent
+from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultPhoto(InlineQueryResult):
+
     def __init__(self,
                  id,
                  photo_url,
@@ -60,12 +59,10 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultPhoto,
-                     InlineQueryResultPhoto).de_json(data)
+        data = super(InlineQueryResultPhoto, InlineQueryResultPhoto).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultPhoto(**data)

@@ -35,10 +35,7 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         self.hide_keyboard = True
         self.selective = True
 
-        self.json_dict = {
-            'hide_keyboard': self.hide_keyboard,
-            'selective': self.selective,
-        }
+        self.json_dict = {'hide_keyboard': self.hide_keyboard, 'selective': self.selective,}
 
     def test_send_message_with_reply_keyboard_hide(self):
         message = self._bot.sendMessage(
@@ -47,12 +44,10 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
             reply_markup=telegram.ReplyKeyboardHide.de_json(self.json_dict))
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text,
-                         u'Моё судно на воздушной подушке полно угрей')
+        self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_reply_keyboard_hide_de_json(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(
-            self.json_dict)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
 
         self.assertEqual(reply_keyboard_hide.hide_keyboard, self.hide_keyboard)
         self.assertEqual(reply_keyboard_hide.selective, self.selective)
@@ -63,17 +58,14 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         self.assertFalse(reply_keyboard_hide)
 
     def test_reply_keyboard_hide_to_json(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(
-            self.json_dict)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(reply_keyboard_hide.to_json()))
 
     def test_reply_keyboard_hide_to_dict(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(
-            self.json_dict)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
 
-        self.assertEqual(reply_keyboard_hide['hide_keyboard'],
-                         self.hide_keyboard)
+        self.assertEqual(reply_keyboard_hide['hide_keyboard'], self.hide_keyboard)
         self.assertEqual(reply_keyboard_hide['selective'], self.selective)
 
 

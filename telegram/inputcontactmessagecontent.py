@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InputContactMessageContent"""
 
@@ -26,10 +25,7 @@ from telegram import InputMessageContent
 class InputContactMessageContent(InputMessageContent):
     """Base class for Telegram InputContactMessageContent Objects"""
 
-    def __init__(self,
-                 phone_number,
-                 first_name,
-                 last_name=None):
+    def __init__(self, phone_number, first_name, last_name=None):
         # Required
         self.phone_number = phone_number
         self.first_name = first_name

@@ -16,12 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultAudio"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, \
-    InputMessageContent
+from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultAudio(InlineQueryResult):
@@ -59,6 +57,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         input_message_content (Optional[
             :class:`telegram.input_message_content`]):
     """
+
     def __init__(self,
                  id,
                  audio_url,
@@ -86,12 +85,10 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultAudio,
-                     InlineQueryResultAudio).de_json(data)
+        data = super(InlineQueryResultAudio, InlineQueryResultAudio).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultAudio(**data)

@@ -41,8 +41,7 @@ class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
         self.gif_file_id = 'gif file id'
         self.title = 'title'
         self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -67,8 +66,7 @@ class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
         self.assertEqual(gif.caption, self.caption)
         self.assertDictEqual(gif.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(gif.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(gif.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_gif_to_json(self):
         gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict)
@@ -76,8 +74,7 @@ class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(gif.to_json()))
 
     def test_gif_to_dict(self):
-        gif = telegram.InlineQueryResultCachedGif.de_json(
-            self.json_dict).to_dict()
+        gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(gif))
         self.assertDictEqual(self.json_dict, gif)

@@ -40,11 +40,10 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.width = 360
         self.height = 640
         self.duration = 5
-        self.thumb = telegram.PhotoSize.de_json(
-            {'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
-             'file_size': 645,
-             'height': 90,
-             'width': 51})
+        self.thumb = telegram.PhotoSize.de_json({'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
+                                                 'file_size': 645,
+                                                 'height': 90,
+                                                 'width': 51})
         self.mime_type = 'video/mp4'
         self.file_size = 326534
 
@@ -64,9 +63,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_required_args_only(self):
-        message = self._bot.sendVideo(self._chat_id,
-                                      self.video_file,
-                                      timeout=10)
+        message = self._bot.sendVideo(self._chat_id, self.video_file, timeout=10)
 
         video = message.video
 

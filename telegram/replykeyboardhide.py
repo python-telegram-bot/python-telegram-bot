@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram
 ReplyKeyboardHide."""
 
@@ -38,9 +37,7 @@ class ReplyKeyboardHide(ReplyMarkup):
         selective (Optional[bool]):
     """
 
-    def __init__(self,
-                 hide_keyboard=True,
-                 **kwargs):
+    def __init__(self, hide_keyboard=True, **kwargs):
         # Required
         self.hide_keyboard = bool(hide_keyboard)
         # Optionals

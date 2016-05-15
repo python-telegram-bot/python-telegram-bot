@@ -52,8 +52,7 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
         result = telegram.ChosenInlineResult.de_json(self.json_dict)
 
         self.assertEqual(result.result_id, self.result_id)
-        self.assertDictEqual(result.from_user.to_dict(),
-                             self.from_user.to_dict())
+        self.assertDictEqual(result.from_user.to_dict(), self.from_user.to_dict())
         self.assertEqual(result.query, self.query)
 
     def test_choseninlineresult_to_json(self):

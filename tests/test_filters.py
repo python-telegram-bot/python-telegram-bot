@@ -35,8 +35,7 @@ class FiltersTest(BaseTest, unittest.TestCase):
     """This object represents Tests for MessageHandler.Filters"""
 
     def setUp(self):
-        self.message = Message(0, User(0, "Testuser"), datetime.now(),
-                               Chat(0, 'private'))
+        self.message = Message(0, User(0, "Testuser"), datetime.now(), Chat(0, 'private'))
         self.update = Update(0, message=self.message)
 
     def test_filters_text(self):

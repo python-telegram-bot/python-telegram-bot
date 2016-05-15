@@ -126,8 +126,7 @@ class FileTest(BaseTest, unittest.TestCase):
         del (json_dict['file_path'])
         del (json_dict['file_size'])
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.getFile(**json_dict))
+        self.assertRaises(telegram.TelegramError, lambda: self._bot.getFile(**json_dict))
 
     def test_error_file_without_required_args(self):
         json_dict = self.json_dict

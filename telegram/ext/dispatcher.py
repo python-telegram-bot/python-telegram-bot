@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the Dispatcher class."""
 
 import logging
@@ -92,6 +91,7 @@ class Dispatcher(object):
         update_queue (Queue): The synchronized queue that will contain the
             updates.
     """
+
     def __init__(self, bot, update_queue, workers=4, exception_event=None):
         self.bot = bot
         self.update_queue = update_queue
@@ -140,8 +140,7 @@ class Dispatcher(object):
                     self.logger.debug('orderly stopping')
                     break
                 elif self.__exception_event.is_set():
-                    self.logger.critical(
-                        'stopping due to exception in another thread')
+                    self.logger.critical('stopping due to exception in another thread')
                     break
                 continue
 
@@ -182,24 +181,21 @@ class Dispatcher(object):
                             break
                     # Dispatch any errors
                     except TelegramError as te:
-                        self.logger.warn(
-                            'A TelegramError was raised while processing the '
-                            'Update.')
+                        self.logger.warn('A TelegramError was raised while processing the '
+                                         'Update.')
 
                         try:
                             self.dispatchError(update, te)
                         except Exception:
-                            self.logger.exception(
-                                'An uncaught error was raised while '
-                                'handling the error')
+                            self.logger.exception('An uncaught error was raised while '
+                                                  'handling the error')
                         finally:
                             break
 
                     # Errors should not stop the thread
                     except Exception:
-                        self.logger.exception(
-                            'An uncaught error was raised while '
-                            'processing the update')
+                        self.logger.exception('An uncaught error was raised while '
+                                              'processing the update')
                         break
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
@@ -228,8 +224,7 @@ class Dispatcher(object):
         """
 
         if not isinstance(handler, Handler):
-            raise TypeError(
-                'handler is not an instance of {0}'.format(Handler.__name__))
+            raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
 
@@ -293,5 +288,5 @@ class Dispatcher(object):
     addHandler = deprecate(add_handler, m + "AddHandler", m + "add_handler")
     removeHandler = deprecate(remove_handler, m + "removeHandler", m + "remove_handler")
     addErrorHandler = deprecate(add_error_handler, m + "addErrorHandler", m + "add_error_handler")
-    removeErrorHandler = deprecate(remove_error_handler,
-                                   m + "removeErrorHandler", m + "remove_error_handler")
+    removeErrorHandler = deprecate(remove_error_handler, m + "removeErrorHandler",
+                                   m + "remove_error_handler")

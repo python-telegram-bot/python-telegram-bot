@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains methods to make POST and GET requests"""
 
 import functools
@@ -57,6 +56,7 @@ def _parse(json_data):
 
 def _try_except_req(func):
     """Decorator for requests to handle known exceptions"""
+
     @functools.wraps(func)
     def decorator(*args, **kwargs):
         try:
@@ -114,9 +114,7 @@ def get(url):
 
 
 @_try_except_req
-def post(url,
-         data,
-         timeout=None):
+def post(url, data, timeout=None):
     """Request an URL.
     Args:
       url:
@@ -142,22 +140,17 @@ def post(url,
 
     if InputFile.is_inputfile(data):
         data = InputFile(data)
-        request = Request(url,
-                          data=data.to_form(),
-                          headers=data.headers)
+        request = Request(url, data=data.to_form(), headers=data.headers)
     else:
         data = json.dumps(data)
-        request = Request(url,
-                          data=data.encode(),
-                          headers={'Content-Type': 'application/json'})
+        request = Request(url, data=data.encode(), headers={'Content-Type': 'application/json'})
 
     result = urlopen(request, **urlopen_kwargs).read()
     return _parse(result)
 
 
 @_try_except_req
-def download(url,
-             filename):
+def download(url, filename):
     """Download a file by its URL.
     Args:
       url:

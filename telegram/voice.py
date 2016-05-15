@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram Voice."""
 
 from telegram import TelegramObject
@@ -41,9 +40,7 @@ class Voice(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self,
-                 file_id,
-                 **kwargs):
+    def __init__(self, file_id, **kwargs):
         # Required
         self.file_id = str(file_id)
         # Optionals

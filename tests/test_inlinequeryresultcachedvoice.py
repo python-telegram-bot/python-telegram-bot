@@ -42,8 +42,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         self.voice_file_id = 'voice file id'
         self.title = 'title'
         self.description = 'description'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -68,8 +67,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.description, self.description)
         self.assertDictEqual(voice.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(voice.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(voice.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_voice_to_json(self):
         voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict)
@@ -77,8 +75,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(voice.to_json()))
 
     def test_voice_to_dict(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(
-            self.json_dict).to_dict()
+        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(voice))
         self.assertDictEqual(self.json_dict, voice)

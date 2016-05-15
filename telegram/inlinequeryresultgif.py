@@ -16,15 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultGif"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, \
-    InputMessageContent
+from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultGif(InlineQueryResult):
+
     def __init__(self,
                  id,
                  gif_url,
@@ -58,12 +57,10 @@ class InlineQueryResultGif(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultGif,
-                     InlineQueryResultGif).de_json(data)
+        data = super(InlineQueryResultGif, InlineQueryResultGif).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultGif(**data)

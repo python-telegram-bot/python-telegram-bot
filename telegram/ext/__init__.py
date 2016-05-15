@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .dispatcher import Dispatcher
@@ -34,6 +33,6 @@ from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
 
 __all__ = ('Dispatcher', 'JobQueue', 'Updater', 'CallbackQueryHandler',
-           'ChosenInlineResultHandler', 'CommandHandler', 'Handler',
-           'InlineQueryHandler', 'MessageHandler', 'Filters', 'RegexHandler',
-           'StringCommandHandler', 'StringRegexHandler', 'TypeHandler')
+           'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
+           'MessageHandler', 'Filters', 'RegexHandler', 'StringCommandHandler',
+           'StringRegexHandler', 'TypeHandler')

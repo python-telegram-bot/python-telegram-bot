@@ -16,12 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultCachedAudio"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, \
-    InputMessageContent
+from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultCachedAudio(InlineQueryResult):
@@ -54,12 +52,8 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         input_message_content (Optional[
             :class:`telegram.input_message_content`]):
     """
-    def __init__(self,
-                 id,
-                 audio_file_id,
-                 reply_markup=None,
-                 input_message_content=None,
-                 **kwargs):
+
+    def __init__(self, id, audio_file_id, reply_markup=None, input_message_content=None, **kwargs):
         # Required
         super(InlineQueryResultCachedAudio, self).__init__('audio', id)
         self.audio_file_id = audio_file_id
@@ -72,12 +66,10 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultCachedAudio,
-                     InlineQueryResultCachedAudio).de_json(data)
+        data = super(InlineQueryResultCachedAudio, InlineQueryResultCachedAudio).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultCachedAudio(**data)

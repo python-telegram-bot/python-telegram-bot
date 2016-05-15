@@ -197,9 +197,9 @@ class AudioTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['audio'] = open(os.devnull, 'rb')
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendAudio(chat_id=self._chat_id,
-                                                      **json_dict))
+        self.assertRaises(
+            telegram.TelegramError,
+            lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
@@ -209,9 +209,9 @@ class AudioTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['audio'] = ''
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendAudio(chat_id=self._chat_id,
-                                                      **json_dict))
+        self.assertRaises(
+            telegram.TelegramError,
+            lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
@@ -221,9 +221,9 @@ class AudioTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         del (json_dict['duration'])
 
-        self.assertRaises(TypeError,
-                          lambda: self._bot.sendAudio(chat_id=self._chat_id,
-                                                      **json_dict))
+        self.assertRaises(
+            TypeError,
+            lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
 
 
 if __name__ == '__main__':

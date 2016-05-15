@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
-
 """This module contains the class Updater, which tries to make creating
 Telegram bots intuitive."""
 
@@ -85,8 +83,7 @@ class Updater(object):
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
         self.__exception_event = Event()
-        self.dispatcher = Dispatcher(self.bot, self.update_queue, workers,
-                                     self.__exception_event)
+        self.dispatcher = Dispatcher(self.bot, self.update_queue, workers, self.__exception_event)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
@@ -97,8 +94,7 @@ class Updater(object):
         """:type: list[Thread]"""
 
     def _init_thread(self, target, name, *args, **kwargs):
-        thr = Thread(target=self._thread_wrapper, name=name,
-                     args=(target,) + args, kwargs=kwargs)
+        thr = Thread(target=self._thread_wrapper, name=name, args=(target,) + args, kwargs=kwargs)
         thr.start()
         self.__threads.append(thr)
 
@@ -113,8 +109,12 @@ class Updater(object):
             raise
         self.logger.debug('{0} - ended'.format(thr_name))
 
-    def start_polling(self, poll_interval=0.0, timeout=10, network_delay=2,
-                      clean=False, bootstrap_retries=0):
+    def start_polling(self,
+                      poll_interval=0.0,
+                      timeout=10,
+                      network_delay=2,
+                      clean=False,
+                      bootstrap_retries=0):
         """
         Starts polling updates from Telegram.
 
@@ -143,9 +143,8 @@ class Updater(object):
 
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher")
-                self._init_thread(self._start_polling, "updater",
-                                  poll_interval, timeout, network_delay,
-                                  bootstrap_retries, clean)
+                self._init_thread(self._start_polling, "updater", poll_interval, timeout,
+                                  network_delay, bootstrap_retries, clean)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -195,15 +194,13 @@ class Updater(object):
 
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher"),
-                self._init_thread(self._start_webhook, "updater", listen,
-                                  port, url_path, cert, key, bootstrap_retries,
-                                  clean, webhook_url)
+                self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
+                                  key, bootstrap_retries, clean, webhook_url)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
-    def _start_polling(self, poll_interval, timeout, network_delay,
-                       bootstrap_retries, clean):
+    def _start_polling(self, poll_interval, timeout, network_delay, bootstrap_retries, clean):
         """
         Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
@@ -221,8 +218,7 @@ class Updater(object):
                                               timeout=timeout,
                                               network_delay=network_delay)
             except TelegramError as te:
-                self.logger.error(
-                    "Error while getting Updates: {0}".format(te))
+                self.logger.error("Error while getting Updates: {0}".format(te))
 
                 # Put the error into the update queue and let the Dispatcher
                 # broadcast it
@@ -256,16 +252,15 @@ class Updater(object):
             current_interval = 30
         return current_interval
 
-    def _start_webhook(self, listen, port, url_path, cert, key,
-                       bootstrap_retries, clean, webhook_url):
+    def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
+                       webhook_url):
         self.logger.debug('Updater thread started')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
             url_path = '/{0}'.format(url_path)
 
         # Create and start server
-        self.httpd = WebhookServer((listen, port), WebhookHandler,
-                                   self.update_queue, url_path)
+        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path)
 
         if use_ssl:
             self._check_ssl_cert(cert, key)
@@ -274,8 +269,10 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(max_retries=bootstrap_retries, clean=clean,
-                            webhook_url=webhook_url, cert=open(cert, 'rb'))
+            self._bootstrap(max_retries=bootstrap_retries,
+                            clean=clean,
+                            webhook_url=webhook_url,
+                            cert=open(cert, 'rb'))
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -285,10 +282,10 @@ class Updater(object):
     def _check_ssl_cert(self, cert, key):
         # Check SSL-Certificate with openssl, if possible
         try:
-            exit_code = subprocess.call(["openssl", "x509", "-text",
-                                         "-noout", "-in", cert],
-                                        stdout=open(os.devnull, 'wb'),
-                                        stderr=subprocess.STDOUT)
+            exit_code = subprocess.call(
+                ["openssl", "x509", "-text", "-noout", "-in", cert],
+                stdout=open(os.devnull, 'wb'),
+                stderr=subprocess.STDOUT)
         except OSError:
             exit_code = 0
         if exit_code is 0:
@@ -305,10 +302,7 @@ class Updater(object):
 
     @staticmethod
     def _gen_webhook_url(listen, port, url_path):
-        return 'https://{listen}:{port}{path}'.format(
-            listen=listen,
-            port=port,
-            path=url_path)
+        return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
 
     def _bootstrap(self, max_retries, clean, webhook_url, cert=None):
         retries = 0
@@ -320,8 +314,7 @@ class Updater(object):
                     self.bot.setWebhook(webhook_url='')
                     self._clean_updates()
 
-                self.bot.setWebhook(webhook_url=webhook_url,
-                                    certificate=cert)
+                self.bot.setWebhook(webhook_url=webhook_url, certificate=cert)
             except (Unauthorized, InvalidToken):
                 raise
             except TelegramError:
@@ -365,10 +358,9 @@ class Updater(object):
 
     def _stop_httpd(self):
         if self.httpd:
-            self.logger.debug(
-                'Waiting for current webhook connection to be '
-                'closed... Send a Telegram message to the bot to exit '
-                'immediately.')
+            self.logger.debug('Waiting for current webhook connection to be '
+                              'closed... Send a Telegram message to the bot to exit '
+                              'immediately.')
             self.httpd.shutdown()
             self.httpd = None
 
@@ -381,16 +373,13 @@ class Updater(object):
             threads = list(dispatcher.async_threads)
         total = len(threads)
         for i, thr in enumerate(threads):
-            self.logger.debug(
-                'Waiting for async thread {0}/{1} to end'.format(i, total))
+            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i, total))
             thr.join()
-            self.logger.debug(
-                'async thread {0}/{1} has ended'.format(i, total))
+            self.logger.debug('async thread {0}/{1} has ended'.format(i, total))
 
     def _join_threads(self):
         for thr in self.__threads:
-            self.logger.debug(
-                'Waiting for {0} thread to end'.format(thr.name))
+            self.logger.debug('Waiting for {0} thread to end'.format(thr.name))
             thr.join()
             self.logger.debug('{0} thread has ended'.format(thr.name))
         self.__threads = []

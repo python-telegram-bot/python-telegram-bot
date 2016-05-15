@@ -39,10 +39,7 @@ class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
         self.latitude = 1.
         self.longitude = 2.
 
-        self.json_dict = {
-            'longitude': self.longitude,
-            'latitude': self.latitude,
-        }
+        self.json_dict = {'longitude': self.longitude, 'latitude': self.latitude,}
 
     def test_ilmc_de_json(self):
         ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict)
@@ -72,8 +69,7 @@ class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(ilmc.to_json()))
 
     def test_ilmc_to_dict(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(
-            self.json_dict).to_dict()
+        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(ilmc))
         self.assertDictEqual(self.json_dict, ilmc)

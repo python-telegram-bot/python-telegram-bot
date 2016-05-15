@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the MessageHandler class """
 
 from .handler import Handler
@@ -76,18 +75,15 @@ class Filters(object):
 
     @staticmethod
     def status_update(update):
-        return bool(
-            update.message.new_chat_member or
-            update.message.left_chat_member or
-            update.message.new_chat_title or
-            update.message.new_chat_photo or
-            update.message.delete_chat_photo or
-            update.message.group_chat_created or
-            update.message.supergroup_chat_created or
-            update.message.channel_chat_created or
-            update.message.migrate_to_chat_id or
-            update.message.migrate_from_chat_id or
-            update.message.pinned_message)
+        # yapf: disable
+        # https://github.com/google/yapf/issues/252
+        return bool(update.message.new_chat_member or update.message.left_chat_member or
+                    update.message.new_chat_title or update.message.new_chat_photo or
+                    update.message.delete_chat_photo or update.message.group_chat_created or
+                    update.message.supergroup_chat_created or
+                    update.message.channel_chat_created or update.message.migrate_to_chat_id or
+                    update.message.migrate_from_chat_id or update.message.pinned_message)
+        # yapf: enable
 
 
 class MessageHandler(Handler):

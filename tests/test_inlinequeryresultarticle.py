@@ -39,8 +39,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.id = 'id'
         self.type = 'article'
         self.title = 'title'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -73,8 +72,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertEqual(article.title, self.title)
         self.assertDictEqual(article.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(article.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(article.reply_markup.to_dict(), self.reply_markup.to_dict())
         self.assertEqual(article.url, self.url)
         self.assertEqual(article.hide_url, self.hide_url)
         self.assertEqual(article.description, self.description)
@@ -88,8 +86,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(article.to_json()))
 
     def test_article_to_dict(self):
-        article = telegram.InlineQueryResultArticle.de_json(
-            self.json_dict).to_dict()
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(article))
         self.assertDictEqual(self.json_dict, article)

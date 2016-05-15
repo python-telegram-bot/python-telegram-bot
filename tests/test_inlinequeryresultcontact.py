@@ -44,8 +44,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
         self.thumb_url = 'thumb url'
         self.thumb_width = 10
         self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -75,8 +74,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact.thumb_height, self.thumb_height)
         self.assertDictEqual(contact.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(contact.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(contact.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_contact_to_json(self):
         contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
@@ -84,8 +82,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(contact.to_json()))
 
     def test_contact_to_dict(self):
-        contact = telegram.InlineQueryResultContact.de_json(
-            self.json_dict).to_dict()
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(contact))
         self.assertDictEqual(self.json_dict, contact)

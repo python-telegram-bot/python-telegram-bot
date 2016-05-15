@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram InputFile."""
 
 try:
@@ -37,15 +36,13 @@ from future.moves.urllib.request import urlopen
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
-USER_AGENT = 'Python Telegram Bot' \
-             ' (https://github.com/python-telegram-bot/python-telegram-bot)'
+USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
 class InputFile(object):
     """This object represents a Telegram InputFile."""
 
-    def __init__(self,
-                 data):
+    def __init__(self, data):
         self.data = data
         self.boundary = choose_boundary()
 
@@ -87,16 +84,14 @@ class InputFile(object):
                 # pylint: disable=E1101
                 self.filename = os.path.basename(self.input_file.name)
             elif from_url:
-                self.filename = os.path.basename(self.input_file.url) \
-                    .split('?')[0].split('&')[0]
+                self.filename = os.path.basename(self.input_file.url).split('?')[0].split('&')[0]
 
             try:
                 self.mimetype = InputFile.is_image(self.input_file_content)
                 if not self.filename or '.' not in self.filename:
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
-                self.mimetype = mimetypes.guess_type(self.filename)[0] or \
-                                DEFAULT_MIME_TYPE
+                self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
 
     @property
     def headers(self):
@@ -104,8 +99,7 @@ class InputFile(object):
         Returns:
             str:
         """
-        return {'User-agent': USER_AGENT,
-                'Content-type': self.content_type}
+        return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
 
     @property
     def content_type(self):
@@ -126,21 +120,14 @@ class InputFile(object):
         # Add data fields
         for name, value in self.data.items():
             form.extend([
-                form_boundary,
-                'Content-Disposition: form-data; name="%s"' % name,
-                '',
-                str(value)
+                form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
             ])
 
         # Add input_file to upload
         form.extend([
-            form_boundary,
-            'Content-Disposition: form-data; name="%s"; filename="%s"' % (
+            form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' % (
                 self.input_name, self.filename
-            ),
-            'Content-Type: %s' % self.mimetype,
-            '',
-            self.input_file_content
+            ), 'Content-Type: %s' % self.mimetype, '', self.input_file_content
         ])
 
         form.append('--' + self.boundary + '--')
@@ -193,14 +180,12 @@ class InputFile(object):
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'sticker', 'video',
-                          'voice', 'certificate']
+            file_types = ['audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate']
             file_type = [i for i in list(data.keys()) if i in file_types]
 
             if file_type:
                 file_content = data[file_type[0]]
 
-                return hasattr(file_content, 'read') or str(
-                    file_content).startswith('http')
+                return hasattr(file_content, 'read') or str(file_content).startswith('http')
 
         return False

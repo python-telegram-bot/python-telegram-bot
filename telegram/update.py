@@ -16,11 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram Update."""
 
-from telegram import (Message, TelegramObject, InlineQuery,
-                      ChosenInlineResult, CallbackQuery)
+from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult, CallbackQuery)
 
 
 class Update(TelegramObject):
@@ -44,9 +42,7 @@ class Update(TelegramObject):
         callback_query (Optional[:class:`telegram.CallbackQuery`]):
     """
 
-    def __init__(self,
-                 update_id,
-                 **kwargs):
+    def __init__(self, update_id, **kwargs):
         # Required
         self.update_id = int(update_id)
         # Optionals
@@ -69,9 +65,7 @@ class Update(TelegramObject):
 
         data['message'] = Message.de_json(data.get('message'))
         data['inline_query'] = InlineQuery.de_json(data.get('inline_query'))
-        data['chosen_inline_result'] = \
-            ChosenInlineResult.de_json(data.get('chosen_inline_result'))
-        data['callback_query'] = \
-            CallbackQuery.de_json(data.get('callback_query'))
+        data['chosen_inline_result'] = ChosenInlineResult.de_json(data.get('chosen_inline_result'))
+        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'))
 
         return Update(**data)

@@ -43,8 +43,7 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.caption = 'caption'
         self.description = 'description'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -60,8 +59,7 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         }
 
     def test_document_de_json(self):
-        document = telegram.InlineQueryResultCachedDocument.de_json(
-            self.json_dict)
+        document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict)
 
         self.assertEqual(document.id, self.id)
         self.assertEqual(document.type, self.type)
@@ -71,18 +69,15 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.description, self.description)
         self.assertDictEqual(document.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(document.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(document.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_document_to_json(self):
-        document = telegram.InlineQueryResultCachedDocument.de_json(
-            self.json_dict)
+        document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict)
 
         self.assertTrue(self.is_json(document.to_json()))
 
     def test_document_to_dict(self):
-        document = telegram.InlineQueryResultCachedDocument.de_json(
-            self.json_dict).to_dict()
+        document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(document))
         self.assertDictEqual(self.json_dict, document)

@@ -61,9 +61,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_sendphotoo_all_args(self):
-        message = self._bot.sendPhoto(self._chat_id,
-                                      self.photo_file,
-                                      caption=self.caption)
+        message = self._bot.sendPhoto(self._chat_id, self.photo_file, caption=self.caption)
 
         thumb, photo = message.photo
 
@@ -128,8 +126,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_photo_resend(self):
-        message = self._bot.sendPhoto(chat_id=self._chat_id,
-                                      photo=self.photo_file_id)
+        message = self._bot.sendPhoto(chat_id=self._chat_id, photo=self.photo_file_id)
 
         thumb, photo = message.photo
 
@@ -175,9 +172,9 @@ class PhotoTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['photo'] = open(os.devnull, 'rb')
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendPhoto(chat_id=self._chat_id,
-                                                      **json_dict))
+        self.assertRaises(
+            telegram.TelegramError,
+            lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
@@ -187,9 +184,9 @@ class PhotoTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['photo'] = ''
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendPhoto(chat_id=self._chat_id,
-                                                      **json_dict))
+        self.assertRaises(
+            telegram.TelegramError,
+            lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
@@ -200,9 +197,9 @@ class PhotoTest(BaseTest, unittest.TestCase):
         del (json_dict['width'])
         del (json_dict['height'])
 
-        self.assertRaises(TypeError,
-                          lambda: self._bot.sendPhoto(chat_id=self._chat_id,
-                                                      **json_dict))
+        self.assertRaises(
+            TypeError,
+            lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
 
 
 if __name__ == '__main__':

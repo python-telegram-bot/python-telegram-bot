@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Bot"""
 
 import io
@@ -120,17 +119,20 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testResendPhoto(self):
-        message = self._bot.sendPhoto(photo='AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI',
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(
+            photo='AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI',
+            chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_id, 'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
+        self.assertEqual(message.photo[0].file_id,
+                         'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
 
     @flaky(3, 1)
     @timeout(10)
     def testSendJPGURLPhoto(self):
-        message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram',
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram',
+            chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 822)
@@ -138,8 +140,9 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendPNGURLPhoto(self):
-        message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.png&text=telegram',
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram',
+            chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
@@ -147,8 +150,9 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendGIFURLPhoto(self):
-        message = self._bot.sendPhoto(photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram',
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram',
+            chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 684)
@@ -158,8 +162,7 @@ class BotTest(BaseTest, unittest.TestCase):
     def testSendBufferedReaderPhoto(self):
         photo = open('tests/data/telegram.png', 'rb')
         br_photo = io.BufferedReader(io.BytesIO(photo.read()))
-        message = self._bot.sendPhoto(photo=br_photo,
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(photo=br_photo, chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 1451)
@@ -167,8 +170,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendChatAction(self):
-        self._bot.sendChatAction(action=telegram.ChatAction.TYPING,
-                                 chat_id=self._chat_id)
+        self._bot.sendChatAction(action=telegram.ChatAction.TYPING, chat_id=self._chat_id)
 
     @flaky(3, 1)
     @timeout(10)

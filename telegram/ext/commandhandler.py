@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the CommandHandler class """
 
 from .handler import Handler
@@ -44,19 +43,15 @@ class CommandHandler(Handler):
             be used to insert updates. Default is ``False``
     """
 
-    def __init__(self, command, callback, pass_args=False,
-                 pass_update_queue=False):
+    def __init__(self, command, callback, pass_args=False, pass_update_queue=False):
         super(CommandHandler, self).__init__(callback, pass_update_queue)
         self.command = command
         self.pass_args = pass_args
 
     def check_update(self, update):
-        return (isinstance(update, Update) and
-                update.message and
-                update.message.text and
+        return (isinstance(update, Update) and update.message and update.message.text and
                 update.message.text.startswith('/') and
-                update.message.text[1:].split(' ')[0].split('@')[0] ==
-                self.command)
+                update.message.text[1:].split(' ')[0].split('@')[0] == self.command)
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)

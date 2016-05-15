@@ -43,8 +43,7 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.description = 'description'
         self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -71,8 +70,7 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.caption, self.caption)
         self.assertDictEqual(photo.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(photo.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(photo.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_photo_to_json(self):
         photo = telegram.InlineQueryResultCachedPhoto.de_json(self.json_dict)
@@ -80,8 +78,7 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(photo.to_json()))
 
     def test_photo_to_dict(self):
-        photo = telegram.InlineQueryResultCachedPhoto.de_json(
-            self.json_dict).to_dict()
+        photo = telegram.InlineQueryResultCachedPhoto.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(photo))
         self.assertDictEqual(self.json_dict, photo)

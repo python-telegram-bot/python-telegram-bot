@@ -46,8 +46,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.thumb_url = 'thumb url'
         self.thumb_width = 10
         self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -81,8 +80,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.assertEqual(venue.thumb_height, self.thumb_height)
         self.assertDictEqual(venue.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(venue.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(venue.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_venue_to_json(self):
         venue = telegram.InlineQueryResultVenue.de_json(self.json_dict)
@@ -90,8 +88,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(venue.to_json()))
 
     def test_venue_to_dict(self):
-        venue = telegram.InlineQueryResultVenue.de_json(
-            self.json_dict).to_dict()
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(venue))
         self.assertDictEqual(self.json_dict, venue)

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the ChosenInlineResultHandler class """
 
 from .handler import Handler
@@ -39,8 +38,7 @@ class ChosenInlineResultHandler(Handler):
     """
 
     def __init__(self, callback, pass_update_queue=False):
-        super(ChosenInlineResultHandler, self).__init__(callback,
-                                                        pass_update_queue)
+        super(ChosenInlineResultHandler, self).__init__(callback, pass_update_queue)
 
     def check_update(self, update):
         return isinstance(update, Update) and update.chosen_inline_result

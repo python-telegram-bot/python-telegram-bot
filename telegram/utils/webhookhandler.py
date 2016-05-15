@@ -9,7 +9,6 @@ try:
 except ImportError:
     import http.server as BaseHTTPServer
 
-
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
@@ -21,10 +20,9 @@ class _InvalidPost(Exception):
 
 
 class WebhookServer(BaseHTTPServer.HTTPServer, object):
-    def __init__(self, server_address, RequestHandlerClass, update_queue,
-                 webhook_path):
-        super(WebhookServer, self).__init__(server_address,
-                                            RequestHandlerClass)
+
+    def __init__(self, server_address, RequestHandlerClass, update_queue, webhook_path):
+        super(WebhookServer, self).__init__(server_address, RequestHandlerClass)
         self.logger = logging.getLogger(__name__)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
@@ -85,13 +83,11 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.logger.debug('Webhook received data: ' + json_string)
 
             update = Update.de_json(json.loads(json_string))
-            self.logger.debug('Received Update with ID %d on Webhook' %
-                              update.update_id)
+            self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
             self.server.update_queue.put(update)
 
     def _validate_post(self):
-        if not (self.path == self.server.webhook_path and
-                'content-type' in self.headers and
+        if not (self.path == self.server.webhook_path and 'content-type' in self.headers and
                 self.headers['content-type'] == 'application/json'):
             raise _InvalidPost(403)
 

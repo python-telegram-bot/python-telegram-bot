@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram KeyboardButton."""
 
 from telegram import TelegramObject
@@ -34,10 +33,7 @@ class KeyboardButton(TelegramObject):
         request_contact (Optional[bool]):
     """
 
-    def __init__(self,
-                 text,
-                 request_contact=None,
-                 request_location=None):
+    def __init__(self, text, request_contact=None, request_location=None):
         # Required
         self.text = text
         # Optionals
@@ -60,7 +56,6 @@ class KeyboardButton(TelegramObject):
 
         keyboards = list()
         for keyboard in data:
-            keyboards.append(KeyboardButton.
-                             de_json(keyboard))
+            keyboards.append(KeyboardButton.de_json(keyboard))
 
         return keyboards

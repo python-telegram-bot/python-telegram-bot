@@ -4,3 +4,6 @@ pep257
 pylint
 unittest2
 flaky
+yapf
+pre-commit
+pre-commit-hooks

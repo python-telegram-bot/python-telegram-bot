@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram
 InlineKeyboardButton"""
 
@@ -43,9 +42,7 @@ class InlineKeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self,
-                 text,
-                 **kwargs):
+    def __init__(self, text, **kwargs):
         # Required
         self.text = text
 
@@ -70,7 +67,6 @@ class InlineKeyboardButton(TelegramObject):
 
         inline_keyboards = list()
         for inline_keyboard in data:
-            inline_keyboards.append(InlineKeyboardButton.
-                                    de_json(inline_keyboard))
+            inline_keyboards.append(InlineKeyboardButton.de_json(inline_keyboard))
 
         return inline_keyboards

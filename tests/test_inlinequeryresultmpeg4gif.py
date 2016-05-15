@@ -44,8 +44,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.thumb_url = 'thumb url'
         self.title = 'title'
         self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -76,8 +75,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.assertEqual(mpeg4.caption, self.caption)
         self.assertDictEqual(mpeg4.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(mpeg4.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(mpeg4.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_mpeg4_to_json(self):
         mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
@@ -85,8 +83,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(mpeg4.to_json()))
 
     def test_mpeg4_to_dict(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(
-            self.json_dict).to_dict()
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(mpeg4))
         self.assertDictEqual(self.json_dict, mpeg4)

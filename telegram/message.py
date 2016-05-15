@@ -17,15 +17,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram Message."""
 
 from datetime import datetime
 from time import mktime
 
-from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize,
-                      Sticker, TelegramObject, User, Video, Voice, Venue,
-                      MessageEntity)
+from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
+                      User, Video, Voice, Venue, MessageEntity)
 
 
 class Message(TelegramObject):
@@ -104,12 +102,7 @@ class Message(TelegramObject):
         channel_chat_created (Optional[bool]):
     """
 
-    def __init__(self,
-                 message_id,
-                 from_user,
-                 date,
-                 chat,
-                 **kwargs):
+    def __init__(self, message_id, from_user, date, chat, **kwargs):
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
@@ -138,12 +131,10 @@ class Message(TelegramObject):
         self.new_chat_photo = kwargs.get('new_chat_photo')
         self.delete_chat_photo = bool(kwargs.get('delete_chat_photo', False))
         self.group_chat_created = bool(kwargs.get('group_chat_created', False))
-        self.supergroup_chat_created = bool(kwargs.get(
-            'supergroup_chat_created', False))
+        self.supergroup_chat_created = bool(kwargs.get('supergroup_chat_created', False))
         self.migrate_to_chat_id = int(kwargs.get('migrate_to_chat_id', 0))
         self.migrate_from_chat_id = int(kwargs.get('migrate_from_chat_id', 0))
-        self.channel_chat_created = bool(kwargs.get('channel_chat_created',
-                                                    False))
+        self.channel_chat_created = bool(kwargs.get('channel_chat_created', False))
         self.pinned_message = kwargs.get('pinned_message')
 
     @property
@@ -170,8 +161,7 @@ class Message(TelegramObject):
         data['forward_from'] = User.de_json(data.get('forward_from'))
         data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'))
         data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
-        data['reply_to_message'] = \
-            Message.de_json(data.get('reply_to_message'))
+        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'))
         data['audio'] = Audio.de_json(data.get('audio'))
         data['document'] = Document.de_json(data.get('document'))
         data['photo'] = PhotoSize.de_list(data.get('photo'))

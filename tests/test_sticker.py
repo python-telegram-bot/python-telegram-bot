@@ -62,8 +62,7 @@ class StickerTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_sticker_resend(self):
-        message = self._bot.sendSticker(chat_id=self._chat_id,
-                                        sticker=self.sticker_file_id)
+        message = self._bot.sendSticker(chat_id=self._chat_id, sticker=self.sticker_file_id)
 
         sticker = message.sticker
 
@@ -110,9 +109,9 @@ class StickerTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['sticker'] = open(os.devnull, 'rb')
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendSticker(chat_id=self._chat_id,
-                                                        **json_dict))
+        self.assertRaises(
+            telegram.TelegramError,
+            lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
@@ -122,9 +121,9 @@ class StickerTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['sticker'] = ''
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendSticker(chat_id=self._chat_id,
-                                                        **json_dict))
+        self.assertRaises(
+            telegram.TelegramError,
+            lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
 
     @flaky(3, 1)
     @timeout(10)
@@ -133,9 +132,9 @@ class StickerTest(BaseTest, unittest.TestCase):
 
         del (json_dict['file_id'])
 
-        self.assertRaises(TypeError,
-                          lambda: self._bot.sendSticker(chat_id=self._chat_id,
-                                                        **json_dict))
+        self.assertRaises(
+            TypeError,
+            lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
 
 
 if __name__ == '__main__':
