@@ -1,3 +1,11 @@
+**2016-05-15**
+
+*Released 4.1*
+
+- Implement API changes from May 6, 2016
+- Fix bug when ``start_polling`` with ``clean=True``
+- Methods now have snake_case equivalent, for example ``telegram.Bot.send_message`` is the same as ``telegram.Bot.sendMessage``
+
 **2016-05-01**
 
 *Released 4.0.3*
