@@ -22,8 +22,8 @@
 import logging
 import functools
 
-from telegram import User, Message, Update, UserProfilePhotos, File, \
-    ReplyMarkup, TelegramObject, NullHandler
+from telegram import (User, Message, Update, UserProfilePhotos, File, ReplyMarkup, TelegramObject,
+                      NullHandler)
 from telegram.utils import request
 from telegram.utils.validate import validate_token
 
@@ -120,12 +120,10 @@ class Bot(TelegramObject):
             url, data = func(self, *args, **kwargs)
 
             if kwargs.get('reply_to_message_id'):
-                data['reply_to_message_id'] = \
-                    kwargs.get('reply_to_message_id')
+                data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
 
             if kwargs.get('disable_notification'):
-                data['disable_notification'] = \
-                    kwargs.get('disable_notification')
+                data['disable_notification'] = kwargs.get('disable_notification')
 
             if kwargs.get('reply_markup'):
                 reply_markup = kwargs.get('reply_markup')

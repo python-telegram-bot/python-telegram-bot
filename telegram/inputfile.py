@@ -36,8 +36,7 @@ from future.moves.urllib.request import urlopen
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
-USER_AGENT = 'Python Telegram Bot' \
-             ' (https://github.com/python-telegram-bot/python-telegram-bot)'
+USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
 class InputFile(object):

@@ -44,9 +44,8 @@ class InlineKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
-        data['inline_keyboard'] = \
-            [InlineKeyboardButton.de_list(inline_keyboard) for inline_keyboard
-             in data['inline_keyboard']]
+        data['inline_keyboard'] = [InlineKeyboardButton.de_list(inline_keyboard)
+                                   for inline_keyboard in data['inline_keyboard']]
 
         return InlineKeyboardMarkup(**data)
 

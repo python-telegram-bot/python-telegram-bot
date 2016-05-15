@@ -19,8 +19,7 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultGif"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, \
-    InputMessageContent
+from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultGif(InlineQueryResult):

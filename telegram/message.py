@@ -161,8 +161,7 @@ class Message(TelegramObject):
         data['forward_from'] = User.de_json(data.get('forward_from'))
         data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'))
         data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
-        data['reply_to_message'] = \
-            Message.de_json(data.get('reply_to_message'))
+        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'))
         data['audio'] = Audio.de_json(data.get('audio'))
         data['document'] = Document.de_json(data.get('document'))
         data['photo'] = PhotoSize.de_list(data.get('photo'))

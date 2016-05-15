@@ -19,8 +19,7 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultAudio"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, \
-    InputMessageContent
+from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultAudio(InlineQueryResult):
