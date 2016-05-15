@@ -28,7 +28,7 @@ test:
 	$(NOSETESTS) -v
 
 install:
-	$(PIP)  install -r requirements.txt
+	$(PIP)  install -r requirements.txt -r requirements-dev.txt
 
 help:
 	@echo "Available targets:"
