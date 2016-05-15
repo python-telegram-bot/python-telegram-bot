@@ -1,4 +1,4 @@
-  #!/usr/bin/env python
+#!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram User"""
 
 import unittest
@@ -59,7 +58,7 @@ class UserTest(BaseTest, unittest.TestCase):
     def test_user_de_json_without_username(self):
         json_dict = self.json_dict
 
-        del(json_dict['username'])
+        del (json_dict['username'])
 
         user = telegram.User.de_json(self.json_dict)
 
@@ -68,14 +67,14 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.type, self.type)
 
-        self.assertEqual(user.name, '%s %s' % (self.first_name, self.last_name))
-
+        self.assertEqual(user.name, '%s %s' %
+                         (self.first_name, self.last_name))
 
     def test_user_de_json_without_username_and_lastname(self):
         json_dict = self.json_dict
 
-        del(json_dict['username'])
-        del(json_dict['last_name'])
+        del (json_dict['username'])
+        del (json_dict['last_name'])
 
         user = telegram.User.de_json(self.json_dict)
 
@@ -98,6 +97,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)
         self.assertEqual(user['type'], self.type)
+
 
 if __name__ == '__main__':
     unittest.main()

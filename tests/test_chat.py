@@ -1,4 +1,4 @@
-  #!/usr/bin/env python
+#!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents Tests for Telegram Chat"""
 
 import unittest
@@ -65,6 +64,7 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.assertEqual(group_chat['id'], self.id)
         self.assertEqual(group_chat['title'], self.title)
         self.assertEqual(group_chat['type'], self.type)
+
 
 if __name__ == '__main__':
     unittest.main()

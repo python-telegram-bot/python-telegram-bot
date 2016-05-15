@@ -499,8 +499,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                             bootstrap_retries=retries,
                             bootstrap_err=Unauthorized())
 
-        self.assertRaises(Unauthorized, self.updater._bootstrap,
-                          retries, False, 'path', None)
+        self.assertRaises(Unauthorized, self.updater._bootstrap, retries,
+                          False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_invalid_token(self):
@@ -510,8 +510,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                             bootstrap_retries=retries,
                             bootstrap_err=InvalidToken())
 
-        self.assertRaises(InvalidToken, self.updater._bootstrap,
-                          retries, False, 'path', None)
+        self.assertRaises(InvalidToken, self.updater._bootstrap, retries,
+                          False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_fail(self):
