@@ -82,8 +82,7 @@ class InputVenueMessageContentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(ivmc.to_json()))
 
     def test_ivmc_to_dict(self):
-        ivmc = telegram.InputVenueMessageContent.de_json(
-            self.json_dict).to_dict()
+        ivmc = telegram.InputVenueMessageContent.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(ivmc))
         self.assertDictEqual(self.json_dict, ivmc)

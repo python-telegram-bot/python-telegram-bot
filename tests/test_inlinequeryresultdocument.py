@@ -46,8 +46,7 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         self.thumb_url = 'thumb url'
         self.thumb_width = 10
         self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -81,8 +80,7 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.thumb_height, self.thumb_height)
         self.assertDictEqual(document.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(document.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(document.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_document_to_json(self):
         document = telegram.InlineQueryResultDocument.de_json(self.json_dict)
@@ -90,8 +88,7 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(document.to_json()))
 
     def test_document_to_dict(self):
-        document = telegram.InlineQueryResultDocument.de_json(
-            self.json_dict).to_dict()
+        document = telegram.InlineQueryResultDocument.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(document))
         self.assertDictEqual(self.json_dict, document)

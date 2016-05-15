@@ -67,8 +67,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.type, self.type)
 
-        self.assertEqual(user.name, '%s %s' %
-                         (self.first_name, self.last_name))
+        self.assertEqual(user.name, '%s %s' % (self.first_name, self.last_name))
 
     def test_user_de_json_without_username_and_lastname(self):
         json_dict = self.json_dict

@@ -74,8 +74,7 @@ class InputContactMessageContentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(icmc.to_json()))
 
     def test_icmc_to_dict(self):
-        icmc = telegram.InputContactMessageContent.de_json(
-            self.json_dict).to_dict()
+        icmc = telegram.InputContactMessageContent.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(icmc))
         self.assertDictEqual(self.json_dict, icmc)

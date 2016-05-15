@@ -40,8 +40,7 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         self.id = 'id'
         self.type = 'audio'
         self.audio_file_id = 'audio file id'
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -62,8 +61,7 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.audio_file_id, self.audio_file_id)
         self.assertDictEqual(audio.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(audio.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(audio.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_audio_to_json(self):
         audio = telegram.InlineQueryResultCachedAudio.de_json(self.json_dict)
@@ -71,8 +69,7 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(audio.to_json()))
 
     def test_audio_to_dict(self):
-        audio = telegram.InlineQueryResultCachedAudio.de_json(
-            self.json_dict).to_dict()
+        audio = telegram.InlineQueryResultCachedAudio.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(audio))
         self.assertDictEqual(self.json_dict, audio)

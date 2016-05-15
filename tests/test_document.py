@@ -100,8 +100,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_resend(self):
-        message = self._bot.sendDocument(chat_id=self._chat_id,
-                                         document=self.document_file_id)
+        message = self._bot.sendDocument(chat_id=self._chat_id, document=self.document_file_id)
 
         document = message.document
 

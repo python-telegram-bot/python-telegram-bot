@@ -60,8 +60,7 @@ root.setLevel(logging.INFO)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.WARN)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s '
-                              '- %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s ' '- %(message)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
@@ -95,8 +94,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.message_count += 1
 
     def telegramInlineHandlerTest(self, bot, update):
-        self.received_message = (update.inline_query,
-                                 update.chosen_inline_result)
+        self.received_message = (update.inline_query, update.chosen_inline_result)
         self.message_count += 1
 
     def telegramCallbackHandlerTest(self, bot, update):
@@ -161,8 +159,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         self._setup_updater('Multiple', 100)
-        self.updater.dispatcher.addHandler(MessageHandler(
-            [], self.telegramHandlerTest))
+        self.updater.dispatcher.addHandler(MessageHandler([], self.telegramHandlerTest))
         self.updater.start_polling(0.0)
         sleep(2)
         self.assertEqual(self.received_message, 'Multiple')
@@ -394,9 +391,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_runAsyncWithAdditionalArgs(self):
         self._setup_updater('Test6', messages=2)
         d = self.updater.dispatcher
-        handler = MessageHandler([],
-                                 self.asyncAdditionalHandlerTest,
-                                 pass_update_queue=True)
+        handler = MessageHandler([], self.asyncAdditionalHandlerTest, pass_update_queue=True)
         d.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(1.2)
@@ -442,8 +437,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(200, response.code)
 
         response = self._send_webhook_msg(
-            ip, port,
-            None, 'webookhandler.py',
+            ip, port, None, 'webookhandler.py',
             get_method=lambda: 'HEAD')
 
         self.assertEqual(b'', response.read())
@@ -494,32 +488,28 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_bootstrap_retries_unauth(self):
         retries = 3
-        self._setup_updater('',
-                            messages=0,
-                            bootstrap_retries=retries,
-                            bootstrap_err=Unauthorized())
+        self._setup_updater(
+            '', messages=0, bootstrap_retries=retries,
+            bootstrap_err=Unauthorized())
 
-        self.assertRaises(Unauthorized, self.updater._bootstrap, retries,
-                          False, 'path', None)
+        self.assertRaises(Unauthorized, self.updater._bootstrap, retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_invalid_token(self):
         retries = 3
-        self._setup_updater('',
-                            messages=0,
-                            bootstrap_retries=retries,
-                            bootstrap_err=InvalidToken())
+        self._setup_updater(
+            '', messages=0, bootstrap_retries=retries,
+            bootstrap_err=InvalidToken())
 
-        self.assertRaises(InvalidToken, self.updater._bootstrap, retries,
-                          False, 'path', None)
+        self.assertRaises(InvalidToken, self.updater._bootstrap, retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_bootstrap_retries_fail(self):
         retries = 1
         self._setup_updater('', messages=0, bootstrap_retries=retries)
 
-        self.assertRaisesRegexp(TelegramError, 'test', self.updater._bootstrap,
-                                retries - 1, False, 'path', None)
+        self.assertRaisesRegexp(TelegramError, 'test', self.updater._bootstrap, retries - 1, False,
+                                'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
 
     def test_webhook_invalid_posts(self):
@@ -542,9 +532,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             self.assertEqual(ctx.exception.code, 403)
 
             with self.assertRaises(HTTPError) as ctx:
-                self._send_webhook_msg(
-                    ip, port, 'dummy-payload',
-                    content_len=-2)
+                self._send_webhook_msg(ip, port, 'dummy-payload', content_len=-2)
             self.assertEqual(ctx.exception.code, 403)
 
             # TODO: prevent urllib or the underlying from adding content-length
@@ -554,10 +542,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             # self.assertEqual(ctx.exception.code, 411)
 
             with self.assertRaises(HTTPError) as ctx:
-                self._send_webhook_msg(ip,
-                                       port,
-                                       'dummy-payload',
-                                       content_len='not-a-number')
+                self._send_webhook_msg(ip, port, 'dummy-payload', content_len='not-a-number')
             self.assertEqual(ctx.exception.code, 403)
 
         finally:
@@ -572,7 +557,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                           content_len=-1,
                           content_type='application/json',
                           get_method=None):
-        headers = {'content-type': content_type, }
+        headers = {'content-type': content_type,}
 
         if not payload_str:
             content_len = None
@@ -586,8 +571,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         if content_len is not None:
             headers['content-length'] = str(content_len)
 
-        url = 'http://{ip}:{port}/{path}'.format(
-            ip=ip, port=port, path=url_path)
+        url = 'http://{ip}:{port}/{path}'.format(ip=ip, port=port, path=url_path)
 
         req = Request(url, data=payload, headers=headers)
 
@@ -622,6 +606,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
 
 class MockBot(object):
+
     def __init__(self,
                  text,
                  messages=1,

@@ -51,8 +51,7 @@ class InputTextMessageContentTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(itmc.parse_mode, self.parse_mode)
         self.assertEqual(itmc.message_text, self.message_text)
-        self.assertEqual(itmc.disable_web_page_preview,
-                         self.disable_web_page_preview)
+        self.assertEqual(itmc.disable_web_page_preview, self.disable_web_page_preview)
 
     def test_itmc_de_json_factory(self):
         itmc = telegram.InputMessageContent.de_json(self.json_dict)
@@ -74,8 +73,7 @@ class InputTextMessageContentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(itmc.to_json()))
 
     def test_itmc_to_dict(self):
-        itmc = telegram.InputTextMessageContent.de_json(
-            self.json_dict).to_dict()
+        itmc = telegram.InputTextMessageContent.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(itmc))
         self.assertDictEqual(self.json_dict, itmc)

@@ -44,8 +44,7 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
         self.thumb_url = 'thumb url'
         self.thumb_width = 10
         self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent(
-            'input_message_content')
+        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
         ]])
@@ -75,8 +74,7 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.thumb_height, self.thumb_height)
         self.assertDictEqual(location.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
-        self.assertDictEqual(location.reply_markup.to_dict(),
-                             self.reply_markup.to_dict())
+        self.assertDictEqual(location.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_location_to_json(self):
         location = telegram.InlineQueryResultLocation.de_json(self.json_dict)
@@ -84,8 +82,7 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(location.to_json()))
 
     def test_location_to_dict(self):
-        location = telegram.InlineQueryResultLocation.de_json(
-            self.json_dict).to_dict()
+        location = telegram.InlineQueryResultLocation.de_json(self.json_dict).to_dict()
 
         self.assertTrue(self.is_dict(location))
         self.assertDictEqual(self.json_dict, location)

@@ -34,11 +34,7 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.title = 'ToledosPalaceBot - Group'
         self.type = 'group'
 
-        self.json_dict = {
-            'id': self.id,
-            'title': self.title,
-            'type': self.type
-        }
+        self.json_dict = {'id': self.id, 'title': self.title, 'type': self.type}
 
     def test_group_chat_de_json_empty_json(self):
         group_chat = telegram.Chat.de_json({})

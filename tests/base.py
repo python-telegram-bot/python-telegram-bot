@@ -36,8 +36,8 @@ class BaseTest(object):
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
 
-        bot = telegram.Bot(os.environ.get(
-            'TOKEN', '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
+        bot = telegram.Bot(os.environ.get('TOKEN',
+                                          '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
         chat_id = os.environ.get('CHAT_ID', '12173560')
 
         self._bot = bot
@@ -61,6 +61,7 @@ class BaseTest(object):
 
 
 class TestTimedOut(AssertionError):
+
     def __init__(self, time_limit, frame):
         super(TestTimedOut, self).__init__('time_limit={0}'.format(time_limit))
         self.time_limit = time_limit
@@ -68,7 +69,9 @@ class TestTimedOut(AssertionError):
 
 
 def timeout(time_limit):
+
     def decorator(func):
+
         def timed_out(_signum, frame):
             raise TestTimedOut(time_limit, frame)
 
