@@ -22,6 +22,11 @@ Setting things up
 
    ``$ pip install -r requirements.txt -r requirements-dev.txt``
 
+
+5. Install pre-commit hooks:
+
+   ``$ pre-commit install``
+
 Finding something to do
 -----------------------
 
@@ -68,17 +73,19 @@ Here's how to make a one-off code change.
 
    - Add yourself to the AUTHORS.rst_ file in an alphabetical fashion.
 
-   - Before making a commit ensure that all automated tests, pep8 & lint validations still pass:
+   - Before making a commit ensure that all automated tests still pass:
 
       ``$ make test``
 
-      ``$ make pep8``
+   - To actually make the commit (this will trigger test for yapf, lint and pep8 automatically):
 
-      ``$ make lint``
+      ``$ git add your-file-changed.py``
 
-   - To actually make the commit and push it to your GitHub fork, run:
+        - yapf may change code formatting, make sure to re-add them to your commit.
 
       ``$ git commit -a -m "your-commit-message-here"``
+
+   - Finally, push it to your GitHub fork, run:
 
       ``$ git push origin your-branch-name``
 
