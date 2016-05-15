@@ -13,7 +13,7 @@ install:
   - pip install -r requirements-dev.txt
 script:
   - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/
-  - 'if [ $TRAVIS_PYTHON_VERSION != 2.6 ] && [ $TRAVIS_PYTHON_VERSION != 3.3 ]; then yapf -r telegram; fi'
+  - 'if [ $TRAVIS_PYTHON_VERSION != 2.6 ] && [ $TRAVIS_PYTHON_VERSION != 3.3 ] && [ $TRAVIS_PYTHON_VERSION != pypy3.3 ]; then yapf -r telegram; fi'
   - flake8 telegram
   - 'if [ $TRAVIS_PYTHON_VERSION != 2.6 ]; then pylint -E telegram --disable=no-name-in-module,import-error; fi'
 after_success:
