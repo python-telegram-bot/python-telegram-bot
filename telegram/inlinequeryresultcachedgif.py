@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultCachedGif"""
 
@@ -25,6 +24,7 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, \
 
 
 class InlineQueryResultCachedGif(InlineQueryResult):
+
     def __init__(self,
                  id,
                  gif_file_id,
@@ -49,12 +49,10 @@ class InlineQueryResultCachedGif(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultCachedGif,
-                     InlineQueryResultCachedGif).de_json(data)
+        data = super(InlineQueryResultCachedGif, InlineQueryResultCachedGif).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultCachedGif(**data)

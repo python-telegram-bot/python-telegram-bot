@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram User."""
 
 from telegram import TelegramObject
@@ -44,10 +43,7 @@ class User(TelegramObject):
         username (Optional[str]):
     """
 
-    def __init__(self,
-                 id,
-                 first_name,
-                 **kwargs):
+    def __init__(self, id, first_name, **kwargs):
         # Required
         self.id = int(id)
         self.first_name = first_name

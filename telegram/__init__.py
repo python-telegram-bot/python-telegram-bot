@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """A library that provides a Python interface to the Telegram Bot API"""
 
 from sys import version_info
@@ -81,70 +80,24 @@ from .inputcontactmessagecontent import InputContactMessageContent
 from .update import Update
 from .bot import Bot
 
-
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '4.0.3'
-__all__ = ['Audio',
-           'Bot',
-           'Chat',
-           'ChatAction',
-           'ChosenInlineResult',
-           'CallbackQuery',
-           'Contact',
-           'Document',
-           'Emoji',
-           'File',
-           'ForceReply',
-           'InlineKeyboardButton',
-           'InlineKeyboardMarkup',
-           'InlineQuery',
-           'InlineQueryResult',
-           'InlineQueryResult',
-           'InlineQueryResultArticle',
-           'InlineQueryResultAudio',
-           'InlineQueryResultCachedAudio',
-           'InlineQueryResultCachedDocument',
-           'InlineQueryResultCachedGif',
-           'InlineQueryResultCachedMpeg4Gif',
-           'InlineQueryResultCachedPhoto',
-           'InlineQueryResultCachedSticker',
-           'InlineQueryResultCachedVideo',
-           'InlineQueryResultCachedVoice',
-           'InlineQueryResultContact',
-           'InlineQueryResultDocument',
-           'InlineQueryResultGif',
-           'InlineQueryResultLocation',
-           'InlineQueryResultMpeg4Gif',
-           'InlineQueryResultPhoto',
-           'InlineQueryResultVenue',
-           'InlineQueryResultVideo',
-           'InlineQueryResultVoice',
-           'InputContactMessageContent',
-           'InputFile',
-           'InputLocationMessageContent',
-           'InputMessageContent',
-           'InputTextMessageContent',
-           'InputVenueMessageContent',
-           'KeyboardButton',
-           'Location',
-           'Message',
-           'MessageEntity',
-           'NullHandler',
-           'ParseMode',
-           'PhotoSize',
-           'ReplyKeyboardHide',
-           'ReplyKeyboardMarkup',
-           'ReplyMarkup',
-           'Sticker',
-           'TelegramError',
-           'TelegramObject',
-           'Update',
-           'User',
-           'UserProfilePhotos',
-           'Venue',
-           'Video',
-           'Voice']
-
+__all__ = ['Audio', 'Bot', 'Chat', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery', 'Contact',
+           'Document', 'Emoji', 'File', 'ForceReply', 'InlineKeyboardButton',
+           'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
+           'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
+           'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
+           'InlineQueryResultCachedMpeg4Gif', 'InlineQueryResultCachedPhoto',
+           'InlineQueryResultCachedSticker', 'InlineQueryResultCachedVideo',
+           'InlineQueryResultCachedVoice', 'InlineQueryResultContact', 'InlineQueryResultDocument',
+           'InlineQueryResultGif', 'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif',
+           'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
+           'InlineQueryResultVoice', 'InputContactMessageContent', 'InputFile',
+           'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
+           'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
+           'NullHandler', 'ParseMode', 'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
+           'ReplyMarkup', 'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User',
+           'UserProfilePhotos', 'Venue', 'Video', 'Voice']
 
 if version_info < (2, 7):
     from warnings import warn

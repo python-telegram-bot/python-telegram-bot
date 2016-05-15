@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultCachedDocument"""
 
@@ -25,6 +24,7 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, \
 
 
 class InlineQueryResultCachedDocument(InlineQueryResult):
+
     def __init__(self,
                  id,
                  title,
@@ -54,9 +54,8 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         data = super(InlineQueryResultCachedDocument,
                      InlineQueryResultCachedDocument).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultCachedDocument(**data)

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the base class for handlers as used by the
 Dispatcher """
 
@@ -85,5 +84,5 @@ class Handler(object):
     m = "telegram.Handler."
     checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
     handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
-    collectOptionalArgs = deprecate(collect_optional_args,
-                                    m + "collectOptionalArgs", m + "collect_optional_args")
+    collectOptionalArgs = deprecate(collect_optional_args, m + "collectOptionalArgs",
+                                    m + "collect_optional_args")

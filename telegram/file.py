@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram File."""
 
 from os.path import basename
@@ -42,9 +41,7 @@ class File(TelegramObject):
         file_path (Optional[str]):
     """
 
-    def __init__(self,
-                 file_id,
-                 **kwargs):
+    def __init__(self, file_id, **kwargs):
         # Required
         self.file_id = str(file_id)
         # Optionals
@@ -65,8 +62,7 @@ class File(TelegramObject):
 
         return File(**data)
 
-    def download(self,
-                 custom_path=None):
+    def download(self, custom_path=None):
         """
         Args:
             custom_path (str):

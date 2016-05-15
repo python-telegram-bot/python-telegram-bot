@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the StringRegexHandler class """
 
 import re
@@ -50,8 +49,12 @@ class StringRegexHandler(Handler):
             be used to insert updates. Default is ``False``
     """
 
-    def __init__(self, pattern, callback, pass_groups=False,
-                 pass_groupdict=False, pass_update_queue=False):
+    def __init__(self,
+                 pattern,
+                 callback,
+                 pass_groups=False,
+                 pass_groupdict=False,
+                 pass_update_queue=False):
         super(StringRegexHandler, self).__init__(callback, pass_update_queue)
 
         if isinstance(pattern, string_types):
@@ -62,8 +65,7 @@ class StringRegexHandler(Handler):
         self.pass_groupdict = pass_groupdict
 
     def check_update(self, update):
-        return isinstance(update, string_types) and bool(
-            re.match(self.pattern, update))
+        return isinstance(update, string_types) and bool(re.match(self.pattern, update))
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)

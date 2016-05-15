@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram
 ReplyKeyboardMarkup."""
 
@@ -42,9 +41,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective (Optional[bool]):
     """
 
-    def __init__(self,
-                 keyboard,
-                 **kwargs):
+    def __init__(self, keyboard, **kwargs):
         # Required
         self.keyboard = keyboard
         # Optionals
@@ -64,8 +61,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
-        data['keyboard'] = [KeyboardButton.de_list(keyboard) for keyboard in
-                            data['keyboard']]
+        data['keyboard'] = [KeyboardButton.de_list(keyboard) for keyboard in data['keyboard']]
 
         return ReplyKeyboardMarkup(**data)
 
@@ -79,6 +75,6 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                 if hasattr(button, 'to_dict'):
                     r.append(button.to_dict())  # telegram.KeyboardButton
                 else:
-                    r.append(button)            # str
+                    r.append(button)  # str
             data['keyboard'].append(r)
         return data

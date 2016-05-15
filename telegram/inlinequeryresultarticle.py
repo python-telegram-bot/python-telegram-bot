@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultArticle"""
 
@@ -97,12 +96,10 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultArticle,
-                     InlineQueryResultArticle).de_json(data)
+        data = super(InlineQueryResultArticle, InlineQueryResultArticle).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultArticle(**data)

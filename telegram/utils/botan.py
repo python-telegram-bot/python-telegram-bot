@@ -44,9 +44,8 @@ class Botan(object):
             urlopen(request)
             return True
         except HTTPError as error:
-            self.logger.warn('Botan track error ' +
-                             str(error.code) +
-                             ':' + error.read().decode('utf-8'))
+            self.logger.warn('Botan track error ' + str(error.code) + ':' + error.read().decode(
+                'utf-8'))
             return False
         except URLError as error:
             self.logger.warn('Botan track error ' + str(error.reason))

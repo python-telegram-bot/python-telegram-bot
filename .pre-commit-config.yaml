@@ -2,7 +2,6 @@
     sha: 'v0.7.1'
     hooks:
     -   id: yapf
-        args: ['-i', '-r']
 
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     sha: 'v0.5.0'
@@ -14,4 +13,4 @@
     sha: 'v1.5.5'
     hooks:
     -   id: pylint
-        args: ['--errors-only', '--disable=no-name-in-module,import-error']
+        args: ['--errors-only', '--disable=no-name-in-module,import-error', 'telegram']

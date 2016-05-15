@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the StringCommandHandler class """
 
 from .handler import Handler
@@ -42,15 +41,13 @@ class StringCommandHandler(Handler):
             be used to insert updates. Default is ``False``
     """
 
-    def __init__(self, command, callback, pass_args=False,
-                 pass_update_queue=False):
+    def __init__(self, command, callback, pass_args=False, pass_update_queue=False):
         super(StringCommandHandler, self).__init__(callback, pass_update_queue)
         self.command = command
         self.pass_args = pass_args
 
     def check_update(self, update):
-        return (isinstance(update, str) and
-                update.startswith('/') and
+        return (isinstance(update, str) and update.startswith('/') and
                 update[1:].split(' ')[0] == self.command)
 
     def handle_update(self, update, dispatcher):

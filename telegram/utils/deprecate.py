@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module facilitates the deprecation of functions"""
 
 import warnings
@@ -24,7 +23,9 @@ import warnings
 
 def deprecate(func, old, new):
     """Warn users invoking old to switch to the new function."""
+
     def f(*args, **kwargs):
         warnings.warn("{0} is being deprecated, please use {1} from now on".format(old, new))
         return func(*args, **kwargs)
+
     return f

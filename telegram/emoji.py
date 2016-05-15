@@ -18,7 +18,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents an Emoji."""
 
 from future.utils import bytes_to_native_str as n
@@ -858,7 +857,8 @@ class Emoji(object):
     NO_MOBILE_PHONES = n(b'\xF0\x9F\x93\xB5')
     TWISTED_RIGHTWARDS_ARROWS = n(b'\xF0\x9F\x94\x80')
     CLOCKWISE_RIGHTWARDS_AND_LEFTWARDS_OPEN_CIRCLE_ARROWS = n(b'\xF0\x9F\x94\x81')
-    CLOCKWISE_RIGHTWARDS_AND_LEFTWARDS_OPEN_CIRCLE_ARROWS_WITH_CIRCLED_ONE_OVERLAY = n(b'\xF0\x9F\x94\x82')
+    CLOCKWISE_RIGHTWARDS_AND_LEFTWARDS_OPEN_CIRCLE_ARROWS_WITH_CIRCLED_ONE_OVERLAY = n(
+        b'\xF0\x9F\x94\x82')
     ANTICLOCKWISE_DOWNWARDS_AND_UPWARDS_OPEN_CIRCLE_ARROWS = n(b'\xF0\x9F\x94\x84')
     LOW_BRIGHTNESS_SYMBOL = n(b'\xF0\x9F\x94\x85')
     HIGH_BRIGHTNESS_SYMBOL = n(b'\xF0\x9F\x94\x86')

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultMpeg4Gif"""
 
@@ -25,6 +24,7 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, \
 
 
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
+
     def __init__(self,
                  id,
                  mpeg4_url,
@@ -58,12 +58,10 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultMpeg4Gif,
-                     InlineQueryResultMpeg4Gif).de_json(data)
+        data = super(InlineQueryResultMpeg4Gif, InlineQueryResultMpeg4Gif).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultMpeg4Gif(**data)

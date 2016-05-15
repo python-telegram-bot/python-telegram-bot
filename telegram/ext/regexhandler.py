@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """ This module contains the RegexHandler class """
 
 import re
@@ -51,8 +50,12 @@ class RegexHandler(Handler):
             be used to insert updates. Default is ``False``
     """
 
-    def __init__(self, pattern, callback, pass_groups=False,
-                 pass_groupdict=False, pass_update_queue=False):
+    def __init__(self,
+                 pattern,
+                 callback,
+                 pass_groups=False,
+                 pass_groupdict=False,
+                 pass_update_queue=False):
         super(RegexHandler, self).__init__(callback, pass_update_queue)
 
         if isinstance(pattern, string_types):
@@ -63,9 +66,7 @@ class RegexHandler(Handler):
         self.pass_groupdict = pass_groupdict
 
     def check_update(self, update):
-        if (isinstance(update, Update) and
-                update.message and
-                update.message.text):
+        if (isinstance(update, Update) and update.message and update.message.text):
             match = re.match(self.pattern, update.message.text)
             return bool(match)
         else:

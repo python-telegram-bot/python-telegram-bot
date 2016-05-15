@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResult"""
 
@@ -36,9 +35,7 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    def __init__(self,
-                 type,
-                 id):
+    def __init__(self, type, id):
         # Required
         self.type = str(type)
         self.id = str(id)

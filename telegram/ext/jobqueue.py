@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the class JobQueue."""
 
 import logging
@@ -50,12 +49,7 @@ class JobQueue(object):
         self.__lock = Lock()
         self.running = False
 
-    def put(self,
-            run,
-            interval,
-            repeat=True,
-            next_t=None,
-            prevent_autostart=False):
+    def put(self, run, interval, repeat=True, next_t=None, prevent_autostart=False):
         """
         Queue a new job. If the JobQueue is not running, it will be started.
 
@@ -123,8 +117,7 @@ class JobQueue(object):
         if not self.running:
             self.running = True
             self.__lock.release()
-            job_queue_thread = Thread(target=self._start,
-                                      name="job_queue")
+            job_queue_thread = Thread(target=self._start, name="job_queue")
             job_queue_thread.start()
             self.logger.debug('Job Queue thread started')
         else:

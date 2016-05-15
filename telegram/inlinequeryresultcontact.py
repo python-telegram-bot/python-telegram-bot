@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains the classes that represent Telegram
 InlineQueryResultContact"""
 
@@ -25,6 +24,7 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, \
 
 
 class InlineQueryResultContact(InlineQueryResult):
+
     def __init__(self,
                  id,
                  phone_number,
@@ -57,12 +57,10 @@ class InlineQueryResultContact(InlineQueryResult):
 
     @staticmethod
     def de_json(data):
-        data = super(InlineQueryResultContact,
-                     InlineQueryResultContact).de_json(data)
+        data = super(InlineQueryResultContact, InlineQueryResultContact).de_json(data)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(
-            data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['input_message_content'] = InputMessageContent.de_json(data.get(
+            'input_message_content'))
 
         return InlineQueryResultContact(**data)

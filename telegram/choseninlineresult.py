@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """
 This module contains a object that represents a Telegram ChosenInlineResult
 """
@@ -42,12 +41,7 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
-    def __init__(self,
-                 result_id,
-                 from_user,
-                 query,
-                 location=None,
-                 inline_message_id=None):
+    def __init__(self, result_id, from_user, query, location=None, inline_message_id=None):
         # Required
         self.result_id = result_id
         self.from_user = from_user

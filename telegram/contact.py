@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram Contact."""
 
 from telegram import TelegramObject
@@ -41,10 +40,7 @@ class Contact(TelegramObject):
         user_id (Optional[int]):
     """
 
-    def __init__(self,
-                 phone_number,
-                 first_name,
-                 **kwargs):
+    def __init__(self, phone_number, first_name, **kwargs):
         # Required
         self.phone_number = str(phone_number)
         self.first_name = first_name

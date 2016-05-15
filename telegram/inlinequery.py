@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram InlineQuery"""
 
 from telegram import TelegramObject, User, Location
@@ -45,12 +44,7 @@ class InlineQuery(TelegramObject):
         location (optional[:class:`telegram.Location`]):
     """
 
-    def __init__(self,
-                 id,
-                 from_user,
-                 query,
-                 offset,
-                 **kwargs):
+    def __init__(self, id, from_user, query, offset, **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
