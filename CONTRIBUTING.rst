@@ -77,7 +77,7 @@ Here's how to make a one-off code change.
 
       ``$ make test``
 
-   - To actually make the commit (this will trigger test for yapf, lint and pep8 automatically):
+   - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 
       ``$ git add your-file-changed.py``
 
