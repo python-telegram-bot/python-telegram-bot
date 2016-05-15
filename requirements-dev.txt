@@ -5,3 +5,4 @@ pylint
 unittest2
 flaky
 yapf
+pre-commit

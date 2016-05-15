@@ -1,0 +1,5 @@
+-   repo: git://github.com/pre-commit/mirrors-yapf
+    sha: 'v0.7.1'
+    hooks:
+    -   id: yapf
+        args: [-i, -r tests telegram]
