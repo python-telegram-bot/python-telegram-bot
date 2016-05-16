@@ -176,8 +176,8 @@ class Dispatcher(object):
             for group in self.groups:
                 for handler in self.handlers[group]:
                     try:
-                        if handler.checkUpdate(update):
-                            handler.handleUpdate(update, self)
+                        if handler.check_update(update):
+                            handler.handle_update(update, self)
                             break
                     # Dispatch any errors
                     except TelegramError as te:
