@@ -1,3 +1,9 @@
+**2016-05-16**
+
+*Released 4.1.1*
+
+- Fix deprecation warning in ``Dispatcher``
+
 **2016-05-15**
 
 *Released 4.1*
