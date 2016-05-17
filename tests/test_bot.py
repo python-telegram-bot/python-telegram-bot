@@ -145,7 +145,7 @@ class BotTest(BaseTest, unittest.TestCase):
             chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 684)
+        self.assertEqual(message.photo[0].file_size, 685)
 
     @flaky(3, 1)
     @timeout(10)
@@ -155,7 +155,7 @@ class BotTest(BaseTest, unittest.TestCase):
             chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 684)
+        self.assertEqual(message.photo[0].file_size, 685)
 
     @flaky(3, 1)
     @timeout(10)
