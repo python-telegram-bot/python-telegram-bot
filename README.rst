@@ -49,8 +49,6 @@ Table of contents
 
 - `Installing`_
 
-- `Getting the code`_
-
 - `Getting started`_
 
   #. `Learning by example`_
@@ -117,37 +115,6 @@ You can install or upgrade python-telegram-bot with:
 .. code:: shell
 
     $ pip install python-telegram-bot --upgrade
-
-===================
-_`Getting the code`
-===================
-
-The code is hosted at https://github.com/python-telegram-bot/python-telegram-bot
-
-Check out the latest development version anonymously with:
-
-.. code:: shell
-
-    $ git clone https://github.com/python-telegram-bot/python-telegram-bot
-    $ cd python-telegram-bot
-
-Install dependencies:
-
-.. code:: shell
-
-    $ pip install -r requirements.txt -r requirements-dev.txt
-
-Run tests:
-
-.. code:: shell
-
-    $ make test
-
-To see other available options, run:
-
-.. code:: shell
-
-    $ make help
 
 ==================
 _`Getting started`
