@@ -47,6 +47,7 @@ class StringRegexHandler(Handler):
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
             be used to insert updates. Default is ``False``
+        flags (optional[]: Provide some flags for regex pattern.
     """
 
     def __init__(self,
@@ -54,11 +55,12 @@ class StringRegexHandler(Handler):
                  callback,
                  pass_groups=False,
                  pass_groupdict=False,
-                 pass_update_queue=False):
+                 pass_update_queue=False,
+                 flags=0):
         super(StringRegexHandler, self).__init__(callback, pass_update_queue)
 
         if isinstance(pattern, string_types):
-            pattern = re.compile(pattern)
+            pattern = re.compile(pattern, flags)
 
         self.pattern = pattern
         self.pass_groups = pass_groups
