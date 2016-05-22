@@ -1,3 +1,9 @@
+**2016-05-22**
+
+*Released 4.1.2*
+
+- Fix ``MessageEntity`` decoding with Bot API 2.1 changes
+
 **2016-05-16**
 
 *Released 4.1.1*
