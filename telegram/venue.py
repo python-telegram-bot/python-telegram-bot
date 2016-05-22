@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-# pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -16,41 +16,37 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains a object that represents a Telegram Venue."""
 
-"""This module contains a object that represents a Telegram GroupChat"""
-
-from telegram import TelegramObject
+from telegram import TelegramObject, Location
 
 
-class GroupChat(TelegramObject):
-    """This object represents a Telegram GroupChat.
-
-    Attributes:
-        id (int):
-        title (str):
+class Venue(TelegramObject):
+    """
+    This object represents a venue.
 
     Args:
-        id (int):
+        location (:class:`telegram.Location`):
         title (str):
+        address (str):
+        foursquare_id (Optional[str]):
     """
 
-    def __init__(self,
-                 id,
-                 title):
+    def __init__(self, location, title, address, foursquare_id=None):
         # Required
-        self.id = int(id)
+        self.location = location
         self.title = title
+        self.address = address
+        # Optionals
+        self.foursquare_id = foursquare_id
 
     @staticmethod
     def de_json(data):
-        """
-        Args:
-            data (str):
+        data = super(Venue, Venue).de_json(data)
 
-        Returns:
-            telegram.GroupChat:
-        """
         if not data:
             return None
 
-        return GroupChat(**data)
+        data['location'] = Location.de_json(data.get('location'))
+
+        return Venue(**data)

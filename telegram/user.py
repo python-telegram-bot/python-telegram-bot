@@ -2,7 +2,8 @@
 # pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -16,20 +17,20 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
-"""This module contains a object that represents a Telegram User"""
+"""This module contains a object that represents a Telegram User."""
 
 from telegram import TelegramObject
 
 
 class User(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """This object represents a Telegram User.
 
     Attributes:
         id (int):
         first_name (str):
         last_name (str):
         username (str):
+        type (str):
 
     Args:
         id (int):
@@ -37,18 +38,17 @@ class User(TelegramObject):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
+        type (Optional[str]):
         last_name (Optional[str]):
         username (Optional[str]):
     """
 
-    def __init__(self,
-                 id,
-                 first_name,
-                 **kwargs):
+    def __init__(self, id, first_name, **kwargs):
         # Required
         self.id = int(id)
         self.first_name = first_name
         # Optionals
+        self.type = kwargs.get('type', '')
         self.last_name = kwargs.get('last_name', '')
         self.username = kwargs.get('username', '')
 

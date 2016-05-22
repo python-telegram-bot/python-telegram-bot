@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -15,14 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
-"""This module contains a object that represents a Telegram Location"""
+"""This module contains a object that represents a Telegram Location."""
 
 from telegram import TelegramObject
 
 
 class Location(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """This object represents a Telegram Location.
 
     Attributes:
         longitude (float):
@@ -33,9 +33,7 @@ class Location(TelegramObject):
         latitude (float):
     """
 
-    def __init__(self,
-                 longitude,
-                 latitude):
+    def __init__(self, longitude, latitude):
         # Required
         self.longitude = float(longitude)
         self.latitude = float(latitude)

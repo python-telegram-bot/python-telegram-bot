@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -15,18 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram
-ReplyKeyboardMarkup"""
+ReplyKeyboardMarkup."""
 
-from telegram import ReplyMarkup
+from telegram import ReplyMarkup, KeyboardButton
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
     """This object represents a Telegram ReplyKeyboardMarkup.
 
     Attributes:
-        keyboard (List[List[str]]):
+        keyboard (List[List[:class:`telegram.KeyboardButton`]]):
         resize_keyboard (bool):
         one_time_keyboard (bool):
         selective (bool):
@@ -41,9 +41,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective (Optional[bool]):
     """
 
-    def __init__(self,
-                 keyboard,
-                 **kwargs):
+    def __init__(self, keyboard, **kwargs):
         # Required
         self.keyboard = keyboard
         # Optionals
@@ -63,4 +61,20 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
+        data['keyboard'] = [KeyboardButton.de_list(keyboard) for keyboard in data['keyboard']]
+
         return ReplyKeyboardMarkup(**data)
+
+    def to_dict(self):
+        data = super(ReplyKeyboardMarkup, self).to_dict()
+
+        data['keyboard'] = []
+        for row in self.keyboard:
+            r = []
+            for button in row:
+                if hasattr(button, 'to_dict'):
+                    r.append(button.to_dict())  # telegram.KeyboardButton
+                else:
+                    r.append(button)  # str
+            data['keyboard'].append(r)
+        return data

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -15,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
-"""This module contains a object that represents a Telegram PhotoSize"""
+"""This module contains a object that represents a Telegram PhotoSize."""
 
 from telegram import TelegramObject
 
@@ -40,17 +40,19 @@ class PhotoSize(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self,
-                 file_id,
-                 width,
-                 height,
-                 **kwargs):
+    def __init__(self, file_id, width, height, **kwargs):
         # Required
-        self.file_id = file_id
+        self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
         # Optionals
         self.file_size = int(kwargs.get('file_size', 0))
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return (self.file_id == other.file_id and self.width == other.width and
+                self.height == other.height and self.file_size == other.file_size)
 
     @staticmethod
     def de_json(data):

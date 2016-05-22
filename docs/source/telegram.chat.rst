@@ -1,7 +1,7 @@
-telegram.groupchat module
+telegram.chat module
 =========================
 
-.. automodule:: telegram.groupchat
+.. automodule:: telegram.chat
     :members:
     :undoc-members:
     :show-inheritance:

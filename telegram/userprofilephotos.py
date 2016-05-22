@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -15,9 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
 """This module contains a object that represents a Telegram
-UserProfilePhotos"""
+UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
 
@@ -34,9 +34,7 @@ class UserProfilePhotos(TelegramObject):
         photos (List[List[:class:`telegram.PhotoSize`]]):
     """
 
-    def __init__(self,
-                 total_count,
-                 photos):
+    def __init__(self, total_count, photos):
         # Required
         self.total_count = int(total_count)
         self.photos = photos

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015 Leandro Toledo de Souza <leandrotoeldodesouza@gmail.com>
+# Copyright (C) 2015-2016
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -15,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
-"""This module contains a object that represents a Telegram Video"""
+"""This module contains a object that represents a Telegram Video."""
 
 from telegram import PhotoSize, TelegramObject
 
@@ -46,12 +46,7 @@ class Video(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self,
-                 file_id,
-                 width,
-                 height,
-                 duration,
-                 **kwargs):
+    def __init__(self, file_id, width, height, duration, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)

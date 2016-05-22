@@ -1,0 +1,28 @@
+telegram.ext package
+====================
+
+Submodules
+----------
+
+.. toctree::
+
+    telegram.ext.updater
+    telegram.ext.dispatcher
+    telegram.ext.jobqueue
+    telegram.ext.handler
+    telegram.ext.choseninlineresulthandler
+    telegram.ext.commandhandler
+    telegram.ext.inlinequeryhandler
+    telegram.ext.messagehandler
+    telegram.ext.regexhandler
+    telegram.ext.stringcommandhandler
+    telegram.ext.stringregexhandler
+    telegram.ext.typehandler
+
+Module contents
+---------------
+
+.. automodule:: telegram.ext
+    :members:
+    :undoc-members:
+    :show-inheritance:
