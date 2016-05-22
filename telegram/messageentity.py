@@ -33,13 +33,13 @@ class MessageEntity(TelegramObject):
         url (Optional[str]):
     """
 
-    def __init__(self, type, offset, length, url=None):
+    def __init__(self, type, offset, length, **kwargs):
         # Required
         self.type = type
         self.offset = offset
         self.length = length
         # Optionals
-        self.url = url
+        self.url = kwargs.get('url')
 
     @staticmethod
     def de_json(data):
