@@ -2,19 +2,17 @@
     sha: d79d3113a991229b8f9d329e8e97b615abad91ba
     hooks:
     -   id: yapf
-        args:
-        - -i
+        files: ^telegram/.*\.py$
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     sha: adbb569fe9a64ad9bce3b53a77f1bc39ef31f682
     hooks:
     -   id: flake8
-        args:
-        - telegram
+        files: ^telegram/.*\.py$
 -   repo: git://github.com/pre-commit/mirrors-pylint
     sha: 4de6c8dfadef1a271a814561ce05b8bc1c446d22
     hooks:
     -   id: pylint
+        files: ^telegram/.*\.py$
         args:
         - --errors-only
         - --disable=no-name-in-module,import-error
-        - telegram
