@@ -120,12 +120,12 @@ class BotTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def testResendPhoto(self):
         message = self._bot.sendPhoto(
-            photo='AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI',
+            photo='AgADAQAD1y0yGx8j9Qf8f_m3CKeS6Iy95y8ABI1ggfVJ4-UvwJcAAgI',
             chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_id,
-                         'AgADAQADyKcxGx8j9Qdp6d-gpUsw4Gja1i8ABEVJsVqQk8LfJ3wAAgI')
+                         'AgADAQAD1y0yGx8j9Qf8f_m3CKeS6Iy95y8ABI1ggfVJ4-UvwJcAAgI')
 
     @flaky(3, 1)
     @timeout(10)
