@@ -75,17 +75,20 @@ class Updater(object):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
             raise ValueError('`token` and `bot` are mutually exclusive')
-
+        
+        self.logger = logging.getLogger(__name__)
         if bot is not None:
             self.bot = bot
         else:
+            if token is not token.strip():
+                self.logger.warning("Token contains whitespace characters")
+                token = token.strip()
             self.bot = Bot(token, base_url)
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
         self.__exception_event = Event()
         self.dispatcher = Dispatcher(self.bot, self.update_queue, workers, self.__exception_event)
         self.last_update_id = 0
-        self.logger = logging.getLogger(__name__)
         self.running = False
         self.is_idle = False
         self.httpd = None
