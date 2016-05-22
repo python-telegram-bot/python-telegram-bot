@@ -49,9 +49,9 @@ class CommandHandler(Handler):
         self.pass_args = pass_args
 
     def check_update(self, update):
-        return (isinstance(update, Update) and update.message and update.message.text and
-                update.message.text.startswith('/') and
-                update.message.text[1:].split(' ')[0].split('@')[0] == self.command)
+        return (isinstance(update, Update) and update.message and update.message.text
+                and update.message.text.startswith('/')
+                and update.message.text[1:].split(' ')[0].split('@')[0] == self.command)
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)

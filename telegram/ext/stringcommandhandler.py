@@ -47,8 +47,8 @@ class StringCommandHandler(Handler):
         self.pass_args = pass_args
 
     def check_update(self, update):
-        return (isinstance(update, str) and update.startswith('/') and
-                update[1:].split(' ')[0] == self.command)
+        return (isinstance(update, str) and update.startswith('/')
+                and update[1:].split(' ')[0] == self.command)
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)

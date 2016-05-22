@@ -318,8 +318,8 @@ class Updater(object):
             except (Unauthorized, InvalidToken):
                 raise
             except TelegramError:
-                msg = 'error in bootstrap phase; try={0} max_retries={1}'\
-                        .format(retries, max_retries)
+                msg = 'error in bootstrap phase; try={0} max_retries={1}'.format(retries,
+                                                                                 max_retries)
                 if max_retries < 0 or retries < max_retries:
                     self.logger.warning(msg)
                     retries += 1

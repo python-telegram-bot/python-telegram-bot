@@ -21,8 +21,7 @@ def main():
     except IndexError:
         update_id = None
 
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     while True:
         try:
@@ -45,8 +44,7 @@ def echo(bot, update_id):
 
         if message:
             # Reply to the message
-            bot.sendMessage(chat_id=chat_id,
-                            text=message)
+            bot.sendMessage(chat_id=chat_id, text=message)
 
     return update_id
 

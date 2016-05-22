@@ -9,7 +9,7 @@ from telegram import Emoji, ForceReply, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - '
-                           '%(message)s',
+                    '%(message)s',
                     level=logging.INFO)
 
 # Define the different states a chat can be in
@@ -17,8 +17,7 @@ MENU, AWAIT_CONFIRMATION, AWAIT_INPUT = range(3)
 
 # Python 2 and 3 unicode differences
 try:
-    YES, NO = (Emoji.THUMBS_UP_SIGN.decode('utf-8'),
-               Emoji.THUMBS_DOWN_SIGN.decode('utf-8'))
+    YES, NO = (Emoji.THUMBS_UP_SIGN.decode('utf-8'), Emoji.THUMBS_DOWN_SIGN.decode('utf-8'))
 except AttributeError:
     YES, NO = (Emoji.THUMBS_UP_SIGN, Emoji.THUMBS_DOWN_SIGN)
 
@@ -46,7 +45,7 @@ def set_value(bot, update):
         context[chat_id] = user_id  # save the user id to context
         bot.sendMessage(chat_id,
                         text="Please enter your settings value or send "
-                             "/cancel to abort",
+                        "/cancel to abort",
                         reply_markup=ForceReply())
 
     # If we are waiting for input and the right user answered
@@ -58,8 +57,7 @@ def set_value(bot, update):
         reply_markup = ReplyKeyboardMarkup(
             [[KeyboardButton(YES), KeyboardButton(NO)]],
             one_time_keyboard=True)
-        bot.sendMessage(chat_id, text="Are you sure?",
-                        reply_markup=reply_markup)
+        bot.sendMessage(chat_id, text="Are you sure?", reply_markup=reply_markup)
 
     # If we are waiting for confirmation and the right user answered
     elif chat_state == AWAIT_CONFIRMATION and chat_context[0] == user_id:
@@ -67,12 +65,10 @@ def set_value(bot, update):
         del context[chat_id]
         if text == YES:
             values[chat_id] = chat_context[1]
-            bot.sendMessage(chat_id,
-                            text="Changed value to %s." % values[chat_id])
+            bot.sendMessage(chat_id, text="Changed value to %s." % values[chat_id])
         else:
             bot.sendMessage(chat_id,
-                            text="Value not changed: %s."
-                                 % values.get(chat_id, '<not set>'))
+                            text="Value not changed: %s." % values.get(chat_id, '<not set>'))
 
 
 # Handler for the /cancel command.
@@ -85,7 +81,6 @@ def cancel(bot, update):
 
 def help(bot, update):
     bot.sendMessage(update.message.chat_id, text="Use /set to test this bot.")
-
 
 # Create the Updater and pass it your bot's token.
 updater = Updater("TOKEN")
