@@ -131,6 +131,55 @@ Here's how to make a one-off code change.
 
 7. **Celebrate.** Congratulations, you have contributed to ``python-telegram-bot``!
 
+Style commandments
+==================
+
+Specific commandments
+---------------------
+
+- Avoid using "double quotes" where you can reasonably use 'single quotes'.
+
+AssertEqual argument order
+--------------------------
+
+assertEqual method's arguments should be in ('actual', 'expected') order.
+
+Properly calling callables
+--------------------------
+
+Methods, functions and classes can specify optional parameters (with default
+values) using Python's keyword arg syntax. When providing a value to such a
+callable we prefer that the call also uses keyword arg syntax. For example::
+
+    def f(required, optional=None):
+        pass
+
+    # GOOD
+    f(0, optional=True)
+
+    # BAD
+    f(0, True)
+
+This gives us the flexibility to re-order arguments and more importantly
+to add new required arguments. It's also more explicit and easier to read.
+
+Properly defining optional arguments
+------------------------------------
+
+It's always good to not initialize optional arguments at class creation, 
+instead use ``**kwargs`` to get them. It's well known Telegram API can 
+change without notice, in that case if a new argument is added it won't 
+break the API classes. For example::
+
+    # GOOD
+    def __init__(self, id, name, **kwargs):
+       self.last_name = kwargs.get('last_name', '')
+
+    # BAD
+    def __init__(self, id, name, last_name=''):
+       self.last_name = last_name
+
+
 .. _`Code of Conduct`: https://www.python.org/psf/codeofconduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
 .. _`developers' mailing list`: mailto:devs@python-telegram-bot.org
