@@ -40,6 +40,7 @@ class Message(TelegramObject):
         forward_from_chat (:class:`telegram.Chat`):
         forward_date (:class:`datetime.datetime`):
         reply_to_message (:class:`telegram.Message`):
+        edit_date (:class:`datetime.datetime`):
         text (str):
         audio (:class:`telegram.Audio`):
         document (:class:`telegram.Document`):
@@ -80,6 +81,7 @@ class Message(TelegramObject):
         forward_from_chat (:class:`telegram.Chat`):
         forward_date (Optional[:class:`datetime.datetime`]):
         reply_to_message (Optional[:class:`telegram.Message`]):
+        edit_date (Optional[:class:`datetime.datetime`]):
         text (Optional[str]):
         audio (Optional[:class:`telegram.Audio`]):
         document (Optional[:class:`telegram.Document`]):
@@ -113,6 +115,7 @@ class Message(TelegramObject):
         self.forward_from_chat = kwargs.get('forward_from_chat')
         self.forward_date = kwargs.get('forward_date')
         self.reply_to_message = kwargs.get('reply_to_message')
+        self.edit_date = kwargs.get('edit_date')
         self.text = kwargs.get('text', '')
         self.entities = kwargs.get('entities', list())
         self.audio = kwargs.get('audio')
@@ -162,6 +165,7 @@ class Message(TelegramObject):
         data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'))
         data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
         data['reply_to_message'] = Message.de_json(data.get('reply_to_message'))
+        data['edit_date'] = Message._fromtimestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'))
         data['document'] = Document.de_json(data.get('document'))
         data['photo'] = PhotoSize.de_list(data.get('photo'))
@@ -197,6 +201,8 @@ class Message(TelegramObject):
         # Optionals
         if self.forward_date:
             data['forward_date'] = self._totimestamp(self.forward_date)
+        if self.edit_date:
+            data['edit_date'] = self._totimestamp(self.edit_date)
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
         if self.entities:
