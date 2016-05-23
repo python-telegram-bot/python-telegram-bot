@@ -33,7 +33,7 @@ class Location(TelegramObject):
         latitude (float):
     """
 
-    def __init__(self, longitude, latitude):
+    def __init__(self, longitude, latitude, **kwargs):
         # Required
         self.longitude = float(longitude)
         self.latitude = float(latitude)

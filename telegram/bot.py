@@ -142,7 +142,7 @@ class Bot(TelegramObject):
         return decorator
 
     @log
-    def getMe(self):
+    def getMe(self, **kwargs):
         """A simple method for testing your bot's auth token.
 
         Returns:
@@ -1170,7 +1170,7 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=.2):
+    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=.2, **kwargs):
         """Use this method to receive incoming updates using long polling.
 
         Args:

@@ -34,7 +34,7 @@ class UserProfilePhotos(TelegramObject):
         photos (List[List[:class:`telegram.PhotoSize`]]):
     """
 
-    def __init__(self, total_count, photos):
+    def __init__(self, total_count, photos, **kwargs):
         # Required
         self.total_count = int(total_count)
         self.photos = photos
