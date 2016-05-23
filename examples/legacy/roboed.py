@@ -10,8 +10,7 @@ import urllib
 
 
 def main():
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     bot = telegram.Bot('TOKEN')  # Telegram Bot Authorization Token
 
     LAST_UPDATE_ID = bot.getUpdates()[-1].update_id  # Get lastest update
@@ -33,6 +32,7 @@ def ed(text):
     data = urllib.urlopen(url).read()
 
     return data.strip()
+
 
 if __name__ == '__main__':
     main()

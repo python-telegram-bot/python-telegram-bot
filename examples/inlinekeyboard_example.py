@@ -11,8 +11,7 @@ from telegram import Emoji, ForceReply, InlineKeyboardButton, \
 from telegram.ext import Updater, CommandHandler, MessageHandler, \
     CallbackQueryHandler, Filters
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - '
-                           '%(message)s',
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
 
 # Define the different states a chat can be in
@@ -20,8 +19,7 @@ MENU, AWAIT_CONFIRMATION, AWAIT_INPUT = range(3)
 
 # Python 2 and 3 unicode differences
 try:
-    YES, NO = (Emoji.THUMBS_UP_SIGN.decode('utf-8'),
-               Emoji.THUMBS_DOWN_SIGN.decode('utf-8'))
+    YES, NO = (Emoji.THUMBS_UP_SIGN.decode('utf-8'), Emoji.THUMBS_DOWN_SIGN.decode('utf-8'))
 except AttributeError:
     YES, NO = (Emoji.THUMBS_UP_SIGN, Emoji.THUMBS_DOWN_SIGN)
 
@@ -58,11 +56,9 @@ def entered_value(bot, update):
 
         # Save the user id and the answer to context
         context[user_id] = update.message.text
-        reply_markup = InlineKeyboardMarkup(
-            [[InlineKeyboardButton(YES, callback_data=YES),
-              InlineKeyboardButton(NO, callback_data=NO)]])
-        bot.sendMessage(chat_id, text="Are you sure?",
-                        reply_markup=reply_markup)
+        reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton(YES, callback_data=YES),
+                                              InlineKeyboardButton(NO, callback_data=NO)]])
+        bot.sendMessage(chat_id, text="Are you sure?", reply_markup=reply_markup)
 
 
 def confirm_value(bot, update):
@@ -82,14 +78,12 @@ def confirm_value(bot, update):
             values[user_id] = user_context
             bot.editMessageText(text="Changed value to %s." % values[user_id],
                                 chat_id=chat_id,
-                                message_id=
-                                query.message.message_id)
+                                message_id=query.message.message_id)
         else:
-            bot.editMessageText(text="Alright, value is still %s."
-                                     % values.get(user_id, 'not set'),
+            bot.editMessageText(text="Alright, value is still %s." %
+                                values.get(user_id, 'not set'),
                                 chat_id=chat_id,
-                                message_id=
-                                query.message.message_id)
+                                message_id=query.message.message_id)
 
 
 def help(bot, update):

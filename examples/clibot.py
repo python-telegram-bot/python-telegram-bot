@@ -3,7 +3,6 @@
 #
 # Example Bot to show some of the functionality of the library
 # This program is dedicated to the public domain under the CC0 license.
-
 """
 This Bot uses the Updater class to handle the bot.
 
@@ -27,9 +26,8 @@ import logging
 from future.builtins import input
 
 # Enable Logging
-logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
@@ -58,9 +56,7 @@ def any_message(bot, update):
     last_chat_id = update.message.chat_id
 
     logger.info("New message\nFrom: %s\nchat_id: %d\nText: %s" %
-                (update.message.from_user,
-                 update.message.chat_id,
-                 update.message.text))
+                (update.message.from_user, update.message.chat_id, update.message.text))
 
 
 @run_async
@@ -72,8 +68,7 @@ def message(bot, update):
     """
 
     sleep(2)  # IO-heavy operation here
-    bot.sendMessage(update.message.chat_id, text='Echo: %s' %
-                                                 update.message.text)
+    bot.sendMessage(update.message.chat_id, text='Echo: %s' % update.message.text)
 
 
 # These handlers are for updates of type str. We use them to react to inputs
@@ -126,8 +121,7 @@ def main():
     # String handlers work pretty much the same. Note that we have to tell
     # the handler to pass the args or update_queue parameter
     dp.add_handler(StringCommandHandler('reply', cli_reply, pass_args=True))
-    dp.add_handler(StringRegexHandler('[^/].*', cli_noncommand,
-                                      pass_update_queue=True))
+    dp.add_handler(StringRegexHandler('[^/].*', cli_noncommand, pass_update_queue=True))
 
     # All TelegramErrors are caught for you and delivered to the error
     # handler(s). Other types of Errors are not caught.
@@ -135,7 +129,6 @@ def main():
 
     # Start the Bot and store the update Queue, so we can insert updates
     update_queue = updater.start_polling(timeout=10)
-
     '''
     # Alternatively, run with webhook:
 
@@ -165,6 +158,7 @@ def main():
         # else, put the text into the update queue to be handled by our handlers
         elif len(text) > 0:
             update_queue.put(text)
+
 
 if __name__ == '__main__':
     main()

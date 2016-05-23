@@ -60,8 +60,8 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict)
 
         self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][
-            0], telegram.InlineKeyboardButton))
+        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][0],
+                                   telegram.InlineKeyboardButton))
 
     def test_inline_keyboard_markup_to_json(self):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict)
@@ -72,8 +72,8 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict)
 
         self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][
-            0], telegram.InlineKeyboardButton))
+        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard[0][0],
+                                   telegram.InlineKeyboardButton))
 
 
 if __name__ == '__main__':

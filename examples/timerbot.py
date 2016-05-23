@@ -3,7 +3,6 @@
 #
 # Simple Bot to send timed Telegram messages
 # This program is dedicated to the public domain under the CC0 license.
-
 """
 This Bot uses the Updater class to handle the bot and the JobQueue to send
 timed messages.
@@ -22,9 +21,8 @@ from telegram.ext import Updater, CommandHandler
 import logging
 
 # Enable logging
-logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 job_queue = None
@@ -33,8 +31,7 @@ job_queue = None
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
-    bot.sendMessage(update.message.chat_id, text='Hi! Use /set <seconds> to '
-                                                 'set a timer')
+    bot.sendMessage(update.message.chat_id, text='Hi! Use /set <seconds> to ' 'set a timer')
 
 
 def set(bot, update, args):
@@ -44,7 +41,8 @@ def set(bot, update, args):
         # args[0] should contain the time for the timer in seconds
         due = int(args[0])
         if due < 0:
-                bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
+            bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
+
         def alarm(bot):
             """ Inner function to send the alarm message """
             bot.sendMessage(chat_id, text='Beep!')
@@ -87,6 +85,7 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
