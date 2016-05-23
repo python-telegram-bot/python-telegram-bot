@@ -2,7 +2,7 @@
     sha: 316b795b2f32cbe80047aff7e842b72368d5a2c1
     hooks:
     -   id: yapf
-        files: ^(examples|telegram|tests)/.*\.py$
+        files: ^(telegram|tests)/.*\.py$
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     sha: adbb569fe9a64ad9bce3b53a77f1bc39ef31f682
     hooks:
