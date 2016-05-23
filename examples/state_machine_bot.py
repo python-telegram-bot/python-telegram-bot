@@ -8,8 +8,7 @@ import logging
 from telegram import Emoji, ForceReply, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - '
-                    '%(message)s',
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 # Define the different states a chat can be in
