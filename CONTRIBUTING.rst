@@ -151,9 +151,6 @@ Methods, functions and classes can specify optional parameters (with default
 values) using Python's keyword arg syntax. When providing a value to such a
 callable we prefer that the call also uses keyword arg syntax. For example::
 
-    def f(required, optional=None):
-        pass
-
     # GOOD
     f(0, optional=True)
 
