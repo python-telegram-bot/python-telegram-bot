@@ -19,11 +19,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a object that represents a Telegram Bot."""
 
-import logging
 import functools
+import logging
 
-from telegram import (User, Message, Update, UserProfilePhotos, File, ReplyMarkup, TelegramObject,
-                      NullHandler)
+from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
+                      ReplyMarkup, TelegramObject, NullHandler)
 from telegram.utils import request
 from telegram.utils.validate import validate_token
 
@@ -1259,6 +1259,56 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
+    def leaveChat(self, chat_id, **kwargs):
+        url = '{0}/leaveChat'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return result
+
+    @log
+    def getChat(self, chat_id, **kwargs):
+        url = '{0}/getChat'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return Chat.de_json(result)
+
+    @log
+    def getChatAdministrators(self, chat_id, **kwargs):
+        url = '{0}/getChatAdministrators'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return [ChatMember.de_json(x) for x in result]
+
+    @log
+    def getChatMembersCount(self, chat_id, **kwargs):
+        url = '{0}/getChatMembersCount'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return result
+
+    @log
+    def getChatMember(self, chat_id, user_id, **kwargs):
+        url = '{0}/getChatMember'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'user_id': user_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return ChatMember.de_json(result)
+
     @staticmethod
     def de_json(data):
         data = super(Bot, Bot).de_json(data)
@@ -1302,3 +1352,8 @@ class Bot(TelegramObject):
     edit_message_reply_markup = editMessageReplyMarkup
     get_updates = getUpdates
     set_webhook = setWebhook
+    leave_chat = leaveChat
+    get_chat = getChat
+    get_chat_administrators = getChatAdministrators
+    get_chat_member = getChatMember
+    get_chat_member_count = getChatMembersCount
