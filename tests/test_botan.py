@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""This module contains a object that represents Tests for Botan analytics integration"""
+"""This module contains an object that represents Tests for Botan analytics integration"""
 
 import sys
 import unittest
@@ -9,7 +9,7 @@ from flaky import flaky
 
 sys.path.append('.')
 
-from telegram.utils.botan import Botan
+from telegram.ext.botan import Botan
 from tests.base import BaseTest
 
 

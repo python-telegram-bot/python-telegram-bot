@@ -1,23 +1,17 @@
-#!/usr/bin/env python
-
 import logging
 from telegram import NullHandler
 
-try:
-    from urllib.request import urlopen, Request
-    from urllib.parse import quote
-    from urllib.error import URLError, HTTPError
-except ImportError:
-    from urllib2 import urlopen, Request
-    from urllib import quote
-    from urllib2 import URLError, HTTPError
+from future.moves.urllib.parse import quote
+from future.moves.urllib.error import HTTPError, URLError
+from future.moves.urllib.request import urlopen, Request
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
 
 class Botan(object):
-    """This class helps to send incoming events in your botan analytics account.
-     See more: https://github.com/botanio/sdk#botan-sdk"""
+    """This class helps to send incoming events to your botan analytics account.
+     See more: https://github.com/botanio/sdk#botan-sdk
+    """
 
     token = ''
     url_template = 'https://api.botan.io/track?token={token}' \
