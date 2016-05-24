@@ -39,14 +39,14 @@ class InputMessageContent(TelegramObject):
             pass
 
         try:
-            from telegram import InputLocationMessageContent
-            return InputLocationMessageContent.de_json(data)
+            from telegram import InputVenueMessageContent
+            return InputVenueMessageContent.de_json(data)
         except TypeError:
             pass
 
         try:
-            from telegram import InputVenueMessageContent
-            return InputVenueMessageContent.de_json(data)
+            from telegram import InputLocationMessageContent
+            return InputLocationMessageContent.de_json(data)
         except TypeError:
             pass
 

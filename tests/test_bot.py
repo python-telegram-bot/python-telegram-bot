@@ -75,7 +75,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testGetUpdates(self):
-        updates = self._bot.getUpdates()
+        updates = self._bot.getUpdates(timeout=1)
 
         if updates:
             self.assertTrue(self.is_json(updates[0].to_json()))
@@ -191,9 +191,6 @@ class BotTest(BaseTest, unittest.TestCase):
 
     def testInvalidToken3(self):
         self._test_invalid_token('12:')
-
-    def testInvalidToken4(self):
-        self._test_invalid_token('1234:abcd1234\n')
 
     def testUnauthToken(self):
         with self.assertRaisesRegexp(telegram.error.Unauthorized, 'Unauthorized'):
