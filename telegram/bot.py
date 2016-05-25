@@ -24,8 +24,8 @@ import functools
 
 from telegram import (User, Message, Update, UserProfilePhotos, File, ReplyMarkup, TelegramObject,
                       NullHandler)
+from telegram.error import InvalidToken
 from telegram.utils import request
-from telegram.utils.validate import validate_token
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -48,7 +48,7 @@ class Bot(TelegramObject):
     """
 
     def __init__(self, token, base_url=None, base_file_url=None):
-        self.token = validate_token(token)
+        self.token = self._validate_token(token)
 
         if not base_url:
             self.base_url = 'https://api.telegram.org/bot{0}'.format(self.token)
@@ -63,6 +63,18 @@ class Bot(TelegramObject):
         self.bot = None
 
         self.logger = logging.getLogger(__name__)
+
+    @staticmethod
+    def _validate_token(token):
+        """a very basic validation on token"""
+        if any(x.isspace() for x in token):
+            raise InvalidToken()
+
+        left, sep, _right = token.partition(':')
+        if (not sep) or (not left.isdigit()) or (len(left) < 3):
+            raise InvalidToken()
+
+        return token
 
     def info(func):
 
