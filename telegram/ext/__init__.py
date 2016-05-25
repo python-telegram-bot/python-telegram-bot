@@ -33,6 +33,6 @@ from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
-           'ChosenInlineResultHandler', 'CommandHandler', 'Handler',
-           'InlineQueryHandler', 'MessageHandler', 'Filters', 'RegexHandler',
-           'StringCommandHandler', 'StringRegexHandler', 'TypeHandler')
+           'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
+           'MessageHandler', 'Filters', 'RegexHandler', 'StringCommandHandler',
+           'StringRegexHandler', 'TypeHandler')

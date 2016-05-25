@@ -65,11 +65,7 @@ class Updater(object):
         ValueError: If both `token` and `bot` are passed or none of them.
     """
 
-    def __init__(self,
-                 token=None,
-                 base_url=None,
-                 workers=4,
-                 bot=None):
+    def __init__(self, token=None, base_url=None, workers=4, bot=None):
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
