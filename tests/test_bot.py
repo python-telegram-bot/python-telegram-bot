@@ -45,11 +45,7 @@ class BotTest(BaseTest, unittest.TestCase):
         bot = self._bot.getMe()
 
         self.assertTrue(self.is_json(bot.to_json()))
-        self.assertEqual(bot.id, 133505823)
-        self.assertEqual(bot.first_name, 'PythonTelegramBot')
-        self.assertEqual(bot.last_name, '')
-        self.assertEqual(bot.username, 'PythonTelegramBot')
-        self.assertEqual(bot.name, '@PythonTelegramBot')
+        self._testUserEqualsBot(bot)
 
     @flaky(3, 1)
     @timeout(10)
@@ -226,10 +222,7 @@ class BotTest(BaseTest, unittest.TestCase):
             self.assertTrue(a.status in ("administrator", "creator"))
 
         bot = [a.user for a in admins if a.user.id == 133505823][0]
-        self.assertEqual(bot.first_name, 'PythonTelegramBot')
-        self.assertEqual(bot.last_name, '')
-        self.assertEqual(bot.username, 'PythonTelegramBot')
-        self.assertEqual(bot.name, '@PythonTelegramBot')
+        self._testUserEqualsBot(bot)
 
     @flaky(3, 1)
     @timeout(10)
@@ -246,11 +239,16 @@ class BotTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(chat_member.to_json()))
         self.assertEqual(chat_member.status, "administrator")
-        self.assertEqual(bot.id, 133505823)
-        self.assertEqual(bot.first_name, 'PythonTelegramBot')
-        self.assertEqual(bot.last_name, '')
-        self.assertEqual(bot.username, 'PythonTelegramBot')
-        self.assertEqual(bot.name, '@PythonTelegramBot')
+        self._testUserEqualsBot(bot)
+
+    def _testUserEqualsBot(self, user):
+        """Tests if user is our trusty @PythonTelegramBot."""
+        self.assertEqual(user.id, 133505823)
+        self.assertEqual(user.first_name, 'PythonTelegramBot')
+        self.assertEqual(user.last_name, '')
+        self.assertEqual(user.username, 'PythonTelegramBot')
+        self.assertEqual(user.name, '@PythonTelegramBot')
+
 
 if __name__ == '__main__':
     unittest.main()
