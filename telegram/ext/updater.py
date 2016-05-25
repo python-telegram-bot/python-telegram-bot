@@ -69,8 +69,7 @@ class Updater(object):
                  token=None,
                  base_url=None,
                  workers=4,
-                 bot=None,
-                 job_queue_tick_interval=1.0):
+                 bot=None):
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
@@ -81,7 +80,7 @@ class Updater(object):
         else:
             self.bot = Bot(token, base_url)
         self.update_queue = Queue()
-        self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
+        self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
         self.dispatcher = Dispatcher(self.bot, self.update_queue, workers, self.__exception_event)
         self.last_update_id = 0
