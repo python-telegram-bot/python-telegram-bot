@@ -20,7 +20,7 @@
 
 import logging
 import time
-from threading import Thread, Lock
+from threading import Thread, Lock, Event
 from queue import PriorityQueue
 
 
@@ -29,55 +29,49 @@ class JobQueue(object):
     This class allows you to periodically perform tasks with the bot.
 
     Attributes:
-        tick_interval (float):
         queue (PriorityQueue):
         bot (Bot):
-        running (bool):
 
     Args:
         bot (Bot): The bot instance that should be passed to the jobs
-        tick_interval (Optional[float]): The interval this queue should check
-            the newest task in seconds. Defaults to 1.0
 
     """
 
-    def __init__(self, bot, tick_interval=1.0):
-        self.tick_interval = tick_interval
+    def __init__(self, bot):
         self.queue = PriorityQueue()
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.__lock = Lock()
+        self.__tick = Event()
+        self.next_peek = None
         self.running = False
 
-    def put(self, run, interval, repeat=True, next_t=None, prevent_autostart=False):
+    def put(self, job, next_t=None, prevent_autostart=False):
         """
         Queue a new job. If the JobQueue is not running, it will be started.
 
         Args:
-            run (function): A function that takes the parameter `bot`
-            interval (float): The interval in seconds in which `run` should be
-                executed
-            repeat (Optional[bool]): If `False`, job will only be executed once
-            next_t (Optional[float]): Time in seconds in which run should be
-                executed first. Defaults to `interval`
-            prevent_autostart (Optional[bool]): If `True`, the job queue will
-                not be started automatically if it is not running.
+            job (Job): The ``Job`` instance representing the new job
+            next_t (Optional[float]): Time in seconds in which the job should be executed first.
+                Defaults to ``job.interval``
+            prevent_autostart (Optional[bool]): If ``True``, the job queue will not be started
+                automatically if it is not running. Defaults to ``False``
         """
-        name = run.__name__
 
-        job = JobQueue.Job()
-        job.run = run
-        job.interval = interval
-        job.name = name
-        job.repeat = repeat
+        job.job_queue = self
 
         if next_t is None:
-            next_t = interval
+            next_t = job.interval
 
-        next_t += time.time()
+        now = time.time()
+        next_t += now
 
         self.logger.debug('Putting a %s with t=%f' % (job.name, next_t))
         self.queue.put((next_t, job))
+
+        if not self.next_peek or self.next_peek > next_t:
+            self.next_peek = next_t
+            self.__tick.set()
 
         if not self.running and not prevent_autostart:
             self.logger.debug('Auto-starting JobQueue')
@@ -90,24 +84,44 @@ class JobQueue(object):
         now = time.time()
 
         self.logger.debug('Ticking jobs with t=%f' % now)
-        while not self.queue.empty():
-            t, j = self.queue.queue[0]
-            self.logger.debug('Peeked at %s with t=%f' % (j.name, t))
 
-            if t < now:
+        while not self.queue.empty():
+            t, job = self.queue.queue[0]
+            self.logger.debug('Peeked at %s with t=%f' % (job.name, t))
+
+            if t <= now:
                 self.queue.get()
-                self.logger.debug('Running job %s' % j.name)
-                try:
-                    j.run(self.bot)
-                except:
-                    self.logger.exception('An uncaught error was raised while '
-                                          'executing job %s' % j.name)
-                if j.repeat:
-                    self.put(j.run, j.interval)
+
+                if job._remove.is_set():
+                    self.logger.debug('Removing job %s' % job.name)
+                    continue
+
+                elif job.enabled:
+                    self.logger.debug('Running job %s' % job.name)
+
+                    try:
+                        job.run()
+
+                    except:
+                        self.logger.exception('An uncaught error was raised while executing job %s'
+                                              % job.name)
+
+                else:
+                    self.logger.debug('Skipping disabled job %s' % job.name)
+
+                if job.repeat:
+                    self.put(job)
+
                 continue
 
             self.logger.debug('Next task isn\'t due yet. Finished!')
+            self.next_peek = t
             break
+
+        else:
+            self.next_peek = None
+
+        self.__tick.clear()
 
     def start(self):
         """
@@ -128,9 +142,16 @@ class JobQueue(object):
         Thread target of thread 'job_queue'. Runs in background and performs
         ticks on the job queue.
         """
+
         while self.running:
+            self.__tick.wait(self.next_peek and self.next_peek - time.time())
+
+            # If we were woken up by set(), wait with the new timeout
+            if self.__tick.is_set():
+                self.__tick.clear()
+                continue
+
             self.tick()
-            time.sleep(self.tick_interval)
 
         self.logger.debug('Job Queue thread stopped')
 
@@ -141,14 +162,66 @@ class JobQueue(object):
         with self.__lock:
             self.running = False
 
-    class Job(object):
-        """ Inner class that represents a job """
-        interval = None
-        name = None
-        repeat = None
+        self.__tick.set()
 
-        def run(self):
-            pass
+    def jobs(self):
+        """Returns a tuple of all jobs that are currently in the ``JobQueue``"""
+        return tuple(job[1] for job in self.queue.queue if job)
 
-        def __lt__(self, other):
-            return False
+
+class Job(object):
+    """This class encapsulates a Job
+
+    Attributes:
+        callback (function):
+        interval (float):
+        repeat (bool):
+        name (str):
+        enabled (bool): If this job is currently active
+
+    Args:
+        callback (function): The callback function that should be executed by the Job. It should
+            take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
+            can be used to terminate the job or modify its interval.
+        interval (float): The interval in which this job should execute its callback function in
+            seconds.
+        repeat (Optional[bool]): If this job should be periodically execute its callback function
+            (``True``) or only once (``False``). (default=``True``)
+
+    """
+    job_queue = None
+
+    def __init__(self, callback, interval, repeat=True):
+        self.callback = callback
+        self.interval = interval
+        self.repeat = repeat
+
+        self.name = callback.__name__
+        self._remove = Event()
+        self._enabled = Event()
+        self._enabled.set()
+
+    def run(self):
+        """Executes the callback function"""
+        self.callback(self.job_queue.bot, self)
+
+    def schedule_removal(self):
+        """
+        Schedules this job for removal from the ``JobQueue``. It will be removed without executing
+        its callback function again.
+        """
+        self._remove.set()
+
+    def is_enabled(self):
+        return self._enabled.is_set()
+
+    def set_enabled(self, status):
+        if status:
+            self._enabled.set()
+        else:
+            self._enabled.clear()
+
+    enabled = property(is_enabled, set_enabled)
+
+    def __lt__(self, other):
+        return False

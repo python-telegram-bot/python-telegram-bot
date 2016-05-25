@@ -31,7 +31,7 @@ else:
 
 sys.path.append('.')
 
-from telegram.ext import JobQueue, Updater
+from telegram.ext import JobQueue, Job, Updater
 from tests.base import BaseTest
 
 # Enable logging
@@ -52,53 +52,107 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     """
 
     def setUp(self):
-        self.jq = JobQueue("Bot", tick_interval=0.005)
+        self.jq = JobQueue("Bot")
         self.result = 0
 
     def tearDown(self):
         if self.jq is not None:
             self.jq.stop()
 
-    def job1(self, bot):
+    def job1(self, bot, job):
         self.result += 1
 
-    def job2(self, bot):
+    def job2(self, bot, job):
         raise Exception("Test Error")
 
+    def job3(self, bot, job):
+        self.result += 1
+        job.schedule_removal()
+
     def test_basic(self):
-        self.jq.put(self.job1, 0.1)
+        self.jq.put(Job(self.job1, 0.1))
         sleep(1.5)
         self.assertGreaterEqual(self.result, 10)
 
     def test_noRepeat(self):
-        self.jq.put(self.job1, 0.1, repeat=False)
+        self.jq.put(Job(self.job1, 0.1, repeat=False))
         sleep(0.5)
         self.assertEqual(1, self.result)
 
     def test_nextT(self):
-        self.jq.put(self.job1, 0.1, next_t=0.5)
+        self.jq.put(Job(self.job1, 0.1), next_t=0.5)
         sleep(0.45)
         self.assertEqual(0, self.result)
         sleep(0.1)
         self.assertEqual(1, self.result)
 
     def test_multiple(self):
-        self.jq.put(self.job1, 0.1, repeat=False)
-        self.jq.put(self.job1, 0.2, repeat=False)
-        self.jq.put(self.job1, 0.4)
+        self.jq.put(Job(self.job1, 0.1, repeat=False))
+        self.jq.put(Job(self.job1, 0.2, repeat=False))
+        self.jq.put(Job(self.job1, 0.4))
         sleep(1)
         self.assertEqual(4, self.result)
 
-    def test_error(self):
-        self.jq.put(self.job2, 0.1)
-        self.jq.put(self.job1, 0.2)
-        self.jq.start()
-        sleep(0.4)
+    def test_disabled(self):
+        j0 = Job(self.job1, 0.1)
+        j1 = Job(self.job1, 0.2)
+
+        self.jq.put(j0)
+        self.jq.put(Job(self.job1, 0.4))
+        self.jq.put(j1)
+
+        j0.enabled = False
+        j1.enabled = False
+
+        sleep(1)
+        self.assertEqual(2, self.result)
+
+    def test_schedule_removal(self):
+        j0 = Job(self.job1, 0.1)
+        j1 = Job(self.job1, 0.2)
+
+        self.jq.put(j0)
+        self.jq.put(Job(self.job1, 0.4))
+        self.jq.put(j1)
+
+        j0.schedule_removal()
+        j1.schedule_removal()
+
+        sleep(1)
+        self.assertEqual(2, self.result)
+
+    def test_schedule_removal_from_within(self):
+        self.jq.put(Job(self.job1, 0.4))
+        self.jq.put(Job(self.job3, 0.2))
+
+        sleep(1)
+        self.assertEqual(3, self.result)
+
+    def test_longer_first(self):
+        self.jq.put(Job(self.job1, 0.2, repeat=False))
+        self.jq.put(Job(self.job1, 0.1, repeat=False))
+        sleep(0.15)
         self.assertEqual(1, self.result)
 
+    def test_error(self):
+        self.jq.put(Job(self.job2, 0.1))
+        self.jq.put(Job(self.job1, 0.2))
+        self.jq.start()
+        sleep(0.5)
+        self.assertEqual(2, self.result)
+
+    def test_jobs_tuple(self):
+
+        jobs = tuple(Job(self.job1, t) for t in range(5, 25))
+
+        for job in jobs:
+            self.jq.put(job)
+
+        self.assertTupleEqual(jobs, self.jq.jobs())
+
     def test_inUpdater(self):
-        u = Updater(bot="MockBot", job_queue_tick_interval=0.005)
-        u.job_queue.put(self.job1, 0.5)
+        u = Updater(bot="MockBot")
+        u.job_queue.put(Job(self.job1, 0.5))
         sleep(0.75)
         self.assertEqual(1, self.result)
         u.stop()

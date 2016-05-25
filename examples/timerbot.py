@@ -17,15 +17,16 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, Job
 import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+                    level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 job_queue = None
+timers = dict()
 
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -35,7 +36,7 @@ def start(bot, update):
 
 
 def set(bot, update, args):
-    """ Adds a job to the queue """
+    """Adds a job to the queue"""
     chat_id = update.message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
@@ -43,18 +44,32 @@ def set(bot, update, args):
         if due < 0:
             bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
 
-        def alarm(bot):
-            """ Inner function to send the alarm message """
+        def alarm(bot, job):
+            """Inner function to send the alarm message"""
             bot.sendMessage(chat_id, text='Beep!')
 
         # Add job to queue
-        job_queue.put(alarm, due, repeat=False)
+        job = Job(alarm, due, repeat=False)
+        timers[chat_id] = job
+        job_queue.put(job)
+
         bot.sendMessage(chat_id, text='Timer successfully set!')
 
-    except IndexError:
+    except (IndexError, ValueError):
         bot.sendMessage(chat_id, text='Usage: /set <seconds>')
-    except ValueError:
-        bot.sendMessage(chat_id, text='Usage: /set <seconds>')
+
+
+def unset(bot, update):
+    """Removes the job if the user changed their mind"""
+    chat_id = update.message.chat_id
+
+    if chat_id not in timers:
+        bot.sendMessage(chat_id, text='You have no active timer')
+        return
+
+    job = timers[chat_id]
+    job.schedule_removal()
+    bot.sendMessage(chat_id, text='Timer successfully unset!')
 
 
 def error(bot, update, error):
@@ -64,7 +79,7 @@ def error(bot, update, error):
 def main():
     global job_queue
 
-    updater = Updater("TOKEN")
+    updater = Updater("148447715:AAH4M0gzPG11_mdQS1Qeb0Ex30I5-rw9bMY")
     job_queue = updater.job_queue
 
     # Get the dispatcher to register handlers
@@ -74,6 +89,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
     dp.add_handler(CommandHandler("set", set, pass_args=True))
+    dp.add_handler(CommandHandler("unset", unset))
 
     # log all errors
     dp.add_error_handler(error)
