@@ -25,7 +25,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
-job_queue = None
 timers = dict()
 
 
@@ -35,7 +34,7 @@ def start(bot, update):
     bot.sendMessage(update.message.chat_id, text='Hi! Use /set <seconds> to ' 'set a timer')
 
 
-def set(bot, update, args):
+def set(bot, update, args, job_queue):
     """Adds a job to the queue"""
     chat_id = update.message.chat_id
     try:
@@ -77,10 +76,7 @@ def error(bot, update, error):
 
 
 def main():
-    global job_queue
-
     updater = Updater("TOKEN")
-    job_queue = updater.job_queue
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -88,7 +84,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(CommandHandler("set", set, pass_args=True))
+    dp.add_handler(CommandHandler("set", set, pass_args=True, pass_job_queue=True))
     dp.add_handler(CommandHandler("unset", unset))
 
     # log all errors
