@@ -1261,6 +1261,26 @@ class Bot(TelegramObject):
 
     @log
     def leaveChat(self, chat_id, **kwargs):
+        """Use this method for your bot to leave a group, supergroup or
+        channel.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
         url = '{0}/leaveChat'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1271,6 +1291,28 @@ class Bot(TelegramObject):
 
     @log
     def getChat(self, chat_id, **kwargs):
+        """Use this method to get up to date information about the chat
+        (current name of the user for one-on-one conversations, current
+        username of a user, group or channel, etc.).
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            :class:`telegram.Chat`: On success, :class:`telegram.Chat` is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
         url = '{0}/getChat'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1281,6 +1323,31 @@ class Bot(TelegramObject):
 
     @log
     def getChatAdministrators(self, chat_id, **kwargs):
+        """Use this method to get a list of administrators in a chat. On
+        success, returns an Array of ChatMember objects that contains
+        information about all chat administrators except other bots. If the
+        chat is a group or a supergroup and no administrators were appointed,
+        only the creator will be returned.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            list[:class:`telegram.ChatMember`]: On success, a list of
+            :class:`telegram.ChatMember` objects are returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
         url = '{0}/getChatAdministrators'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1291,6 +1358,26 @@ class Bot(TelegramObject):
 
     @log
     def getChatMembersCount(self, chat_id, **kwargs):
+        """Use this method to get the number of members in a chat.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            int: On success, an `int` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
         url = '{0}/getChatMembersCount'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1301,6 +1388,29 @@ class Bot(TelegramObject):
 
     @log
     def getChatMember(self, chat_id, user_id, **kwargs):
+        """Use this method to get information about a member of a chat.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+          user_id:
+            Unique identifier of the target user.
+
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            :class:`telegram.ChatMember`: On success,
+            :class:`telegram.ChatMember` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
         url = '{0}/getChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
