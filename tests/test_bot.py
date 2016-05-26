@@ -188,6 +188,13 @@ class BotTest(BaseTest, unittest.TestCase):
     def testInvalidToken3(self):
         self._test_invalid_token('12:')
 
+    def testInvalidToken4(self):
+        # white spaces are invalid
+        self._test_invalid_token('1234:abcd1234\n')
+        self._test_invalid_token(' 1234:abcd1234')
+        self._test_invalid_token(' 1234:abcd1234\r')
+        self._test_invalid_token('1234:abcd 1234')
+
     def testUnauthToken(self):
         with self.assertRaisesRegexp(telegram.error.Unauthorized, 'Unauthorized'):
             bot = telegram.Bot('1234:abcd1234')
