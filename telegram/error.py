@@ -77,7 +77,7 @@ class NetworkError(TelegramError):
     pass
 
 
-class BadRequest(TelegramError):
+class BadRequest(NetworkError):
     pass
 
 

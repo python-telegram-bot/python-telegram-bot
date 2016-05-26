@@ -207,6 +207,9 @@ class BotTest(BaseTest, unittest.TestCase):
         with self.assertRaisesRegexp(telegram.error.BadRequest, 'Chat not found'):
             chat = self._bot.leaveChat(-123456)
 
+        with self.assertRaisesRegexp(telegram.error.NetworkError, 'Chat not found'):
+            chat = self._bot.leaveChat(-123456)
+
     @flaky(3, 1)
     @timeout(10)
     def testGetChat(self):
