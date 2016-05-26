@@ -73,11 +73,11 @@ class InvalidToken(TelegramError):
         super(InvalidToken, self).__init__('Invalid token')
 
 
-class BadRequest(TelegramError):
+class NetworkError(TelegramError):
     pass
 
 
-class NetworkError(TelegramError):
+class BadRequest(TelegramError):
     pass
 
 
