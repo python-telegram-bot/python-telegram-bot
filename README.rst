@@ -34,6 +34,10 @@ Not **just** a Python wrapper around the Telegram Bot API
 .. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
    :alt: Coveralls
+   
+.. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
+   :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
+   :alt: Average time to resolve an issue
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
