@@ -29,3 +29,19 @@ def deprecate(func, old, new):
         return func(*args, **kwargs)
 
     return f
+
+
+def deprecate_network_delay(timeout, total_timeout, **kwargs):
+    if 'network_delay' in kwargs:
+        warnings.warn('start_polling(): network_delay is being deprecated, please use '
+                      'total_timeout from now on')
+        if timeout is not None:
+            network_delay = kwargs['network_delay']
+            if network_delay is not None:
+                total_timeout = timeout + network_delay
+            else:
+                warnings.warn('start_polling(): network_delay is ignored becuase it is None')
+        else:
+            warnings.warn('start_polling(): network_delay is ignored because timeout is None')
+
+    return total_timeout

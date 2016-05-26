@@ -31,6 +31,7 @@ from queue import Queue
 from telegram import Bot, TelegramError, NullHandler
 from telegram.ext import dispatcher, Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
+from telegram.utils.deprecate import deprecate_network_delay
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 logging.getLogger(__name__).addHandler(NullHandler())
@@ -112,9 +113,10 @@ class Updater(object):
     def start_polling(self,
                       poll_interval=0.0,
                       timeout=10,
-                      network_delay=2,
+                      total_timeout=15,
                       clean=False,
-                      bootstrap_retries=0):
+                      bootstrap_retries=0,
+                      **kwargs):
         """
         Starts polling updates from Telegram.
 
@@ -122,7 +124,7 @@ class Updater(object):
             poll_interval (Optional[float]): Time to wait between polling
                 updates from Telegram in seconds. Default is 0.0
             timeout (Optional[float]): Passed to Bot.getUpdates
-            network_delay (Optional[float]): Passed to Bot.getUpdates
+            total_timeout (Optional[float]): Passed to Bot.getUpdates
             clean (Optional[bool]): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is
                 False.
@@ -137,6 +139,8 @@ class Updater(object):
             Queue: The update queue that can be filled from the main thread
 
         """
+        total_timeout = deprecate_network_delay(timeout, total_timeout, **kwargs)
+
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -144,7 +148,7 @@ class Updater(object):
                 # Create & start threads
                 self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  network_delay, bootstrap_retries, clean)
+                                  total_timeout, bootstrap_retries, clean)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -200,7 +204,7 @@ class Updater(object):
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
-    def _start_polling(self, poll_interval, timeout, network_delay, bootstrap_retries, clean):
+    def _start_polling(self, poll_interval, timeout, total_timeout, bootstrap_retries, clean):
         """
         Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
@@ -216,7 +220,7 @@ class Updater(object):
             try:
                 updates = self.bot.getUpdates(self.last_update_id,
                                               timeout=timeout,
-                                              network_delay=network_delay)
+                                              total_timeout=total_timeout)
             except TelegramError as te:
                 self.logger.error("Error while getting Updates: {0}".format(te))
 
