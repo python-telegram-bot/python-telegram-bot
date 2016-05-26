@@ -51,6 +51,7 @@ class TelegramError(Exception):
 
         msg = _lstrip_str(message, 'Error: ')
         msg = _lstrip_str(msg, '[Error]: ')
+        msg = _lstrip_str(msg, 'Bad Request: ')
         if msg != message:
             # api_error - capitalize the msg...
             msg = msg.capitalize()
@@ -70,6 +71,10 @@ class InvalidToken(TelegramError):
 
     def __init__(self):
         super(InvalidToken, self).__init__('Invalid token')
+
+
+class BadRequest(TelegramError):
+    pass
 
 
 class NetworkError(TelegramError):

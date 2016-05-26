@@ -203,6 +203,12 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def testLeaveChat(self):
+        with self.assertRaisesRegexp(telegram.error.BadRequest, 'Chat not found'):
+            chat = self._bot.leaveChat(-123456)
+
+    @flaky(3, 1)
+    @timeout(10)
     def testGetChat(self):
         chat = self._bot.getChat(self._group_id)
 
