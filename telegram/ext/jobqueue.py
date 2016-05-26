@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the class JobQueue."""
+"""This module contains the classes JobQueue and Job."""
 
 import logging
 import time
@@ -69,6 +69,7 @@ class JobQueue(object):
         self.logger.debug('Putting a %s with t=%f' % (job.name, next_t))
         self.queue.put((next_t, job))
 
+        # Wake up the loop if this job should be executed next
         if not self.next_peek or self.next_peek > next_t:
             self.next_peek = next_t
             self.__tick.set()
@@ -128,19 +129,21 @@ class JobQueue(object):
         Starts the job_queue thread.
         """
         self.__lock.acquire()
+
         if not self.running:
             self.running = True
             self.__lock.release()
             job_queue_thread = Thread(target=self._start, name="job_queue")
             job_queue_thread.start()
             self.logger.debug('Job Queue thread started')
+
         else:
             self.__lock.release()
 
     def _start(self):
         """
-        Thread target of thread 'job_queue'. Runs in background and performs
-        ticks on the job queue.
+        Thread target of thread ``job_queue``. Runs in background and performs ticks on the job
+        queue.
         """
 
         while self.running:
