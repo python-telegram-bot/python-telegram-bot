@@ -37,10 +37,20 @@ class TypeHandler(Handler):
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
             be used to insert updates. Default is ``False``
+        pass_job_queue (optional[bool]): If the callback should be passed the job queue as a
+            keyword argument called ``job_queue``. It can be used to schedule new jobs.
+            Default is ``False``
     """
 
-    def __init__(self, type, callback, strict=False, pass_update_queue=False):
-        super(TypeHandler, self).__init__(callback, pass_update_queue)
+    def __init__(self,
+                 type,
+                 callback,
+                 strict=False,
+                 pass_update_queue=False,
+                 pass_job_queue=False):
+        super(TypeHandler, self).__init__(callback,
+                                          pass_update_queue=pass_update_queue,
+                                          pass_job_queue=pass_job_queue)
         self.type = type
         self.strict = strict
 
