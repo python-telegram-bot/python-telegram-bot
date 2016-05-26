@@ -186,15 +186,18 @@ class Job(object):
         interval (float): The interval in which this job should execute its callback function in
             seconds.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
-            (``True``) or only once (``False``). (default=``True``)
+            (``True``) or only once (``False``). Defaults to ``True``
+        context (Optional[object]): Additional data needed for the callback function. Can be
+            accessed through ``job.context`` in the callback. Defaults to ``None``
 
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True):
+    def __init__(self, callback, interval, repeat=True, context=None):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
+        self.context = context
 
         self.name = callback.__name__
         self._remove = Event()
