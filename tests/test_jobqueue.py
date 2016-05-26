@@ -69,10 +69,18 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.result += 1
         job.schedule_removal()
 
+    def job4(self, bot, job):
+        self.result += job.context
+
     def test_basic(self):
         self.jq.put(Job(self.job1, 0.1))
         sleep(1.5)
         self.assertGreaterEqual(self.result, 10)
+
+    def test_job_with_context(self):
+        self.jq.put(Job(self.job4, 0.1, context=5))
+        sleep(1.5)
+        self.assertGreaterEqual(self.result, 50)
 
     def test_noRepeat(self):
         self.jq.put(Job(self.job1, 0.1, repeat=False))
