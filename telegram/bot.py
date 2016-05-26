@@ -1466,4 +1466,4 @@ class Bot(TelegramObject):
     get_chat = getChat
     get_chat_administrators = getChatAdministrators
     get_chat_member = getChatMember
-    get_chat_member_count = getChatMembersCount
+    get_chat_members_count = getChatMembersCount
