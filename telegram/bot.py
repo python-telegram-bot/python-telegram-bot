@@ -26,6 +26,7 @@ from telegram import (User, Message, Update, UserProfilePhotos, File, ReplyMarku
                       NullHandler)
 from telegram.error import InvalidToken
 from telegram.utils import request
+from telegram.utils.deprecate import deprecate_network_delay
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -982,10 +983,6 @@ class Bot(TelegramObject):
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
-            network_delay (Optional[float]): If using the timeout (which is
-                a `timeout` for the Telegram servers operation),
-                then `network_delay` as an extra delay (in seconds) to
-                compensate for network latency. Defaults to 2.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1182,36 +1179,37 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=.2):
+    def getUpdates(self, offset=None, limit=100, timeout=0, total_timeout=None, **kwargs):
         """Use this method to receive incoming updates using long polling.
 
         Args:
           offset:
-            Identifier of the first update to be returned. Must be greater by
-            one than the highest among the identifiers of previously received
-            updates. By default, updates starting with the earliest unconfirmed
-            update are returned. An update is considered confirmed as soon as
-            getUpdates is called with an offset higher than its update_id.
+            Identifier of the first update to be returned. Must be greater by one than the highest
+            among the identifiers of previously received updates. By default, updates starting with
+            the earliest unconfirmed update are returned. An update is considered confirmed as soon
+            as `getUpdates` is called with an offset higher than its update_id.
+
           limit:
-            Limits the number of updates to be retrieved. Values between 1-100
-            are accepted. Defaults to 100.
+            Limits the number of updates to be retrieved. Values between 1-100 are accepted.
+            Defaults to 100.
+
           timeout:
-            Timeout in seconds for long polling. Defaults to 0, i.e. usual
-            short polling.
-          network_delay:
-            Additional timeout in seconds to allow the response from Telegram
-            to take some time when using long polling. Defaults to 2, which
-            should be enough for most connections. Increase it if it takes very
-            long for data to be transmitted from and to the Telegram servers.
+            Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling.
+
+          total_timeout (Optional[float]):
+            Timeout in seconds for the whole operation (`timeout` on telegram servers + network
+            latency). `total_timeout` will only be respected if when
+            `total_timeout` > `timeout` > 0
 
         Returns:
-            list[:class:`telegram.Update`]: A list of :class:`telegram.Update`
-            objects are returned.
+            list[:class:`telegram.Update`]: A list of :class:`telegram.Update` objects are
+            returned.
 
         Raises:
             :class:`telegram.TelegramError`
 
         """
+        total_timeout = deprecate_network_delay(timeout, total_timeout, **kwargs)
 
         url = '{0}/getUpdates'.format(self.base_url)
 
@@ -1222,7 +1220,10 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        urlopen_timeout = timeout + network_delay
+        if total_timeout is not None and total_timeout > timeout > 0:
+            urlopen_timeout = timeout + total_timeout
+        else:
+            urlopen_timeout = None
 
         result = request.post(url, data, timeout=urlopen_timeout)
 

@@ -637,7 +637,7 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=2.):
+    def getUpdates(self, offset=None, limit=100, timeout=0, total_timeout=None):
 
         if self.raise_error:
             raise TelegramError('Test Error 2')
