@@ -97,7 +97,7 @@ def error(bot, update, error):
 updater = Updater("TOKEN")
 
 # The command
-updater.dispatcher.addHandler(CommandHandler('set', set_value))
+updater.dispatcher.add_handler(CommandHandler('set', set_value))
 # The answer
 updater.dispatcher.add_handler(MessageHandler([Filters.text], entered_value))
 # The confirmation
