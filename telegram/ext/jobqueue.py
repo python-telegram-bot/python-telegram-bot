@@ -43,8 +43,8 @@ class JobQueue(object):
         self.logger = logging.getLogger(__name__)
         self.__lock = Lock()
         self.__tick = Event()
-        self.next_peek = None
-        self.running = False
+        self._next_peek = None
+        self._running = False
 
     def put(self, job, next_t=None, prevent_autostart=False):
         """
@@ -70,11 +70,11 @@ class JobQueue(object):
         self.queue.put((next_t, job))
 
         # Wake up the loop if this job should be executed next
-        if not self.next_peek or self.next_peek > next_t:
-            self.next_peek = next_t
+        if not self._next_peek or self._next_peek > next_t:
+            self._next_peek = next_t
             self.__tick.set()
 
-        if not self.running and not prevent_autostart:
+        if not self._running and not prevent_autostart:
             self.logger.debug('Auto-starting JobQueue')
             self.start()
 
@@ -116,11 +116,11 @@ class JobQueue(object):
                 continue
 
             self.logger.debug('Next task isn\'t due yet. Finished!')
-            self.next_peek = t
+            self._next_peek = t
             break
 
         else:
-            self.next_peek = None
+            self._next_peek = None
 
         self.__tick.clear()
 
@@ -130,8 +130,8 @@ class JobQueue(object):
         """
         self.__lock.acquire()
 
-        if not self.running:
-            self.running = True
+        if not self._running:
+            self._running = True
             self.__lock.release()
             job_queue_thread = Thread(target=self._start, name="job_queue")
             job_queue_thread.start()
@@ -146,8 +146,8 @@ class JobQueue(object):
         queue.
         """
 
-        while self.running:
-            self.__tick.wait(self.next_peek and self.next_peek - time.time())
+        while self._running:
+            self.__tick.wait(self._next_peek and self._next_peek - time.time())
 
             # If we were woken up by set(), wait with the new timeout
             if self.__tick.is_set():
@@ -163,7 +163,7 @@ class JobQueue(object):
         Stops the thread
         """
         with self.__lock:
-            self.running = False
+            self._running = False
 
         self.__tick.set()
 
