@@ -96,7 +96,7 @@ class Dispatcher(object):
             decorator
     """
 
-    def __init__(self, bot, update_queue, job_queue=None, workers=4, exception_event=None):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
