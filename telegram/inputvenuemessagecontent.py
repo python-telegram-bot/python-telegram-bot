@@ -25,7 +25,7 @@ from telegram import InputMessageContent
 class InputVenueMessageContent(InputMessageContent):
     """Base class for Telegram InputVenueMessageContent Objects"""
 
-    def __init__(self, latitude, longitude, title, address, foursquare_id=None):
+    def __init__(self, latitude, longitude, title, address, foursquare_id=None, **kwargs):
         # Required
         self.latitude = latitude
         self.longitude = longitude

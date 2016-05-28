@@ -23,6 +23,7 @@ from sys import version_info
 from .base import TelegramObject
 from .user import User
 from .chat import Chat
+from .chatmember import ChatMember
 from .photosize import PhotoSize
 from .audio import Audio
 from .voice import Voice
@@ -82,24 +83,25 @@ from .bot import Bot
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '4.1.2'
-__all__ = ['Audio', 'Bot', 'Chat', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery', 'Contact',
-           'Document', 'Emoji', 'File', 'ForceReply', 'InlineKeyboardButton',
-           'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
-           'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
-           'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
-           'InlineQueryResultCachedMpeg4Gif', 'InlineQueryResultCachedPhoto',
-           'InlineQueryResultCachedSticker', 'InlineQueryResultCachedVideo',
-           'InlineQueryResultCachedVoice', 'InlineQueryResultContact', 'InlineQueryResultDocument',
-           'InlineQueryResultGif', 'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif',
-           'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
-           'InlineQueryResultVoice', 'InputContactMessageContent', 'InputFile',
-           'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
-           'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
-           'NullHandler', 'ParseMode', 'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
-           'ReplyMarkup', 'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User',
-           'UserProfilePhotos', 'Venue', 'Video', 'Voice']
+__all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult',
+           'CallbackQuery', 'Contact', 'Document', 'Emoji', 'File', 'ForceReply',
+           'InlineKeyboardButton', 'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult',
+           'InlineQueryResult', 'InlineQueryResultArticle', 'InlineQueryResultAudio',
+           'InlineQueryResultCachedAudio', 'InlineQueryResultCachedDocument',
+           'InlineQueryResultCachedGif', 'InlineQueryResultCachedMpeg4Gif',
+           'InlineQueryResultCachedPhoto', 'InlineQueryResultCachedSticker',
+           'InlineQueryResultCachedVideo', 'InlineQueryResultCachedVoice',
+           'InlineQueryResultContact', 'InlineQueryResultDocument', 'InlineQueryResultGif',
+           'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif', 'InlineQueryResultPhoto',
+           'InlineQueryResultVenue', 'InlineQueryResultVideo', 'InlineQueryResultVoice',
+           'InputContactMessageContent', 'InputFile', 'InputLocationMessageContent',
+           'InputMessageContent', 'InputTextMessageContent', 'InputVenueMessageContent',
+           'KeyboardButton', 'Location', 'Message', 'MessageEntity', 'NullHandler', 'ParseMode',
+           'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup', 'ReplyMarkup', 'Sticker',
+           'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
+           'Video', 'Voice']
 
 if version_info < (2, 7):
     from warnings import warn
     warn("python-telegram-bot will stop supporting Python 2.6 in a future release. "
-         "Please upgrade your Python!")
+         "Please upgrade your Python version to at least Python 2.7!")

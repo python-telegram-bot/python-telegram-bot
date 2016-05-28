@@ -28,7 +28,7 @@ from future.moves.urllib.error import HTTPError, URLError
 from future.moves.urllib.request import urlopen, urlretrieve, Request
 
 from telegram import (InputFile, TelegramError)
-from telegram.error import Unauthorized, NetworkError, TimedOut
+from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
 
 
 def _parse(json_data):
@@ -67,13 +67,15 @@ def _try_except_req(func):
             # come first.
             errcode = error.getcode()
 
-            if errcode in (401, 403):
-                raise Unauthorized()
-            elif errcode == 502:
-                raise NetworkError('Bad Gateway')
-
             try:
                 message = _parse(error.read())
+
+                if errcode in (401, 403):
+                    raise Unauthorized()
+                elif errcode == 400:
+                    raise BadRequest(message)
+                elif errcode == 502:
+                    raise NetworkError('Bad Gateway')
             except ValueError:
                 message = 'Unknown HTTPError {0}'.format(error.getcode())
 

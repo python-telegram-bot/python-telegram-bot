@@ -16,54 +16,47 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
-UserProfilePhotos."""
+"""This module contains a object that represents a Telegram ChatMember."""
 
-from telegram import PhotoSize, TelegramObject
+from telegram import User, TelegramObject
 
 
-class UserProfilePhotos(TelegramObject):
-    """This object represents a Telegram UserProfilePhotos.
+class ChatMember(TelegramObject):
+    """This object represents a Telegram ChatMember.
 
     Attributes:
-        total_count (int):
-        photos (List[List[:class:`telegram.PhotoSize`]]):
+        user (:class:`telegram.User`): Information about the user.
+        status (str): The member's status in the chat. Can be 'creator', 'administrator', 'member',
+            'left' or 'kicked'.
 
     Args:
-        total_count (int):
-        photos (List[List[:class:`telegram.PhotoSize`]]):
+        user (:class:`telegram.User`):
+        status (str):
     """
 
-    def __init__(self, total_count, photos, **kwargs):
+    CREATOR = 'creator'
+    ADMINISTRATOR = 'administrator'
+    MEMBER = 'member'
+    LEFT = 'left'
+    KICKED = 'kicked'
+
+    def __init__(self, user, status, **kwargs):
         # Required
-        self.total_count = int(total_count)
-        self.photos = photos
+        self.user = user
+        self.status = status
 
     @staticmethod
     def de_json(data):
         """
         Args:
-            data (str):
+            data (dict):
 
         Returns:
-            telegram.UserProfilePhotos:
+            telegram.ChatMember:
         """
         if not data:
             return None
 
-        data['photos'] = [PhotoSize.de_list(photo) for photo in data['photos']]
+        data['user'] = User.de_json(data.get('user'))
 
-        return UserProfilePhotos(**data)
-
-    def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
-        data = super(UserProfilePhotos, self).to_dict()
-
-        data['photos'] = []
-        for photo in self.photos:
-            data['photos'].append([x.to_dict() for x in photo])
-
-        return data
+        return ChatMember(**data)

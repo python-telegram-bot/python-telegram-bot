@@ -40,6 +40,8 @@ class BaseTest(object):
                                           '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
         chat_id = os.environ.get('CHAT_ID', '12173560')
 
+        self._group_id = os.environ.get('GROUP_ID', '-49740850')
+        self._channel_id = os.environ.get('CHANNEL_ID', '@pythontelegrambottests')
         self._bot = bot
         self._chat_id = chat_id
 

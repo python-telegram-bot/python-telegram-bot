@@ -45,11 +45,7 @@ class BotTest(BaseTest, unittest.TestCase):
         bot = self._bot.getMe()
 
         self.assertTrue(self.is_json(bot.to_json()))
-        self.assertEqual(bot.id, 133505823)
-        self.assertEqual(bot.first_name, 'PythonTelegramBot')
-        self.assertEqual(bot.last_name, '')
-        self.assertEqual(bot.username, 'PythonTelegramBot')
-        self.assertEqual(bot.name, '@PythonTelegramBot')
+        self._testUserEqualsBot(bot)
 
     @flaky(3, 1)
     @timeout(10)
@@ -75,7 +71,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testGetUpdates(self):
-        updates = self._bot.getUpdates()
+        updates = self._bot.getUpdates(timeout=1)
 
         if updates:
             self.assertTrue(self.is_json(updates[0].to_json()))
@@ -211,6 +207,63 @@ class BotTest(BaseTest, unittest.TestCase):
             bot.base_url = 'https://api.telegram.org/bot{0}'.format('12')
 
             bot.getMe()
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testLeaveChat(self):
+        with self.assertRaisesRegexp(telegram.error.BadRequest, 'Chat not found'):
+            chat = self._bot.leaveChat(-123456)
+
+        with self.assertRaisesRegexp(telegram.error.NetworkError, 'Chat not found'):
+            chat = self._bot.leaveChat(-123456)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testGetChat(self):
+        chat = self._bot.getChat(self._group_id)
+
+        self.assertTrue(self.is_json(chat.to_json()))
+        self.assertEqual(chat.type, "group")
+        self.assertEqual(chat.title, ">>> telegram.Bot() - Developers")
+        self.assertEqual(chat.id, int(self._group_id))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testGetChatAdministrators(self):
+        admins = self._bot.getChatAdministrators(self._channel_id)
+        self.assertTrue(isinstance(admins, list))
+        self.assertTrue(self.is_json(admins[0].to_json()))
+
+        for a in admins:
+            self.assertTrue(a.status in ("administrator", "creator"))
+
+        bot = [a.user for a in admins if a.user.id == 133505823][0]
+        self._testUserEqualsBot(bot)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testGetChatMembersCount(self):
+        count = self._bot.getChatMembersCount(self._channel_id)
+        self.assertTrue(isinstance(count, int))
+        self.assertTrue(count > 3)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def testGetChatMember(self):
+        chat_member = self._bot.getChatMember(self._channel_id, 133505823)
+        bot = chat_member.user
+
+        self.assertTrue(self.is_json(chat_member.to_json()))
+        self.assertEqual(chat_member.status, "administrator")
+        self._testUserEqualsBot(bot)
+
+    def _testUserEqualsBot(self, user):
+        """Tests if user is our trusty @PythonTelegramBot."""
+        self.assertEqual(user.id, 133505823)
+        self.assertEqual(user.first_name, 'PythonTelegramBot')
+        self.assertEqual(user.last_name, '')
+        self.assertEqual(user.username, 'PythonTelegramBot')
+        self.assertEqual(user.name, '@PythonTelegramBot')
 
 
 if __name__ == '__main__':

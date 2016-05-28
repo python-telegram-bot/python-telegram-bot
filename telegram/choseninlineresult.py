@@ -41,7 +41,13 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
-    def __init__(self, result_id, from_user, query, location=None, inline_message_id=None):
+    def __init__(self,
+                 result_id,
+                 from_user,
+                 query,
+                 location=None,
+                 inline_message_id=None,
+                 **kwargs):
         # Required
         self.result_id = result_id
         self.from_user = from_user
