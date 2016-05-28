@@ -31,12 +31,14 @@ class CallbackQueryHandler(Handler):
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
-        pass_update_queue (optional[bool]): If the handler should be passed the
-            update queue as a keyword argument called ``update_queue``. It can
-            be used to insert updates. Default is ``False``
-        pass_job_queue (optional[bool]): If the callback should be passed the job queue as a
-            keyword argument called ``job_queue``. It can be used to schedule new jobs.
-            Default is ``False``
+        pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
+            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
+            instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
+             be used to insert updates. Default is ``False``.
+        pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
+            ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
+            instance created by the ``Updater`` which can be used to schedule new jobs.
+            Default is ``False``.
     """
 
     def __init__(self, callback, pass_update_queue=False, pass_job_queue=False):
