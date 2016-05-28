@@ -1,3 +1,11 @@
+**2016-05-28**
+
+*Released 4.2*
+
+- Implement Bot API 2.1
+- Move ``botan`` module to ``telegram.contrib``
+- New exception type: ``BadRequest``
+
 **2016-05-22**
 
 *Released 4.1.2*
