@@ -34,6 +34,12 @@ class ChatMember(TelegramObject):
         status (str):
     """
 
+    CREATOR = 'creator'
+    ADMINISTRATOR = 'administrator'
+    MEMBER = 'member'
+    LEFT = 'left'
+    KICKED = 'kicked'
+
     def __init__(self, user, status, **kwargs):
         # Required
         self.user = user
