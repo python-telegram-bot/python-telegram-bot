@@ -104,4 +104,4 @@ __all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResu
 if version_info < (2, 7):
     from warnings import warn
     warn("python-telegram-bot will stop supporting Python 2.6 in a future release. "
-         "Please upgrade your Python!")
+         "Please upgrade your Python version to at least Python 2.7!")
