@@ -15,8 +15,8 @@ Not **just** a Python wrapper around the Telegram Bot API
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: Supported python versions
 
-.. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=latest
-   :target: https://readthedocs.org/projects/python-telegram-bot/?badge=latest
+.. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
+   :target: https://pythonhosted.org/python-telegram-bot/
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
@@ -109,7 +109,7 @@ Our Wiki contains a lot of resources to get you started with ``python-telegram-b
 Other references:
 
 - `Telegram API documentation <https://core.telegram.org/bots/api>`_
-- `python-telegram-bot documentation <http://pythonhosted.org/python-telegram-bot/>`_
+- `python-telegram-bot documentation <https://pythonhosted.org/python-telegram-bot/>`_
 
 ----------------------
 _`Learning by example`
@@ -171,7 +171,7 @@ If you want DEBUG logs instead:
 _`Documentation`
 ================
 
-``python-telegram-bot``'s documentation lives at `pythonhosted.org <http://pythonhosted.org/python-telegram-bot/>`_.
+``python-telegram-bot``'s documentation lives at `pythonhosted.org <https://pythonhosted.org/python-telegram-bot/>`_.
 
 ===============
 _`Getting help`
