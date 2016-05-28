@@ -1,4 +1,4 @@
 from .deprecate import deprecate
-from telegram.ext.botan import Botan as Bo
+from telegram.contrib.botan import Botan as Bo
 
-Botan = deprecate(Bo, 'telegram.utils.botan', 'telegram.ext.botan')
+Botan = deprecate(Bo, 'telegram.utils.botan', 'telegram.contrib.botan')

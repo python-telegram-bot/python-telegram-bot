@@ -9,7 +9,7 @@ from flaky import flaky
 
 sys.path.append('.')
 
-from telegram.ext.botan import Botan
+from telegram.contrib.botan import Botan
 from tests.base import BaseTest
 
 
