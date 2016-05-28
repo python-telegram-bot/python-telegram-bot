@@ -101,7 +101,7 @@ class JobQueue(object):
                     self.logger.debug('Running job %s' % job.name)
 
                     try:
-                        job.run()
+                        job.run(self.bot)
 
                     except:
                         self.logger.exception(
@@ -180,7 +180,7 @@ class Job(object):
         interval (float):
         repeat (bool):
         name (str):
-        enabled (bool): If this job is currently active
+        enabled (bool): Boolean property that decides if this job is currently active
 
     Args:
         callback (function): The callback function that should be executed by the Job. It should
@@ -207,9 +207,9 @@ class Job(object):
         self._enabled = Event()
         self._enabled.set()
 
-    def run(self):
+    def run(self, bot):
         """Executes the callback function"""
-        self.callback(self.job_queue.bot, self)
+        self.callback(bot, self)
 
     def schedule_removal(self):
         """
