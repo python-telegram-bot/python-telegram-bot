@@ -181,7 +181,7 @@ You can get help in several ways:
 
 1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
 
-2. Our `Wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offers a growing amount of resources.
+2. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
 
 3. You can ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
 
