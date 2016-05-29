@@ -20,6 +20,7 @@
 
 import json
 
+import certifi
 import urllib3
 
 from telegram import (InputFile, TelegramError)
@@ -33,7 +34,7 @@ def _get_con_pool():
         return _CON_POOL
 
     global _CON_POOL
-    _CON_POOL = urllib3.PoolManager(10)
+    _CON_POOL = urllib3.PoolManager(10, cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
     return _CON_POOL
 
 
