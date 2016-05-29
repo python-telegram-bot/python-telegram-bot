@@ -67,9 +67,9 @@ Table of contents
 
 - `License`_
 
-===============
-_`Introduction`
-===============
+============
+Introduction
+============
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
@@ -81,15 +81,15 @@ In addition to the pure API implementation, this library features a number of hi
 make the development of bots easy and straightforward. These classes are contained in the
 ``telegram.ext`` submodule.
 
-=======================
-_`Telegram API support`
-=======================
+====================
+Telegram API support
+====================
 
 As of **28. May 2016**, all types and methods of the Telegram Bot API are supported.
 
-=============
-_`Installing`
-=============
+==========
+Installing
+==========
 
 You can install or upgrade python-telegram-bot with:
 
@@ -97,9 +97,9 @@ You can install or upgrade python-telegram-bot with:
 
     $ pip install python-telegram-bot --upgrade
 
-==================
-_`Getting started`
-==================
+===============
+Getting started
+===============
 
 Our Wiki contains a lot of resources to get you started with ``python-telegram-bot``:
 
@@ -111,9 +111,9 @@ Other references:
 - `Telegram API documentation <https://core.telegram.org/bots/api>`_
 - `python-telegram-bot documentation <https://pythonhosted.org/python-telegram-bot/>`_
 
-----------------------
-_`Learning by example`
-----------------------
+-------------------
+Learning by example
+-------------------
 
 We believe that the best way to learn and understand this simple package is by example. So here
 are some examples for you to review. Even if it's not your approach for learning, please take a
@@ -139,9 +139,9 @@ Examples using only the pure API:
 
 Look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
 
-----------
-_`Logging`
-----------
+-------
+Logging
+-------
 
 This library uses the ``logging`` module. To set up logging to standard output, put:
 
@@ -167,15 +167,15 @@ If you want DEBUG logs instead:
     logger.setLevel(logging.DEBUG)
 
 
-================
-_`Documentation`
-================
+=============
+Documentation
+=============
 
 ``python-telegram-bot``'s documentation lives at `pythonhosted.org <https://pythonhosted.org/python-telegram-bot/>`_.
 
-===============
-_`Getting help`
-===============
+============
+Getting help
+============
 
 You can get help in several ways:
 
@@ -188,14 +188,14 @@ You can get help in several ways:
 4. As last resort, the developers are ready to help you with `serious issues <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
 
 
-===============
-_`Contributing`
-===============
+============
+Contributing
+============
 
 Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
 
-==========
-_`License`
-==========
+=======
+License
+=======
 
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_, but applications that use the library don't have to be.
+You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
