@@ -35,9 +35,10 @@ def _get_con_pool():
         return _CON_POOL
 
     global _CON_POOL
-    _CON_POOL = urllib3.PoolManager(CON_POOL_SIZE,
-                                    cert_reqs='CERT_REQUIRED',
-                                    ca_certs=certifi.where())
+    _CON_POOL = urllib3.HTTPSConnectionPool(host='api.telegram.org',
+                                            maxsize=CON_POOL_SIZE,
+                                            cert_reqs='CERT_REQUIRED',
+                                            ca_certs=certifi.where())
     return _CON_POOL
 
 
