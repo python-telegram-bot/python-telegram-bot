@@ -20,7 +20,7 @@
 
 import logging
 from functools import wraps
-from threading import Thread, Lock, Event  # , current_thread
+from threading import Thread, Lock, Event, current_thread
 from time import sleep
 from queue import Queue, Empty
 
@@ -43,19 +43,16 @@ def pooled():
     A wrapper to run a thread in a thread pool
     """
     while True:
-        logging.info('Waiting for function')
-
         try:
             func, args, kwargs = async_queue.get()
 
         except TypeError:
+            logging.debug("Closing run_async thread %s/%d" %
+                          (current_thread().getName(), len(async_threads)))
             break
-
-        logging.info('Got function')
 
         try:
             func(*args, **kwargs)
-            logging.info('Executed function')
 
         except:
             logging.exception("Async function raised exception")
@@ -114,7 +111,7 @@ class Dispatcher(object):
         if not len(async_threads):
             request.CON_POOL_SIZE = workers + 3
             for i in range(workers):
-                thread = Thread(target=pooled)
+                thread = Thread(target=pooled, name=str(i))
                 async_threads.add(thread)
                 thread.start()
         else:
