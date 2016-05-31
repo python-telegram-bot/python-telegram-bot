@@ -19,9 +19,11 @@
 """This module contains methods to make POST and GET requests"""
 
 import json
+import socket
 
 import certifi
 import urllib3
+from urllib3.connection import HTTPConnection
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
@@ -35,10 +37,14 @@ def _get_con_pool():
         return _CON_POOL
 
     global _CON_POOL
-    _CON_POOL = urllib3.HTTPSConnectionPool(host='api.telegram.org',
-                                            maxsize=CON_POOL_SIZE,
-                                            cert_reqs='CERT_REQUIRED',
-                                            ca_certs=certifi.where())
+    _CON_POOL = urllib3.HTTPSConnectionPool(
+        host='api.telegram.org',
+        maxsize=CON_POOL_SIZE,
+        cert_reqs='CERT_REQUIRED',
+        ca_certs=certifi.where(),
+        socket_options=HTTPConnection.default_socket_options + [
+            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+        ])
     return _CON_POOL
 
 
