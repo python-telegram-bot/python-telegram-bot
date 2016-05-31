@@ -109,6 +109,8 @@ class Dispatcher(object):
         self.__exception_event = exception_event or Event()
 
         if not len(async_threads):
+            if request._CON_POOL:
+                self.logger.warning("Connection Pool already initialized!")
             request.CON_POOL_SIZE = workers + 3
             for i in range(workers):
                 thread = Thread(target=pooled, name=str(i))
