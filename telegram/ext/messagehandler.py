@@ -105,7 +105,12 @@ class MessageHandler(Handler):
             be used to insert updates. Default is ``False``
     """
 
-    def __init__(self, filters, callback, allow_edited=False, pass_update_queue=False, pass_job_queue=False):
+    def __init__(self,
+                 filters,
+                 callback,
+                 allow_edited=False,
+                 pass_update_queue=False,
+                 pass_job_queue=False):
         super(MessageHandler, self).__init__(callback,
                                              pass_update_queue=pass_update_queue,
                                              pass_job_queue=pass_job_queue)
