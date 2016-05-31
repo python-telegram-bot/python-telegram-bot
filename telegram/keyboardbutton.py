@@ -33,7 +33,7 @@ class KeyboardButton(TelegramObject):
         request_contact (Optional[bool]):
     """
 
-    def __init__(self, text, request_contact=None, request_location=None):
+    def __init__(self, text, request_contact=None, request_location=None, **kwargs):
         # Required
         self.text = text
         # Optionals

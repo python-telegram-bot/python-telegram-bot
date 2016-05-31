@@ -42,6 +42,11 @@ class Chat(TelegramObject):
         type (Optional[str]):
     """
 
+    PRIVATE = 'private'
+    GROUP = 'group'
+    SUPERGROUP = 'supergroup'
+    CHANNEL = 'channel'
+
     def __init__(self, id, type, **kwargs):
         # Required
         self.id = int(id)

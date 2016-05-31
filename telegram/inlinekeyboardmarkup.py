@@ -33,7 +33,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     """
 
-    def __init__(self, inline_keyboard):
+    def __init__(self, inline_keyboard, **kwargs):
         # Required
         self.inline_keyboard = inline_keyboard
 

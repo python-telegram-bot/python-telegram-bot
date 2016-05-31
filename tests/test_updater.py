@@ -98,6 +98,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.received_message = update.message.text
         self.message_count += 1
 
+    def telegramHandlerEditedTest(self, bot, update):
+        self.received_message = update.edited_message.text
+        self.message_count += 1
+
     def telegramInlineHandlerTest(self, bot, update):
         self.received_message = (update.inline_query, update.chosen_inline_result)
         self.message_count += 1
@@ -165,6 +169,28 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
+    def test_editedMessageHandler(self):
+        self._setup_updater('Test', edited=True)
+        d = self.updater.dispatcher
+        from telegram.ext import Filters
+        handler = MessageHandler([Filters.text], self.telegramHandlerEditedTest, allow_edited=True)
+        d.addHandler(handler)
+        self.updater.start_polling(0.01)
+        sleep(.1)
+        self.assertEqual(self.received_message, 'Test')
+
+        # Remove handler
+        d.removeHandler(handler)
+        handler = MessageHandler([Filters.text],
+                                 self.telegramHandlerEditedTest,
+                                 allow_edited=False)
+        d.addHandler(handler)
+        self.reset()
+
+        self.updater.bot.send_messages = 1
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
     def test_addTelegramMessageHandlerMultipleMessages(self):
         self._setup_updater('Multiple', 100)
         self.updater.dispatcher.add_handler(MessageHandler([], self.telegramHandlerTest))
@@ -202,6 +228,25 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         # Remove handler
         d.remove_handler(handler)
+        self.reset()
+
+        self.updater.bot.send_messages = 1
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_editedCommandHandler(self):
+        self._setup_updater('/test', edited=True)
+        d = self.updater.dispatcher
+        handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=True)
+        d.addHandler(handler)
+        self.updater.start_polling(0.01)
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test')
+
+        # Remove handler
+        d.removeHandler(handler)
+        handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=False)
+        d.addHandler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -621,7 +666,8 @@ class MockBot(object):
                  messages=1,
                  raise_error=False,
                  bootstrap_retries=None,
-                 bootstrap_err=TelegramError('test')):
+                 bootstrap_err=TelegramError('test'),
+                 edited=False):
         self.text = text
         self.send_messages = messages
         self.raise_error = raise_error
@@ -629,13 +675,18 @@ class MockBot(object):
         self.bootstrap_retries = bootstrap_retries
         self.bootstrap_attempts = 0
         self.bootstrap_err = bootstrap_err
+        self.edited = edited
 
-    @staticmethod
-    def mockUpdate(text):
+    def mockUpdate(self, text):
         message = Message(0, None, None, None)
         message.text = text
         update = Update(0)
-        update.message = message
+
+        if self.edited:
+            update.edited_message = message
+        else:
+            update.message = message
+
         return update
 
     def setWebhook(self, webhook_url=None, certificate=None):

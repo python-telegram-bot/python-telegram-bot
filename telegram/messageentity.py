@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a object that represents a Telegram MessageEntity."""
 
-from telegram import TelegramObject
+from telegram import User, TelegramObject
 
 
 class MessageEntity(TelegramObject):
@@ -31,6 +31,7 @@ class MessageEntity(TelegramObject):
         offset (int):
         length (int):
         url (Optional[str]):
+        user (Optional[:class:`telegram.User`]):
     """
 
     def __init__(self, type, offset, length, **kwargs):
@@ -40,10 +41,13 @@ class MessageEntity(TelegramObject):
         self.length = length
         # Optionals
         self.url = kwargs.get('url')
+        self.user = kwargs.get('user')
 
     @staticmethod
     def de_json(data):
         data = super(MessageEntity, MessageEntity).de_json(data)
+
+        data['user'] = User.de_json(data.get('user'))
 
         return MessageEntity(**data)
 

@@ -30,57 +30,56 @@ class Filters(object):
     """
 
     @staticmethod
-    def text(update):
-        return update.message.text and not update.message.text.startswith('/')
+    def text(message):
+        return message.text and not message.text.startswith('/')
 
     @staticmethod
-    def command(update):
-        return update.message.text and update.message.text.startswith('/')
+    def command(message):
+        return message.text and message.text.startswith('/')
 
     @staticmethod
-    def audio(update):
-        return bool(update.message.audio)
+    def audio(message):
+        return bool(message.audio)
 
     @staticmethod
-    def document(update):
-        return bool(update.message.document)
+    def document(message):
+        return bool(message.document)
 
     @staticmethod
-    def photo(update):
-        return bool(update.message.photo)
+    def photo(message):
+        return bool(message.photo)
 
     @staticmethod
-    def sticker(update):
-        return bool(update.message.sticker)
+    def sticker(message):
+        return bool(message.sticker)
 
     @staticmethod
-    def video(update):
-        return bool(update.message.video)
+    def video(message):
+        return bool(message.video)
 
     @staticmethod
-    def voice(update):
-        return bool(update.message.voice)
+    def voice(message):
+        return bool(message.voice)
 
     @staticmethod
-    def contact(update):
-        return bool(update.message.contact)
+    def contact(message):
+        return bool(message.contact)
 
     @staticmethod
-    def location(update):
-        return bool(update.message.location)
+    def location(message):
+        return bool(message.location)
 
     @staticmethod
-    def venue(update):
-        return bool(update.message.venue)
+    def venue(message):
+        return bool(message.venue)
 
     @staticmethod
-    def status_update(update):
-        return bool(update.message.new_chat_member or update.message.left_chat_member
-                    or update.message.new_chat_title or update.message.new_chat_photo
-                    or update.message.delete_chat_photo or update.message.group_chat_created
-                    or update.message.supergroup_chat_created
-                    or update.message.channel_chat_created or update.message.migrate_to_chat_id
-                    or update.message.migrate_from_chat_id or update.message.pinned_message)
+    def status_update(message):
+        return bool(message.new_chat_member or message.left_chat_member or message.new_chat_title
+                    or message.new_chat_photo or message.delete_chat_photo
+                    or message.group_chat_created or message.supergroup_chat_created
+                    or message.channel_chat_created or message.migrate_to_chat_id
+                    or message.migrate_from_chat_id or message.pinned_message)
 
 
 class MessageHandler(Handler):
@@ -99,30 +98,34 @@ class MessageHandler(Handler):
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
-        pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
-             be used to insert updates. Default is ``False``.
-        pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
-            instance created by the ``Updater`` which can be used to schedule new jobs.
-            Default is ``False``.
+        allow_edited (Optional[bool]): If the handler should also accept edited messages.
+            Default is ``False``
+        pass_update_queue (optional[bool]): If the handler should be passed the
+            update queue as a keyword argument called ``update_queue``. It can
+            be used to insert updates. Default is ``False``
     """
 
-    def __init__(self, filters, callback, pass_update_queue=False, pass_job_queue=False):
+    def __init__(self, filters, callback, allow_edited=False, pass_update_queue=False, pass_job_queue=False):
         super(MessageHandler, self).__init__(callback,
                                              pass_update_queue=pass_update_queue,
                                              pass_job_queue=pass_job_queue)
         self.filters = filters
+        self.allow_edited = allow_edited
 
     def check_update(self, update):
-        if isinstance(update, Update) and update.message:
+        if (isinstance(update, Update)
+                and (update.message or update.edited_message and self.allow_edited)):
+
             if not self.filters:
                 res = True
+
             else:
-                res = any(func(update) for func in self.filters)
+                message = update.message or update.edited_message
+                res = any(func(message) for func in self.filters)
+
         else:
             res = False
+
         return res
 
     def handle_update(self, update, dispatcher):

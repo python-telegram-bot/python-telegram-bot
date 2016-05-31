@@ -34,6 +34,8 @@ class CommandHandler(Handler):
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
+        allow_edited (Optional[bool]): If the handler should also accept edited messages.
+            Default is ``False``
         pass_args (optional[bool]): If the handler should be passed the
             arguments passed to the command as a keyword argument called `
             ``args``. It will contain a list of strings, which is the text
@@ -51,6 +53,7 @@ class CommandHandler(Handler):
     def __init__(self,
                  command,
                  callback,
+                 allow_edited=False,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
@@ -58,18 +61,27 @@ class CommandHandler(Handler):
                                              pass_update_queue=pass_update_queue,
                                              pass_job_queue=pass_job_queue)
         self.command = command
+        self.allow_edited = allow_edited
         self.pass_args = pass_args
 
     def check_update(self, update):
-        return (isinstance(update, Update) and update.message and update.message.text
-                and update.message.text.startswith('/')
-                and update.message.text[1:].split(' ')[0].split('@')[0] == self.command)
+        if (isinstance(update, Update)
+                and (update.message or update.edited_message and self.allow_edited)):
+            message = update.message or update.edited_message
+
+            return (message.text and message.text.startswith('/')
+                    and message.text[1:].split(' ')[0].split('@')[0] == self.command)
+
+        else:
+            return False
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)
 
+        message = update.message or update.edited_message
+
         if self.pass_args:
-            optional_args['args'] = update.message.text.split(' ')[1:]
+            optional_args['args'] = message.text.split(' ')[1:]
 
         self.callback(dispatcher.bot, update, **optional_args)
 

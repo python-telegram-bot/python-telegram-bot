@@ -32,7 +32,7 @@ class Venue(TelegramObject):
         foursquare_id (Optional[str]):
     """
 
-    def __init__(self, location, title, address, foursquare_id=None):
+    def __init__(self, location, title, address, foursquare_id=None, **kwargs):
         # Required
         self.location = location
         self.title = title

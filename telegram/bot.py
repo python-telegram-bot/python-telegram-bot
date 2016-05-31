@@ -19,13 +19,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a object that represents a Telegram Bot."""
 
-import logging
 import functools
+import logging
 
-from telegram import (User, Message, Update, UserProfilePhotos, File, ReplyMarkup, TelegramObject,
-                      NullHandler)
+from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
+                      ReplyMarkup, TelegramObject, NullHandler)
+from telegram.error import InvalidToken
 from telegram.utils import request
-from telegram.utils.validate import validate_token
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -48,7 +48,7 @@ class Bot(TelegramObject):
     """
 
     def __init__(self, token, base_url=None, base_file_url=None):
-        self.token = validate_token(token)
+        self.token = self._validate_token(token)
 
         if not base_url:
             self.base_url = 'https://api.telegram.org/bot{0}'.format(self.token)
@@ -63,6 +63,18 @@ class Bot(TelegramObject):
         self.bot = None
 
         self.logger = logging.getLogger(__name__)
+
+    @staticmethod
+    def _validate_token(token):
+        """a very basic validation on token"""
+        if any(x.isspace() for x in token):
+            raise InvalidToken()
+
+        left, sep, _right = token.partition(':')
+        if (not sep) or (not left.isdigit()) or (len(left) < 3):
+            raise InvalidToken()
+
+        return token
 
     def info(func):
 
@@ -142,7 +154,7 @@ class Bot(TelegramObject):
         return decorator
 
     @log
-    def getMe(self):
+    def getMe(self, **kwargs):
         """A simple method for testing your bot's auth token.
 
         Returns:
@@ -1170,31 +1182,27 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=.2):
+    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=5., **kwargs):
         """Use this method to receive incoming updates using long polling.
 
         Args:
-          offset:
-            Identifier of the first update to be returned. Must be greater by
-            one than the highest among the identifiers of previously received
-            updates. By default, updates starting with the earliest unconfirmed
-            update are returned. An update is considered confirmed as soon as
-            getUpdates is called with an offset higher than its update_id.
-          limit:
-            Limits the number of updates to be retrieved. Values between 1-100
-            are accepted. Defaults to 100.
-          timeout:
-            Timeout in seconds for long polling. Defaults to 0, i.e. usual
-            short polling.
-          network_delay:
-            Additional timeout in seconds to allow the response from Telegram
-            to take some time when using long polling. Defaults to 2, which
-            should be enough for most connections. Increase it if it takes very
-            long for data to be transmitted from and to the Telegram servers.
+          offset (Optional[int]):
+            Identifier of the first update to be returned. Must be greater by  one than the highest
+            among the identifiers of previously received updates. By default, updates starting with
+            the earliest unconfirmed update are returned. An update is considered confirmed as soon
+            as getUpdates is called with an offset higher than its update_id.
+          limit (Optional[int]):
+            Limits the number of updates to be retrieved. Values between 1-100 are accepted.
+            Defaults to 100.
+          timeout (Optional[int]):
+            Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling.
+          network_delay (Optional[float]):
+            Additional timeout in seconds to allow the response from Telegram servers. This should
+            cover network latency around the globe, SSL handshake and slowness of the Telegram
+            servers (which unfortunately happens a lot recently - 2016-05-28). Defaults to 5.
 
         Returns:
-            list[:class:`telegram.Update`]: A list of :class:`telegram.Update`
-            objects are returned.
+            list[:class:`telegram.Update`]
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1259,6 +1267,166 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
+    def leaveChat(self, chat_id, **kwargs):
+        """Use this method for your bot to leave a group, supergroup or
+        channel.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '{0}/leaveChat'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return result
+
+    @log
+    def getChat(self, chat_id, **kwargs):
+        """Use this method to get up to date information about the chat
+        (current name of the user for one-on-one conversations, current
+        username of a user, group or channel, etc.).
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            :class:`telegram.Chat`: On success, :class:`telegram.Chat` is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '{0}/getChat'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return Chat.de_json(result)
+
+    @log
+    def getChatAdministrators(self, chat_id, **kwargs):
+        """Use this method to get a list of administrators in a chat. On
+        success, returns an Array of ChatMember objects that contains
+        information about all chat administrators except other bots. If the
+        chat is a group or a supergroup and no administrators were appointed,
+        only the creator will be returned.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            list[:class:`telegram.ChatMember`]: On success, a list of
+            :class:`telegram.ChatMember` objects are returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '{0}/getChatAdministrators'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return [ChatMember.de_json(x) for x in result]
+
+    @log
+    def getChatMembersCount(self, chat_id, **kwargs):
+        """Use this method to get the number of members in a chat.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            int: On success, an `int` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '{0}/getChatMembersCount'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return result
+
+    @log
+    def getChatMember(self, chat_id, user_id, **kwargs):
+        """Use this method to get information about a member of a chat.
+
+        Args:
+          chat_id:
+            Unique identifier for the target chat or username of the target
+            channel (in the format @channelusername).
+          user_id:
+            Unique identifier of the target user.
+
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            :class:`telegram.ChatMember`: On success,
+            :class:`telegram.ChatMember` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '{0}/getChatMember'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'user_id': user_id}
+
+        result = request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return ChatMember.de_json(result)
+
     @staticmethod
     def de_json(data):
         data = super(Bot, Bot).de_json(data)
@@ -1302,3 +1470,8 @@ class Bot(TelegramObject):
     edit_message_reply_markup = editMessageReplyMarkup
     get_updates = getUpdates
     set_webhook = setWebhook
+    leave_chat = leaveChat
+    get_chat = getChat
+    get_chat_administrators = getChatAdministrators
+    get_chat_member = getChatMember
+    get_chat_members_count = getChatMembersCount
