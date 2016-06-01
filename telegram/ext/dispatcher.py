@@ -73,11 +73,11 @@ def run_async(func):
     #       set a threading.Event to notify caller thread
 
     @wraps(func)
-    def async_func(*pargs, **kwargs):
+    def async_func(*args, **kwargs):
         """
         A wrapper to run a function in a thread
         """
-        ASYNC_QUEUE.put((func, pargs, kwargs))
+        ASYNC_QUEUE.put((func, args, kwargs))
 
     return async_func
 
