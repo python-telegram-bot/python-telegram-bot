@@ -47,6 +47,9 @@ def _get_con_pool():
         ])
     return _CON_POOL
 
+def is_con_pool_initialized():
+    return _CON_POOL is not None
+
 
 def _parse(json_data):
     """Try and parse the JSON returned from Telegram.

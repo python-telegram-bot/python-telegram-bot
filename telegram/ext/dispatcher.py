@@ -24,6 +24,8 @@ from threading import Thread, Lock, Event, current_thread
 from time import sleep
 from queue import Queue, Empty
 
+from future.builtins import range
+
 from telegram import (TelegramError, NullHandler)
 from telegram.utils import request
 from telegram.ext.handler import Handler
@@ -109,8 +111,9 @@ class Dispatcher(object):
         self.__exception_event = exception_event or Event()
 
         if not len(ASYNC_THREADS):
-            if request._CON_POOL:
-                self.logger.warning("Connection Pool already initialized!")
+            if request.is_con_pool_initialized():
+                raise RuntimeError('Connection Pool already initialized')
+
             request.CON_POOL_SIZE = workers + 3
             for i in range(workers):
                 thread = Thread(target=_pooled, name=str(i))
