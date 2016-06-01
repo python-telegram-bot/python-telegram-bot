@@ -33,10 +33,11 @@ CON_POOL_SIZE = 1
 
 
 def _get_con_pool():
+    global _CON_POOL
+
     if _CON_POOL is not None:
         return _CON_POOL
 
-    global _CON_POOL
     _CON_POOL = urllib3.HTTPSConnectionPool(
         host='api.telegram.org',
         maxsize=CON_POOL_SIZE,
