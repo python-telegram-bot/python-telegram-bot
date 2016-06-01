@@ -31,24 +31,24 @@ from telegram.utils.deprecate import deprecate
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
-async_queue = Queue()
-async_threads = set()
+ASYNC_QUEUE = Queue()
+ASYNC_THREADS = set()
 """:type: set[Thread]"""
-async_lock = Lock()
+ASYNC_LOCK = Lock()
 DEFAULT_GROUP = 0
 
 
-def pooled():
+def _pooled():
     """
     A wrapper to run a thread in a thread pool
     """
     while True:
         try:
-            func, args, kwargs = async_queue.get()
+            func, args, kwargs = ASYNC_QUEUE.get()
 
         except TypeError:
             logging.debug("Closing run_async thread %s/%d" %
-                          (current_thread().getName(), len(async_threads)))
+                          (current_thread().getName(), len(ASYNC_THREADS)))
             break
 
         try:
@@ -77,7 +77,7 @@ def run_async(func):
         """
         A wrapper to run a function in a thread
         """
-        async_queue.put((func, pargs, kwargs))
+        ASYNC_QUEUE.put((func, pargs, kwargs))
 
     return async_func
 
@@ -108,13 +108,13 @@ class Dispatcher(object):
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
 
-        if not len(async_threads):
+        if not len(ASYNC_THREADS):
             if request._CON_POOL:
                 self.logger.warning("Connection Pool already initialized!")
             request.CON_POOL_SIZE = workers + 3
             for i in range(workers):
-                thread = Thread(target=pooled, name=str(i))
-                async_threads.add(thread)
+                thread = Thread(target=_pooled, name=str(i))
+                ASYNC_THREADS.add(thread)
                 thread.start()
         else:
             self.logger.debug('Thread pool already initialized, skipping.')

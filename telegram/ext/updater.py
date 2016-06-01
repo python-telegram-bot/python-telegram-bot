@@ -372,12 +372,12 @@ class Updater(object):
         self.dispatcher.stop()
 
     def _join_async_threads(self):
-        with dispatcher.async_lock:
-            threads = list(dispatcher.async_threads)
+        with dispatcher.ASYNC_LOCK:
+            threads = list(dispatcher.ASYNC_THREADS)
         total = len(threads)
 
         for i in range(total):
-            dispatcher.async_queue.put(0)
+            dispatcher.ASYNC_QUEUE.put(0)
 
         for i, thr in enumerate(threads):
             self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i, total))
