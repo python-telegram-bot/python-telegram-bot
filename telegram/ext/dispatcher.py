@@ -42,7 +42,7 @@ def _pooled():
     """
     A wrapper to run a thread in a thread pool
     """
-    while True:
+    while 1:
         try:
             func, args, kwargs = ASYNC_QUEUE.get()
 
