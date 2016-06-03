@@ -35,15 +35,14 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.photo_file = open('tests/data/telegram.jpg', 'rb')
-        self.photo_file_id = 'AgADAQADvb8xGx8j9QcpZDKxYoFK3bfX1i8ABFX_dgMWoKDuQugAAgI'
+        self.photo_file_id = 'AgADAQADgEsyGx8j9QfmDMmwkPBrFcKRzy8ABHW8ul9nW7FoNHYBAAEC'
         self.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
         self.width = 300
         self.height = 300
         self.thumb = {
             'width': 90,
             'height': 90,
-            'file_id':
-            'AgADAQADvb8xGx8j9QcpZDKxYoFK3bfX1i8ABBxRLXFhLnhIQ-gAAgI',
+            'file_id': 'AgADAQADgEsyGx8j9QfmDMmwkPBrFcKRzy8ABD64nkFkjujeNXYBAAEC',
             'file_size': 1478
         }
         self.file_size = 10209
