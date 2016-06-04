@@ -1009,6 +1009,7 @@ class Bot(TelegramObject):
         return result
 
     @log
+    @message
     def editMessageText(self,
                         text,
                         chat_id=None,
@@ -1016,7 +1017,6 @@ class Bot(TelegramObject):
                         inline_message_id=None,
                         parse_mode=None,
                         disable_web_page_preview=None,
-                        reply_markup=None,
                         **kwargs):
         """Use this method to edit text messages sent by the bot or via the bot
         (for inline bots).
@@ -1043,6 +1043,10 @@ class Bot(TelegramObject):
             A JSON-serialized object for an inline keyboard.
 
         Keyword Args:
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
 
@@ -1070,15 +1074,8 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
-        if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
-
-        return Message.de_json(result)
+        return url, data
 
     @log
     @message
