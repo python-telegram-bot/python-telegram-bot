@@ -1,3 +1,10 @@
+**2016-06-10**
+
+*Released 4.2.1*
+
+- Fix ``CallbackQuery.to_dict()`` bug (thanks to @jlmadurga)
+- Fix ``editMessageText`` exception when receiving a ``CallbackQuery``
+
 **2016-05-28**
 
 *Released 4.2*
