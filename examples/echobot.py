@@ -43,13 +43,10 @@ def echo(bot):
         # chat_id is required to reply to any message
         chat_id = update.message.chat_id
         update_id = update.update_id + 1
-        if not update.message:  # we ignore updates without messages
-            continue
-        message = update.message.text
 
-        if message:
+        if update.message:  # your bot can receive updates without messages
             # Reply to the message
-            bot.sendMessage(chat_id=chat_id, text=message)
+            bot.sendMessage(chat_id=chat_id, text=update.message.text)
 
 
 if __name__ == '__main__':
