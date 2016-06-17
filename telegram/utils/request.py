@@ -29,6 +29,7 @@ from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
 
 _CON_POOL = None
+""":type: urllib3.HTTPSConnectionPool"""
 CON_POOL_SIZE = 1
 
 
