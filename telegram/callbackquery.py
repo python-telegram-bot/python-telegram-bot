@@ -43,3 +43,14 @@ class CallbackQuery(TelegramObject):
         data['message'] = Message.de_json(data.get('message'))
 
         return CallbackQuery(**data)
+
+    def to_dict(self):
+        """
+        Returns:
+            dict:
+        """
+        data = super(CallbackQuery, self).to_dict()
+
+        # Required
+        data['from'] = data.pop('from_user', None)
+        return data
