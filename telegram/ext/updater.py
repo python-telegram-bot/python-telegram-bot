@@ -346,7 +346,7 @@ class Updater(object):
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running:
+            if self.running or dispatcher.ASYNC_THREADS:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
