@@ -49,8 +49,17 @@ def _get_con_pool():
         ])
     return _CON_POOL
 
+
 def is_con_pool_initialized():
     return _CON_POOL is not None
+
+
+def stop_con_pool():
+    global _CON_POOL
+    if _CON_POOL is not None:
+        _CON_POOL.close()
+        _CON_POOL = None
+
 
 
 def _parse(json_data):

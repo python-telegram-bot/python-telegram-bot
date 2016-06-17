@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # encoding: utf-8
 #
@@ -31,6 +32,7 @@ else:
 
 sys.path.append('.')
 
+from telegram.utils.request import stop_con_pool
 from telegram.ext import JobQueue, Updater
 from tests.base import BaseTest
 
@@ -58,6 +60,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     def tearDown(self):
         if self.jq is not None:
             self.jq.stop()
+        stop_con_pool()
 
     def job1(self, bot):
         self.result += 1

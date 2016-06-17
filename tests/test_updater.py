@@ -48,6 +48,7 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Bot
+from telegram.utils.request import stop_con_pool
 from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
@@ -84,6 +85,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def tearDown(self):
         if self.updater is not None:
             self.updater.stop()
+        stop_con_pool()
 
     def reset(self):
         self.message_count = 0
