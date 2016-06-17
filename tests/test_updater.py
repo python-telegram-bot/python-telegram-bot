@@ -639,8 +639,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertFalse(self.updater.running)
 
     def test_createBot(self):
-        updater = Updater('123:abcd')
-        self.assertIsNotNone(updater.bot)
+        self.updater = Updater('123:abcd')
+        self.assertIsNotNone(self.updater.bot)
 
     def test_mutualExclusiveTokenBot(self):
         bot = Bot('123:zyxw')
