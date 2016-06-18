@@ -79,6 +79,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.lock = Lock()
 
     def _setup_updater(self, *args, **kwargs):
+        stop_con_pool()
         bot = MockBot(*args, **kwargs)
         self.updater = Updater(workers=2, bot=bot)
 
