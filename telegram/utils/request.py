@@ -39,13 +39,12 @@ def _get_con_pool():
     if _CON_POOL is not None:
         return _CON_POOL
 
-    _CON_POOL = urllib3.PoolManager(
-        maxsize=CON_POOL_SIZE,
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where(),
-        socket_options=HTTPConnection.default_socket_options + [
-            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-        ])
+    _CON_POOL = urllib3.PoolManager(maxsize=CON_POOL_SIZE,
+                                    cert_reqs='CERT_REQUIRED',
+                                    ca_certs=certifi.where(),
+                                    socket_options=HTTPConnection.default_socket_options + [
+                                        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+                                    ])
     return _CON_POOL
 
 
@@ -58,7 +57,6 @@ def stop_con_pool():
     if _CON_POOL is not None:
         _CON_POOL.clear()
         _CON_POOL = None
-
 
 
 def _parse(json_data):
