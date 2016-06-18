@@ -29,7 +29,7 @@ from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
 
 _CON_POOL = None
-""":type: urllib3.HTTPSConnectionPool"""
+""":type: urllib3.PoolManager"""
 CON_POOL_SIZE = 1
 
 
@@ -39,8 +39,7 @@ def _get_con_pool():
     if _CON_POOL is not None:
         return _CON_POOL
 
-    _CON_POOL = urllib3.HTTPSConnectionPool(
-        host='api.telegram.org',
+    _CON_POOL = urllib3.PoolManager(
         maxsize=CON_POOL_SIZE,
         cert_reqs='CERT_REQUIRED',
         ca_certs=certifi.where(),
@@ -57,7 +56,7 @@ def is_con_pool_initialized():
 def stop_con_pool():
     global _CON_POOL
     if _CON_POOL is not None:
-        _CON_POOL.close()
+        _CON_POOL.clear()
         _CON_POOL = None
 
 
