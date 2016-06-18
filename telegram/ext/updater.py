@@ -285,10 +285,9 @@ class Updater(object):
     def _check_ssl_cert(self, cert, key):
         # Check SSL-Certificate with openssl, if possible
         try:
-            exit_code = subprocess.call(
-                ["openssl", "x509", "-text", "-noout", "-in", cert],
-                stdout=open(os.devnull, 'wb'),
-                stderr=subprocess.STDOUT)
+            exit_code = subprocess.call(["openssl", "x509", "-text", "-noout", "-in", cert],
+                                        stdout=open(os.devnull, 'wb'),
+                                        stderr=subprocess.STDOUT)
         except OSError:
             exit_code = 0
         if exit_code is 0:
