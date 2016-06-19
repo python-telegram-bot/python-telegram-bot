@@ -125,9 +125,9 @@ class InputFile(object):
 
         # Add input_file to upload
         form.extend([
-            form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' %
-            (self.input_name, self.filename), 'Content-Type: %s' % self.mimetype, '',
-            self.input_file_content
+            form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' % (
+                self.input_name, self.filename
+            ), 'Content-Type: %s' % self.mimetype, '', self.input_file_content
         ])
 
         form.append('--' + self.boundary + '--')
