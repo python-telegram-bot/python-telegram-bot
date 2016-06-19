@@ -36,7 +36,7 @@ logging.getLogger(__name__).addHandler(NullHandler())
 ASYNC_QUEUE = Queue()
 ASYNC_THREADS = set()
 """:type: set[Thread]"""
-ASYNC_LOCK = Lock()
+ASYNC_LOCK = Lock()  # guards ASYNC_THREADS
 DEFAULT_GROUP = 0
 
 
@@ -48,16 +48,17 @@ def _pooled():
         try:
             func, args, kwargs = ASYNC_QUEUE.get()
 
+        # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
         except TypeError:
-            logging.debug("Closing run_async thread %s/%d" %
-                          (current_thread().getName(), len(ASYNC_THREADS)))
+            logging.getLogger(__name__).debug("Closing run_async thread %s/%d" %
+                                              (current_thread().getName(), len(ASYNC_THREADS)))
             break
 
         try:
             func(*args, **kwargs)
 
         except:
-            logging.exception("Async function raised exception")
+            logging.getLogger(__name__).exception("run_async function raised exception")
 
 
 def run_async(func):
@@ -110,17 +111,18 @@ class Dispatcher(object):
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
 
-        if not len(ASYNC_THREADS):
-            if request.is_con_pool_initialized():
-                raise RuntimeError('Connection Pool already initialized')
+        with ASYNC_LOCK:
+            if not ASYNC_THREADS:
+                if request.is_con_pool_initialized():
+                    raise RuntimeError('Connection Pool already initialized')
 
-            request.CON_POOL_SIZE = workers + 3
-            for i in range(workers):
-                thread = Thread(target=_pooled, name=str(i))
-                ASYNC_THREADS.add(thread)
-                thread.start()
-        else:
-            self.logger.debug('Thread pool already initialized, skipping.')
+                request.CON_POOL_SIZE = workers + 3
+                for i in range(workers):
+                    thread = Thread(target=_pooled, name=str(i))
+                    ASYNC_THREADS.add(thread)
+                    thread.start()
+            else:
+                self.logger.debug('Thread pool already initialized, skipping.')
 
     def start(self):
         """
@@ -140,7 +142,7 @@ class Dispatcher(object):
         self.running = True
         self.logger.debug('Dispatcher started')
 
-        while True:
+        while 1:
             try:
                 # Pop update from update queue.
                 update = self.update_queue.get(True, 1)
@@ -154,7 +156,7 @@ class Dispatcher(object):
                 continue
 
             self.logger.debug('Processing Update: %s' % update)
-            self.processUpdate(update)
+            self.process_update(update)
 
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
@@ -169,7 +171,7 @@ class Dispatcher(object):
                 sleep(0.1)
             self.__stop_event.clear()
 
-    def processUpdate(self, update):
+    def process_update(self, update):
         """
         Processes a single update.
 
@@ -179,7 +181,7 @@ class Dispatcher(object):
 
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.dispatchError(None, update)
+            self.dispatch_error(None, update)
 
         else:
             for group in self.groups:
@@ -194,7 +196,7 @@ class Dispatcher(object):
                                          'Update.')
 
                         try:
-                            self.dispatchError(update, te)
+                            self.dispatch_error(update, te)
                         except Exception:
                             self.logger.exception('An uncaught error was raised while '
                                                   'handling the error')
@@ -280,7 +282,7 @@ class Dispatcher(object):
         if callback in self.error_handlers:
             self.error_handlers.remove(callback)
 
-    def dispatchError(self, update, error):
+    def dispatch_error(self, update, error):
         """
         Dispatches an error.
 

@@ -285,9 +285,10 @@ class Updater(object):
     def _check_ssl_cert(self, cert, key):
         # Check SSL-Certificate with openssl, if possible
         try:
-            exit_code = subprocess.call(["openssl", "x509", "-text", "-noout", "-in", cert],
-                                        stdout=open(os.devnull, 'wb'),
-                                        stderr=subprocess.STDOUT)
+            exit_code = subprocess.call(
+                ["openssl", "x509", "-text", "-noout", "-in", cert],
+                stdout=open(os.devnull, 'wb'),
+                stderr=subprocess.STDOUT)
         except OSError:
             exit_code = 0
         if exit_code is 0:
@@ -308,7 +309,7 @@ class Updater(object):
 
     def _bootstrap(self, max_retries, clean, webhook_url, cert=None):
         retries = 0
-        while True:
+        while 1:
 
             try:
                 if clean:
@@ -353,9 +354,8 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                # async threads must be join()ed only after the dispatcher
-                # thread was joined, otherwise we can still have new async
-                # threads dispatched
+                # async threads must be join()ed only after the dispatcher thread was joined,
+                # otherwise we can still have new async threads dispatched
                 self._join_async_threads()
 
     def _stop_httpd(self):
@@ -373,16 +373,17 @@ class Updater(object):
     def _join_async_threads(self):
         with dispatcher.ASYNC_LOCK:
             threads = list(dispatcher.ASYNC_THREADS)
-        total = len(threads)
+            total = len(threads)
 
-        for i in range(total):
-            dispatcher.ASYNC_QUEUE.put(0)
+            # Stop all threads in the thread pool by put()ting one non-tuple per thread
+            for i in range(total):
+                dispatcher.ASYNC_QUEUE.put(None)
 
-        for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
-            thr.join()
-            dispatcher.ASYNC_THREADS.remove(thr)
-            self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
+            for i, thr in enumerate(threads):
+                self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
+                thr.join()
+                dispatcher.ASYNC_THREADS.remove(thr)
+                self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
 
     def _join_threads(self):
         for thr in self.__threads:
