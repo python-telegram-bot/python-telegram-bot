@@ -20,6 +20,7 @@
 
 import json
 import socket
+import logging
 
 import certifi
 import urllib3
@@ -31,6 +32,8 @@ from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
 _CON_POOL = None
 """:type: urllib3.PoolManager"""
 CON_POOL_SIZE = 1
+
+logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
 def _get_con_pool():
@@ -99,7 +102,7 @@ def _request_wrapper(*args, **kwargs):
         raise TimedOut()
     except urllib3.exceptions.HTTPError as error:
         # HTTPError must come last as its the base urllib3 exception class
-        # TODO: do something smart here; for now just raise NetowrkError
+        # TODO: do something smart here; for now just raise NetworkError
         raise NetworkError('urllib3 HTTPError {0}'.format(error))
 
     if 200 <= resp.status <= 299:
