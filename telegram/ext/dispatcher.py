@@ -20,22 +20,45 @@
 
 import logging
 from functools import wraps
-from threading import Thread, BoundedSemaphore, Lock, Event, current_thread
+from threading import Thread, Lock, Event, current_thread
 from time import sleep
+from queue import Queue, Empty
 
-from queue import Empty
+from future.builtins import range
 
 from telegram import (TelegramError, NullHandler)
+from telegram.utils import request
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import deprecate
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
-semaphore = None
-async_threads = set()
+ASYNC_QUEUE = Queue()
+ASYNC_THREADS = set()
 """:type: set[Thread]"""
-async_lock = Lock()
+ASYNC_LOCK = Lock()  # guards ASYNC_THREADS
 DEFAULT_GROUP = 0
+
+
+def _pooled():
+    """
+    A wrapper to run a thread in a thread pool
+    """
+    while 1:
+        try:
+            func, args, kwargs = ASYNC_QUEUE.get()
+
+        # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
+        except TypeError:
+            logging.getLogger(__name__).debug("Closing run_async thread %s/%d" %
+                                              (current_thread().getName(), len(ASYNC_THREADS)))
+            break
+
+        try:
+            func(*args, **kwargs)
+
+        except:
+            logging.getLogger(__name__).exception("run_async function raised exception")
 
 
 def run_async(func):
@@ -53,30 +76,11 @@ def run_async(func):
     #       set a threading.Event to notify caller thread
 
     @wraps(func)
-    def pooled(*pargs, **kwargs):
-        """
-        A wrapper to run a thread in a thread pool
-        """
-        try:
-            result = func(*pargs, **kwargs)
-        finally:
-            semaphore.release()
-
-            with async_lock:
-                async_threads.remove(current_thread())
-        return result
-
-    @wraps(func)
-    def async_func(*pargs, **kwargs):
+    def async_func(*args, **kwargs):
         """
         A wrapper to run a function in a thread
         """
-        thread = Thread(target=pooled, args=pargs, kwargs=kwargs)
-        semaphore.acquire()
-        with async_lock:
-            async_threads.add(thread)
-        thread.start()
-        return thread
+        ASYNC_QUEUE.put((func, args, kwargs))
 
     return async_func
 
@@ -112,11 +116,18 @@ class Dispatcher(object):
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
 
-        global semaphore
-        if not semaphore:
-            semaphore = BoundedSemaphore(value=workers)
-        else:
-            self.logger.debug('Semaphore already initialized, skipping.')
+        with ASYNC_LOCK:
+            if not ASYNC_THREADS:
+                if request.is_con_pool_initialized():
+                    raise RuntimeError('Connection Pool already initialized')
+
+                request.CON_POOL_SIZE = workers + 3
+                for i in range(workers):
+                    thread = Thread(target=_pooled, name=str(i))
+                    ASYNC_THREADS.add(thread)
+                    thread.start()
+            else:
+                self.logger.debug('Thread pool already initialized, skipping.')
 
     def start(self):
         """
@@ -136,7 +147,7 @@ class Dispatcher(object):
         self.running = True
         self.logger.debug('Dispatcher started')
 
-        while True:
+        while 1:
             try:
                 # Pop update from update queue.
                 update = self.update_queue.get(True, 1)
@@ -150,7 +161,7 @@ class Dispatcher(object):
                 continue
 
             self.logger.debug('Processing Update: %s' % update)
-            self.processUpdate(update)
+            self.process_update(update)
 
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
@@ -165,7 +176,7 @@ class Dispatcher(object):
                 sleep(0.1)
             self.__stop_event.clear()
 
-    def processUpdate(self, update):
+    def process_update(self, update):
         """
         Processes a single update.
 
@@ -175,7 +186,7 @@ class Dispatcher(object):
 
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.dispatchError(None, update)
+            self.dispatch_error(None, update)
 
         else:
             for group in self.groups:
@@ -190,7 +201,7 @@ class Dispatcher(object):
                                          'Update.')
 
                         try:
-                            self.dispatchError(update, te)
+                            self.dispatch_error(update, te)
                         except Exception:
                             self.logger.exception('An uncaught error was raised while '
                                                   'handling the error')
@@ -276,7 +287,7 @@ class Dispatcher(object):
         if callback in self.error_handlers:
             self.error_handlers.remove(callback)
 
-    def dispatchError(self, update, error):
+    def dispatch_error(self, update, error):
         """
         Dispatches an error.
 
