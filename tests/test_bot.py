@@ -20,6 +20,7 @@
 """This module contains a object that represents Tests for Telegram Bot"""
 
 import io
+import re
 from datetime import datetime
 import sys
 
@@ -211,10 +212,11 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testLeaveChat(self):
-        with self.assertRaisesRegexp(telegram.error.BadRequest, 'Chat not found'):
+        regex = re.compile('chat not found', re.IGNORECASE)
+        with self.assertRaisesRegexp(telegram.error.BadRequest, regex):
             chat = self._bot.leaveChat(-123456)
 
-        with self.assertRaisesRegexp(telegram.error.NetworkError, 'Chat not found'):
+        with self.assertRaisesRegexp(telegram.error.NetworkError, regex):
             chat = self._bot.leaveChat(-123456)
 
     @flaky(3, 1)

@@ -18,29 +18,56 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests"""
 
-import functools
 import json
 import socket
-from ssl import SSLError
+import logging
 
-from future.moves.http.client import HTTPException
-from future.moves.urllib.error import HTTPError, URLError
-from future.moves.urllib.request import urlopen, urlretrieve, Request
+import certifi
+import urllib3
+from urllib3.connection import HTTPConnection
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
 
+_CON_POOL = None
+""":type: urllib3.PoolManager"""
+CON_POOL_SIZE = 1
+
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+
+def _get_con_pool():
+    global _CON_POOL
+
+    if _CON_POOL is not None:
+        return _CON_POOL
+
+    _CON_POOL = urllib3.PoolManager(maxsize=CON_POOL_SIZE,
+                                    cert_reqs='CERT_REQUIRED',
+                                    ca_certs=certifi.where(),
+                                    socket_options=HTTPConnection.default_socket_options + [
+                                        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+                                    ])
+    return _CON_POOL
+
+
+def is_con_pool_initialized():
+    return _CON_POOL is not None
+
+
+def stop_con_pool():
+    global _CON_POOL
+    if _CON_POOL is not None:
+        _CON_POOL.clear()
+        _CON_POOL = None
+
 
 def _parse(json_data):
-    """Try and parse the JSON returned from Telegram and return an empty
-    dictionary if there is any error.
-
-    Args:
-      url:
-        urllib.urlopen object
+    """Try and parse the JSON returned from Telegram.
 
     Returns:
-      A JSON parsed as Python dict with results.
+        dict: A JSON parsed as Python dict with results - on error this dict will be empty.
+
     """
     decoded_s = json_data.decode('utf-8')
     try:
@@ -54,53 +81,49 @@ def _parse(json_data):
     return data['result']
 
 
-def _try_except_req(func):
-    """Decorator for requests to handle known exceptions"""
+def _request_wrapper(*args, **kwargs):
+    """Wraps urllib3 request for handling known exceptions.
 
-    @functools.wraps(func)
-    def decorator(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
+    Args:
+        args: unnamed arguments, passed to urllib3 request.
+        kwargs: keyword arguments, passed tp urllib3 request.
 
-        except HTTPError as error:
-            # `HTTPError` inherits from `URLError` so `HTTPError` handling must
-            # come first.
-            errcode = error.getcode()
+    Returns:
+        str: A non-parsed JSON text.
 
-            try:
-                message = _parse(error.read())
+    Raises:
+        TelegramError
 
-                if errcode in (401, 403):
-                    raise Unauthorized()
-                elif errcode == 400:
-                    raise BadRequest(message)
-                elif errcode == 502:
-                    raise NetworkError('Bad Gateway')
-            except ValueError:
-                message = 'Unknown HTTPError {0}'.format(error.getcode())
+    """
 
-            raise NetworkError('{0} ({1})'.format(message, errcode))
+    try:
+        resp = _get_con_pool().request(*args, **kwargs)
+    except urllib3.exceptions.TimeoutError as error:
+        raise TimedOut()
+    except urllib3.exceptions.HTTPError as error:
+        # HTTPError must come last as its the base urllib3 exception class
+        # TODO: do something smart here; for now just raise NetworkError
+        raise NetworkError('urllib3 HTTPError {0}'.format(error))
 
-        except URLError as error:
-            raise NetworkError('URLError: {0}'.format(error.reason))
+    if 200 <= resp.status <= 299:
+        # 200-299 range are HTTP success statuses
+        return resp.data
 
-        except (SSLError, socket.timeout) as error:
-            err_s = str(error)
-            if 'operation timed out' in err_s:
-                raise TimedOut()
+    try:
+        message = _parse(resp.data)
+    except ValueError:
+        raise NetworkError('Unknown HTTPError {0}'.format(resp.status))
 
-            raise NetworkError(err_s)
-
-        except HTTPException as error:
-            raise NetworkError('HTTPException: {0!r}'.format(error))
-
-        except socket.error as error:
-            raise NetworkError('socket.error: {0!r}'.format(error))
-
-    return decorator
+    if resp.status in (401, 403):
+        raise Unauthorized()
+    elif resp.status == 400:
+        raise BadRequest(repr(message))
+    elif resp.status == 502:
+        raise NetworkError('Bad Gateway')
+    else:
+        raise NetworkError('{0} ({1})'.format(message, resp.status))
 
 
-@_try_except_req
 def get(url):
     """Request an URL.
     Args:
@@ -109,13 +132,13 @@ def get(url):
 
     Returns:
       A JSON object.
+
     """
-    result = urlopen(url).read()
+    result = _request_wrapper('GET', url)
 
     return _parse(result)
 
 
-@_try_except_req
 def post(url, data, timeout=None):
     """Request an URL.
     Args:
@@ -142,16 +165,17 @@ def post(url, data, timeout=None):
 
     if InputFile.is_inputfile(data):
         data = InputFile(data)
-        request = Request(url, data=data.to_form(), headers=data.headers)
+        result = _request_wrapper('POST', url, body=data.to_form(), headers=data.headers)
     else:
         data = json.dumps(data)
-        request = Request(url, data=data.encode(), headers={'Content-Type': 'application/json'})
+        result = _request_wrapper('POST',
+                                  url,
+                                  body=data.encode(),
+                                  headers={'Content-Type': 'application/json'})
 
-    result = urlopen(request, **urlopen_kwargs).read()
     return _parse(result)
 
 
-@_try_except_req
 def download(url, filename):
     """Download a file by its URL.
     Args:
@@ -160,6 +184,8 @@ def download(url, filename):
 
       filename:
         The filename within the path to download the file.
-    """
 
-    urlretrieve(url, filename)
+    """
+    buf = _request_wrapper('GET', url)
+    with open(filename, 'wb') as fobj:
+        fobj.write(buf)

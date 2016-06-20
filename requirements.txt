@@ -1,1 +1,3 @@
-future
+future>=0.15.2
+urllib3>=1.8.3
+certifi
