@@ -85,6 +85,9 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             update = Update.de_json(json.loads(json_string))
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
             self.server.update_queue.put(update)
+    
+    def log_message(self, format, *args):
+        return
 
     def _validate_post(self):
         if not (self.path == self.server.webhook_path and 'content-type' in self.headers and
