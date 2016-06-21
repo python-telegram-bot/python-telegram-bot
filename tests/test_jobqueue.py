@@ -152,7 +152,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.assertEqual(2, self.result)
 
     def test_jobs_tuple(self):
-
+        self.jq.stop()
         jobs = tuple(Job(self.job1, t) for t in range(5, 25))
 
         for job in jobs:
