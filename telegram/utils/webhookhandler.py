@@ -87,6 +87,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.server.update_queue.put(update)
     
     def log_message(self, format, *args):
+        self.logger.debug(format % args)
         return
 
     def _validate_post(self):
