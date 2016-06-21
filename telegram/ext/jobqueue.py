@@ -25,8 +25,7 @@ from queue import PriorityQueue
 
 
 class JobQueue(object):
-    """
-    This class allows you to periodically perform tasks with the bot.
+    """This class allows you to periodically perform tasks with the bot.
 
     Attributes:
         queue (PriorityQueue):
@@ -47,8 +46,7 @@ class JobQueue(object):
         self._running = False
 
     def put(self, job, next_t=None, prevent_autostart=False):
-        """
-        Queue a new job. If the JobQueue is not running, it will be started.
+        """Queue a new job. If the JobQueue is not running, it will be started.
 
         Args:
             job (Job): The ``Job`` instance representing the new job
@@ -56,8 +54,8 @@ class JobQueue(object):
                 Defaults to ``job.interval``
             prevent_autostart (Optional[bool]): If ``True``, the job queue will not be started
                 automatically if it is not running. Defaults to ``False``
-        """
 
+        """
         job.job_queue = self
 
         if next_t is None:
@@ -66,7 +64,7 @@ class JobQueue(object):
         now = time.time()
         next_t += now
 
-        self.logger.debug('Putting a %s with t=%f' % (job.name, next_t))
+        self.logger.debug('Putting job %s with t=%f', job.name, next_t)
         self.queue.put((next_t, job))
 
         # Wake up the loop if this job should be executed next
@@ -80,35 +78,36 @@ class JobQueue(object):
 
     def tick(self):
         """
-        Run all jobs that are due and re-enqueue them with their interval
+        Run all jobs that are due and re-enqueue them with their interval.
+
         """
         now = time.time()
 
-        self.logger.debug('Ticking jobs with t=%f' % now)
+        self.logger.debug('Ticking jobs with t=%f', now)
 
         while not self.queue.empty():
             t, job = self.queue.queue[0]
-            self.logger.debug('Peeked at %s with t=%f' % (job.name, t))
+            self.logger.debug('Peeked at %s with t=%f', job.name, t)
 
             if t <= now:
                 self.queue.get()
 
                 if job._remove.is_set():
-                    self.logger.debug('Removing job %s' % job.name)
+                    self.logger.debug('Removing job %s', job.name)
                     continue
 
                 elif job.enabled:
-                    self.logger.debug('Running job %s' % job.name)
+                    self.logger.debug('Running job %s', job.name)
 
                     try:
                         job.run(self.bot)
 
                     except:
                         self.logger.exception(
-                            'An uncaught error was raised while executing job %s' % job.name)
+                            'An uncaught error was raised while executing job %s', job.name)
 
                 else:
-                    self.logger.debug('Skipping disabled job %s' % job.name)
+                    self.logger.debug('Skipping disabled job %s', job.name)
 
                 if job.repeat:
                     self.put(job)
@@ -127,6 +126,7 @@ class JobQueue(object):
     def start(self):
         """
         Starts the job_queue thread.
+
         """
         self.__lock.acquire()
 
@@ -135,7 +135,7 @@ class JobQueue(object):
             self.__lock.release()
             job_queue_thread = Thread(target=self._start, name="job_queue")
             job_queue_thread.start()
-            self.logger.debug('Job Queue thread started')
+            self.logger.debug('%s thread started', self.__class__.__name__)
 
         else:
             self.__lock.release()
@@ -144,8 +144,8 @@ class JobQueue(object):
         """
         Thread target of thread ``job_queue``. Runs in background and performs ticks on the job
         queue.
-        """
 
+        """
         while self._running:
             self.__tick.wait(self._next_peek and self._next_peek - time.time())
 
@@ -156,7 +156,7 @@ class JobQueue(object):
 
             self.tick()
 
-        self.logger.debug('Job Queue thread stopped')
+        self.logger.debug('%s thread stopped', self.__class__.__name__)
 
     def stop(self):
         """
@@ -215,6 +215,7 @@ class Job(object):
         """
         Schedules this job for removal from the ``JobQueue``. It will be removed without executing
         its callback function again.
+
         """
         self._remove.set()
 
