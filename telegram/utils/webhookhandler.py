@@ -87,7 +87,9 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.server.update_queue.put(update)
     
     def log_message(self, format, *args):
-        self.logger.debug(format % args)
+        # The client ip address and current date and time are prefixed 
+        # to every message logged by original function 
+        self.logger.debug(('%s - - ' + format) % (client_address[0], args))
         return
 
     def _validate_post(self):
