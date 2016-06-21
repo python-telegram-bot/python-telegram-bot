@@ -39,7 +39,7 @@ class JobQueue(object):
     def __init__(self, bot):
         self.queue = PriorityQueue()
         self.bot = bot
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.__lock = Lock()
         self.__tick = Event()
         self._next_peek = None
