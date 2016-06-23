@@ -22,6 +22,7 @@ import logging
 
 from telegram import Update
 from telegram.ext import Handler
+from telegram.utils.promise import Promise
 
 
 class ConversationHandler(Handler):
@@ -110,6 +111,10 @@ class ConversationHandler(Handler):
 
         key = (chat.id, user.id) if chat else (None, user.id)
         state = self.conversations.get(key)
+
+        if isinstance(state, Promise):
+            self.logger.debug('waiting for promise...')
+            state = state.result()
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
 

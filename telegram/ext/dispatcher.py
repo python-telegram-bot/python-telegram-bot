@@ -30,6 +30,7 @@ from telegram import (TelegramError, NullHandler)
 from telegram.utils import request
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import deprecate
+from telegram.utils.promise import Promise
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
@@ -45,17 +46,16 @@ def _pooled():
     A wrapper to run a thread in a thread pool
     """
     while 1:
-        try:
-            func, args, kwargs = ASYNC_QUEUE.get()
+        promise = ASYNC_QUEUE.get()
 
         # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
-        except TypeError:
+        if not isinstance(promise, Promise):
             logging.getLogger(__name__).debug("Closing run_async thread %s/%d" %
                                               (current_thread().getName(), len(ASYNC_THREADS)))
             break
 
         try:
-            func(*args, **kwargs)
+            promise.run()
 
         except:
             logging.getLogger(__name__).exception("run_async function raised exception")
@@ -80,7 +80,9 @@ def run_async(func):
         """
         A wrapper to run a function in a thread
         """
-        ASYNC_QUEUE.put((func, args, kwargs))
+        promise = Promise(func, args, kwargs)
+        ASYNC_QUEUE.put(promise)
+        return promise
 
     return async_func
 
