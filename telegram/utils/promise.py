@@ -28,7 +28,7 @@ class Promise(object):
         self.pooled_function = pooled_function
         self.args = args
         self.kwargs = kwargs
-        self._done = Event()
+        self.done = Event()
         self._result = None
 
     def run(self):
@@ -39,8 +39,8 @@ class Promise(object):
             raise
 
         finally:
-            self._done.set()
+            self.done.set()
 
     def result(self, timeout=None):
-        self._done.wait(timeout=timeout)
+        self.done.wait(timeout=timeout)
         return self._result
