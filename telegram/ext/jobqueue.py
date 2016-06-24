@@ -128,8 +128,8 @@ class JobQueue(object):
                     job.run(self.bot)
 
                 except:
-                    self.logger.exception(
-                        'An uncaught error was raised while executing job %s', job.name)
+                    self.logger.exception('An uncaught error was raised while executing job %s',
+                                          job.name)
 
             else:
                 self.logger.debug('Skipping disabled job %s', job.name)
