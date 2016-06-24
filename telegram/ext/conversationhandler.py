@@ -27,7 +27,7 @@ from telegram.utils.promise import Promise
 
 class ConversationHandler(Handler):
     """
-    A handler to hold a conversation with a user by managing three collections of other handlers.
+    A handler to hold a conversation with a user by managing four collections of other handlers.
 
     The first collection, a ``list`` named ``entry_points``, is used to initiate the conversation,
     for example with a ``CommandHandler`` or ``RegexHandler``.
@@ -43,34 +43,64 @@ class ConversationHandler(Handler):
     a regular text message is expected. You could use this for a ``/cancel`` command or to let the
     user know their message was not recognized.
 
+    The fourth, optional collection of handlers, a ``list`` named ``timed_out_behavior`` is used if
+    the wait for ``run_async`` takes longer than defined in ``run_async_timeout``. For example,
+    you can let the user know that they should wait for a bit before they can continue.
+
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. To end the conversation, the callback function must
-    return ``CallbackHandler.END`` or -1.
+    return ``CallbackHandler.END`` or ``-1``.
 
     Args:
         entry_points (list): A list of ``Handler`` objects that can trigger the start of the
-            conversation.
+            conversation. The first handler which ``check_update`` method returns ``True`` will be
+            used. If all return ``False``, the update is not handled.
         states (dict): A ``dict[object: list[Handler]]`` that defines the different states of
             conversation a user can be in and one or more associated ``Handler`` objects that
             should be used in that state. The first handler which ``check_update`` method returns
             ``True`` will be used.
         fallbacks (list): A list of handlers that might be used if the user is in a conversation,
             but every handler for their current state returned ``False`` on ``check_update``.
+            The first handler which ``check_update`` method returns ``True`` will be used. If all
+            return ``False``, the update is not handled.
         allow_reentry (Optional[bool]): If set to ``True``, a user that is currently in a
             conversation can restart the conversation by triggering one of the entry points.
+        run_async_timeout (Optional[float]): If the previous handler for this user was running
+            asynchronously using the ``run_async`` decorator, it might not be finished when the
+            next message arrives. This timeout defines how long the conversation handler should
+            wait for the next state to be computed. The default is ``None`` which means it will
+            wait indefinitely.
+        timed_out_behavior (Optional[list]): A list of handlers that might be used if
+            the wait for ``run_async`` timed out. The first handler which ``check_update`` method
+            returns ``True`` will be used. If all return ``False``, the update is not handled.
+
     """
 
     END = -1
 
-    def __init__(self, entry_points, states, fallbacks, allow_reentry=False):
+    def __init__(self,
+                 entry_points,
+                 states,
+                 fallbacks,
+                 allow_reentry=False,
+                 run_async_timeout=None,
+                 timed_out_behavior=None):
+
         self.entry_points = entry_points
         """:type: list[telegram.ext.Handler]"""
+
         self.states = states
         """:type: dict[str: telegram.ext.Handler]"""
+
         self.fallbacks = fallbacks
         """:type: list[telegram.ext.Handler]"""
+
         self.allow_reentry = allow_reentry
+        self.run_async_timeout = run_async_timeout
+
+        self.timed_out_behavior = timed_out_behavior
+        """:type: list[telegram.ext.Handler]"""
 
         self.conversations = dict()
         """:type: dict[(int, int): str]"""
@@ -112,9 +142,26 @@ class ConversationHandler(Handler):
         key = (chat.id, user.id) if chat else (None, user.id)
         state = self.conversations.get(key)
 
+        # Resolve promises
         if isinstance(state, Promise):
             self.logger.debug('waiting for promise...')
-            state = state.result()
+            state.result(timeout=self.run_async_timeout)
+
+            if state.done.is_set():
+                self.update_state(state.result())
+                state = self.conversations.get(key)
+
+            else:
+                for candidate in (self.timed_out_behavior or []):
+                    if candidate.check_update(update):
+                        # Save the current user and the selected handler for handle_update
+                        self.current_conversation = key
+                        self.current_handler = candidate
+
+                        return True
+
+                else:
+                    return False
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
 
@@ -160,6 +207,9 @@ class ConversationHandler(Handler):
 
         new_state = self.current_handler.handle_update(update, dispatcher)
 
+        self.update_state(new_state)
+
+    def update_state(self, new_state):
         if new_state == self.END:
             del self.conversations[self.current_conversation]
         elif new_state is not None:
