@@ -117,10 +117,10 @@ class Bot(TelegramObject):
 
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
-            logger.debug('Entering: %s', func.__name__)
+            #logger.debug('Entering: %s', func.__name__)
             result = func(self, *args, **kwargs)
             logger.debug(result)
-            logger.debug('Exiting: %s', func.__name__)
+            #logger.debug('Exiting: %s', func.__name__)
             return result
 
         return decorator

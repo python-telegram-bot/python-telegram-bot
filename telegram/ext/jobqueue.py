@@ -89,10 +89,10 @@ class JobQueue(object):
         """
         now = time.time()
 
-        self.logger.debug('Ticking jobs with t=%f' % now)
+        #self.logger.debug('Ticking jobs with t=%f' % now)
         while not self.queue.empty():
             t, j = self.queue.queue[0]
-            self.logger.debug('Peeked at %s with t=%f' % (j.name, t))
+            #self.logger.debug('Peeked at %s with t=%f' % (j.name, t))
 
             if t < now:
                 self.queue.get()
@@ -106,7 +106,7 @@ class JobQueue(object):
                     self.put(j.run, j.interval)
                 continue
 
-            self.logger.debug('Next task isn\'t due yet. Finished!')
+            #self.logger.debug('Next task isn\'t due yet. Finished!')
             break
 
     def start(self):
