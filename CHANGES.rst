@@ -1,3 +1,11 @@
+**2016-06-28**
+
+*Released 4.3*
+
+- Use ``urllib3.PoolManager`` for connection re-use
+- Rewrite ``run_async`` decorator to re-use threads
+- New requirements: ``urllib3`` and ``certifi``
+
 **2016-06-10**
 
 *Released 4.2.1*
