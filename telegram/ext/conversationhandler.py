@@ -143,12 +143,14 @@ class ConversationHandler(Handler):
         state = self.conversations.get(key)
 
         # Resolve promises
-        if isinstance(state, Promise):
+        if isinstance(state, tuple):
             self.logger.debug('waiting for promise...')
-            state.result(timeout=self.run_async_timeout)
 
-            if state.done.is_set():
-                self.update_state(state.result())
+            old_state, new_state = state
+            new_state.result(timeout=self.run_async_timeout)
+
+            if new_state.done.is_set():
+                self.update_state(new_state.result(), key)
                 state = self.conversations.get(key)
 
             else:
@@ -207,10 +209,17 @@ class ConversationHandler(Handler):
 
         new_state = self.current_handler.handle_update(update, dispatcher)
 
-        self.update_state(new_state)
+        self.update_state(new_state, self.current_conversation)
 
-    def update_state(self, new_state):
+    def update_state(self, new_state, key):
         if new_state == self.END:
-            del self.conversations[self.current_conversation]
+            del self.conversations[key]
+
+        elif isinstance(new_state, Promise):
+            self.conversations[key] = (self.conversations[key], new_state)
+
         elif new_state is not None:
-            self.conversations[self.current_conversation] = new_state
+            self.conversations[key] = new_state
+
+        elif isinstance(self.conversations[key], tuple):
+            self.conversations[key] = self.conversations[key][0]
