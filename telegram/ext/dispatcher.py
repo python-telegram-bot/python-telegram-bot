@@ -94,11 +94,16 @@ class Dispatcher(object):
             handlers
         update_queue (Queue): The synchronized queue that will contain the
             updates.
+        job_queue (Optional[telegram.ext.JobQueue]): The ``JobQueue`` instance to pass onto handler
+            callbacks
+        workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
+            decorator
     """
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
         self.update_queue = update_queue
+        self.job_queue = job_queue
 
         self.handlers = {}
         """:type: dict[int, list[Handler]"""
