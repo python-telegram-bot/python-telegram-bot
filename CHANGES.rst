@@ -1,3 +1,9 @@
+**2016-06-29**
+
+*Released 4.3.1*
+
+- Update wrong requirement: ``urllib3>=1.10``
+
 **2016-06-28**
 
 *Released 4.3*
