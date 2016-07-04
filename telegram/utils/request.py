@@ -171,7 +171,8 @@ def post(url, data, timeout=None):
         result = _request_wrapper('POST',
                                   url,
                                   body=data.encode(),
-                                  headers={'Content-Type': 'application/json'})
+                                  headers={'Content-Type': 'application/json'},
+                                  **urlopen_kwargs)
 
     return _parse(result)
 
