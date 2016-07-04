@@ -1,3 +1,9 @@
+**2016-07-04**
+
+*Released 4.3.2*
+
+- Fix: Use ``timeout`` parameter in all API methods
+
 **2016-06-29**
 
 *Released 4.3.1*
