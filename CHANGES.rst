@@ -1,3 +1,9 @@
+**2016-07-08**
+
+*Released 4.3.3*
+
+- Fix proxy support with ``urllib3``
+
 **2016-07-04**
 
 *Released 4.3.2*

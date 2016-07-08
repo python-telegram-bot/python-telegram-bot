@@ -82,7 +82,7 @@ from .update import Update
 from .bot import Bot
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '4.3.2'
+__version__ = '4.3.3'
 __all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult',
            'CallbackQuery', 'Contact', 'Document', 'Emoji', 'File', 'ForceReply',
            'InlineKeyboardButton', 'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult',
