@@ -19,6 +19,7 @@
 """This module contains methods to make POST and GET requests"""
 
 import json
+import os
 import socket
 import logging
 
@@ -31,24 +32,39 @@ from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
 
 _CON_POOL = None
 """:type: urllib3.PoolManager"""
+_CON_POOL_PROXY = None
+_CON_POOL_PROXY_KWARGS = {}
 CON_POOL_SIZE = 1
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 
 def _get_con_pool():
-    global _CON_POOL
-
     if _CON_POOL is not None:
         return _CON_POOL
 
-    _CON_POOL = urllib3.PoolManager(maxsize=CON_POOL_SIZE,
-                                    cert_reqs='CERT_REQUIRED',
-                                    ca_certs=certifi.where(),
-                                    socket_options=HTTPConnection.default_socket_options + [
-                                        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-                                    ])
+    _init_con_pool()
     return _CON_POOL
+
+
+def _init_con_pool():
+    global _CON_POOL
+    kwargs = dict(maxsize=CON_POOL_SIZE,
+                  cert_reqs='CERT_REQUIRED',
+                  ca_certs=certifi.where(),
+                  socket_options=HTTPConnection.default_socket_options + [
+                      (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+                  ])
+    proxy_url = _get_con_pool_proxy()
+    if not proxy_url:
+        mgr = urllib3.PoolManager
+    else:
+        kwargs['proxy_url'] = proxy_url
+        if _CON_POOL_PROXY_KWARGS:
+            kwargs.update(_CON_POOL_PROXY_KWARGS)
+        mgr = urllib3.ProxyManager
+
+    _CON_POOL = mgr(**kwargs)
 
 
 def is_con_pool_initialized():
@@ -60,6 +76,47 @@ def stop_con_pool():
     if _CON_POOL is not None:
         _CON_POOL.clear()
         _CON_POOL = None
+
+
+def set_con_pool_proxy(url, **urllib3_kwargs):
+    """Setup connection pool behind a proxy
+
+    Args:
+        url (str): The URL to the proxy server. For example: `http://127.0.0.1:3128`
+        urllib3_kwargs (dict): Arbitrary arguments passed as-is to `urllib3.ProxyManager`
+
+    """
+    global _CON_POOL_PROXY
+    global _CON_POOL_PROXY_KWARGS
+
+    if is_con_pool_initialized():
+        raise TelegramError('conpool already initialized')
+
+    _CON_POOL_PROXY = url
+    _CON_POOL_PROXY_KWARGS = urllib3_kwargs
+
+
+def _get_con_pool_proxy():
+    """Return the user configured proxy according to the following order:
+
+      * proxy configured using `set_con_pool_proxy()`.
+      * proxy set in `HTTPS_PROXY` env. var.
+      * proxy set in `https_proxy` env. var.
+      * None (if no proxy is configured)
+
+      Returns:
+          str | None
+
+    """
+    if _CON_POOL_PROXY:
+        return _CON_POOL_PROXY
+    from_env = os.environ.get('HTTPS_PROXY')
+    if from_env:
+        return from_env
+    from_env = os.environ.get('https_proxy')
+    if from_env:
+        return from_env
+    return None
 
 
 def _parse(json_data):
