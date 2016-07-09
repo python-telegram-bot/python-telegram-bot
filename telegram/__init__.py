@@ -80,6 +80,7 @@ from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
 from .update import Update
 from .bot import Bot
+from .constants import MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH
 
 __author__ = 'devs@python-telegram-bot.org'
 __version__ = '4.3.3'
@@ -99,7 +100,7 @@ __all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResu
            'KeyboardButton', 'Location', 'Message', 'MessageEntity', 'NullHandler', 'ParseMode',
            'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup', 'ReplyMarkup', 'Sticker',
            'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
-           'Video', 'Voice']
+           'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH']
 
 if version_info < (2, 7):
     from warnings import warn
