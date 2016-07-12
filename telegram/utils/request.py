@@ -57,14 +57,17 @@ def _init_con_pool():
                   ])
     proxy_url = _get_con_pool_proxy()
     if not proxy_url:
-        mgr = urllib3.PoolManager
+        mgr = urllib3.PoolManager(**kwargs)
     else:
-        kwargs['proxy_url'] = proxy_url
         if _CON_POOL_PROXY_KWARGS:
             kwargs.update(_CON_POOL_PROXY_KWARGS)
-        mgr = urllib3.ProxyManager
+        mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
+        if mgr.proxy.auth:
+            # TODO: what about other auth types?
+            auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
+            mgr.proxy_headers.update(auth_hdrs)
 
-    _CON_POOL = mgr(**kwargs)
+    _CON_POOL = mgr
 
 
 def is_con_pool_initialized():
