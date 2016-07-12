@@ -114,7 +114,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         string contains any % escapes requiring parameters, they should be specified as subsequent
         arguments (it's just like printf!).
 
-        The client ip and current date/time are prefixed to every message.
+        The client ip is prefixed to every message.
         """
 
         self.logger.debug("%s - - %s" % (self.address_string(), format % args))
