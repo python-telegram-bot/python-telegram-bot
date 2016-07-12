@@ -121,6 +121,11 @@ class Dispatcher(object):
                 if request.is_con_pool_initialized():
                     raise RuntimeError('Connection Pool already initialized')
 
+                # we need a connection pool the size of:
+                # * for each of the workers
+                # * 1 for Dispatcher
+                # * 1 for polling Updater (even if updater is webhook, we can spare a connection)
+                # * 1 for JobQueue
                 request.CON_POOL_SIZE = workers + 3
                 for i in range(workers):
                     thread = Thread(target=_pooled, name=str(i))
