@@ -102,3 +102,19 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         if clen < 0:
             raise _InvalidPost(403)
         return clen
+
+    def log_message(self, format, *args):
+        """Log an arbitrary message.
+
+        This is used by all other logging functions.
+
+        It overrides ``BaseHTTPRequestHandler.log_message``, which logs to ``sys.stderr``.
+
+        The first argument, FORMAT, is a format string for the message to be logged.  If the format
+        string contains any % escapes requiring parameters, they should be specified as subsequent
+        arguments (it's just like printf!).
+
+        The client ip is prefixed to every message.
+        """
+
+        self.logger.debug("%s - - %s" % (self.address_string(), format % args))
