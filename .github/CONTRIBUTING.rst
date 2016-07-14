@@ -153,7 +153,7 @@ Specific commandments
 AssertEqual argument order
 ######################
 
-assertEqual method's arguments should be in ('actual', 'expected') order.
+- assertEqual method's arguments should be in ('actual', 'expected') order.
 
 Properly calling callables
 #######################
