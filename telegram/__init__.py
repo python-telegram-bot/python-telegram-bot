@@ -86,7 +86,7 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
                         MAX_MESSAGES_PER_MINUTE_PER_GROUP)
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '4.3.4'
+__version__ = '5.0.0'
 __all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult',
            'CallbackQuery', 'Contact', 'Document', 'Emoji', 'File', 'ForceReply',
            'InlineKeyboardButton', 'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult',

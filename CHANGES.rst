@@ -1,6 +1,14 @@
-==============
+=======
 Changes
-==============
+=======
+
+**2016-07-15**
+
+*Released 5.0*
+
+- Rework ``JobQueue``
+- Introduce ``ConversationHandler``
+
 **2016-07-12**
 
 *Released 4.3.4*
