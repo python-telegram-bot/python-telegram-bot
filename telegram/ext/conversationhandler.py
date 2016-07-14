@@ -143,7 +143,7 @@ class ConversationHandler(Handler):
         state = self.conversations.get(key)
 
         # Resolve promises
-        if isinstance(state, tuple):
+        if isinstance(state, tuple) and len(state) is 2 and isinstance(state[1], Promise):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
@@ -220,6 +220,3 @@ class ConversationHandler(Handler):
 
         elif new_state is not None:
             self.conversations[key] = new_state
-
-        elif isinstance(self.conversations[key], tuple):
-            self.conversations[key] = self.conversations[key][0]
