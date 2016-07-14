@@ -24,7 +24,6 @@ import logging
 import sys
 from time import sleep
 
-
 if sys.version_info[0:2] == (2, 6):
     import unittest2 as unittest
 else:
@@ -71,16 +70,15 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.updater = None
         self.current_state = dict()
-        self.entry_points =[CommandHandler('start', self.start)]
-        self.states = {self.THIRSTY:  [CommandHandler('brew',           self.brew),
-                                       CommandHandler('wait',           self.start)],
-                       self.BREWING:  [CommandHandler('pourCoffee',     self.drink)],
-                       self.DRINKING: [CommandHandler('startCoding',    self.code),
-                                       CommandHandler('drinkMore',      self.drink)],
-                       self.CODING:   [CommandHandler('keepCoding',     self.code),
-                                       CommandHandler('gettingThirsty', self.start),
-                                       CommandHandler('drinkMore',      self.drink)],
-                       }
+        self.entry_points = [CommandHandler('start', self.start)]
+        self.states = {self.THIRSTY: [CommandHandler('brew', self.brew),
+                                      CommandHandler('wait', self.start)],
+                       self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+                       self.DRINKING: [CommandHandler('startCoding', self.code),
+                                       CommandHandler('drinkMore', self.drink)],
+                       self.CODING: [CommandHandler('keepCoding', self.code),
+                                     CommandHandler('gettingThirsty', self.start),
+                                     CommandHandler('drinkMore', self.drink)],}
         self.fallbacks = [CommandHandler('eat', self.start)]
 
     def _setup_updater(self, *args, **kwargs):
@@ -98,7 +96,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
 
     # State handlers
     def _set_state(self, update, state):
-        self.current_state[update.message.from_user.id]= state
+        self.current_state[update.message.from_user.id] = state
         return state
 
     def _get_state(self, user_id):
