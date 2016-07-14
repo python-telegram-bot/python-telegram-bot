@@ -63,11 +63,13 @@ class Handler(object):
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. It should also be overridden, but in most
-        cases call self.callback(dispatcher.bot, update), possibly along with
-        optional arguments.
+        cases call ``self.callback(dispatcher.bot, update)``, possibly along with
+        optional arguments. To work with the ``ConversationHandler``, this method should return the
+        value returned from ``self.callback``
 
         Args:
             update (object): The update to be handled
+            dispatcher (Dispatcher): The dispatcher to collect optional args
 
         """
         raise NotImplementedError

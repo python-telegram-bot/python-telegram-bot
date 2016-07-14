@@ -83,7 +83,7 @@ class CommandHandler(Handler):
         if self.pass_args:
             optional_args['args'] = message.text.split(' ')[1:]
 
-        self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(dispatcher.bot, update, **optional_args)
 
     # old non-PEP8 Handler methods
     m = "telegram.CommandHandler."

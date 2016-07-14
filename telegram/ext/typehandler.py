@@ -65,7 +65,7 @@ class TypeHandler(Handler):
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)
 
-        self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(dispatcher.bot, update, **optional_args)
 
     # old non-PEP8 Handler methods
     m = "telegram.TypeHandler."

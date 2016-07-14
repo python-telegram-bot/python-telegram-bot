@@ -1,7 +1,7 @@
-telegram.ext.handler module
-===========================
+telegram.ext.callbackqueryhandler module
+========================================
 
-.. automodule:: telegram.ext.handler
+.. automodule:: telegram.ext.callbackqueryhandler
     :members:
     :undoc-members:
     :show-inheritance:

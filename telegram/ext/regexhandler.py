@@ -89,7 +89,7 @@ class RegexHandler(Handler):
         if self.pass_groupdict:
             optional_args['groupdict'] = match.groupdict()
 
-        self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(dispatcher.bot, update, **optional_args)
 
     # old non-PEP8 Handler methods
     m = "telegram.RegexHandler."

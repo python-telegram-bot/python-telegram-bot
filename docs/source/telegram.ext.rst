@@ -11,6 +11,7 @@ Submodules
     telegram.ext.jobqueue
     telegram.ext.handler
     telegram.ext.choseninlineresulthandler
+    telegram.ext.conversationhandler
     telegram.ext.commandhandler
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
