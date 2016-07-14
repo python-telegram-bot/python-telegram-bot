@@ -17,10 +17,16 @@
 """Constants in the Telegram network.
 
 Attributes:
-    MAX_MESSAGE_LENGTH (int)
-    MAX_CAPTION_LENGTH (int)
+    MAX_MESSAGE_LENGTH (int): from
+        https://core.telegram.org/method/messages.sendMessage#return-errors
+    MAX_CAPTION_LENGTH (int): from https://core.telegram.org/bots/api#sendphoto
+
+The following constants were extracted from the
+`Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_.
+
+Attributes:
     SUPPORTED_WEBHOOK_PORTS (List[int])
-    MAX_FILESIZE_DOWNLOAD (int)
+    MAX_FILESIZE_DOWNLOAD (int): In bytes.
     MAX_FILESIZE_UPLOAD (int): Official limit, the actual limit can be a bit higher.
     MAX_MESSAGES_PER_SECOND_PER_CHAT (int): Telegram may allow short bursts that go over this
         limit, but eventually you'll begin receiving 429 errors.
@@ -28,15 +34,11 @@ Attributes:
     MAX_MESSAGES_PER_MINUTE_PER_GROUP (int)
 """
 
-# https://core.telegram.org/method/messages.sendMessage
 MAX_MESSAGE_LENGTH = 4096
-
-# https://core.telegram.org/bots/api#sendphoto
 MAX_CAPTION_LENGTH = 200
 
 # constants above this line are tested
 
-# https://core.telegram.org/bots/faq
 SUPPORTED_WEBHOOK_PORTS = [443, 80, 88, 8443]
 MAX_FILESIZE_DOWNLOAD = int(20E6)  # (20MB)
 MAX_FILESIZE_UPLOAD = int(50E6)  # (50MB)
