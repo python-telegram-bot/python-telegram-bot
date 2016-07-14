@@ -1,34 +1,41 @@
 How To Contribute
-=================
+===================
 
 Every open source project lives from the generous help by contributors that sacrifice their time and ``python-telegram-bot`` is no different. To make participation as pleasant as possible, this project adheres to the `Code of Conduct`_ by the Python Software Foundation.
 
 Setting things up
------------------
+-------------------
 
 1. Fork the ``python-telegram-bot`` repository to your GitHub account.
 
 2. Clone your forked repository of ``python-telegram-bot`` to your computer:
 
-   ``$ git clone https://github.com/<your username>/python-telegram-bot``
+   .. code-block:: bash
 
-   ``$ cd python-telegram-bot``
+      $ git clone https://github.com/<your username>/python-telegram-bot
+      $ cd python-telegram-bot
 
 3. Add a track to the original repository:
 
-   ``$ git remote add upstream https://github.com/python-telegram-bot/python-telegram-bot``
+   .. code-block:: bash
+
+      $ git remote add upstream https://github.com/python-telegram-bot/python-telegram-bot
 
 4. Install dependencies:
 
-   ``$ pip install -r requirements.txt -r requirements-dev.txt``
+   .. code-block:: bash
+
+      $ sudo pip install -r requirements.txt -r requirements-dev.txt
 
 
 5. Install pre-commit hooks:
 
-   ``$ pre-commit install``
+   .. code-block:: bash
+
+      $ pre-commit install
 
 Finding something to do
------------------------
+###################
 
 If you already know what you'd like to work on, you can skip this section.
 
@@ -37,7 +44,7 @@ If you have an idea for something to do, first check if it's already been filed 
 Another great way to start contributing is by writing tests. Tests are really important because they help prevent developers from accidentally breaking existing code, allowing them to build cool things faster. If you're interested in helping out, let the development team know by posting to the `developers' mailing list`_, and we'll help you get started.
 
 Instructions for making a code change
--------------------------------------
+####################
 
 The central development branch is ``master``, which should be clean and ready for release at any time. In general, all changes should be done as feature branches based off of ``master``.
 
@@ -47,13 +54,12 @@ Here's how to make a one-off code change.
 
 2. **Create a new branch with this name, starting from** ``master``. In other words, run:
 
-   ``$ git fetch upstream``
+   .. code-block:: bash
 
-   ``$ git checkout master``
-
-   ``$ git merge upstream/master``
-
-   ``$ git checkout -b your-branch-name``
+      $ git fetch upstream
+      $ git checkout master
+      $ git merge upstream/master
+      $ git checkout -b your-branch-name
 
 3. **Make a commit to your feature branch**. Each commit should be self-contained and have a descriptive commit message that helps other developers understand why the changes were made.
 
@@ -75,19 +81,27 @@ Here's how to make a one-off code change.
 
    - Before making a commit ensure that all automated tests still pass:
 
-      ``$ make test``
+     .. code-block::
+
+        $ make test
 
    - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 
-      ``$ git add your-file-changed.py``
+     .. code-block:: bash
 
-        - yapf may change code formatting, make sure to re-add them to your commit.
+        $ git add your-file-changed.py
 
-      ``$ git commit -a -m "your-commit-message-here"``
+   - yapf may change code formatting, make sure to re-add them to your commit.
+
+     .. code-block:: bash
+
+      $ git commit -a -m "your-commit-message-here"
 
    - Finally, push it to your GitHub fork, run:
 
-      ``$ git push origin your-branch-name``
+     .. code-block:: bash
+
+      $ git push origin your-branch-name
 
 4. **When your feature is ready to merge, create a pull request.**
 
@@ -107,66 +121,67 @@ Here's how to make a one-off code change.
 
    - Resolve any merge conflicts that arise. To resolve conflicts between 'your-branch-name' (in your fork) and 'master' (in the ``python-telegram-bot`` repository), run:
 
-      ``$ git checkout your-branch-name``
+     .. code-block:: bash
 
-      ``$ git fetch upstream``
-
-      ``$ git merge upstream/master``
-
-      ``$ ...[fix the conflicts]...``
-
-      ``$ ...[make sure the tests pass before committing]...``
-
-      ``$ git commit -a``
-
-      ``$ git push origin your-branch-name``
+      	$ git checkout your-branch-name
+      	$ git fetch upstream
+	$ git merge upstream/master
+      	$ ...[fix the conflicts]...
+      	$ ...[make sure the tests pass before committing]...
+      	$ git commit -a
+      	$ git push origin your-branch-name
 
    - At the end, the reviewer will merge the pull request.
 
 6. **Tidy up!** Delete the feature branch from both your local clone and the GitHub repository:
 
-   ``$ git branch -D your-branch-name``
+   .. code-block:: bash
 
-   ``$ git push origin --delete your-branch-name``
+      $ git branch -D your-branch-name
+      $ git push origin --delete your-branch-name
 
 7. **Celebrate.** Congratulations, you have contributed to ``python-telegram-bot``!
 
 Style commandments
-==================
+---------------------
 
 Specific commandments
----------------------
+#####################
 
 - Avoid using "double quotes" where you can reasonably use 'single quotes'.
 
 AssertEqual argument order
---------------------------
+######################
 
 assertEqual method's arguments should be in ('actual', 'expected') order.
 
 Properly calling callables
---------------------------
+#######################
 
 Methods, functions and classes can specify optional parameters (with default
 values) using Python's keyword arg syntax. When providing a value to such a
-callable we prefer that the call also uses keyword arg syntax. For example::
+callable we prefer that the call also uses keyword arg syntax. For example:
 
-    # GOOD
-    f(0, optional=True)
+.. code-block:: python
 
-    # BAD
-    f(0, True)
+   # GOOD
+   f(0, optional=True)
+
+   # BAD
+   f(0, True)
 
 This gives us the flexibility to re-order arguments and more importantly
 to add new required arguments. It's also more explicit and easier to read.
 
 Properly defining optional arguments
-------------------------------------
+########################
 
-It's always good to not initialize optional arguments at class creation, 
-instead use ``**kwargs`` to get them. It's well known Telegram API can 
-change without notice, in that case if a new argument is added it won't 
-break the API classes. For example::
+It's always good to not initialize optional arguments at class creation,
+instead use ``**kwargs`` to get them. It's well known Telegram API can
+change without notice, in that case if a new argument is added it won't
+break the API classes. For example:
+
+.. code-block:: python
 
     # GOOD
     def __init__(self, id, name, **kwargs):
@@ -183,4 +198,4 @@ break the API classes. For example::
 .. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
 .. _`Google Python Style Guide`: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 .. _`Google Python Style Docstrings`: http://sphinx-doc.org/latest/ext/example_google.html
-.. _AUTHORS.rst: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/AUTHORS.rst
+.. _AUTHORS.rst: ../AUTHORS.rst
