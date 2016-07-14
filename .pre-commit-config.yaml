@@ -4,7 +4,7 @@
     -   id: yapf
         files: ^(telegram|tests)/.*\.py$
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 6dfcb89af3c9b4d172cc2e5a8a2fa0f54615a338
+    sha: 3fa02652357ff0dbb42b5bc78c673b7bc105fcf3
     hooks:
     -   id: flake8
         files: ^telegram/.*\.py$
