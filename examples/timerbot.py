@@ -34,6 +34,11 @@ def start(bot, update):
     bot.sendMessage(update.message.chat_id, text='Hi! Use /set <seconds> to ' 'set a timer')
 
 
+def alarm(bot, job):
+    """Function to send the alarm message"""
+    bot.sendMessage(job.context, text='Beep!')
+
+
 def set(bot, update, args, job_queue):
     """Adds a job to the queue"""
     chat_id = update.message.chat_id
@@ -43,12 +48,8 @@ def set(bot, update, args, job_queue):
         if due < 0:
             bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
 
-        def alarm(bot, job):
-            """Inner function to send the alarm message"""
-            bot.sendMessage(chat_id, text='Beep!')
-
         # Add job to queue
-        job = Job(alarm, due, repeat=False)
+        job = Job(alarm, due, repeat=False, context=chat_id)
         timers[chat_id] = job
         job_queue.put(job)
 
@@ -68,6 +69,8 @@ def unset(bot, update):
 
     job = timers[chat_id]
     job.schedule_removal()
+    del timers[chat_id]
+
     bot.sendMessage(chat_id, text='Timer successfully unset!')
 
 
