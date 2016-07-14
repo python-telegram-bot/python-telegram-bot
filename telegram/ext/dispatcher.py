@@ -96,11 +96,16 @@ class Dispatcher(object):
             handlers
         update_queue (Queue): The synchronized queue that will contain the
             updates.
+        job_queue (Optional[telegram.ext.JobQueue]): The ``JobQueue`` instance to pass onto handler
+            callbacks
+        workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
+            decorator
     """
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
         self.update_queue = update_queue
+        self.job_queue = job_queue
 
         self.handlers = {}
         """:type: dict[int, list[Handler]"""
@@ -118,6 +123,11 @@ class Dispatcher(object):
                 if request.is_con_pool_initialized():
                     raise RuntimeError('Connection Pool already initialized')
 
+                # we need a connection pool the size of:
+                # * for each of the workers
+                # * 1 for Dispatcher
+                # * 1 for polling Updater (even if updater is webhook, we can spare a connection)
+                # * 1 for JobQueue
                 request.CON_POOL_SIZE = workers + 3
                 for i in range(workers):
                     thread = Thread(target=_pooled, name=str(i))

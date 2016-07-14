@@ -1,3 +1,35 @@
+**2016-07-12**
+
+*Released 4.3.4*
+
+- Fix proxy support with ``urllib3`` when proxy requires auth
+
+**2016-07-08**
+
+*Released 4.3.3*
+
+- Fix proxy support with ``urllib3``
+
+**2016-07-04**
+
+*Released 4.3.2*
+
+- Fix: Use ``timeout`` parameter in all API methods
+
+**2016-06-29**
+
+*Released 4.3.1*
+
+- Update wrong requirement: ``urllib3>=1.10``
+
+**2016-06-28**
+
+*Released 4.3*
+
+- Use ``urllib3.PoolManager`` for connection re-use
+- Rewrite ``run_async`` decorator to re-use threads
+- New requirements: ``urllib3`` and ``certifi``
+
 **2016-06-10**
 
 *Released 4.2.1*
