@@ -159,7 +159,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         message = Message(0, second_user, None, None, text="/brew")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
-        self.assertRaises(KeyError, self._get_state, userid=second_user.id)
+        self.assertRaises(KeyError, self._get_state, user_id=second_user.id)
 
 
 if __name__ == '__main__':
