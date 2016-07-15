@@ -125,9 +125,9 @@ code and building on top of it.
 
 - `inlinebot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_ basic example of an `inline bot <https://core.telegram.org/bots/inline>`_.
 
-- `state machine bot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/state_machine_bot.py>`_ keeps the state for individual users, useful for multipart conversations.
+- `conversationbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.py>`_ uses the `ConversationHandler <https://pythonhosted.org/python-telegram-bot/telegram.ext.conversationhandler.html>`_ to have multipart conversations (modeled as a finite-state machine) with individual users.
 
-- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the ``JobQueue`` to send timed messages.
+- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the `JobQueue <https://pythonhosted.org/python-telegram-bot/telegram.ext.jobqueue.html>`_  to send timed messages.
 
 - `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ uses only the pure API to echo messages.
 
