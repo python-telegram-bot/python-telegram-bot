@@ -135,11 +135,13 @@ def _parse(json_data):
     except ValueError:
         raise TelegramError('Invalid server response')
 
-    if not data.get('ok') and data.get('description'):
-        return data['description']
+    if not data.get('ok'):
+        if data.get('parameters') and data['parameters'].get('migrate_to_chat_id'):
+            raise ChatMigrated(str(data['parameters']['migrate_to_chat_id']))
+        if data.get('description'):
+            return data['description']
 
     return data['result']
-
 
 def _request_wrapper(*args, **kwargs):
     """Wraps urllib3 request for handling known exceptions.

@@ -85,3 +85,6 @@ class TimedOut(NetworkError):
 
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')
+
+class ChatMigrated(TelegramError):
+    pass
