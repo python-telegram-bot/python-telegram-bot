@@ -28,7 +28,7 @@ import urllib3
 from urllib3.connection import HTTPConnection
 
 from telegram import (InputFile, TelegramError)
-from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
+from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated
 
 _CON_POOL = None
 """:type: urllib3.PoolManager"""
