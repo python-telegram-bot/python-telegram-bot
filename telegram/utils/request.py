@@ -136,12 +136,18 @@ def _parse(json_data):
         raise TelegramError('Invalid server response')
 
     if not data.get('ok'):
-        if data.get('parameters') and data['parameters'].get('migrate_to_chat_id'):
-            raise ChatMigrated(str(data['parameters']['migrate_to_chat_id']))
-        if data.get('description'):
-            return data['description']
+        description = data.get('description')
+        parameters = data.get('parameters')
+        if description:
+            if parameters:
+                migrate_to_chat_id = parameters.get('migrate_to_chat_id')
+                if migrate_to_chat_id:
+                    raise ChatMigrated(description, chat_id=int(migrate_to_chat_id))
+            else:
+                return description
 
     return data['result']
+
 
 def _request_wrapper(*args, **kwargs):
     """Wraps urllib3 request for handling known exceptions.

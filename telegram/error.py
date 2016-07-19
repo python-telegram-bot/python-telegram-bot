@@ -39,10 +39,13 @@ def _lstrip_str(in_s, lstr):
 class TelegramError(Exception):
     """This object represents a Telegram Error."""
 
-    def __init__(self, message):
+    def __init__(self, message, **kwargs):
         """
         Args:
             message (str):
+
+        Kwargs:
+            chat_id (int):
 
         Returns:
 
@@ -56,6 +59,7 @@ class TelegramError(Exception):
             # api_error - capitalize the msg...
             msg = msg.capitalize()
         self.message = msg
+        self.chat_id = kwargs.get('chat_id')
 
     def __str__(self):
         return '%s' % (self.message)
@@ -85,6 +89,7 @@ class TimedOut(NetworkError):
 
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')
+
 
 class ChatMigrated(TelegramError):
     pass
