@@ -138,13 +138,12 @@ def _parse(json_data):
     if not data.get('ok'):
         description = data.get('description')
         parameters = data.get('parameters')
+        if parameters:
+            migrate_to_chat_id = parameters.get('migrate_to_chat_id')
+            if migrate_to_chat_id:
+                raise ChatMigrated(migrate_to_chat_id)
         if description:
-            if parameters:
-                migrate_to_chat_id = parameters.get('migrate_to_chat_id')
-                if migrate_to_chat_id:
-                    raise ChatMigrated(description, chat_id=int(migrate_to_chat_id))
-            else:
-                return description
+            return description
 
     return data['result']
 
