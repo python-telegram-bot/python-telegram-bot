@@ -97,5 +97,5 @@ class ChatMigrated(TelegramError):
         Returns:
 
         """
-        super(ChatMigrated, self).__init__('Chat migrated to {0}'.format(new_chat_id))
+        super(ChatMigrated, self).__init__('Chat migrated')
         self.new_chat_id = new_chat_id
