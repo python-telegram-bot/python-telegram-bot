@@ -117,21 +117,11 @@ Learning by example
 
 We believe that the best way to learn and understand this simple package is by example. So here
 are some examples for you to review. Even if it's not your approach for learning, please take a
-look at ``echobot2`` (below), it is de facto the base for most of the bots out there. Best of all,
+look at ``echobot2``, it is de facto the base for most of the bots out there. Best of all,
 the code for these examples are released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
-- `echobot2 <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py>`_ replies back messages.
-
-- `inlinebot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_ basic example of an `inline bot <https://core.telegram.org/bots/inline>`_.
-
-- `conversationbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.py>`_ uses the `ConversationHandler <https://pythonhosted.org/python-telegram-bot/telegram.ext.conversationhandler.html>`_ to have multipart conversations (modeled as a finite-state machine) with individual users.
-
-- `timerbot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_ uses the `JobQueue <https://pythonhosted.org/python-telegram-bot/telegram.ext.jobqueue.html>`_  to send timed messages.
-
-- `echobot <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/legacy/echobot.py>`_ uses only the pure API to echo messages.
-
-Look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
+Visit `this page <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/README.md>`_ to discover the official examples or look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
 
 -------
 Logging
