@@ -2,9 +2,9 @@
 Thanks for reporting issues of python-telegram-bot!
 To make it easier for us to help you please enter detailed information below.
 
-Please note, we only support the latest version of python-telegram-bot. Please
-make sure to upgrade & recreate the issue on the latest version prior to opening
-an issue.
+Please note, we only support the latest version of python-telegram-bot and
+master branch. Please make sure to upgrade & recreate the issue on the latest
+version prior to opening an issue.
 -->
 ### Steps to reproduce
 1.
