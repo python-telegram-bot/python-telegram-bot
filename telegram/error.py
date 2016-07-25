@@ -85,3 +85,17 @@ class TimedOut(NetworkError):
 
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')
+
+
+class ChatMigrated(TelegramError):
+
+    def __init__(self, new_chat_id):
+        """
+        Args:
+            new_chat_id (int):
+
+        Returns:
+
+        """
+        super(ChatMigrated, self).__init__('Chat migrated')
+        self.new_chat_id = new_chat_id

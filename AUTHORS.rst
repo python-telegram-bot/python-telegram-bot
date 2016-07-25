@@ -22,6 +22,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
+- `overquota <https://github.com/overquota>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_

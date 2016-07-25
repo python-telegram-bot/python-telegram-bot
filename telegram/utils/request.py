@@ -28,7 +28,7 @@ import urllib3
 from urllib3.connection import HTTPConnection
 
 from telegram import (InputFile, TelegramError)
-from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest
+from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated
 
 _CON_POOL = None
 """:type: urllib3.PoolManager"""
@@ -135,8 +135,15 @@ def _parse(json_data):
     except ValueError:
         raise TelegramError('Invalid server response')
 
-    if not data.get('ok') and data.get('description'):
-        return data['description']
+    if not data.get('ok'):
+        description = data.get('description')
+        parameters = data.get('parameters')
+        if parameters:
+            migrate_to_chat_id = parameters.get('migrate_to_chat_id')
+            if migrate_to_chat_id:
+                raise ChatMigrated(migrate_to_chat_id)
+        if description:
+            return description
 
     return data['result']
 
