@@ -2,7 +2,7 @@
 """The setup and build script for the python-telegram-bot library."""
 
 import codecs
-import telegram
+import os
 from setuptools import setup, find_packages
 
 
@@ -17,8 +17,10 @@ def requirements():
     return requirements_list
 
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
+    execfile(os.path.join('telegram', 'version.py'))
+
     setup(name='python-telegram-bot',
-          version=telegram.__version__,
+          version=__version__,
           author='Leandro Toledo',
           author_email='devs@python-telegram-bot.org',
           license='LGPLv3',
