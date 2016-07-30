@@ -1178,6 +1178,26 @@ class Bot(TelegramObject):
 
         return url, data
 
+    def create_references(self, d):
+        """
+        Recursively reates a reference to this Bot instance in the dict and all contained dicts and
+        lists of dicts. This reference can then be retrieved in constructors to be used in class
+        methods like ``Message.reply_text``.
+
+        Args:
+            d (dict): The dict to create the references in.
+        """
+
+        for value in d.values():
+            if isinstance(value, list):
+                for item in value:
+                    self.create_references(item)
+
+            elif isinstance(value, dict):
+                self.create_references(value)
+
+        d['bot'] = self
+
     @log
     def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=5., **kwargs):
         """Use this method to receive incoming updates using long polling.
@@ -1221,10 +1241,14 @@ class Bot(TelegramObject):
 
         if result:
             self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
+
         else:
             self.logger.debug('No new updates found.')
 
-        return [Update.de_json(x) for x in result]
+        for u in result:
+            self.create_references(u)
+
+        return [Update.de_json(u) for u in result]
 
     @log
     def setWebhook(self, webhook_url=None, certificate=None, **kwargs):
