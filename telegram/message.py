@@ -140,6 +140,8 @@ class Message(TelegramObject):
         self.channel_chat_created = bool(kwargs.get('channel_chat_created', False))
         self.pinned_message = kwargs.get('pinned_message')
 
+        self.bot = kwargs.get('bot')
+
     @property
     def chat_id(self):
         """int: Short for :attr:`Message.chat.id`"""
@@ -244,3 +246,12 @@ class Message(TelegramObject):
         except AttributeError:
             # Python 3 (< 3.3) and Python 2
             return int(mktime(dt_obj.timetuple()))
+
+    def reply_text(self, *args, **kwargs):
+        """Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``"""
+
+        if not self.bot:
+            raise RuntimeError('Missing reference to telegram.Bot instance. '
+                               'Use telegram.Bot.create_references to create this reference.')
+
+        self.bot.sendMessage(self.chat_id, *args, **kwargs)
