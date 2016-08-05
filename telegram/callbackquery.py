@@ -34,6 +34,8 @@ class CallbackQuery(TelegramObject):
         self.message = kwargs.get('message')
         self.inline_message_id = kwargs.get('inline_message_id', '')
 
+        self.bot = kwargs.get('bot')
+
     @staticmethod
     def de_json(data):
         if not data:
@@ -54,3 +56,8 @@ class CallbackQuery(TelegramObject):
         # Required
         data['from'] = data.pop('from_user', None)
         return data
+
+    def answer(self, *args, **kwargs):
+        """Shortcut for ``bot.answerCallbackQuery(update.callback_query.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.answerCallbackQuery(self.id, *args, **kwargs)

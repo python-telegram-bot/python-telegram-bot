@@ -102,6 +102,7 @@ class Message(TelegramObject):
         migrate_to_chat_id (Optional[int]):
         migrate_from_chat_id (Optional[int]):
         channel_chat_created (Optional[bool]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
     def __init__(self, message_id, from_user, date, chat, **kwargs):
@@ -249,9 +250,65 @@ class Message(TelegramObject):
 
     def reply_text(self, *args, **kwargs):
         """Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
 
-        if not self.bot:
-            raise RuntimeError('Missing reference to telegram.Bot instance. '
-                               'Use telegram.Bot.create_references to create this reference.')
+    def reply_photo(self, *args, **kwargs):
+        """Shortcut for ``bot.sendPhoto(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendPhoto(self.chat_id, *args, **kwargs)
 
-        self.bot.sendMessage(self.chat_id, *args, **kwargs)
+    def reply_audio(self, *args, **kwargs):
+        """Shortcut for ``bot.sendAudio(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendAudio(self.chat_id, *args, **kwargs)
+
+    def reply_document(self, *args, **kwargs):
+        """Shortcut for ``bot.sendDocument(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendDocument(self.chat_id, *args, **kwargs)
+
+    def reply_sticker(self, *args, **kwargs):
+        """Shortcut for ``bot.sendSticker(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendSticker(self.chat_id, *args, **kwargs)
+
+    def reply_video(self, *args, **kwargs):
+        """Shortcut for ``bot.sendVideo(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendVideo(self.chat_id, *args, **kwargs)
+
+    def reply_voice(self, *args, **kwargs):
+        """Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendVoice(self.chat_id, *args, **kwargs)
+
+    def reply_location(self, *args, **kwargs):
+        """Shortcut for ``bot.sendLocation(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendLocation(self.chat_id, *args, **kwargs)
+
+    def reply_venue(self, *args, **kwargs):
+        """Shortcut for ``bot.sendVenue(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendVenue(self.chat_id, *args, **kwargs)
+
+    def reply_contact(self, *args, **kwargs):
+        """Shortcut for ``bot.sendContact(update.message.chat_id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendContact(self.chat_id, *args, **kwargs)
+
+    def forward(self, chat_id, disable_notification=False):
+        """Shortcut for
+
+            bot.forwardMessage(chat_id=chat_id,
+                               from_chat_id=update.message.chat_id,
+                               disable_notification=disable_notification,
+                               message_id=update.message.message_id)
+
+        """
+        self._check_bot_reference()
+        return self.bot.forwardMessage(chat_id=chat_id,
+                                       from_chat_id=self.chat_id,
+                                       disable_notification=disable_notification,
+                                       message_id=self.message_id)

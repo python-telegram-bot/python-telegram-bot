@@ -41,6 +41,7 @@ class User(TelegramObject):
         type (Optional[str]):
         last_name (Optional[str]):
         username (Optional[str]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
     def __init__(self, id, first_name, **kwargs):
@@ -51,6 +52,8 @@ class User(TelegramObject):
         self.type = kwargs.get('type', '')
         self.last_name = kwargs.get('last_name', '')
         self.username = kwargs.get('username', '')
+
+        self.bot = kwargs.get('bot')
 
     @property
     def name(self):
@@ -74,3 +77,10 @@ class User(TelegramObject):
             return None
 
         return User(**data)
+
+    def get_profile_photos(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.getUserProfilePhotos(update.message.from_user.id, *args, **kwargs)``
+        """
+        self._check_bot_reference()
+        return self.bot.getUserProfilePhotos(self.id, *args, **kwargs)

@@ -72,3 +72,8 @@ class TelegramObject(object):
                     data[key] = value
 
         return data
+
+    def _check_bot_reference(self):
+        if not hasattr(self, 'bot'):
+            raise RuntimeError('Missing reference to telegram.Bot instance. '
+                               'Use telegram.Bot.create_references to create this reference.')

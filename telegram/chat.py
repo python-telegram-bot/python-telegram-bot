@@ -40,6 +40,7 @@ class Chat(TelegramObject):
 
     Keyword Args:
         type (Optional[str]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
     PRIVATE = 'private'
@@ -57,6 +58,8 @@ class Chat(TelegramObject):
         self.first_name = kwargs.get('first_name', '')
         self.last_name = kwargs.get('last_name', '')
 
+        self.bot = kwargs.get('bot')
+
     @staticmethod
     def de_json(data):
         """
@@ -70,3 +73,28 @@ class Chat(TelegramObject):
             return None
 
         return Chat(**data)
+
+    def send_action(self, *args, **kwargs):
+        """Shortcut for ``bot.sendChatAction(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.sendChatAction(self.id, *args, **kwargs)
+
+    def leave(self, *args, **kwargs):
+        """Shortcut for ``bot.leaveChat(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.leaveChat(self.id, *args, **kwargs)
+
+    def get_administrators(self, *args, **kwargs):
+        """Shortcut for ``bot.getChatAdministrators(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.getChatAdministrators(self.id, *args, **kwargs)
+
+    def get_members_count(self, *args, **kwargs):
+        """Shortcut for ``bot.getChatMembersCount(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.getChatMembersCount(self.id, *args, **kwargs)
+
+    def get_member(self, *args, **kwargs):
+        """Shortcut for ``bot.getChatMember(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.getChatMember(self.id, *args, **kwargs)

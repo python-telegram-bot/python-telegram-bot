@@ -42,6 +42,7 @@ class InlineQuery(TelegramObject):
 
     Keyword Args:
         location (optional[:class:`telegram.Location`]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
     def __init__(self, id, from_user, query, offset, **kwargs):
@@ -53,6 +54,8 @@ class InlineQuery(TelegramObject):
 
         # Optional
         self.location = kwargs.get('location')
+
+        self.bot = kwargs.get('bot')
 
     @staticmethod
     def de_json(data):
@@ -84,3 +87,8 @@ class InlineQuery(TelegramObject):
         data['from'] = data.pop('from_user', None)
 
         return data
+
+    def answer(self, *args, **kwargs):
+        """Shortcut for ``bot.answerInlineQuery(update.inline_query.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.answerInlineQuery(self.id, *args, **kwargs)
