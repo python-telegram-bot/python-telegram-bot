@@ -3,15 +3,15 @@
 This module contains a simple integration with django.
 
 To install on your django project, you need to register all bots on settings, add one line on
-your urls and create a register method thar will received a dispatcher to add all handlers of
+your urls and create a register method that will received a dispatcher to add all handlers of
 your bot.
 
 ///////// settings.py
 
 TELEGRAM_BOT = [{
     'token': '{YOUR_BOT_TOKEN}',
-    'register': 'myapp.dispatcher.register', // register method that will be called
-    'webhook': 'https://mydomain.com/telegram_webhook/%s' // optional if you use django.sites
+    'register': 'myapp.dispatcher.register',  # register method that will be called
+    'webhook': 'https://mydomain.com/telegram_webhook/%s'  # optional if you use django.sites
 }]
 
 /////////  urls.py file
@@ -35,7 +35,7 @@ def help(bot, update):
 def error(bot, update):
     bot.sendMessage(update.message.chat_id, text='Command not founded.')
 
-// this method will be called on start of application
+# this method will be called on start of application
 def register(dispatcher):
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help))
