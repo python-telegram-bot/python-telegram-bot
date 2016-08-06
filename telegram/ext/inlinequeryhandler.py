@@ -28,7 +28,8 @@ from .handler import Handler
 
 class InlineQueryHandler(Handler):
     """
-    Handler class to handle Telegram inline queries. Optionally based on a regex. Read the documentation of the ``re`` module for more information.
+    Handler class to handle Telegram inline queries. Optionally based on a regex. Read the
+    documentation of the ``re`` module for more information.
 
     Args:
         callback (function): A function that takes ``bot, update`` as
@@ -42,7 +43,8 @@ class InlineQueryHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
             instance created by the ``Updater`` which can be used to schedule new jobs.
             Default is ``False``.
-        pattern (optional[str or Pattern]): Optional regex pattern. If not ``None`` The ``re.match`` function is used to determine if an update should be handled by this handler.
+        pattern (optional[str or Pattern]): Optional regex pattern. If not ``None`` ``re.match``
+            is used to determine if an update should be handled by this handler.
         pass_groups (optional[bool]): If the callback should be passed the
             result of ``re.match(pattern, query).groups()`` as a keyword
             argument called ``groups``. Default is ``False``
