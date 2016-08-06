@@ -47,7 +47,7 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError, User, Chat, Bot
+from telegram import Update, Message, TelegramError, User, Chat, Bot, InlineQuery, CallbackQuery
 from telegram.utils.request import stop_con_pool
 from telegram.ext import *
 from telegram.ext.dispatcher import run_async
@@ -441,6 +441,40 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d.add_handler(handler)
         queue = self.updater.start_polling(0.01)
         queue.put('This is a test message for regex group matching.')
+        sleep(.1)
+        self.assertEqual(self.received_message, (('This', 'regex group'),
+                                                 {'testgroup': 'regex group'}))
+
+    def test_regexGroupHandlerInlineQuery(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = InlineQueryHandler(self.regexGroupHandlerTest,
+                                     pattern='^(This).*?(?P<testgroup>regex group).*',
+                                     pass_groupdict=True,
+                                     pass_groups=True)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+        queue.put(Update(update_id=0,
+                         inline_query=InlineQuery(
+                             0, None, 'This is a test message for regex group matching.', None)))
+
+        sleep(.1)
+        self.assertEqual(self.received_message, (('This', 'regex group'),
+                                                 {'testgroup': 'regex group'}))
+
+    def test_regexGroupHandlerCallbackQuery(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CallbackQueryHandler(self.regexGroupHandlerTest,
+                                       pattern='^(This).*?(?P<testgroup>regex group).*',
+                                       pass_groupdict=True,
+                                       pass_groups=True)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+        queue.put(Update(update_id=0,
+                         callback_query=CallbackQuery(
+                             0, None, 'This is a test message for regex group matching.')))
+
         sleep(.1)
         self.assertEqual(self.received_message, (('This', 'regex group'),
                                                  {'testgroup': 'regex group'}))
