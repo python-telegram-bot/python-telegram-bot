@@ -47,7 +47,7 @@ import json
 import logging
 
 try:
-    import django
+    import django  # noqa
 except ImportError as e:
     raise Exception('Need Django installed.')
 
@@ -68,6 +68,7 @@ from django.views.decorators.csrf import csrf_exempt
 logger = logging.getLogger(__name__)
 
 BOTS_REGISTERED = {}
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TelegramView(generic.View):
