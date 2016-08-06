@@ -3,7 +3,7 @@
 This module contains a simple integration with django.
 
 To install on your django project, you need to register all bots on settings, add one line on
-your urls and create a register method that will received a dispatcher to add all handlers of
+your urls and create a register method it will received a dispatcher to add all handlers of
 your bot.
 
 ///////// settings.py
