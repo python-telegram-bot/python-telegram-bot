@@ -18,14 +18,19 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the CallbackQueryHandler class """
 
-from .handler import Handler
+import re
+
+from future.utils import string_types
+
 from telegram import Update
 from telegram.utils.deprecate import deprecate
+from .handler import Handler
 
 
 class CallbackQueryHandler(Handler):
     """
-    Handler class to handle Telegram callback queries.
+    Handler class to handle Telegram callback queries. Optionally based on a regex.
+    Read the documentation of the ``re`` module for more information.
 
     Args:
         callback (function): A function that takes ``bot, update`` as
@@ -39,18 +44,52 @@ class CallbackQueryHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
             instance created by the ``Updater`` which can be used to schedule new jobs.
             Default is ``False``.
+        pattern (optional[str or Pattern]): Optional regex pattern. If not ``None`` ``re.match``
+            is used to determine if an update should be handled by this handler.
+        pass_groups (optional[bool]): If the callback should be passed the
+            result of ``re.match(pattern, data).groups()`` as a keyword
+            argument called ``groups``. Default is ``False``
+        pass_groupdict (optional[bool]): If the callback should be passed the
+            result of ``re.match(pattern, data).groupdict()`` as a keyword
+            argument called ``groupdict``. Default is ``False``
     """
 
-    def __init__(self, callback, pass_update_queue=False, pass_job_queue=False):
+    def __init__(self,
+                 callback,
+                 pass_update_queue=False,
+                 pass_job_queue=False,
+                 pattern=None,
+                 pass_groups=False,
+                 pass_groupdict=False):
         super(CallbackQueryHandler, self).__init__(callback,
                                                    pass_update_queue=pass_update_queue,
                                                    pass_job_queue=pass_job_queue)
 
+        if isinstance(pattern, string_types):
+            pattern = re.compile(pattern)
+
+        self.pattern = pattern
+        self.pass_groups = pass_groups
+        self.pass_groupdict = pass_groupdict
+
     def check_update(self, update):
-        return isinstance(update, Update) and update.callback_query
+        if isinstance(update, Update) and update.callback_query:
+            if self.pattern:
+                if update.callback_query.data:
+                    match = re.match(self.pattern, update.callback_query.data)
+                    return bool(match)
+            else:
+                return True
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)
+        if self.pattern:
+            match = re.match(self.pattern, update.callback_query.data)
+
+            if self.pass_groups:
+                optional_args['groups'] = match.groups()
+            if self.pass_groupdict:
+                optional_args['groupdict'] = match.groupdict()
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
