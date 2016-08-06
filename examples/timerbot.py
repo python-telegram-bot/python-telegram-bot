@@ -47,6 +47,7 @@ def set(bot, update, args, job_queue):
         due = int(args[0])
         if due < 0:
             bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
+            return
 
         # Add job to queue
         job = Job(alarm, due, repeat=False, context=chat_id)
