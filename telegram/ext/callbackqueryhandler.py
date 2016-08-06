@@ -91,7 +91,7 @@ class CallbackQueryHandler(Handler):
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
-# old non-PEP8 Handler methods
+    # old non-PEP8 Handler methods
 
     m = "telegram.CallbackQueryHandler."
     checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
