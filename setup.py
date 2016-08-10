@@ -16,6 +16,13 @@ def requirements():
 
     return requirements_list
 
+
+def execfile(fn):
+    with open(fn) as f:
+        code = compile(f.read(), fn, 'exec')
+        exec(code)
+
+
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
     execfile(os.path.join('telegram', 'version.py'))
 
