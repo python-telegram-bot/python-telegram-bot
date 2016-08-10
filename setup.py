@@ -54,4 +54,4 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
               'Programming Language :: Python :: 3.3',
               'Programming Language :: Python :: 3.4',
               'Programming Language :: Python :: 3.5',
-          ], )
+          ],)
