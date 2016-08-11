@@ -120,7 +120,7 @@ class DjangoDispatcher(Dispatcher):
 
 def register_webhooks(force=False):
     global BOTS_REGISTERED
-    if BOTS_REGISTERED or not force:
+    if BOTS_REGISTERED and not force:
         return
 
     BOTS_REGISTERED = {}
