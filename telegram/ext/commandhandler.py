@@ -57,9 +57,8 @@ class CommandHandler(Handler):
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(CommandHandler, self).__init__(callback,
-                                             pass_update_queue=pass_update_queue,
-                                             pass_job_queue=pass_job_queue)
+        super(CommandHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.command = command
         self.allow_edited = allow_edited
         self.pass_args = pass_args
@@ -86,7 +85,7 @@ class CommandHandler(Handler):
             command, target_bot_name = split_command[0], split_command[1]
             calling_me = (target_bot_name.lower() == dispatcher.bot.username.lower())
             if not calling_me:
-                return # don't reply, we aren't being talked to
+                return  # don't reply, we aren't being talked to
 
         if self.pass_args:
             optional_args['args'] = message.text.split(' ')[1:]
