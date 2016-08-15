@@ -98,3 +98,13 @@ class Chat(TelegramObject):
         """Shortcut for ``bot.getChatMember(update.message.chat.id, *args, **kwargs)``"""
         self._check_bot_reference()
         return self.bot.getChatMember(self.id, *args, **kwargs)
+
+    def kick_member(self, *args, **kwargs):
+        """Shortcut for ``bot.kickChatMember(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.kickChatMember(self.id, *args, **kwargs)
+
+    def unban_member(self, *args, **kwargs):
+        """Shortcut for ``bot.unbanChatMember(update.message.chat.id, *args, **kwargs)``"""
+        self._check_bot_reference()
+        return self.bot.unbanChatMember(self.id, *args, **kwargs)
