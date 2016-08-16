@@ -60,7 +60,7 @@ def set(bot, update, args, job_queue):
         bot.sendMessage(chat_id, text='Usage: /set <seconds>')
 
 
-def unset(bot, update):
+def unset(bot, update, job_queue):
     """Removes the job if the user changed their mind"""
     chat_id = update.message.chat_id
 
@@ -89,7 +89,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
     dp.add_handler(CommandHandler("set", set, pass_args=True, pass_job_queue=True))
-    dp.add_handler(CommandHandler("unset", unset))
+    dp.add_handler(CommandHandler("unset", unset, pass_job_queue=True))
 
     # log all errors
     dp.add_error_handler(error)
