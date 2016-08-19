@@ -23,11 +23,11 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, NullHandler)
+                      ReplyMarkup, TelegramObject)
 from telegram.error import InvalidToken
 from telegram.utils import request
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Bot(TelegramObject):
