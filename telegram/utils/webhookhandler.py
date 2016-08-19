@@ -1,6 +1,6 @@
 import logging
 
-from telegram import Update, NullHandler
+from telegram import Update
 from future.utils import bytes_to_native_str
 from threading import Lock
 import json
@@ -9,7 +9,7 @@ try:
 except ImportError:
     import http.server as BaseHTTPServer
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class _InvalidPost(Exception):

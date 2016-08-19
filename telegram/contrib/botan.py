@@ -1,11 +1,10 @@
 import logging
-from telegram import NullHandler
 
 from future.moves.urllib.parse import quote
 from future.moves.urllib.error import HTTPError, URLError
 from future.moves.urllib.request import urlopen, Request
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Botan(object):
