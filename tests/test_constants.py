@@ -17,13 +17,9 @@
 """Test the Telegram constants."""
 
 import sys
+import unittest
 
 from flaky import flaky
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
 
 sys.path.append('.')
 

@@ -26,13 +26,13 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import (TelegramError, NullHandler)
+from telegram import TelegramError
 from telegram.utils import request
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import deprecate
 from telegram.utils.promise import Promise
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 ASYNC_QUEUE = Queue()
 ASYNC_THREADS = set()

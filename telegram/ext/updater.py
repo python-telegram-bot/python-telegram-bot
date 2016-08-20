@@ -28,12 +28,12 @@ import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
-from telegram import Bot, TelegramError, NullHandler
+from telegram import Bot, TelegramError
 from telegram.ext import dispatcher, Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Updater(object):

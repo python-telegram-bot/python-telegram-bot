@@ -26,16 +26,12 @@ import signal
 import sys
 import os
 import re
+import unittest
 from datetime import datetime
 from time import sleep
 from random import randrange
 
 from future.builtins import bytes
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
 
 try:
     # python2

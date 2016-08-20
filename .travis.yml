@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
   - "3.4"
@@ -13,6 +12,6 @@ install:
   - pip install -r requirements-dev.txt
 script:
   - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/
-  - 'if [ $TRAVIS_PYTHON_VERSION != 2.6 ] && [ $TRAVIS_PYTHON_VERSION != 3.3 ] && [ $TRAVIS_PYTHON_VERSION != pypy3 ]; then pre-commit run --all-files; fi'
+  - 'if [ $TRAVIS_PYTHON_VERSION != 3.3 ] && [ $TRAVIS_PYTHON_VERSION != pypy3 ]; then pre-commit run --all-files; fi'
 after_success:
   coveralls

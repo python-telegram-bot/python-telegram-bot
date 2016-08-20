@@ -22,12 +22,8 @@ This module contains a object that represents Tests for ConversationHandler
 """
 import logging
 import sys
+import unittest
 from time import sleep
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
 
 try:
     # python2
