@@ -213,7 +213,8 @@ class ConversationHandler(Handler):
 
     def update_state(self, new_state, key):
         if new_state == self.END:
-            del self.conversations[key]
+            if key in self.conversations:
+                del self.conversations[key]
 
         elif isinstance(new_state, Promise):
             self.conversations[key] = (self.conversations[key], new_state)
