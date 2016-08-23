@@ -80,6 +80,10 @@ class Filters(object):
                     or message.group_chat_created or message.supergroup_chat_created
                     or message.channel_chat_created or message.migrate_to_chat_id
                     or message.migrate_from_chat_id or message.pinned_message)
+                    
+    @staticmethod
+    def forwarded(message):
+        return bool(message.forward_date)
 
 
 class MessageHandler(Handler):
