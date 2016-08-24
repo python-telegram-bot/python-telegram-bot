@@ -18,6 +18,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `jh0ker <https://github.com/jh0ker>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
+- `Li-aung Yip <https://github.com/LiaungYip>`_
 - `macrojames <https://github.com/macrojames>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `njittam <https://github.com/njittam>`_
