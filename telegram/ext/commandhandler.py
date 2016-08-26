@@ -57,9 +57,8 @@ class CommandHandler(Handler):
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(CommandHandler, self).__init__(callback,
-                                             pass_update_queue=pass_update_queue,
-                                             pass_job_queue=pass_job_queue)
+        super(CommandHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.command = command
         self.allow_edited = allow_edited
         self.pass_args = pass_args

@@ -36,8 +36,8 @@ class BaseTest(object):
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
 
-        bot = telegram.Bot(os.environ.get('TOKEN',
-                                          '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
+        bot = telegram.Bot(
+            os.environ.get('TOKEN', '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
         chat_id = os.environ.get('CHAT_ID', '12173560')
 
         self._group_id = os.environ.get('GROUP_ID', '-49740850')

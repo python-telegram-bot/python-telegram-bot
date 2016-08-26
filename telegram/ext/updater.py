@@ -78,11 +78,12 @@ class Updater(object):
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
-        self.dispatcher = Dispatcher(self.bot,
-                                     self.update_queue,
-                                     job_queue=self.job_queue,
-                                     workers=workers,
-                                     exception_event=self.__exception_event)
+        self.dispatcher = Dispatcher(
+            self.bot,
+            self.update_queue,
+            job_queue=self.job_queue,
+            workers=workers,
+            exception_event=self.__exception_event)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
@@ -216,9 +217,8 @@ class Updater(object):
 
         while self.running:
             try:
-                updates = self.bot.getUpdates(self.last_update_id,
-                                              timeout=timeout,
-                                              network_delay=network_delay)
+                updates = self.bot.getUpdates(
+                    self.last_update_id, timeout=timeout, network_delay=network_delay)
             except TelegramError as te:
                 self.logger.error("Error while getting Updates: {0}".format(te))
 
@@ -271,10 +271,11 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(max_retries=bootstrap_retries,
-                            clean=clean,
-                            webhook_url=webhook_url,
-                            cert=open(cert, 'rb'))
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                clean=clean,
+                webhook_url=webhook_url,
+                cert=open(cert, 'rb'))
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -292,10 +293,8 @@ class Updater(object):
             exit_code = 0
         if exit_code is 0:
             try:
-                self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
-                                                    certfile=cert,
-                                                    keyfile=key,
-                                                    server_side=True)
+                self.httpd.socket = ssl.wrap_socket(
+                    self.httpd.socket, certfile=cert, keyfile=key, server_side=True)
             except ssl.SSLError as error:
                 self.logger.exception('Failed to init SSL socket')
                 raise TelegramError(str(error))

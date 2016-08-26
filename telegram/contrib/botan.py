@@ -28,12 +28,10 @@ class Botan(object):
             return False
         data = message.to_json()
         try:
-            url = self.url_template.format(token=str(self.token),
-                                           uid=str(uid),
-                                           name=quote(event_name))
-            request = Request(url,
-                              data=data.encode(),
-                              headers={'Content-Type': 'application/json'})
+            url = self.url_template.format(
+                token=str(self.token), uid=str(uid), name=quote(event_name))
+            request = Request(
+                url, data=data.encode(), headers={'Content-Type': 'application/json'})
             urlopen(request)
             return True
         except HTTPError as error:

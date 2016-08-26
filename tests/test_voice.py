@@ -64,11 +64,12 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_all_args(self):
-        message = self._bot.sendVoice(self._chat_id,
-                                      self.voice_file,
-                                      self.duration,
-                                      mime_type=self.mime_type,
-                                      file_size=self.file_size)
+        message = self._bot.sendVoice(
+            self._chat_id,
+            self.voice_file,
+            self.duration,
+            mime_type=self.mime_type,
+            file_size=self.file_size)
 
         voice = message.voice
 
@@ -81,9 +82,8 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_file(self):
-        message = self._bot.sendVoice(chat_id=self._chat_id,
-                                      voice=self.voice_file,
-                                      duration=self.duration)
+        message = self._bot.sendVoice(
+            chat_id=self._chat_id, voice=self.voice_file, duration=self.duration)
 
         voice = message.voice
 
@@ -96,10 +96,11 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_file_with_custom_filename(self):
-        message = self._bot.sendVoice(chat_id=self._chat_id,
-                                      voice=self.voice_file,
-                                      duration=self.duration,
-                                      filename='telegram_custom.ogg')
+        message = self._bot.sendVoice(
+            chat_id=self._chat_id,
+            voice=self.voice_file,
+            duration=self.duration,
+            filename='telegram_custom.ogg')
 
         voice = message.voice
 
@@ -112,9 +113,8 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_url_file(self):
-        message = self._bot.sendVoice(chat_id=self._chat_id,
-                                      voice=self.voice_file_url,
-                                      duration=self.duration)
+        message = self._bot.sendVoice(
+            chat_id=self._chat_id, voice=self.voice_file_url, duration=self.duration)
 
         voice = message.voice
 
@@ -127,9 +127,8 @@ class VoiceTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_resend(self):
-        message = self._bot.sendVoice(chat_id=self._chat_id,
-                                      voice=self.voice_file_id,
-                                      duration=self.duration)
+        message = self._bot.sendVoice(
+            chat_id=self._chat_id, voice=self.voice_file_id, duration=self.duration)
 
         voice = message.voice
 

@@ -118,9 +118,8 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         user = User(first_name="Misses Test", id=123)
         second_user = User(first_name="Mister Test", id=124)
 
-        handler = ConversationHandler(entry_points=self.entry_points,
-                                      states=self.states,
-                                      fallbacks=self.fallbacks)
+        handler = ConversationHandler(
+            entry_points=self.entry_points, states=self.states, fallbacks=self.fallbacks)
         d.add_handler(handler)
         queue = self.updater.start_polling(0.01)
 

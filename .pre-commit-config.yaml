@@ -1,5 +1,5 @@
 -   repo: git://github.com/pre-commit/mirrors-yapf
-    sha: 316b795b2f32cbe80047aff7e842b72368d5a2c1
+    sha: 34303f2856d4e4ba26dc302d9c28632e9b5a8626
     hooks:
     -   id: yapf
         files: ^(telegram|tests)/.*\.py$
