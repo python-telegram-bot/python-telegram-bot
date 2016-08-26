@@ -18,7 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests"""
 
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
 import os
 import socket
 import logging
