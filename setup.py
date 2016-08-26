@@ -34,6 +34,9 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           long_description=fd.read(),
           packages=find_packages(exclude=['tests*']),
           install_requires=requirements(),
+          extras_require={
+              'json': 'ujson',
+          },
           include_package_data=True,
           classifiers=[
               'Development Status :: 5 - Production/Stable',
