@@ -35,12 +35,14 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         self.force_reply = True
         self.selective = True
 
-        self.json_dict = {'force_reply': self.force_reply, 'selective': self.selective,}
+        self.json_dict = {'force_reply': self.force_reply,
+                          'selective': self.selective,}
 
     def test_send_message_with_force_reply(self):
-        message = self._bot.sendMessage(self._chat_id,
-                                        'Моё судно на воздушной подушке полно угрей',
-                                        reply_markup=telegram.ForceReply.de_json(self.json_dict))
+        message = self._bot.sendMessage(
+            self._chat_id,
+            'Моё судно на воздушной подушке полно угрей',
+            reply_markup=telegram.ForceReply.de_json(self.json_dict))
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')

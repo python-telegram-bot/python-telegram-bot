@@ -64,7 +64,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         data = super(InlineQueryResultDocument, InlineQueryResultDocument).de_json(data)
 
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(data.get(
-            'input_message_content'))
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'))
 
         return InlineQueryResultDocument(**data)

@@ -79,11 +79,12 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_all_args(self):
-        message = self._bot.sendVideo(self._chat_id,
-                                      self.video_file,
-                                      timeout=10,
-                                      duration=self.duration,
-                                      caption=self.caption)
+        message = self._bot.sendVideo(
+            self._chat_id,
+            self.video_file,
+            timeout=10,
+            duration=self.duration,
+            caption=self.caption)
 
         video = message.video
 
@@ -101,11 +102,12 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file(self):
-        message = self._bot.sendVideo(chat_id=self._chat_id,
-                                      video=self.video_file,
-                                      timeout=10,
-                                      duration=self.duration,
-                                      caption=self.caption)
+        message = self._bot.sendVideo(
+            chat_id=self._chat_id,
+            video=self.video_file,
+            timeout=10,
+            duration=self.duration,
+            caption=self.caption)
 
         video = message.video
 
@@ -123,12 +125,13 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file_with_custom_filename(self):
-        message = self._bot.sendVideo(chat_id=self._chat_id,
-                                      video=self.video_file,
-                                      timeout=10,
-                                      duration=self.duration,
-                                      caption=self.caption,
-                                      filename='telegram_custom.mp4')
+        message = self._bot.sendVideo(
+            chat_id=self._chat_id,
+            video=self.video_file,
+            timeout=10,
+            duration=self.duration,
+            caption=self.caption,
+            filename='telegram_custom.mp4')
 
         video = message.video
 
@@ -146,11 +149,12 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file_url(self):
-        message = self._bot.sendVideo(chat_id=self._chat_id,
-                                      video=self.video_file_url,
-                                      timeout=10,
-                                      duration=self.duration,
-                                      caption=self.caption)
+        message = self._bot.sendVideo(
+            chat_id=self._chat_id,
+            video=self.video_file_url,
+            timeout=10,
+            duration=self.duration,
+            caption=self.caption)
 
         video = message.video
 
@@ -167,11 +171,12 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_resend(self):
-        message = self._bot.sendVideo(chat_id=self._chat_id,
-                                      video=self.video_file_id,
-                                      timeout=10,
-                                      duration=self.duration,
-                                      caption=self.caption)
+        message = self._bot.sendVideo(
+            chat_id=self._chat_id,
+            video=self.video_file_id,
+            timeout=10,
+            duration=self.duration,
+            caption=self.caption)
 
         video = message.video
 

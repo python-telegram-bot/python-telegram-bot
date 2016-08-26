@@ -80,7 +80,7 @@ class Filters(object):
                     or message.group_chat_created or message.supergroup_chat_created
                     or message.channel_chat_created or message.migrate_to_chat_id
                     or message.migrate_from_chat_id or message.pinned_message)
-                    
+
     @staticmethod
     def forwarded(message):
         return bool(message.forward_date)
@@ -115,9 +115,8 @@ class MessageHandler(Handler):
                  allow_edited=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(MessageHandler, self).__init__(callback,
-                                             pass_update_queue=pass_update_queue,
-                                             pass_job_queue=pass_job_queue)
+        super(MessageHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.filters = filters
         self.allow_edited = allow_edited
 

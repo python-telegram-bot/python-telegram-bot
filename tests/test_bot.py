@@ -47,8 +47,8 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendMessage(self):
-        message = self._bot.sendMessage(chat_id=self._chat_id,
-                                        text='Моё судно на воздушной подушке полно угрей')
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id, text='Моё судно на воздушной подушке полно угрей')
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
@@ -57,9 +57,10 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSilentSendMessage(self):
-        message = self._bot.sendMessage(chat_id=self._chat_id,
-                                        text='Моё судно на воздушной подушке полно угрей',
-                                        disable_notification=True)
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id,
+            text='Моё судно на воздушной подушке полно угрей',
+            disable_notification=True)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
@@ -77,9 +78,8 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testForwardMessage(self):
-        message = self._bot.forwardMessage(chat_id=self._chat_id,
-                                           from_chat_id=self._chat_id,
-                                           message_id=2398)
+        message = self._bot.forwardMessage(
+            chat_id=self._chat_id, from_chat_id=self._chat_id, message_id=2398)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, 'teste')
@@ -89,9 +89,10 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendPhoto(self):
-        message = self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
-                                      caption='testSendPhoto',
-                                      chat_id=self._chat_id)
+        message = self._bot.sendPhoto(
+            photo=open('tests/data/telegram.png', 'rb'),
+            caption='testSendPhoto',
+            chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 1451)
@@ -100,10 +101,11 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSilentSendPhoto(self):
-        message = self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
-                                      caption='testSendPhoto',
-                                      chat_id=self._chat_id,
-                                      disable_notification=True)
+        message = self._bot.sendPhoto(
+            photo=open('tests/data/telegram.png', 'rb'),
+            caption='testSendPhoto',
+            chat_id=self._chat_id,
+            disable_notification=True)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 1451)
@@ -113,8 +115,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def testResendPhoto(self):
         message = self._bot.sendPhoto(
-            photo='AgADAQAD1y0yGx8j9Qf8f_m3CKeS6Iy95y8ABI1ggfVJ4-UvwJcAAgI',
-            chat_id=self._chat_id)
+            photo='AgADAQAD1y0yGx8j9Qf8f_m3CKeS6Iy95y8ABI1ggfVJ4-UvwJcAAgI', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_id,
@@ -124,8 +125,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def testSendJPGURLPhoto(self):
         message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram',
-            chat_id=self._chat_id)
+            photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 822)
@@ -134,8 +134,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def testSendPNGURLPhoto(self):
         message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram',
-            chat_id=self._chat_id)
+            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 685)
@@ -144,8 +143,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def testSendGIFURLPhoto(self):
         message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram',
-            chat_id=self._chat_id)
+            photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.photo[0].file_size, 685)

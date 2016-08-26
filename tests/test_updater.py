@@ -180,9 +180,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         # Remove handler
         d.removeHandler(handler)
-        handler = MessageHandler([Filters.text],
-                                 self.telegramHandlerEditedTest,
-                                 allow_edited=False)
+        handler = MessageHandler(
+            [Filters.text], self.telegramHandlerEditedTest, allow_edited=False)
         d.addHandler(handler)
         self.reset()
 
@@ -414,11 +413,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)
-        handler = StringCommandHandler('test5',
-                                       self.additionalArgsTest,
-                                       pass_update_queue=True,
-                                       pass_job_queue=True,
-                                       pass_args=True)
+        handler = StringCommandHandler(
+            'test5',
+            self.additionalArgsTest,
+            pass_update_queue=True,
+            pass_job_queue=True,
+            pass_args=True)
         self.updater.dispatcher.add_handler(handler)
 
         queue = self.updater.start_polling(0.01)
@@ -430,10 +430,11 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_regexGroupHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        handler = StringRegexHandler('^(This).*?(?P<testgroup>regex group).*',
-                                     self.regexGroupHandlerTest,
-                                     pass_groupdict=True,
-                                     pass_groups=True)
+        handler = StringRegexHandler(
+            '^(This).*?(?P<testgroup>regex group).*',
+            self.regexGroupHandlerTest,
+            pass_groupdict=True,
+            pass_groups=True)
         d.add_handler(handler)
         queue = self.updater.start_polling(0.01)
         queue.put('This is a test message for regex group matching.')
@@ -444,15 +445,18 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_regexGroupHandlerInlineQuery(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        handler = InlineQueryHandler(self.regexGroupHandlerTest,
-                                     pattern='^(This).*?(?P<testgroup>regex group).*',
-                                     pass_groupdict=True,
-                                     pass_groups=True)
+        handler = InlineQueryHandler(
+            self.regexGroupHandlerTest,
+            pattern='^(This).*?(?P<testgroup>regex group).*',
+            pass_groupdict=True,
+            pass_groups=True)
         d.add_handler(handler)
         queue = self.updater.start_polling(0.01)
-        queue.put(Update(update_id=0,
-                         inline_query=InlineQuery(
-                             0, None, 'This is a test message for regex group matching.', None)))
+        queue.put(
+            Update(
+                update_id=0,
+                inline_query=InlineQuery(
+                    0, None, 'This is a test message for regex group matching.', None)))
 
         sleep(.1)
         self.assertEqual(self.received_message, (('This', 'regex group'),
@@ -461,15 +465,18 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_regexGroupHandlerCallbackQuery(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
-        handler = CallbackQueryHandler(self.regexGroupHandlerTest,
-                                       pattern='^(This).*?(?P<testgroup>regex group).*',
-                                       pass_groupdict=True,
-                                       pass_groups=True)
+        handler = CallbackQueryHandler(
+            self.regexGroupHandlerTest,
+            pattern='^(This).*?(?P<testgroup>regex group).*',
+            pass_groupdict=True,
+            pass_groups=True)
         d.add_handler(handler)
         queue = self.updater.start_polling(0.01)
-        queue.put(Update(update_id=0,
-                         callback_query=CallbackQuery(
-                             0, None, 'This is a test message for regex group matching.')))
+        queue.put(
+            Update(
+                update_id=0,
+                callback_query=CallbackQuery(0, None,
+                                             'This is a test message for regex group matching.')))
 
         sleep(.1)
         self.assertEqual(self.received_message, (('This', 'regex group'),
@@ -493,21 +500,21 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port for travis
-        self.updater.start_webhook(ip,
-                                   port,
-                                   url_path='TOKEN',
-                                   cert='./tests/test_updater.py',
-                                   key='./tests/test_updater.py',
-                                   webhook_url=None)
+        self.updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN',
+            cert='./tests/test_updater.py',
+            key='./tests/test_updater.py',
+            webhook_url=None)
         sleep(0.5)
         # SSL-Wrapping will fail, so we start the server without SSL
         Thread(target=self.updater.httpd.serve_forever).start()
 
         # Now, we send an update to the server via urlopen
-        message = Message(1,
-                          User(1, "Tester"),
-                          datetime.now(),
-                          Chat(1, "group", title="Test Group"))
+        message = Message(
+            1, User(1, "Tester"), datetime.now(), Chat(
+                1, "group", title="Test Group"))
 
         message.text = "Webhook Test"
         update = Update(1)
@@ -524,8 +531,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(200, response.code)
 
         response = self._send_webhook_msg(
-            ip, port, None, 'webookhandler.py',
-            get_method=lambda: 'HEAD')
+            ip, port, None, 'webookhandler.py', get_method=lambda: 'HEAD')
 
         self.assertEqual(b'', response.read())
         self.assertEqual(200, response.code)
@@ -547,10 +553,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(0.5)
 
         # Now, we send an update to the server via urlopen
-        message = Message(1,
-                          User(1, "Tester 2"),
-                          datetime.now(),
-                          Chat(1, 'group', title="Test Group 2"))
+        message = Message(
+            1, User(1, "Tester 2"), datetime.now(), Chat(
+                1, 'group', title="Test Group 2"))
 
         message.text = "Webhook Test 2"
         update = Update(1)
@@ -576,8 +581,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_bootstrap_retries_unauth(self):
         retries = 3
         self._setup_updater(
-            '', messages=0, bootstrap_retries=retries,
-            bootstrap_err=Unauthorized())
+            '', messages=0, bootstrap_retries=retries, bootstrap_err=Unauthorized())
 
         self.assertRaises(Unauthorized, self.updater._bootstrap, retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
@@ -585,8 +589,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_bootstrap_retries_invalid_token(self):
         retries = 3
         self._setup_updater(
-            '', messages=0, bootstrap_retries=retries,
-            bootstrap_err=InvalidToken())
+            '', messages=0, bootstrap_retries=retries, bootstrap_err=InvalidToken())
 
         self.assertRaises(InvalidToken, self.updater._bootstrap, retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
@@ -604,18 +607,16 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
-        thr = Thread(target=self.updater._start_webhook,
-                     args=(ip, port, '', None, None, 0, False, None))
+        thr = Thread(
+            target=self.updater._start_webhook, args=(ip, port, '', None, None, 0, False, None))
         thr.start()
 
         sleep(0.5)
 
         try:
             with self.assertRaises(HTTPError) as ctx:
-                self._send_webhook_msg(ip,
-                                       port,
-                                       '<root><bla>data</bla></root>',
-                                       content_type='application/xml')
+                self._send_webhook_msg(
+                    ip, port, '<root><bla>data</bla></root>', content_type='application/xml')
             self.assertEqual(ctx.exception.code, 403)
 
             with self.assertRaises(HTTPError) as ctx:
