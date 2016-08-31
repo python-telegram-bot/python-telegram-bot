@@ -36,7 +36,6 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Bot
-from telegram.utils.request import stop_con_pool
 from telegram.ext import *
 from tests.base import BaseTest
 from tests.test_updater import MockBot

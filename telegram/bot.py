@@ -899,7 +899,7 @@ class Bot(TelegramObject):
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
 
-        return File.de_json(result)
+        return File.de_json(result, self._request)
 
     @log
     def kickChatMember(self, chat_id, user_id, **kwargs):

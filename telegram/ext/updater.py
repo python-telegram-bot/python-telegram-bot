@@ -352,7 +352,7 @@ class Updater(object):
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running or dispatcher.ASYNC_THREADS:
+            if self.running or self.dispatcher.has_running_threads:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
@@ -360,9 +360,6 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                # async threads must be join()ed only after the dispatcher thread was joined,
-                # otherwise we can still have new async threads dispatched
-                self._join_async_threads()
 
     def _stop_httpd(self):
         if self.httpd:
@@ -375,21 +372,6 @@ class Updater(object):
     def _stop_dispatcher(self):
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
-
-    def _join_async_threads(self):
-        with dispatcher.ASYNC_LOCK:
-            threads = list(dispatcher.ASYNC_THREADS)
-            total = len(threads)
-
-            # Stop all threads in the thread pool by put()ting one non-tuple per thread
-            for i in range(total):
-                dispatcher.ASYNC_QUEUE.put(None)
-
-            for i, thr in enumerate(threads):
-                self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
-                thr.join()
-                dispatcher.ASYNC_THREADS.remove(thr)
-                self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
 
     def _join_threads(self):
         for thr in self.__threads:

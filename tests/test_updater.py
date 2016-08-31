@@ -44,7 +44,6 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Bot, InlineQuery, CallbackQuery
-from telegram.utils.request import stop_con_pool
 from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
@@ -80,14 +79,14 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.lock = Lock()
 
     def _setup_updater(self, *args, **kwargs):
-        stop_con_pool()
+        # stop_con_pool()
         bot = MockBot(*args, **kwargs)
         self.updater = Updater(workers=2, bot=bot)
 
     def tearDown(self):
         if self.updater is not None:
             self.updater.stop()
-        stop_con_pool()
+        # stop_con_pool()
 
     def reset(self):
         self.message_count = 0
