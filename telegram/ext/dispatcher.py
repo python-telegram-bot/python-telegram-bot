@@ -27,7 +27,6 @@ from queue import Queue, Empty
 from future.builtins import range
 
 from telegram import TelegramError
-from telegram.utils import request
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import deprecate
 from telegram.utils.promise import Promise
@@ -37,41 +36,21 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 ASYNC_QUEUE = Queue()
 ASYNC_THREADS = set()
 """:type: set[Thread]"""
-ASYNC_LOCK = Lock()  # guards ASYNC_THREADS
 DEFAULT_GROUP = 0
 
 
-def _pooled():
-    """
-    A wrapper to run a thread in a thread pool
-    """
-    while 1:
-        promise = ASYNC_QUEUE.get()
-
-        # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
-        if not isinstance(promise, Promise):
-            logging.getLogger(__name__).debug("Closing run_async thread %s/%d" %
-                                              (current_thread().getName(), len(ASYNC_THREADS)))
-            break
-
-        try:
-            promise.run()
-
-        except:
-            logging.getLogger(__name__).exception("run_async function raised exception")
-
-
-def run_async(func):
+def run_async(func, async_queue=ASYNC_QUEUE):
     """
     Function decorator that will run the function in a new thread.
 
     Args:
         func (function): The function to run in the thread.
+        aysnc_queue (Queue): The queue of the functions to be executed asynchronously.
 
     Returns:
         function:
-    """
 
+    """
     # TODO: handle exception in async threads
     #       set a threading.Event to notify caller thread
 
@@ -81,7 +60,7 @@ def run_async(func):
         A wrapper to run a function in a thread
         """
         promise = Promise(func, args, kwargs)
-        ASYNC_QUEUE.put(promise)
+        async_queue.put(promise)
         return promise
 
     return async_func
@@ -100,9 +79,14 @@ class Dispatcher(object):
             callbacks
         workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
             decorator
-    """
+        no_singleton (Optional[bool]): Set this to True if you need more than one dispatcher
+            instance. Dispatchers created that way do not support the global `run_async` decorator.
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
+    """
+    _async_lock = Lock()  # guards singleton constructor
+
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None,
+                 no_singleton=False):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
@@ -118,23 +102,43 @@ class Dispatcher(object):
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
 
-        with ASYNC_LOCK:
-            if not ASYNC_THREADS:
-                if request.is_con_pool_initialized():
-                    raise RuntimeError('Connection Pool already initialized')
+        if not no_singleton:
+            self._async_queue = Queue()
+            self._async_threads = set()
+            self._init_async_threads(workers)
+        else:
+            self._async_queue = ASYNC_QUEUE
+            self._async_threads = ASYNC_THREADS
+            with self._async_lock:
+                if self._async_threads:
+                    raise RuntimeError('Dispatcher singleton already initialized')
+                self._init_async_threads(workers)
 
-                # we need a connection pool the size of:
-                # * for each of the workers
-                # * 1 for Dispatcher
-                # * 1 for polling Updater (even if updater is webhook, we can spare a connection)
-                # * 1 for JobQueue
-                request.CON_POOL_SIZE = workers + 3
-                for i in range(workers):
-                    thread = Thread(target=_pooled, name=str(i))
-                    ASYNC_THREADS.add(thread)
-                    thread.start()
-            else:
-                self.logger.debug('Thread pool already initialized, skipping.')
+    def _init_async_threads(self, workers):
+        for i in range(workers):
+            thread = Thread(target=self._pooled, name=str(i))
+            ASYNC_THREADS.add(thread)
+            thread.start()
+
+    def _pooled(self):
+        """
+        A wrapper to run a thread in a thread pool
+        """
+        while 1:
+            promise = self._async_queue.get()
+
+            # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
+            if not isinstance(promise, Promise):
+                logging.getLogger(__name__).debug(
+                    "Closing run_async thread %s/%d",
+                    (current_thread().getName(), len(self._async_threads)))
+                break
+
+            try:
+                promise.run()
+
+            except:
+                logging.getLogger(__name__).exception("run_async function raised exception")
 
     def start(self):
         """

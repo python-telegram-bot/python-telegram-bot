@@ -31,6 +31,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import dispatcher, Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
+from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -57,7 +58,9 @@ class Updater(object):
         base_url (Optional[str]):
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
-        bot (Optional[Bot]):
+        bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
+            the user's responsibility to create it using a `Request` instance with a large enough
+            connection pool
         job_queue_tick_interval(Optional[float]): The interval the queue should
             be checked for new tasks. Defaults to 1.0
 
@@ -74,7 +77,12 @@ class Updater(object):
         if bot is not None:
             self.bot = bot
         else:
-            self.bot = Bot(token, base_url)
+            # we need a connection pool the size of:
+            # * for each of the workers
+            # * 1 for Dispatcher
+            # * 1 for polling Updater (even if webhook is used, we can spare a connection)
+            # * 1 for JobQueue
+            self.bot = Bot(token, base_url, request=Request(con_pool_size=workers + 3))
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()

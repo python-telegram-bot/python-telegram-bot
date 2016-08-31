@@ -25,7 +25,7 @@ import logging
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject)
 from telegram.error import InvalidToken
-from telegram.utils import request
+from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -44,10 +44,11 @@ class Bot(TelegramObject):
         token (str): Bot's unique authentication.
         base_url (Optional[str]): Telegram Bot API service URL.
         base_file_url (Optional[str]): Telegram Bot API file URL.
+        request (Optional[Request]): Pre initialized `Request` class.
 
     """
 
-    def __init__(self, token, base_url=None, base_file_url=None):
+    def __init__(self, token, base_url=None, base_file_url=None, request=None):
         self.token = self._validate_token(token)
 
         if not base_url:
@@ -61,8 +62,17 @@ class Bot(TelegramObject):
             self.base_file_url = base_file_url + self.token
 
         self.bot = None
-
+        self._request = request or Request()
         self.logger = logging.getLogger(__name__)
+
+    # def set_requester(self, request):
+    #     """Replace the request object.
+    #
+    #     Args:
+    #         request (Request): Pre initialized request object.
+    #
+    #     """
+    #     self._request = request
 
     @staticmethod
     def _validate_token(token):
@@ -144,7 +154,7 @@ class Bot(TelegramObject):
                 else:
                     data['reply_markup'] = reply_markup
 
-            result = request.post(url, data, timeout=kwargs.get('timeout'))
+            result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
             if result is True:
                 return result
@@ -169,7 +179,7 @@ class Bot(TelegramObject):
 
         url = '{0}/getMe'.format(self.base_url)
 
-        result = request.get(url)
+        result = self._request.get(url)
 
         self.bot = User.de_json(result)
 
@@ -813,7 +823,7 @@ class Bot(TelegramObject):
         if switch_pm_parameter:
             data['switch_pm_parameter'] = switch_pm_parameter
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -853,7 +863,7 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return UserProfilePhotos.de_json(result)
 
@@ -884,7 +894,7 @@ class Bot(TelegramObject):
 
         data = {'file_id': file_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
@@ -921,7 +931,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'user_id': user_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -955,7 +965,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'user_id': user_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -999,7 +1009,7 @@ class Bot(TelegramObject):
         if show_alert:
             data['show_alert'] = show_alert
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1213,7 +1223,7 @@ class Bot(TelegramObject):
 
         urlopen_timeout = timeout + network_delay
 
-        result = request.post(url, data, timeout=urlopen_timeout)
+        result = self._request.post(url, data, timeout=urlopen_timeout)
 
         if result:
             self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
@@ -1256,7 +1266,7 @@ class Bot(TelegramObject):
         if certificate:
             data['certificate'] = certificate
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1286,7 +1296,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1318,7 +1328,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return Chat.de_json(result)
 
@@ -1353,7 +1363,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return [ChatMember.de_json(x) for x in result]
 
@@ -1383,7 +1393,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return result
 
@@ -1416,7 +1426,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'user_id': user_id}
 
-        result = request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         return ChatMember.de_json(result)
 
