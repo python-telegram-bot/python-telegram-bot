@@ -101,19 +101,19 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.ogg'))
 
     def test_file_de_json(self):
-        newFile = telegram.File.de_json(self.json_dict)
+        newFile = telegram.File.de_json(self.json_dict, None)
 
         self.assertEqual(newFile.file_id, self.json_dict['file_id'])
         self.assertEqual(newFile.file_path, self.json_dict['file_path'])
         self.assertEqual(newFile.file_size, self.json_dict['file_size'])
 
     def test_file_to_json(self):
-        newFile = telegram.File.de_json(self.json_dict)
+        newFile = telegram.File.de_json(self.json_dict, None)
 
         self.assertTrue(self.is_json(newFile.to_json()))
 
     def test_file_to_dict(self):
-        newFile = telegram.File.de_json(self.json_dict)
+        newFile = telegram.File.de_json(self.json_dict, None)
 
         self.assertTrue(self.is_dict(newFile.to_dict()))
         self.assertEqual(newFile['file_id'], self.json_dict['file_id'])

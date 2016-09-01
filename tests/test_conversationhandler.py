@@ -60,10 +60,10 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
     # At first we're thirsty.  Then we brew coffee, we drink it
     # and then we can start coding!
     END, THIRSTY, BREWING, DRINKING, CODING = range(-1, 4)
+    _updater = None
 
     # Test related
     def setUp(self):
-        self.updater = None
         self.current_state = dict()
         self.entry_points = [CommandHandler('start', self.start)]
         self.states = {self.THIRSTY: [CommandHandler('brew', self.brew),
@@ -77,14 +77,22 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         self.fallbacks = [CommandHandler('eat', self.start)]
 
     def _setup_updater(self, *args, **kwargs):
-        stop_con_pool()
         bot = MockBot(*args, **kwargs)
         self.updater = Updater(workers=2, bot=bot)
 
     def tearDown(self):
         if self.updater is not None:
             self.updater.stop()
-        stop_con_pool()
+
+    @property
+    def updater(self):
+        return self._updater
+
+    @updater.setter
+    def updater(self, val):
+        if self._updater:
+            self._updater.stop()
+        self._updater = val
 
     def reset(self):
         self.current_state = dict()

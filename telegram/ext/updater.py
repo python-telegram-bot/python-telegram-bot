@@ -76,12 +76,14 @@ class Updater(object):
 
         if bot is not None:
             self.bot = bot
+            self._my_bot = False
         else:
             # we need a connection pool the size of:
             # * for each of the workers
             # * 1 for Dispatcher
             # * 1 for polling Updater (even if webhook is used, we can spare a connection)
             # * 1 for JobQueue
+            self._my_bot = True
             self.bot = Bot(token, base_url, request=Request(con_pool_size=workers + 3))
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
@@ -345,14 +347,14 @@ class Updater(object):
         while updates:
             updates = self.bot.getUpdates(updates[-1].update_id + 1)
 
-    def stop(self, force=False):
+    def stop(self):
         """
         Stops the polling/webhook thread, the dispatcher and the job queue
         """
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running or self.dispatcher.has_running_threads or force:
+            if self.running or self.dispatcher.has_running_threads:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
@@ -360,7 +362,8 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                self.bot.request.stop()
+                if self._my_bot:
+                    self.bot.request.stop()
 
     def _stop_httpd(self):
         if self.httpd:
