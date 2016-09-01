@@ -82,9 +82,6 @@ class Request(object):
 
         self._con_pool = mgr
 
-    def __del__(self):
-        self.stop()
-
     def stop(self):
         self._con_pool.clear()
 
