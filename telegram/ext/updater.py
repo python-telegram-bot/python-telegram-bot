@@ -29,7 +29,7 @@ from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
 from telegram import Bot, TelegramError
-from telegram.ext import dispatcher, Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
