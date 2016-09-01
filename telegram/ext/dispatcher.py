@@ -52,17 +52,9 @@ def run_async(func, async_queue=_ASYNC_QUEUE):
         function:
 
     """
-    # TODO: handle exception in async threads
-    #       set a threading.Event to notify caller thread
-
     @wraps(func)
     def async_func(*args, **kwargs):
-        """
-        A wrapper to run a function in a thread
-        """
-        promise = Promise(func, args, kwargs)
-        async_queue.put(promise)
-        return promise
+        return Dispatcher.queue_async_func(async_queue, func, args, kwargs)
 
     return async_func
 
@@ -141,6 +133,29 @@ class Dispatcher(object):
 
             except:
                 self.logger.exception("run_async function raised exception")
+
+    def run_async(self, func, *args, **kwargs):
+        """Run a function (with given args/kwargs) asynchorniously.
+
+        Args:
+            func (function): The function to run in the thread.
+            args (Optional[tuple]): Arguments to `func`.
+            kwargs (Optional[dict]): Keyword arguments to `func`.
+
+        Returns:
+            Promise
+
+        """
+        return self.queue_async_func(self.__async_queue, func, args, kwargs)
+
+    @staticmethod
+    def queue_async_func(async_queue, func, args, kwargs):
+        """Create a `Promise` for the given func and queue it for running"""
+        # TODO: handle exception in async threads
+        #       set a threading.Event to notify caller thread
+        promise = Promise(func, args, kwargs)
+        async_queue.put(promise)
+        return promise
 
     def start(self):
         """
