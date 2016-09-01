@@ -33,7 +33,6 @@ from urllib3.connection import HTTPConnection
 from telegram import (InputFile, TelegramError)
 from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated
 
-
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 

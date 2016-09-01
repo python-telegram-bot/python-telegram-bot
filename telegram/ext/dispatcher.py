@@ -54,6 +54,7 @@ def run_async(func, async_queue=_ASYNC_QUEUE):
         function:
 
     """
+
     @wraps(func)
     def async_func(*args, **kwargs):
         return Dispatcher.queue_async_func(async_queue, func, args, kwargs)
@@ -80,7 +81,12 @@ class Dispatcher(object):
     """
     __async_lock = Lock()  # guards singleton constructor
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None,
+    def __init__(self,
+                 bot,
+                 update_queue,
+                 workers=4,
+                 exception_event=None,
+                 job_queue=None,
                  no_singleton=False):
         self.bot = bot
         self.update_queue = update_queue
@@ -128,8 +134,8 @@ class Dispatcher(object):
 
             # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
             if not isinstance(promise, Promise):
-                self.logger.debug("Closing run_async thread %s/%d",
-                                  thr_name, len(self.__async_threads))
+                self.logger.debug("Closing run_async thread %s/%d", thr_name,
+                                  len(self.__async_threads))
                 break
 
             try:
