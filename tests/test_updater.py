@@ -29,6 +29,7 @@ import re
 import unittest
 from datetime import datetime
 from time import sleep
+from queue import Queue
 from random import randrange
 
 from future.builtins import bytes
@@ -50,7 +51,7 @@ from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
-from threading import Lock, Thread
+from threading import Lock, Thread, current_thread
 
 # Enable logging
 root = logging.getLogger()
@@ -417,6 +418,37 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1.2)
         self.assertEqual(self.received_message, 'Test5')
         self.assertEqual(self.message_count, 2)
+
+    def test_multiple_dispatchers(self):
+        def get_dispatcher_name(q):
+            q.put(current_thread().name)
+            sleep(1.2)
+
+        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1, no_singleton=True)
+        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1, no_singleton=True)
+        q1 = Queue()
+        q2 = Queue()
+
+        try:
+            d1.run_async(get_dispatcher_name, q1)
+            d2.run_async(get_dispatcher_name, q2)
+
+            name1 = q1.get()
+            name2 = q2.get()
+
+            self.assertNotEqual(name1, name2)
+        finally:
+            d1.stop()
+            d2.stop()
+
+    def test_singleton_dispatcher(self):
+        bot = MockBot('disp1')
+        q = Queue
+        d = Dispatcher(bot, q)
+        try:
+            self.assertRaises(RuntimeError, Dispatcher, bot, q)
+        finally:
+            d.stop()
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)
