@@ -23,6 +23,8 @@ from functools import wraps
 from threading import Thread, Lock, Event, current_thread
 from dummy_threading import Lock as DummyLock
 from time import sleep
+from uuid import uuid4
+
 from queue import Queue, Empty
 
 from future.builtins import range
@@ -99,19 +101,21 @@ class Dispatcher(object):
             self.__async_lock = DummyLock()
             self.__async_queue = Queue()
             self.__async_threads = set()
-            self._init_async_threads(workers)
+            self._init_async_threads(uuid4(), workers)
         else:
             self.__async_queue = _ASYNC_QUEUE
             self.__async_threads = _ASYNC_THREADS
             with self.__async_lock:
                 if self.__async_threads:
                     raise RuntimeError('Dispatcher singleton already initialized')
-                self._init_async_threads(workers)
+                self._init_async_threads('', workers)
 
-    def _init_async_threads(self, workers):
+    def _init_async_threads(self, base_name, workers):
+        base_name = '{}_'.format(base_name) if base_name else ''
+
         for i in range(workers):
-            thread = Thread(target=self._pooled, name=str(i))
-            _ASYNC_THREADS.add(thread)
+            thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
+            self.__async_threads.add(thread)
             thread.start()
 
     def _pooled(self):
