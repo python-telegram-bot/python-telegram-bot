@@ -60,7 +60,7 @@ class Updater(object):
             functions decorated with @run_async
         bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
             the user's responsibility to create it using a `Request` instance with a large enough
-            connection pool
+            connection pool.
         job_queue_tick_interval(Optional[float]): The interval the queue should
             be checked for new tasks. Defaults to 1.0
 

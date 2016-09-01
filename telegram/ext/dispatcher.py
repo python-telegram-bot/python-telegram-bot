@@ -19,7 +19,6 @@
 """This module contains the Dispatcher class."""
 
 import logging
-import traceback
 from functools import wraps
 from threading import Thread, Lock, Event, current_thread
 from dummy_threading import Lock as DummyLock
@@ -62,7 +61,6 @@ def run_async(func, async_queue=_ASYNC_QUEUE):
         A wrapper to run a function in a thread
         """
         promise = Promise(func, args, kwargs)
-        logging.getLogger(__name__).debug('queueing promise %s; queue=%s', promise, async_queue)
         async_queue.put(promise)
         return promise
 
@@ -129,8 +127,6 @@ class Dispatcher(object):
         A wrapper to run a thread in a thread pool
         """
         thr_name = current_thread().getName()
-        self.logger.debug('Dispatcher thread; queue=%s threads=%s name=%s',
-                          self.__async_queue, id(self.__async_threads), thr_name)
         while 1:
             promise = self.__async_queue.get()
 
@@ -141,11 +137,10 @@ class Dispatcher(object):
                 break
 
             try:
-                self.logger.debug('Running promise %s', promise)
                 promise.run()
 
             except:
-                logging.getLogger(__name__).exception("run_async function raised exception")
+                self.logger.exception("run_async function raised exception")
 
     def start(self):
         """
@@ -224,18 +219,13 @@ class Dispatcher(object):
 
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.logger.debug('Caught error while polling')
             self.dispatch_error(None, update)
 
         else:
-            self.logger.debug('Iterating groups')
             for group in self.groups:
-                self.logger.debug('Handling group %s', group)
                 for handler in self.handlers[group]:
                     try:
-                        self.logger.debug('handler %s check update', handler)
                         if handler.check_update(update):
-                            self.logger.debug('update for me')
                             handler.handle_update(update, self)
                             break
                     # Dispatch any errors

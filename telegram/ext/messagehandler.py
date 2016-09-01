@@ -138,8 +138,6 @@ class MessageHandler(Handler):
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)
-        import logging
-        logging.getLogger('MessageHandler').debug('callback %s', self.callback)
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
