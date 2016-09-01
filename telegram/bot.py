@@ -65,14 +65,9 @@ class Bot(TelegramObject):
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
 
-    # def set_requester(self, request):
-    #     """Replace the request object.
-    #
-    #     Args:
-    #         request (Request): Pre initialized request object.
-    #
-    #     """
-    #     self._request = request
+    @property
+    def request(self):
+        return self._request
 
     @staticmethod
     def _validate_token(token):

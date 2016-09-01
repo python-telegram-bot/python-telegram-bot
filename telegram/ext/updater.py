@@ -345,14 +345,14 @@ class Updater(object):
         while updates:
             updates = self.bot.getUpdates(updates[-1].update_id + 1)
 
-    def stop(self):
+    def stop(self, force=False):
         """
         Stops the polling/webhook thread, the dispatcher and the job queue
         """
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running or self.dispatcher.has_running_threads:
+            if self.running or self.dispatcher.has_running_threads or force:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
@@ -360,6 +360,7 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
+                self.bot.request.stop()
 
     def _stop_httpd(self):
         if self.httpd:

@@ -33,6 +33,8 @@ from random import randrange
 
 from future.builtins import bytes
 
+from telegram.utils.request import Request as Requester
+
 try:
     # python2
     from urllib2 import urlopen, Request, HTTPError
@@ -67,26 +69,38 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     WebhookHandler
     """
 
-    updater = None
+    _updater = None
     received_message = None
-    message_count = None
-    lock = None
 
     def setUp(self):
+        if self.updater:
+            self.updater.stop(True)
         self.updater = None
         self.received_message = None
         self.message_count = 0
         self.lock = Lock()
 
+    def __del__(self):
+        if self.updater:
+            self.updater.stop()
+
+    @property
+    def updater(self):
+        return self._updater
+
+    @updater.setter
+    def updater(self, val):
+        if self._updater:
+            self._updater.stop()
+        self._updater = val
+
     def _setup_updater(self, *args, **kwargs):
-        # stop_con_pool()
         bot = MockBot(*args, **kwargs)
         self.updater = Updater(workers=2, bot=bot)
 
     def tearDown(self):
         if self.updater is not None:
-            self.updater.stop()
-        # stop_con_pool()
+            self.updater.stop(True)
 
     def reset(self):
         self.message_count = 0
@@ -110,6 +124,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     @run_async
     def asyncHandlerTest(self, bot, update):
+        logging.getLogger('ASYNC_HANDLER').info('async handler %s %s', bot, update)
         sleep(1)
         with self.lock:
             self.received_message = update.message.text
@@ -482,6 +497,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                                                  {'testgroup': 'regex group'}))
 
     def test_runAsyncWithAdditionalArgs(self):
+        if self.updater:
+            self.updater.stop(True)
         self._setup_updater('Test6', messages=2)
         d = self.updater.dispatcher
         handler = MessageHandler([], self.asyncAdditionalHandlerTest, pass_update_queue=True)
@@ -692,6 +709,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertRaises(ValueError, Updater)
 
 
+class MockyMock(object):
+    pass
+
+
 class MockBot(object):
 
     def __init__(self,
@@ -709,6 +730,8 @@ class MockBot(object):
         self.bootstrap_attempts = 0
         self.bootstrap_err = bootstrap_err
         self.edited = edited
+        self.request = MockyMock()
+        self.request.stop = MockyMock
 
     def mockUpdate(self, text):
         message = Message(0, None, None, None)
