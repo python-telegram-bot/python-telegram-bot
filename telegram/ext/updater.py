@@ -66,7 +66,9 @@ class Updater(object):
 
     Raises:
         ValueError: If both `token` and `bot` are passed or none of them.
+
     """
+    _request = None
 
     def __init__(self, token=None, base_url=None, workers=4, bot=None):
         if (token is None) and (bot is None):
@@ -76,15 +78,14 @@ class Updater(object):
 
         if bot is not None:
             self.bot = bot
-            self._my_bot = False
         else:
             # we need a connection pool the size of:
             # * for each of the workers
             # * 1 for Dispatcher
             # * 1 for polling Updater (even if webhook is used, we can spare a connection)
             # * 1 for JobQueue
-            self._my_bot = True
-            self.bot = Bot(token, base_url, request=Request(con_pool_size=workers + 3))
+            self._request = Request(con_pool_size=workers + 3)
+            self.bot = Bot(token, base_url, request=self._request)
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
@@ -362,8 +363,10 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                if self._my_bot:
-                    self.bot.request.stop()
+
+                # Stop the Request instance only if it was created by the Updater
+                if self._request:
+                    self._request.stop()
 
     def _stop_httpd(self):
         if self.httpd:
