@@ -145,7 +145,7 @@ class Dispatcher(object):
                 self.logger.exception("run_async function raised exception")
 
     def run_async(self, func, *args, **kwargs):
-        """Run a function (with given args/kwargs) asynchorniously.
+        """Run a function (with given args/kwargs) asynchronously.
 
         Args:
             func (function): The function to run in the thread.
