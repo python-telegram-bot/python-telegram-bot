@@ -84,7 +84,8 @@ class Updater(object):
             # * 1 for Dispatcher
             # * 1 for polling Updater (even if webhook is used, we can spare a connection)
             # * 1 for JobQueue
-            self._request = Request(con_pool_size=workers + 3)
+            # * 1 for main thread
+            self._request = Request(con_pool_size=workers + 4)
             self.bot = Bot(token, base_url, request=self._request)
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
