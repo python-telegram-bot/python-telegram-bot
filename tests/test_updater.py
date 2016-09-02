@@ -420,6 +420,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.message_count, 2)
 
     def test_multiple_dispatchers(self):
+
         def get_dispatcher_name(q):
             q.put(current_thread().name)
             sleep(1.2)
@@ -732,10 +733,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertRaises(ValueError, Updater)
 
 
-class MockyMock(object):
-    pass
-
-
 class MockBot(object):
 
     def __init__(self,
@@ -753,8 +750,6 @@ class MockBot(object):
         self.bootstrap_attempts = 0
         self.bootstrap_err = bootstrap_err
         self.edited = edited
-        self.request = MockyMock()
-        self.request.stop = MockyMock
 
     def mockUpdate(self, text):
         message = Message(0, None, None, None)
