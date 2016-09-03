@@ -88,9 +88,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         if self._updater:
             self._updater.stop()
             del self._updater.dispatcher
-            # following two lines are for pypy unitests
-            Dispatcher._set_singleton(None)
-            Dispatcher.__singleton_semaphore = Semaphore()
 
         self._updater = val
 
@@ -445,6 +442,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         finally:
             d1.stop()
             d2.stop()
+            del d1
+            del d2
 
     def test_multiple_dispatcers_no_decorator(self):
 
@@ -459,6 +458,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         d1.stop()
         d2.stop()
+        del d1
+        del d2
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)
