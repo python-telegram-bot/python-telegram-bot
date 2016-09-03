@@ -87,6 +87,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def updater(self, val):
         if self._updater:
             self._updater.stop()
+            del self._updater.dispatcher
         self._updater = val
 
     def _setup_updater(self, *args, **kwargs):
@@ -94,8 +95,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.updater = Updater(workers=2, bot=bot)
 
     def tearDown(self):
-        if self.updater is not None:
-            self.updater.stop()
+        self.updater = None
 
     def reset(self):
         self.message_count = 0
@@ -425,8 +425,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             q.put(current_thread().name)
             sleep(1.2)
 
-        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1, no_singleton=True)
-        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1, no_singleton=True)
+        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1)
+        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1)
         q1 = Queue()
         q2 = Queue()
 
@@ -442,14 +442,19 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             d1.stop()
             d2.stop()
 
-    def test_singleton_dispatcher(self):
-        bot = MockBot('disp1')
-        q = Queue
-        d = Dispatcher(bot, q)
-        try:
-            self.assertRaises(RuntimeError, Dispatcher, bot, q)
-        finally:
-            d.stop()
+    def test_multiple_dispatcers_no_decorator(self):
+
+        @run_async
+        def must_raise_runtime_error():
+            pass
+
+        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1)
+        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1)
+
+        self.assertRaises(RuntimeError, must_raise_runtime_error)
+
+        d1.stop()
+        d2.stop()
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)

@@ -19,9 +19,9 @@
 """This module contains the Dispatcher class."""
 
 import logging
+import weakref
 from functools import wraps
-from threading import Thread, Lock, Event, current_thread
-from dummy_threading import Lock as DummyLock
+from threading import Thread, Lock, Event, current_thread, Semaphore
 from time import sleep
 from uuid import uuid4
 
@@ -35,16 +35,14 @@ from telegram.utils.deprecate import deprecate
 from telegram.utils.promise import Promise
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
-
-_ASYNC_QUEUE = Queue()
-_ASYNC_THREADS = set()
 """:type: set[Thread]"""
 DEFAULT_GROUP = 0
 
 
-def run_async(func, async_queue=_ASYNC_QUEUE):
-    """
-    Function decorator that will run the function in a new thread.
+def run_async(func):
+    """Function decorator that will run the function in a new thread.
+
+    Using this decorator is only possible when only a single Dispatcher exist in the system.
 
     Args:
         func (function): The function to run in the thread.
@@ -57,7 +55,7 @@ def run_async(func, async_queue=_ASYNC_QUEUE):
 
     @wraps(func)
     def async_func(*args, **kwargs):
-        return Dispatcher.queue_async_func(async_queue, func, args, kwargs)
+        return Dispatcher.get_instance().run_async(func, *args, **kwargs)
 
     return async_func
 
@@ -75,19 +73,14 @@ class Dispatcher(object):
             callbacks
         workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
             decorator
-        no_singleton (Optional[bool]): Set this to True if you need more than one dispatcher
-            instance. Dispatchers created that way do not support the global `run_async` decorator.
 
     """
-    __async_lock = Lock()  # guards singleton constructor
+    __singleton_lock = Lock()
+    __singleton_semaphore = Semaphore()
+    __singleton = None
+    logger = logging.getLogger(__name__)
 
-    def __init__(self,
-                 bot,
-                 update_queue,
-                 workers=4,
-                 exception_event=None,
-                 job_queue=None,
-                 no_singleton=False):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
@@ -98,23 +91,26 @@ class Dispatcher(object):
         """:type: list[int]"""
         self.error_handlers = []
 
-        self.logger = logging.getLogger(__name__)
         self.running = False
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
+        self.__async_queue = Queue()
+        self.__async_threads = set()
 
-        if no_singleton:
-            self.__async_lock = DummyLock()
-            self.__async_queue = Queue()
-            self.__async_threads = set()
-            self._init_async_threads(uuid4(), workers)
-        else:
-            self.__async_queue = _ASYNC_QUEUE
-            self.__async_threads = _ASYNC_THREADS
-            with self.__async_lock:
-                if self.__async_threads:
-                    raise RuntimeError('Dispatcher singleton already initialized')
-                self._init_async_threads('', workers)
+        # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
+        # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
+        with self.__singleton_lock:
+            if self.__singleton_semaphore.acquire(blocking=0):
+                self._set_singleton(self)
+            else:
+                self._set_singleton(None)
+
+        self._init_async_threads(uuid4(), workers)
+
+    def __del__(self):
+        # NOTE: This d'tor was added mainly for test_updater benefit. What it lacks is the
+        #       capability to identify (other) existing Dispatcher and set it as the singleton.
+        self.__singleton_semaphore.release()
 
     def _init_async_threads(self, base_name, workers):
         base_name = '{}_'.format(base_name) if base_name else ''
@@ -123,6 +119,25 @@ class Dispatcher(object):
             thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
             self.__async_threads.add(thread)
             thread.start()
+
+    @classmethod
+    def _set_singleton(cls, val):
+        cls.logger.debug('Setting singleton dispatcher as %s', val)
+        cls.__singleton = weakref.ref(val) if val else None
+
+    @classmethod
+    def get_instance(cls):
+        """Get the singleton instance of this class.
+
+        Returns:
+            Dispatcher
+
+        """
+        if cls.__singleton is not None:
+            return cls.__singleton()
+        else:
+            raise RuntimeError('{} not initialized or multiple instances exist'.format(
+                cls.__name__))
 
     def _pooled(self):
         """
@@ -145,7 +160,7 @@ class Dispatcher(object):
                 self.logger.exception("run_async function raised exception")
 
     def run_async(self, func, *args, **kwargs):
-        """Run a function (with given args/kwargs) asynchronously.
+        """Queue a function (with given args/kwargs) to be run asynchronously.
 
         Args:
             func (function): The function to run in the thread.
@@ -156,15 +171,10 @@ class Dispatcher(object):
             Promise
 
         """
-        return self.queue_async_func(self.__async_queue, func, args, kwargs)
-
-    @staticmethod
-    def queue_async_func(async_queue, func, args, kwargs):
-        """Create a `Promise` for the given func and queue it for running"""
         # TODO: handle exception in async threads
         #       set a threading.Event to notify caller thread
         promise = Promise(func, args, kwargs)
-        async_queue.put(promise)
+        self.__async_queue.put(promise)
         return promise
 
     def start(self):
@@ -216,19 +226,18 @@ class Dispatcher(object):
 
         # async threads must be join()ed only after the dispatcher thread was joined,
         # otherwise we can still have new async threads dispatched
-        with self.__async_lock:
-            threads = list(self.__async_threads)
-            total = len(threads)
+        threads = list(self.__async_threads)
+        total = len(threads)
 
-            # Stop all threads in the thread pool by put()ting one non-tuple per thread
-            for i in range(total):
-                self.__async_queue.put(None)
+        # Stop all threads in the thread pool by put()ting one non-tuple per thread
+        for i in range(total):
+            self.__async_queue.put(None)
 
-            for i, thr in enumerate(threads):
-                self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
-                thr.join()
-                self.__async_threads.remove(thr)
-                self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
+        for i, thr in enumerate(threads):
+            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
+            thr.join()
+            self.__async_threads.remove(thr)
+            self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
 
     @property
     def has_running_threads(self):
