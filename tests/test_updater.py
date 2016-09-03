@@ -51,7 +51,7 @@ from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
-from threading import Lock, Thread, current_thread
+from threading import Lock, Thread, current_thread, Semaphore
 
 # Enable logging
 root = logging.getLogger()
@@ -88,6 +88,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         if self._updater:
             self._updater.stop()
             del self._updater.dispatcher
+            # following two lines are for pypy unitests
+            Dispatcher._set_singleton(None)
+            Dispatcher.__singleton_semaphore = Semaphore()
+
         self._updater = val
 
     def _setup_updater(self, *args, **kwargs):
