@@ -17,13 +17,9 @@
 """Test the Telegram constants."""
 
 import sys
+import unittest
 
 from flaky import flaky
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
 
 sys.path.append('.')
 
@@ -37,12 +33,12 @@ class ConstantsTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testMaxMessageLength(self):
-        self._bot.sendMessage(chat_id=self._chat_id,
-                              text='a' * telegram.constants.MAX_MESSAGE_LENGTH)
+        self._bot.sendMessage(
+            chat_id=self._chat_id, text='a' * telegram.constants.MAX_MESSAGE_LENGTH)
 
         try:
-            self._bot.sendMessage(chat_id=self._chat_id,
-                                  text='a' * (telegram.constants.MAX_MESSAGE_LENGTH + 1))
+            self._bot.sendMessage(
+                chat_id=self._chat_id, text='a' * (telegram.constants.MAX_MESSAGE_LENGTH + 1))
         except BadRequest as e:
             err = str(e)
 
@@ -51,14 +47,16 @@ class ConstantsTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testMaxCaptionLength(self):
-        self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
-                            caption='a' * telegram.constants.MAX_CAPTION_LENGTH,
-                            chat_id=self._chat_id)
+        self._bot.sendPhoto(
+            photo=open('tests/data/telegram.png', 'rb'),
+            caption='a' * telegram.constants.MAX_CAPTION_LENGTH,
+            chat_id=self._chat_id)
 
         try:
-            self._bot.sendPhoto(photo=open('tests/data/telegram.png', 'rb'),
-                                caption='a' * (telegram.constants.MAX_CAPTION_LENGTH + 1),
-                                chat_id=self._chat_id)
+            self._bot.sendPhoto(
+                photo=open('tests/data/telegram.png', 'rb'),
+                caption='a' * (telegram.constants.MAX_CAPTION_LENGTH + 1),
+                chat_id=self._chat_id)
         except BadRequest as e:
             err = str(e)
 

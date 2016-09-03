@@ -60,9 +60,8 @@ class InlineQueryHandler(Handler):
                  pattern=None,
                  pass_groups=False,
                  pass_groupdict=False):
-        super(InlineQueryHandler, self).__init__(callback,
-                                                 pass_update_queue=pass_update_queue,
-                                                 pass_job_queue=pass_job_queue)
+        super(InlineQueryHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)

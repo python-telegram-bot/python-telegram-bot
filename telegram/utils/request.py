@@ -18,7 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests"""
 
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
 import os
 import socket
 import logging
@@ -49,12 +52,13 @@ def _get_con_pool():
 
 def _init_con_pool():
     global _CON_POOL
-    kwargs = dict(maxsize=CON_POOL_SIZE,
-                  cert_reqs='CERT_REQUIRED',
-                  ca_certs=certifi.where(),
-                  socket_options=HTTPConnection.default_socket_options + [
-                      (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-                  ])
+    kwargs = dict(
+        maxsize=CON_POOL_SIZE,
+        cert_reqs='CERT_REQUIRED',
+        ca_certs=certifi.where(),
+        socket_options=HTTPConnection.default_socket_options + [
+            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+        ])
     proxy_url = _get_con_pool_proxy()
     if not proxy_url:
         mgr = urllib3.PoolManager(**kwargs)
@@ -235,11 +239,12 @@ def post(url, data, timeout=None):
         result = _request_wrapper('POST', url, body=data.to_form(), headers=data.headers)
     else:
         data = json.dumps(data)
-        result = _request_wrapper('POST',
-                                  url,
-                                  body=data.encode(),
-                                  headers={'Content-Type': 'application/json'},
-                                  **urlopen_kwargs)
+        result = _request_wrapper(
+            'POST',
+            url,
+            body=data.encode(),
+            headers={'Content-Type': 'application/json'},
+            **urlopen_kwargs)
 
     return _parse(result)
 

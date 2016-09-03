@@ -44,15 +44,10 @@ class TypeHandler(Handler):
             Default is ``False``.
     """
 
-    def __init__(self,
-                 type,
-                 callback,
-                 strict=False,
-                 pass_update_queue=False,
+    def __init__(self, type, callback, strict=False, pass_update_queue=False,
                  pass_job_queue=False):
-        super(TypeHandler, self).__init__(callback,
-                                          pass_update_queue=pass_update_queue,
-                                          pass_job_queue=pass_job_queue)
+        super(TypeHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.type = type
         self.strict = strict
 

@@ -23,11 +23,11 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, NullHandler)
+                      ReplyMarkup, TelegramObject)
 from telegram.error import InvalidToken
 from telegram.utils import request
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Bot(TelegramObject):
@@ -618,13 +618,8 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendVenue(
-            self, chat_id,
-            latitude,
-            longitude,
-            title, address,
-            foursquare_id=None,
-            **kwargs):
+    def sendVenue(self, chat_id, latitude, longitude, title, address, foursquare_id=None,
+                  **kwargs):
         """
         Use this method to send information about a venue.
 
@@ -1132,10 +1127,11 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def editMessageReplyMarkup(
-            self, chat_id=None,
-            message_id=None, inline_message_id=None,
-            **kwargs):
+    def editMessageReplyMarkup(self,
+                               chat_id=None,
+                               message_id=None,
+                               inline_message_id=None,
+                               **kwargs):
         """Use this method to edit only the reply markup of messages sent by
         the bot or via the bot (for inline bots).
 
