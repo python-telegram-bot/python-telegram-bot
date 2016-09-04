@@ -25,6 +25,7 @@ from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity)
+from telegram.messageentity import TYPES
 
 
 class Message(TelegramObject):
@@ -274,8 +275,7 @@ class Message(TelegramObject):
             List of string: the text of the matched MessageEntities
         """
         if types is None:
-            types = ['mention', 'hashtag', 'bot_command', 'url', 'email', 'bold', 'italic', 'code',
-                     'pre', 'text_link', 'text_mention']
+            types = TYPES
 
         utf16text = self.text.encode('utf-16-le')
 
