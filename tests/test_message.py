@@ -31,15 +31,32 @@ from tests.base import BaseTest
 class MessageTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram MessageTest."""
 
-    def setUp(self):
-        self.text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
-                     b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
-
     def test_get_entity(self):
-        entity = telegram.MessageEntity(type='url', offset=13, length=17)
+        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+        entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
         message = telegram.Message(
-            message_id=1, from_user=None, date=None, chat=None, text=self.text, entities=[entity])
+            message_id=1, from_user=None, date=None, chat=None, text=text, entities=[entity])
         self.assertEqual(message.get_entity(entity), 'http://google.com')
+
+    def test_get_entities(self):
+        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+        entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
+        entity_2 = telegram.MessageEntity(type=telegram.MessageEntity.BOLD, offset=13, length=1)
+        message = telegram.Message(
+            message_id=1,
+            from_user=None,
+            date=None,
+            chat=None,
+            text=text,
+            entities=[entity_2, entity])
+        entity_with_text = entity
+        entity_with_text.text = 'http://google.com'
+        self.assertListEqual(message.get_entities(telegram.MessageEntity.URL), [entity_with_text])
+        entity_2_with_text = entity_2
+        entity_2_with_text.text = 'h'
+        self.assertListEqual(message.get_entities(), [entity_2_with_text, entity_with_text])
 
 
 if __name__ == '__main__':
