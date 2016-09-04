@@ -246,10 +246,17 @@ class Message(TelegramObject):
             # Python 3 (< 3.3) and Python 2
             return int(mktime(dt_obj.timetuple()))
 
-    def get_entity(self, entity):
+    def get_entity_text(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`
+
+        Note:
+            This method is present because telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of python don't handle automatically.
+            (That is, you can't just slice message.text with the offset and length.
+
         Args:
             entity (MessageEntity): The entity to extract text from
+
         Returns:
             str: The text of entity
         """
@@ -263,29 +270,25 @@ class Message(TelegramObject):
         return entity_text.decode('utf-16-le')
 
     def get_entities(self, types=None):
-        """Returns a list with the text from all the :class:`telegram.MessageEntity`s
-        in self matching types
+        """Returns a list of :class:`telegram.MessageEntity` with text attributes that match types.
+
+        Note:
+            This method should always be used as opposed to the entities attribute since it
+            automatically adds text attributes. See get_entity_text for more info.
 
         Args:
-            types (Optional[list]): Only extract text of MessageEntities if its type
-            in in this list. Defaults to all types.
+            types (Optional[list]): List of MessageEntity types. Defaults to all types.
+            All types can be found as constants in :class:`telegram.MessageEntity`.
 
         Returns:
-            List of string: the text of the matched MessageEntities
+            List of :class:`telegram.MessageEntity`: Each containing with a text attribute
         """
         if types is None:
             types = MessageEntity.ALL_TYPES
 
-        utf16text = self.text.encode('utf-16-le')
-
         entities = []
         for entity in self.entities:
             if entity.type in types:
-                if sys.maxunicode == 0xffff:
-                    entity.text = self.text[entity.offset:entity.offset + entity.length]
-                    entities.append(entity)
-                else:
-                    start, end = entity.offset * 2, (entity.offset + entity.length) * 2
-                    entity.text = utf16text[start:end].decode('utf-16-le')
-                    entities.append(entity)
+                entity.text = self.get_entity_text(entity)
+                entities.append(entity)
         return entities
