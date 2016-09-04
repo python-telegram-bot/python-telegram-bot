@@ -261,3 +261,30 @@ class Message(TelegramObject):
             entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
 
         return entity_text.decode('utf-16-le')
+
+    def get_entities(self, types=None):
+        """Returns a list with the text from all the :class:`telegram.MessageEntity`s
+        in self matching types
+
+        Args:
+            types (Optional[list]): Only extract text of MessageEntities if its type
+            in in this list. Defaults to all types.
+
+        Returns:
+            List of string: the text of the matched MessageEntities
+        """
+        if types is None:
+            types = ['mention', 'hashtag', 'bot_command', 'url', 'email', 'bold', 'italic', 'code',
+                     'pre', 'text_link', 'text_mention']
+
+        utf16text = self.text.encode('utf-16-le')
+
+        entity_texts = []
+        for entity in self.entities:
+            if entity.type in types:
+                if sys.maxunicode == 0xffff:
+                    entity_texts.append(self.text[entity.offset:entity.offset + entity.length])
+                else:
+                    entity_texts.append(utf16text[entity.offset * 2:(entity.offset + entity.length)
+                                                  * 2].decode('utf-16-le'))
+        return entity_texts
