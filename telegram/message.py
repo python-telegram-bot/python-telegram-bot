@@ -25,7 +25,6 @@ from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity)
-from telegram.messageentity import TYPES
 
 
 class Message(TelegramObject):
@@ -275,16 +274,18 @@ class Message(TelegramObject):
             List of string: the text of the matched MessageEntities
         """
         if types is None:
-            types = TYPES
+            types = MessageEntity.ALL_TYPES
 
         utf16text = self.text.encode('utf-16-le')
 
-        entity_texts = []
+        entities = []
         for entity in self.entities:
             if entity.type in types:
                 if sys.maxunicode == 0xffff:
-                    entity_texts.append(self.text[entity.offset:entity.offset + entity.length])
+                    entity.text = self.text[entity.offset:entity.offset + entity.length]
+                    entities.append(entity)
                 else:
-                    entity_texts.append(utf16text[entity.offset * 2:(entity.offset + entity.length)
-                                                  * 2].decode('utf-16-le'))
-        return entity_texts
+                    start, end = entity.offset * 2, (entity.offset + entity.length) * 2
+                    entity.text = utf16text[start:end].decode('utf-16-le')
+                    entities.append(entity)
+        return entities
