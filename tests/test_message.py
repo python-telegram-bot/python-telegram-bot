@@ -37,7 +37,7 @@ class MessageTest(BaseTest, unittest.TestCase):
         entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
         message = telegram.Message(
             message_id=1, from_user=None, date=None, chat=None, text=text, entities=[entity])
-        self.assertEqual(message.get_entity(entity), 'http://google.com')
+        self.assertEqual(message.get_entity_text(entity), 'http://google.com')
 
     def test_get_entities(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
