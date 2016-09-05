@@ -21,7 +21,7 @@
 import logging
 import weakref
 from functools import wraps
-from threading import Thread, Lock, Event, current_thread, Semaphore
+from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
 from uuid import uuid4
 
@@ -76,7 +76,7 @@ class Dispatcher(object):
 
     """
     __singleton_lock = Lock()
-    __singleton_semaphore = Semaphore()
+    __singleton_semaphore = BoundedSemaphore()
     __singleton = None
     logger = logging.getLogger(__name__)
 
@@ -107,10 +107,11 @@ class Dispatcher(object):
 
         self._init_async_threads(uuid4(), workers)
 
-    def __del__(self):
-        # NOTE: This d'tor was added mainly for test_updater benefit. What it lacks is the
-        #       capability to identify (other) existing Dispatcher and set it as the singleton.
-        self.__singleton_semaphore.release()
+    @classmethod
+    def _reset_singleton(cls):
+        # NOTE: This method was added mainly for test_updater benefit and specifically pypy. Never
+        #       call it in production code.
+        cls.__singleton_semaphore.release()
 
     def _init_async_threads(self, base_name, workers):
         base_name = '{}_'.format(base_name) if base_name else ''
