@@ -31,15 +31,15 @@ from tests.base import BaseTest
 class MessageTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram MessageTest."""
 
-    def test_get_entity(self):
+    def test_parse_entity(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
         entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
         message = telegram.Message(
             message_id=1, from_user=None, date=None, chat=None, text=text, entities=[entity])
-        self.assertEqual(message.get_entity_text(entity), 'http://google.com')
+        self.assertEqual(message.parse_entity(entity), 'http://google.com')
 
-    def test_get_entities(self):
+    def test_parse_entities(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
         entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
@@ -51,12 +51,9 @@ class MessageTest(BaseTest, unittest.TestCase):
             chat=None,
             text=text,
             entities=[entity_2, entity])
-        entity_with_text = entity
-        entity_with_text.text = 'http://google.com'
-        self.assertListEqual(message.get_entities(telegram.MessageEntity.URL), [entity_with_text])
-        entity_2_with_text = entity_2
-        entity_2_with_text.text = 'h'
-        self.assertListEqual(message.get_entities(), [entity_2_with_text, entity_with_text])
+        self.assertListEqual(
+            message.parse_entities(telegram.MessageEntity.URL), {entity: 'http://google.com'})
+        self.assertDictEqual(message.parse_entities(), {entity_2: 'h'})
 
 
 if __name__ == '__main__':

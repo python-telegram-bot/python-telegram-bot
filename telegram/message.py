@@ -246,7 +246,7 @@ class Message(TelegramObject):
             # Python 3 (< 3.3) and Python 2
             return int(mktime(dt_obj.timetuple()))
 
-    def get_entity_text(self, entity):
+    def parse_entity(self, entity):
         """
         Returns the text from a given :class:`telegram.MessageEntity`.
 
@@ -271,7 +271,7 @@ class Message(TelegramObject):
 
         return entity_text.decode('utf-16-le')
 
-    def get_entities(self, types=None):
+    def parse_entities(self, types=None):
         """
         Returns a list of :class:`telegram.MessageEntity` from this message, filtered by their
         ``type`` attribute.
@@ -294,9 +294,5 @@ class Message(TelegramObject):
         if types is None:
             types = MessageEntity.ALL_TYPES
 
-        entities = []
-        for entity in self.entities:
-            if entity.type in types:
-                entity.text = self.get_entity_text(entity)
-                entities.append(entity)
-        return entities
+        return {entity: self.parse_entity(entity)
+                for entity in self.entities if entity.type in types}
