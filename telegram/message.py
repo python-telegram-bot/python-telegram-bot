@@ -273,13 +273,14 @@ class Message(TelegramObject):
 
     def parse_entities(self, types=None):
         """
-        Returns a list of :class:`telegram.MessageEntity` from this message, filtered by their
-        ``type`` attribute.
+        Returns a ``dict`` that maps :class:`telegram.MessageEntity` to ``str``.
+        It contains entities from this message filtered by their ``type`` attribute as the key, and
+        the text that each entity belongs to as the value of the ``dict``.
 
         Note:
             This method should always be used instead of the ``entities`` attribute, since it
-            automatically adds a ``text`` attribute to each entity. See ``get_entity_text`` for
-            more info.
+            calculates the correct substring from the message text based on UTF-16 codepoints.
+            See ``get_entity_text`` for more info.
 
         Args:
             types (Optional[list]): List of ``MessageEntity`` types as strings. If the ``type``
@@ -288,8 +289,8 @@ class Message(TelegramObject):
                 :class:`telegram.MessageEntity`.
 
         Returns:
-            list[:class:`telegram.MessageEntity`]: A list of entities that have a ``text``
-                attribute set, which was calculated based on UTF-16 codepoints.
+            dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
+                text that belongs to them, calculated based on UTF-16 codepoints.
         """
         if types is None:
             types = MessageEntity.ALL_TYPES
