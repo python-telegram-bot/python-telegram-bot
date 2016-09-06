@@ -51,9 +51,10 @@ class MessageTest(BaseTest, unittest.TestCase):
             chat=None,
             text=text,
             entities=[entity_2, entity])
-        self.assertListEqual(
+        self.assertDictEqual(
             message.parse_entities(telegram.MessageEntity.URL), {entity: 'http://google.com'})
-        self.assertDictEqual(message.parse_entities(), {entity_2: 'h'})
+        self.assertDictEqual(message.parse_entities(), {entity: 'http://google.com',
+                                                        entity_2: 'h'})
 
 
 if __name__ == '__main__':
