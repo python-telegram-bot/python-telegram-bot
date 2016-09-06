@@ -19,70 +19,43 @@
 """This module contains the Dispatcher class."""
 
 import logging
+import weakref
 from functools import wraps
-from threading import Thread, Lock, Event, current_thread
+from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
+from uuid import uuid4
+
 from queue import Queue, Empty
 
 from future.builtins import range
 
 from telegram import TelegramError
-from telegram.utils import request
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import deprecate
 from telegram.utils.promise import Promise
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
-
-ASYNC_QUEUE = Queue()
-ASYNC_THREADS = set()
 """:type: set[Thread]"""
-ASYNC_LOCK = Lock()  # guards ASYNC_THREADS
 DEFAULT_GROUP = 0
 
 
-def _pooled():
-    """
-    A wrapper to run a thread in a thread pool
-    """
-    while 1:
-        promise = ASYNC_QUEUE.get()
-
-        # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
-        if not isinstance(promise, Promise):
-            logging.getLogger(__name__).debug("Closing run_async thread %s/%d" %
-                                              (current_thread().getName(), len(ASYNC_THREADS)))
-            break
-
-        try:
-            promise.run()
-
-        except:
-            logging.getLogger(__name__).exception("run_async function raised exception")
-
-
 def run_async(func):
-    """
-    Function decorator that will run the function in a new thread.
+    """Function decorator that will run the function in a new thread.
+
+    Using this decorator is only possible when only a single Dispatcher exist in the system.
 
     Args:
         func (function): The function to run in the thread.
+        async_queue (Queue): The queue of the functions to be executed asynchronously.
 
     Returns:
         function:
-    """
 
-    # TODO: handle exception in async threads
-    #       set a threading.Event to notify caller thread
+    """
 
     @wraps(func)
     def async_func(*args, **kwargs):
-        """
-        A wrapper to run a function in a thread
-        """
-        promise = Promise(func, args, kwargs)
-        ASYNC_QUEUE.put(promise)
-        return promise
+        return Dispatcher.get_instance().run_async(func, *args, **kwargs)
 
     return async_func
 
@@ -100,7 +73,12 @@ class Dispatcher(object):
             callbacks
         workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
             decorator
+
     """
+    __singleton_lock = Lock()
+    __singleton_semaphore = BoundedSemaphore()
+    __singleton = None
+    logger = logging.getLogger(__name__)
 
     def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
@@ -113,28 +91,92 @@ class Dispatcher(object):
         """:type: list[int]"""
         self.error_handlers = []
 
-        self.logger = logging.getLogger(__name__)
         self.running = False
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
+        self.__async_queue = Queue()
+        self.__async_threads = set()
 
-        with ASYNC_LOCK:
-            if not ASYNC_THREADS:
-                if request.is_con_pool_initialized():
-                    raise RuntimeError('Connection Pool already initialized')
-
-                # we need a connection pool the size of:
-                # * for each of the workers
-                # * 1 for Dispatcher
-                # * 1 for polling Updater (even if updater is webhook, we can spare a connection)
-                # * 1 for JobQueue
-                request.CON_POOL_SIZE = workers + 3
-                for i in range(workers):
-                    thread = Thread(target=_pooled, name=str(i))
-                    ASYNC_THREADS.add(thread)
-                    thread.start()
+        # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
+        # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
+        with self.__singleton_lock:
+            if self.__singleton_semaphore.acquire(blocking=0):
+                self._set_singleton(self)
             else:
-                self.logger.debug('Thread pool already initialized, skipping.')
+                self._set_singleton(None)
+
+        self._init_async_threads(uuid4(), workers)
+
+    @classmethod
+    def _reset_singleton(cls):
+        # NOTE: This method was added mainly for test_updater benefit and specifically pypy. Never
+        #       call it in production code.
+        cls.__singleton_semaphore.release()
+
+    def _init_async_threads(self, base_name, workers):
+        base_name = '{}_'.format(base_name) if base_name else ''
+
+        for i in range(workers):
+            thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
+            self.__async_threads.add(thread)
+            thread.start()
+
+    @classmethod
+    def _set_singleton(cls, val):
+        cls.logger.debug('Setting singleton dispatcher as %s', val)
+        cls.__singleton = weakref.ref(val) if val else None
+
+    @classmethod
+    def get_instance(cls):
+        """Get the singleton instance of this class.
+
+        Returns:
+            Dispatcher
+
+        """
+        if cls.__singleton is not None:
+            return cls.__singleton()
+        else:
+            raise RuntimeError('{} not initialized or multiple instances exist'.format(
+                cls.__name__))
+
+    def _pooled(self):
+        """
+        A wrapper to run a thread in a thread pool
+        """
+        thr_name = current_thread().getName()
+        while 1:
+            promise = self.__async_queue.get()
+
+            # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
+            if not isinstance(promise, Promise):
+                self.logger.debug("Closing run_async thread %s/%d", thr_name,
+                                  len(self.__async_threads))
+                break
+
+            try:
+                promise.run()
+
+            except:
+                self.logger.exception("run_async function raised exception")
+
+    def run_async(self, func, *args, **kwargs):
+        """Queue a function (with given args/kwargs) to be run asynchronously.
+
+        Args:
+            func (function): The function to run in the thread.
+            args (Optional[tuple]): Arguments to `func`.
+            kwargs (Optional[dict]): Keyword arguments to `func`.
+
+        Returns:
+            Promise
+
+        """
+        # TODO: handle exception in async threads
+        #       set a threading.Event to notify caller thread
+        promise = Promise(func, args, kwargs)
+        self.__async_queue.put(promise)
+        return promise
 
     def start(self):
         """
@@ -182,6 +224,25 @@ class Dispatcher(object):
             while self.running:
                 sleep(0.1)
             self.__stop_event.clear()
+
+        # async threads must be join()ed only after the dispatcher thread was joined,
+        # otherwise we can still have new async threads dispatched
+        threads = list(self.__async_threads)
+        total = len(threads)
+
+        # Stop all threads in the thread pool by put()ting one non-tuple per thread
+        for i in range(total):
+            self.__async_queue.put(None)
+
+        for i, thr in enumerate(threads):
+            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
+            thr.join()
+            self.__async_threads.remove(thr)
+            self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
+
+    @property
+    def has_running_threads(self):
+        return self.running or bool(self.__async_threads)
 
     def process_update(self, update):
         """

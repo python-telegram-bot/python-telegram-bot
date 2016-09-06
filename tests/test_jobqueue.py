@@ -25,9 +25,10 @@ import sys
 import unittest
 from time import sleep
 
+from tests.test_updater import MockBot
+
 sys.path.append('.')
 
-from telegram.utils.request import stop_con_pool
 from telegram.ext import JobQueue, Job, Updater
 from tests.base import BaseTest
 
@@ -49,13 +50,12 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     """
 
     def setUp(self):
-        self.jq = JobQueue("Bot")
+        self.jq = JobQueue(MockBot('jobqueue_test'))
         self.result = 0
 
     def tearDown(self):
         if self.jq is not None:
             self.jq.stop()
-        stop_con_pool()
 
     def job1(self, bot, job):
         self.result += 1
@@ -158,12 +158,15 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def test_inUpdater(self):
         u = Updater(bot="MockBot")
-        u.job_queue.put(Job(self.job1, 0.5))
-        sleep(0.75)
-        self.assertEqual(1, self.result)
-        u.stop()
-        sleep(2)
-        self.assertEqual(1, self.result)
+        try:
+            u.job_queue.put(Job(self.job1, 0.5))
+            sleep(0.75)
+            self.assertEqual(1, self.result)
+            u.stop()
+            sleep(2)
+            self.assertEqual(1, self.result)
+        finally:
+            u.stop()
 
 
 if __name__ == '__main__':

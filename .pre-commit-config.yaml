@@ -1,15 +1,15 @@
 -   repo: git://github.com/pre-commit/mirrors-yapf
-    sha: 34303f2856d4e4ba26dc302d9c28632e9b5a8626
+    sha: v0.11.0
     hooks:
     -   id: yapf
         files: ^(telegram|tests)/.*\.py$
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 3fa02652357ff0dbb42b5bc78c673b7bc105fcf3
+    sha: 18d7035de5388cc7775be57f529c154bf541aab9
     hooks:
     -   id: flake8
         files: ^telegram/.*\.py$
 -   repo: git://github.com/pre-commit/mirrors-pylint
-    sha: 4de6c8dfadef1a271a814561ce05b8bc1c446d22
+    sha: v1.5.5
     hooks:
     -   id: pylint
         files: ^telegram/.*\.py$

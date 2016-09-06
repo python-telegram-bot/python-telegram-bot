@@ -29,8 +29,9 @@ from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
 from telegram import Bot, TelegramError
-from telegram.ext import dispatcher, Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
+from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -57,13 +58,17 @@ class Updater(object):
         base_url (Optional[str]):
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
-        bot (Optional[Bot]):
+        bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
+            the user's responsibility to create it using a `Request` instance with a large enough
+            connection pool.
         job_queue_tick_interval(Optional[float]): The interval the queue should
             be checked for new tasks. Defaults to 1.0
 
     Raises:
         ValueError: If both `token` and `bot` are passed or none of them.
+
     """
+    _request = None
 
     def __init__(self, token=None, base_url=None, workers=4, bot=None):
         if (token is None) and (bot is None):
@@ -74,7 +79,14 @@ class Updater(object):
         if bot is not None:
             self.bot = bot
         else:
-            self.bot = Bot(token, base_url)
+            # we need a connection pool the size of:
+            # * for each of the workers
+            # * 1 for Dispatcher
+            # * 1 for polling Updater (even if webhook is used, we can spare a connection)
+            # * 1 for JobQueue
+            # * 1 for main thread
+            self._request = Request(con_pool_size=workers + 4)
+            self.bot = Bot(token, base_url, request=self._request)
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
@@ -344,7 +356,7 @@ class Updater(object):
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running or dispatcher.ASYNC_THREADS:
+            if self.running or self.dispatcher.has_running_threads:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
@@ -352,9 +364,10 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                # async threads must be join()ed only after the dispatcher thread was joined,
-                # otherwise we can still have new async threads dispatched
-                self._join_async_threads()
+
+                # Stop the Request instance only if it was created by the Updater
+                if self._request:
+                    self._request.stop()
 
     def _stop_httpd(self):
         if self.httpd:
@@ -367,21 +380,6 @@ class Updater(object):
     def _stop_dispatcher(self):
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
-
-    def _join_async_threads(self):
-        with dispatcher.ASYNC_LOCK:
-            threads = list(dispatcher.ASYNC_THREADS)
-            total = len(threads)
-
-            # Stop all threads in the thread pool by put()ting one non-tuple per thread
-            for i in range(total):
-                dispatcher.ASYNC_QUEUE.put(None)
-
-            for i, thr in enumerate(threads):
-                self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
-                thr.join()
-                dispatcher.ASYNC_THREADS.remove(thr)
-                self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
 
     def _join_threads(self):
         for thr in self.__threads:

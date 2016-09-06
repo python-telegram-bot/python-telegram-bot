@@ -29,9 +29,12 @@ import re
 import unittest
 from datetime import datetime
 from time import sleep
+from queue import Queue
 from random import randrange
 
 from future.builtins import bytes
+
+from telegram.utils.request import Request as Requester
 
 try:
     # python2
@@ -44,12 +47,11 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Bot, InlineQuery, CallbackQuery
-from telegram.utils.request import stop_con_pool
 from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
-from threading import Lock, Thread
+from threading import Lock, Thread, current_thread, Semaphore
 
 # Enable logging
 root = logging.getLogger()
@@ -68,10 +70,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     WebhookHandler
     """
 
-    updater = None
+    _updater = None
     received_message = None
-    message_count = None
-    lock = None
 
     def setUp(self):
         self.updater = None
@@ -79,15 +79,25 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.message_count = 0
         self.lock = Lock()
 
+    @property
+    def updater(self):
+        return self._updater
+
+    @updater.setter
+    def updater(self, val):
+        if self._updater:
+            self._updater.stop()
+            self._updater.dispatcher._reset_singleton()
+            del self._updater.dispatcher
+
+        self._updater = val
+
     def _setup_updater(self, *args, **kwargs):
-        stop_con_pool()
         bot = MockBot(*args, **kwargs)
         self.updater = Updater(workers=2, bot=bot)
 
     def tearDown(self):
-        if self.updater is not None:
-            self.updater.stop()
-        stop_con_pool()
+        self.updater = None
 
     def reset(self):
         self.message_count = 0
@@ -410,6 +420,51 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1.2)
         self.assertEqual(self.received_message, 'Test5')
         self.assertEqual(self.message_count, 2)
+
+    def test_multiple_dispatchers(self):
+
+        def get_dispatcher_name(q):
+            q.put(current_thread().name)
+            sleep(1.2)
+
+        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1)
+        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1)
+        q1 = Queue()
+        q2 = Queue()
+
+        try:
+            d1.run_async(get_dispatcher_name, q1)
+            d2.run_async(get_dispatcher_name, q2)
+
+            name1 = q1.get()
+            name2 = q2.get()
+
+            self.assertNotEqual(name1, name2)
+        finally:
+            d1.stop()
+            d2.stop()
+            # following three lines are for pypy unitests
+            d1._reset_singleton()
+            del d1
+            del d2
+
+    def test_multiple_dispatcers_no_decorator(self):
+
+        @run_async
+        def must_raise_runtime_error():
+            pass
+
+        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1)
+        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1)
+
+        self.assertRaises(RuntimeError, must_raise_runtime_error)
+
+        d1.stop()
+        d2.stop()
+        # following three lines are for pypy unitests
+        d1._reset_singleton()
+        del d1
+        del d2
 
     def test_additionalArgs(self):
         self._setup_updater('', messages=0)
