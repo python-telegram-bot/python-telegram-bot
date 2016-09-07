@@ -154,6 +154,8 @@ class Bot(TelegramObject):
             if result is True:
                 return result
 
+            self.create_references(result)
+
             return Message.de_json(result)
 
         return decorator
