@@ -18,7 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
 
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
+
 from abc import ABCMeta
 
 

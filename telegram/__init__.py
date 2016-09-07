@@ -43,7 +43,6 @@ from .forcereply import ForceReply
 from .error import TelegramError
 from .inputfile import InputFile
 from .file import File
-from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
@@ -101,14 +100,9 @@ __all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResu
            'InlineQueryResultVenue', 'InlineQueryResultVideo', 'InlineQueryResultVoice',
            'InputContactMessageContent', 'InputFile', 'InputLocationMessageContent',
            'InputMessageContent', 'InputTextMessageContent', 'InputVenueMessageContent',
-           'KeyboardButton', 'Location', 'Message', 'MessageEntity', 'NullHandler', 'ParseMode',
-           'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup', 'ReplyMarkup', 'Sticker',
-           'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
-           'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
+           'KeyboardButton', 'Location', 'Message', 'MessageEntity', 'ParseMode', 'PhotoSize',
+           'ReplyKeyboardHide', 'ReplyKeyboardMarkup', 'ReplyMarkup', 'Sticker', 'TelegramError',
+           'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue', 'Video', 'Voice',
+           'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
            'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
            'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP']
-
-if version_info < (2, 7):
-    from warnings import warn
-    warn("python-telegram-bot will stop supporting Python 2.6 in a future release. "
-         "Please upgrade your Python version to at least Python 2.7!")

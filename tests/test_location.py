@@ -44,9 +44,8 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.longitude, self.longitude)
 
     def test_send_location_explicit_args(self):
-        message = self._bot.sendLocation(chat_id=self._chat_id,
-                                         latitude=self.latitude,
-                                         longitude=self.longitude)
+        message = self._bot.sendLocation(
+            chat_id=self._chat_id, latitude=self.latitude, longitude=self.longitude)
 
         location = message.location
 

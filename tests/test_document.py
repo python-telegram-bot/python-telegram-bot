@@ -70,9 +70,8 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file_with_custom_file_name(self):
-        message = self._bot.sendDocument(self._chat_id,
-                                         self.document_file,
-                                         filename='telegram_custom.png')
+        message = self._bot.sendDocument(
+            self._chat_id, self.document_file, filename='telegram_custom.png')
 
         document = message.document
 

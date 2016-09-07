@@ -16,8 +16,12 @@ def requirements():
 
     return requirements_list
 
+
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
-    execfile(os.path.join('telegram', 'version.py'))
+    fn = os.path.join('telegram', 'version.py')
+    with open(fn) as fh:
+        code = compile(fh.read(), fn, 'exec')
+        exec(code)
 
     setup(name='python-telegram-bot',
           version=__version__,
@@ -30,6 +34,9 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           long_description=fd.read(),
           packages=find_packages(exclude=['tests*']),
           install_requires=requirements(),
+          extras_require={
+              'json': 'ujson',
+          },
           include_package_data=True,
           classifiers=[
               'Development Status :: 5 - Production/Stable',
@@ -41,7 +48,6 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
               'Topic :: Internet',
               'Programming Language :: Python',
               'Programming Language :: Python :: 2',
-              'Programming Language :: Python :: 2.6',
               'Programming Language :: Python :: 2.7',
               'Programming Language :: Python :: 3',
               'Programming Language :: Python :: 3.3',

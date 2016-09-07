@@ -47,6 +47,7 @@ def set(bot, update, args, job_queue):
         due = int(args[0])
         if due < 0:
             bot.sendMessage(chat_id, text='Sorry we can not go back to future!')
+            return
 
         # Add job to queue
         job = Job(alarm, due, repeat=False, context=chat_id)
@@ -59,7 +60,7 @@ def set(bot, update, args, job_queue):
         bot.sendMessage(chat_id, text='Usage: /set <seconds>')
 
 
-def unset(bot, update):
+def unset(bot, update, job_queue):
     """Removes the job if the user changed their mind"""
     chat_id = update.message.chat_id
 
@@ -88,7 +89,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
     dp.add_handler(CommandHandler("set", set, pass_args=True, pass_job_queue=True))
-    dp.add_handler(CommandHandler("unset", unset))
+    dp.add_handler(CommandHandler("unset", unset, pass_job_queue=True))
 
     # log all errors
     dp.add_error_handler(error)

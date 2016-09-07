@@ -21,7 +21,6 @@
 from os.path import basename
 
 from telegram import TelegramObject
-from telegram.utils.request import download as _download
 
 
 class File(TelegramObject):
@@ -34,38 +33,44 @@ class File(TelegramObject):
 
     Args:
         file_id (str):
+        request (telegram.utils.request.Request):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
         file_size (Optional[int]):
         file_path (Optional[str]):
+
     """
 
-    def __init__(self, file_id, **kwargs):
+    def __init__(self, file_id, request, **kwargs):
         # Required
         self.file_id = str(file_id)
+        self._request = request
         # Optionals
         self.file_size = int(kwargs.get('file_size', 0))
         self.file_path = str(kwargs.get('file_path', ''))
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, request):
         """
         Args:
-            data (str):
+            data (dict):
+            request (telegram.utils.request.Request):
 
         Returns:
             telegram.File:
+
         """
         if not data:
             return None
 
-        return File(**data)
+        return File(request=request, **data)
 
     def download(self, custom_path=None):
         """
         Args:
             custom_path (str):
+
         """
         url = self.file_path
 
@@ -74,4 +79,4 @@ class File(TelegramObject):
         else:
             filename = basename(url)
 
-        _download(url, filename)
+        self._request.download(url, filename)

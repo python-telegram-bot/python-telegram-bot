@@ -70,13 +70,14 @@ class AudioTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_audio_all_args(self):
-        message = self._bot.sendAudio(self._chat_id,
-                                      self.audio_file,
-                                      duration=self.duration,
-                                      performer=self.performer,
-                                      title=self.title,
-                                      mime_type=self.mime_type,
-                                      file_size=self.file_size)
+        message = self._bot.sendAudio(
+            self._chat_id,
+            self.audio_file,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title,
+            mime_type=self.mime_type,
+            file_size=self.file_size)
 
         audio = message.audio
 
@@ -91,11 +92,12 @@ class AudioTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_audio_mp3_file(self):
-        message = self._bot.sendAudio(chat_id=self._chat_id,
-                                      audio=self.audio_file,
-                                      duration=self.duration,
-                                      performer=self.performer,
-                                      title=self.title)
+        message = self._bot.sendAudio(
+            chat_id=self._chat_id,
+            audio=self.audio_file,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title)
 
         audio = message.audio
 
@@ -110,12 +112,13 @@ class AudioTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_audio_mp3_file_custom_filename(self):
-        message = self._bot.sendAudio(chat_id=self._chat_id,
-                                      audio=self.audio_file,
-                                      duration=self.duration,
-                                      performer=self.performer,
-                                      title=self.title,
-                                      filename='telegram_custom.mp3')
+        message = self._bot.sendAudio(
+            chat_id=self._chat_id,
+            audio=self.audio_file,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title,
+            filename='telegram_custom.mp3')
 
         audio = message.audio
 
@@ -130,11 +133,12 @@ class AudioTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_audio_mp3_url_file(self):
-        message = self._bot.sendAudio(chat_id=self._chat_id,
-                                      audio=self.audio_file_url,
-                                      duration=self.duration,
-                                      performer=self.performer,
-                                      title=self.title)
+        message = self._bot.sendAudio(
+            chat_id=self._chat_id,
+            audio=self.audio_file_url,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title)
 
         audio = message.audio
 
@@ -149,11 +153,12 @@ class AudioTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_audio_resend(self):
-        message = self._bot.sendAudio(chat_id=self._chat_id,
-                                      audio=self.audio_file_id,
-                                      duration=self.duration,
-                                      performer=self.performer,
-                                      title=self.title)
+        message = self._bot.sendAudio(
+            chat_id=self._chat_id,
+            audio=self.audio_file_id,
+            duration=self.duration,
+            performer=self.performer,
+            title=self.title)
 
         audio = message.audio
 

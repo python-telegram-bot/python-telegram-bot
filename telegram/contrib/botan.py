@@ -1,11 +1,10 @@
 import logging
-from telegram import NullHandler
 
 from future.moves.urllib.parse import quote
 from future.moves.urllib.error import HTTPError, URLError
 from future.moves.urllib.request import urlopen, Request
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Botan(object):
@@ -29,12 +28,10 @@ class Botan(object):
             return False
         data = message.to_json()
         try:
-            url = self.url_template.format(token=str(self.token),
-                                           uid=str(uid),
-                                           name=quote(event_name))
-            request = Request(url,
-                              data=data.encode(),
-                              headers={'Content-Type': 'application/json'})
+            url = self.url_template.format(
+                token=str(self.token), uid=str(uid), name=quote(event_name))
+            request = Request(
+                url, data=data.encode(), headers={'Content-Type': 'application/json'})
             urlopen(request)
             return True
         except HTTPError as error:

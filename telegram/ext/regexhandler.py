@@ -62,9 +62,8 @@ class RegexHandler(Handler):
                  pass_groupdict=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(RegexHandler, self).__init__(callback,
-                                           pass_update_queue=pass_update_queue,
-                                           pass_job_queue=pass_job_queue)
+        super(RegexHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)

@@ -28,12 +28,13 @@ import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
-from telegram import Bot, TelegramError, NullHandler
-from telegram.ext import dispatcher, Dispatcher, JobQueue
+from telegram import Bot, TelegramError
+from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken
+from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Updater(object):
@@ -57,13 +58,17 @@ class Updater(object):
         base_url (Optional[str]):
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
-        bot (Optional[Bot]):
+        bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
+            the user's responsibility to create it using a `Request` instance with a large enough
+            connection pool.
         job_queue_tick_interval(Optional[float]): The interval the queue should
             be checked for new tasks. Defaults to 1.0
 
     Raises:
         ValueError: If both `token` and `bot` are passed or none of them.
+
     """
+    _request = None
 
     def __init__(self, token=None, base_url=None, workers=4, bot=None):
         if (token is None) and (bot is None):
@@ -74,15 +79,23 @@ class Updater(object):
         if bot is not None:
             self.bot = bot
         else:
-            self.bot = Bot(token, base_url)
+            # we need a connection pool the size of:
+            # * for each of the workers
+            # * 1 for Dispatcher
+            # * 1 for polling Updater (even if webhook is used, we can spare a connection)
+            # * 1 for JobQueue
+            # * 1 for main thread
+            self._request = Request(con_pool_size=workers + 4)
+            self.bot = Bot(token, base_url, request=self._request)
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
-        self.dispatcher = Dispatcher(self.bot,
-                                     self.update_queue,
-                                     job_queue=self.job_queue,
-                                     workers=workers,
-                                     exception_event=self.__exception_event)
+        self.dispatcher = Dispatcher(
+            self.bot,
+            self.update_queue,
+            job_queue=self.job_queue,
+            workers=workers,
+            exception_event=self.__exception_event)
         self.last_update_id = 0
         self.logger = logging.getLogger(__name__)
         self.running = False
@@ -216,9 +229,8 @@ class Updater(object):
 
         while self.running:
             try:
-                updates = self.bot.getUpdates(self.last_update_id,
-                                              timeout=timeout,
-                                              network_delay=network_delay)
+                updates = self.bot.getUpdates(
+                    self.last_update_id, timeout=timeout, network_delay=network_delay)
             except TelegramError as te:
                 self.logger.error("Error while getting Updates: {0}".format(te))
 
@@ -262,8 +274,8 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create and start server
-        self.httpd = WebhookServer(
-            (listen, port), WebhookHandler, self.update_queue, url_path, self.bot)
+        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path,
+                                   self.bot)
 
         if use_ssl:
             self._check_ssl_cert(cert, key)
@@ -272,10 +284,11 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(max_retries=bootstrap_retries,
-                            clean=clean,
-                            webhook_url=webhook_url,
-                            cert=open(cert, 'rb'))
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                clean=clean,
+                webhook_url=webhook_url,
+                cert=open(cert, 'rb'))
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -293,10 +306,8 @@ class Updater(object):
             exit_code = 0
         if exit_code is 0:
             try:
-                self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
-                                                    certfile=cert,
-                                                    keyfile=key,
-                                                    server_side=True)
+                self.httpd.socket = ssl.wrap_socket(
+                    self.httpd.socket, certfile=cert, keyfile=key, server_side=True)
             except ssl.SSLError as error:
                 self.logger.exception('Failed to init SSL socket')
                 raise TelegramError(str(error))
@@ -346,7 +357,7 @@ class Updater(object):
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running or dispatcher.ASYNC_THREADS:
+            if self.running or self.dispatcher.has_running_threads:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
@@ -354,9 +365,10 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                # async threads must be join()ed only after the dispatcher thread was joined,
-                # otherwise we can still have new async threads dispatched
-                self._join_async_threads()
+
+                # Stop the Request instance only if it was created by the Updater
+                if self._request:
+                    self._request.stop()
 
     def _stop_httpd(self):
         if self.httpd:
@@ -369,21 +381,6 @@ class Updater(object):
     def _stop_dispatcher(self):
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
-
-    def _join_async_threads(self):
-        with dispatcher.ASYNC_LOCK:
-            threads = list(dispatcher.ASYNC_THREADS)
-            total = len(threads)
-
-            # Stop all threads in the thread pool by put()ting one non-tuple per thread
-            for i in range(total):
-                dispatcher.ASYNC_QUEUE.put(None)
-
-            for i, thr in enumerate(threads):
-                self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
-                thr.join()
-                dispatcher.ASYNC_THREADS.remove(thr)
-                self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
 
     def _join_threads(self):
         for thr in self.__threads:
