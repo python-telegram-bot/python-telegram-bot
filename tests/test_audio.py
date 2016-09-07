@@ -230,6 +230,15 @@ class AudioTest(BaseTest, unittest.TestCase):
             TypeError,
             lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_audio(self):
+        """Test for Message.reply_audio"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_audio(self.audio_file)
+
+        self.assertNotEqual(message.audio.file_id, '')
+
 
 if __name__ == '__main__':
     unittest.main()

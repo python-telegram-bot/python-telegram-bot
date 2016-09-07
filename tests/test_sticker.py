@@ -136,6 +136,15 @@ class StickerTest(BaseTest, unittest.TestCase):
             TypeError,
             lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_sticker(self):
+        """Test for Message.reply_sticker"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_sticker(self.sticker_file_id)
+
+        self.assertNotEqual(message.sticker.file_id, '')
+
 
 if __name__ == '__main__':
     unittest.main()

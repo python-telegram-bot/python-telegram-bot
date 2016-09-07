@@ -21,6 +21,8 @@
 import sys
 import unittest
 
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -61,6 +63,16 @@ class VenueTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)
+
+    @flaky(3, 1)
+    def test_reply_venue(self):
+        """Test for Message.reply_venue"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_venue(self.location.latitude, self.location.longitude, self.title,
+                                      self._address)
+
+        self.assertAlmostEqual(message.venue.location.latitude, self.location.latitude, 2)
+        self.assertAlmostEqual(message.venue.location.longitude, self.location.longitude, 2)
 
 
 if __name__ == '__main__':

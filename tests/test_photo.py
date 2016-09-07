@@ -200,6 +200,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
             TypeError,
             lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_photo(self):
+        """Test for Message.reply_photo"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_photo(self.photo_file)
+
+        self.assertNotEqual(message.photo[0].file_id, '')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -20,6 +20,9 @@
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -63,6 +66,15 @@ class ContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact['first_name'], self.first_name)
         self.assertEqual(contact['last_name'], self.last_name)
         self.assertEqual(contact['user_id'], self.user_id)
+
+    @flaky(3, 1)
+    def test_reply_contact(self):
+        """Test for Message.reply_contact"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_contact(self.phone_number, self.first_name)
+
+        self.assertEqual(message.contact.phone_number, self.phone_number)
+        self.assertEqual(message.contact.first_name, self.first_name)
 
 
 if __name__ == '__main__':

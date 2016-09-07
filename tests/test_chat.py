@@ -20,6 +20,9 @@
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -60,6 +63,17 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.assertEqual(group_chat['id'], self.id)
         self.assertEqual(group_chat['title'], self.title)
         self.assertEqual(group_chat['type'], self.type)
+
+    @flaky(3, 1)
+    def test_send_action(self):
+        """Test for Chat.send_action"""
+        self.json_dict['id'] = self._chat_id
+        group_chat = telegram.Chat.de_json(self.json_dict)
+        group_chat.bot = self._bot
+
+        result = group_chat.send_action(telegram.ChatAction.TYPING)
+
+        self.assertTrue(result)
 
 
 if __name__ == '__main__':

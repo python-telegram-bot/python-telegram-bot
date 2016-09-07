@@ -20,6 +20,9 @@
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -96,6 +99,17 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)
         self.assertEqual(user['type'], self.type)
+
+    @flaky(3, 1)
+    def test_get_profile_photos(self):
+        """Test for User.get_profile_photos"""
+        self.json_dict['id'] = self._chat_id
+        user = telegram.User.de_json(self.json_dict)
+        user.bot = self._bot
+
+        result = user.get_profile_photos()
+
+        self.assertNotEquals(result, None)
 
 
 if __name__ == '__main__':

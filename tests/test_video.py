@@ -253,6 +253,15 @@ class VideoTest(BaseTest, unittest.TestCase):
                                                       timeout=10,
                                                       **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_video(self):
+        """Test for Message.reply_video"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_video(self.video_file)
+
+        self.assertNotEqual(message.video.file_id, '')
+
 
 if __name__ == '__main__':
     unittest.main()

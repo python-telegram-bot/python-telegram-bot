@@ -194,6 +194,15 @@ class VoiceTest(BaseTest, unittest.TestCase):
             TypeError,
             lambda: self._bot.sendVoice(chat_id=self._chat_id, **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_voice(self):
+        """Test for Message.reply_voice"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_voice(self.voice_file)
+
+        self.assertNotEqual(message.voice.file_id, '')
+
 
 if __name__ == '__main__':
     unittest.main()

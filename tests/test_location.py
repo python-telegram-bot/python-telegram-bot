@@ -20,6 +20,9 @@
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -88,6 +91,15 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertRaises(TypeError,
                           lambda: self._bot.sendLocation(chat_id=self._chat_id,
                                                          **json_dict))
+
+    @flaky(3, 1)
+    def test_reply_location(self):
+        """Test for Message.reply_location"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_location(self.latitude, self.longitude)
+
+        self.assertEqual(message.location.latitude, self.latitude)
+        self.assertEqual(message.location.longitude, self.longitude)
 
 
 if __name__ == '__main__':

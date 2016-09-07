@@ -167,6 +167,15 @@ class DocumentTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendDocument(chat_id=self._chat_id,
                                                          **json_dict))
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_document(self):
+        """Test for Message.reply_document"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_document(self.document_file)
+
+        self.assertNotEqual(message.document.file_id, '')
+
 
 if __name__ == '__main__':
     unittest.main()
