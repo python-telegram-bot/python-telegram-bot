@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a object that represents a Telegram Message."""
 
+import sys
 from datetime import datetime
 from time import mktime
 
@@ -244,3 +245,55 @@ class Message(TelegramObject):
         except AttributeError:
             # Python 3 (< 3.3) and Python 2
             return int(mktime(dt_obj.timetuple()))
+
+    def parse_entity(self, entity):
+        """
+        Returns the text from a given :class:`telegram.MessageEntity`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.text`` with the offset and length.)
+
+        Args:
+            entity (MessageEntity): The entity to extract the text from. It must be an entity that
+                belongs to this message.
+
+        Returns:
+            str: The text of the given entity
+        """
+        # Is it a narrow build, if so we don't need to convert
+        if sys.maxunicode == 0xffff:
+            return self.text[entity.offset:entity.offset + entity.length]
+        else:
+            entity_text = self.text.encode('utf-16-le')
+            entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
+
+        return entity_text.decode('utf-16-le')
+
+    def parse_entities(self, types=None):
+        """
+        Returns a ``dict`` that maps :class:`telegram.MessageEntity` to ``str``.
+        It contains entities from this message filtered by their ``type`` attribute as the key, and
+        the text that each entity belongs to as the value of the ``dict``.
+
+        Note:
+            This method should always be used instead of the ``entities`` attribute, since it
+            calculates the correct substring from the message text based on UTF-16 codepoints.
+            See ``get_entity_text`` for more info.
+
+        Args:
+            types (Optional[list]): List of ``MessageEntity`` types as strings. If the ``type``
+                attribute of an entity is contained in this list, it will be returned.
+                Defaults to a list of all types. All types can be found as constants in
+                :class:`telegram.MessageEntity`.
+
+        Returns:
+            dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
+                text that belongs to them, calculated based on UTF-16 codepoints.
+        """
+        if types is None:
+            types = MessageEntity.ALL_TYPES
+
+        return {entity: self.parse_entity(entity)
+                for entity in self.entities if entity.type in types}

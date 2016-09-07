@@ -32,6 +32,12 @@ Attributes:
         limit, but eventually you'll begin receiving 429 errors.
     MAX_MESSAGES_PER_SECOND (int)
     MAX_MESSAGES_PER_MINUTE_PER_GROUP (int)
+
+The following constant have been found by experimentation:
+
+Attributes:
+    MAX_MESSAGE_ENTITIES (int): Max number of entities that can be in a message.
+        (Beyond this cap telegram will simply ignore further formatting styles)
 """
 
 MAX_MESSAGE_LENGTH = 4096
@@ -45,3 +51,4 @@ MAX_FILESIZE_UPLOAD = int(50E6)  # (50MB)
 MAX_MESSAGES_PER_SECOND_PER_CHAT = 1
 MAX_MESSAGES_PER_SECOND = 30
 MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
+MAX_MESSAGE_ENTITIES = 100
