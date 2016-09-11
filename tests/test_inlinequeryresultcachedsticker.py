@@ -50,7 +50,7 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
         }
 
     def test_sticker_de_json(self):
-        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict)
+        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker.type, self.type)
         self.assertEqual(sticker.id, self.id)
@@ -60,12 +60,13 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(sticker.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_sticker_to_json(self):
-        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict)
+        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict).to_dict()
+        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict,
+                                                                  self._bot).to_dict()
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)

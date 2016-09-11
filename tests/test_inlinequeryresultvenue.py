@@ -62,7 +62,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         }
 
     def test_venue_de_json(self):
-        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict)
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot)
 
         self.assertEqual(venue.id, self.id)
         self.assertEqual(venue.type, self.type)
@@ -79,12 +79,12 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(venue.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_venue_to_json(self):
-        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict)
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(venue.to_json()))
 
     def test_venue_to_dict(self):
-        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict).to_dict()
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(venue))
         self.assertDictEqual(self.json_dict, venue)

@@ -65,10 +65,11 @@ class User(TelegramObject):
         return self.first_name
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.User:
@@ -76,11 +77,10 @@ class User(TelegramObject):
         if not data:
             return None
 
-        return User(**data)
+        return User(bot=bot, **data)
 
     def get_profile_photos(self, *args, **kwargs):
         """
         Shortcut for ``bot.getUserProfilePhotos(update.message.from_user.id, *args, **kwargs)``
         """
-        self._check_bot_reference()
         return self.bot.getUserProfilePhotos(self.id, *args, **kwargs)

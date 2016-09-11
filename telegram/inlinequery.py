@@ -58,23 +58,24 @@ class InlineQuery(TelegramObject):
         self.bot = kwargs.get('bot')
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.InlineQuery:
         """
-        data = super(InlineQuery, InlineQuery).de_json(data)
+        data = super(InlineQuery, InlineQuery).de_json(data, bot)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'))
-        data['location'] = Location.de_json(data.get('location'))
+        data['from_user'] = User.de_json(data.get('from'), bot)
+        data['location'] = Location.de_json(data.get('location'), bot)
 
-        return InlineQuery(**data)
+        return InlineQuery(bot=bot, **data)
 
     def to_dict(self):
         """
@@ -90,5 +91,4 @@ class InlineQuery(TelegramObject):
 
     def answer(self, *args, **kwargs):
         """Shortcut for ``bot.answerInlineQuery(update.inline_query.id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.answerInlineQuery(self.id, *args, **kwargs)

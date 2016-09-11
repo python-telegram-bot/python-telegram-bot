@@ -56,18 +56,18 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.longitude, self.longitude)
 
     def test_location_de_json(self):
-        location = telegram.Location.de_json(self.json_dict)
+        location = telegram.Location.de_json(self.json_dict, self._bot)
 
         self.assertEqual(location.latitude, self.latitude)
         self.assertEqual(location.longitude, self.longitude)
 
     def test_location_to_json(self):
-        location = telegram.Location.de_json(self.json_dict)
+        location = telegram.Location.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(location.to_json()))
 
     def test_location_to_dict(self):
-        location = telegram.Location.de_json(self.json_dict)
+        location = telegram.Location.de_json(self.json_dict, self._bot)
 
         self.assertEqual(location['latitude'], self.latitude)
         self.assertEqual(location['longitude'], self.longitude)

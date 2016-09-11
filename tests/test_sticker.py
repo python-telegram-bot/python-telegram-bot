@@ -77,7 +77,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker.file_id, self.sticker_file_id)
         self.assertEqual(sticker.width, self.width)
@@ -87,12 +87,12 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_to_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker['file_id'], self.sticker_file_id)
         self.assertEqual(sticker['width'], self.width)

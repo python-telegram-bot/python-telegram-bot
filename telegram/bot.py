@@ -154,9 +154,7 @@ class Bot(TelegramObject):
             if result is True:
                 return result
 
-            self.create_references(result)
-
-            return Message.de_json(result)
+            return Message.de_json(result, self)
 
         return decorator
 
@@ -178,7 +176,7 @@ class Bot(TelegramObject):
 
         result = self._request.get(url)
 
-        self.bot = User.de_json(result)
+        self.bot = User.de_json(result, self)
 
         return self.bot
 
@@ -862,7 +860,7 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return UserProfilePhotos.de_json(result)
+        return UserProfilePhotos.de_json(result, self)
 
     @log
     def getFile(self, file_id, **kwargs):
@@ -896,7 +894,7 @@ class Bot(TelegramObject):
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
 
-        return File.de_json(result, self._request)
+        return File.de_json(result, self)
 
     @log
     def kickChatMember(self, chat_id, user_id, **kwargs):
@@ -1181,26 +1179,6 @@ class Bot(TelegramObject):
 
         return url, data
 
-    def create_references(self, d):
-        """
-        Recursively reates a reference to this Bot instance in the dict and all contained dicts and
-        lists of dicts. This reference can then be retrieved in constructors to be used in class
-        methods like ``Message.reply_text``.
-
-        Args:
-            d (dict): The dict to create the references in.
-        """
-
-        for value in d.values():
-            if isinstance(value, list):
-                for item in value:
-                    self.create_references(item)
-
-            elif isinstance(value, dict):
-                self.create_references(value)
-
-        d['bot'] = self
-
     @log
     def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=5., **kwargs):
         """Use this method to receive incoming updates using long polling.
@@ -1244,14 +1222,10 @@ class Bot(TelegramObject):
 
         if result:
             self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
-
         else:
             self.logger.debug('No new updates found.')
 
-        for u in result:
-            self.create_references(u)
-
-        return [Update.de_json(u) for u in result]
+        return [Update.de_json(u, self) for u in result]
 
     @log
     def setWebhook(self, webhook_url=None, certificate=None, **kwargs):
@@ -1351,7 +1325,7 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return Chat.de_json(result)
+        return Chat.de_json(result, self)
 
     @log
     def getChatAdministrators(self, chat_id, **kwargs):
@@ -1386,7 +1360,7 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return [ChatMember.de_json(x) for x in result]
+        return [ChatMember.de_json(x, self) for x in result]
 
     @log
     def getChatMembersCount(self, chat_id, **kwargs):
@@ -1449,11 +1423,11 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return ChatMember.de_json(result)
+        return ChatMember.de_json(result, self)
 
     @staticmethod
-    def de_json(data):
-        data = super(Bot, Bot).de_json(data)
+    def de_json(data, bot):
+        data = super(Bot, Bot).de_json(data, bot)
 
         return Bot(**data)
 

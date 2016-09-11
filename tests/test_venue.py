@@ -46,7 +46,7 @@ class VenueTest(BaseTest, unittest.TestCase):
         }
 
     def test_sticker_de_json(self):
-        sticker = telegram.Venue.de_json(self.json_dict)
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(sticker.location, telegram.Location))
         self.assertEqual(sticker.title, self.title)
@@ -54,12 +54,12 @@ class VenueTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.foursquare_id, self.foursquare_id)
 
     def test_sticker_to_json(self):
-        sticker = telegram.Venue.de_json(self.json_dict)
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Venue.de_json(self.json_dict).to_dict()
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)

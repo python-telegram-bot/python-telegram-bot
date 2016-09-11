@@ -35,11 +35,11 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    def __init__(self, type, id):
+    def __init__(self, type, id, **kwargs):
         # Required
         self.type = str(type)
         self.id = str(id)
 
     @staticmethod
-    def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+    def de_json(data, bot):
+        return super(InlineQueryResult, InlineQueryResult).de_json(data, bot)

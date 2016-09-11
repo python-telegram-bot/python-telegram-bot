@@ -31,5 +31,5 @@ class InputLocationMessageContent(InputMessageContent):
         self.longitude = longitude
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         return InputLocationMessageContent(**data)

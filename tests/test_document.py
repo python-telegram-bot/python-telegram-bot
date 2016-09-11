@@ -109,7 +109,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.mime_type, self.mime_type)
 
     def test_document_de_json(self):
-        document = telegram.Document.de_json(self.json_dict)
+        document = telegram.Document.de_json(self.json_dict, self._bot)
 
         self.assertEqual(document.file_id, self.document_file_id)
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
@@ -118,12 +118,12 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.file_size, self.file_size)
 
     def test_document_to_json(self):
-        document = telegram.Document.de_json(self.json_dict)
+        document = telegram.Document.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(document.to_json()))
 
     def test_document_to_dict(self):
-        document = telegram.Document.de_json(self.json_dict)
+        document = telegram.Document.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(document.to_dict()))
         self.assertEqual(document['file_id'], self.document_file_id)

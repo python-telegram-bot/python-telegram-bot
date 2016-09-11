@@ -37,14 +37,23 @@ class CallbackQuery(TelegramObject):
         self.bot = kwargs.get('bot')
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
+        """
+        Args:
+            data (dict):
+            bot (telegram.Bot):
+
+        Returns:
+            telegram.CallbackQuery:
+        """
+
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'))
-        data['message'] = Message.de_json(data.get('message'))
+        data['from_user'] = User.de_json(data.get('from'), bot)
+        data['message'] = Message.de_json(data.get('message'), bot)
 
-        return CallbackQuery(**data)
+        return CallbackQuery(bot=bot, **data)
 
     def to_dict(self):
         """
@@ -59,5 +68,4 @@ class CallbackQuery(TelegramObject):
 
     def answer(self, *args, **kwargs):
         """Shortcut for ``bot.answerCallbackQuery(update.callback_query.id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.answerCallbackQuery(self.id, *args, **kwargs)

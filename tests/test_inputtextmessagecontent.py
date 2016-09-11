@@ -43,14 +43,14 @@ class InputTextMessageContentTest(BaseTest, unittest.TestCase):
         }
 
     def test_itmc_de_json(self):
-        itmc = telegram.InputTextMessageContent.de_json(self.json_dict)
+        itmc = telegram.InputTextMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertEqual(itmc.parse_mode, self.parse_mode)
         self.assertEqual(itmc.message_text, self.message_text)
         self.assertEqual(itmc.disable_web_page_preview, self.disable_web_page_preview)
 
     def test_itmc_de_json_factory(self):
-        itmc = telegram.InputMessageContent.de_json(self.json_dict)
+        itmc = telegram.InputMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(itmc, telegram.InputTextMessageContent))
 
@@ -59,17 +59,17 @@ class InputTextMessageContentTest(BaseTest, unittest.TestCase):
 
         del (json_dict['message_text'])
 
-        itmc = telegram.InputMessageContent.de_json(json_dict)
+        itmc = telegram.InputMessageContent.de_json(json_dict, self._bot)
 
         self.assertFalse(itmc)
 
     def test_itmc_to_json(self):
-        itmc = telegram.InputTextMessageContent.de_json(self.json_dict)
+        itmc = telegram.InputTextMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(itmc.to_json()))
 
     def test_itmc_to_dict(self):
-        itmc = telegram.InputTextMessageContent.de_json(self.json_dict).to_dict()
+        itmc = telegram.InputTextMessageContent.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(itmc))
         self.assertDictEqual(self.json_dict, itmc)

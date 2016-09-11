@@ -86,9 +86,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
             self.logger.debug('Webhook received data: ' + json_string)
 
-            update_dict = json.loads(json_string)
-            self.server.bot.create_references(update_dict)
-            update = Update.de_json(update_dict)
+            update = Update.de_json(json.loads(json_string), self.server.bot)
 
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
             self.server.update_queue.put(update)

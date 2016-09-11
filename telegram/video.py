@@ -58,10 +58,11 @@ class Video(TelegramObject):
         self.file_size = int(kwargs.get('file_size', 0))
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Video:
@@ -69,6 +70,6 @@ class Video(TelegramObject):
         if not data:
             return None
 
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'))
+        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
         return Video(**data)

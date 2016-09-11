@@ -169,7 +169,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.mime_type, self.mime_type)
 
     def test_audio_de_json(self):
-        audio = telegram.Audio.de_json(self.json_dict)
+        audio = telegram.Audio.de_json(self.json_dict, self._bot)
 
         self.assertEqual(audio.file_id, self.audio_file_id)
         self.assertEqual(audio.duration, self.duration)
@@ -179,12 +179,12 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.file_size, self.file_size)
 
     def test_audio_to_json(self):
-        audio = telegram.Audio.de_json(self.json_dict)
+        audio = telegram.Audio.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(audio.to_json()))
 
     def test_audio_to_dict(self):
-        audio = telegram.Audio.de_json(self.json_dict)
+        audio = telegram.Audio.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(audio.to_dict()))
         self.assertEqual(audio['file_id'], self.audio_file_id)

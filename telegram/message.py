@@ -150,10 +150,11 @@ class Message(TelegramObject):
         return self.chat.id
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Message:
@@ -161,30 +162,30 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'))
+        data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = datetime.fromtimestamp(data['date'])
-        data['chat'] = Chat.de_json(data.get('chat'))
-        data['entities'] = MessageEntity.de_list(data.get('entities'))
-        data['forward_from'] = User.de_json(data.get('forward_from'))
-        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'))
+        data['chat'] = Chat.de_json(data.get('chat'), bot)
+        data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
+        data['forward_from'] = User.de_json(data.get('forward_from'), bot)
+        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
         data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
-        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'))
+        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
         data['edit_date'] = Message._fromtimestamp(data.get('edit_date'))
-        data['audio'] = Audio.de_json(data.get('audio'))
-        data['document'] = Document.de_json(data.get('document'))
-        data['photo'] = PhotoSize.de_list(data.get('photo'))
-        data['sticker'] = Sticker.de_json(data.get('sticker'))
-        data['video'] = Video.de_json(data.get('video'))
-        data['voice'] = Voice.de_json(data.get('voice'))
-        data['contact'] = Contact.de_json(data.get('contact'))
-        data['location'] = Location.de_json(data.get('location'))
-        data['venue'] = Venue.de_json(data.get('venue'))
-        data['new_chat_member'] = User.de_json(data.get('new_chat_member'))
-        data['left_chat_member'] = User.de_json(data.get('left_chat_member'))
-        data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'))
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'))
+        data['audio'] = Audio.de_json(data.get('audio'), bot)
+        data['document'] = Document.de_json(data.get('document'), bot)
+        data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
+        data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
+        data['video'] = Video.de_json(data.get('video'), bot)
+        data['voice'] = Voice.de_json(data.get('voice'), bot)
+        data['contact'] = Contact.de_json(data.get('contact'), bot)
+        data['location'] = Location.de_json(data.get('location'), bot)
+        data['venue'] = Venue.de_json(data.get('venue'), bot)
+        data['new_chat_member'] = User.de_json(data.get('new_chat_member'), bot)
+        data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
+        data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
+        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
 
-        return Message(**data)
+        return Message(bot=bot, **data)
 
     def __getitem__(self, item):
         if item in self.__dict__.keys():
@@ -251,52 +252,42 @@ class Message(TelegramObject):
 
     def reply_text(self, *args, **kwargs):
         """Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendMessage(self.chat_id, *args, **kwargs)
 
     def reply_photo(self, *args, **kwargs):
         """Shortcut for ``bot.sendPhoto(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendPhoto(self.chat_id, *args, **kwargs)
 
     def reply_audio(self, *args, **kwargs):
         """Shortcut for ``bot.sendAudio(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendAudio(self.chat_id, *args, **kwargs)
 
     def reply_document(self, *args, **kwargs):
         """Shortcut for ``bot.sendDocument(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendDocument(self.chat_id, *args, **kwargs)
 
     def reply_sticker(self, *args, **kwargs):
         """Shortcut for ``bot.sendSticker(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendSticker(self.chat_id, *args, **kwargs)
 
     def reply_video(self, *args, **kwargs):
         """Shortcut for ``bot.sendVideo(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendVideo(self.chat_id, *args, **kwargs)
 
     def reply_voice(self, *args, **kwargs):
         """Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendVoice(self.chat_id, *args, **kwargs)
 
     def reply_location(self, *args, **kwargs):
         """Shortcut for ``bot.sendLocation(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendLocation(self.chat_id, *args, **kwargs)
 
     def reply_venue(self, *args, **kwargs):
         """Shortcut for ``bot.sendVenue(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendVenue(self.chat_id, *args, **kwargs)
 
     def reply_contact(self, *args, **kwargs):
         """Shortcut for ``bot.sendContact(update.message.chat_id, *args, **kwargs)``"""
-        self._check_bot_reference()
         return self.bot.sendContact(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, disable_notification=False):
@@ -308,7 +299,6 @@ class Message(TelegramObject):
                                message_id=update.message.message_id)
 
         """
-        self._check_bot_reference()
         return self.bot.forwardMessage(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
