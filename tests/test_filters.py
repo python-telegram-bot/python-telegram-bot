@@ -23,10 +23,11 @@ This module contains a object that represents Tests for MessageHandler.Filters
 import sys
 import unittest
 from datetime import datetime
+import functools
 
 sys.path.append('.')
 
-from telegram import Message, User, Chat
+from telegram import Message, User, Chat, MessageEntity
 from telegram.ext import Filters
 from tests.base import BaseTest
 
@@ -149,6 +150,27 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.pinned_message = 'test'
         self.assertTrue(Filters.status_update(self.message))
         self.message.pinned_message = None
+
+    def test_entities_filter(self):
+        e = functools.partial(MessageEntity, offset=0, length=0)
+
+        self.message.entities = [e(MessageEntity.MENTION)]
+        self.assertTrue(Filters.entities([MessageEntity.MENTION])(self.message))
+
+        self.message.entities = []
+        self.assertFalse(Filters.entities([MessageEntity.MENTION])(self.message))
+
+        self.message.entities = [e(MessageEntity.BOLD)]
+        self.assertFalse(Filters.entities([MessageEntity.MENTION])(self.message))
+
+        self.message.entities = [e(MessageEntity.MENTION)]
+        self.assertTrue(
+            Filters.entities([MessageEntity.MENTION, MessageEntity.BOLD])(self.message))
+        self.message.entities = [e(MessageEntity.BOLD)]
+        self.assertTrue(
+            Filters.entities([MessageEntity.MENTION, MessageEntity.BOLD])(self.message))
+        self.assertFalse(
+            Filters.entities([MessageEntity.MENTION, MessageEntity.TEXT_MENTION])(self.message))
 
 
 if __name__ == '__main__':
