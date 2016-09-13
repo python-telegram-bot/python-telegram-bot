@@ -85,6 +85,33 @@ class Filters(object):
     def forwarded(message):
         return bool(message.forward_date)
 
+    @staticmethod
+    def entities(entity_types):
+        """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
+        that match `entity_types`.
+
+        Note:
+            This filter functions as an OR filter, meaning that just one of the entity_type.
+            If you want AND filtering instead, you have to specify multiple of this filter in the
+            `filters` attribute. Example:
+
+                >>> MessageHandler([Filters.entities(TEXT_MENTION, MENTION),
+                ...                 Filters.entities(HASHTAG)], callback)
+
+            Will require either a one type of mention AND a hashtag in the message.
+
+        Args:
+            entity_types: List of entity types to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        Returns: function to use as filter
+        """
+
+        def entities_filter(message):
+            return any([entity_types in entity.type for entity in message.entities])
+
+        return entities_filter
+
 
 class MessageHandler(Handler):
     """
