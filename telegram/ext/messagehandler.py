@@ -95,8 +95,8 @@ class Filters(object):
             If you want AND filtering instead, you have to specify multiple of this filter in the
             `filters` attribute. Example:
 
-                >>> MessageHandler([Filters.entities(TEXT_MENTION, MENTION),
-                ...                 Filters.entities(HASHTAG)], callback)
+                >>> MessageHandler([Filters.entities([TEXT_MENTION, MENTION]),
+                ...                 Filters.entities([HASHTAG])], callback)
 
             Will require either a one type of mention AND a hashtag in the message.
 
