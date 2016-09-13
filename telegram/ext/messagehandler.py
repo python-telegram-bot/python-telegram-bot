@@ -108,7 +108,7 @@ class Filters(object):
         """
 
         def entities_filter(message):
-            return any([entity_types in entity.type for entity in message.entities])
+            return any([entity.type in entity_types for entity in message.entities])
 
         return entities_filter
 
