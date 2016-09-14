@@ -23,69 +23,6 @@ from telegram import Update
 from telegram.utils.deprecate import deprecate
 
 
-class Filters(object):
-    """
-    Convenient namespace (class) & methods for the filter funcs of the
-    MessageHandler class.
-    """
-
-    @staticmethod
-    def text(message):
-        return message.text and not message.text.startswith('/')
-
-    @staticmethod
-    def command(message):
-        return message.text and message.text.startswith('/')
-
-    @staticmethod
-    def audio(message):
-        return bool(message.audio)
-
-    @staticmethod
-    def document(message):
-        return bool(message.document)
-
-    @staticmethod
-    def photo(message):
-        return bool(message.photo)
-
-    @staticmethod
-    def sticker(message):
-        return bool(message.sticker)
-
-    @staticmethod
-    def video(message):
-        return bool(message.video)
-
-    @staticmethod
-    def voice(message):
-        return bool(message.voice)
-
-    @staticmethod
-    def contact(message):
-        return bool(message.contact)
-
-    @staticmethod
-    def location(message):
-        return bool(message.location)
-
-    @staticmethod
-    def venue(message):
-        return bool(message.venue)
-
-    @staticmethod
-    def status_update(message):
-        return bool(message.new_chat_member or message.left_chat_member or message.new_chat_title
-                    or message.new_chat_photo or message.delete_chat_photo
-                    or message.group_chat_created or message.supergroup_chat_created
-                    or message.channel_chat_created or message.migrate_to_chat_id
-                    or message.migrate_from_chat_id or message.pinned_message)
-
-    @staticmethod
-    def forwarded(message):
-        return bool(message.forward_date)
-
-
 class MessageHandler(Handler):
     """
     Handler class to handle telegram messages. Messages are Telegram Updates

@@ -26,7 +26,8 @@ from .choseninlineresulthandler import ChosenInlineResultHandler
 from .commandhandler import CommandHandler
 from .handler import Handler
 from .inlinequeryhandler import InlineQueryHandler
-from .messagehandler import MessageHandler, Filters
+from .messagehandler import MessageHandler
+from .filters import Filters
 from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler

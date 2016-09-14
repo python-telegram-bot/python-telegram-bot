@@ -150,6 +150,30 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.assertTrue(Filters.status_update(self.message))
         self.message.pinned_message = None
 
+    def test_and_filters(self):
+        # For now just test with forwarded as that's the only one that makes sense
+        # That'll change when we get a entities filter
+        self.message.text = 'test'
+        self.message.forward_date = True
+        self.assertTrue((Filters.text & Filters.forwarded)(self.message))
+        self.message.text = '/test'
+        self.assertFalse((Filters.text & Filters.forwarded)(self.message))
+        self.message.text = 'test'
+        self.message.forward_date = None
+        self.assertFalse((Filters.text & Filters.forwarded)(self.message))
+
+    def test_or_filters(self):
+        # For now just test with forwarded as that's the only one that makes sense
+        # That'll change when we get a entities filter
+        self.message.text = 'test'
+        self.assertTrue((Filters.text | Filters.status_update)(self.message))
+        self.message.group_chat_created = True
+        self.assertTrue((Filters.text | Filters.status_update)(self.message))
+        self.message.text = None
+        self.assertTrue((Filters.text | Filters.status_update)(self.message))
+        self.message.group_chat_created = False
+        self.assertFalse((Filters.text | Filters.status_update)(self.message))
+
 
 if __name__ == '__main__':
     unittest.main()
