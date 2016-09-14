@@ -128,7 +128,7 @@ class BotTest(BaseTest, unittest.TestCase):
             photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 822)
+        self.assertEqual(message.photo[0].file_size, 813)
 
     @flaky(3, 1)
     @timeout(10)
@@ -137,7 +137,7 @@ class BotTest(BaseTest, unittest.TestCase):
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 685)
+        self.assertEqual(message.photo[0].file_size, 670)
 
     @flaky(3, 1)
     @timeout(10)
@@ -146,7 +146,7 @@ class BotTest(BaseTest, unittest.TestCase):
             photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram', chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 685)
+        self.assertEqual(message.photo[0].file_size, 670)
 
     @flaky(3, 1)
     @timeout(10)
