@@ -25,7 +25,7 @@ from telegram import TelegramObject, Message, User
 class CallbackQuery(TelegramObject):
     """This object represents a Telegram CallbackQuery."""
 
-    def __init__(self, id, from_user, data, **kwargs):
+    def __init__(self, id, from_user, data, bot=None, **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
@@ -34,7 +34,7 @@ class CallbackQuery(TelegramObject):
         self.message = kwargs.get('message')
         self.inline_message_id = kwargs.get('inline_message_id', '')
 
-        self.bot = kwargs.get('bot')
+        self.bot = bot
 
     @staticmethod
     def de_json(data, bot):

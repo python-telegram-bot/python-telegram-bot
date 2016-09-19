@@ -45,7 +45,7 @@ class InlineQuery(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, id, from_user, query, offset, **kwargs):
+    def __init__(self, id, from_user, query, offset, bot=None, **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
@@ -55,7 +55,7 @@ class InlineQuery(TelegramObject):
         # Optional
         self.location = kwargs.get('location')
 
-        self.bot = kwargs.get('bot')
+        self.bot = bot
 
     @staticmethod
     def de_json(data, bot):

@@ -106,7 +106,7 @@ class Message(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, message_id, from_user, date, chat, **kwargs):
+    def __init__(self, message_id, from_user, date, chat, bot=None, **kwargs):
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
@@ -142,7 +142,7 @@ class Message(TelegramObject):
         self.channel_chat_created = bool(kwargs.get('channel_chat_created', False))
         self.pinned_message = kwargs.get('pinned_message')
 
-        self.bot = kwargs.get('bot')
+        self.bot = bot
 
     @property
     def chat_id(self):

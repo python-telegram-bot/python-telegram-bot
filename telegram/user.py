@@ -44,7 +44,7 @@ class User(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, id, first_name, **kwargs):
+    def __init__(self, id, first_name, bot=None, **kwargs):
         # Required
         self.id = int(id)
         self.first_name = first_name
@@ -53,7 +53,7 @@ class User(TelegramObject):
         self.last_name = kwargs.get('last_name', '')
         self.username = kwargs.get('username', '')
 
-        self.bot = kwargs.get('bot')
+        self.bot = bot
 
     @property
     def name(self):
