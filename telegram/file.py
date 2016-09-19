@@ -80,4 +80,4 @@ class File(TelegramObject):
         else:
             filename = basename(url)
 
-        self.bot._request.download(url, filename)
+        self.bot.request.download(url, filename)
