@@ -39,7 +39,8 @@ class CommandHandler(Handler):
         pass_args (optional[bool]): If the handler should be passed the
             arguments passed to the command as a keyword argument called `
             ``args``. It will contain a list of strings, which is the text
-            following the command split on spaces. Default is ``False``
+            following the command split on single or consecutive whitespace characters.
+            Default is ``False``
         pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
@@ -80,7 +81,7 @@ class CommandHandler(Handler):
         message = update.message or update.edited_message
 
         if self.pass_args:
-            optional_args['args'] = message.text.split(' ')[1:]
+            optional_args['args'] = message.text.split()[1:]
 
         return self.callback(dispatcher.bot, update, **optional_args)
 

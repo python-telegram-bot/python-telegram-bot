@@ -11,6 +11,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
+- `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `franciscod <https://github.com/franciscod>`_
 - `Jacob Bom <https://github.com/bomjacob>`_
