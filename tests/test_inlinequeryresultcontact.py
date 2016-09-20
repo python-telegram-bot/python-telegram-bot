@@ -58,7 +58,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
         }
 
     def test_contact_de_json(self):
-        contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot)
 
         self.assertEqual(contact.id, self.id)
         self.assertEqual(contact.type, self.type)
@@ -73,12 +73,12 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(contact.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_contact_to_json(self):
-        contact = telegram.InlineQueryResultContact.de_json(self.json_dict)
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(contact.to_json()))
 
     def test_contact_to_dict(self):
-        contact = telegram.InlineQueryResultContact.de_json(self.json_dict).to_dict()
+        contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(contact))
         self.assertDictEqual(self.json_dict, contact)

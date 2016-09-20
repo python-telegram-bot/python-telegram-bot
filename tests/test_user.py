@@ -20,6 +20,9 @@
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -45,7 +48,7 @@ class UserTest(BaseTest, unittest.TestCase):
         }
 
     def test_user_de_json(self):
-        user = telegram.User.de_json(self.json_dict)
+        user = telegram.User.de_json(self.json_dict, self._bot)
 
         self.assertEqual(user.id, self.id)
         self.assertEqual(user.first_name, self.first_name)
@@ -60,7 +63,7 @@ class UserTest(BaseTest, unittest.TestCase):
 
         del (json_dict['username'])
 
-        user = telegram.User.de_json(self.json_dict)
+        user = telegram.User.de_json(self.json_dict, self._bot)
 
         self.assertEqual(user.id, self.id)
         self.assertEqual(user.first_name, self.first_name)
@@ -75,7 +78,7 @@ class UserTest(BaseTest, unittest.TestCase):
         del (json_dict['username'])
         del (json_dict['last_name'])
 
-        user = telegram.User.de_json(self.json_dict)
+        user = telegram.User.de_json(self.json_dict, self._bot)
 
         self.assertEqual(user.id, self.id)
         self.assertEqual(user.first_name, self.first_name)
@@ -83,12 +86,12 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.name, self.first_name)
 
     def test_user_to_json(self):
-        user = telegram.User.de_json(self.json_dict)
+        user = telegram.User.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(user.to_json()))
 
     def test_user_to_dict(self):
-        user = telegram.User.de_json(self.json_dict)
+        user = telegram.User.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(user.to_dict()))
         self.assertEqual(user['id'], self.id)
@@ -96,6 +99,17 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)
         self.assertEqual(user['type'], self.type)
+
+    @flaky(3, 1)
+    def test_get_profile_photos(self):
+        """Test for User.get_profile_photos"""
+        self.json_dict['id'] = self._chat_id
+        user = telegram.User.de_json(self.json_dict, self._bot)
+        user.bot = self._bot
+
+        result = user.get_profile_photos()
+
+        self.assertNotEquals(result, None)
 
 
 if __name__ == '__main__':

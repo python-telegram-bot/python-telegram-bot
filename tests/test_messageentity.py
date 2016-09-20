@@ -45,7 +45,7 @@ class MessageEntityTest(BaseTest, unittest.TestCase):
         }
 
     def test_sticker_de_json(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict)
+        sticker = telegram.MessageEntity.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker.type, self.type)
         self.assertEqual(sticker.offset, self.offset)
@@ -53,12 +53,12 @@ class MessageEntityTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.url, self.url)
 
     def test_sticker_to_json(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict)
+        sticker = telegram.MessageEntity.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict).to_dict()
+        sticker = telegram.MessageEntity.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)

@@ -103,9 +103,10 @@ class Message(TelegramObject):
         migrate_to_chat_id (Optional[int]):
         migrate_from_chat_id (Optional[int]):
         channel_chat_created (Optional[bool]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, message_id, from_user, date, chat, **kwargs):
+    def __init__(self, message_id, from_user, date, chat, bot=None, **kwargs):
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
@@ -141,16 +142,19 @@ class Message(TelegramObject):
         self.channel_chat_created = bool(kwargs.get('channel_chat_created', False))
         self.pinned_message = kwargs.get('pinned_message')
 
+        self.bot = bot
+
     @property
     def chat_id(self):
         """int: Short for :attr:`Message.chat.id`"""
         return self.chat.id
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Message:
@@ -158,30 +162,30 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'))
+        data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = datetime.fromtimestamp(data['date'])
-        data['chat'] = Chat.de_json(data.get('chat'))
-        data['entities'] = MessageEntity.de_list(data.get('entities'))
-        data['forward_from'] = User.de_json(data.get('forward_from'))
-        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'))
+        data['chat'] = Chat.de_json(data.get('chat'), bot)
+        data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
+        data['forward_from'] = User.de_json(data.get('forward_from'), bot)
+        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
         data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
-        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'))
+        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
         data['edit_date'] = Message._fromtimestamp(data.get('edit_date'))
-        data['audio'] = Audio.de_json(data.get('audio'))
-        data['document'] = Document.de_json(data.get('document'))
-        data['photo'] = PhotoSize.de_list(data.get('photo'))
-        data['sticker'] = Sticker.de_json(data.get('sticker'))
-        data['video'] = Video.de_json(data.get('video'))
-        data['voice'] = Voice.de_json(data.get('voice'))
-        data['contact'] = Contact.de_json(data.get('contact'))
-        data['location'] = Location.de_json(data.get('location'))
-        data['venue'] = Venue.de_json(data.get('venue'))
-        data['new_chat_member'] = User.de_json(data.get('new_chat_member'))
-        data['left_chat_member'] = User.de_json(data.get('left_chat_member'))
-        data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'))
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'))
+        data['audio'] = Audio.de_json(data.get('audio'), bot)
+        data['document'] = Document.de_json(data.get('document'), bot)
+        data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
+        data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
+        data['video'] = Video.de_json(data.get('video'), bot)
+        data['voice'] = Voice.de_json(data.get('voice'), bot)
+        data['contact'] = Contact.de_json(data.get('contact'), bot)
+        data['location'] = Location.de_json(data.get('location'), bot)
+        data['venue'] = Venue.de_json(data.get('venue'), bot)
+        data['new_chat_member'] = User.de_json(data.get('new_chat_member'), bot)
+        data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
+        data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
+        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
 
-        return Message(**data)
+        return Message(bot=bot, **data)
 
     def __getitem__(self, item):
         if item in self.__dict__.keys():
@@ -245,6 +249,61 @@ class Message(TelegramObject):
         except AttributeError:
             # Python 3 (< 3.3) and Python 2
             return int(mktime(dt_obj.timetuple()))
+
+    def reply_text(self, *args, **kwargs):
+        """Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
+
+    def reply_photo(self, *args, **kwargs):
+        """Shortcut for ``bot.sendPhoto(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendPhoto(self.chat_id, *args, **kwargs)
+
+    def reply_audio(self, *args, **kwargs):
+        """Shortcut for ``bot.sendAudio(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendAudio(self.chat_id, *args, **kwargs)
+
+    def reply_document(self, *args, **kwargs):
+        """Shortcut for ``bot.sendDocument(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendDocument(self.chat_id, *args, **kwargs)
+
+    def reply_sticker(self, *args, **kwargs):
+        """Shortcut for ``bot.sendSticker(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendSticker(self.chat_id, *args, **kwargs)
+
+    def reply_video(self, *args, **kwargs):
+        """Shortcut for ``bot.sendVideo(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendVideo(self.chat_id, *args, **kwargs)
+
+    def reply_voice(self, *args, **kwargs):
+        """Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendVoice(self.chat_id, *args, **kwargs)
+
+    def reply_location(self, *args, **kwargs):
+        """Shortcut for ``bot.sendLocation(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendLocation(self.chat_id, *args, **kwargs)
+
+    def reply_venue(self, *args, **kwargs):
+        """Shortcut for ``bot.sendVenue(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendVenue(self.chat_id, *args, **kwargs)
+
+    def reply_contact(self, *args, **kwargs):
+        """Shortcut for ``bot.sendContact(update.message.chat_id, *args, **kwargs)``"""
+        return self.bot.sendContact(self.chat_id, *args, **kwargs)
+
+    def forward(self, chat_id, disable_notification=False):
+        """Shortcut for
+
+            bot.forwardMessage(chat_id=chat_id,
+                               from_chat_id=update.message.chat_id,
+                               disable_notification=disable_notification,
+                               message_id=update.message.message_id)
+
+        """
+        return self.bot.forwardMessage(
+            chat_id=chat_id,
+            from_chat_id=self.chat_id,
+            disable_notification=disable_notification,
+            message_id=self.message_id)
 
     def parse_entity(self, entity):
         """

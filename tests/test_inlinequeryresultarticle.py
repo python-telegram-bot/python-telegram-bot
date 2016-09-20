@@ -61,7 +61,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         }
 
     def test_article_de_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot)
 
         self.assertEqual(article.type, self.type)
         self.assertEqual(article.id, self.id)
@@ -77,12 +77,12 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertEqual(article.thumb_width, self.thumb_width)
 
     def test_article_to_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(article.to_json()))
 
     def test_article_to_dict(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict).to_dict()
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(article))
         self.assertDictEqual(self.json_dict, article)

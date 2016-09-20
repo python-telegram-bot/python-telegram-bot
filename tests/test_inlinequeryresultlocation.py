@@ -58,7 +58,7 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
         }
 
     def test_location_de_json(self):
-        location = telegram.InlineQueryResultLocation.de_json(self.json_dict)
+        location = telegram.InlineQueryResultLocation.de_json(self.json_dict, self._bot)
 
         self.assertEqual(location.id, self.id)
         self.assertEqual(location.type, self.type)
@@ -73,12 +73,12 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(location.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_location_to_json(self):
-        location = telegram.InlineQueryResultLocation.de_json(self.json_dict)
+        location = telegram.InlineQueryResultLocation.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(location.to_json()))
 
     def test_location_to_dict(self):
-        location = telegram.InlineQueryResultLocation.de_json(self.json_dict).to_dict()
+        location = telegram.InlineQueryResultLocation.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(location))
         self.assertDictEqual(self.json_dict, location)

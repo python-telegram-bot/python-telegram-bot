@@ -54,11 +54,11 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.thumb_height = thumb_height
 
     @staticmethod
-    def de_json(data):
-        data = super(InlineQueryResultLocation, InlineQueryResultLocation).de_json(data)
+    def de_json(data, bot):
+        data = super(InlineQueryResultLocation, InlineQueryResultLocation).de_json(data, bot)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
         data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+            data.get('input_message_content'), bot)
 
         return InlineQueryResultLocation(**data)

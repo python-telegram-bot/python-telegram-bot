@@ -42,29 +42,29 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         message = self._bot.sendMessage(
             self._chat_id,
             'Моё судно на воздушной подушке полно угрей',
-            reply_markup=telegram.ForceReply.de_json(self.json_dict))
+            reply_markup=telegram.ForceReply.de_json(self.json_dict, self._bot))
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_force_reply_de_json(self):
-        force_reply = telegram.ForceReply.de_json(self.json_dict)
+        force_reply = telegram.ForceReply.de_json(self.json_dict, self._bot)
 
         self.assertEqual(force_reply.force_reply, self.force_reply)
         self.assertEqual(force_reply.selective, self.selective)
 
     def test_force_reply_de_json_empty(self):
-        force_reply = telegram.ForceReply.de_json(None)
+        force_reply = telegram.ForceReply.de_json(None, self._bot)
 
         self.assertFalse(force_reply)
 
     def test_force_reply_to_json(self):
-        force_reply = telegram.ForceReply.de_json(self.json_dict)
+        force_reply = telegram.ForceReply.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(force_reply.to_json()))
 
     def test_force_reply_to_dict(self):
-        force_reply = telegram.ForceReply.de_json(self.json_dict)
+        force_reply = telegram.ForceReply.de_json(self.json_dict, self._bot)
 
         self.assertEqual(force_reply['force_reply'], self.force_reply)
         self.assertEqual(force_reply['selective'], self.selective)

@@ -42,9 +42,10 @@ class InlineQuery(TelegramObject):
 
     Keyword Args:
         location (optional[:class:`telegram.Location`]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, id, from_user, query, offset, **kwargs):
+    def __init__(self, id, from_user, query, offset, bot=None, **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
@@ -54,24 +55,27 @@ class InlineQuery(TelegramObject):
         # Optional
         self.location = kwargs.get('location')
 
+        self.bot = bot
+
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.InlineQuery:
         """
-        data = super(InlineQuery, InlineQuery).de_json(data)
+        data = super(InlineQuery, InlineQuery).de_json(data, bot)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'))
-        data['location'] = Location.de_json(data.get('location'))
+        data['from_user'] = User.de_json(data.get('from'), bot)
+        data['location'] = Location.de_json(data.get('location'), bot)
 
-        return InlineQuery(**data)
+        return InlineQuery(bot=bot, **data)
 
     def to_dict(self):
         """
@@ -84,3 +88,7 @@ class InlineQuery(TelegramObject):
         data['from'] = data.pop('from_user', None)
 
         return data
+
+    def answer(self, *args, **kwargs):
+        """Shortcut for ``bot.answerInlineQuery(update.inline_query.id, *args, **kwargs)``"""
+        return self.bot.answerInlineQuery(self.id, *args, **kwargs)
