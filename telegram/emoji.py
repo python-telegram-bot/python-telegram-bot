@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # flake8: noqa
-# pylint: disable=C0103,R0903
+# pylint: disable=C0103,R0903,E0213
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -18,13 +18,26 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents an Emoji."""
+"""This module contains a object that represents an Emoji.
 
-from future.utils import bytes_to_native_str as n
+This module will be removed in the future.
+"""
+
+import warnings
+
+from future.utils import bytes_to_native_str
 
 
-class Emoji(object):
+class Emoji2(object):
     """This object represents an Emoji."""
+
+    def n(b):
+
+        def e(cls):
+            warnings.warn("telegram.Emoji is being deprecated, please see https://git.io/v6DeB")
+            return bytes_to_native_str(b)
+
+        return property(e)
 
     GRINNING_FACE_WITH_SMILING_EYES = n(b'\xF0\x9F\x98\x81')
     FACE_WITH_TEARS_OF_JOY = n(b'\xF0\x9F\x98\x82')
@@ -879,3 +892,6 @@ class Emoji(object):
     CLOCK_FACE_TEN_THIRTY = n(b'\xF0\x9F\x95\xA5')
     CLOCK_FACE_ELEVEN_THIRTY = n(b'\xF0\x9F\x95\xA6')
     CLOCK_FACE_TWELVE_THIRTY = n(b'\xF0\x9F\x95\xA7')
+
+
+Emoji = Emoji2()
