@@ -215,9 +215,11 @@ class ConversationHandler(Handler):
         if new_state == self.END:
             if key in self.conversations:
                 del self.conversations[key]
+            else:
+                pass
 
         elif isinstance(new_state, Promise):
-            self.conversations[key] = (self.conversations[key], new_state)
+            self.conversations[key] = (self.conversations.get(key), new_state)
 
         elif new_state is not None:
             self.conversations[key] = new_state
