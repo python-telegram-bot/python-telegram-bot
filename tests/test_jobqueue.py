@@ -51,6 +51,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.jq = JobQueue(MockBot('jobqueue_test'))
+        self.jq.start()
         self.result = 0
 
     def tearDown(self):
@@ -143,7 +144,6 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     def test_error(self):
         self.jq.put(Job(self.job2, 0.1))
         self.jq.put(Job(self.job1, 0.2))
-        self.jq.start()
         sleep(0.5)
         self.assertEqual(2, self.result)
 
@@ -158,6 +158,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def test_inUpdater(self):
         u = Updater(bot="MockBot")
+        u.job_queue.start()
         try:
             u.job_queue.put(Job(self.job1, 0.5))
             sleep(0.75)

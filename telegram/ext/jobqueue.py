@@ -30,15 +30,13 @@ class JobQueue(object):
     Attributes:
         queue (PriorityQueue):
         bot (Bot):
-        prevent_autostart (Optional[bool]): If ``True``, the job queue will not be started
-                automatically. Defaults to ``False``
 
     Args:
         bot (Bot): The bot instance that should be passed to the jobs
 
     """
 
-    def __init__(self, bot, prevent_autostart=False):
+    def __init__(self, bot):
         self.queue = PriorityQueue()
         self.bot = bot
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -50,10 +48,6 @@ class JobQueue(object):
         self._next_peek = None
         """:type: float"""
         self._running = False
-
-        if not prevent_autostart:
-            self.logger.debug('Auto-starting %s', self.__class__.__name__)
-            self.start()
 
     def put(self, job, next_t=None):
         """Queue a new job. If the JobQueue is not running, it will be started.

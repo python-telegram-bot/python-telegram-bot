@@ -84,6 +84,7 @@ class Dispatcher(object):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
+        self.workers = workers
 
         self.handlers = {}
         """:type: dict[int, list[Handler]"""
@@ -104,8 +105,6 @@ class Dispatcher(object):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
-
-        self._init_async_threads(uuid4(), workers)
 
     @classmethod
     def _reset_singleton(cls):
@@ -193,6 +192,7 @@ class Dispatcher(object):
             self.logger.error(msg)
             raise TelegramError(msg)
 
+        self._init_async_threads(uuid4(), self.workers)
         self.running = True
         self.logger.debug('Dispatcher started')
 

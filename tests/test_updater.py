@@ -427,10 +427,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             q.put(current_thread().name)
             sleep(1.2)
 
-        d1 = Dispatcher(MockBot('disp1'), Queue(), workers=1)
-        d2 = Dispatcher(MockBot('disp2'), Queue(), workers=1)
+        d1 = Dispatcher(MockBot('disp1'), Queue())
+        d2 = Dispatcher(MockBot('disp2'), Queue())
         q1 = Queue()
         q2 = Queue()
+        d1._init_async_threads('test_1', workers=1)
+        d2._init_async_threads('test_2', workers=1)
 
         try:
             d1.run_async(get_dispatcher_name, q1)
@@ -622,9 +624,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_start_dispatcher_twice(self):
         self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
         self.updater.start_polling(0.1)
-        d.start()
+        sleep(0.5)
+        self.updater.dispatcher.start()
 
     def test_bootstrap_retries_success(self):
         retries = 3
