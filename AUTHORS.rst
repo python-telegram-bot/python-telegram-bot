@@ -19,6 +19,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
 - `macrojames <https://github.com/macrojames>`_
+- `Michael Elovskikh <https://github.com/wronglink>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
