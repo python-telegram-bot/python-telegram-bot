@@ -250,44 +250,151 @@ class Message(TelegramObject):
             # Python 3 (< 3.3) and Python 2
             return int(mktime(dt_obj.timetuple()))
 
+    def _quote(self, kwargs):
+        """Modify kwargs for replying with or without quoting"""
+
+        if 'reply_to_message_id' in kwargs:
+            if 'quote' in kwargs:
+                del kwargs['quote']
+
+        elif 'quote' in kwargs:
+            if kwargs['quote']:
+                kwargs['reply_to_message_id'] = self.message_id
+
+            del kwargs['quote']
+
+        else:
+            if self.chat.type != Chat.PRIVATE:
+                kwargs['reply_to_message_id'] = self.message_id
+
     def reply_text(self, *args, **kwargs):
-        """Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendMessage(self.chat_id, *args, **kwargs)
 
     def reply_photo(self, *args, **kwargs):
-        """Shortcut for ``bot.sendPhoto(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendPhoto(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the photo is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendPhoto(self.chat_id, *args, **kwargs)
 
     def reply_audio(self, *args, **kwargs):
-        """Shortcut for ``bot.sendAudio(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendAudio(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the audio is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendAudio(self.chat_id, *args, **kwargs)
 
     def reply_document(self, *args, **kwargs):
-        """Shortcut for ``bot.sendDocument(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendDocument(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the document is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendDocument(self.chat_id, *args, **kwargs)
 
     def reply_sticker(self, *args, **kwargs):
-        """Shortcut for ``bot.sendSticker(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendSticker(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the sticker is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendSticker(self.chat_id, *args, **kwargs)
 
     def reply_video(self, *args, **kwargs):
-        """Shortcut for ``bot.sendVideo(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendVideo(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendVideo(self.chat_id, *args, **kwargs)
 
     def reply_voice(self, *args, **kwargs):
-        """Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the voice is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendVoice(self.chat_id, *args, **kwargs)
 
     def reply_location(self, *args, **kwargs):
-        """Shortcut for ``bot.sendLocation(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendLocation(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the location is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendLocation(self.chat_id, *args, **kwargs)
 
     def reply_venue(self, *args, **kwargs):
-        """Shortcut for ``bot.sendVenue(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendVenue(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the venue is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendVenue(self.chat_id, *args, **kwargs)
 
     def reply_contact(self, *args, **kwargs):
-        """Shortcut for ``bot.sendContact(update.message.chat_id, *args, **kwargs)``"""
+        """
+        Shortcut for ``bot.sendContact(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the contact is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        self._quote(kwargs)
         return self.bot.sendContact(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, disable_notification=False):
