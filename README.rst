@@ -96,6 +96,13 @@ You can install or upgrade python-telegram-bot with:
 
     $ pip install python-telegram-bot --upgrade
 
+Or you can install from source with:
+
+.. code:: shell
+
+    $ git clone https://github.com/python-telegram-bot/python-telegram-bot
+    $ cd python-telegram-bot
+    $ python setup.py install
 ===============
 Getting started
 ===============
