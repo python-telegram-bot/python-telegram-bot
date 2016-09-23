@@ -20,7 +20,7 @@ def start(bot, update):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    bot.sendMessage(update.message.chat_id, text="Please choose:", reply_markup=reply_markup)
+    update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
 
 def button(bot, update):
@@ -32,7 +32,7 @@ def button(bot, update):
 
 
 def help(bot, update):
-    bot.sendMessage(update.message.chat_id, text="Use /start to test this bot.")
+    update.message.reply_text("Use /start to test this bot.")
 
 
 def error(bot, update, error):
