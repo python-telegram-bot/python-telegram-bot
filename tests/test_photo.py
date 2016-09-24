@@ -42,7 +42,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.thumb = {
             'width': 90,
             'height': 90,
-            'file_id': 'AgADAQADgEsyGx8j9QfmDMmwkPBrFcKRzy8ABD64nkFkjujeNXYBAAEC',
+            'file_id': 'AgADAQADgEsyGx8j9QeYW9oDz2mKRsKRzy8ABD64nkFkjujeNXYBAAEC',
             'file_size': 1478
         }
         self.file_size = 10209
