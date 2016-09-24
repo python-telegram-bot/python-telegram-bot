@@ -23,7 +23,7 @@ class BaseFilter(object):
     """Base class for all Message Filters"""
 
     def __call__(self, message):
-        self.filter(message)
+        return self.filter(message)
 
     def __and__(self, other):
         return MergedFilter(self, and_filter=other)
