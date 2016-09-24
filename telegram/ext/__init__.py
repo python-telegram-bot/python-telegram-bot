@@ -27,7 +27,7 @@ from .commandhandler import CommandHandler
 from .handler import Handler
 from .inlinequeryhandler import InlineQueryHandler
 from .messagehandler import MessageHandler
-from .filters import Filters
+from .filters import BaseFilter, Filters
 from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
@@ -36,5 +36,5 @@ from .conversationhandler import ConversationHandler
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
-           'MessageHandler', 'Filters', 'RegexHandler', 'StringCommandHandler',
+           'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
            'StringRegexHandler', 'TypeHandler', 'ConversationHandler')

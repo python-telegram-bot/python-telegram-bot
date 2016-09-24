@@ -16,11 +16,31 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the MessageHandler class """
+""" This module contains the Filters for use with the MessageHandler class """
 
 
 class BaseFilter(object):
-    """Base class for all Message Filters"""
+    """Base class for all Message Filters
+
+    Subclassing from this class filters to be combined using bitwise operators:
+
+    And:
+
+        >>> (Filters.text & Filters.entity(MENTION)
+
+    Or:
+
+        >>> (Filters.audio | Filters.video)
+
+    Also works with more than two filters:
+
+        >>> (Filters.text & (Filters.entity(URL |Filters.entity(TEXT_LINK))))
+
+    If you want to create your own filters create a class inheriting from this class and implement
+    a `filter` method that returns a boolean: `True` if the message should be handled, `False`
+    otherwise. Note that the filters work only as class instances, not actual class objects
+    (so remember to initialize your filter classes).
+    """
 
     def __call__(self, message):
         return self.filter(message)
@@ -52,88 +72,87 @@ class MergedFilter(BaseFilter):
 
 class Filters(object):
     """
-    Convenient namespace (class) & methods for the filter funcs of the
-    MessageHandler class.
+    Predefined filters for use with the `filter` argument of :class:`telegram.ext.MessageHandler`.
     """
 
-    class Text(BaseFilter):
+    class _Text(BaseFilter):
 
         def filter(self, message):
             return bool(message.text and not message.text.startswith('/'))
 
-    text = Text()
+    text = _Text()
 
-    class Command(BaseFilter):
+    class _Command(BaseFilter):
 
         def filter(self, message):
             return bool(message.text and message.text.startswith('/'))
 
-    command = Command()
+    command = _Command()
 
-    class Audio(BaseFilter):
+    class _Audio(BaseFilter):
 
         def filter(self, message):
             return bool(message.audio)
 
-    audio = Audio()
+    audio = _Audio()
 
-    class Document(BaseFilter):
+    class _Document(BaseFilter):
 
         def filter(self, message):
             return bool(message.document)
 
-    document = Document()
+    document = _Document()
 
-    class Photo(BaseFilter):
+    class _Photo(BaseFilter):
 
         def filter(self, message):
             return bool(message.photo)
 
-    photo = Photo()
+    photo = _Photo()
 
-    class Sticker(BaseFilter):
+    class _Sticker(BaseFilter):
 
         def filter(self, message):
             return bool(message.sticker)
 
-    sticker = Sticker()
+    sticker = _Sticker()
 
-    class Video(BaseFilter):
+    class _Video(BaseFilter):
 
         def filter(self, message):
             return bool(message.video)
 
-    video = Video()
+    video = _Video()
 
-    class Voice(BaseFilter):
+    class _Voice(BaseFilter):
 
         def filter(self, message):
             return bool(message.voice)
 
-    voice = Voice()
+    voice = _Voice()
 
-    class Contact(BaseFilter):
+    class _Contact(BaseFilter):
 
         def filter(self, message):
             return bool(message.contact)
 
-    contact = Contact()
+    contact = _Contact()
 
-    class Location(BaseFilter):
+    class _Location(BaseFilter):
 
         def filter(self, message):
             return bool(message.location)
 
-    location = Location()
+    location = _Location()
 
-    class Venue(BaseFilter):
+    class _Venue(BaseFilter):
 
         def filter(self, message):
             return bool(message.venue)
 
-    venue = Venue()
+    venue = _Venue()
 
-    class StatusUpdate(BaseFilter):
+    class _StatusUpdate(BaseFilter):
 
         def filter(self, message):
             return bool(message.new_chat_member or message.left_chat_member
@@ -143,16 +162,16 @@ class Filters(object):
                         or message.migrate_to_chat_id or message.migrate_from_chat_id
                         or message.pinned_message)
 
-    status_update = StatusUpdate()
+    status_update = _StatusUpdate()
 
-    class Forwarded(BaseFilter):
+    class _Forwarded(BaseFilter):
 
         def filter(self, message):
             return bool(message.forward_date)
 
-    forwarded = Forwarded()
+    forwarded = _Forwarded()
 
-    class Entity(BaseFilter):
+    class entity(BaseFilter):
         """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.
 
@@ -168,7 +187,3 @@ class Filters(object):
 
         def filter(self, message):
             return any([entity.type == self.entity_type for entity in message.entities])
-
-# We don't initialize since this filter accepts arguments.
-
-    entity = Entity
