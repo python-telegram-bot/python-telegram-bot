@@ -85,6 +85,23 @@ class Filters(object):
     def forwarded(message):
         return bool(message.forward_date)
 
+    @staticmethod
+    def entity(entity_type):
+        """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
+        where their `type` matches `entity_type`.
+
+        Args:
+            entity_type: Entity type to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        Returns: function to use as filter
+        """
+
+        def entities_filter(message):
+            return any([entity.type == entity_type for entity in message.entities])
+
+        return entities_filter
+
 
 class MessageHandler(Handler):
     """
@@ -141,7 +158,8 @@ class MessageHandler(Handler):
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
-    # old non-PEP8 Handler methods
+# old non-PEP8 Handler methods
+
     m = "telegram.MessageHandler."
     checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
     handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
