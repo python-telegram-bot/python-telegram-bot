@@ -37,11 +37,12 @@ class JobQueue(object):
 
     Deprecated: 5.2
         prevent_autostart (Optional[bool]): Thread does not start during initialisation.
+        Use `start` method instead.
     """
 
     def __init__(self, bot, prevent_autostart=None):
         if prevent_autostart is not None:
-            warnings.warn("prevent_autostart is being deprecated, thread does not start during initialisation.")
+            warnings.warn("prevent_autostart is being deprecated, use `start` method instead.")
 
         self.queue = PriorityQueue()
         self.bot = bot
