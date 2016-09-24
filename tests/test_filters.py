@@ -155,22 +155,16 @@ class FiltersTest(BaseTest, unittest.TestCase):
         e = functools.partial(MessageEntity, offset=0, length=0)
 
         self.message.entities = [e(MessageEntity.MENTION)]
-        self.assertTrue(Filters.entities([MessageEntity.MENTION])(self.message))
+        self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
 
         self.message.entities = []
-        self.assertFalse(Filters.entities([MessageEntity.MENTION])(self.message))
+        self.assertFalse(Filters.entity(MessageEntity.MENTION)(self.message))
 
         self.message.entities = [e(MessageEntity.BOLD)]
-        self.assertFalse(Filters.entities([MessageEntity.MENTION])(self.message))
+        self.assertFalse(Filters.entity(MessageEntity.MENTION)(self.message))
 
-        self.message.entities = [e(MessageEntity.MENTION)]
-        self.assertTrue(
-            Filters.entities([MessageEntity.MENTION, MessageEntity.BOLD])(self.message))
-        self.message.entities = [e(MessageEntity.BOLD)]
-        self.assertTrue(
-            Filters.entities([MessageEntity.MENTION, MessageEntity.BOLD])(self.message))
-        self.assertFalse(
-            Filters.entities([MessageEntity.MENTION, MessageEntity.TEXT_MENTION])(self.message))
+        self.message.entities = [e(MessageEntity.BOLD), e(MessageEntity.MENTION)]
+        self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
 
 
 if __name__ == '__main__':

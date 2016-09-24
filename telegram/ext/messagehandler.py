@@ -86,29 +86,19 @@ class Filters(object):
         return bool(message.forward_date)
 
     @staticmethod
-    def entities(entity_types):
+    def entity(entity_type):
         """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
-        that match `entity_types`.
-
-        Note:
-            This filter functions as an OR filter, meaning that just one of the entity_type.
-            If you want AND filtering instead, you have to specify multiple of this filter in the
-            `filters` attribute. Example:
-
-                >>> MessageHandler([Filters.entities([TEXT_MENTION, MENTION]),
-                ...                 Filters.entities([HASHTAG])], callback)
-
-            Will require either a one type of mention AND a hashtag in the message.
+        where their `type` matches `entity_type`.
 
         Args:
-            entity_types: List of entity types to check for. All types can be found as constants
+            entity_type: Entity type to check for. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
 
         Returns: function to use as filter
         """
 
         def entities_filter(message):
-            return any([entity.type in entity_types for entity in message.entities])
+            return any([entity.type == entity_type for entity in message.entities])
 
         return entities_filter
 
@@ -168,7 +158,8 @@ class MessageHandler(Handler):
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
-    # old non-PEP8 Handler methods
+# old non-PEP8 Handler methods
+
     m = "telegram.MessageHandler."
     checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
     handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
