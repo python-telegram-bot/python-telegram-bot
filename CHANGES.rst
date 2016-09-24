@@ -2,6 +2,23 @@
 Changes
 =======
 
+**2016-09-24**
+
+*Released 5.1*
+
+- Drop Python 2.6 support
+- Deprecate ``telegram.Emoji``
+
+- Use ``ujson`` if available
+- Add instance methods to ``Message``, ``Chat``, ``User``, ``InlineQuery`` and ``CallbackQuery``
+- RegEx filtering for ``CallbackQueryHandler`` and ``InlineQueryHandler``
+- New ``MessageHandler`` filters: ``forwarded`` and ``entity``
+- Add ``Message.get_entity`` to correctly handle UTF-16 codepoints and ``MessageEntity`` offsets
+- Fix bug in ``ConversationHandler`` when first handler ends the conversation
+- Allow multiple ``Dispatcher`` instances
+- Add ``ChatMigrated`` Exception
+- Properly split and handle arguments in ``CommandHandler``
+
 **2016-07-15**
 
 *Released 5.0*
