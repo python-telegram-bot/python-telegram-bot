@@ -35,7 +35,10 @@ class Filters(object):
 
     @staticmethod
     def command(message):
-        return message.text and message.text.startswith('/')
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'bot_command')
+        else:
+            return False
 
     @staticmethod
     def audio(message):
@@ -74,6 +77,76 @@ class Filters(object):
         return bool(message.venue)
 
     @staticmethod
+    def mention(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'mention')
+        else:
+            return False
+
+    @staticmethod
+    def hashtag(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'hashtag')
+        else:
+            return False
+
+    @staticmethod
+    def url(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'url')
+        else:
+            return False
+
+    @staticmethod
+    def email(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'email')
+        else:
+            return False
+
+    @staticmethod
+    def bold(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'bold')
+        else:
+            return False
+
+    @staticmethod
+    def italic(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'italic')
+        else:
+            return False
+
+    @staticmethod
+    def code(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'code')
+        else:
+            return False
+
+    @staticmethod
+    def pre(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'pre')
+        else:
+            return False
+
+    @staticmethod
+    def text_link(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'text_link')
+        else:
+            return False
+
+    @staticmethod
+    def text_mention(message):
+        if len(message.entities) == 1:
+            return bool(message.entities[0].type == 'text_mention')
+        else:
+            return False
+
+    @staticmethod
     def status_update(message):
         return bool(message.new_chat_member or message.left_chat_member or message.new_chat_title
                     or message.new_chat_photo or message.delete_chat_photo
@@ -101,6 +174,7 @@ class Filters(object):
             return any([entity.type == entity_type for entity in message.entities])
 
         return entities_filter
+
 
 
 class MessageHandler(Handler):
