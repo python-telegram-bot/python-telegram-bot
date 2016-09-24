@@ -67,6 +67,8 @@ class ContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact['last_name'], self.last_name)
         self.assertEqual(contact['user_id'], self.user_id)
 
+
+''' Commented out, because it would cause "Too Many Requests (429)" errors.
     @flaky(3, 1)
     def test_reply_contact(self):
         """Test for Message.reply_contact"""
@@ -75,7 +77,7 @@ class ContactTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(message.contact.phone_number, self.phone_number)
         self.assertEqual(message.contact.first_name, self.first_name)
-
+'''
 
 if __name__ == '__main__':
     unittest.main()
