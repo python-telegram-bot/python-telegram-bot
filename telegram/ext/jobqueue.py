@@ -20,6 +20,7 @@
 
 import logging
 import time
+import warnings
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
 
@@ -34,9 +35,14 @@ class JobQueue(object):
     Args:
         bot (Bot): The bot instance that should be passed to the jobs
 
+    Deprecated: 5.2
+        prevent_autostart (Optional[bool]): Thread does not start during initialisation.
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot, prevent_autostart=None):
+        if prevent_autostart is not None:
+            warnings.warn("prevent_autostart is being deprecated, thread does not start during initialisation.")
+
         self.queue = PriorityQueue()
         self.bot = bot
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -50,7 +56,7 @@ class JobQueue(object):
         self._running = False
 
     def put(self, job, next_t=None):
-        """Queue a new job. If the JobQueue is not running, it will be started.
+        """Queue a new job.
 
         Args:
             job (Job): The ``Job`` instance representing the new job
