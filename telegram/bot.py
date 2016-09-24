@@ -154,7 +154,7 @@ class Bot(TelegramObject):
             if result is True:
                 return result
 
-            return Message.de_json(result)
+            return Message.de_json(result, self)
 
         return decorator
 
@@ -176,7 +176,7 @@ class Bot(TelegramObject):
 
         result = self._request.get(url)
 
-        self.bot = User.de_json(result)
+        self.bot = User.de_json(result, self)
 
         return self.bot
 
@@ -860,7 +860,7 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return UserProfilePhotos.de_json(result)
+        return UserProfilePhotos.de_json(result, self)
 
     @log
     def getFile(self, file_id, **kwargs):
@@ -894,7 +894,7 @@ class Bot(TelegramObject):
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
 
-        return File.de_json(result, self._request)
+        return File.de_json(result, self)
 
     @log
     def kickChatMember(self, chat_id, user_id, **kwargs):
@@ -1225,7 +1225,7 @@ class Bot(TelegramObject):
         else:
             self.logger.debug('No new updates found.')
 
-        return [Update.de_json(x) for x in result]
+        return [Update.de_json(u, self) for u in result]
 
     @log
     def setWebhook(self, webhook_url=None, certificate=None, **kwargs):
@@ -1325,7 +1325,7 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return Chat.de_json(result)
+        return Chat.de_json(result, self)
 
     @log
     def getChatAdministrators(self, chat_id, **kwargs):
@@ -1360,7 +1360,7 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return [ChatMember.de_json(x) for x in result]
+        return [ChatMember.de_json(x, self) for x in result]
 
     @log
     def getChatMembersCount(self, chat_id, **kwargs):
@@ -1423,11 +1423,11 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
-        return ChatMember.de_json(result)
+        return ChatMember.de_json(result, self)
 
     @staticmethod
-    def de_json(data):
-        data = super(Bot, Bot).de_json(data)
+    def de_json(data, bot):
+        data = super(Bot, Bot).de_json(data, bot)
 
         return Bot(**data)
 

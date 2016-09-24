@@ -39,13 +39,13 @@ class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
                           'latitude': self.latitude,}
 
     def test_ilmc_de_json(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict)
+        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertEqual(ilmc.longitude, self.longitude)
         self.assertEqual(ilmc.latitude, self.latitude)
 
     def test_ilmc_de_json_factory(self):
-        ilmc = telegram.InputMessageContent.de_json(self.json_dict)
+        ilmc = telegram.InputMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(ilmc, telegram.InputLocationMessageContent))
 
@@ -56,17 +56,17 @@ class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
         # If none args are sent it will fall in a different condition
         # del (json_dict['latitude'])
 
-        ilmc = telegram.InputMessageContent.de_json(json_dict)
+        ilmc = telegram.InputMessageContent.de_json(json_dict, self._bot)
 
         self.assertFalse(ilmc)
 
     def test_ilmc_to_json(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict)
+        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(ilmc.to_json()))
 
     def test_ilmc_to_dict(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict).to_dict()
+        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(ilmc))
         self.assertDictEqual(self.json_dict, ilmc)

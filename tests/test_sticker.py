@@ -77,7 +77,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker.file_id, self.sticker_file_id)
         self.assertEqual(sticker.width, self.width)
@@ -87,12 +87,12 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_to_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker['file_id'], self.sticker_file_id)
         self.assertEqual(sticker['width'], self.width)
@@ -135,6 +135,15 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertRaises(
             TypeError,
             lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_sticker(self):
+        """Test for Message.reply_sticker"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_sticker(self.sticker_file_id)
+
+        self.assertNotEqual(message.sticker.file_id, '')
 
 
 if __name__ == '__main__':

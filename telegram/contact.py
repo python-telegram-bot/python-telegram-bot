@@ -49,10 +49,11 @@ class Contact(TelegramObject):
         self.user_id = int(kwargs.get('user_id', 0))
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Contact:

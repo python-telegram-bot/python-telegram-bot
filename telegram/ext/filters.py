@@ -151,3 +151,24 @@ class Filters(object):
             return bool(message.forward_date)
 
     forwarded = Forwarded()
+
+    class Entity(BaseFilter):
+        """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
+        where their `type` matches `entity_type`.
+
+        Args:
+            entity_type: Entity type to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        Returns: function to use as filter
+        """
+
+        def __init__(self, entity_type):
+            self.entity_type = entity_type
+
+        def filter(self, message):
+            return any([entity.type == self.entity_type for entity in message.entities])
+
+# We don't initialize since this filter accepts arguments.
+
+    entity = Entity

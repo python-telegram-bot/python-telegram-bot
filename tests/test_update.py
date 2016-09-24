@@ -48,23 +48,23 @@ class UpdateTest(BaseTest, unittest.TestCase):
         self.json_dict = {'update_id': self.update_id, 'message': self.message}
 
     def test_update_de_json(self):
-        update = telegram.Update.de_json(self.json_dict)
+        update = telegram.Update.de_json(self.json_dict, self._bot)
 
         self.assertEqual(update.update_id, self.update_id)
         self.assertTrue(isinstance(update.message, telegram.Message))
 
     def test_update_de_json_empty(self):
-        update = telegram.Update.de_json(None)
+        update = telegram.Update.de_json(None, self._bot)
 
         self.assertFalse(update)
 
     def test_update_to_json(self):
-        update = telegram.Update.de_json(self.json_dict)
+        update = telegram.Update.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(update.to_json()))
 
     def test_update_to_dict(self):
-        update = telegram.Update.de_json(self.json_dict)
+        update = telegram.Update.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(update.to_dict()))
         self.assertEqual(update['update_id'], self.update_id)

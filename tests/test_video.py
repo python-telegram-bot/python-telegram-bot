@@ -43,7 +43,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.thumb = telegram.PhotoSize.de_json({'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
                                                  'file_size': 645,
                                                  'height': 90,
-                                                 'width': 51})
+                                                 'width': 51}, self._bot)
         self.mime_type = 'video/mp4'
         self.file_size = 326534
 
@@ -188,7 +188,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.caption, self.caption)
 
     def test_video_de_json(self):
-        video = telegram.Video.de_json(self.json_dict)
+        video = telegram.Video.de_json(self.json_dict, self._bot)
 
         self.assertEqual(video.file_id, self.video_file_id)
         self.assertEqual(video.width, self.width)
@@ -199,12 +199,12 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.file_size, self.file_size)
 
     def test_video_to_json(self):
-        video = telegram.Video.de_json(self.json_dict)
+        video = telegram.Video.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(video.to_json()))
 
     def test_video_to_dict(self):
-        video = telegram.Video.de_json(self.json_dict)
+        video = telegram.Video.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(video.to_dict()))
         self.assertEqual(video['file_id'], self.video_file_id)
@@ -252,6 +252,15 @@ class VideoTest(BaseTest, unittest.TestCase):
                           lambda: self._bot.sendVideo(chat_id=self._chat_id,
                                                       timeout=10,
                                                       **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_video(self):
+        """Test for Message.reply_video"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_video(self.video_file)
+
+        self.assertNotEqual(message.video.file_id, '')
 
 
 if __name__ == '__main__':

@@ -24,6 +24,10 @@ import sys
 import unittest
 from datetime import datetime
 
+import functools
+
+from telegram import MessageEntity
+
 sys.path.append('.')
 
 from telegram import Message, User, Chat
@@ -149,6 +153,21 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.pinned_message = 'test'
         self.assertTrue(Filters.status_update(self.message))
         self.message.pinned_message = None
+
+    def test_entities_filter(self):
+        e = functools.partial(MessageEntity, offset=0, length=0)
+
+        self.message.entities = [e(MessageEntity.MENTION)]
+        self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
+
+        self.message.entities = []
+        self.assertFalse(Filters.entity(MessageEntity.MENTION)(self.message))
+
+        self.message.entities = [e(MessageEntity.BOLD)]
+        self.assertFalse(Filters.entity(MessageEntity.MENTION)(self.message))
+
+        self.message.entities = [e(MessageEntity.BOLD), e(MessageEntity.MENTION)]
+        self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
 
     def test_and_filters(self):
         # For now just test with forwarded as that's the only one that makes sense

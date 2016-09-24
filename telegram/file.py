@@ -33,7 +33,7 @@ class File(TelegramObject):
 
     Args:
         file_id (str):
-        request (telegram.utils.request.Request):
+        bot (telegram.Bot):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
@@ -42,29 +42,30 @@ class File(TelegramObject):
 
     """
 
-    def __init__(self, file_id, request, **kwargs):
+    def __init__(self, file_id, bot, **kwargs):
         # Required
         self.file_id = str(file_id)
-        self._request = request
+
         # Optionals
         self.file_size = int(kwargs.get('file_size', 0))
         self.file_path = str(kwargs.get('file_path', ''))
 
+        self.bot = bot
+
     @staticmethod
-    def de_json(data, request):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
-            request (telegram.utils.request.Request):
+            bot (telegram.Bot):
 
         Returns:
             telegram.File:
-
         """
         if not data:
             return None
 
-        return File(request=request, **data)
+        return File(bot=bot, **data)
 
     def download(self, custom_path=None):
         """
@@ -79,4 +80,4 @@ class File(TelegramObject):
         else:
             filename = basename(url)
 
-        self._request.download(url, filename)
+        self.bot.request.download(url, filename)

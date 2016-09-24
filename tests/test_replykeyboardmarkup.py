@@ -48,18 +48,18 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         message = self._bot.sendMessage(
             self._chat_id,
             'Моё судно на воздушной подушке полно угрей',
-            reply_markup=telegram.ReplyKeyboardMarkup.de_json(self.json_dict))
+            reply_markup=telegram.ReplyKeyboardMarkup.de_json(self.json_dict, self._bot))
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_reply_markup_empty_de_json_empty(self):
-        reply_markup_empty = telegram.ReplyKeyboardMarkup.de_json(None)
+        reply_markup_empty = telegram.ReplyKeyboardMarkup.de_json(None, self._bot)
 
         self.assertFalse(reply_markup_empty)
 
     def test_reply_keyboard_markup_de_json(self):
-        reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
+        reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(reply_keyboard_markup.keyboard, list))
         self.assertTrue(isinstance(reply_keyboard_markup.keyboard[0][0], telegram.KeyboardButton))
@@ -68,12 +68,12 @@ class ReplyKeyboardMarkupTest(BaseTest, unittest.TestCase):
         self.assertEqual(reply_keyboard_markup.selective, self.selective)
 
     def test_reply_keyboard_markup_to_json(self):
-        reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
+        reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(reply_keyboard_markup.to_json()))
 
     def test_reply_keyboard_markup_to_dict(self):
-        reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict)
+        reply_keyboard_markup = telegram.ReplyKeyboardMarkup.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(reply_keyboard_markup.keyboard, list))
         self.assertTrue(isinstance(reply_keyboard_markup.keyboard[0][0], telegram.KeyboardButton))

@@ -42,29 +42,29 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         message = self._bot.sendMessage(
             self._chat_id,
             'Моё судно на воздушной подушке полно угрей',
-            reply_markup=telegram.ReplyKeyboardHide.de_json(self.json_dict))
+            reply_markup=telegram.ReplyKeyboardHide.de_json(self.json_dict, self._bot))
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     def test_reply_keyboard_hide_de_json(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict, self._bot)
 
         self.assertEqual(reply_keyboard_hide.hide_keyboard, self.hide_keyboard)
         self.assertEqual(reply_keyboard_hide.selective, self.selective)
 
     def test_reply_keyboard_hide_de_json_empty(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(None)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(None, self._bot)
 
         self.assertFalse(reply_keyboard_hide)
 
     def test_reply_keyboard_hide_to_json(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(reply_keyboard_hide.to_json()))
 
     def test_reply_keyboard_hide_to_dict(self):
-        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict)
+        reply_keyboard_hide = telegram.ReplyKeyboardHide.de_json(self.json_dict, self._bot)
 
         self.assertEqual(reply_keyboard_hide['hide_keyboard'], self.hide_keyboard)
         self.assertEqual(reply_keyboard_hide['selective'], self.selective)

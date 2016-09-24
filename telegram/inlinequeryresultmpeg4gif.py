@@ -56,11 +56,11 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             self.input_message_content = input_message_content
 
     @staticmethod
-    def de_json(data):
-        data = super(InlineQueryResultMpeg4Gif, InlineQueryResultMpeg4Gif).de_json(data)
+    def de_json(data, bot):
+        data = super(InlineQueryResultMpeg4Gif, InlineQueryResultMpeg4Gif).de_json(data, bot)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
         data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'))
+            data.get('input_message_content'), bot)
 
         return InlineQueryResultMpeg4Gif(**data)

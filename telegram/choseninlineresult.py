@@ -57,10 +57,11 @@ class ChosenInlineResult(TelegramObject):
         self.inline_message_id = inline_message_id
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.ChosenInlineResult:
@@ -69,9 +70,9 @@ class ChosenInlineResult(TelegramObject):
             return None
 
         # Required
-        data['from_user'] = User.de_json(data.pop('from'))
+        data['from_user'] = User.de_json(data.pop('from'), bot)
         # Optionals
-        data['location'] = Location.de_json(data.get('location'))
+        data['location'] = Location.de_json(data.get('location'), bot)
 
         return ChosenInlineResult(**data)
 

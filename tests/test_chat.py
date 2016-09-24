@@ -20,6 +20,9 @@
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -37,29 +40,40 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.json_dict = {'id': self.id, 'title': self.title, 'type': self.type}
 
     def test_group_chat_de_json_empty_json(self):
-        group_chat = telegram.Chat.de_json({})
+        group_chat = telegram.Chat.de_json({}, self._bot)
 
         self.assertEqual(group_chat, None)
 
     def test_group_chat_de_json(self):
-        group_chat = telegram.Chat.de_json(self.json_dict)
+        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
 
         self.assertEqual(group_chat.id, self.id)
         self.assertEqual(group_chat.title, self.title)
         self.assertEqual(group_chat.type, self.type)
 
     def test_group_chat_to_json(self):
-        group_chat = telegram.Chat.de_json(self.json_dict)
+        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(group_chat.to_json()))
 
     def test_group_chat_to_dict(self):
-        group_chat = telegram.Chat.de_json(self.json_dict)
+        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(group_chat.to_dict()))
         self.assertEqual(group_chat['id'], self.id)
         self.assertEqual(group_chat['title'], self.title)
         self.assertEqual(group_chat['type'], self.type)
+
+    @flaky(3, 1)
+    def test_send_action(self):
+        """Test for Chat.send_action"""
+        self.json_dict['id'] = self._chat_id
+        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
+        group_chat.bot = self._bot
+
+        result = group_chat.send_action(telegram.ChatAction.TYPING)
+
+        self.assertTrue(result)
 
 
 if __name__ == '__main__':

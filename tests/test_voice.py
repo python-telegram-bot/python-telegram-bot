@@ -137,7 +137,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.mime_type, self.mime_type)
 
     def test_voice_de_json(self):
-        voice = telegram.Voice.de_json(self.json_dict)
+        voice = telegram.Voice.de_json(self.json_dict, self._bot)
 
         self.assertEqual(voice.file_id, self.voice_file_id)
         self.assertEqual(voice.duration, self.duration)
@@ -145,12 +145,12 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.file_size, self.file_size)
 
     def test_voice_to_json(self):
-        voice = telegram.Voice.de_json(self.json_dict)
+        voice = telegram.Voice.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(voice.to_json()))
 
     def test_voice_to_dict(self):
-        voice = telegram.Voice.de_json(self.json_dict)
+        voice = telegram.Voice.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(voice.to_dict()))
         self.assertEqual(voice['file_id'], self.voice_file_id)
@@ -193,6 +193,15 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertRaises(
             TypeError,
             lambda: self._bot.sendVoice(chat_id=self._chat_id, **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_voice(self):
+        """Test for Message.reply_voice"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_voice(self.voice_file)
+
+        self.assertNotEqual(message.voice.file_id, '')
 
 
 if __name__ == '__main__':

@@ -33,5 +33,5 @@ class InputContactMessageContent(InputMessageContent):
         self.last_name = last_name
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         return InputContactMessageContent(**data)

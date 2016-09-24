@@ -22,6 +22,8 @@
 import sys
 import unittest
 
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -55,6 +57,24 @@ class MessageTest(BaseTest, unittest.TestCase):
             message.parse_entities(telegram.MessageEntity.URL), {entity: 'http://google.com'})
         self.assertDictEqual(message.parse_entities(), {entity: 'http://google.com',
                                                         entity_2: 'h'})
+
+    @flaky(3, 1)
+    def test_reply_text(self):
+        """Test for Message.reply_text"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_text('Testing class method')
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, 'Testing class method')
+
+    @flaky(3, 1)
+    def test_forward(self):
+        """Test for Message.forward"""
+        message = self._bot.sendMessage(self._chat_id, 'Testing class method')
+        message = message.forward(self._chat_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, 'Testing class method')
 
 
 if __name__ == '__main__':
