@@ -274,7 +274,8 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create and start server
-        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path)
+        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path,
+                                   self.bot)
 
         if use_ssl:
             self._check_ssl_cert(cert, key)

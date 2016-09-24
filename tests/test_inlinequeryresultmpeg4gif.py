@@ -59,7 +59,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         }
 
     def test_mpeg4_de_json(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(mpeg4.type, self.type)
         self.assertEqual(mpeg4.id, self.id)
@@ -74,12 +74,12 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(mpeg4.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_mpeg4_to_json(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict)
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(mpeg4.to_json()))
 
     def test_mpeg4_to_dict(self):
-        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict).to_dict()
+        mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(mpeg4))
         self.assertDictEqual(self.json_dict, mpeg4)

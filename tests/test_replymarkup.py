@@ -32,7 +32,7 @@ class ReplyMarkupTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram ReplyMarkup."""
 
     def test_reply_markup_de_json_empty(self):
-        reply_markup = telegram.ReplyMarkup.de_json(None)
+        reply_markup = telegram.ReplyMarkup.de_json(None, self._bot)
 
         self.assertFalse(reply_markup)
 

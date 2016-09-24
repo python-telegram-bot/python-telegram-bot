@@ -59,7 +59,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         }
 
     def test_gif_de_json(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(gif.type, self.type)
         self.assertEqual(gif.id, self.id)
@@ -74,12 +74,12 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(gif.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_gif_to_json(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(gif.to_json()))
 
     def test_gif_to_dict(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict).to_dict()
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(gif))
         self.assertDictEqual(self.json_dict, gif)

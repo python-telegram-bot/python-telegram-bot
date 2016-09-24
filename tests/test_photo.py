@@ -140,7 +140,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.height, self.height)
 
     def test_photo_de_json(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict)
+        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
         self.assertEqual(photo.file_id, self.photo_file_id)
         self.assertTrue(isinstance(photo, telegram.PhotoSize))
@@ -149,12 +149,12 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.file_size, self.file_size)
 
     def test_photo_to_json(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict)
+        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(photo.to_json()))
 
     def test_photo_to_dict(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict)
+        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(photo.to_dict()))
         self.assertEqual(photo['file_id'], self.photo_file_id)
@@ -199,6 +199,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertRaises(
             TypeError,
             lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_photo(self):
+        """Test for Message.reply_photo"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_photo(self.photo_file)
+
+        self.assertNotEqual(message.photo[0].file_id, '')
 
 
 if __name__ == '__main__':

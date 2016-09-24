@@ -799,6 +799,9 @@ class MockBot(object):
         else:
             return []
 
+    def create_references(self, d):
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()

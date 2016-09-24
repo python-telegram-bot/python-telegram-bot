@@ -24,11 +24,12 @@ class _InvalidPost(Exception):
 
 class WebhookServer(BaseHTTPServer.HTTPServer, object):
 
-    def __init__(self, server_address, RequestHandlerClass, update_queue, webhook_path):
+    def __init__(self, server_address, RequestHandlerClass, update_queue, webhook_path, bot):
         super(WebhookServer, self).__init__(server_address, RequestHandlerClass)
         self.logger = logging.getLogger(__name__)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
+        self.bot = bot
         self.is_running = False
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
@@ -85,7 +86,8 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
             self.logger.debug('Webhook received data: ' + json_string)
 
-            update = Update.de_json(json.loads(json_string))
+            update = Update.de_json(json.loads(json_string), self.server.bot)
+
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
             self.server.update_queue.put(update)
 

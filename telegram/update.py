@@ -55,10 +55,11 @@ class Update(TelegramObject):
         self.callback_query = kwargs.get('callback_query')
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Update:
@@ -66,10 +67,11 @@ class Update(TelegramObject):
         if not data:
             return None
 
-        data['message'] = Message.de_json(data.get('message'))
-        data['edited_message'] = Message.de_json(data.get('edited_message'))
-        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'))
-        data['chosen_inline_result'] = ChosenInlineResult.de_json(data.get('chosen_inline_result'))
-        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'))
+        data['message'] = Message.de_json(data.get('message'), bot)
+        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
+        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
+        data['chosen_inline_result'] = ChosenInlineResult.de_json(
+            data.get('chosen_inline_result'), bot)
+        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
 
         return Update(**data)

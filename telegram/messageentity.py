@@ -44,15 +44,15 @@ class MessageEntity(TelegramObject):
         self.user = kwargs.get('user')
 
     @staticmethod
-    def de_json(data):
-        data = super(MessageEntity, MessageEntity).de_json(data)
+    def de_json(data, bot):
+        data = super(MessageEntity, MessageEntity).de_json(data, bot)
 
-        data['user'] = User.de_json(data.get('user'))
+        data['user'] = User.de_json(data.get('user'), bot)
 
         return MessageEntity(**data)
 
     @staticmethod
-    def de_list(data):
+    def de_list(data, bot):
         """
         Args:
             data (list):
@@ -65,7 +65,7 @@ class MessageEntity(TelegramObject):
 
         entities = list()
         for entity in data:
-            entities.append(MessageEntity.de_json(entity))
+            entities.append(MessageEntity.de_json(entity, bot))
 
         return entities
 

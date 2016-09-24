@@ -32,7 +32,7 @@ class InputMessageContentTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InputMessageContent."""
 
     def test_imc_de_json(self):
-        imc = telegram.InputMessageContent.de_json(None)
+        imc = telegram.InputMessageContent.de_json(None, self._bot)
 
         self.assertFalse(imc)
 

@@ -50,10 +50,11 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.selective = bool(kwargs.get('selective', False))
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.ReplyKeyboardMarkup:
@@ -61,7 +62,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
-        data['keyboard'] = [KeyboardButton.de_list(keyboard) for keyboard in data['keyboard']]
+        data['keyboard'] = [KeyboardButton.de_list(keyboard, bot) for keyboard in data['keyboard']]
 
         return ReplyKeyboardMarkup(**data)
 

@@ -45,19 +45,19 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
         }
 
     def test_choseninlineresult_de_json(self):
-        result = telegram.ChosenInlineResult.de_json(self.json_dict)
+        result = telegram.ChosenInlineResult.de_json(self.json_dict, self._bot)
 
         self.assertEqual(result.result_id, self.result_id)
         self.assertDictEqual(result.from_user.to_dict(), self.from_user.to_dict())
         self.assertEqual(result.query, self.query)
 
     def test_choseninlineresult_to_json(self):
-        result = telegram.ChosenInlineResult.de_json(self.json_dict)
+        result = telegram.ChosenInlineResult.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(result.to_json()))
 
     def test_choseninlineresult_to_dict(self):
-        result = telegram.ChosenInlineResult.de_json(self.json_dict).to_dict()
+        result = telegram.ChosenInlineResult.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(result))
         self.assertEqual(result['result_id'], self.result_id)

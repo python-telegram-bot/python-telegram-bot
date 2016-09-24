@@ -43,14 +43,14 @@ class InputContactMessageContentTest(BaseTest, unittest.TestCase):
         }
 
     def test_icmc_de_json(self):
-        icmc = telegram.InputContactMessageContent.de_json(self.json_dict)
+        icmc = telegram.InputContactMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertEqual(icmc.first_name, self.first_name)
         self.assertEqual(icmc.phone_number, self.phone_number)
         self.assertEqual(icmc.last_name, self.last_name)
 
     def test_icmc_de_json_factory(self):
-        icmc = telegram.InputMessageContent.de_json(self.json_dict)
+        icmc = telegram.InputMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(icmc, telegram.InputContactMessageContent))
 
@@ -60,17 +60,17 @@ class InputContactMessageContentTest(BaseTest, unittest.TestCase):
         del (json_dict['phone_number'])
         del (json_dict['first_name'])
 
-        icmc = telegram.InputMessageContent.de_json(json_dict)
+        icmc = telegram.InputMessageContent.de_json(json_dict, self._bot)
 
         self.assertFalse(icmc)
 
     def test_icmc_to_json(self):
-        icmc = telegram.InputContactMessageContent.de_json(self.json_dict)
+        icmc = telegram.InputContactMessageContent.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(icmc.to_json()))
 
     def test_icmc_to_dict(self):
-        icmc = telegram.InputContactMessageContent.de_json(self.json_dict).to_dict()
+        icmc = telegram.InputContactMessageContent.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(icmc))
         self.assertDictEqual(self.json_dict, icmc)

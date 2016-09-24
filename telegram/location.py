@@ -39,10 +39,11 @@ class Location(TelegramObject):
         self.latitude = float(latitude)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Location:
