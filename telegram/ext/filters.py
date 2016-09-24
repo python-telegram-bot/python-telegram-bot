@@ -23,13 +23,16 @@ class BaseFilter(object):
     """Base class for all Message Filters"""
 
     def __call__(self, message):
-        raise NotImplementedError('Please implement a call method in your filter.')
+        self.filter(message)
 
     def __and__(self, other):
         return MergedFilter(self, and_filter=other)
 
     def __or__(self, other):
         return MergedFilter(self, or_filter=other)
+
+    def filter(self, message):
+        raise NotImplementedError
 
 
 class MergedFilter(BaseFilter):
@@ -40,7 +43,7 @@ class MergedFilter(BaseFilter):
         self.and_filter = and_filter
         self.or_filter = or_filter
 
-    def __call__(self, message):
+    def filter(self, message):
         if self.and_filter:
             return self.base_filter(message) and self.and_filter(message)
         elif self.or_filter:
@@ -55,84 +58,84 @@ class Filters(object):
 
     class Text(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.text and not message.text.startswith('/'))
 
     text = Text()
 
     class Command(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.text and message.text.startswith('/'))
 
     command = Command()
 
     class Audio(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.audio)
 
     audio = Audio()
 
     class Document(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.document)
 
     document = Document()
 
     class Photo(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.photo)
 
     photo = Photo()
 
     class Sticker(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.sticker)
 
     sticker = Sticker()
 
     class Video(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.video)
 
     video = Video()
 
     class Voice(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.voice)
 
     voice = Voice()
 
     class Contact(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.contact)
 
     contact = Contact()
 
     class Location(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.location)
 
     location = Location()
 
     class Venue(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.venue)
 
     venue = Venue()
 
     class StatusUpdate(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.new_chat_member or message.left_chat_member
                         or message.new_chat_title or message.new_chat_photo
                         or message.delete_chat_photo or message.group_chat_created
@@ -144,7 +147,7 @@ class Filters(object):
 
     class Forwarded(BaseFilter):
 
-        def __call__(self, message):
+        def filter(self, message):
             return bool(message.forward_date)
 
     forwarded = Forwarded()
