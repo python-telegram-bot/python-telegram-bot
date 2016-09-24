@@ -21,6 +21,8 @@
 import sys
 import unittest
 
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -44,7 +46,7 @@ class VenueTest(BaseTest, unittest.TestCase):
         }
 
     def test_sticker_de_json(self):
-        sticker = telegram.Venue.de_json(self.json_dict)
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(sticker.location, telegram.Location))
         self.assertEqual(sticker.title, self.title)
@@ -52,15 +54,25 @@ class VenueTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.foursquare_id, self.foursquare_id)
 
     def test_sticker_to_json(self):
-        sticker = telegram.Venue.de_json(self.json_dict)
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Venue.de_json(self.json_dict).to_dict()
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)
+
+    @flaky(3, 1)
+    def test_reply_venue(self):
+        """Test for Message.reply_venue"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_venue(self.location.latitude, self.location.longitude, self.title,
+                                      self._address)
+
+        self.assertAlmostEqual(message.venue.location.latitude, self.location.latitude, 2)
+        self.assertAlmostEqual(message.venue.location.longitude, self.location.longitude, 2)
 
 
 if __name__ == '__main__':

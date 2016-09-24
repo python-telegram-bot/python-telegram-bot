@@ -109,7 +109,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.mime_type, self.mime_type)
 
     def test_document_de_json(self):
-        document = telegram.Document.de_json(self.json_dict)
+        document = telegram.Document.de_json(self.json_dict, self._bot)
 
         self.assertEqual(document.file_id, self.document_file_id)
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
@@ -118,12 +118,12 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertEqual(document.file_size, self.file_size)
 
     def test_document_to_json(self):
-        document = telegram.Document.de_json(self.json_dict)
+        document = telegram.Document.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(document.to_json()))
 
     def test_document_to_dict(self):
-        document = telegram.Document.de_json(self.json_dict)
+        document = telegram.Document.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(document.to_dict()))
         self.assertEqual(document['file_id'], self.document_file_id)
@@ -166,6 +166,15 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.assertRaises(TypeError,
                           lambda: self._bot.sendDocument(chat_id=self._chat_id,
                                                          **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_document(self):
+        """Test for Message.reply_document"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_document(self.document_file)
+
+        self.assertNotEqual(message.document.file_id, '')
 
 
 if __name__ == '__main__':

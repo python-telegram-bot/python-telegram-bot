@@ -34,11 +34,11 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
-    bot.sendMessage(update.message.chat_id, text='Hi!')
+    update.message.reply_text('Hi!')
 
 
 def help(bot, update):
-    bot.sendMessage(update.message.chat_id, text='Help!')
+    update.message.reply_text('Help!')
 
 
 def escape_markdown(text):
@@ -68,7 +68,7 @@ def inlinequery(bot, update):
                                                 "_%s_" % escape_markdown(query),
                                                 parse_mode=ParseMode.MARKDOWN)))
 
-    bot.answerInlineQuery(update.inline_query.id, results=results)
+    update.inline_query.answer(results)
 
 
 def error(bot, update, error):

@@ -46,7 +46,7 @@ def echo(bot):
 
         if update.message:  # your bot can receive updates without messages
             # Reply to the message
-            bot.sendMessage(chat_id=chat_id, text=update.message.text)
+            update.message.reply_text(update.message.text)
 
 
 if __name__ == '__main__':

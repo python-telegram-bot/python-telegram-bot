@@ -53,7 +53,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         }
 
     def test_voice_de_json(self):
-        voice = telegram.InlineQueryResultVoice.de_json(self.json_dict)
+        voice = telegram.InlineQueryResultVoice.de_json(self.json_dict, self._bot)
 
         self.assertEqual(voice.type, self.type)
         self.assertEqual(voice.id, self.id)
@@ -65,12 +65,12 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(voice.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_voice_to_json(self):
-        voice = telegram.InlineQueryResultVoice.de_json(self.json_dict)
+        voice = telegram.InlineQueryResultVoice.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(voice.to_json()))
 
     def test_voice_to_dict(self):
-        voice = telegram.InlineQueryResultVoice.de_json(self.json_dict).to_dict()
+        voice = telegram.InlineQueryResultVoice.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(voice))
         self.assertDictEqual(self.json_dict, voice)

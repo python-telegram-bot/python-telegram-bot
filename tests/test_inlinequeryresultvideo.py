@@ -65,7 +65,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         }
 
     def test_video_de_json(self):
-        video = telegram.InlineQueryResultVideo.de_json(self.json_dict)
+        video = telegram.InlineQueryResultVideo.de_json(self.json_dict, self._bot)
 
         self.assertEqual(video.type, self.type)
         self.assertEqual(video.id, self.id)
@@ -83,12 +83,12 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(video.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_video_to_json(self):
-        video = telegram.InlineQueryResultVideo.de_json(self.json_dict)
+        video = telegram.InlineQueryResultVideo.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(video.to_json()))
 
     def test_video_to_dict(self):
-        video = telegram.InlineQueryResultVideo.de_json(self.json_dict).to_dict()
+        video = telegram.InlineQueryResultVideo.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(video))
         self.assertDictEqual(self.json_dict, video)

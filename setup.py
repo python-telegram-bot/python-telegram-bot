@@ -28,7 +28,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           author='Leandro Toledo',
           author_email='devs@python-telegram-bot.org',
           license='LGPLv3',
-          url='https://github.com/python-telegram-bot/python-telegram-bot',
+          url='https://python-telegram-bot.org/',
           keywords='python telegram bot api wrapper',
           description='Not just a Python wrapper around the Telegram Bot API',
           long_description=fd.read(),

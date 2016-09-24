@@ -55,10 +55,11 @@ class PhotoSize(TelegramObject):
                 and self.height == other.height and self.file_size == other.file_size)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.PhotoSize:
@@ -69,10 +70,11 @@ class PhotoSize(TelegramObject):
         return PhotoSize(**data)
 
     @staticmethod
-    def de_list(data):
+    def de_list(data, bot):
         """
         Args:
             data (list):
+            bot (telegram.Bot):
 
         Returns:
             List<telegram.PhotoSize>:
@@ -82,6 +84,6 @@ class PhotoSize(TelegramObject):
 
         photos = list()
         for photo in data:
-            photos.append(PhotoSize.de_json(photo))
+            photos.append(PhotoSize.de_json(photo, bot))
 
         return photos

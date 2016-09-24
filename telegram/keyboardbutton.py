@@ -43,19 +43,19 @@ class KeyboardButton(TelegramObject):
             self.request_location = request_location
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         if not data:
             return None
 
         return KeyboardButton(**data)
 
     @staticmethod
-    def de_list(data):
+    def de_list(data, bot):
         if not data:
             return []
 
         keyboards = list()
         for keyboard in data:
-            keyboards.append(KeyboardButton.de_json(keyboard))
+            keyboards.append(KeyboardButton.de_json(keyboard, bot))
 
         return keyboards

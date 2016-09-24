@@ -38,13 +38,14 @@ class TelegramObject(object):
         return self.__dict__[item]
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
-            telegram.TelegramObject:
+            dict:
         """
         if not data:
             return None
@@ -68,6 +69,9 @@ class TelegramObject(object):
         data = dict()
 
         for key in iter(self.__dict__):
+            if key == 'bot':
+                continue
+
             value = self.__dict__[key]
             if value is not None:
                 if hasattr(value, 'to_dict'):

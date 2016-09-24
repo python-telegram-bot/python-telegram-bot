@@ -44,10 +44,11 @@ class ReplyKeyboardHide(ReplyMarkup):
         self.selective = bool(kwargs.get('selective', False))
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot(telegram.Bot):
 
         Returns:
             telegram.ReplyKeyboardHide:

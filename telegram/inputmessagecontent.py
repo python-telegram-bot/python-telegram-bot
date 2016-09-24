@@ -26,33 +26,33 @@ class InputMessageContent(TelegramObject):
     """Base class for Telegram InputMessageContent Objects"""
 
     @staticmethod
-    def de_json(data):
-        data = super(InputMessageContent, InputMessageContent).de_json(data)
+    def de_json(data, bot):
+        data = super(InputMessageContent, InputMessageContent).de_json(data, bot)
 
         if not data:
             return None
 
         try:
             from telegram import InputTextMessageContent
-            return InputTextMessageContent.de_json(data)
+            return InputTextMessageContent.de_json(data, bot)
         except TypeError:
             pass
 
         try:
             from telegram import InputVenueMessageContent
-            return InputVenueMessageContent.de_json(data)
+            return InputVenueMessageContent.de_json(data, bot)
         except TypeError:
             pass
 
         try:
             from telegram import InputLocationMessageContent
-            return InputLocationMessageContent.de_json(data)
+            return InputLocationMessageContent.de_json(data, bot)
         except TypeError:
             pass
 
         try:
             from telegram import InputContactMessageContent
-            return InputContactMessageContent.de_json(data)
+            return InputContactMessageContent.de_json(data, bot)
         except TypeError:
             pass
 

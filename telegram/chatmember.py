@@ -46,10 +46,11 @@ class ChatMember(TelegramObject):
         self.status = status
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
             data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.ChatMember:
@@ -57,6 +58,6 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        data['user'] = User.de_json(data.get('user'))
+        data['user'] = User.de_json(data.get('user'), bot)
 
         return ChatMember(**data)

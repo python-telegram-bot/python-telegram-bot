@@ -51,12 +51,12 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, 'Testing InlineKeyboardMarkup')
 
     def test_inline_keyboard_markup_de_json_empty(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(None)
+        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(None, self._bot)
 
         self.assertFalse(inline_keyboard_markup)
 
     def test_inline_keyboard_markup_de_json(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict)
+        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
         self.assertTrue(
@@ -64,12 +64,12 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
                        telegram.InlineKeyboardButton))
 
     def test_inline_keyboard_markup_to_json(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict)
+        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(inline_keyboard_markup.to_json()))
 
     def test_inline_keyboard_markup_to_dict(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict)
+        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
         self.assertTrue(
