@@ -69,6 +69,13 @@ class MergedFilter(BaseFilter):
         elif self.or_filter:
             return self.base_filter(message) or self.or_filter(message)
 
+    def __str__(self):
+        return ("<telegram.ext.filters.MergedFilter consisting of"
+                " {} {} {}>").format(self.base_filter, "and" if self.and_filter else "or",
+                                     self.and_filter or self.or_filter)
+
+    __repr__ = __str__
+
 
 class Filters(object):
     """
