@@ -212,6 +212,18 @@ class Request(object):
             The filename within the path to download the file.
 
         """
-        buf = self._request_wrapper('GET', url)
         with open(filename, 'wb') as fobj:
-            fobj.write(buf)
+            self.download_to(url, fobj)
+    
+    def download_to(self, url, file_object):
+        """Downloads a file by its URL using an existing file object.
+        Args:
+          url:
+            The web location we want to retrieve.
+          
+          file_object:
+            A file-like object that supports write().
+        
+        """
+        buf = self._request_wrapper('GET', url)
+        file_object.write(buf)
