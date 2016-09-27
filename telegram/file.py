@@ -89,4 +89,5 @@ class File(TelegramObject):
 
         """
         url = self.file_path
-        self.bot.request.download(url, file_object)
+        
+        self.bot.request.download_to(url, file_object)
