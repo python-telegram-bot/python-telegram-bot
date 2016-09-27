@@ -4,7 +4,7 @@ The examples in this folder are small bots meant to show you how a bot that is w
 
 All examples are licensed under the [CC0 License](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/LICENSE.txt) and are therefore fully dedicated to the public domain. You can use them as the base for your own bots without worrying about copyrights.
 
-### [`echobot2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/v5.0/examples/echobot2.py) 
+### [`echobot2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py) 
 This is probably the base for most of the bots made with `python-telegram-bot`. It simply replies to each text message with a message that contains the same text.
 
 ### [`timerbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py) 
