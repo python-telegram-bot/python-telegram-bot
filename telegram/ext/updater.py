@@ -157,6 +157,7 @@ class Updater(object):
                 self.running = True
 
                 # Create & start threads
+                self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
                                   network_delay, bootstrap_retries, clean)
@@ -208,6 +209,7 @@ class Updater(object):
                 self.running = True
 
                 # Create & start threads
+                self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher"),
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
                                   key, bootstrap_retries, clean, webhook_url)

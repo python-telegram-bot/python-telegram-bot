@@ -21,6 +21,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `jlmadurga <https://github.com/jlmadurga>`_
 - `Li-aung Yip <https://github.com/LiaungYip>`_
 - `macrojames <https://github.com/macrojames>`_
+- `Michael Elovskikh <https://github.com/wronglink>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
