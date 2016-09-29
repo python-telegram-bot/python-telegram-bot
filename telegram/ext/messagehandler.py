@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the MessageHandler class """
+import warnings
 
 from .handler import Handler
 from telegram import Update
@@ -30,12 +31,10 @@ class MessageHandler(Handler):
     updates.
 
     Args:
-        filters (list[function]): A list of filter functions. Standard filters
-            can be found in the Filters class above.
-          | Each `function` takes ``Update`` as arg and returns ``bool``.
-          | All messages that match at least one of those filters will be
-            accepted. If ``bool(filters)`` evaluates to ``False``, messages are
-            not filtered.
+        filters (telegram.ext.BaseFilter): A filter inheriting from
+            :class:`telegram.filters.BaseFilter`. Standard filters can be found in
+            :class:`telegram.filters.Filters`. Filters can be combined using bitwise
+            operators (& for and, | for or).
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
@@ -57,6 +56,13 @@ class MessageHandler(Handler):
         self.filters = filters
         self.allow_edited = allow_edited
 
+        # We put this up here instead of with the rest of checking code
+        # in check_update since we don't wanna spam a ton
+        if isinstance(self.filters, list):
+            warnings.warn('Using a list of filters in MessageHandler is getting '
+                          'deprecated, please use bitwise operators (& and |) '
+                          'instead. More info: https://git.io/vPTbc.')
+
     def check_update(self, update):
         if (isinstance(update, Update)
                 and (update.message or update.edited_message and self.allow_edited)):
@@ -66,7 +72,10 @@ class MessageHandler(Handler):
 
             else:
                 message = update.message or update.edited_message
-                res = any(func(message) for func in self.filters)
+                if isinstance(self.filters, list):
+                    res = any(func(message) for func in self.filters)
+                else:
+                    res = self.filters(message)
 
         else:
             res = False
