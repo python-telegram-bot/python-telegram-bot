@@ -42,6 +42,7 @@ class Game(TelegramObject):
 
         Returns:
             telegram.Game:
+
         """
         if not data:
             return None

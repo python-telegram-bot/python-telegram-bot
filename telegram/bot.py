@@ -1517,6 +1517,12 @@ class Bot(TelegramObject):
                      inline_message_id=None,
                      edit_message=None,
                      **kwargs):
+        """Use this method to set the score of the specified user in a game.
+
+        Returns:
+            :class:`telegram.Message`: The edited message.
+
+        """
         url = '{0}/setGameScore'.format(self.base_url)
 
         data = {'user_id': user_id, 'score': score}
@@ -1524,15 +1530,14 @@ class Bot(TelegramObject):
         if chat_id:
             data['chat_id'] = chat_id
         if message_id:
-            data['chat_id'] = chat_id
+            data['message_id'] = message_id
         if inline_message_id:
-            data['chat_id'] = inline_message_id
+            data['inline_message_id'] = inline_message_id
         if edit_message:
             data['edit_message'] = edit_message
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
-        del result  # To satisfy flake8
-        # Help: Result is either Message or True or an error
+        return Message.de_json(result, self)
 
     def getGameHighScores(self,
                           user_id,
