@@ -46,6 +46,8 @@ from .file import File
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
+from .animation import Animation
+from .game import Game
 from .message import Message
 from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
@@ -79,8 +81,6 @@ from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
 from .webhookinfo import WebhookInfo
-from .animation import Animation
-from .game import Game
 from .gamehighscore import GameHighScore
 from .update import Update
 from .bot import Bot
