@@ -28,7 +28,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
                  id,
                  voice_file_id,
                  title,
-                 description=None,
+                 caption=None,
                  reply_markup=None,
                  input_message_content=None,
                  **kwargs):
@@ -38,8 +38,8 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         self.title = title
 
         # Optionals
-        if description:
-            self.description = description
+        if caption:
+            self.caption = caption
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

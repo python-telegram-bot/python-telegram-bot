@@ -323,7 +323,14 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendAudio(self, chat_id, audio, duration=None, performer=None, title=None, **kwargs):
+    def sendAudio(self,
+                  chat_id,
+                  audio,
+                  duration=None,
+                  performer=None,
+                  title=None,
+                  caption=None,
+                  **kwargs):
         """Use this method to send audio files, if you want Telegram clients to
         display them in the music player. Your audio must be in an .mp3 format.
         On success, the sent Message is returned. Bots can currently send audio
@@ -348,6 +355,8 @@ class Bot(TelegramObject):
             Performer of sent audio. [Optional]
           title:
             Title of sent audio. [Optional]
+          caption:
+            Audio caption [Optional]
 
         Keyword Args:
             disable_notification (Optional[bool]): Sends the message silently.
@@ -381,6 +390,8 @@ class Bot(TelegramObject):
             data['performer'] = performer
         if title:
             data['title'] = title
+        if caption:
+            data['caption'] = caption
 
         return url, data
 
@@ -531,7 +542,7 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendVoice(self, chat_id, voice, duration=None, **kwargs):
+    def sendVoice(self, chat_id, voice, duration=None, caption=None, **kwargs):
         """Use this method to send audio files, if you want Telegram clients to
         display the file as a playable voice message. For this to work, your
         audio must be in an .ogg file encoded with OPUS (other formats may be
@@ -548,6 +559,8 @@ class Bot(TelegramObject):
             a new audio file using multipart/form-data.
           duration:
             Duration of sent audio in seconds. [Optional]
+          caption:
+            Voice caption [Optional]
 
         Keyword Args:
             disable_notification (Optional[bool]): Sends the message silently.
@@ -577,6 +590,8 @@ class Bot(TelegramObject):
 
         if duration:
             data['duration'] = duration
+        if caption:
+            data['caption'] = caption
 
         return url, data
 
@@ -1443,7 +1458,8 @@ class Bot(TelegramObject):
         return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
                                  self.base_file_url.replace(self.token, '')))
 
-    # snake_case (PEP8) aliases
+# snake_case (PEP8) aliases
+
     get_me = getMe
     send_message = sendMessage
     forward_message = forwardMessage

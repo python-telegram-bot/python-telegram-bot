@@ -32,6 +32,7 @@ class Chat(TelegramObject):
         username (str): Username, for private chats and channels if available
         first_name (str): First name of the other party in a private chat
         last_name (str): Last name of the other party in a private chat
+        all_members_are_admins (bool): True if a group has ‘All Members Are Admins’ enabled.
 
     Args:
         id (int):
@@ -57,6 +58,7 @@ class Chat(TelegramObject):
         self.username = kwargs.get('username', '')
         self.first_name = kwargs.get('first_name', '')
         self.last_name = kwargs.get('last_name', '')
+        self.all_members_are_admins = kwargs.get('all_members_are_admins', '')
 
         self.bot = bot
 

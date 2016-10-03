@@ -31,6 +31,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     Attributes:
         id (str):
         audio_file_id (str):
+        caption (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
         input_message_content (Optional[
             :class:`telegram.input_message_content`]):
@@ -48,17 +49,26 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
+        caption (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
         input_message_content (Optional[
             :class:`telegram.input_message_content`]):
     """
 
-    def __init__(self, id, audio_file_id, reply_markup=None, input_message_content=None, **kwargs):
+    def __init__(self,
+                 id,
+                 audio_file_id,
+                 caption=None,
+                 reply_markup=None,
+                 input_message_content=None,
+                 **kwargs):
         # Required
         super(InlineQueryResultCachedAudio, self).__init__('audio', id)
         self.audio_file_id = audio_file_id
 
         # Optionals
+        if caption:
+            self.caption = caption
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:
