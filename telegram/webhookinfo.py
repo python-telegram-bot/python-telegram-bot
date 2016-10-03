@@ -28,8 +28,8 @@ class WebhookInfo(TelegramObject):
         url (str): Webhook URL, may be empty if webhook is not set up.
         has_custom_certificate (bool):
         pending_update_count (int):
-        last_error_date (Optional[int]):
-        last_error_message (Optional[str]):
+        last_error_date (int):
+        last_error_message (str):
 
     Args:
         url (str): Webhook URL, may be empty if webhook is not set up.

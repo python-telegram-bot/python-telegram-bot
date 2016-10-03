@@ -30,19 +30,26 @@ class InlineKeyboardButton(TelegramObject):
         url (str):
         callback_data (str):
         switch_inline_query (str):
-        switch_inline_query_current_chat (Optional[str]):
-        callback_game (Optional[:class:`telegram.CallbackGame`]):
+        switch_inline_query_current_chat (str):
+        callback_game (:class:`telegram.CallbackGame`):
 
     Args:
-        text (str):
+        text (str): Label text on the button.
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
-        url (Optional[str]):
-        callback_data (Optional[str]):
-        switch_inline_query (Optional[str]):
-        switch_inline_query_current_chat (Optional[str]):
-        callback_game (Optional[:class:`telegram.CallbackGame`]):
+        url (Optional[str]): HTTP url to be opened when button is pressed.
+        callback_data (Optional[str]):  Data to be sent in a callback query to the bot when button
+            is pressed, 1-64 bytes.
+        switch_inline_query (Optional[str]): If set, pressing the button will prompt the user to
+            select one of their chats, open that chat and insert the bot's username and the
+            specified inline query in the input field. Can be empty, in which case just the bot's
+            username will be inserted.
+        switch_inline_query_current_chat (Optional[str]): If set, pressing the button will insert
+            the bot's username and the specified inline query in the current chat's input field.
+            Can be empty, in which case only the bot's username will be inserted.
+        callback_game (Optional[:class:`telegram.CallbackGame`]): Description of the game that will
+            be launched when the user presses the button.
 
     """
 
