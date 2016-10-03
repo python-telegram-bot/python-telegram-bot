@@ -1432,14 +1432,12 @@ class Bot(TelegramObject):
                 the definitive timeout (in seconds) for urlopen() operations.
 
         Returns:
-            :class:`telegram.ChatMember`: On success,
-            :class:`telegram.ChatMember` is returned.
+            :class:`telegram.ChatMember`
 
         Raises:
             :class:`telegram.TelegramError`
 
         """
-
         url = '{0}/getChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
@@ -1449,6 +1447,14 @@ class Bot(TelegramObject):
         return ChatMember.de_json(result, self)
 
     def getWebhookInfo(self, **kwargs):
+        """Use this method to get current webhook status.
+
+        If the bot is using getUpdates, will return an object with the url field empty.
+
+        Returns:
+            :class: `telegram.WebhookInfo`
+
+        """
         url = '{0}/getWebhookInfo'.format(self.base_url)
 
         data = {}
@@ -1475,7 +1481,7 @@ class Bot(TelegramObject):
         return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
                                  self.base_file_url.replace(self.token, '')))
 
-# snake_case (PEP8) aliases
+    # snake_case (PEP8) aliases
 
     get_me = getMe
     send_message = sendMessage

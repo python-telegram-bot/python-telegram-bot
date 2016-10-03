@@ -25,18 +25,19 @@ class WebhookInfo(TelegramObject):
     """This object represents a Telegram WebhookInfo.
 
     Attributes:
-        url (str): Webhook URL, may be empty if webhook is not set up
+        url (str): Webhook URL, may be empty if webhook is not set up.
         has_custom_certificate (bool):
         pending_update_count (int):
         last_error_date (Optional[int]):
         last_error_message (Optional[str]):
 
     Args:
-        url (str): Webhook URL, may be empty if webhook is not set up
+        url (str): Webhook URL, may be empty if webhook is not set up.
         has_custom_certificate (bool):
         pending_update_count (int):
         last_error_date (Optional[int]):
         last_error_message (Optional[str]):
+
     """
 
     def __init__(self, url, has_custom_certificate, pending_update_count, **kwargs):
@@ -56,6 +57,7 @@ class WebhookInfo(TelegramObject):
 
         Returns:
             telegram.WebhookInfo:
+
         """
         if not data:
             return None
