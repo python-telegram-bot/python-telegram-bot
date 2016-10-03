@@ -80,7 +80,7 @@ class InputFile(object):
                 self.filename = os.path.basename(self.input_file.name)
 
             try:
-                self.mimetype = InputFile.is_image(self.input_file_content)
+                self.mimetype = self.is_image(self.input_file_content)
                 if not self.filename or '.' not in self.filename:
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
@@ -127,7 +127,7 @@ class InputFile(object):
         form.append('--' + self.boundary + '--')
         form.append('')
 
-        return InputFile._parse(form)
+        return self._parse(form)
 
     @staticmethod
     def _parse(form):
