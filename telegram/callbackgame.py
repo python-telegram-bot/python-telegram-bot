@@ -22,4 +22,4 @@ from telegram import TelegramObject
 
 
 class CallbackGame(TelegramObject):
-    """Why is this even here???"""
+    """A placeholder, currently holds no information. Use BotFather to set up your game."""
