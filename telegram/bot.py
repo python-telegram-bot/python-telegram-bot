@@ -23,7 +23,7 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, WebhookInfo)
+                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
 from telegram.error import InvalidToken
 from telegram.utils.request import Request
 
@@ -1514,6 +1514,52 @@ class Bot(TelegramObject):
 
         return WebhookInfo.de_json(result, self)
 
+    def setGameScore(self,
+                     user_id,
+                     score,
+                     chat_id=None,
+                     message_id=None,
+                     inline_message_id=None,
+                     edit_message=None,
+                     **kwargs):
+        url = '{0}/setGameScore'.format(self.base_url)
+
+        data = {'user_id': user_id, 'score': score}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['chat_id'] = chat_id
+        if inline_message_id:
+            data['chat_id'] = inline_message_id
+        if edit_message:
+            data['edit_message'] = edit_message
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        del result  # To satisfy flake8
+        # Help: Result is either Message or True or an error
+
+    def getGameHighScores(self,
+                          user_id,
+                          chat_id=None,
+                          message_id=None,
+                          inline_message_id=None,
+                          **kwargs):
+        url = '{0}/setGameScore'.format(self.base_url)
+
+        data = {'user_id': user_id}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['chat_id'] = chat_id
+        if inline_message_id:
+            data['chat_id'] = inline_message_id
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return [GameHighScore.de_json(hs, self) for hs in result]
+
     @staticmethod
     def de_json(data, bot):
         data = super(Bot, Bot).de_json(data, bot)
@@ -1565,3 +1611,5 @@ class Bot(TelegramObject):
     get_chat_member = getChatMember
     get_chat_members_count = getChatMembersCount
     get_webhook_info = getWebhookInfo
+    set_game_score = setGameScore
+    get_game_high_scores = getGameHighScores
