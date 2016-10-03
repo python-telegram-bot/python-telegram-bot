@@ -77,16 +77,16 @@ from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
+from .webhookinfo import WebhookInfo
+from .animation import Animation
+from .game import Game
+from .gamehighscore import GameHighScore
 from .update import Update
 from .bot import Bot
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,
                         MAX_FILESIZE_DOWNLOAD, MAX_FILESIZE_UPLOAD,
                         MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,
                         MAX_MESSAGES_PER_MINUTE_PER_GROUP)
-from .webhookinfo import WebhookInfo
-from .animation import Animation
-from .game import Game
-from .gamehighscore import GameHighScore
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
