@@ -743,6 +743,57 @@ class Bot(TelegramObject):
 
     @log
     @message
+    def sendGame(self,
+                 chat_id,
+                 game_short_name,
+                 parse_mode=None,
+                 disable_web_page_preview=None,
+                 **kwargs):
+        """Use this method to send game messages.
+
+        Args:
+            chat_id (str): Unique identifier for the target chat or
+                username of the target channel (in the format
+                @channelusername).
+            game_short_name (str): Short name of the game, serves as the unique
+                identifier for the game.
+            **kwargs (dict): Arbitrary keyword arguments.
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently.
+                iOS users will not receive a notification, Android users will
+                receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
+                interface options. A JSON-serialized object for an inline
+                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent message is
+            returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+
+        url = '{0}/sendMessage'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'game_short_name': game_short_name}
+
+        if parse_mode:
+            data['parse_mode'] = parse_mode
+        if disable_web_page_preview:
+            data['disable_web_page_preview'] = disable_web_page_preview
+
+        return url, data
+
+    @log
+    @message
     def sendChatAction(self, chat_id, action, **kwargs):
         """Use this method when you need to tell the user that something is
         happening on the bot's side. The status is set for 5 seconds or less
@@ -1481,7 +1532,7 @@ class Bot(TelegramObject):
         return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
                                  self.base_file_url.replace(self.token, '')))
 
-    # snake_case (PEP8) aliases
+# snake_case (PEP8) aliases
 
     get_me = getMe
     send_message = sendMessage
@@ -1495,6 +1546,7 @@ class Bot(TelegramObject):
     send_location = sendLocation
     send_venue = sendVenue
     send_contact = sendContact
+    send_game = sendGame
     send_chat_action = sendChatAction
     answer_inline_query = answerInlineQuery
     get_user_profile_photos = getUserProfilePhotos
