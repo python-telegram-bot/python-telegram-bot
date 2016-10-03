@@ -37,6 +37,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         self.voice_url = 'voice url'
         self.title = 'title'
         self.voice_duration = 'voice_duration'
+        self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
         self.reply_markup = telegram.InlineKeyboardMarkup([[
             telegram.InlineKeyboardButton('reply_markup')
@@ -48,6 +49,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
             'voice_url': self.voice_url,
             'title': self.title,
             'voice_duration': self.voice_duration,
+            'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
@@ -60,6 +62,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.voice_url, self.voice_url)
         self.assertEqual(voice.title, self.title)
         self.assertEqual(voice.voice_duration, self.voice_duration)
+        self.assertEqual(voice.caption, self.caption)
         self.assertDictEqual(voice.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
         self.assertDictEqual(voice.reply_markup.to_dict(), self.reply_markup.to_dict())
