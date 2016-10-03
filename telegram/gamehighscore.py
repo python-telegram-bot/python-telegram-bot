@@ -22,6 +22,14 @@ from telegram import TelegramObject, User
 
 
 class GameHighScore(TelegramObject):
+    """This object represents a Telegram GameHighScore.
+
+    Attributes:
+        position (int): Position in high score table for the game.
+        user (:class:`telegram.User`): User object.
+        score (int): Score.
+
+    """
 
     def __init__(self, position, user, score):
         self.position = position
