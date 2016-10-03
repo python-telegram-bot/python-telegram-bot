@@ -22,8 +22,26 @@ from telegram import TelegramObject
 
 
 class Animation(TelegramObject):
+    """This object represents a Telegram Animation.
 
-    def __init__(self, file_id, **kwargs):
+    Attributes:
+        file_id (str): Unique file identifier.
+
+    Keyword Args:
+        thumb (Optional[:class:`telegram.PhotoSize`]): Animation thumbnail as defined by sender.
+        file_name (Optional[str]): Original animation filename as defined by sender.
+        mime_type (Optional[str]): MIME type of the file as defined by sender.
+        file_size (Optional[int]): File size.
+
+    """
+
+    def __init__(self,
+                 file_id,
+                 thumb=None,
+                 file_name=None,
+                 mime_type=None,
+                 file_size=None,
+                 **kwargs):
         self.file_id = file_id
         self.thumb = kwargs.get('thumb')
         self.file_name = kwargs.get('file_name')
