@@ -749,45 +749,40 @@ class Bot(TelegramObject):
                  parse_mode=None,
                  disable_web_page_preview=None,
                  **kwargs):
-        """Use this method to send game messages.
+        """Use this method to send a game.
 
         Args:
-            chat_id (str): Unique identifier for the target chat or
-                username of the target channel (in the format
-                @channelusername).
-            game_short_name (str): Short name of the game, serves as the unique
-                identifier for the game.
+            chat_id: Unique identifier for the target chat or username of the target channel (in
+                the format @channelusername).
+            game_short_name (str): Short name of the game, serves as the unique identifier for the
+                game.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Keyword Args:
-            disable_notification (Optional[bool]): Sends the message silently.
-                iOS users will not receive a notification, Android users will
-                receive a notification with no sound.
+            disable_notification (Optional[bool]): Sends the message silently. iOS users will not
+                receive a notification, Android users will receive a notification with no sound.
             reply_to_message_id (Optional[int]): If the message is a reply,
                 ID of the original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
-                interface options. A JSON-serialized object for an inline
-                keyboard, custom reply keyboard, instructions to hide reply
-                keyboard or to force a reply from the user.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options.
+                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to hide reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
 
         Returns:
-            :class:`telegram.Message`: On success, the sent message is
-            returned.
+            :class:`telegram.Message`: On success, the sent message is returned.
 
         Raises:
             :class:`telegram.TelegramError`
 
         """
-
         url = '{0}/sendMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        if parse_mode:
+        if parse_mode is not None:
             data['parse_mode'] = parse_mode
-        if disable_web_page_preview:
+        if disable_web_page_preview is not None:
             data['disable_web_page_preview'] = disable_web_page_preview
 
         return url, data
