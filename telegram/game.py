@@ -24,14 +24,40 @@ from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
 
 
 class Game(TelegramObject):
+    """This object represents a Telegram Game.
 
-    def __init__(self, title, description, photo, **kwargs):
+    Attributes:
+        title (str): Title of the game.
+        description (str): Description of the game.
+        photo (list[:class:`telegram.PhotoSize`]): List of photos that will be displayed in the
+            game message in chats.
+
+    Keyword Args:
+        text (Optional[str]): Brief description of the game or high scores included in the game
+            message. Can be automatically edited to include current high scores for the game when
+            the bot calls setGameScore, or manually edited using editMessageText.
+            0-4096 characters.
+        text_entities (Optional[list[:class:`telegram.MessageEntity`]]): Special entities that
+            appear in text, such as usernames, URLs, bot commands, etc.
+        animation (Optional[:class:`telegram.Animation`]): Animation that will be displayed in the
+            game message in chats. Upload via BotFather.
+
+    """
+
+    def __init__(self,
+                 title,
+                 description,
+                 photo,
+                 text=None,
+                 text_entities=None,
+                 animation=None,
+                 **kwargs):
         self.title = title
         self.description = description
         self.photo = photo
-        self.text = kwargs.get('text')
-        self.text_entities = kwargs.get('text_entities')
-        self.animation = kwargs.get('animation')
+        self.text = text
+        self.text_entities = text_entities
+        self.animation = animation
 
     @staticmethod
     def de_json(data, bot):
