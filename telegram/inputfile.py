@@ -35,6 +35,7 @@ from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
+FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate')
 
 
 class InputFile(object):
@@ -110,7 +111,8 @@ class InputFile(object):
         form_boundary = '--' + self.boundary
 
         # Add data fields
-        for name, value in self.data.items():
+        for name in iter(self.data):
+            value = self.data[name]
             form.extend([
                 form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
             ])
@@ -166,14 +168,13 @@ class InputFile(object):
         """Check if the request is a file request.
 
         Args:
-            data (str): A dict of (str, unicode) key/value pairs
+            data (dict): A dict of (str, unicode) key/value pairs
 
         Returns:
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate']
-            file_type = [i for i in list(data.keys()) if i in file_types]
+            file_type = [i for i in iter(data) if i in FILE_TYPES]
 
             if file_type:
                 file_content = data[file_type[0]]
