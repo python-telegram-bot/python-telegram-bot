@@ -1076,7 +1076,7 @@ class Bot(TelegramObject):
         if show_alert:
             data['show_alert'] = show_alert
         if url:
-            data['show_alert'] = url
+            data['url'] = url
 
         result = self._request.post(url_, data, timeout=kwargs.get('timeout'))
 
