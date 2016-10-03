@@ -84,6 +84,9 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
                         MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,
                         MAX_MESSAGES_PER_MINUTE_PER_GROUP)
 from .webhookinfo import WebhookInfo
+from .animation import Animation
+from .game import Game
+from .gamehighscore import GameHighScore
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -106,4 +109,5 @@ __all__ = ['Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResu
            'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue', 'Video', 'Voice',
            'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
            'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
-           'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo']
+           'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo',
+           'Animation', 'Game', 'GameHighScore']
