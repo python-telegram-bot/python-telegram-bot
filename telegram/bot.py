@@ -1545,6 +1545,13 @@ class Bot(TelegramObject):
                           message_id=None,
                           inline_message_id=None,
                           **kwargs):
+        """Use this method to get data for high score tables.
+
+        Returns:
+            list[:class:`telegram.GameHighScore`]: Scores of the specified user and several of his
+                neighbors in a game.
+
+        """
         url = '{0}/setGameScore'.format(self.base_url)
 
         data = {'user_id': user_id}
@@ -1552,9 +1559,9 @@ class Bot(TelegramObject):
         if chat_id:
             data['chat_id'] = chat_id
         if message_id:
-            data['chat_id'] = chat_id
+            data['message_id'] = message_id
         if inline_message_id:
-            data['chat_id'] = inline_message_id
+            data['inline_message_id'] = inline_message_id
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
