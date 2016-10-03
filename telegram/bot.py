@@ -23,7 +23,7 @@ import functools
 import logging
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject)
+                      ReplyMarkup, TelegramObject, WebhookInfo)
 from telegram.error import InvalidToken
 from telegram.utils.request import Request
 
@@ -1440,6 +1440,15 @@ class Bot(TelegramObject):
 
         return ChatMember.de_json(result, self)
 
+    def getWebhookInfo(self, **kwargs):
+        url = '{0}/getWebhookInfo'.format(self.base_url)
+
+        data = {}
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return WebhookInfo.de_json(result, self)
+
     @staticmethod
     def de_json(data, bot):
         data = super(Bot, Bot).de_json(data, bot)
@@ -1489,3 +1498,4 @@ class Bot(TelegramObject):
     get_chat_administrators = getChatAdministrators
     get_chat_member = getChatMember
     get_chat_members_count = getChatMembersCount
+    get_webhook_info = getWebhookInfo
