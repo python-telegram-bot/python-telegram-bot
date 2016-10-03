@@ -94,8 +94,20 @@ class ChatMigrated(TelegramError):
         Args:
             new_chat_id (int):
 
-        Returns:
+        """
+        super(ChatMigrated,
+              self).__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
+        self.new_chat_id = new_chat_id
+
+
+class RetryAfter(TelegramError):
+
+    def __init__(self, retry_after):
+        """
+        Args:
+            retry_after (int):
 
         """
-        super(ChatMigrated, self).__init__('Chat migrated')
-        self.new_chat_id = new_chat_id
+        super(RetryAfter,
+              self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
+        self.retry_after = retry_after

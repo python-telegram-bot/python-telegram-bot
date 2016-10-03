@@ -31,7 +31,8 @@ import urllib3
 from urllib3.connection import HTTPConnection
 
 from telegram import (InputFile, TelegramError)
-from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated
+from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated, \
+    RetryAfter
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -105,6 +106,9 @@ class Request(object):
                 migrate_to_chat_id = parameters.get('migrate_to_chat_id')
                 if migrate_to_chat_id:
                     raise ChatMigrated(migrate_to_chat_id)
+                retry_after = parameters.get('retry_after')
+                if retry_after:
+                    raise RetryAfter(retry_after)
             if description:
                 return description
 
