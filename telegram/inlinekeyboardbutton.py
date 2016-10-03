@@ -31,6 +31,7 @@ class InlineKeyboardButton(TelegramObject):
         callback_data (str):
         switch_inline_query (str):
         switch_inline_query_current_chat (Optional[str]):
+        callback_game (Optional[:class:`telegram.CallbackGame`]):
 
     Args:
         text (str):
@@ -41,6 +42,7 @@ class InlineKeyboardButton(TelegramObject):
         callback_data (Optional[str]):
         switch_inline_query (Optional[str]):
         switch_inline_query_current_chat (Optional[str]):
+        callback_game (Optional[:class:`telegram.CallbackGame`]):
 
     """
 
@@ -53,6 +55,7 @@ class InlineKeyboardButton(TelegramObject):
         self.callback_data = kwargs.get('callback_data')
         self.switch_inline_query = kwargs.get('switch_inline_query')
         self.switch_inline_query_current_chat = kwargs.get('switch_inline_query_current_chat')
+        self.callback_game = kwargs.get('callback_game')
 
     @staticmethod
     def de_json(data, bot):
