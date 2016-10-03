@@ -31,8 +31,6 @@ import mimetypes
 import os
 import sys
 
-from future.moves.urllib.request import urlopen
-
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
@@ -49,32 +47,28 @@ class InputFile(object):
         if 'audio' in data:
             self.input_name = 'audio'
             self.input_file = data.pop('audio')
-        if 'document' in data:
+        elif 'document' in data:
             self.input_name = 'document'
             self.input_file = data.pop('document')
-        if 'photo' in data:
+        elif 'photo' in data:
             self.input_name = 'photo'
             self.input_file = data.pop('photo')
-        if 'sticker' in data:
+        elif 'sticker' in data:
             self.input_name = 'sticker'
             self.input_file = data.pop('sticker')
-        if 'video' in data:
+        elif 'video' in data:
             self.input_name = 'video'
             self.input_file = data.pop('video')
-        if 'voice' in data:
+        elif 'voice' in data:
             self.input_name = 'voice'
             self.input_file = data.pop('voice')
-        if 'certificate' in data:
+        elif 'certificate' in data:
             self.input_name = 'certificate'
             self.input_file = data.pop('certificate')
-
-        if str(self.input_file).startswith('http'):
-            from_url = True
-            self.input_file = urlopen(self.input_file)
         else:
-            from_url = False
+            raise TelegramError('Unknown inputfile type')
 
-        if hasattr(self.input_file, 'read') or from_url:
+        if hasattr(self.input_file, 'read'):
             self.filename = None
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
@@ -83,8 +77,6 @@ class InputFile(object):
                 # on py2.7, pylint fails to understand this properly
                 # pylint: disable=E1101
                 self.filename = os.path.basename(self.input_file.name)
-            elif from_url:
-                self.filename = os.path.basename(self.input_file.url).split('?')[0].split('&')[0]
 
             try:
                 self.mimetype = InputFile.is_image(self.input_file_content)
@@ -186,6 +178,6 @@ class InputFile(object):
             if file_type:
                 file_content = data[file_type[0]]
 
-                return hasattr(file_content, 'read') or str(file_content).startswith('http')
+                return hasattr(file_content, 'read')
 
         return False

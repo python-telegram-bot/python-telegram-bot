@@ -134,19 +134,13 @@ class AudioTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def test_send_audio_mp3_url_file(self):
         message = self._bot.sendAudio(
-            chat_id=self._chat_id,
-            audio=self.audio_file_url,
-            duration=self.duration,
-            performer=self.performer,
-            title=self.title)
+            chat_id=self._chat_id, audio=self.audio_file_url, duration=self.duration)
 
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
         self.assertNotEqual(audio.file_id, '')
         self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
