@@ -980,7 +980,12 @@ class Bot(TelegramObject):
         return result
 
     @log
-    def answerCallbackQuery(self, callback_query_id, text=None, show_alert=False, **kwargs):
+    def answerCallbackQuery(self,
+                            callback_query_id,
+                            text=None,
+                            show_alert=False,
+                            url=None,
+                            **kwargs):
         """Use this method to send answers to callback queries sent from
         inline keyboards. The answer will be displayed to the user as a
         notification at the top of the chat screen or as an alert.
@@ -993,6 +998,7 @@ class Bot(TelegramObject):
             show_alert (Optional[bool]): If `True`, an alert will be shown
                 by the client instead of a notification at the top of the chat
                 screen. Defaults to `False`.
+            url (Optional[str]): URL that will be opened by the user's client.
 
         Keyword Args:
             timeout (Optional[float]): If this value is specified, use it as
@@ -1010,7 +1016,7 @@ class Bot(TelegramObject):
 
         """
 
-        url = '{0}/answerCallbackQuery'.format(self.base_url)
+        url_ = '{0}/answerCallbackQuery'.format(self.base_url)
 
         data = {'callback_query_id': callback_query_id}
 
@@ -1018,8 +1024,10 @@ class Bot(TelegramObject):
             data['text'] = text
         if show_alert:
             data['show_alert'] = show_alert
+        if url:
+            data['show_alert'] = url
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url_, data, timeout=kwargs.get('timeout'))
 
         return result
 
