@@ -35,7 +35,6 @@ class InlineKeyboardButton(TelegramObject):
 
     Args:
         text (str): Label text on the button.
-        **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
         url (Optional[str]): HTTP url to be opened when button is pressed.
