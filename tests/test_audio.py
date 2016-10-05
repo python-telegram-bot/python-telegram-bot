@@ -40,6 +40,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         self.duration = 4
         self.performer = 'Leandro Toledo'
         self.title = 'Teste'
+        self.caption = "Test audio"
         self.mime_type = 'audio/mpeg'
         self.file_size = 28232
 
@@ -48,6 +49,7 @@ class AudioTest(BaseTest, unittest.TestCase):
             'duration': self.duration,
             'performer': self.performer,
             'title': self.title,
+            'caption': self.caption,
             'mime_type': self.mime_type,
             'file_size': self.file_size
         }
@@ -56,6 +58,8 @@ class AudioTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def test_send_audio_required_args_only(self):
         message = self._bot.sendAudio(self._chat_id, self.audio_file)
+
+        self.assertEqual(message.caption, '')
 
         audio = message.audio
 
@@ -76,8 +80,11 @@ class AudioTest(BaseTest, unittest.TestCase):
             duration=self.duration,
             performer=self.performer,
             title=self.title,
+            caption=self.caption,
             mime_type=self.mime_type,
             file_size=self.file_size)
+
+        self.assertEqual(message.caption, self.caption)
 
         audio = message.audio
 
@@ -97,7 +104,10 @@ class AudioTest(BaseTest, unittest.TestCase):
             audio=self.audio_file,
             duration=self.duration,
             performer=self.performer,
-            title=self.title)
+            title=self.title,
+            caption=self.caption)
+
+        self.assertEqual(message.caption, self.caption)
 
         audio = message.audio
 
@@ -118,7 +128,10 @@ class AudioTest(BaseTest, unittest.TestCase):
             duration=self.duration,
             performer=self.performer,
             title=self.title,
+            caption=self.caption,
             filename='telegram_custom.mp3')
+
+        self.assertEqual(message.caption, self.caption)
 
         audio = message.audio
 
@@ -146,13 +159,35 @@ class AudioTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_send_audio_mp3_url_file_with_caption(self):
+        message = self._bot.sendAudio(
+            chat_id=self._chat_id,
+            audio=self.audio_file_url,
+            duration=self.duration,
+            caption=self.caption)
+
+        self.assertEqual(message.caption, self.caption)
+
+        audio = message.audio
+
+        self.assertTrue(isinstance(audio.file_id, str))
+        self.assertNotEqual(audio.file_id, '')
+        self.assertEqual(audio.duration, self.duration)
+        self.assertEqual(audio.mime_type, self.mime_type)
+        self.assertEqual(audio.file_size, self.file_size)
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_audio_resend(self):
         message = self._bot.sendAudio(
             chat_id=self._chat_id,
             audio=self.audio_file_id,
             duration=self.duration,
             performer=self.performer,
-            title=self.title)
+            title=self.title,
+            caption=self.caption)
+
+        self.assertEqual(message.caption, self.caption)
 
         audio = message.audio
 
