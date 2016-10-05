@@ -255,6 +255,15 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(chat_member.status, "administrator")
         self._testUserEqualsBot(bot)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_get_webhook_info(self):
+        url = 'https://python-telegram-bot.org/test/webhook'
+        self._bot.set_webhook(url)
+        info = self._bot.getWebhookInfo()
+        self._bot.set_webhook('')
+        self.assertEqual(url, info.url)
+
     def _testUserEqualsBot(self, user):
         """Tests if user is our trusty @PythonTelegramBot."""
         self.assertEqual(user.id, 133505823)
