@@ -123,6 +123,7 @@ class Message(TelegramObject):
         self.text = kwargs.get('text', '')
         self.entities = kwargs.get('entities', list())
         self.audio = kwargs.get('audio')
+        self.game = kwargs.get('game')
         self.document = kwargs.get('document')
         self.photo = kwargs.get('photo')
         self.sticker = kwargs.get('sticker')
