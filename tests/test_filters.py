@@ -104,6 +104,12 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.venue = None
         self.assertFalse(Filters.venue(self.message))
 
+    def test_filters_game(self):
+        self.message.game = 'test'
+        self.assertTrue(Filters.game(self.message))
+        self.message.game = None
+        self.assertFalse(Filters.game(self.message))
+
     def test_filters_status_update(self):
         self.assertFalse(Filters.status_update(self.message))
 

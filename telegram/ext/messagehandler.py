@@ -74,6 +74,10 @@ class Filters(object):
         return bool(message.venue)
 
     @staticmethod
+    def game(message):
+        return bool(message.game)
+
+    @staticmethod
     def status_update(message):
         return bool(message.new_chat_member or message.left_chat_member or message.new_chat_title
                     or message.new_chat_photo or message.delete_chat_photo
