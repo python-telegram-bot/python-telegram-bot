@@ -160,6 +160,17 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def testSendGame(self):
+        game_short_name = 'pyhthon_telegram_bot_test_game'
+        message = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.game.description, 'This is a test game for python-telegram-bot.')
+        self.assertEqual(message.game.animation.file_id, 'BQADBAADFQEAAny4rAVRC_XtgXzEvAI')
+        self.assertEqual(message.game.photo[0].file_size, 849)
+
+    @flaky(3, 1)
+    @timeout(10)
     def testSendChatAction(self):
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING, chat_id=self._chat_id)
 
