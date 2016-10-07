@@ -25,14 +25,14 @@ from telegram import TelegramObject, Message, User
 class CallbackQuery(TelegramObject):
     """This object represents a Telegram CallbackQuery."""
 
-    def __init__(self, id, from_user, data, chat_instance, bot=None, **kwargs):
+    def __init__(self, id, from_user, chat_instance, bot=None, **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
-        self.data = data
         self.chat_instance = chat_instance
         # Optionals
         self.message = kwargs.get('message')
+        self.data = kwargs.get('data', '')
         self.inline_message_id = kwargs.get('inline_message_id', '')
         self.game_short_name = kwargs.get('game_short_name')
 

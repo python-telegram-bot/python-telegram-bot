@@ -776,7 +776,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/sendMessage'.format(self.base_url)
+        url = '{0}/sendGame'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
