@@ -533,7 +533,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             Update(
                 update_id=0,
                 callback_query=CallbackQuery(
-                    0, None, 'This is a test message for regex group matching.', None)))
+                    0, None, None, data='This is a test message for regex group matching.')))
 
         sleep(.1)
         self.assertEqual(self.received_message, (('This', 'regex group'),
