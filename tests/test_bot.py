@@ -22,6 +22,7 @@
 import io
 import re
 from datetime import datetime
+import time
 import sys
 import unittest
 
@@ -161,7 +162,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testSendGame(self):
-        game_short_name = 'pyhthon_telegram_bot_test_game'
+        game_short_name = 'python_telegram_bot_test_game'
         message = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
 
         self.assertTrue(self.is_json(message.to_json()))
@@ -274,6 +275,26 @@ class BotTest(BaseTest, unittest.TestCase):
         info = self._bot.getWebhookInfo()
         self._bot.set_webhook('')
         self.assertEqual(url, info.url)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score(self):
+        # We need a game to set the score for
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        message = self._bot.set_game_score(
+            user_id=self._chat_id,
+            score=int(time.time() - 1450000000),
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+            edit_message=True)
+
+        self.assertTrue(self.is_json(game.to_json()))
+        self.assertEqual(message.game.description, game.game.description)
+        self.assertEqual(message.game.animation.file_id, game.game.animation)
+        self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
+        self.assertNotEqual(message.game.text, game.game.text)
 
     def _testUserEqualsBot(self, user):
         """Tests if user is our trusty @PythonTelegramBot."""
