@@ -34,19 +34,33 @@ class GameTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.title = 'Python-telegram-bot Test Game'
         self.description = 'description'
-        self.photo = [telegram.PhotoSize(file_id='Blah', width=640, height=360)]
+        self.photo = [
+            {
+                'width': 640,
+                'height': 360,
+                'file_id': 'Blah',
+                'file_size': 0
+            }
+        ]
         self.text = 'Other description'
-        self.text_entities = [telegram.MessageEntity(
-            type=telegram.MessageEntity.URL, offset=13, length=17)]
-        self.animation = telegram.Animation(file_id='Bleh')
+        self.text_entities = [
+            {
+                'offset': 13,
+                'length': 17,
+                'type': telegram.MessageEntity.URL
+            }
+        ]
+        self.animation = {
+            'file_id': 'Blah'
+        }
 
         self.json_dict = {
             'title': self.title,
             'description': self.description,
             'photo': self.photo,
             'text': self.text,
-            'text_entities': [e.to_json() for e in self.text_entities],
-            'animation': self.animation.to_json()
+            'text_entities': self.text_entities,
+            'animation': self.animation
         }
 
     def test_game_de_json(self):
@@ -106,7 +120,12 @@ class AnimationTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.file_id = 'thisisafileid'
-        self.thumb = telegram.PhotoSize(file_id='Blah', width=640, height=360)
+        self.thumb = {
+            'width': 640,
+            'height': 360,
+            'file_id': 'Blah',
+            'file_size': 0
+        }
         self.file_name = 'File name'
         self.mime_type = 'something/gif'
         self.file_size = 42
@@ -123,7 +142,7 @@ class AnimationTest(BaseTest, unittest.TestCase):
         animation = telegram.Animation.de_json(self.json_dict, self._bot)
 
         self.assertEqual(animation.file_id, self.file_id)
-        self.assertEqual(animation.thumb, self.thumb)
+        self.assertTrue(isinstance(animation.thumb, telegram.PhotoSize))
         self.assertEqual(animation.file_name, self.file_name)
         self.assertEqual(animation.mime_type, self.mime_type)
         self.assertEqual(animation.file_size, self.file_size)
