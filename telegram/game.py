@@ -79,6 +79,18 @@ class Game(TelegramObject):
 
         return Game(**data)
 
+    def to_dict(self):
+        """
+        Returns:
+            dict:
+        """
+        data = super(Game, self).to_dict()
+
+        data['photo'] = [p.to_dict() for p in self.photo]
+        data['text_entities'] = [x.to_dict() for x in self.text_entities]
+
+        return data
+
     def parse_text_entity(self, entity):
         """
         Returns the text from a given :class:`telegram.MessageEntity`.

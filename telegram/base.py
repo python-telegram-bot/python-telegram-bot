@@ -74,17 +74,9 @@ class TelegramObject(object):
 
             value = self.__dict__[key]
             if value is not None:
-                if type(value) == list:
-                    l = list()
-                    for e in value:
-                        if hasattr(e, 'to_dict'):
-                            l.append(e.to_dict())
-                        else:
-                            l.append(e)
+                if hasattr(value, 'to_dict'):
+                    data[key] = value.to_dict()
                 else:
-                    if hasattr(value, 'to_dict'):
-                        data[key] = value.to_dict()
-                    else:
-                        data[key] = value
+                    data[key] = value
 
         return data
