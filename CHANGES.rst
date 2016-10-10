@@ -2,6 +2,12 @@
 Changes
 =======
 
+**2016-10-10**
+
+*Released 5.1.1*
+
+- Fix documentation builds on readthedocs
+
 **2016-09-24**
 
 *Released 5.1*
