@@ -292,7 +292,7 @@ class BotTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(game.to_json()))
         self.assertEqual(message.game.description, game.game.description)
-        self.assertEqual(message.game.animation.file_id, game.game.animation)
+        self.assertEqual(message.game.animation, game.game.animation)
         self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
         self.assertNotEqual(message.game.text, game.game.text)
 
