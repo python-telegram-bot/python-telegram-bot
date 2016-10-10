@@ -86,6 +86,9 @@ class Dispatcher(object):
         self.job_queue = job_queue
         self.workers = workers
 
+        self.user_data = dict()
+        """:type: dict[int, dict]"""
+
         self.handlers = {}
         """:type: dict[int, list[Handler]"""
         self.groups = []

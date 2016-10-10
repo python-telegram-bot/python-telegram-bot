@@ -20,6 +20,7 @@
 Dispatcher """
 
 from telegram.utils.deprecate import deprecate
+from telegram.utils.helpers import extract_chat_and_user
 
 
 class Handler(object):
@@ -39,12 +40,21 @@ class Handler(object):
             ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
             instance created by the ``Updater`` which can be used to schedule new jobs.
             Default is ``False``.
+        pass_user_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``user_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the user that sent the update. For each update of
+            the same user, it will be the same ``dict``. Default is ``False``.
     """
 
-    def __init__(self, callback, pass_update_queue=False, pass_job_queue=False):
+    def __init__(self,
+                 callback,
+                 pass_update_queue=False,
+                 pass_job_queue=False,
+                 pass_user_data=False):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
+        self.pass_user_data = pass_user_data
 
     def check_update(self, update):
         """
@@ -74,7 +84,7 @@ class Handler(object):
         """
         raise NotImplementedError
 
-    def collect_optional_args(self, dispatcher):
+    def collect_optional_args(self, dispatcher, update=None):
         """
         Prepares the optional arguments that are the same for all types of
         handlers
@@ -87,6 +97,17 @@ class Handler(object):
             optional_args['update_queue'] = dispatcher.update_queue
         if self.pass_job_queue:
             optional_args['job_queue'] = dispatcher.job_queue
+        if self.pass_user_data:
+            if not update:
+                raise ValueError("update must not be None")
+
+            _, user = extract_chat_and_user(update)
+            # print(user_id, dispatcher.user_data)
+
+            if user.id not in dispatcher.user_data:
+                dispatcher.user_data[user.id] = dict()
+
+            optional_args['user_data'] = dispatcher.user_data[user.id]
 
         return optional_args
 

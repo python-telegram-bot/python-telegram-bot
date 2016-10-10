@@ -22,6 +22,7 @@ import logging
 
 from telegram import Update
 from telegram.ext import Handler
+from telegram.utils.helpers import extract_chat_and_user
 from telegram.utils.promise import Promise
 
 
@@ -115,29 +116,7 @@ class ConversationHandler(Handler):
         if not isinstance(update, Update):
             return False
 
-        user = None
-        chat = None
-
-        if update.message:
-            user = update.message.from_user
-            chat = update.message.chat
-
-        elif update.edited_message:
-            user = update.edited_message.from_user
-            chat = update.edited_message.chat
-
-        elif update.inline_query:
-            user = update.inline_query.from_user
-
-        elif update.chosen_inline_result:
-            user = update.chosen_inline_result.from_user
-
-        elif update.callback_query:
-            user = update.callback_query.from_user
-            chat = update.callback_query.message.chat if update.callback_query.message else None
-
-        else:
-            return False
+        chat, user = extract_chat_and_user(update)
 
         key = (chat.id, user.id) if chat else (None, user.id)
         state = self.conversations.get(key)
