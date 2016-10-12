@@ -40,15 +40,18 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.width = 360
         self.height = 640
         self.duration = 5
-        self.thumb = telegram.PhotoSize.de_json({'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
-                                                 'file_size': 645,
-                                                 'height': 90,
-                                                 'width': 51}, self._bot)
-        self.thumb_from_url = telegram.PhotoSize.de_json({'file_id':
-                                                          'AAQEABPZU2EZAAQ_tPcvcRTF4i1GAQABAg',
-                                                          'file_size': 645,
-                                                          'height': 90,
-                                                          'width': 51}, self._bot)
+        self.thumb = telegram.PhotoSize.de_json({
+            'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
+            'file_size': 645,
+            'height': 90,
+            'width': 51
+        }, self._bot)
+        self.thumb_from_url = telegram.PhotoSize.de_json({
+            'file_id': 'AAQEABPZU2EZAAQ_tPcvcRTF4i1GAQABAg',
+            'file_size': 645,
+            'height': 90,
+            'width': 51
+        }, self._bot)
         self.mime_type = 'video/mp4'
         self.file_size = 326534
 

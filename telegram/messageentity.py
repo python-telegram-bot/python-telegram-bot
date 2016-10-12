@@ -80,5 +80,6 @@ class MessageEntity(TelegramObject):
     PRE = 'pre'
     TEXT_LINK = 'text_link'
     TEXT_MENTION = 'text_mention'
-    ALL_TYPES = [MENTION, HASHTAG, BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK,
-                 TEXT_MENTION]
+    ALL_TYPES = [
+        MENTION, HASHTAG, BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
+    ]

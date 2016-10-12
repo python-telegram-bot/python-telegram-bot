@@ -36,9 +36,8 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.type = 'article'
         self.title = 'title'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
         self.url = 'url'
         self.hide_url = True
         self.description = 'description'

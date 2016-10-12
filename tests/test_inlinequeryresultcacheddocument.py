@@ -40,9 +40,8 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         self.caption = 'caption'
         self.description = 'description'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
             'id': self.id,
             'type': self.type,

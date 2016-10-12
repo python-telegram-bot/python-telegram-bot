@@ -38,10 +38,12 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.sticker_file_id = 'BQADAQADHAADyIsGAAFZfq1bphjqlgI'
         self.width = 510
         self.height = 512
-        self.thumb = {'width': 90,
-                      'height': 90,
-                      'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
-                      'file_size': 2364}
+        self.thumb = {
+            'width': 90,
+            'height': 90,
+            'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
+            'file_size': 2364
+        }
         self.emoji = telegram.Emoji.FLEXED_BICEPS
         self.file_size = 39518
 

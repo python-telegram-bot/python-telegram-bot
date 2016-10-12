@@ -96,8 +96,9 @@ class GameTest(BaseTest, unittest.TestCase):
             self.title, self.description, self.photo, text=text, text_entities=[entity_2, entity])
         self.assertDictEqual(
             game.parse_text_entities(telegram.MessageEntity.URL), {entity: 'http://google.com'})
-        self.assertDictEqual(game.parse_text_entities(), {entity: 'http://google.com',
-                                                          entity_2: 'h'})
+        self.assertDictEqual(game.parse_text_entities(),
+                             {entity: 'http://google.com',
+                              entity_2: 'h'})
 
 
 class AnimationTest(BaseTest, unittest.TestCase):

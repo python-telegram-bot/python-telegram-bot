@@ -465,5 +465,7 @@ class Message(TelegramObject):
         if types is None:
             types = MessageEntity.ALL_TYPES
 
-        return {entity: self.parse_entity(entity)
-                for entity in self.entities if entity.type in types}
+        return {
+            entity: self.parse_entity(entity)
+            for entity in self.entities if entity.type in types
+        }

@@ -682,11 +682,13 @@ class Bot(TelegramObject):
 
         url = '{0}/sendVenue'.format(self.base_url)
 
-        data = {'chat_id': chat_id,
-                'latitude': latitude,
-                'longitude': longitude,
-                'address': address,
-                'title': title}
+        data = {
+            'chat_id': chat_id,
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address,
+            'title': title
+        }
 
         if foursquare_id:
             data['foursquare_id'] = foursquare_id

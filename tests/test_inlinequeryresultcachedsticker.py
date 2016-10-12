@@ -37,9 +37,8 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
         self.type = 'sticker'
         self.sticker_file_id = 'sticker file id'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,

@@ -39,9 +39,8 @@ class InlineQueryResultCachedMpeg4GifTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,

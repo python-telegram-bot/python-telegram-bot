@@ -41,9 +41,8 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
         self.thumb_width = 10
         self.thumb_height = 15
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
             'id': self.id,
             'type': self.type,

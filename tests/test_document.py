@@ -37,10 +37,12 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.document_file = open('tests/data/telegram.png', 'rb')
         self.document_file_id = 'BQADAQADpAADHyP1B04ipZxJTe2BAg'
         self.document_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.gif'
-        self.thumb = {'width': 90,
-                      'height': 90,
-                      'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
-                      'file_size': 2364}
+        self.thumb = {
+            'width': 90,
+            'height': 90,
+            'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
+            'file_size': 2364
+        }
         self.file_name = 'telegram.png'
         self.mime_type = 'image/png'
         self.file_size = 12948

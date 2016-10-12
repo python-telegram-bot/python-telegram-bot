@@ -39,9 +39,8 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         self.voice_duration = 'voice_duration'
         self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
