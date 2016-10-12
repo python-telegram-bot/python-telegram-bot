@@ -35,9 +35,7 @@ class Animation(TelegramObject):
 
     """
 
-    def __init__(self,
-                 file_id,
-                 **kwargs):
+    def __init__(self, file_id, **kwargs):
         self.file_id = file_id
         self.thumb = kwargs.get('thumb')
         self.file_name = kwargs.get('file_name')

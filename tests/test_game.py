@@ -34,25 +34,10 @@ class GameTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.title = 'Python-telegram-bot Test Game'
         self.description = 'description'
-        self.photo = [
-            {
-                'width': 640,
-                'height': 360,
-                'file_id': 'Blah',
-                'file_size': 0
-            }
-        ]
+        self.photo = [{'width': 640, 'height': 360, 'file_id': 'Blah', 'file_size': 0}]
         self.text = 'Other description'
-        self.text_entities = [
-            {
-                'offset': 13,
-                'length': 17,
-                'type': telegram.MessageEntity.URL
-            }
-        ]
-        self.animation = {
-            'file_id': 'Blah'
-        }
+        self.text_entities = [{'offset': 13, 'length': 17, 'type': telegram.MessageEntity.URL}]
+        self.animation = {'file_id': 'Blah'}
 
         self.json_dict = {
             'title': self.title,
@@ -120,12 +105,7 @@ class AnimationTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.file_id = 'thisisafileid'
-        self.thumb = {
-            'width': 640,
-            'height': 360,
-            'file_id': 'Blah',
-            'file_size': 0
-        }
+        self.thumb = {'width': 640, 'height': 360, 'file_id': 'Blah', 'file_size': 0}
         self.file_name = 'File name'
         self.mime_type = 'something/gif'
         self.file_size = 42
