@@ -167,8 +167,8 @@ class BotTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.game.description, 'This is a test game for python-telegram-bot.')
-        self.assertEqual(message.game.animation.file_id, 'BQADBAADFQEAAny4rAVRC_XtgXzEvAI')
-        self.assertEqual(message.game.photo[0].file_size, 849)
+        self.assertEqual(message.game.animation.file_id, 'BQADAQADKwIAAvjAuQABozciVqhFDO0C')
+        self.assertEqual(message.game.photo[0].file_size, 851)
 
     @flaky(3, 1)
     @timeout(10)
@@ -292,7 +292,7 @@ class BotTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(game.to_json()))
         self.assertEqual(message.game.description, game.game.description)
-        self.assertEqual(message.game.animation, game.game.animation)
+        self.assertEqual(message.game.animation.file_id, game.game.animation.file_id)
         self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
         self.assertNotEqual(message.game.text, game.game.text)
 
