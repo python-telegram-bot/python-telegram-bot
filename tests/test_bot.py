@@ -69,6 +69,17 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_sendMessage_no_web_page_preview(self):
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id,
+            text='Моё судно на воздушной подушке полно угрей',
+            disable_web_page_preview=True)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
+
+    @flaky(3, 1)
+    @timeout(10)
     def testGetUpdates(self):
         updates = self._bot.getUpdates(timeout=1)
 
@@ -180,6 +191,13 @@ class BotTest(BaseTest, unittest.TestCase):
     def testGetUserProfilePhotos(self):
         upf = self._bot.getUserProfilePhotos(user_id=self._chat_id)
 
+        self.assertTrue(self.is_json(upf.to_json()))
+        self.assertEqual(upf.photos[0][0].file_size, 12421)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_get_one_user_profile_photo(self):
+        upf = self._bot.getUserProfilePhotos(user_id=self._chat_id, offset=0)
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(upf.photos[0][0].file_size, 12421)
 
@@ -303,6 +321,27 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.last_name, '')
         self.assertEqual(user.username, 'PythonTelegramBot')
         self.assertEqual(user.name, '@PythonTelegramBot')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_info(self):
+        # tests the Bot.info decorator and associated funcs
+        self.assertEqual(self._bot.id, 133505823)
+        self.assertEqual(self._bot.first_name, 'PythonTelegramBot')
+        self.assertEqual(self._bot.last_name, '')
+        self.assertEqual(self._bot.username, 'PythonTelegramBot')
+        self.assertEqual(self._bot.name, '@PythonTelegramBot')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_contact(self):
+        phone = '+3-54-5445445'
+        name = 'name'
+        last = 'last'
+        message = self._bot.send_contact(self._chat_id, phone, name, last)
+        self.assertEqual(phone.replace('-', ''), message.contact.phone_number)
+        self.assertEqual(name, message.contact.first_name)
+        self.assertEqual(last, message.contact.last_name)
 
 
 if __name__ == '__main__':

@@ -58,7 +58,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file(self):
-        message = self._bot.sendDocument(self._chat_id, self.document_file)
+        message = self._bot.sendDocument(self._chat_id, self.document_file, caption='caption text')
 
         document = message.document
 

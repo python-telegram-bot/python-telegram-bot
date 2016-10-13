@@ -51,16 +51,14 @@ class Bot(TelegramObject):
     def __init__(self, token, base_url=None, base_file_url=None, request=None):
         self.token = self._validate_token(token)
 
-        if not base_url:
-            self.base_url = 'https://api.telegram.org/bot{0}'.format(self.token)
-        else:
-            self.base_url = base_url + self.token
+        if base_url is None:
+            base_url = 'https://api.telegram.org/bot'
 
-        if not base_file_url:
-            self.base_file_url = 'https://api.telegram.org/file/bot{0}'.format(self.token)
-        else:
-            self.base_file_url = base_file_url + self.token
+        if base_file_url is None:
+            base_file_url = 'https://api.telegram.org/file/bot'
 
+        self.base_url = str(base_url) + str(self.token)
+        self.base_file_url = str(base_file_url) + str(self.token)
         self.bot = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
@@ -781,11 +779,6 @@ class Bot(TelegramObject):
         url = '{0}/sendGame'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
-
-        if parse_mode is not None:
-            data['parse_mode'] = parse_mode
-        if disable_web_page_preview is not None:
-            data['disable_web_page_preview'] = disable_web_page_preview
 
         return url, data
 
