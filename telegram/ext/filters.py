@@ -26,7 +26,7 @@ class BaseFilter(object):
 
     And:
 
-        >>> (Filters.text & Filters.entity(MENTION)
+        >>> (Filters.text & Filters.entity(MENTION))
 
     Or:
 
@@ -34,7 +34,7 @@ class BaseFilter(object):
 
     Also works with more than two filters:
 
-        >>> (Filters.text & (Filters.entity(URL |Filters.entity(TEXT_LINK))))
+        >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
 
     If you want to create your own filters create a class inheriting from this class and implement
     a `filter` method that returns a boolean: `True` if the message should be handled, `False`
@@ -56,7 +56,13 @@ class BaseFilter(object):
 
 
 class MergedFilter(BaseFilter):
-    """Represents a filter consisting of two other filters."""
+    """Represents a filter consisting of two other filters.
+
+    Args:
+        base_filter: Filter 1 of the merged filter
+        and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
+        or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
+    """
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
