@@ -206,13 +206,22 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.assertTrue((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION))
                         )(self.message))
 
-        self.assertRegex(
-            str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
-            r"<telegram.ext.filters.MergedFilter consisting of "
-            r"<telegram.ext.filters.Filters._Text object at .*?> and "
-            r"<telegram.ext.filters.MergedFilter consisting of "
-            r"<telegram.ext.filters.Filters._Forwarded object at .*?> or "
-            r"<telegram.ext.filters.Filters.entity object at .*?>>>")
+        try:
+            self.assertRegex(
+                str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
+                r"<telegram.ext.filters.MergedFilter consisting of "
+                r"<telegram.ext.filters.Filters._Text object at .*?> and "
+                r"<telegram.ext.filters.MergedFilter consisting of "
+                r"<telegram.ext.filters.Filters._Forwarded object at .*?> or "
+                r"<telegram.ext.filters.Filters.entity object at .*?>>>")
+        except AttributeError:
+            self.assertRegexpMatches(
+                str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
+                r"<telegram.ext.filters.MergedFilter consisting of "
+                r"<telegram.ext.filters.Filters._Text object at .*?> and "
+                r"<telegram.ext.filters.MergedFilter consisting of "
+                r"<telegram.ext.filters.Filters._Forwarded object at .*?> or "
+                r"<telegram.ext.filters.Filters.entity object at .*?>>>")
 
     def test_faulty_custom_filter(self):
 
