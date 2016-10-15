@@ -30,7 +30,7 @@ from queue import Queue
 
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
-from telegram.error import Unauthorized, InvalidToken
+from telegram.error import Unauthorized, InvalidToken, RetryAfter
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
@@ -233,6 +233,9 @@ class Updater(object):
             try:
                 updates = self.bot.getUpdates(
                     self.last_update_id, timeout=timeout, network_delay=network_delay)
+            except RetryAfter as e:
+                self.logger.info(str(e))
+                cur_interval = 0.5 + e.retry_after
             except TelegramError as te:
                 self.logger.error("Error while getting Updates: {0}".format(te))
 
