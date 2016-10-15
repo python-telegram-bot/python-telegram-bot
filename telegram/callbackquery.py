@@ -69,3 +69,52 @@ class CallbackQuery(TelegramObject):
     def answer(self, *args, **kwargs):
         """Shortcut for ``bot.answerCallbackQuery(update.callback_query.id, *args, **kwargs)``"""
         return self.bot.answerCallbackQuery(self.id, *args, **kwargs)
+
+    def edit_message_text(self, *args, **kwargs):
+        """
+        Shortcut for either ``bot.editMessageText(chat_id=update.callback_query.message.chat_id, \
+message_id=update.callback_query.message.message_id, \
+*args, **kwargs)``
+        or ``bot.editMessageText(inline_message_id=update.callback_query.inline_message_id, \
+*args, **kwargs)``
+        """
+        if self.inline_message_id:
+            return self.bot.edit_message_text(
+                inline_message_id=self.inline_message_id, *args, **kwargs)
+        else:
+            return self.bot.edit_message_text(
+                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+
+    def edit_message_caption(self, *args, **kwargs):
+        """
+        Shortcut for either
+        ``bot.editMessageCaption(chat_id=update.callback_query.message.chat_id, \
+message_id=update.callback_query.message.message_id, \
+*args, **kwargs)``
+        or
+        ``bot.editMessageCaption(inline_message_id=update.callback_query.inline_message_id, \
+*args, **kwargs)``
+        """
+        if self.inline_message_id:
+            return self.bot.edit_message_caption(
+                inline_message_id=self.inline_message_id, *args, **kwargs)
+        else:
+            return self.bot.edit_message_caption(
+                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+
+    def edit_message_reply_markup(self, *args, **kwargs):
+        """
+        Shortcut for either
+        ``bot.editMessageReplyMarkup(chat_id=update.callback_query.message.chat_id, \
+message_id=update.callback_query.message.message_id, \
+*args, **kwargs)``
+        or
+        ``bot.editMessageReplyMarkup(inline_message_id=update.callback_query.inline_message_id, \
+*args, **kwargs)``
+        """
+        if self.inline_message_id:
+            return self.bot.edit_message_reply_markup(
+                inline_message_id=self.inline_message_id, *args, **kwargs)
+        else:
+            return self.bot.edit_message_reply_markup(
+                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
