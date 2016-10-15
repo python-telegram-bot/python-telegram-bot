@@ -28,7 +28,7 @@ import functools
 sys.path.append('.')
 
 from telegram import Message, User, Chat, MessageEntity
-from telegram.ext import Filters
+from telegram.ext import Filters, BaseFilter
 from tests.base import BaseTest
 
 
@@ -205,6 +205,24 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.entities = [self.e(MessageEntity.MENTION)]
         self.assertTrue((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION))
                         )(self.message))
+
+        self.assertRegex(
+            str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
+            r"<telegram.ext.filters.MergedFilter consisting of "
+            r"<telegram.ext.filters.Filters._Text object at .*?> and "
+            r"<telegram.ext.filters.MergedFilter consisting of "
+            r"<telegram.ext.filters.Filters._Forwarded object at .*?> or "
+            r"<telegram.ext.filters.Filters.entity object at .*?>>>")
+
+    def test_faulty_custom_filter(self):
+
+        class _CustomFilter(BaseFilter):
+            pass
+
+        custom = _CustomFilter()
+
+        with self.assertRaises(NotImplementedError):
+            (custom & Filters.text)(self.message)
 
 
 if __name__ == '__main__':
