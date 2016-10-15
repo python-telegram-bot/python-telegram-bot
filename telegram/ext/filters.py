@@ -88,6 +88,13 @@ class Filters(object):
     Predefined filters for use with the `filter` argument of :class:`telegram.ext.MessageHandler`.
     """
 
+    class _All(BaseFilter):
+
+        def filter(self, message):
+            return True
+
+    all = _All()
+
     class _Text(BaseFilter):
 
         def filter(self, message):
