@@ -743,12 +743,7 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendGame(self,
-                 chat_id,
-                 game_short_name,
-                 parse_mode=None,
-                 disable_web_page_preview=None,
-                 **kwargs):
+    def sendGame(self, chat_id, game_short_name, **kwargs):
         """Use this method to send a game.
 
         Args:
@@ -756,7 +751,6 @@ class Bot(TelegramObject):
                 the format @channelusername).
             game_short_name (str): Short name of the game, serves as the unique identifier for the
                 game.
-            **kwargs (dict): Arbitrary keyword arguments.
 
         Keyword Args:
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
