@@ -45,8 +45,8 @@ class WebhookInfo(TelegramObject):
         self.url = url
         self.has_custom_certificate = has_custom_certificate
         self.pending_update_count = pending_update_count
-        self.last_error_date = kwargs.get('last_error_date')
-        self.last_error_message = kwargs.get('last_error_message')
+        self.last_error_date = kwargs.get('last_error_date', '')
+        self.last_error_message = kwargs.get('last_error_message', '')
 
     @staticmethod
     def de_json(data, bot):

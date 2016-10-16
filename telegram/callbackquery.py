@@ -34,7 +34,7 @@ class CallbackQuery(TelegramObject):
         self.message = kwargs.get('message')
         self.data = kwargs.get('data', '')
         self.inline_message_id = kwargs.get('inline_message_id', '')
-        self.game_short_name = kwargs.get('game_short_name')
+        self.game_short_name = kwargs.get('game_short_name', '')
 
         self.bot = bot
 

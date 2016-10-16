@@ -58,7 +58,7 @@ class Chat(TelegramObject):
         self.username = kwargs.get('username', '')
         self.first_name = kwargs.get('first_name', '')
         self.last_name = kwargs.get('last_name', '')
-        self.all_members_are_admins = kwargs.get('all_members_are_admins', '')
+        self.all_members_are_admins = kwargs.get('all_members_are_admins', False)
 
         self.bot = bot
 

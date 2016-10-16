@@ -48,7 +48,7 @@ class Game(TelegramObject):
                  title,
                  description,
                  photo,
-                 text=None,
+                 text='',
                  text_entities=None,
                  animation=None,
                  **kwargs):
