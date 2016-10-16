@@ -35,13 +35,12 @@ class Audio(TelegramObject):
     Args:
         file_id (str):
         duration (int):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         performer (Optional[str]):
         title (Optional[str]):
         mime_type (Optional[str]):
         file_size (Optional[int]):
+        **kwargs: Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

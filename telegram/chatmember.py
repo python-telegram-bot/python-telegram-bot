@@ -32,8 +32,9 @@ class ChatMember(TelegramObject):
     Args:
         user (:class:`telegram.User`):
         status (str):
-    """
+        **kwargs (dict): Arbitrary keyword arguments.
 
+    """
     CREATOR = 'creator'
     ADMINISTRATOR = 'administrator'
     MEMBER = 'member'

@@ -34,11 +34,9 @@ class File(TelegramObject):
     Args:
         file_id (str):
         bot (telegram.Bot):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         file_size (Optional[int]):
         file_path (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 

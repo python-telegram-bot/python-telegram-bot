@@ -26,12 +26,13 @@ class InlineQueryResult(TelegramObject):
     """This object represents a Telegram InlineQueryResult.
 
     Attributes:
-        type (str):
-        id (str):
+        type (str): Type of the result.
+        id (str): Unique identifier for this result, 1-64 Bytes
 
     Args:
-        type (str):
+        type (str): Type of the result.
         id (str): Unique identifier for this result, 1-64 Bytes
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 

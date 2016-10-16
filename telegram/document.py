@@ -33,13 +33,12 @@ class Document(TelegramObject):
 
     Args:
         file_id (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         thumb (Optional[:class:`telegram.PhotoSize`]):
         file_name (Optional[str]):
         mime_type (Optional[str]):
         file_size (Optional[int]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, file_id, thumb=None, file_name='', mime_type='', file_size=0, **kwargs):

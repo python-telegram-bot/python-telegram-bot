@@ -33,11 +33,10 @@ class Contact(TelegramObject):
     Args:
         phone_number (str):
         first_name (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         last_name (Optional[str]):
         user_id (Optional[int]):
+        **kwargs: Arbitrary keyword arguments.
+
     """
 
     def __init__(self, phone_number, first_name, last_name='', user_id=0, **kwargs):

@@ -30,10 +30,9 @@ class ForceReply(ReplyMarkup):
 
     Args:
         force_reply (bool):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         selective (Optional[bool]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, force_reply=True, selective=False, **kwargs):

@@ -33,11 +33,16 @@ class ChosenInlineResult(TelegramObject):
         result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
+        location (:class:`telegram.Location`):
+        inline_message_id (str):
 
     Args:
         result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
+        location (Optional[:class:`telegram.Location`]):
+        inline_message_id (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 

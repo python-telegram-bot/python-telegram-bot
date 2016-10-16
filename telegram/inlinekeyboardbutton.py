@@ -33,12 +33,10 @@ class InlineKeyboardButton(TelegramObject):
 
     Args:
         text (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         url (Optional[str]):
         callback_data (Optional[str]):
         switch_inline_query (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 

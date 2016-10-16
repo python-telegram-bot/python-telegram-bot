@@ -23,34 +23,29 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultCachedAudio(InlineQueryResult):
-    """Represents a link to an mp3 audio file stored on the Telegram
-    servers. By default, this audio file will be sent by the user.
-    Alternatively, you can use input_message_content to send a message with
-    the specified content instead of the audio.
+    """Represents a link to an mp3 audio file stored on the Telegram servers. By default, this
+    audio file will be sent by the user. Alternatively, you can use input_message_content to send a
+    message with the specified content instead of the audio.
 
     Attributes:
         id (str):
         audio_file_id (str):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[
-            :class:`telegram.input_message_content`]):
+        input_message_content (Optional[:class:`telegram.input_message_content`]):
 
     Deprecated: 4.0
         message_text (str): Use :class:`InputTextMessageContent` instead.
 
         parse_mode (str): Use :class:`InputTextMessageContent` instead.
 
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
-        instead.
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
 
     Args:
         audio_file_id (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[
-            :class:`telegram.input_message_content`]):
+        input_message_content (Optional[:class:`telegram.input_message_content`]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, id, audio_file_id, reply_markup=None, input_message_content=None, **kwargs):

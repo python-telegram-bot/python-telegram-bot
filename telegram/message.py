@@ -153,9 +153,7 @@ class Message(TelegramObject):
         self.reply_to_message = reply_to_message
         self.edit_date = edit_date
         self.text = text
-        if entities is None:
-            entities = list()
-        self.entities = entities
+        self.entities = entities or list()
         self.audio = audio
         self.document = document
         self.photo = photo

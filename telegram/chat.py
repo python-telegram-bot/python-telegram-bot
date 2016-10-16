@@ -36,13 +36,14 @@ class Chat(TelegramObject):
     Args:
         id (int):
         type (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        type (Optional[str]):
+        title (Optional[str]):
+        username(Optional[str]):
+        first_name(Optional[str]):
+        last_name(Optional[str]):
         bot (Optional[Bot]): The Bot to use for instance methods
-    """
+        **kwargs (dict): Arbitrary keyword arguments.
 
+    """
     PRIVATE = 'private'
     GROUP = 'group'
     SUPERGROUP = 'supergroup'
