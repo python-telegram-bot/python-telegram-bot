@@ -44,15 +44,22 @@ class Audio(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, duration, **kwargs):
+    def __init__(self,
+                 file_id,
+                 duration,
+                 performer='',
+                 title='',
+                 mime_type='',
+                 file_size=0,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
         self.duration = int(duration)
         # Optionals
-        self.performer = kwargs.get('performer', '')
-        self.title = kwargs.get('title', '')
-        self.mime_type = str(kwargs.get('mime_type', ''))
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.performer = performer
+        self.title = title
+        self.mime_type = str(mime_type)
+        self.file_size = int(file_size)
 
     @staticmethod
     def de_json(data, bot):
