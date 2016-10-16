@@ -24,7 +24,7 @@ import logging
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject)
-from telegram.error import InvalidToken
+from telegram.error import InvalidToken, TelegramError
 from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -1213,6 +1213,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+        if inline_message_id is None and (chat_id is None or message_id is None):
+            raise TelegramError(
+                'editMessageCaption: Both chat_id and message_id are required when '
+                'inline_message_id is not specified')
 
         url = '{0}/editMessageCaption'.format(self.base_url)
 
@@ -1266,6 +1270,10 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+        if inline_message_id is None and (chat_id is None or message_id is None):
+            raise TelegramError(
+                'editMessageCaption: Both chat_id and message_id are required when '
+                'inline_message_id is not specified')
 
         url = '{0}/editMessageReplyMarkup'.format(self.base_url)
 
