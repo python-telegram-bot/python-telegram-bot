@@ -208,11 +208,10 @@ class FiltersTest(BaseTest, unittest.TestCase):
 
         self.assertRegexpMatches(
             str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
-            r"<telegram.ext.filters.MergedFilter consisting of "
-            r"<telegram.ext.filters.Filters._Text object at .*?> and "
-            r"<telegram.ext.filters.MergedFilter consisting of "
-            r"<telegram.ext.filters.Filters._Forwarded object at .*?> or "
-            r"<telegram.ext.filters.Filters.entity object at .*?>>>")
+            r"<telegram.ext.filters.MergedFilter consisting of <telegram.ext.filters.(Filters.)?_"
+            r"Text object at .*?> and <telegram.ext.filters.MergedFilter consisting of "
+            r"<telegram.ext.filters.(Filters.)?_Forwarded object at .*?> or "
+            r"<telegram.ext.filters.(Filters.)?entity object at .*?>>>")
 
     def test_faulty_custom_filter(self):
 
