@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Location."""
+"""This module contains an object that represents a Telegram Location."""
 
 from telegram import TelegramObject
 

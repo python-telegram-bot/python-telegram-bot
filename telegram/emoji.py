@@ -18,7 +18,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents an Emoji.
+"""This module contains an object that represents an Emoji.
 
 This module will be removed in the future.
 """
