@@ -1515,7 +1515,8 @@ class Bot(TelegramObject):
         """Use this method to set the score of the specified user in a game.
 
         Returns:
-            :class:`telegram.Message`: The edited message.
+            :class:`telegram.Message` or True: The edited message, or if the
+                message wasn't sent by the bot, True.
 
         """
         url = '{0}/setGameScore'.format(self.base_url)
@@ -1532,7 +1533,10 @@ class Bot(TelegramObject):
             data['edit_message'] = edit_message
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
-        return Message.de_json(result, self)
+        if result is True:
+            return result
+        else:
+            return Message.de_json(result, self)
 
     def getGameHighScores(self,
                           user_id,

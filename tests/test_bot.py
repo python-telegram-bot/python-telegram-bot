@@ -31,6 +31,7 @@ from flaky import flaky
 sys.path.append('.')
 
 import telegram
+from telegram.error import BadRequest
 from tests.base import BaseTest, timeout
 
 
@@ -313,6 +314,17 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.game.animation.file_id, game.game.animation.file_id)
         self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
         self.assertNotEqual(message.game.text, game.game.text)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score_too_low_score(self):
+        # We need a game to set the score for
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        with self.assertRaises(BadRequest):
+            self._bot.set_game_score(
+                user_id=self._chat_id, score=100, chat_id=game.chat_id, message_id=game.message_id)
 
     def _testUserEqualsBot(self, user):
         """Tests if user is our trusty @PythonTelegramBot."""
