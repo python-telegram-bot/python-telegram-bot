@@ -16,13 +16,35 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultCachedVoice"""
+"""This module contains the classes that represent Telegram InlineQueryResultCachedVoice"""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultCachedVoice(InlineQueryResult):
+    """Represents a link to a voice message stored on the Telegram servers. By default, this voice
+    message will be sent by the user. Alternatively, you can use input_message_content to send a
+    message with the specified content instead of the voice message.
+
+    Attributes:
+        voice_file_id (str): A valid file identifier for the voice message.
+        title (str): Voice message title.
+        caption (Optional[str]): Caption, 0-200 characters.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the voice message.
+
+    Args:
+        id (str):
+        voice_file_id (str):
+        title (str):
+        caption (Optional[str]):
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
+    """
 
     def __init__(self,
                  id,
