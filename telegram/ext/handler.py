@@ -111,7 +111,7 @@ class Handler(object):
                 optional_args['user_data'] = dispatcher.user_data[user.id]
 
             if self.pass_chat_data:
-                optional_args['chat_data'] = dispatcher.user_data[chat.id]
+                optional_args['chat_data'] = dispatcher.chat_data[chat.id]
 
         return optional_args
 
