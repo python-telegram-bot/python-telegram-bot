@@ -182,7 +182,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self._setup_updater('Test', edited=True)
         d = self.updater.dispatcher
         from telegram.ext import Filters
-        handler = MessageHandler([Filters.text], self.telegramHandlerEditedTest, allow_edited=True)
+        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
         d.addHandler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
@@ -190,8 +190,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
         # Remove handler
         d.removeHandler(handler)
-        handler = MessageHandler(
-            [Filters.text], self.telegramHandlerEditedTest, allow_edited=False)
+        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=False)
         d.addHandler(handler)
         self.reset()
 
@@ -201,7 +200,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         self._setup_updater('Multiple', 100)
-        self.updater.dispatcher.add_handler(MessageHandler([], self.telegramHandlerTest))
+        self.updater.dispatcher.add_handler(MessageHandler(Filters.all, self.telegramHandlerTest))
         self.updater.start_polling(0.0)
         sleep(2)
         self.assertEqual(self.received_message, 'Multiple')
