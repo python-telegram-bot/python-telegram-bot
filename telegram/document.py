@@ -33,23 +33,22 @@ class Document(TelegramObject):
 
     Args:
         file_id (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         thumb (Optional[:class:`telegram.PhotoSize`]):
         file_name (Optional[str]):
         mime_type (Optional[str]):
         file_size (Optional[int]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, file_id, **kwargs):
+    def __init__(self, file_id, thumb=None, file_name='', mime_type='', file_size=0, **kwargs):
         # Required
         self.file_id = str(file_id)
         # Optionals
-        self.thumb = kwargs.get('thumb')
-        self.file_name = kwargs.get('file_name', '')
-        self.mime_type = str(kwargs.get('mime_type', ''))
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.thumb = thumb
+        self.file_name = file_name
+        self.mime_type = str(mime_type)
+        self.file_size = int(file_size)
 
     @staticmethod
     def de_json(data, bot):

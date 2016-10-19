@@ -77,6 +77,15 @@ class MessageTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, 'Testing class method')
 
+    @flaky(3, 1)
+    def test_edit_text(self):
+        """Test for Message.edit_text"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.edit_text('Testing class method')
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, 'Testing class method')
+
 
 if __name__ == '__main__':
     unittest.main()

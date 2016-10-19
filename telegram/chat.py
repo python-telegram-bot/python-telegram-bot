@@ -37,28 +37,38 @@ class Chat(TelegramObject):
     Args:
         id (int):
         type (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        type (Optional[str]):
+        title (Optional[str]):
+        username(Optional[str]):
+        first_name(Optional[str]):
+        last_name(Optional[str]):
         bot (Optional[Bot]): The Bot to use for instance methods
-    """
+        **kwargs (dict): Arbitrary keyword arguments.
 
+    """
     PRIVATE = 'private'
     GROUP = 'group'
     SUPERGROUP = 'supergroup'
     CHANNEL = 'channel'
 
-    def __init__(self, id, type, bot=None, **kwargs):
+    def __init__(self,
+                 id,
+                 type,
+                 title='',
+                 username='',
+                 first_name='',
+                 last_name='',
+                 all_members_are_admins=False,
+                 bot=None,
+                 **kwargs):
         # Required
         self.id = int(id)
         self.type = type
         # Optionals
-        self.title = kwargs.get('title', '')
-        self.username = kwargs.get('username', '')
-        self.first_name = kwargs.get('first_name', '')
-        self.last_name = kwargs.get('last_name', '')
-        self.all_members_are_admins = kwargs.get('all_members_are_admins', False)
+        self.title = title
+        self.username = username
+        self.first_name = first_name
+        self.last_name = last_name
+        self.all_members_are_admins = all_members_are_admins
 
         self.bot = bot
 

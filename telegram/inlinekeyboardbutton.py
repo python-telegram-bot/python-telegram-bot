@@ -35,8 +35,6 @@ class InlineKeyboardButton(TelegramObject):
 
     Args:
         text (str): Label text on the button.
-
-    Keyword Args:
         url (Optional[str]): HTTP url to be opened when button is pressed.
         callback_data (Optional[str]):  Data to be sent in a callback query to the bot when button
             is pressed, 1-64 bytes.
@@ -49,17 +47,18 @@ class InlineKeyboardButton(TelegramObject):
             Can be empty, in which case only the bot's username will be inserted.
         callback_game (Optional[:class:`telegram.CallbackGame`]): Description of the game that will
             be launched when the user presses the button.
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, text, **kwargs):
+    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, **kwargs):
         # Required
         self.text = text
 
         # Optionals
-        self.url = kwargs.get('url')
-        self.callback_data = kwargs.get('callback_data')
-        self.switch_inline_query = kwargs.get('switch_inline_query')
+        self.url = url
+        self.callback_data = callback_data
+        self.switch_inline_query = switch_inline_query
         self.switch_inline_query_current_chat = kwargs.get('switch_inline_query_current_chat')
         self.callback_game = kwargs.get('callback_game')
 

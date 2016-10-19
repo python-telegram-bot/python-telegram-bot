@@ -33,20 +33,19 @@ class Contact(TelegramObject):
     Args:
         phone_number (str):
         first_name (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         last_name (Optional[str]):
         user_id (Optional[int]):
+        **kwargs: Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, phone_number, first_name, **kwargs):
+    def __init__(self, phone_number, first_name, last_name='', user_id=0, **kwargs):
         # Required
         self.phone_number = str(phone_number)
         self.first_name = first_name
         # Optionals
-        self.last_name = kwargs.get('last_name', '')
-        self.user_id = int(kwargs.get('user_id', 0))
+        self.last_name = last_name
+        self.user_id = int(user_id)
 
     @staticmethod
     def de_json(data, bot):

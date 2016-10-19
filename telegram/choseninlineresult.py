@@ -33,11 +33,16 @@ class ChosenInlineResult(TelegramObject):
         result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
+        location (:class:`telegram.Location`):
+        inline_message_id (str):
 
     Args:
         result_id (str):
         from_user (:class:`telegram.User`):
         query (str):
+        location (Optional[:class:`telegram.Location`]):
+        inline_message_id (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
@@ -69,7 +74,7 @@ class ChosenInlineResult(TelegramObject):
         if not data:
             return None
 
-        # Required
+# Required
         data['from_user'] = User.de_json(data.pop('from'), bot)
         # Optionals
         data['location'] = Location.de_json(data.get('location'), bot)

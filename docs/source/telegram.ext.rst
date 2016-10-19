@@ -15,6 +15,7 @@ Submodules
     telegram.ext.commandhandler
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
+    telegram.ext.filters
     telegram.ext.regexhandler
     telegram.ext.stringcommandhandler
     telegram.ext.stringregexhandler

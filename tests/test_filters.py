@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains an object that represents Tests for MessageHandler.Filters
+This module contains an object that represents Tests for Filters for use with MessageHandler.
 """
 
 import sys
@@ -28,7 +28,7 @@ import functools
 sys.path.append('.')
 
 from telegram import Message, User, Chat, MessageEntity
-from telegram.ext import Filters
+from telegram.ext import Filters, BaseFilter
 from tests.base import BaseTest
 
 
@@ -37,6 +37,7 @@ class FiltersTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.message = Message(0, User(0, "Testuser"), datetime.now(), Chat(0, 'private'))
+        self.e = functools.partial(MessageEntity, offset=0, length=0)
 
     def test_filters_text(self):
         self.message.text = 'test'
@@ -158,19 +159,75 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.pinned_message = None
 
     def test_entities_filter(self):
-        e = functools.partial(MessageEntity, offset=0, length=0)
-
-        self.message.entities = [e(MessageEntity.MENTION)]
+        self.message.entities = [self.e(MessageEntity.MENTION)]
         self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
 
         self.message.entities = []
         self.assertFalse(Filters.entity(MessageEntity.MENTION)(self.message))
 
-        self.message.entities = [e(MessageEntity.BOLD)]
+        self.message.entities = [self.e(MessageEntity.BOLD)]
         self.assertFalse(Filters.entity(MessageEntity.MENTION)(self.message))
 
-        self.message.entities = [e(MessageEntity.BOLD), e(MessageEntity.MENTION)]
+        self.message.entities = [self.e(MessageEntity.BOLD), self.e(MessageEntity.MENTION)]
         self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
+
+    def test_and_filters(self):
+        self.message.text = 'test'
+        self.message.forward_date = True
+        self.assertTrue((Filters.text & Filters.forwarded)(self.message))
+        self.message.text = '/test'
+        self.assertFalse((Filters.text & Filters.forwarded)(self.message))
+        self.message.text = 'test'
+        self.message.forward_date = None
+        self.assertFalse((Filters.text & Filters.forwarded)(self.message))
+
+        self.message.text = 'test'
+        self.message.forward_date = True
+        self.message.entities = [self.e(MessageEntity.MENTION)]
+        self.assertTrue((Filters.text & Filters.forwarded & Filters.entity(MessageEntity.MENTION))(
+            self.message))
+        self.message.entities = [self.e(MessageEntity.BOLD)]
+        self.assertFalse((Filters.text & Filters.forwarded & Filters.entity(MessageEntity.MENTION)
+                         )(self.message))
+
+    def test_or_filters(self):
+        self.message.text = 'test'
+        self.assertTrue((Filters.text | Filters.status_update)(self.message))
+        self.message.group_chat_created = True
+        self.assertTrue((Filters.text | Filters.status_update)(self.message))
+        self.message.text = None
+        self.assertTrue((Filters.text | Filters.status_update)(self.message))
+        self.message.group_chat_created = False
+        self.assertFalse((Filters.text | Filters.status_update)(self.message))
+
+    def test_and_or_filters(self):
+        self.message.text = 'test'
+        self.message.forward_date = True
+        self.assertTrue((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION))
+                        )(self.message))
+        self.message.forward_date = False
+        self.assertFalse((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)
+                                         ))(self.message))
+        self.message.entities = [self.e(MessageEntity.MENTION)]
+        self.assertTrue((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION))
+                        )(self.message))
+
+        self.assertRegexpMatches(
+            str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
+            r"<telegram.ext.filters.MergedFilter consisting of <telegram.ext.filters.(Filters.)?_"
+            r"Text object at .*?> and <telegram.ext.filters.MergedFilter consisting of "
+            r"<telegram.ext.filters.(Filters.)?_Forwarded object at .*?> or "
+            r"<telegram.ext.filters.(Filters.)?entity object at .*?>>>")
+
+    def test_faulty_custom_filter(self):
+
+        class _CustomFilter(BaseFilter):
+            pass
+
+        custom = _CustomFilter()
+
+        with self.assertRaises(NotImplementedError):
+            (custom & Filters.text)(self.message)
 
 
 if __name__ == '__main__':

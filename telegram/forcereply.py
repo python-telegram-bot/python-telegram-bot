@@ -30,17 +30,16 @@ class ForceReply(ReplyMarkup):
 
     Args:
         force_reply (bool):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         selective (Optional[bool]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, force_reply=True, **kwargs):
+    def __init__(self, force_reply=True, selective=False, **kwargs):
         # Required
         self.force_reply = bool(force_reply)
         # Optionals
-        self.selective = bool(kwargs.get('selective', False))
+        self.selective = bool(selective)
 
     @staticmethod
     def de_json(data, bot):

@@ -30,6 +30,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
@@ -46,6 +47,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
         Returns:
             telegram.InlineKeyboardMarkup:
+
         """
         data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data, bot)
 

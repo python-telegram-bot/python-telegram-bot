@@ -37,11 +37,11 @@ class ReplyKeyboardHide(ReplyMarkup):
         selective (Optional[bool]):
     """
 
-    def __init__(self, hide_keyboard=True, **kwargs):
+    def __init__(self, hide_keyboard=True, selective=False, **kwargs):
         # Required
         self.hide_keyboard = bool(hide_keyboard)
         # Optionals
-        self.selective = bool(kwargs.get('selective', False))
+        self.selective = bool(selective)
 
     @staticmethod
     def de_json(data, bot):
