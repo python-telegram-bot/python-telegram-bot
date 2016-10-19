@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Document"""
+"""This module contains an object that represents Tests for Telegram Document"""
 
 import sys
 import unittest
@@ -37,10 +37,12 @@ class DocumentTest(BaseTest, unittest.TestCase):
         self.document_file = open('tests/data/telegram.png', 'rb')
         self.document_file_id = 'BQADAQADpAADHyP1B04ipZxJTe2BAg'
         self.document_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.gif'
-        self.thumb = {'width': 90,
-                      'height': 90,
-                      'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
-                      'file_size': 2364}
+        self.thumb = {
+            'width': 90,
+            'height': 90,
+            'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
+            'file_size': 2364
+        }
         self.file_name = 'telegram.png'
         self.mime_type = 'image/png'
         self.file_size = 12948
@@ -56,7 +58,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_document_png_file(self):
-        message = self._bot.sendDocument(self._chat_id, self.document_file)
+        message = self._bot.sendDocument(self._chat_id, self.document_file, caption='caption text')
 
         document = message.document
 

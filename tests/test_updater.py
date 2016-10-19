@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains a object that represents Tests for Updater, Dispatcher,
+This module contains an object that represents Tests for Updater, Dispatcher,
 WebhookServer and WebhookHandler
 """
 import logging
@@ -495,8 +495,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue = self.updater.start_polling(0.01)
         queue.put('This is a test message for regex group matching.')
         sleep(.1)
-        self.assertEqual(self.received_message, (('This', 'regex group'),
-                                                 {'testgroup': 'regex group'}))
+        self.assertEqual(self.received_message, (('This', 'regex group'), {
+            'testgroup': 'regex group'
+        }))
 
     def test_regexGroupHandlerInlineQuery(self):
         self._setup_updater('', messages=0)
@@ -515,8 +516,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                     0, None, 'This is a test message for regex group matching.', None)))
 
         sleep(.1)
-        self.assertEqual(self.received_message, (('This', 'regex group'),
-                                                 {'testgroup': 'regex group'}))
+        self.assertEqual(self.received_message, (('This', 'regex group'), {
+            'testgroup': 'regex group'
+        }))
 
     def test_regexGroupHandlerCallbackQuery(self):
         self._setup_updater('', messages=0)
@@ -531,12 +533,13 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue.put(
             Update(
                 update_id=0,
-                callback_query=CallbackQuery(0, None,
-                                             'This is a test message for regex group matching.')))
+                callback_query=CallbackQuery(
+                    0, None, None, data='This is a test message for regex group matching.')))
 
         sleep(.1)
-        self.assertEqual(self.received_message, (('This', 'regex group'),
-                                                 {'testgroup': 'regex group'}))
+        self.assertEqual(self.received_message, (('This', 'regex group'), {
+            'testgroup': 'regex group'
+        }))
 
     def test_runAsyncWithAdditionalArgs(self):
         self._setup_updater('Test6', messages=2)

@@ -68,3 +68,6 @@ telegram.mp4
 telegram.ogg
 telegram.png
 telegram.webp
+
+# original files from merges
+*.orig

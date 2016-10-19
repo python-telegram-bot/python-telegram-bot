@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram InlineKeyboardMarkup"""
+"""This module contains an object that represents Tests for Telegram InlineKeyboardMarkup"""
 
 import sys
 import unittest
@@ -32,13 +32,15 @@ class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram KeyboardButton."""
 
     def setUp(self):
-        self.inline_keyboard = [[telegram.InlineKeyboardButton(
-            text='button1', callback_data='data1'), telegram.InlineKeyboardButton(
-                text='button2', callback_data='data2')]]
+        self.inline_keyboard = [[
+            telegram.InlineKeyboardButton(
+                text='button1', callback_data='data1'), telegram.InlineKeyboardButton(
+                    text='button2', callback_data='data2')
+        ]]
 
         self.json_dict = {
-            'inline_keyboard': [[self.inline_keyboard[0][0].to_dict(),
-                                 self.inline_keyboard[0][1].to_dict()]],
+            'inline_keyboard':
+            [[self.inline_keyboard[0][0].to_dict(), self.inline_keyboard[0][1].to_dict()]],
         }
 
     def test_send_message_with_inline_keyboard_markup(self):

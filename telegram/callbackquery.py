@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
-CallbackQuery"""
+"""This module contains an object that represents a Telegram CallbackQuery"""
 
 from telegram import TelegramObject, Message, User
 
@@ -25,15 +24,25 @@ from telegram import TelegramObject, Message, User
 class CallbackQuery(TelegramObject):
     """This object represents a Telegram CallbackQuery."""
 
-    def __init__(self, id, from_user, data, message=None, inline_message_id='', bot=None,
+    def __init__(self,
+                 id,
+                 from_user,
+                 chat_instance,
+                 message=None,
+                 data=None,
+                 inline_message_id=None,
+                 game_short_name=None,
+                 bot=None,
                  **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
-        self.data = data
+        self.chat_instance = chat_instance
         # Optionals
         self.message = message
+        self.data = data
         self.inline_message_id = inline_message_id
+        self.game_short_name = game_short_name
 
         self.bot = bot
 

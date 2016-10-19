@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Chat."""
+"""This module contains an object that represents a Telegram Chat."""
 
 from telegram import TelegramObject
 
@@ -32,6 +32,7 @@ class Chat(TelegramObject):
         username (str): Username, for private chats and channels if available
         first_name (str): First name of the other party in a private chat
         last_name (str): Last name of the other party in a private chat
+        all_members_are_admins (bool): True if a group has 'All Members Are Admins' enabled.
 
     Args:
         id (int):
@@ -56,6 +57,7 @@ class Chat(TelegramObject):
                  username='',
                  first_name='',
                  last_name='',
+                 all_members_are_admins=False,
                  bot=None,
                  **kwargs):
         # Required
@@ -66,6 +68,7 @@ class Chat(TelegramObject):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
+        self.all_members_are_admins = all_members_are_admins
 
         self.bot = bot
 

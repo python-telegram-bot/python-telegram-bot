@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InputLocationMessageContent"""
 
 import sys
@@ -35,8 +35,10 @@ class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
         self.latitude = 1.
         self.longitude = 2.
 
-        self.json_dict = {'longitude': self.longitude,
-                          'latitude': self.latitude,}
+        self.json_dict = {
+            'longitude': self.longitude,
+            'latitude': self.latitude,
+        }
 
     def test_ilmc_de_json(self):
         ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot)

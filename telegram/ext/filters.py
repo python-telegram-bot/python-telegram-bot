@@ -191,6 +191,13 @@ class Filters(object):
 
     forwarded = _Forwarded()
 
+    class _Game(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.game)
+
+    game = _Game()
+
     class entity(BaseFilter):
         """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.

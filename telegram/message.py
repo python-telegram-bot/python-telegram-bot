@@ -17,14 +17,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Message."""
+"""This module contains an object that represents a Telegram Message."""
 
 import sys
 from datetime import datetime
 from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity)
+                      User, Video, Voice, Venue, MessageEntity, Game)
 
 
 class Message(TelegramObject):
@@ -45,6 +45,7 @@ class Message(TelegramObject):
         text (str):
         audio (:class:`telegram.Audio`):
         document (:class:`telegram.Document`):
+        game (:class:`telegram.Game`):
         photo (List[:class:`telegram.PhotoSize`]):
         sticker (:class:`telegram.Sticker`):
         video (:class:`telegram.Video`):
@@ -86,6 +87,7 @@ class Message(TelegramObject):
         text (Optional[str]):
         audio (Optional[:class:`telegram.Audio`]):
         document (Optional[:class:`telegram.Document`]):
+        game (Optional[:class:`telegram.Game`]):
         photo (Optional[List[:class:`telegram.PhotoSize`]]):
         sticker (Optional[:class:`telegram.Sticker`]):
         video (Optional[:class:`telegram.Video`]):
@@ -155,6 +157,7 @@ class Message(TelegramObject):
         self.text = text
         self.entities = entities or list()
         self.audio = audio
+        self.game = kwargs.get('game')
         self.document = document
         self.photo = photo
         self.sticker = sticker
@@ -207,6 +210,7 @@ class Message(TelegramObject):
         data['edit_date'] = Message._fromtimestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
+        data['game'] = Game.de_json(data.get('game'), bot)
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
         data['video'] = Video.de_json(data.get('video'), bot)
@@ -537,5 +541,7 @@ class Message(TelegramObject):
         if types is None:
             types = MessageEntity.ALL_TYPES
 
-        return {entity: self.parse_entity(entity)
-                for entity in self.entities if entity.type in types}
+        return {
+            entity: self.parse_entity(entity)
+            for entity in self.entities if entity.type in types
+        }

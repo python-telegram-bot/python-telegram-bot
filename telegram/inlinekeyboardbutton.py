@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
+"""This module contains an object that represents a Telegram
 InlineKeyboardButton"""
 
 from telegram import TelegramObject
@@ -30,12 +30,23 @@ class InlineKeyboardButton(TelegramObject):
         url (str):
         callback_data (str):
         switch_inline_query (str):
+        switch_inline_query_current_chat (str):
+        callback_game (:class:`telegram.CallbackGame`):
 
     Args:
-        text (str):
-        url (Optional[str]):
-        callback_data (Optional[str]):
-        switch_inline_query (Optional[str]):
+        text (str): Label text on the button.
+        url (Optional[str]): HTTP url to be opened when button is pressed.
+        callback_data (Optional[str]):  Data to be sent in a callback query to the bot when button
+            is pressed, 1-64 bytes.
+        switch_inline_query (Optional[str]): If set, pressing the button will prompt the user to
+            select one of their chats, open that chat and insert the bot's username and the
+            specified inline query in the input field. Can be empty, in which case just the bot's
+            username will be inserted.
+        switch_inline_query_current_chat (Optional[str]): If set, pressing the button will insert
+            the bot's username and the specified inline query in the current chat's input field.
+            Can be empty, in which case only the bot's username will be inserted.
+        callback_game (Optional[:class:`telegram.CallbackGame`]): Description of the game that will
+            be launched when the user presses the button.
         **kwargs (dict): Arbitrary keyword arguments.
 
     """
@@ -48,6 +59,8 @@ class InlineKeyboardButton(TelegramObject):
         self.url = url
         self.callback_data = callback_data
         self.switch_inline_query = switch_inline_query
+        self.switch_inline_query_current_chat = kwargs.get('switch_inline_query_current_chat')
+        self.callback_game = kwargs.get('callback_game')
 
     @staticmethod
     def de_json(data, bot):

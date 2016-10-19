@@ -29,6 +29,7 @@ class InlineQueryResultVoice(InlineQueryResult):
                  voice_url,
                  title,
                  voice_duration=None,
+                 caption=None,
                  reply_markup=None,
                  input_message_content=None,
                  **kwargs):
@@ -41,6 +42,8 @@ class InlineQueryResultVoice(InlineQueryResult):
         # Optional
         if voice_duration:
             self.voice_duration = voice_duration
+        if caption:
+            self.caption = caption
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

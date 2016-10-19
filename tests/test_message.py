@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Message"""
+"""This module contains an object that represents Tests for Telegram Message"""
 
 import sys
 import unittest
@@ -55,8 +55,9 @@ class MessageTest(BaseTest, unittest.TestCase):
             entities=[entity_2, entity])
         self.assertDictEqual(
             message.parse_entities(telegram.MessageEntity.URL), {entity: 'http://google.com'})
-        self.assertDictEqual(message.parse_entities(), {entity: 'http://google.com',
-                                                        entity_2: 'h'})
+        self.assertDictEqual(message.parse_entities(),
+                             {entity: 'http://google.com',
+                              entity_2: 'h'})
 
     @flaky(3, 1)
     def test_reply_text(self):

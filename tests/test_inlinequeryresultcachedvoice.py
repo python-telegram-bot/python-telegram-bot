@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultCachedVoice"""
 
 import sys
@@ -37,18 +37,17 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         self.type = 'voice'
         self.voice_file_id = 'voice file id'
         self.title = 'title'
-        self.description = 'description'
+        self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
             'id': self.id,
             'voice_file_id': self.voice_file_id,
             'title': self.title,
-            'description': self.description,
+            'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
@@ -60,7 +59,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.id, self.id)
         self.assertEqual(voice.voice_file_id, self.voice_file_id)
         self.assertEqual(voice.title, self.title)
-        self.assertEqual(voice.description, self.description)
+        self.assertEqual(voice.caption, self.caption)
         self.assertDictEqual(voice.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
         self.assertDictEqual(voice.reply_markup.to_dict(), self.reply_markup.to_dict())

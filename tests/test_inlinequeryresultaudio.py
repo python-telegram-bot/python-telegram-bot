@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultAudio"""
 
 import sys
@@ -38,10 +38,10 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.performer = 'performer'
         self.audio_duration = 'audio_duration'
+        self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -50,6 +50,7 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
             'title': self.title,
             'performer': self.performer,
             'audio_duration': self.audio_duration,
+            'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
@@ -63,6 +64,7 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.audio_duration, self.audio_duration)
+        self.assertEqual(audio.caption, self.caption)
         self.assertDictEqual(audio.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
         self.assertDictEqual(audio.reply_markup.to_dict(), self.reply_markup.to_dict())

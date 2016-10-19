@@ -16,49 +16,39 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Voice."""
+"""This module contains an object that represents a Telegram GameHighScore."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, User
 
 
-class Voice(TelegramObject):
-    """This object represents a Telegram Voice.
+class GameHighScore(TelegramObject):
+    """This object represents a Telegram GameHighScore.
 
     Attributes:
-        file_id (str):
-        duration (int):
-        mime_type (str):
-        file_size (int):
+        position (int): Position in high score table for the game.
+        user (:class:`telegram.User`): User object.
+        score (int): Score.
 
-    Args:
-        file_id (str):
-        duration (Optional[int]):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, duration, mime_type='', file_size=0, **kwargs):
-        # Required
-        self.file_id = str(file_id)
-        self.duration = int(duration)
-        # Optionals
-        self.mime_type = str(mime_type)
-        self.file_size = int(file_size)
+    def __init__(self, position, user, score):
+        self.position = position
+        self.user = user
+        self.score = score
 
     @staticmethod
     def de_json(data, bot):
         """
         Args:
             data (dict):
-            bot (telegram.Bot)
+            bot (telegram.Bot):
 
         Returns:
-            telegram.Voice:
+            telegram.Game:
         """
         if not data:
             return None
 
-        return Voice(**data)
+        data['user'] = User.de_json(data.get('user'), bot)
+
+        return GameHighScore(**data)

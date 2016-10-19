@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram InputFile."""
+"""This module contains an object that represents a Telegram InputFile."""
 
 try:
     # python 3
@@ -31,12 +31,11 @@ import mimetypes
 import os
 import sys
 
-from future.moves.urllib.request import urlopen
-
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
+FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate')
 
 
 class InputFile(object):
@@ -49,32 +48,28 @@ class InputFile(object):
         if 'audio' in data:
             self.input_name = 'audio'
             self.input_file = data.pop('audio')
-        if 'document' in data:
+        elif 'document' in data:
             self.input_name = 'document'
             self.input_file = data.pop('document')
-        if 'photo' in data:
+        elif 'photo' in data:
             self.input_name = 'photo'
             self.input_file = data.pop('photo')
-        if 'sticker' in data:
+        elif 'sticker' in data:
             self.input_name = 'sticker'
             self.input_file = data.pop('sticker')
-        if 'video' in data:
+        elif 'video' in data:
             self.input_name = 'video'
             self.input_file = data.pop('video')
-        if 'voice' in data:
+        elif 'voice' in data:
             self.input_name = 'voice'
             self.input_file = data.pop('voice')
-        if 'certificate' in data:
+        elif 'certificate' in data:
             self.input_name = 'certificate'
             self.input_file = data.pop('certificate')
-
-        if str(self.input_file).startswith('http'):
-            from_url = True
-            self.input_file = urlopen(self.input_file)
         else:
-            from_url = False
+            raise TelegramError('Unknown inputfile type')
 
-        if hasattr(self.input_file, 'read') or from_url:
+        if hasattr(self.input_file, 'read'):
             self.filename = None
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
@@ -83,11 +78,9 @@ class InputFile(object):
                 # on py2.7, pylint fails to understand this properly
                 # pylint: disable=E1101
                 self.filename = os.path.basename(self.input_file.name)
-            elif from_url:
-                self.filename = os.path.basename(self.input_file.url).split('?')[0].split('&')[0]
 
             try:
-                self.mimetype = InputFile.is_image(self.input_file_content)
+                self.mimetype = self.is_image(self.input_file_content)
                 if not self.filename or '.' not in self.filename:
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
@@ -118,7 +111,8 @@ class InputFile(object):
         form_boundary = '--' + self.boundary
 
         # Add data fields
-        for name, value in self.data.items():
+        for name in iter(self.data):
+            value = self.data[name]
             form.extend([
                 form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
             ])
@@ -133,7 +127,7 @@ class InputFile(object):
         form.append('--' + self.boundary + '--')
         form.append('')
 
-        return InputFile._parse(form)
+        return self._parse(form)
 
     @staticmethod
     def _parse(form):
@@ -174,18 +168,17 @@ class InputFile(object):
         """Check if the request is a file request.
 
         Args:
-            data (str): A dict of (str, unicode) key/value pairs
+            data (dict): A dict of (str, unicode) key/value pairs
 
         Returns:
             bool
         """
         if data:
-            file_types = ['audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate']
-            file_type = [i for i in list(data.keys()) if i in file_types]
+            file_type = [i for i in iter(data) if i in FILE_TYPES]
 
             if file_type:
                 file_content = data[file_type[0]]
 
-                return hasattr(file_content, 'read') or str(file_content).startswith('http')
+                return hasattr(file_content, 'read')
 
         return False

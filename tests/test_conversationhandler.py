@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains a object that represents Tests for ConversationHandler
+This module contains an object that represents Tests for ConversationHandler
 """
 import logging
 import sys
@@ -66,14 +66,17 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.current_state = dict()
         self.entry_points = [CommandHandler('start', self.start)]
-        self.states = {self.THIRSTY: [CommandHandler('brew', self.brew),
-                                      CommandHandler('wait', self.start)],
-                       self.BREWING: [CommandHandler('pourCoffee', self.drink)],
-                       self.DRINKING: [CommandHandler('startCoding', self.code),
-                                       CommandHandler('drinkMore', self.drink)],
-                       self.CODING: [CommandHandler('keepCoding', self.code),
-                                     CommandHandler('gettingThirsty', self.start),
-                                     CommandHandler('drinkMore', self.drink)],}
+        self.states = {
+            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
+            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+            self.DRINKING:
+            [CommandHandler('startCoding', self.code), CommandHandler('drinkMore', self.drink)],
+            self.CODING: [
+                CommandHandler('keepCoding', self.code),
+                CommandHandler('gettingThirsty', self.start),
+                CommandHandler('drinkMore', self.drink)
+            ],
+        }
         self.fallbacks = [CommandHandler('eat', self.start)]
 
     def _setup_updater(self, *args, **kwargs):

@@ -16,49 +16,50 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Voice."""
+"""This module contains an object that represents a Telegram WebhookInfo."""
 
 from telegram import TelegramObject
 
 
-class Voice(TelegramObject):
-    """This object represents a Telegram Voice.
+class WebhookInfo(TelegramObject):
+    """This object represents a Telegram WebhookInfo.
 
     Attributes:
-        file_id (str):
-        duration (int):
-        mime_type (str):
-        file_size (int):
+        url (str): Webhook URL, may be empty if webhook is not set up.
+        has_custom_certificate (bool):
+        pending_update_count (int):
+        last_error_date (int):
+        last_error_message (str):
 
     Args:
-        file_id (str):
-        duration (Optional[int]):
-        **kwargs: Arbitrary keyword arguments.
+        url (str): Webhook URL, may be empty if webhook is not set up.
+        has_custom_certificate (bool):
+        pending_update_count (int):
+        last_error_date (Optional[int]):
+        last_error_message (Optional[str]):
 
-    Keyword Args:
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, duration, mime_type='', file_size=0, **kwargs):
+    def __init__(self, url, has_custom_certificate, pending_update_count, **kwargs):
         # Required
-        self.file_id = str(file_id)
-        self.duration = int(duration)
-        # Optionals
-        self.mime_type = str(mime_type)
-        self.file_size = int(file_size)
+        self.url = url
+        self.has_custom_certificate = has_custom_certificate
+        self.pending_update_count = pending_update_count
+        self.last_error_date = kwargs.get('last_error_date', '')
+        self.last_error_message = kwargs.get('last_error_message', '')
 
     @staticmethod
     def de_json(data, bot):
         """
         Args:
             data (dict):
-            bot (telegram.Bot)
+            bot (telegram.Bot):
 
         Returns:
-            telegram.Voice:
+            telegram.WebhookInfo:
+
         """
         if not data:
             return None
 
-        return Voice(**data)
+        return WebhookInfo(**data)

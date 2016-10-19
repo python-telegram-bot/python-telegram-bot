@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Video"""
+"""This module contains an object that represents Tests for Telegram Video"""
 
 import sys
 import unittest
@@ -36,14 +36,22 @@ class VideoTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.video_file = open('tests/data/telegram.mp4', 'rb')
         self.video_file_id = 'BAADAQADXwADHyP1BwJFTcmY2RYCAg'
-        self.video_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp4'
+        self.video_file_url = 'https://python-telegram-bot.org/static/website/telegram.mp4'
         self.width = 360
         self.height = 640
         self.duration = 5
-        self.thumb = telegram.PhotoSize.de_json({'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
-                                                 'file_size': 645,
-                                                 'height': 90,
-                                                 'width': 51}, self._bot)
+        self.thumb = telegram.PhotoSize.de_json({
+            'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
+            'file_size': 645,
+            'height': 90,
+            'width': 51
+        }, self._bot)
+        self.thumb_from_url = telegram.PhotoSize.de_json({
+            'file_id': 'AAQEABPZU2EZAAQ_tPcvcRTF4i1GAQABAg',
+            'file_size': 645,
+            'height': 90,
+            'width': 51
+        }, self._bot)
         self.mime_type = 'video/mp4'
         self.file_size = 326534
 
@@ -162,7 +170,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(video.file_id, '')
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
-        self.assertEqual(video.thumb, self.thumb)
+        self.assertEqual(video.thumb, self.thumb_from_url)
         self.assertEqual(video.mime_type, '')
         self.assertEqual(video.file_size, self.file_size)
 

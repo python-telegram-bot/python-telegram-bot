@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2016
@@ -17,17 +16,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram ChatAction."""
+"""This module contains the classes that represent Telegram
+InlineQueryResultGame"""
+
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 
 
-class ChatAction(object):
-    """This object represents a Telegram ChatAction."""
+class InlineQueryResultGame(InlineQueryResult):
 
-    TYPING = 'typing'
-    UPLOAD_PHOTO = 'upload_photo'
-    RECORD_VIDEO = 'record_video'
-    UPLOAD_VIDEO = 'upload_video'
-    RECORD_AUDIO = 'record_audio'
-    UPLOAD_AUDIO = 'upload_audio'
-    UPLOAD_DOCUMENT = 'upload_document'
-    FIND_LOCATION = 'find_location'
+    def __init__(self, id, game_short_name, reply_markup=None, **kwargs):
+        # Required
+        super(InlineQueryResultGame, self).__init__('game', id)
+        self.id = id
+        self.game_short_name = game_short_name
+
+        if reply_markup:
+            self.reply_markup = reply_markup
+
+    @staticmethod
+    def de_json(data, bot):
+        data = super(InlineQueryResultGame, InlineQueryResultGame).de_json(data, bot)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+
+        return InlineQueryResultGame(**data)

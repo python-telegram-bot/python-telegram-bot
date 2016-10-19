@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram ReplyKeyboardHide"""
+"""This module contains an object that represents Tests for Telegram ReplyKeyboardHide"""
 
 import sys
 import unittest
@@ -35,8 +35,10 @@ class ReplyKeyboardHideTest(BaseTest, unittest.TestCase):
         self.hide_keyboard = True
         self.selective = True
 
-        self.json_dict = {'hide_keyboard': self.hide_keyboard,
-                          'selective': self.selective,}
+        self.json_dict = {
+            'hide_keyboard': self.hide_keyboard,
+            'selective': self.selective,
+        }
 
     def test_send_message_with_reply_keyboard_hide(self):
         message = self._bot.sendMessage(

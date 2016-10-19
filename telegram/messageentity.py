@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram MessageEntity."""
+"""This module contains an object that represents a Telegram MessageEntity."""
 
 from telegram import User, TelegramObject
 
@@ -80,5 +80,6 @@ class MessageEntity(TelegramObject):
     PRE = 'pre'
     TEXT_LINK = 'text_link'
     TEXT_MENTION = 'text_mention'
-    ALL_TYPES = [MENTION, HASHTAG, BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK,
-                 TEXT_MENTION]
+    ALL_TYPES = [
+        MENTION, HASHTAG, BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
+    ]

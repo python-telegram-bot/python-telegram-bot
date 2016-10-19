@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram ForceReply"""
+"""This module contains an object that represents Tests for Telegram ForceReply"""
 
 import sys
 import unittest
@@ -35,8 +35,10 @@ class ForceReplyTest(BaseTest, unittest.TestCase):
         self.force_reply = True
         self.selective = True
 
-        self.json_dict = {'force_reply': self.force_reply,
-                          'selective': self.selective,}
+        self.json_dict = {
+            'force_reply': self.force_reply,
+            'selective': self.selective,
+        }
 
     def test_send_message_with_force_reply(self):
         message = self._bot.sendMessage(

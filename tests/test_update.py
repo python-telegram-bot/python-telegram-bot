@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Update"""
+"""This module contains an object that represents Tests for Telegram Update"""
 
 import sys
 import unittest
@@ -32,18 +32,24 @@ class UpdateTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.update_id = 868573637
-        self.message = {'message_id': 319,
-                        'from': {'id': 12173560,
-                                 'first_name': "Leandro",
-                                 'last_name': "S.",
-                                 'username': "leandrotoledo"},
-                        'chat': {'id': 12173560,
-                                 'type': 'private',
-                                 'first_name': "Leandro",
-                                 'last_name': "S.",
-                                 'username': "leandrotoledo"},
-                        'date': 1441644592,
-                        'text': "Update Test"}
+        self.message = {
+            'message_id': 319,
+            'from': {
+                'id': 12173560,
+                'first_name': "Leandro",
+                'last_name': "S.",
+                'username': "leandrotoledo"
+            },
+            'chat': {
+                'id': 12173560,
+                'type': 'private',
+                'first_name': "Leandro",
+                'last_name': "S.",
+                'username': "leandrotoledo"
+            },
+            'date': 1441644592,
+            'text': "Update Test"
+        }
 
         self.json_dict = {'update_id': self.update_id, 'message': self.message}
 

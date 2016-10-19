@@ -27,6 +27,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Noam Meltzer <https://github.com/tsnoam>`_
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
 - `overquota <https://github.com/overquota>`_
+- `Patrick Hofmann <https://github.com/PH89>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_

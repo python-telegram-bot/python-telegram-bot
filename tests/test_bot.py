@@ -17,11 +17,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Bot"""
+"""This module contains an object that represents Tests for Telegram Bot"""
 
 import io
 import re
 from datetime import datetime
+import time
 import sys
 import unittest
 
@@ -30,6 +31,7 @@ from flaky import flaky
 sys.path.append('.')
 
 import telegram
+from telegram.error import BadRequest
 from tests.base import BaseTest, timeout
 
 
@@ -65,6 +67,17 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
         self.assertTrue(isinstance(message.date, datetime))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_sendMessage_no_web_page_preview(self):
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id,
+            text='Моё судно на воздушной подушке полно угрей',
+            disable_web_page_preview=True)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text, u'Моё судно на воздушной подушке полно угрей')
 
     @flaky(3, 1)
     @timeout(10)
@@ -160,6 +173,17 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def testSendGame(self):
+        game_short_name = 'python_telegram_bot_test_game'
+        message = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.game.description, 'This is a test game for python-telegram-bot.')
+        self.assertEqual(message.game.animation.file_id, 'BQADAQADKwIAAvjAuQABozciVqhFDO0C')
+        self.assertEqual(message.game.photo[0].file_size, 851)
+
+    @flaky(3, 1)
+    @timeout(10)
     def testSendChatAction(self):
         self._bot.sendChatAction(action=telegram.ChatAction.TYPING, chat_id=self._chat_id)
 
@@ -168,6 +192,13 @@ class BotTest(BaseTest, unittest.TestCase):
     def testGetUserProfilePhotos(self):
         upf = self._bot.getUserProfilePhotos(user_id=self._chat_id)
 
+        self.assertTrue(self.is_json(upf.to_json()))
+        self.assertEqual(upf.photos[0][0].file_size, 12421)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_get_one_user_profile_photo(self):
+        upf = self._bot.getUserProfilePhotos(user_id=self._chat_id, offset=0)
         self.assertTrue(self.is_json(upf.to_json()))
         self.assertEqual(upf.photos[0][0].file_size, 12421)
 
@@ -255,6 +286,46 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(chat_member.status, "administrator")
         self._testUserEqualsBot(bot)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_get_webhook_info(self):
+        url = 'https://python-telegram-bot.org/test/webhook'
+        self._bot.set_webhook(url)
+        info = self._bot.getWebhookInfo()
+        self._bot.set_webhook('')
+        self.assertEqual(url, info.url)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score(self):
+        # We need a game to set the score for
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        message = self._bot.set_game_score(
+            user_id=self._chat_id,
+            score=int(time.time() - 1450000000),
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+            edit_message=True)
+
+        self.assertTrue(self.is_json(game.to_json()))
+        self.assertEqual(message.game.description, game.game.description)
+        self.assertEqual(message.game.animation.file_id, game.game.animation.file_id)
+        self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
+        self.assertNotEqual(message.game.text, game.game.text)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score_too_low_score(self):
+        # We need a game to set the score for
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        with self.assertRaises(BadRequest):
+            self._bot.set_game_score(
+                user_id=self._chat_id, score=100, chat_id=game.chat_id, message_id=game.message_id)
+
     def _testUserEqualsBot(self, user):
         """Tests if user is our trusty @PythonTelegramBot."""
         self.assertEqual(user.id, 133505823)
@@ -262,6 +333,27 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.last_name, '')
         self.assertEqual(user.username, 'PythonTelegramBot')
         self.assertEqual(user.name, '@PythonTelegramBot')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_info(self):
+        # tests the Bot.info decorator and associated funcs
+        self.assertEqual(self._bot.id, 133505823)
+        self.assertEqual(self._bot.first_name, 'PythonTelegramBot')
+        self.assertEqual(self._bot.last_name, '')
+        self.assertEqual(self._bot.username, 'PythonTelegramBot')
+        self.assertEqual(self._bot.name, '@PythonTelegramBot')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_contact(self):
+        phone = '+3-54-5445445'
+        name = 'name'
+        last = 'last'
+        message = self._bot.send_contact(self._chat_id, phone, name, last)
+        self.assertEqual(phone.replace('-', ''), message.contact.phone_number)
+        self.assertEqual(name, message.contact.first_name)
+        self.assertEqual(last, message.contact.last_name)
 
 
 if __name__ == '__main__':

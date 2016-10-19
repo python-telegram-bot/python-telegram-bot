@@ -17,13 +17,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Bot."""
+"""This module contains an object that represents a Telegram Bot."""
 
 import functools
 import logging
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject)
+                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.request import Request
 
@@ -51,16 +51,14 @@ class Bot(TelegramObject):
     def __init__(self, token, base_url=None, base_file_url=None, request=None):
         self.token = self._validate_token(token)
 
-        if not base_url:
-            self.base_url = 'https://api.telegram.org/bot{0}'.format(self.token)
-        else:
-            self.base_url = base_url + self.token
+        if base_url is None:
+            base_url = 'https://api.telegram.org/bot'
 
-        if not base_file_url:
-            self.base_file_url = 'https://api.telegram.org/file/bot{0}'.format(self.token)
-        else:
-            self.base_file_url = base_file_url + self.token
+        if base_file_url is None:
+            base_file_url = 'https://api.telegram.org/file/bot'
 
+        self.base_url = str(base_url) + str(self.token)
+        self.base_file_url = str(base_file_url) + str(self.token)
         self.bot = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
@@ -330,6 +328,7 @@ class Bot(TelegramObject):
                   duration=None,
                   performer=None,
                   title=None,
+                  caption=None,
                   disable_notification=False,
                   reply_to_message_id=None,
                   reply_markup=None,
@@ -354,6 +353,7 @@ class Bot(TelegramObject):
             duration (Optional[int]): Duration of sent audio in seconds.
             performer: Performer of sent audio. [Optional]
             title: Title of sent audio. [Optional]
+            caption: Audio caption [Optional]
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
                 receive a notification, Android users will receive a notification with no sound.
             reply_to_message_id (Optional[int]): If the message is a reply, ID of the original
@@ -382,6 +382,8 @@ class Bot(TelegramObject):
             data['performer'] = performer
         if title:
             data['title'] = title
+        if caption:
+            data['caption'] = caption
 
         return url, data
 
@@ -534,6 +536,7 @@ class Bot(TelegramObject):
                   chat_id,
                   voice,
                   duration=None,
+                  caption=None,
                   disable_notification=False,
                   reply_to_message_id=None,
                   reply_markup=None,
@@ -551,6 +554,7 @@ class Bot(TelegramObject):
                 that is already on the Telegram servers, or upload a new audio file using
                 multipart/form-data.
             duration (Optional[int]): Duration of sent audio in seconds.
+            caption: Voice caption [Optional]
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
                 receive a notification, Android users will receive a notification with no sound.
             reply_to_message_id (Optional[int]): If the message is a reply, ID of the original
@@ -575,6 +579,8 @@ class Bot(TelegramObject):
 
         if duration:
             data['duration'] = duration
+        if caption:
+            data['caption'] = caption
 
         return url, data
 
@@ -664,11 +670,13 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendVenue'.format(self.base_url)
 
-        data = {'chat_id': chat_id,
-                'latitude': latitude,
-                'longitude': longitude,
-                'address': address,
-                'title': title}
+        data = {
+            'chat_id': chat_id,
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address,
+            'title': title
+        }
 
         if foursquare_id:
             data['foursquare_id'] = foursquare_id
@@ -720,6 +728,41 @@ class Bot(TelegramObject):
 
         if last_name:
             data['last_name'] = last_name
+
+        return url, data
+
+    @log
+    @message
+    def sendGame(self, chat_id, game_short_name, **kwargs):
+        """Use this method to send a game.
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the target channel (in
+                the format @channelusername).
+            game_short_name (str): Short name of the game, serves as the unique identifier for the
+                game.
+
+        Keyword Args:
+            disable_notification (Optional[bool]): Sends the message silently. iOS users will not
+                receive a notification, Android users will receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply,
+                ID of the original message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options.
+                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to hide reply keyboard or to force a reply from the user.
+            timeout (Optional[float]): If this value is specified, use it as
+                the definitive timeout (in seconds) for urlopen() operations.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendGame'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
         return url, data
 
@@ -942,6 +985,7 @@ class Bot(TelegramObject):
                             callback_query_id,
                             text=None,
                             show_alert=False,
+                            url=None,
                             timeout=None,
                             **kwargs):
         """Use this method to send answers to callback queries sent from inline keyboards. The
@@ -955,7 +999,8 @@ class Bot(TelegramObject):
             show_alert (Optional[bool]): If `True`, an alert will be shown by the client instead of
                 a notification at the top of the chat screen. Defaults to `False`.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-            (in seconds) for urlopen() operations.
+                (in seconds) for urlopen() operations.
+            url (Optional[str]): URL that will be opened by the user's client.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -965,7 +1010,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/answerCallbackQuery'.format(self.base_url)
+        url_ = '{0}/answerCallbackQuery'.format(self.base_url)
 
         data = {'callback_query_id': callback_query_id}
 
@@ -973,8 +1018,10 @@ class Bot(TelegramObject):
             data['text'] = text
         if show_alert:
             data['show_alert'] = show_alert
+        if url:
+            data['url'] = url
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url_, data, timeout=timeout)
 
         return result
 
@@ -1362,6 +1409,85 @@ class Bot(TelegramObject):
 
         return ChatMember.de_json(result, self)
 
+    def getWebhookInfo(self, **kwargs):
+        """Use this method to get current webhook status.
+
+        If the bot is using getUpdates, will return an object with the url field empty.
+
+        Returns:
+            :class: `telegram.WebhookInfo`
+
+        """
+        url = '{0}/getWebhookInfo'.format(self.base_url)
+
+        data = {}
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return WebhookInfo.de_json(result, self)
+
+    def setGameScore(self,
+                     user_id,
+                     score,
+                     chat_id=None,
+                     message_id=None,
+                     inline_message_id=None,
+                     edit_message=None,
+                     **kwargs):
+        """Use this method to set the score of the specified user in a game.
+
+        Returns:
+            :class:`telegram.Message` or True: The edited message, or if the
+                message wasn't sent by the bot, True.
+
+        """
+        url = '{0}/setGameScore'.format(self.base_url)
+
+        data = {'user_id': user_id, 'score': score}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+        if edit_message:
+            data['edit_message'] = edit_message
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        if result is True:
+            return result
+        else:
+            return Message.de_json(result, self)
+
+    def getGameHighScores(self,
+                          user_id,
+                          chat_id=None,
+                          message_id=None,
+                          inline_message_id=None,
+                          **kwargs):
+        """Use this method to get data for high score tables.
+
+        Returns:
+            list[:class:`telegram.GameHighScore`]: Scores of the specified user and several of his
+                neighbors in a game.
+
+        """
+        url = '{0}/setGameScore'.format(self.base_url)
+
+        data = {'user_id': user_id}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+
+        return [GameHighScore.de_json(hs, self) for hs in result]
+
     @staticmethod
     def de_json(data, bot):
         data = super(Bot, Bot).de_json(data, bot)
@@ -1380,7 +1506,8 @@ class Bot(TelegramObject):
         return (self.__class__, (self.token, self.base_url.replace(self.token, ''),
                                  self.base_file_url.replace(self.token, '')))
 
-    # snake_case (PEP8) aliases
+# snake_case (PEP8) aliases
+
     get_me = getMe
     send_message = sendMessage
     forward_message = forwardMessage
@@ -1393,6 +1520,7 @@ class Bot(TelegramObject):
     send_location = sendLocation
     send_venue = sendVenue
     send_contact = sendContact
+    send_game = sendGame
     send_chat_action = sendChatAction
     answer_inline_query = answerInlineQuery
     get_user_profile_photos = getUserProfilePhotos
@@ -1410,3 +1538,6 @@ class Bot(TelegramObject):
     get_chat_administrators = getChatAdministrators
     get_chat_member = getChatMember
     get_chat_members_count = getChatMembersCount
+    get_webhook_info = getWebhookInfo
+    set_game_score = setGameScore
+    get_game_high_scores = getGameHighScores

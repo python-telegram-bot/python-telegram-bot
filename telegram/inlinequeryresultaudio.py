@@ -33,6 +33,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         title (str):
         performer (Optional[str]):
         audio_duration (Optional[str]):
+        caption (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
         input_message_content (Optional[:class:`telegram.input_message_content`]):
 
@@ -48,6 +49,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         title (str):
         performer (Optional[str]):
         audio_duration (Optional[str]):
+        caption (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
         input_message_content (Optional[:class:`telegram.input_message_content`]):
         **kwargs (dict): Arbitrary keyword arguments.
@@ -60,6 +62,7 @@ class InlineQueryResultAudio(InlineQueryResult):
                  title,
                  performer=None,
                  audio_duration=None,
+                 caption=None,
                  reply_markup=None,
                  input_message_content=None,
                  **kwargs):
@@ -74,6 +77,8 @@ class InlineQueryResultAudio(InlineQueryResult):
             self.performer = performer
         if audio_duration:
             self.audio_duration = audio_duration
+        if caption:
+            self.caption = caption
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

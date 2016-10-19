@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains a object that represents a Telegram ChosenInlineResult
+This module contains an object that represents a Telegram ChosenInlineResult
 """
 
 from telegram import TelegramObject, User, Location
@@ -74,7 +74,7 @@ class ChosenInlineResult(TelegramObject):
         if not data:
             return None
 
-        # Required
+# Required
         data['from_user'] = User.de_json(data.pop('from'), bot)
         # Optionals
         data['location'] = Location.de_json(data.get('location'), bot)

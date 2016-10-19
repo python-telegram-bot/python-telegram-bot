@@ -1,5 +1,5 @@
--   repo: git://github.com/pre-commit/mirrors-yapf
-    sha: v0.11.0
+-   repo: git://github.com/python-telegram-bot/mirrors-yapf
+    sha: v0.12.2
     hooks:
     -   id: yapf
         files: ^(telegram|tests)/.*\.py$

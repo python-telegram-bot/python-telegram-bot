@@ -6,6 +6,9 @@ python:
   - "3.5"
   - "pypy"
   - "pypy3"
+branches:
+  only:
+    - master
 install:
   - pip install coveralls
   - pip install -r requirements.txt
@@ -13,6 +16,6 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 script:
   - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/
-  - if [ $TRAVIS_PYTHON_VERSION != 3.3 ] && [ $TRAVIS_PYTHON_VERSION != pypy3 ]; then pre-commit run --all-files; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pre-commit run --all-files; fi
 after_success:
   coveralls
