@@ -16,7 +16,7 @@ We have made you a wrapper you can't refuse
    :alt: Supported python versions
 
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
-   :target: https://pythonhosted.org/python-telegram-bot/
+   :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
@@ -37,7 +37,7 @@ We have made you a wrapper you can't refuse
    
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
-   :alt: Average time to resolve an issue
+   :alt: Median time to resolve an issue
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
@@ -116,7 +116,7 @@ Our Wiki contains a lot of resources to get you started with ``python-telegram-b
 Other references:
 
 - `Telegram API documentation <https://core.telegram.org/bots/api>`_
-- `python-telegram-bot documentation <https://pythonhosted.org/python-telegram-bot/>`_
+- `python-telegram-bot documentation <https://python-telegram-bot.readthedocs.io/>`_
 
 -------------------
 Learning by example
@@ -162,7 +162,7 @@ If you want DEBUG logs instead:
 Documentation
 =============
 
-``python-telegram-bot``'s documentation lives at `pythonhosted.org <https://pythonhosted.org/python-telegram-bot/>`_.
+``python-telegram-bot``'s documentation lives at `readthedocs.io <https://python-telegram-bot.readthedocs.io/>`_.
 
 ============
 Getting help
