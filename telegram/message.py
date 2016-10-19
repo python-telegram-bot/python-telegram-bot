@@ -106,41 +106,75 @@ class Message(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, message_id, from_user, date, chat, bot=None, **kwargs):
+    def __init__(self,
+                 message_id,
+                 from_user,
+                 date,
+                 chat,
+                 forward_from=None,
+                 forward_from_chat=None,
+                 forward_date=None,
+                 reply_to_message=None,
+                 edit_date=None,
+                 text='',
+                 entities=None,
+                 audio=None,
+                 document=None,
+                 photo=None,
+                 sticker=None,
+                 video=None,
+                 voice=None,
+                 caption='',
+                 contact=None,
+                 location=None,
+                 venue=None,
+                 new_chat_member=None,
+                 left_chat_member=None,
+                 new_chat_title='',
+                 new_chat_photo=None,
+                 delete_chat_photo=False,
+                 group_chat_created=False,
+                 supergroup_chat_created=False,
+                 migrate_to_chat_id=0,
+                 migrate_from_chat_id=0,
+                 channel_chat_created=False,
+                 pinned_message=None,
+                 bot=None,
+                 **kwargs):
         # Required
         self.message_id = int(message_id)
         self.from_user = from_user
         self.date = date
         self.chat = chat
         # Optionals
-        self.forward_from = kwargs.get('forward_from')
-        self.forward_from_chat = kwargs.get('forward_from_chat')
-        self.forward_date = kwargs.get('forward_date')
-        self.reply_to_message = kwargs.get('reply_to_message')
-        self.edit_date = kwargs.get('edit_date')
-        self.text = kwargs.get('text', '')
-        self.entities = kwargs.get('entities', list())
-        self.audio = kwargs.get('audio')
-        self.document = kwargs.get('document')
-        self.photo = kwargs.get('photo')
-        self.sticker = kwargs.get('sticker')
-        self.video = kwargs.get('video')
-        self.voice = kwargs.get('voice')
-        self.caption = kwargs.get('caption', '')
-        self.contact = kwargs.get('contact')
-        self.location = kwargs.get('location')
-        self.venue = kwargs.get('venue')
-        self.new_chat_member = kwargs.get('new_chat_member')
-        self.left_chat_member = kwargs.get('left_chat_member')
-        self.new_chat_title = kwargs.get('new_chat_title', '')
-        self.new_chat_photo = kwargs.get('new_chat_photo')
-        self.delete_chat_photo = bool(kwargs.get('delete_chat_photo', False))
-        self.group_chat_created = bool(kwargs.get('group_chat_created', False))
-        self.supergroup_chat_created = bool(kwargs.get('supergroup_chat_created', False))
-        self.migrate_to_chat_id = int(kwargs.get('migrate_to_chat_id', 0))
-        self.migrate_from_chat_id = int(kwargs.get('migrate_from_chat_id', 0))
-        self.channel_chat_created = bool(kwargs.get('channel_chat_created', False))
-        self.pinned_message = kwargs.get('pinned_message')
+        self.forward_from = forward_from
+        self.forward_from_chat = forward_from_chat
+        self.forward_date = forward_date
+        self.reply_to_message = reply_to_message
+        self.edit_date = edit_date
+        self.text = text
+        self.entities = entities or list()
+        self.audio = audio
+        self.document = document
+        self.photo = photo
+        self.sticker = sticker
+        self.video = video
+        self.voice = voice
+        self.caption = caption
+        self.contact = contact
+        self.location = location
+        self.venue = venue
+        self.new_chat_member = new_chat_member
+        self.left_chat_member = left_chat_member
+        self.new_chat_title = new_chat_title
+        self.new_chat_photo = new_chat_photo
+        self.delete_chat_photo = bool(delete_chat_photo)
+        self.group_chat_created = bool(group_chat_created)
+        self.supergroup_chat_created = bool(supergroup_chat_created)
+        self.migrate_to_chat_id = int(migrate_to_chat_id)
+        self.migrate_from_chat_id = int(migrate_from_chat_id)
+        self.channel_chat_created = bool(channel_chat_created)
+        self.pinned_message = pinned_message
 
         self.bot = bot
 

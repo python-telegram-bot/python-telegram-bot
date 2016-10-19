@@ -34,28 +34,24 @@ class InlineQueryResultAudio(InlineQueryResult):
         performer (Optional[str]):
         audio_duration (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[
-            :class:`telegram.input_message_content`]):
+        input_message_content (Optional[:class:`telegram.input_message_content`]):
 
     Deprecated: 4.0
         message_text (str): Use :class:`InputTextMessageContent` instead.
 
         parse_mode (str): Use :class:`InputTextMessageContent` instead.
 
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
-        instead.
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
 
     Args:
         audio_url (str):
         title (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         performer (Optional[str]):
         audio_duration (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[
-            :class:`telegram.input_message_content`]):
+        input_message_content (Optional[:class:`telegram.input_message_content`]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

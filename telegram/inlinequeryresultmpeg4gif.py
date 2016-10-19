@@ -16,13 +16,43 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultMpeg4Gif"""
+"""This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif"""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
+    """Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default,
+    this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you
+    can use input_message_content to send a message with the specified content instead of the
+    animation.
+
+    Attributes:
+        mpeg4_url (str): A valid URL for the MP4 file. File size must not exceed 1MB.
+        thumb_url (str): URL of the static thumbnail (jpeg or gif) for the result.
+        mpeg4_width (Optional[int]): Video width.
+        mpeg4_height (Optional[int]): Video height.
+        title (Optional[str]): Title for the result.
+        caption	(Optional[str]): Caption of the MPEG-4 file to be sent, 0-200 characters.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the video animation.
+
+    Args:
+        mpeg4_url (str): A valid URL for the MP4 file. File size must not exceed 1MB.
+        thumb_url (str): URL of the static thumbnail (jpeg or gif) for the result.
+        mpeg4_width (Optional[int]): Video width.
+        mpeg4_height (Optional[int]): Video height.
+        title (Optional[str]): Title for the result.
+        caption	(Optional[str]): Caption of the MPEG-4 file to be sent, 0-200 characters.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the video animation.
+        **kwargs (dict): Arbitrary keyword arguments.
+
+    """
 
     def __init__(self,
                  id,

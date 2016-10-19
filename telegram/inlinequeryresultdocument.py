@@ -16,13 +16,46 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultDocument"""
+"""This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultDocument(InlineQueryResult):
+    """Represents a link to a file. By default, this file will be sent by the user with an optional
+    caption. Alternatively, you can use input_message_content to send a message with the specified
+    content instead of the file. Currently, only .PDF and .ZIP files can be sent using this method.
+
+    Attributes:
+        title (str): Title for the result.
+        caption (Optional[str]): Caption of the document to be sent, 0-200 characters.
+        document_url (Optional[str]): A valid URL for the file.
+        mime_type (Optional[str]): Mime type of the content of the file, either "application/pdf"
+            or "application/zip".
+        description	(Optional[str]): Short description of the result.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the file.
+        thumb_url (Optional[str]): URL of the thumbnail (jpeg only) for the file.
+        thumb_width (Optional[int]): Thumbnail width.
+        thumb_height (Optional[int]): Thumbnail height.
+
+    Args:
+        id (str):
+        document_url (str):
+        title (str):
+        mime_type (str):
+        caption (Optional[str]):
+        description	(Optional[str]):
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
+        thumb_url (Optional[str]):
+        thumb_width (Optional[int]):
+        thumb_height (Optional[int]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
+    """
 
     def __init__(self,
                  id,

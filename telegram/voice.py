@@ -32,21 +32,21 @@ class Voice(TelegramObject):
 
     Args:
         file_id (str):
+        duration (Optional[int]):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
-        duration (Optional[int]):
         mime_type (Optional[str]):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, **kwargs):
+    def __init__(self, file_id, duration, mime_type='', file_size=0, **kwargs):
         # Required
         self.file_id = str(file_id)
+        self.duration = int(duration)
         # Optionals
-        self.duration = int(kwargs.get('duration', 0))
-        self.mime_type = str(kwargs.get('mime_type', ''))
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.mime_type = str(mime_type)
+        self.file_size = int(file_size)
 
     @staticmethod
     def de_json(data, bot):

@@ -42,21 +42,20 @@ class InlineQueryResultArticle(InlineQueryResult):
 
         parse_mode (str): Use :class:`InputTextMessageContent` instead.
 
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
-        instead.
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
 
     Args:
         id (str): Unique identifier for this result, 1-64 Bytes
         title (str):
         reply_markup (:class:`telegram.ReplyMarkup`):
-
-    Keyword Args:
         url (Optional[str]):
         hide_url (Optional[bool]):
         description (Optional[str]):
         thumb_url (Optional[str]):
         thumb_width (Optional[int]):
         thumb_height (Optional[int]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

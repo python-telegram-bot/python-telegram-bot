@@ -33,23 +33,21 @@ class InlineKeyboardButton(TelegramObject):
 
     Args:
         text (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         url (Optional[str]):
         callback_data (Optional[str]):
         switch_inline_query (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, text, **kwargs):
+    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, **kwargs):
         # Required
         self.text = text
 
         # Optionals
-        self.url = kwargs.get('url')
-        self.callback_data = kwargs.get('callback_data')
-        self.switch_inline_query = kwargs.get('switch_inline_query')
+        self.url = url
+        self.callback_data = callback_data
+        self.switch_inline_query = switch_inline_query
 
     @staticmethod
     def de_json(data, bot):

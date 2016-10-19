@@ -38,14 +38,13 @@ class InlineQuery(TelegramObject):
         from_user (:class:`telegram.User`):
         query (str):
         offset (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         location (optional[:class:`telegram.Location`]):
         bot (Optional[Bot]): The Bot to use for instance methods
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, id, from_user, query, offset, bot=None, **kwargs):
+    def __init__(self, id, from_user, query, offset, location=None, bot=None, **kwargs):
         # Required
         self.id = id
         self.from_user = from_user
@@ -53,7 +52,7 @@ class InlineQuery(TelegramObject):
         self.offset = offset
 
         # Optional
-        self.location = kwargs.get('location')
+        self.location = location
 
         self.bot = bot
 

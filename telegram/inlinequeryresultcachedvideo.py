@@ -16,13 +16,37 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultCachedVideo"""
+"""This module contains the classes that represent Telegram InlineQueryResultCachedVideo"""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultCachedVideo(InlineQueryResult):
+    """Represents a link to a video file stored on the Telegram servers. By default, this video
+    file will be sent by the user with an optional caption. Alternatively, you can use
+    input_message_content to send a message with the specified content instead of the video.
+
+    Attributes:
+        video_file_id (str): A valid file identifier for the video file.
+        title (str): Title for the result.
+        description (Optional[str]): Short description of the result.
+        caption (Optional[str]): Caption of the video to be sent, 0-200 characters.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the video
+
+    Args:
+        id (str):
+        video_file_id (str):
+        title (str):
+        description (Optional[str]):
+        caption (Optional[str]):
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
+    """
 
     def __init__(self,
                  id,

@@ -34,14 +34,14 @@ class MessageEntity(TelegramObject):
         user (Optional[:class:`telegram.User`]):
     """
 
-    def __init__(self, type, offset, length, **kwargs):
+    def __init__(self, type, offset, length, url=None, user=None, **kwargs):
         # Required
         self.type = type
         self.offset = offset
         self.length = length
         # Optionals
-        self.url = kwargs.get('url')
-        self.user = kwargs.get('user')
+        self.url = url
+        self.user = user
 
     @staticmethod
     def de_json(data, bot):

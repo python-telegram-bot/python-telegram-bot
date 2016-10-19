@@ -44,15 +44,22 @@ class Update(TelegramObject):
         callback_query (Optional[:class:`telegram.CallbackQuery`]):
     """
 
-    def __init__(self, update_id, **kwargs):
+    def __init__(self,
+                 update_id,
+                 message=None,
+                 edited_message=None,
+                 inline_query=None,
+                 chosen_inline_result=None,
+                 callback_query=None,
+                 **kwargs):
         # Required
         self.update_id = int(update_id)
         # Optionals
-        self.message = kwargs.get('message')
-        self.edited_message = kwargs.get('edited_message')
-        self.inline_query = kwargs.get('inline_query')
-        self.chosen_inline_result = kwargs.get('chosen_inline_result')
-        self.callback_query = kwargs.get('callback_query')
+        self.message = message
+        self.edited_message = edited_message
+        self.inline_query = inline_query
+        self.chosen_inline_result = chosen_inline_result
+        self.callback_query = callback_query
 
     @staticmethod
     def de_json(data, bot):

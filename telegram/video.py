@@ -46,16 +46,24 @@ class Video(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, width, height, duration, **kwargs):
+    def __init__(self,
+                 file_id,
+                 width,
+                 height,
+                 duration,
+                 thumb=None,
+                 mime_type='',
+                 file_size=0,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
         self.duration = int(duration)
         # Optionals
-        self.thumb = kwargs.get('thumb')
-        self.mime_type = str(kwargs.get('mime_type', ''))
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.thumb = thumb
+        self.mime_type = str(mime_type)
+        self.file_size = int(file_size)
 
     @staticmethod
     def de_json(data, bot):
