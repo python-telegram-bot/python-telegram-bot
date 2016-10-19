@@ -24,6 +24,7 @@ from functools import wraps
 from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
 from uuid import uuid4
+from collections import defaultdict
 
 from queue import Queue, Empty
 
@@ -86,7 +87,9 @@ class Dispatcher(object):
         self.job_queue = job_queue
         self.workers = workers
 
-        self.user_data = dict()
+        self.user_data = defaultdict(dict)
+        """:type: dict[int, dict]"""
+        self.chat_data = defaultdict(dict)
         """:type: dict[int, dict]"""
 
         self.handlers = {}

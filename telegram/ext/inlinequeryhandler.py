@@ -55,6 +55,10 @@ class InlineQueryHandler(Handler):
             ``user_data`` will be passed to the callback function. It will be a ``dict`` you
             can use to keep any data related to the user that sent the update. For each update of
             the same user, it will be the same ``dict``. Default is ``False``.
+        pass_chat_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the chat that the update was sent in.
+            For each update in the same chat, it will be the same ``dict``. Default is ``False``.
     """
 
     def __init__(self,
@@ -64,12 +68,14 @@ class InlineQueryHandler(Handler):
                  pattern=None,
                  pass_groups=False,
                  pass_groupdict=False,
-                 pass_user_data=False):
+                 pass_user_data=False,
+                 pass_chat_data=False):
         super(InlineQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data)
+            pass_user_data=pass_user_data,
+            pass_chat_data=pass_chat_data)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
