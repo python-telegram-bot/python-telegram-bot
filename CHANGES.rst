@@ -2,6 +2,16 @@
 Changes
 =======
 
+**2016-10-25**
+
+*Released 5.2*
+
+- Implement API changes of October 3rd (games update)
+- Add ``Message.edit_*`` methods
+- Filters for the ``MessageHandler`` can now be combined using bitwise operators (``& and |``)
+- Add a way to save user- and chat-related data temporarily
+- Other bugfixes and improvements
+
 **2016-09-24**
 
 *Released 5.1*
