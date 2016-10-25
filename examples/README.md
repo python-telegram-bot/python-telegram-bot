@@ -13,6 +13,9 @@ This bot uses the [`JobQueue`](https://python-telegram-bot.readthedocs.io/en/lat
 ### [`conversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.py)
 A common task for a bot is to ask information from the user. In v5.0 of this library, we introduced the [`ConversationHandler`](https://python-telegram-bot.readthedocs.io/en/latest/telegram.ext.conversationhandler.html) for that exact purpose. This example uses it to retrieve user-information in a conversation-like style.
 
+### [`conversationbot2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.py)
+A more complex example of a bot that uses the `ConversationHandler`
+
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
 This example sheds some light on inline keyboards, callback queries and message editing.
 
