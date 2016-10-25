@@ -145,6 +145,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         elif args[0] == 'noresend':
             pass
 
+    def userAndChatDataTest(self, bot, update, user_data, chat_data):
+        user_data['text'] = update.message.text
+        chat_data['text'] = update.message.text
+        self.received_message = update.message.text
+        self.message_count += 1
+
     @run_async
     def asyncAdditionalHandlerTest(self, bot, update, update_queue=None):
         sleep(1)
@@ -483,6 +489,19 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertEqual(self.received_message, '/test5 noresend')
         self.assertEqual(self.message_count, 2)
 
+    def test_user_and_chat_data(self):
+        self._setup_updater('/test_data', messages=1)
+        handler = CommandHandler(
+            'test_data', self.userAndChatDataTest, pass_user_data=True, pass_chat_data=True)
+        self.updater.dispatcher.add_handler(handler)
+
+        self.updater.start_polling(0.01)
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test_data')
+        self.assertEqual(self.message_count, 1)
+        self.assertDictEqual(dict(self.updater.dispatcher.user_data), {0: {'text': '/test_data'}})
+        self.assertDictEqual(dict(self.updater.dispatcher.chat_data), {0: {'text': '/test_data'}})
+
     def test_regexGroupHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
@@ -771,7 +790,7 @@ class MockBot(object):
         self.edited = edited
 
     def mockUpdate(self, text):
-        message = Message(0, None, None, None)
+        message = Message(0, User(0, 'Testuser'), None, Chat(0, Chat.GROUP))
         message.text = text
         update = Update(0)
 

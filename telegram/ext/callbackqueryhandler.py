@@ -52,6 +52,14 @@ class CallbackQueryHandler(Handler):
         pass_groupdict (optional[bool]): If the callback should be passed the
             result of ``re.match(pattern, data).groupdict()`` as a keyword
             argument called ``groupdict``. Default is ``False``
+        pass_user_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``user_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the user that sent the update. For each update of
+            the same user, it will be the same ``dict``. Default is ``False``.
+        pass_chat_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the chat that the update was sent in.
+            For each update in the same chat, it will be the same ``dict``. Default is ``False``.
     """
 
     def __init__(self,
@@ -60,9 +68,15 @@ class CallbackQueryHandler(Handler):
                  pass_job_queue=False,
                  pattern=None,
                  pass_groups=False,
-                 pass_groupdict=False):
+                 pass_groupdict=False,
+                 pass_user_data=False,
+                 pass_chat_data=False):
         super(CallbackQueryHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            pass_user_data=pass_user_data,
+            pass_chat_data=pass_chat_data)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
@@ -81,7 +95,7 @@ class CallbackQueryHandler(Handler):
                 return True
 
     def handle_update(self, update, dispatcher):
-        optional_args = self.collect_optional_args(dispatcher)
+        optional_args = self.collect_optional_args(dispatcher, update)
         if self.pattern:
             match = re.match(self.pattern, update.callback_query.data)
 
