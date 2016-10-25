@@ -330,6 +330,7 @@ class Updater(object):
                     # Disable webhook for cleaning
                     self.bot.setWebhook(webhook_url='')
                     self._clean_updates()
+                    sleep(1)
 
                 self.bot.setWebhook(webhook_url=webhook_url, certificate=cert)
             except (Unauthorized, InvalidToken):
