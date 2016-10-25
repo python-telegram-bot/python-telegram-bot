@@ -120,12 +120,12 @@ def main():
                                     custom_choice),
                        ],
 
-            TYPING_CHOICE: [MessageHandler([Filters.text],
+            TYPING_CHOICE: [MessageHandler(Filters.text,
                                            regular_choice,
                                            pass_user_data=True),
                             ],
 
-            TYPING_REPLY: [MessageHandler([Filters.text],
+            TYPING_REPLY: [MessageHandler(Filters.text,
                                           received_information,
                                           pass_user_data=True),
                            ],

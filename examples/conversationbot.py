@@ -127,13 +127,13 @@ def main():
         states={
             GENDER: [RegexHandler('^(Boy|Girl|Other)$', gender)],
 
-            PHOTO: [MessageHandler([Filters.photo], photo),
+            PHOTO: [MessageHandler(Filters.photo, photo),
                     CommandHandler('skip', skip_photo)],
 
-            LOCATION: [MessageHandler([Filters.location], location),
+            LOCATION: [MessageHandler(Filters.location, location),
                        CommandHandler('skip', skip_location)],
 
-            BIO: [MessageHandler([Filters.text], bio)]
+            BIO: [MessageHandler(Filters.text, bio)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
