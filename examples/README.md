@@ -11,10 +11,10 @@ This is probably the base for most of the bots made with `python-telegram-bot`. 
 This bot uses the [`JobQueue`](https://python-telegram-bot.readthedocs.io/en/latest/telegram.ext.jobqueue.html) class to send timed messages. The user sets a timer by using `/set` command with a specific time, for example `/set 30`. The bot then sets up a job to send a message to that user after 30 seconds. The user can also cancel the timer by sending `/unset`. To learn more about the `JobQueue`, read [this wiki article](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue).
 
 ### [`conversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.py)
-A common task for a bot is to ask information from the user. In v5.0 of this library, we introduced the [`ConversationHandler`](https://python-telegram-bot.readthedocs.io/en/latest/telegram.ext.conversationhandler.html) for that exact purpose. This example uses it to retrieve user-information in a conversation-like style.
+A common task for a bot is to ask information from the user. In v5.0 of this library, we introduced the [`ConversationHandler`](https://python-telegram-bot.readthedocs.io/en/latest/telegram.ext.conversationhandler.html) for that exact purpose. This example uses it to retrieve user-information in a conversation-like style. To get a better understanding, take a look at the [state diagram](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot.png).
 
 ### [`conversationbot2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot2.py)
-A more complex example of a bot that uses the `ConversationHandler`
+A more complex example of a bot that uses the `ConversationHandler`. It is also more confusing. Good thing there is a [fancy state diagram](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot2.png) for this one, too!
 
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
 This example sheds some light on inline keyboards, callback queries and message editing.
