@@ -1,5 +1,5 @@
 telegram.inlinequeryresultcachedgif module
-=================================
+==========================================
 
 .. automodule:: telegram.inlinequeryresultcachedgif
     :members:

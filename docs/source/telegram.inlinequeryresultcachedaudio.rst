@@ -1,5 +1,5 @@
 telegram.inlinequeryresultcachedaudio module
-=================================
+============================================
 
 .. automodule:: telegram.inlinequeryresultcachedaudio
     :members:

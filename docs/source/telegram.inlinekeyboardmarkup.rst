@@ -1,5 +1,5 @@
 telegram.inlinekeyboardmarkup module
-==========================
+====================================
 
 .. automodule:: telegram.inlinekeyboardmarkup
     :members:

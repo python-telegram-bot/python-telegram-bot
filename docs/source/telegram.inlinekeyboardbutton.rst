@@ -1,5 +1,5 @@
 telegram.inlinekeyboardbutton module
-===========================
+====================================
 
 .. automodule:: telegram.inlinekeyboardbutton
     :members:

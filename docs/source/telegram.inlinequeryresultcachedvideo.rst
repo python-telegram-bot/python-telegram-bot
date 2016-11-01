@@ -1,5 +1,5 @@
 telegram.inlinequeryresultcachedvideo module
-=================================
+============================================
 
 .. automodule:: telegram.inlinequeryresultcachedvideo
     :members:

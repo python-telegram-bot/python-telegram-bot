@@ -44,7 +44,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         caption	(Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
         input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-         **kwargs (dict): Arbitrary keyword arguments.
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 

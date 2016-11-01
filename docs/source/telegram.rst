@@ -10,6 +10,7 @@ Submodules
    telegram.base
    telegram.bot
    telegram.constants
+   telegram.contrib
    telegram.ext
    telegram.inlinequery
    telegram.inlinequeryresult

@@ -1,5 +1,5 @@
 telegram.inlinequeryresultcachedvoice module
-=================================
+============================================
 
 .. automodule:: telegram.inlinequeryresultcachedvoice
     :members:
