@@ -13,6 +13,7 @@ Submodules
    telegram.base
    telegram.bot
    telegram.callbackgame
+   telegram.callbackquery
    telegram.chat
    telegram.chataction
    telegram.chatmember
@@ -21,6 +22,7 @@ Submodules
    telegram.contact
    telegram.document
    telegram.error
+   telegram.file
    telegram.forcereply
    telegram.game
    telegram.gamehighscore
@@ -40,6 +42,7 @@ Submodules
    telegram.inlinequeryresultcachedvoice
    telegram.inlinequeryresultcontact
    telegram.inlinequeryresultdocument
+   telegram.inlinequeryresultgame
    telegram.inlinequeryresultgif
    telegram.inlinequeryresultlocation
    telegram.inlinequeryresultmpeg4gif
@@ -47,7 +50,12 @@ Submodules
    telegram.inlinequeryresultvenue
    telegram.inlinequeryresultvideo
    telegram.inlinequeryresultvoice
+   telegram.inputcontactmessagecontent
    telegram.inputfile
+   telegram.inputlocationmessagecontent
+   telegram.inputmessagecontent
+   telegram.inputtextmessagecontent
+   telegram.inputvenuemessagecontent
    telegram.keyboardbutton
    telegram.location
    telegram.message
