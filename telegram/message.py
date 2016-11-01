@@ -507,8 +507,8 @@ class Message(TelegramObject):
             (That is, you can't just slice ``Message.text`` with the offset and length.)
 
         Args:
-            entity (MessageEntity): The entity to extract the text from. It must be an entity that
-                belongs to this message.
+            entity (telegram.MessageEntity): The entity to extract the text from. It must be an
+                entity that belongs to this message.
 
         Returns:
             str: The text of the given entity
@@ -534,8 +534,8 @@ class Message(TelegramObject):
             See ``get_entity_text`` for more info.
 
         Args:
-            types (Optional[list]): List of ``MessageEntity`` types as strings. If the ``type``
-                attribute of an entity is contained in this list, it will be returned.
+            types (Optional[list]): List of ``telegram.MessageEntity`` types as strings. If the
+                ``type`` attribute of an entity is contained in this list, it will be returned.
                 Defaults to a list of all types. All types can be found as constants in
                 :class:`telegram.MessageEntity`.
 

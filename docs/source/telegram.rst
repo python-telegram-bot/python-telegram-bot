@@ -6,16 +6,28 @@ Submodules
 
 .. toctree::
 
+   telegram.contrib
+   telegram.ext
+   telegram.animation
    telegram.audio
    telegram.base
    telegram.bot
+   telegram.callbackgame
+   telegram.chat
+   telegram.chataction
+   telegram.chatmember
+   telegram.choseninlineresult
    telegram.constants
-   telegram.contrib
-   telegram.ext
-   telegram.inlinequery
-   telegram.inlinequeryresult
+   telegram.contact
+   telegram.document
+   telegram.error
+   telegram.forcereply
+   telegram.game
+   telegram.gamehighscore
    telegram.inlinekeyboardbutton
    telegram.inlinekeyboardmarkup
+   telegram.inlinequery
+   telegram.inlinequeryresult
    telegram.inlinequeryresultarticle
    telegram.inlinequeryresultaudio
    telegram.inlinequeryresultcachedaudio
@@ -35,16 +47,12 @@ Submodules
    telegram.inlinequeryresultvenue
    telegram.inlinequeryresultvideo
    telegram.inlinequeryresultvoice
-   telegram.choseninlineresult
-   telegram.chataction
-   telegram.contact
-   telegram.document
-   telegram.error
-   telegram.forcereply
-   telegram.chat
    telegram.inputfile
+   telegram.keyboardbutton
    telegram.location
    telegram.message
+   telegram.messageentity
+   telegram.parsemode
    telegram.photosize
    telegram.replykeyboardhide
    telegram.replykeyboardmarkup
@@ -53,8 +61,10 @@ Submodules
    telegram.update
    telegram.user
    telegram.userprofilephotos
+   telegram.venue
    telegram.video
    telegram.voice
+   telegram.webhookinfo
 
 Module contents
 ---------------

@@ -101,8 +101,8 @@ class Game(TelegramObject):
             (That is, you can't just slice ``Message.text`` with the offset and length.)
 
         Args:
-            entity (MessageEntity): The entity to extract the text from. It must be an entity that
-                belongs to this message.
+            entity (telegram.MessageEntity): The entity to extract the text from. It must be an
+                entity that belongs to this message.
 
         Returns:
             str: The text of the given entity
