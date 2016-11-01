@@ -30,10 +30,10 @@ class JobQueue(object):
 
     Attributes:
         queue (PriorityQueue):
-        bot (Bot):
+        bot (telegram.Bot):
 
     Args:
-        bot (Bot): The bot instance that should be passed to the jobs
+        bot (telegram.Bot): The bot instance that should be passed to the jobs
 
     Deprecated: 5.2
         prevent_autostart (Optional[bool]): Thread does not start during initialisation.
@@ -60,7 +60,7 @@ class JobQueue(object):
         """Queue a new job.
 
         Args:
-            job (Job): The ``Job`` instance representing the new job
+            job (telegram.ext.Job): The ``Job`` instance representing the new job
             next_t (Optional[float]): Time in seconds in which the job should be executed first.
                 Defaults to ``job.interval``
 

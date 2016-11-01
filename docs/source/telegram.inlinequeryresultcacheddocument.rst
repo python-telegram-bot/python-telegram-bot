@@ -1,5 +1,5 @@
 telegram.inlinequeryresultcacheddocument module
-=================================
+===============================================
 
 .. automodule:: telegram.inlinequeryresultcacheddocument
     :members:

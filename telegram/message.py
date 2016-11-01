@@ -438,11 +438,10 @@ class Message(TelegramObject):
     def forward(self, chat_id, disable_notification=False):
         """Shortcut for
 
-            bot.forwardMessage(chat_id=chat_id,
-                               from_chat_id=update.message.chat_id,
-                               disable_notification=disable_notification,
-                               message_id=update.message.message_id)
-
+            >>> bot.forwardMessage(chat_id=chat_id,
+            ...                    from_chat_id=update.message.chat_id,
+            ...                    disable_notification=disable_notification,
+            ...                    message_id=update.message.message_id)
         """
         return self.bot.forwardMessage(
             chat_id=chat_id,
@@ -452,42 +451,48 @@ class Message(TelegramObject):
 
     def edit_text(self, *args, **kwargs):
         """
-        Shortcut for ``bot.editMessageText(chat_id=message.chat_id,
-                                       message_id=message.message_id,
-                                       *args, **kwargs)``
+        Shortcut for
+
+            >>> bot.editMessageText(chat_id=message.chat_id,
+            ...                     message_id=message.message_id,
+            ...                     *args, **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself,
             therefore this method can only be used on the
-            return value of the bot.send_* family of methods.
+            return value of the ``bot.send_*`` family of methods.
         """
         return self.bot.edit_message_text(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def edit_caption(self, *args, **kwargs):
         """
-        Shortcut for ``bot.editMessageCaption(chat_id=message.chat_id,
-                                              message_id=message.message_id,
-                                              *args, **kwargs)``
+        Shortcut for
+
+            >>> bot.editMessageCaption(chat_id=message.chat_id,
+            ...                        message_id=message.message_id,
+            ...                        *args, **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself,
             therefore this method can only be used on the
-            return value of the bot.send_* family of methods.
+            return value of the ``bot.send_*`` family of methods.
         """
         return self.bot.edit_message_caption(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def edit_reply_markup(self, *args, **kwargs):
         """
-        Shortcut for ``bot.editReplyMarkup(chat_id=message.chat_id,
-                                           message_id=message.message_id,
-                                           *args, **kwargs)``
+        Shortcut for
+
+            >>> bot.editReplyMarkup(chat_id=message.chat_id,
+            ...                     message_id=message.message_id,
+            ...                     *args, **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself,
             therefore this method can only be used on the
-            return value of the bot.send_* family of methods.
+            return value of the ``bot.send_*`` family of methods.
         """
         return self.bot.edit_message_caption(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)

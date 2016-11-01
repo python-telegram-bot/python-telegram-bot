@@ -35,7 +35,7 @@ class Handler(object):
         pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
-             be used to insert updates. Default is ``False``.
+            be used to insert updates. Default is ``False``.
         pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
             instance created by the ``Updater`` which can be used to schedule new jobs.
@@ -85,7 +85,7 @@ class Handler(object):
 
         Args:
             update (object): The update to be handled
-            dispatcher (Dispatcher): The dispatcher to collect optional args
+            dispatcher (telegram.ext.Dispatcher): The dispatcher to collect optional args
 
         """
         raise NotImplementedError
@@ -96,7 +96,7 @@ class Handler(object):
         handlers
 
         Args:
-            dispatcher (Dispatcher):
+            dispatcher (telegram.ext.Dispatcher):
         """
         optional_args = dict()
 

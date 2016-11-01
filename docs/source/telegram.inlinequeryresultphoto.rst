@@ -1,5 +1,5 @@
 telegram.inlinequeryresultphoto module
-=================================
+======================================
 
 .. automodule:: telegram.inlinequeryresultphoto
     :members:

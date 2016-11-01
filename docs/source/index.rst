@@ -10,7 +10,7 @@ Contents:
    telegram
 
 .. toctree::
-   :maxdepth: 2
+   telegram
 
 
 

@@ -309,7 +309,7 @@ class Dispatcher(object):
             which handlers were added to the group defines the priority.
 
         Args:
-            handler (Handler): A Handler instance
+            handler (telegram.ext.Handler): A Handler instance
             group (Optional[int]): The group identifier. Default is 0
         """
 
@@ -330,7 +330,7 @@ class Dispatcher(object):
         Remove a handler from the specified group
 
         Args:
-            handler (Handler): A Handler instance
+            handler (telegram.ext.Handler): A Handler instance
             group (optional[object]): The group identifier. Default is 0
         """
         if handler in self.handlers[group]:

@@ -9,6 +9,8 @@ Submodules
    telegram.audio
    telegram.base
    telegram.bot
+   telegram.constants
+   telegram.contrib
    telegram.ext
    telegram.inlinequery
    telegram.inlinequeryresult
@@ -37,14 +39,12 @@ Submodules
    telegram.chataction
    telegram.contact
    telegram.document
-   telegram.emoji
    telegram.error
    telegram.forcereply
    telegram.chat
    telegram.inputfile
    telegram.location
    telegram.message
-   telegram.nullhandler
    telegram.photosize
    telegram.replykeyboardhide
    telegram.replykeyboardmarkup

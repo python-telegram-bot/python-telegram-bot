@@ -1,5 +1,5 @@
 telegram.inlinequeryresultcachedsticker module
-=================================
+==============================================
 
 .. automodule:: telegram.inlinequeryresultcachedsticker
     :members:
