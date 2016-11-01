@@ -209,17 +209,17 @@ htmlhelp_basename = 'PythonTelegramBotdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-    'preamble': '''\\setcounter{tocdepth}{2}
-\\usepackage{enumitem}
-\\setlistdepth{99}''',
+
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
 # The font size ('10pt', '11pt' or '12pt').
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    'preamble': r'''\setcounter{tocdepth}{2}
+\usepackage{enumitem}
+\setlistdepth{99}''',
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
@@ -230,7 +230,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'PythonTelegramBot.tex', u'Python Telegram Bot Documentation',
-   u'Leandro Toledo', 'manual'),
+   author, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -274,7 +274,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   (master_doc, 'PythonTelegramBot', u'Python Telegram Bot Documentation',
-   author, 'PythonTelegramBot', 'Not just a Python wrapper around the Telegram Bot API',
+   author, 'PythonTelegramBot', "We have made you a wrapper you can't refuse",
    'Miscellaneous'),
 ]
 
