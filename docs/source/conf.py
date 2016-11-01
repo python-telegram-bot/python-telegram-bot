@@ -209,6 +209,9 @@ htmlhelp_basename = 'PythonTelegramBotdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
+    'preamble': '''\\setcounter{tocdepth}{2}
+\\usepackage{enumitem}
+\\setlistdepth{99}''',
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
