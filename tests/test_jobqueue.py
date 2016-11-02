@@ -186,25 +186,23 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
         self.jq.put(Job(self.job5, seconds_interval, repeat=False))
         sleep(6)
-        self.assertEqual(expected_time, self.job_time)
+        self.assertEqual(self.job_time, expected_time)
 
         # Testing the minute time unit
         minutes_interval = 0.083  # This is about 4.9 seconds
         expected_time = int(round(self.getSeconds() + (minutes_interval * 60)))
 
-        self.jq.put(Job(self.job5, minutes_interval, repeat=False,
-                        unit=TimeUnits.minutes))
+        self.jq.put(Job(self.job5, minutes_interval, repeat=False, unit=TimeUnits.minutes))
         sleep(6)
-        self.assertEqual(expected_time, self.job_time)
+        self.assertEqual(self.job_time, expected_time)
 
         # Testing the hour time unit
         hours_interval = 0.001389  # This is about 5.0004 seconds
         expected_time = int(round(self.getSeconds() + (hours_interval * 60 * 60)))
 
-        self.jq.put(Job(self.job5, hours_interval, repeat=False,
-                        unit=TimeUnits.hours))
+        self.jq.put(Job(self.job5, hours_interval, repeat=False, unit=TimeUnits.hours))
         sleep(6)
-        self.assertEqual(expected_time, self.job_time)
+        self.assertEqual(self.job_time, expected_time)
 
 
 if __name__ == '__main__':
