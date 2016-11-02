@@ -32,7 +32,6 @@ from tests.test_updater import MockBot
 sys.path.append('.')
 
 from telegram.ext import JobQueue, Job, Updater
-from telegram.ext.jobqueue import TimeUnits
 from tests.base import BaseTest
 
 # Enable logging
