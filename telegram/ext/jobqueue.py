@@ -232,7 +232,6 @@ class Job(object):
     Attributes:
         callback (function):
         interval (float):
-        unit (int):
         days: (tuple)
         repeat (bool):
         name (str):
