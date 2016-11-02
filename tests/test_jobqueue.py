@@ -23,6 +23,7 @@ This module contains an object that represents Tests for JobQueue
 import logging
 import sys
 import unittest
+import datetime
 import time
 from time import sleep
 
@@ -179,32 +180,24 @@ class JobQueueTest(BaseTest, unittest.TestCase):
             u.stop()
 
     def test_time_units(self):
-        # I'm going to make all intervals about 5 seconds long
-        # Testing the seconds time unit (it's default)
+        # Testing seconds in int
         seconds_interval = 5
         expected_time = self.getSeconds() + seconds_interval
 
         self.jq.put(Job(self.job5, seconds_interval, repeat=False))
         sleep(6)
-        self.assertEqual(expected_time, self.job_time)
+        self.assertEqual(self.job_time, expected_time)
 
-        # Testing the minute time unit
-        minutes_interval = 0.083  # This is about 4.9 seconds
-        expected_time = int(round(self.getSeconds() + (minutes_interval * 60)))
+        # Testing seconds, minutes and hours in datetime.time
+        # I'm using another notation here to prove that it works, making
+        # it run a minute and an hour takes too long for testing. This is
+        # sufficient to test that it actually works.
+        interval = datetime.time(0, 0, 5)
+        expected_time = self.getSeconds() + interval.second
 
-        self.jq.put(Job(self.job5, minutes_interval, repeat=False,
-                        unit=TimeUnits.minutes))
+        self.jq.put(Job(self.job5, interval, repeat=False))
         sleep(6)
-        self.assertEqual(expected_time, self.job_time)
-
-        # Testing the hour time unit
-        hours_interval = 0.001389  # This is about 5.0004 seconds
-        expected_time = int(round(self.getSeconds() + (hours_interval * 60 * 60)))
-
-        self.jq.put(Job(self.job5, hours_interval, repeat=False,
-                        unit=TimeUnits.hours))
-        sleep(6)
-        self.assertEqual(expected_time, self.job_time)
+        self.assertEqual(self.job_time, expected_time)
 
 
 if __name__ == '__main__':

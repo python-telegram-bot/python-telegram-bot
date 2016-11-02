@@ -74,6 +74,12 @@ class JobQueue(object):
         """:type: float"""
         self._running = False
 
+    def dt_time_to_seconds(self, dt_time):
+        hours = dt_time.hour * 60 * 60
+        minutes = dt_time.minute * 60
+        seconds = dt_time.second
+        return hours + minutes + seconds
+
     def put(self, job, next_t=None):
         """Queue a new job.
 
@@ -87,16 +93,18 @@ class JobQueue(object):
 
         if next_t is None:
             interval = job.interval
-            unit = job.unit
 
-            if unit == TimeUnits.seconds:
+            if isinstance(interval, int) or isinstance(interval, float):
                 next_t = interval
-            elif unit == TimeUnits.minutes:
-                next_t = interval * 60
-            elif unit == TimeUnits.hours:
-                next_t = interval * 60 * 60
+            elif isinstance(interval, datetime.time):
+                next_t = self.dt_time_to_seconds(interval)
             else:
-                next_t = interval
+                err_msg = "The interval argument should be of type datetime.time, \
+                        int or float"
+
+                raise ValueError(err_msg)
+        elif isinstance(next_t, datetime.time):
+            next_t = self.dt_time_to_seconds(next_t)
 
         now = time.time()
         next_t += now
@@ -240,25 +248,27 @@ class Job(object):
         callback (function): The callback function that should be executed by the Job. It should
             take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
             can be used to terminate the job or modify its interval.
-        interval (float): The interval in which this job should execute its callback function in
-            seconds.
+        interval (float or datetime.time): The interval in which this job should execute its
+            callback function in seconds.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
             (``True``) or only once (``False``). Defaults to ``True``
         context (Optional[object]): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to ``None``
-        unit (Integer): Defines in which time unit the interval will be.
         days (Tuple): Defines on which days the job should be ran.
 
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None,
-                 unit=TimeUnits.seconds, days=tuple(day for day in Days)):
+    def __init__(self,
+                 callback,
+                 interval,
+                 repeat=True,
+                 context=None,
+                 days=tuple(day for day in Days)):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
         self.context = context
-        self.unit = unit
         self.days = days
 
         self.name = callback.__name__
