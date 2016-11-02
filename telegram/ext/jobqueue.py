@@ -21,8 +21,26 @@
 import logging
 import time
 import warnings
+import datetime
+from enum import Enum
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
+
+
+class TimeUnits(Enum):
+    seconds = 0
+    minutes = 1
+    hours = 2
+
+
+class Days(Enum):
+    mon = 0
+    tue = 1
+    wed = 2
+    thu = 3
+    fri = 4
+    sat = 5
+    sun = 6
 
 
 class JobQueue(object):
@@ -68,7 +86,17 @@ class JobQueue(object):
         job.job_queue = self
 
         if next_t is None:
-            next_t = job.interval
+            interval = job.interval
+            unit = job.unit
+
+            if unit == TimeUnits.seconds:
+                next_t = interval
+            elif unit == TimeUnits.minutes:
+                next_t = interval * 60
+            elif unit == TimeUnits.hours:
+                next_t = interval * 60 * 60
+            else:
+                next_t = interval
 
         now = time.time()
         next_t += now
@@ -126,7 +154,9 @@ class JobQueue(object):
                 self.logger.debug('Running job %s', job.name)
 
                 try:
-                    job.run(self.bot)
+                    for day in job.days:
+                        if Days(day).value == datetime.datetime.now().weekday():
+                            job.run(self.bot)
 
                 except:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -200,6 +230,8 @@ class Job(object):
     Attributes:
         callback (function):
         interval (float):
+        unit (int):
+        days: (tuple)
         repeat (bool):
         name (str):
         enabled (bool): Boolean property that decides if this job is currently active
@@ -214,15 +246,20 @@ class Job(object):
             (``True``) or only once (``False``). Defaults to ``True``
         context (Optional[object]): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to ``None``
+        unit (Integer): Defines in which time unit the interval will be.
+        days (Tuple): Defines on which days the job should be ran.
 
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None):
+    def __init__(self, callback, interval, repeat=True, context=None,
+                 unit=TimeUnits.seconds, days=tuple(day for day in Days)):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
         self.context = context
+        self.unit = unit
+        self.days = days
 
         self.name = callback.__name__
         self._remove = Event()
