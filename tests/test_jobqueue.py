@@ -23,6 +23,7 @@ This module contains an object that represents Tests for JobQueue
 import logging
 import sys
 import unittest
+import time
 from time import sleep
 
 from tests.test_updater import MockBot
@@ -30,6 +31,7 @@ from tests.test_updater import MockBot
 sys.path.append('.')
 
 from telegram.ext import JobQueue, Job, Updater
+from telegram.ext.jobqueue import TimeUnits
 from tests.base import BaseTest
 
 # Enable logging
@@ -53,10 +55,14 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.jq = JobQueue(MockBot('jobqueue_test'))
         self.jq.start()
         self.result = 0
+        self.job_time = 0
 
     def tearDown(self):
         if self.jq is not None:
             self.jq.stop()
+
+    def getSeconds(self):
+        return int(round(time.time()))
 
     def job1(self, bot, job):
         self.result += 1
@@ -70,6 +76,9 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def job4(self, bot, job):
         self.result += job.context
+
+    def job5(self, bot, job):
+        self.job_time = self.getSeconds()
 
     def test_basic(self):
         self.jq.put(Job(self.job1, 0.1))
@@ -168,6 +177,34 @@ class JobQueueTest(BaseTest, unittest.TestCase):
             self.assertEqual(1, self.result)
         finally:
             u.stop()
+
+    def test_time_units(self):
+        # I'm going to make all intervals about 5 seconds long
+        # Testing the seconds time unit (it's default)
+        seconds_interval = 5
+        expected_time = self.getSeconds() + seconds_interval
+
+        self.jq.put(Job(self.job5, seconds_interval, repeat=False))
+        sleep(6)
+        self.assertEqual(expected_time, self.job_time)
+
+        # Testing the minute time unit
+        minutes_interval = 0.083  # This is about 4.9 seconds
+        expected_time = int(round(self.getSeconds() + (minutes_interval * 60)))
+
+        self.jq.put(Job(self.job5, minutes_interval, repeat=False,
+                        unit=TimeUnits.minutes))
+        sleep(6)
+        self.assertEqual(expected_time, self.job_time)
+
+        # Testing the hour time unit
+        hours_interval = 0.001389  # This is about 5.0004 seconds
+        expected_time = int(round(self.getSeconds() + (hours_interval * 60 * 60)))
+
+        self.jq.put(Job(self.job5, hours_interval, repeat=False,
+                        unit=TimeUnits.hours))
+        sleep(6)
+        self.assertEqual(expected_time, self.job_time)
 
 
 if __name__ == '__main__':
