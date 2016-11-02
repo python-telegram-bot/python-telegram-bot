@@ -27,12 +27,6 @@ from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
 
 
-class TimeUnits(Enum):
-    seconds = 0
-    minutes = 1
-    hours = 2
-
-
 class Days(Enum):
     mon = 0
     tue = 1
