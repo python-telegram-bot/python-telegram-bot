@@ -32,6 +32,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `Valentijn <https://github.com/Faalentijn>`_
+- `voider1 <https://github.com/voider1>`_
 - `wjt <https://github.com/wjt>`_
 
 Please add yourself here alphabetically when you submit your first pull request.
