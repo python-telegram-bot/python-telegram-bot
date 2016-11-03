@@ -153,11 +153,10 @@ class JobQueue(object):
                 continue
 
             if job.enabled:
-                self.logger.debug('Running job %s', job.name)
-
                 try:
                     for day in job.days:
                         if Days(day).value == datetime.datetime.now().weekday():
+                            self.logger.debug('Running job %s', job.name)
                             job.run(self.bot)
 
                 except:
