@@ -93,10 +93,8 @@ class JobQueue(object):
             elif isinstance(interval, datetime.time):
                 next_t = self.dt_time_to_seconds(interval)
             else:
-                err_msg = "The interval argument should be of type datetime.time, \
-                        int or float"
-
-                raise ValueError(err_msg)
+                raise ValueError("The interval argument should be of type datetime.time, int or \
+                                 float")
         elif isinstance(next_t, datetime.time):
             next_t = self.dt_time_to_seconds(next_t)
 
@@ -266,10 +264,7 @@ class Job(object):
             raise ValueError("The 'days argument should be of type 'tuple'")
 
         if not all(isinstance(day, Days) for day in days):
-            err_msg = "The elements of the 'days' argument \
-                    should be of type 'Days'"
-
-            raise ValueError(err_msg)
+            raise ValueError("The elements of the 'days' argument should be of type 'Days'")
 
         self.days = days
         self.name = callback.__name__
