@@ -262,8 +262,18 @@ class Job(object):
         self.interval = interval
         self.repeat = repeat
         self.context = context
-        self.days = days
 
+        if not isinstance(days, tuple):
+            err_msg = "The 'days' argument should be of type 'tuple'"
+            raise ValueError(err_msg)
+
+        if not all(isinstance(day, Days) for day in days):
+            err_msg = "The elements of the 'days' argument \
+                    should be of type 'Days'"
+
+            raise ValueError(err_msg)
+
+        self.days = days
         self.name = callback.__name__
         self._remove = Event()
         self._enabled = Event()
