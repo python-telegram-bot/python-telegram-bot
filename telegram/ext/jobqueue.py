@@ -264,8 +264,7 @@ class Job(object):
         self.context = context
 
         if not isinstance(days, tuple):
-            err_msg = "The 'days' argument should be of type 'tuple'"
-            raise ValueError(err_msg)
+            raise ValueError("The 'days argument should be of type 'tuple'")
 
         if not all(isinstance(day, Days) for day in days):
             err_msg = "The elements of the 'days' argument \
