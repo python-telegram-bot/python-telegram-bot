@@ -25,6 +25,7 @@ import sys
 import unittest
 import datetime
 import time
+from math import ceil
 from time import sleep
 
 from tests.test_updater import MockBot
@@ -62,7 +63,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
             self.jq.stop()
 
     def getSeconds(self):
-        return int(round(time.time()))
+        return int(ceil(time.time()))
 
     def job1(self, bot, job):
         self.result += 1
@@ -178,7 +179,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         finally:
             u.stop()
 
-    def test_time_units(self):
+    def test_time_unit_int(self):
         # Testing seconds in int
         seconds_interval = 5
         expected_time = self.getSeconds() + seconds_interval
@@ -187,12 +188,11 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         sleep(6)
         self.assertEqual(self.job_time, expected_time)
 
-        # Testing seconds, minutes and hours in datetime.time
-        # I'm using another notation here to prove that it works, making
-        # it run a minute and an hour takes too long for testing. This is
-        # sufficient to test that it actually works.
-        interval = datetime.time(0, 0, 5)
-        expected_time = self.getSeconds() + interval.second
+    def test_time_unit_dt_time(self):
+        # Testing seconds, minutes and hours as datetime.timedelta object
+        # This is sufficient to test that it actually works.
+        interval = datetime.timedelta(seconds=5)
+        expected_time = self.getSeconds() + interval.total_seconds()
 
         self.jq.put(Job(self.job5, interval, repeat=False))
         sleep(6)
