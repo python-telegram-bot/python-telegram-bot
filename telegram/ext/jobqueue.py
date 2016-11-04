@@ -68,11 +68,8 @@ class JobQueue(object):
         """:type: float"""
         self._running = False
 
-    def dt_time_to_seconds(self, dt_time):
-        hours = dt_time.hour * 60 * 60
-        minutes = dt_time.minute * 60
-        seconds = dt_time.second
-        return hours + minutes + seconds
+    def timedelta_to_seconds(self, tdelta):
+        return tdelta.total_seconds()
 
     def put(self, job, next_t=None):
         """Queue a new job.
@@ -90,13 +87,13 @@ class JobQueue(object):
 
             if isinstance(interval, int) or isinstance(interval, float):
                 next_t = interval
-            elif isinstance(interval, datetime.time):
-                next_t = self.dt_time_to_seconds(interval)
+            elif isinstance(interval, datetime.timedelta):
+                next_t = self.timedelta_to_seconds(interval)
             else:
-                raise ValueError("The interval argument should be of type datetime.time, int or \
-                                 float")
-        elif isinstance(next_t, datetime.time):
-            next_t = self.dt_time_to_seconds(next_t)
+                raise ValueError("The interval argument should be of type datetime.timedelta, \
+                                 int or float")
+        elif isinstance(next_t, datetime.timedelta):
+            next_t = self.timedelta_to_seconds(next_t)
 
         now = time.time()
         next_t += now
