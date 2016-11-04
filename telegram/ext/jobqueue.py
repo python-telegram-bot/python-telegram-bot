@@ -69,7 +69,10 @@ class JobQueue(object):
         self._running = False
 
     def timedelta_to_seconds(self, tdelta):
-        return tdelta.total_seconds()
+        try:
+            return tdelta.total_seconds()
+        except AttributeError:
+            raise AttributeError("timedelta_to_seconds only takes a datetime.timedelta object")
 
     def put(self, job, next_t=None):
         """Queue a new job.
