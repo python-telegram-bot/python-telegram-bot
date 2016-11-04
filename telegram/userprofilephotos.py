@@ -52,6 +52,8 @@ class UserProfilePhotos(TelegramObject):
         if not data:
             return None
 
+        data = super(UserProfilePhotos, UserProfilePhotos).de_json(data, bot)
+
         data['photos'] = [PhotoSize.de_list(photo, bot) for photo in data['photos']]
 
         return UserProfilePhotos(**data)

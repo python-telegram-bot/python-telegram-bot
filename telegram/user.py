@@ -77,6 +77,8 @@ class User(TelegramObject):
         if not data:
             return None
 
+        data = super(User, User).de_json(data, bot)
+
         return User(bot=bot, **data)
 
     def get_profile_photos(self, *args, **kwargs):
