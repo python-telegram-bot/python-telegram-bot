@@ -71,3 +71,6 @@ telegram.webp
 
 # original files from merges
 *.orig
+
+# Exclude .exrc file for Vim
+.exrc
