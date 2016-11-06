@@ -68,7 +68,7 @@ class File(TelegramObject):
     def download(self, custom_path=None, out=None):
         """
         Args:
-            custom_path (str): Custom path. Will be ignored out is not None.
+            custom_path (str): Custom path. Will be ignored if out is not None.
             out(func): An file-like function. Must be in wb.
 
         """
