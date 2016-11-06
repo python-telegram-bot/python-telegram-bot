@@ -93,8 +93,8 @@ class JobQueue(object):
             elif isinstance(interval, datetime.timedelta):
                 next_t = self.timedelta_to_seconds(interval)
             else:
-                raise ValueError("The interval argument should be of type datetime.timedelta, \
-                                 int or float")
+                raise ValueError("The interval argument should be of type datetime.timedelta,"
+                                 " int or float")
         elif isinstance(next_t, datetime.timedelta):
             next_t = self.timedelta_to_seconds(next_t)
 
