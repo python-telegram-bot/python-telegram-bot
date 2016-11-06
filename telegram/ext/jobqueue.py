@@ -22,6 +22,7 @@ import logging
 import time
 import warnings
 import datetime
+from numbers import number
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
 
@@ -91,7 +92,7 @@ class JobQueue(object):
         if next_t is None:
             interval = job.interval
 
-            if isinstance(interval, int) or isinstance(interval, float):
+            if isinstance(interval, number):
                 next_t = interval
             elif isinstance(interval, datetime.timedelta):
                 next_t = self.timedelta_to_seconds(interval)
