@@ -159,7 +159,7 @@ class ConversationHandler(Handler):
                 if state is None:
                     return False
 
-        # Get the handler list for current state, if we didn't find one yet and we're still here
+# Get the handler list for current state, if we didn't find one yet and we're still here
         if state is not None and not handler:
             handlers = self.states.get(state)
 
@@ -168,7 +168,7 @@ class ConversationHandler(Handler):
                     handler = candidate
                     break
 
-            # Find a fallback handler if all other handlers fail
+# Find a fallback handler if all other handlers fail
             else:
                 for fallback in self.fallbacks:
                     if fallback.check_update(update):
@@ -178,7 +178,7 @@ class ConversationHandler(Handler):
                 else:
                     return False
 
-        # Save the current user and the selected handler for handle_update
+# Save the current user and the selected handler for handle_update
         self.current_conversation = key
         self.current_handler = handler
 

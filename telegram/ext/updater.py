@@ -276,7 +276,7 @@ class Updater(object):
         if not url_path.startswith('/'):
             url_path = '/{0}'.format(url_path)
 
-        # Create and start server
+# Create and start server
         self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path,
                                    self.bot)
 

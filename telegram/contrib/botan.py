@@ -13,8 +13,8 @@ class Botan(object):
     """
 
     token = ''
-    url_template = 'https://api.botan.io/track?token={token}' \
-                   '&uid={uid}&name={name}&src=python-telegram-bot'
+    url_template = \
+        'https://api.botan.io/track?token={token}' '&uid={uid}&name={name}&src=python-telegram-bot'
 
     def __init__(self, token):
         self.token = token

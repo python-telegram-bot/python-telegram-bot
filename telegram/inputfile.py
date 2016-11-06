@@ -117,7 +117,7 @@ class InputFile(object):
                 form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
             ])
 
-        # Add input_file to upload
+# Add input_file to upload
         form.extend([
             form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' %
             (self.input_name,

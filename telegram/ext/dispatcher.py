@@ -231,8 +231,8 @@ class Dispatcher(object):
                 sleep(0.1)
             self.__stop_event.clear()
 
-        # async threads must be join()ed only after the dispatcher thread was joined,
-        # otherwise we can still have new async threads dispatched
+# async threads must be join()ed only after the dispatcher thread was joined,
+# otherwise we can still have new async threads dispatched
         threads = list(self.__async_threads)
         total = len(threads)
 
@@ -282,7 +282,7 @@ class Dispatcher(object):
                         finally:
                             break
 
-                    # Errors should not stop the thread
+# Errors should not stop the thread
                     except Exception:
                         self.logger.exception('An uncaught error was raised while '
                                               'processing the update')
@@ -373,7 +373,8 @@ class Dispatcher(object):
         for callback in self.error_handlers:
             callback(self.bot, update, error)
 
-    # old non-PEP8 Dispatcher methods
+# old non-PEP8 Dispatcher methods
+
     m = "telegram.dispatcher."
     addHandler = deprecate(add_handler, m + "AddHandler", m + "add_handler")
     removeHandler = deprecate(remove_handler, m + "removeHandler", m + "remove_handler")
