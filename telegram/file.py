@@ -79,3 +79,7 @@ class File(TelegramObject):
             filename = basename(url)
 
         self.bot.request.download(url, filename)
+
+    def downloadbytes(self):
+        url = self.file_path
+        return self.bot.request.downbytes(url)
