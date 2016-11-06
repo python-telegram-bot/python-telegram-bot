@@ -65,10 +65,11 @@ class File(TelegramObject):
 
         return File(bot=bot, **data)
 
-    def download(self, custom_path=None):
+    def download(self, custom_path=None, out=None):
         """
         Args:
-            custom_path (str):
+            custom_path (str): Custom path. Will be ignored out is not None.
+            out(func): An file-like function. Must be in wb.
 
         """
         url = self.file_path
@@ -77,14 +78,9 @@ class File(TelegramObject):
             filename = custom_path
         else:
             filename = basename(url)
-
-        self.bot.request.download(url, filename)
-
-    def downbyte(self, file):
-        """
-        Args:
-            file (func):a file-like object. Must be opened in wb mode.
-        """
-        url = self.file_path
-        buf = self.bot.request.downbyte(url)
-        file.write(buf)
+        if out:
+            url = self.file_path
+            buf = self.bot.request.downbyte(url)
+            out.write(buf)
+        else:
+            self.bot.request.download(url, filename)
