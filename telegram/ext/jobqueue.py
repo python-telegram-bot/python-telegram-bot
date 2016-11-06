@@ -22,12 +22,11 @@ import logging
 import time
 import warnings
 import datetime
-from enum import Enum
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
 
 
-class Days(Enum):
+class Days(object):
     mon = 0
     tue = 1
     wed = 2
@@ -35,6 +34,10 @@ class Days(Enum):
     fri = 4
     sat = 5
     sun = 6
+
+
+def get_days():
+    return tuple(Days.__dict__[i] for i in Days.__dict__ if i[0] != "_")
 
 
 class JobQueue(object):
@@ -153,7 +156,7 @@ class JobQueue(object):
             if job.enabled:
                 try:
                     for day in job.days:
-                        if Days(day).value == datetime.datetime.now().weekday():
+                        if day == datetime.datetime.now().weekday():
                             self.logger.debug('Running job %s', job.name)
                             job.run(self.bot)
 
@@ -249,22 +252,23 @@ class Job(object):
     """
     job_queue = None
 
-    def __init__(self,
-                 callback,
-                 interval,
-                 repeat=True,
-                 context=None,
-                 days=tuple(day for day in Days)):
+    def __init__(self, callback, interval, repeat=True, context=None, days=get_days()):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
         self.context = context
 
+        print(days)
+
         if not isinstance(days, tuple):
             raise ValueError("The 'days argument should be of type 'tuple'")
 
-        if not all(isinstance(day, Days) for day in days):
-            raise ValueError("The elements of the 'days' argument should be of type 'Days'")
+        if not all(isinstance(day, int) for day in days):
+            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+
+        if not all(day >= 0 and day <= 6 for day in days):
+            raise ValueError("The elements of the 'days' argument should be from 0 up to and "
+                             "including 6")
 
         self.days = days
         self.name = callback.__name__
