@@ -219,3 +219,11 @@ class Request(object):
         buf = self._request_wrapper('GET', url)
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
+
+    def downbyte(self, url):
+        """Download a file by its URL to bytes.
+        Args:
+          url:
+            The web location we want to retrieve.
+        """
+        return self._request_wrapper('GET', url)
