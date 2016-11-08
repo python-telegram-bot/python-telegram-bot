@@ -63,12 +63,6 @@ class JobQueue(object):
         """:type: float"""
         self._running = False
 
-    def timedelta_to_seconds(self, tdelta):
-        try:
-            return tdelta.total_seconds()
-        except AttributeError:
-            raise AttributeError("timedelta_to_seconds only takes a datetime.timedelta object")
-
     def put(self, job, next_t=None):
         """Queue a new job.
 
@@ -86,12 +80,12 @@ class JobQueue(object):
             if isinstance(interval, Number):
                 next_t = interval
             elif isinstance(interval, datetime.timedelta):
-                next_t = self.timedelta_to_seconds(interval)
+                next_t = interval.total_seconds()
             else:
                 raise ValueError("The interval argument should be of type datetime.timedelta,"
                                  " int or float")
         elif isinstance(next_t, datetime.timedelta):
-            next_t = self.timedelta_to_seconds(next_t)
+            next_t = next_t.total_second()
 
         now = time.time()
         next_t += now
