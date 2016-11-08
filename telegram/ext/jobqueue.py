@@ -29,7 +29,7 @@ from queue import PriorityQueue, Empty
 
 class Days(object):
     MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
-    ALL_DAYS = tuple(range(7))
+    EVERY_DAY = tuple(range(7))
 
 
 class JobQueue(object):
@@ -141,11 +141,10 @@ class JobQueue(object):
 
             if job.enabled:
                 try:
-                    for day in job.days:
-                        if day == datetime.datetime.now().weekday():
-                            self.logger.debug('Running job %s', job.name)
-                            job.run(self.bot)
-
+                    current_week_day = datetime.datetime.now().weekday()
+                    if any(day == current_week_day for day in job.days):
+                        self.logger.debug('Running job %s', job.name)
+                        job.run(self.bot)
                 except:
                     self.logger.exception('An uncaught error was raised while executing job %s',
                                           job.name)
@@ -238,7 +237,7 @@ class Job(object):
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None, days=Days.ALL_DAYS):
+    def __init__(self, callback, interval, repeat=True, context=None, days=Days.EVERY_DAY):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
