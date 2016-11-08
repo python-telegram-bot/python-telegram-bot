@@ -28,13 +28,13 @@ from queue import PriorityQueue, Empty
 
 
 class Days(object):
-    mon = 0
-    tue = 1
-    wed = 2
-    thu = 3
-    fri = 4
-    sat = 5
-    sun = 6
+    MON = 0
+    TUE = 1
+    WED = 2
+    THU = 3
+    FRI = 4
+    SAT = 5
+    SUN = 6
 
 
 def get_days():
