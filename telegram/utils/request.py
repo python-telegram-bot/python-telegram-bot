@@ -150,6 +150,8 @@ class Request(object):
             raise Unauthorized()
         elif resp.status == 400:
             raise BadRequest(repr(message))
+        elif resp.status == 404:
+            raise TelegramError('Invalid server response')
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
