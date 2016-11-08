@@ -28,17 +28,8 @@ from queue import PriorityQueue, Empty
 
 
 class Days(object):
-    MON = 0
-    TUE = 1
-    WED = 2
-    THU = 3
-    FRI = 4
-    SAT = 5
-    SUN = 6
-
-
-def get_days():
-    return tuple(Days.__dict__[i] for i in Days.__dict__ if i[0] != "_")
+    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
+    ALL_DAYS = tuple(range(7))
 
 
 class JobQueue(object):
@@ -253,7 +244,7 @@ class Job(object):
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None, days=get_days()):
+    def __init__(self, callback, interval, repeat=True, context=None, days=Days.ALL_DAYS):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
