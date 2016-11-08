@@ -69,8 +69,8 @@ class JobQueue(object):
         Args:
             job (telegram.ext.Job): The ``Job`` instance representing the new job
             next_t (Optional[int, float, datetime.timedelta]): Time in which the job
-                should be executed first. Defaults to ``job.interval``. `int` and `float` will be
-                interpreted as seconds.
+                should be executed first. Defaults to ``job.interval``. ``int`` and ``float``
+                will be interpreted as seconds.
 
         """
         job.job_queue = self
@@ -228,7 +228,7 @@ class Job(object):
             take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
             can be used to terminate the job or modify its interval.
         interval ([int, float, datetime.timedelta]): The interval in which the job will execute its
-            callback function. `int` and `float` will be interpreted as seconds.
+            callback function. ``int`` and ``float`` will be interpreted as seconds.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
             (``True``) or only once (``False``). Defaults to ``True``
         context (Optional[object]): Additional data needed for the callback function. Can be
