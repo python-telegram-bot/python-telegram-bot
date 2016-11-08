@@ -243,8 +243,6 @@ class Job(object):
         self.repeat = repeat
         self.context = context
 
-        print(days)
-
         if not isinstance(days, tuple):
             raise ValueError("The 'days argument should be of type 'tuple'")
 
