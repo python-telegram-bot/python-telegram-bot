@@ -206,6 +206,14 @@ class Request(object):
 
         return self._parse(result)
 
+    def retrieve(self, url):
+        """Retrieve the contents of a file by its URL.
+        Args:
+          url:
+            The web location we want to retrieve.
+        """
+        return self._request_wrapper('GET', url)
+
     def download(self, url, filename):
         """Download a file by its URL.
         Args:
@@ -216,14 +224,7 @@ class Request(object):
             The filename within the path to download the file.
 
         """
-        buf = self._request_wrapper('GET', url)
+        buf = self.retrieve(url)
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
 
-    def downbyte(self, url):
-        """Download a file by its URL to bytes.
-        Args:
-          url:
-            The web location we want to retrieve.
-        """
-        return self._request_wrapper('GET', url)

@@ -67,20 +67,34 @@ class File(TelegramObject):
 
     def download(self, custom_path=None, out=None):
         """
-        Args:
-            custom_path (str): Custom path. Will be ignored if out is not None.
-            out(func): An file-like function. Must be in wb.
+        Download this file. By default, the file is saved in the current working directory with its
+        original filename as reported by Telegram. If a ``custom_path`` is supplied, it will be
+        saved to that path instead. If ``out`` is defined, the file contents will be saved to that
+        object using the ``out.write`` method. ``custom_path`` and ``out`` are mutually exclusive.
 
+        Keyword Args:
+            custom_path (Optional[str]): Custom path.
+            out (Optional[object]): A file-like object. Must be opened in binary mode, if 
+                applicable.
+
+        Raises:
+            ValueError: If both ``custom_path`` and ``out`` are passed.
         """
+        
+        if custom_path is not None and out is not None:
+            raise ValueError('custom_path and out are mutually exclusive')
+        
         url = self.file_path
 
-        if custom_path:
-            filename = custom_path
-        else:
-            filename = basename(url)
         if out:
-            url = self.file_path
-            buf = self.bot.request.downbyte(url)
+            buf = self.bot.request.retrieve(url)
             out.write(buf)
+
         else:
+            if custom_path:
+                filename = custom_path
+            else:
+                filename = basename(url)
+
             self.bot.request.download(url, filename)
+
