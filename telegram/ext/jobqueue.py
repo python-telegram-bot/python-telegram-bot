@@ -68,8 +68,8 @@ class JobQueue(object):
 
         Args:
             job (telegram.ext.Job): The ``Job`` instance representing the new job
-            next_t (Optional[float]): Time in seconds in which the job should be executed first.
-                Defaults to ``job.interval``
+            next_t (Optional[float, datetime.timedelta]): Time in seconds in which the job should
+                be executed first. Defaults to ``job.interval``
 
         """
         job.job_queue = self
