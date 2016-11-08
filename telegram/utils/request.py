@@ -31,8 +31,8 @@ import urllib3
 from urllib3.connection import HTTPConnection
 
 from telegram import (InputFile, TelegramError)
-from telegram.error import Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated, \
-    RetryAfter
+from telegram.error import Unauthorized, InvalidToken, NetworkError, TimedOut, BadRequest, \
+    ChatMigrated, RetryAfter
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -151,7 +151,7 @@ class Request(object):
         elif resp.status == 400:
             raise BadRequest(repr(message))
         elif resp.status == 404:
-            raise TelegramError('Invalid server response')
+            raise InvalidToken()
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
