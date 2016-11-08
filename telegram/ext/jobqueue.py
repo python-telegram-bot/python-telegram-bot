@@ -226,7 +226,7 @@ class Job(object):
         callback (function): The callback function that should be executed by the Job. It should
             take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
             can be used to terminate the job or modify its interval.
-        interval (float or datetime.time): The interval in which this job should execute its
+        interval (float or datetime.timedelta): The interval in which this job should execute its
             callback function in seconds.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
             (``True``) or only once (``False``). Defaults to ``True``
