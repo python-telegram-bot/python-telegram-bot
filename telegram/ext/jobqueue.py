@@ -21,8 +21,15 @@
 import logging
 import time
 import warnings
+import datetime
+from numbers import Number
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
+
+
+class Days(object):
+    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
+    EVERY_DAY = tuple(range(7))
 
 
 class JobQueue(object):
@@ -61,14 +68,25 @@ class JobQueue(object):
 
         Args:
             job (telegram.ext.Job): The ``Job`` instance representing the new job
-            next_t (Optional[float]): Time in seconds in which the job should be executed first.
-                Defaults to ``job.interval``
+            next_t (Optional[int, float, datetime.timedelta]): Time in which the job
+                should be executed first. Defaults to ``job.interval``. ``int`` and ``float``
+                will be interpreted as seconds.
 
         """
         job.job_queue = self
 
         if next_t is None:
-            next_t = job.interval
+            interval = job.interval
+
+            if isinstance(interval, Number):
+                next_t = interval
+            elif isinstance(interval, datetime.timedelta):
+                next_t = interval.total_seconds()
+            else:
+                raise ValueError("The interval argument should be of type datetime.timedelta,"
+                                 " int or float")
+        elif isinstance(next_t, datetime.timedelta):
+            next_t = next_t.total_second()
 
         now = time.time()
         next_t += now
@@ -123,11 +141,11 @@ class JobQueue(object):
                 continue
 
             if job.enabled:
-                self.logger.debug('Running job %s', job.name)
-
                 try:
-                    job.run(self.bot)
-
+                    current_week_day = datetime.datetime.now().weekday()
+                    if any(day == current_week_day for day in job.days):
+                        self.logger.debug('Running job %s', job.name)
+                        job.run(self.bot)
                 except:
                     self.logger.exception('An uncaught error was raised while executing job %s',
                                           job.name)
@@ -200,6 +218,7 @@ class Job(object):
     Attributes:
         callback (function):
         interval (float):
+        days: (tuple)
         repeat (bool):
         name (str):
         enabled (bool): Boolean property that decides if this job is currently active
@@ -208,22 +227,34 @@ class Job(object):
         callback (function): The callback function that should be executed by the Job. It should
             take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
             can be used to terminate the job or modify its interval.
-        interval (float): The interval in which this job should execute its callback function in
-            seconds.
+        interval ([int, float, datetime.timedelta]): The interval in which the job will execute its
+            callback function. ``int`` and ``float`` will be interpreted as seconds.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
             (``True``) or only once (``False``). Defaults to ``True``
         context (Optional[object]): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to ``None``
+        days (Tuple): Defines on which days the job should be ran.
 
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None):
+    def __init__(self, callback, interval, repeat=True, context=None, days=Days.EVERY_DAY):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
         self.context = context
 
+        if not isinstance(days, tuple):
+            raise ValueError("The 'days argument should be of type 'tuple'")
+
+        if not all(isinstance(day, int) for day in days):
+            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+
+        if not all(day >= 0 and day <= 6 for day in days):
+            raise ValueError("The elements of the 'days' argument should be from 0 up to and "
+                             "including 6")
+
+        self.days = days
         self.name = callback.__name__
         self._remove = Event()
         self._enabled = Event()
