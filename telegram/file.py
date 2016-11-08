@@ -74,16 +74,16 @@ class File(TelegramObject):
 
         Keyword Args:
             custom_path (Optional[str]): Custom path.
-            out (Optional[object]): A file-like object. Must be opened in binary mode, if 
+            out (Optional[object]): A file-like object. Must be opened in binary mode, if
                 applicable.
 
         Raises:
             ValueError: If both ``custom_path`` and ``out`` are passed.
         """
-        
+
         if custom_path is not None and out is not None:
             raise ValueError('custom_path and out are mutually exclusive')
-        
+
         url = self.file_path
 
         if out:
