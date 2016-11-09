@@ -13,6 +13,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
+- `Eugene Lisitsky <https://github.com/lisitsky>`_
 - `franciscod <https://github.com/franciscod>`_
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
