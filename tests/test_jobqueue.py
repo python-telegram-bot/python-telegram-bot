@@ -23,6 +23,9 @@ This module contains an object that represents Tests for JobQueue
 import logging
 import sys
 import unittest
+import datetime
+import time
+from math import ceil
 from time import sleep
 
 from tests.test_updater import MockBot
@@ -53,10 +56,14 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.jq = JobQueue(MockBot('jobqueue_test'))
         self.jq.start()
         self.result = 0
+        self.job_time = 0
 
     def tearDown(self):
         if self.jq is not None:
             self.jq.stop()
+
+    def getSeconds(self):
+        return int(ceil(time.time()))
 
     def job1(self, bot, job):
         self.result += 1
@@ -70,6 +77,9 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def job4(self, bot, job):
         self.result += job.context
+
+    def job5(self, bot, job):
+        self.job_time = self.getSeconds()
 
     def test_basic(self):
         self.jq.put(Job(self.job1, 0.1))
@@ -168,6 +178,25 @@ class JobQueueTest(BaseTest, unittest.TestCase):
             self.assertEqual(1, self.result)
         finally:
             u.stop()
+
+    def test_time_unit_int(self):
+        # Testing seconds in int
+        seconds_interval = 5
+        expected_time = self.getSeconds() + seconds_interval
+
+        self.jq.put(Job(self.job5, seconds_interval, repeat=False))
+        sleep(6)
+        self.assertEqual(self.job_time, expected_time)
+
+    def test_time_unit_dt_time(self):
+        # Testing seconds, minutes and hours as datetime.timedelta object
+        # This is sufficient to test that it actually works.
+        interval = datetime.timedelta(seconds=5)
+        expected_time = self.getSeconds() + interval.total_seconds()
+
+        self.jq.put(Job(self.job5, interval, repeat=False))
+        sleep(6)
+        self.assertEqual(self.job_time, expected_time)
 
 
 if __name__ == '__main__':

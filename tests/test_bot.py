@@ -227,7 +227,7 @@ class BotTest(BaseTest, unittest.TestCase):
             bot.getMe()
 
     def testInvalidSrvResp(self):
-        with self.assertRaisesRegexp(telegram.TelegramError, 'Invalid server response'):
+        with self.assertRaisesRegexp(telegram.error.InvalidToken, 'Invalid token'):
             # bypass the valid token check
             newbot_cls = type(
                 'NoTokenValidateBot', (telegram.Bot,), dict(_validate_token=lambda x, y: None))
