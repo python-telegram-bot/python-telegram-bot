@@ -107,6 +107,13 @@ class Filters(object):
         def filter(self, message):
             return bool(message.text and message.text.startswith('/'))
 
+    class _Reply(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.reply_to_message)
+
+    reply = _Reply()
+
     command = _Command()
 
     class _Audio(BaseFilter):
