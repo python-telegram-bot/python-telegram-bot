@@ -39,6 +39,7 @@ class Message(TelegramObject):
         date (:class:`datetime.datetime`):
         forward_from (:class:`telegram.User`):
         forward_from_chat (:class:`telegram.Chat`):
+        forward_from_message_id (int):
         forward_date (:class:`datetime.datetime`):
         reply_to_message (:class:`telegram.Message`):
         edit_date (:class:`datetime.datetime`):
@@ -76,11 +77,9 @@ class Message(TelegramObject):
         from_user (:class:`telegram.User`):
         date (:class:`datetime.datetime`):
         chat (:class:`telegram.Chat`):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         forward_from (Optional[:class:`telegram.User`]):
-        forward_from_chat (:class:`telegram.Chat`):
+        forward_from_chat (Optional[:class:`telegram.Chat`]):
+        forward_from_message_id (Optional[int]):
         forward_date (Optional[:class:`datetime.datetime`]):
         reply_to_message (Optional[:class:`telegram.Message`]):
         edit_date (Optional[:class:`datetime.datetime`]):
@@ -141,6 +140,7 @@ class Message(TelegramObject):
                  migrate_from_chat_id=0,
                  channel_chat_created=False,
                  pinned_message=None,
+                 forward_from_message_id=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -178,6 +178,7 @@ class Message(TelegramObject):
         self.migrate_from_chat_id = int(migrate_from_chat_id)
         self.channel_chat_created = bool(channel_chat_created)
         self.pinned_message = pinned_message
+        self.forward_from_message_id = forward_from_message_id
 
         self.bot = bot
 
