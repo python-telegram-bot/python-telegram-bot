@@ -21,6 +21,7 @@
 
 import functools
 import logging
+import warnings
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
@@ -1434,8 +1435,31 @@ class Bot(TelegramObject):
                      message_id=None,
                      inline_message_id=None,
                      edit_message=None,
+                     force=None,
+                     disable_edit_message=None,
                      **kwargs):
         """Use this method to set the score of the specified user in a game.
+
+        Args:
+            user_id (int): User identifier.
+            score (int): New score, must be non-negative.
+            chat_id (Optional[int|str]): Required if `inline_message_id` is not specified. Unique
+                identifier for the target chat (or username of the target channel in the format
+                `@channelusername`)
+            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
+                of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            force (Optional[bool]): Pass True, if the high score is allowed to decrease. This can
+                be useful when fixing mistakes or banning cheaters.
+            disable_edit_message (Optional[bool]): Pass True, if the game message should not be
+                automatically edited to include the current scoreboard.
+            edit_message (Optional[bool]): Deprecated. Has the opposite logic for
+                `disable_edit_message`.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
+                (in seconds) for urlopen() operations.
 
         Returns:
             :class:`telegram.Message` or True: The edited message, or if the
@@ -1452,8 +1476,16 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
-        if edit_message:
-            data['edit_message'] = edit_message
+        if force is not None:
+            data['force'] = force
+        if disable_edit_message is not None:
+            data['disable_edit_message'] = disable_edit_message
+        if edit_message is not None:
+            warnings.warn('edit_message is deprecated, use disable_edit_message instead')
+            if disable_edit_message is None:
+                data['edit_message'] = edit_message
+            else:
+                warnings.warn('edit_message is ignored when disable_edit_message is used')
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
         if result is True:
