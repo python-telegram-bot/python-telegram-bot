@@ -988,6 +988,7 @@ class Bot(TelegramObject):
                             text=None,
                             show_alert=False,
                             url=None,
+                            cache_time=None,
                             timeout=None,
                             **kwargs):
         """Use this method to send answers to callback queries sent from inline keyboards. The
@@ -1000,9 +1001,12 @@ class Bot(TelegramObject):
                 to the user.
             show_alert (Optional[bool]): If `True`, an alert will be shown by the client instead of
                 a notification at the top of the chat screen. Defaults to `False`.
+            url (Optional[str]): URL that will be opened by the user's client.
+            cache_time (Optional[int]): The maximum amount of time in seconds that the result of
+                the callback query may be cached client-side. Telegram apps will support caching
+                starting in version 3.14. Defaults to 0.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
-            url (Optional[str]): URL that will be opened by the user's client.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1022,6 +1026,8 @@ class Bot(TelegramObject):
             data['show_alert'] = show_alert
         if url:
             data['url'] = url
+        if cache_time is not None:
+            data['cache_time'] = cache_time
 
         result = self._request.post(url_, data, timeout=timeout)
 
