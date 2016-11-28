@@ -1,7 +1,7 @@
-telegram.replykeyboardhide module
+telegram.replykeyboardremove module
 =================================
 
-.. automodule:: telegram.replykeyboardhide
+.. automodule:: telegram.replykeyboardremove
     :members:
     :undoc-members:
     :show-inheritance:

@@ -16,30 +16,31 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-ReplyKeyboardHide."""
+"""This module contains an object that represents a Telegram ReplyKeyboardRemove."""
 
 from telegram import ReplyMarkup
 
 
-class ReplyKeyboardHide(ReplyMarkup):
-    """This object represents a Telegram ReplyKeyboardHide.
+class ReplyKeyboardRemove(ReplyMarkup):
+    """This object represents a Telegram ReplyKeyboardRemove.
 
     Attributes:
-        hide_keyboard (bool):
+        remove_keyboard (bool): Always True.
         selective (bool):
 
     Args:
-        hide_keyboard (bool):
+        selective (Optional[bool]): Use this parameter if you want to remove the keyboard for
+            specific users only. Targets:
+                1) users that are @mentioned in the text of the Message object;
+                2) if the bot's message is a reply (has reply_to_message_id), sender of the
+                    original message.
         **kwargs: Arbitrary keyword arguments.
 
-    Keyword Args:
-        selective (Optional[bool]):
     """
 
-    def __init__(self, hide_keyboard=True, selective=False, **kwargs):
+    def __init__(self, selective=False, **kwargs):
         # Required
-        self.hide_keyboard = bool(hide_keyboard)
+        self.remove_keyboard = True
         # Optionals
         self.selective = bool(selective)
 
@@ -51,9 +52,10 @@ class ReplyKeyboardHide(ReplyMarkup):
             bot(telegram.Bot):
 
         Returns:
-            telegram.ReplyKeyboardHide:
+            telegram.ReplyKeyboardRemove
+
         """
         if not data:
             return None
 
-        return ReplyKeyboardHide(**data)
+        return ReplyKeyboardRemove(**data)

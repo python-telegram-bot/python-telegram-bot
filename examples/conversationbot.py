@@ -17,7 +17,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardHide)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
 
@@ -49,7 +49,7 @@ def gender(bot, update):
     logger.info("Gender of %s: %s" % (user.first_name, update.message.text))
     update.message.reply_text('I see! Please send me a photo of yourself, '
                               'so I know what you look like, or send /skip if you don\'t want to.',
-                              reply_markup=ReplyKeyboardHide())
+                              reply_markup=ReplyKeyboardRemove())
 
     return PHOTO
 
@@ -106,7 +106,7 @@ def cancel(bot, update):
     user = update.message.from_user
     logger.info("User %s canceled the conversation." % user.first_name)
     update.message.reply_text('Bye! I hope we can talk again some day.',
-                              reply_markup=ReplyKeyboardHide())
+                              reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
 
