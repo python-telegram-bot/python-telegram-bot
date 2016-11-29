@@ -291,6 +291,16 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_forward_channel_messgae(self):
+        text = 'test forward message'
+        msg = self._bot.sendMessage(self._channel_id, text)
+        self.assertEqual(text, msg.text)
+        fwdmsg = msg.forward(self._chat_id)
+        self.assertEqual(text, fwdmsg.text)
+        self.assertEqual(fwdmsg.forward_from_message_id, msg.message_id)
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_get_webhook_info(self):
         url = 'https://python-telegram-bot.org/test/webhook'
         self._bot.set_webhook(url)
