@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
-
 from telegram import ReplyMarkup
+from telegram.utils.deprecate import warn_deprecate_obj
 
 
 class ReplyKeyboardRemove(ReplyMarkup):
@@ -59,3 +59,12 @@ class ReplyKeyboardRemove(ReplyMarkup):
             return None
 
         return ReplyKeyboardRemove(**data)
+
+
+class ReplyKeyboardHide(object):
+
+    def __new__(cls, hide_keyboard=True, selective=False, **kwargs):
+        warn_deprecate_obj(ReplyKeyboardHide.__name__, ReplyKeyboardRemove.__name__)
+        obj = ReplyKeyboardRemove.__new__(ReplyKeyboardRemove, selective)
+        obj.__init__(selective)
+        return obj
