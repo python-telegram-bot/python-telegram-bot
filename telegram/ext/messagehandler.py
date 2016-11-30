@@ -32,8 +32,8 @@ class MessageHandler(Handler):
 
     Args:
         filters (telegram.ext.BaseFilter): A filter inheriting from
-            :class:`telegram.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.filters.Filters`. Filters can be combined using bitwise
+            :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
+            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
             operators (& for and, | for or).
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
@@ -51,6 +51,11 @@ class MessageHandler(Handler):
             ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
             can use to keep any data related to the chat that the update was sent in.
             For each update in the same chat, it will be the same ``dict``. Default is ``False``.
+        message_updates (Optional[bool]): Should "normal" message updates be handled? Default is
+            ``True``.
+        channel_posts_updates (Optional[bool]): Should channel posts updates be handled? Default is
+            ``True``.
+
     """
 
     def __init__(self,
@@ -60,7 +65,12 @@ class MessageHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 message_updates=True,
+                 channel_posts_updates=True):
+        if not message_updates and not channel_posts_updates:
+            raise ValueError('Both message_updates & channel_post_updates are False')
+
         super(MessageHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -69,6 +79,8 @@ class MessageHandler(Handler):
             pass_chat_data=pass_chat_data)
         self.filters = filters
         self.allow_edited = allow_edited
+        self.message_updates = message_updates
+        self.channel_posts_updates = channel_posts_updates
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -77,15 +89,24 @@ class MessageHandler(Handler):
                           'deprecated, please use bitwise operators (& and |) '
                           'instead. More info: https://git.io/vPTbc.')
 
+    def _is_allowed_message(self, update):
+        return (self.message_updates
+                and (update.message or (update.edited_message and self.allow_edited)))
+
+    def _is_allowed_channel_post(self, update):
+        return (self.channel_posts_updates
+                and (update.channel_post or (update.edited_channel_post and self.allow_edited)))
+
     def check_update(self, update):
         if (isinstance(update, Update)
-                and (update.message or update.edited_message and self.allow_edited)):
+                and (self._is_allowed_message(update) or self._is_allowed_channel_post(update))):
 
             if not self.filters:
                 res = True
 
             else:
-                message = update.message or update.edited_message
+                message = (update.message or update.edited_message or update.channel_post
+                           or update.edited_channel_post)
                 if isinstance(self.filters, list):
                     res = any(func(message) for func in self.filters)
                 else:
