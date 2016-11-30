@@ -14,5 +14,10 @@ def print_ver_info():
     print('future {0}'.format(future.__version__))
     print('Python {0}'.format(sys.version.replace('\n', ' ')))
 
-# main
-print_ver_info()
+
+def main():
+    print_ver_info()
+
+
+if __name__ == '__main__':
+    main()
