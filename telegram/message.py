@@ -494,7 +494,7 @@ class Message(TelegramObject):
             therefore this method can only be used on the
             return value of the ``bot.send_*`` family of methods.
         """
-        return self.bot.edit_message_caption(
+        return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def parse_entity(self, entity):
