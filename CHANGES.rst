@@ -2,6 +2,17 @@
 Changes
 =======
 
+**2016-12-11**
+
+*Released 5.3*
+
+- Implement API changes of November 21st (Bot API 2.3)
+- ``JobQueue`` now supports ``datetime.timedelta`` in addition to seconds
+- ``JobQueue`` now supports running jobs only on certain days
+- New ``Filters.reply`` filter
+- Bugfix for ``Message.edit_reply_markup``
+- Other bugfixes
+
 **2016-10-25**
 
 *Released 5.2*

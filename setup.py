@@ -30,7 +30,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           license='LGPLv3',
           url='https://python-telegram-bot.org/',
           keywords='python telegram bot api wrapper',
-          description='Not just a Python wrapper around the Telegram Bot API',
+          description="We have made you a wrapper you can't refuse",
           long_description=fd.read(),
           packages=find_packages(exclude=['tests*']),
           install_requires=requirements(),
