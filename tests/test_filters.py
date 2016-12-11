@@ -51,6 +51,14 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.text = '/test'
         self.assertTrue(Filters.command(self.message))
 
+    def test_filters_reply(self):
+        another_message = Message(1, User(1, "TestOther"), datetime.now(), Chat(0, 'private'))
+        self.message.text = 'test'
+        self.assertFalse(Filters.reply(self.message))
+        self.assertFalse(Filters.reply(Filters.message))
+        self.message.reply_to_message = another_message
+        self.assertTrue(Filters.reply(self.message))
+
     def test_filters_audio(self):
         self.message.audio = 'test'
         self.assertTrue(Filters.audio(self.message))
