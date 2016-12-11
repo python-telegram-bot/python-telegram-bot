@@ -1,5 +1,5 @@
 telegram.replykeyboardremove module
-=================================
+===================================
 
 .. automodule:: telegram.replykeyboardremove
     :members:
