@@ -47,20 +47,26 @@ class ConstantsTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testMaxCaptionLength(self):
-        self._bot.sendPhoto(
+        good_caption = 'a' * telegram.constants.MAX_CAPTION_LENGTH
+        good_msg = self._bot.sendPhoto(
             photo=open('tests/data/telegram.png', 'rb'),
-            caption='a' * telegram.constants.MAX_CAPTION_LENGTH,
+            caption=good_caption,
             chat_id=self._chat_id)
+        self.assertEqual(good_msg.caption, good_caption)
 
+        bad_caption = good_caption + 'Z'
         try:
-            self._bot.sendPhoto(
+            bad_msg = self._bot.sendPhoto(
                 photo=open('tests/data/telegram.png', 'rb'),
                 caption='a' * (telegram.constants.MAX_CAPTION_LENGTH + 1),
                 chat_id=self._chat_id)
         except BadRequest as e:
+            # This used to be the way long caption was handled before Oct? Nov? 2016
             err = str(e)
-
-        self.assertTrue("TOO_LONG" in err)  # BadRequest: 'MEDIA_CAPTION_TOO_LONG'
+            self.assertTrue("TOO_LONG" in err)  # BadRequest: 'MEDIA_CAPTION_TOO_LONG'
+        else:
+            self.assertNotEqual(bad_msg.caption, bad_caption)
+            self.assertEqual(len(bad_msg.caption), telegram.constants.MAX_CAPTION_LENGTH)
 
 
 if __name__ == '__main__':

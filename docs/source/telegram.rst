@@ -62,7 +62,7 @@ Submodules
    telegram.messageentity
    telegram.parsemode
    telegram.photosize
-   telegram.replykeyboardhide
+   telegram.replykeyboardremove
    telegram.replykeyboardmarkup
    telegram.replymarkup
    telegram.sticker

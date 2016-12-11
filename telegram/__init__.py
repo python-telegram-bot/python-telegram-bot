@@ -38,7 +38,7 @@ from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
-from .replykeyboardhide import ReplyKeyboardHide
+from .replykeyboardremove import ReplyKeyboardRemove, ReplyKeyboardHide
 from .forcereply import ForceReply
 from .error import TelegramError
 from .inputfile import InputFile
@@ -106,9 +106,9 @@ __all__ = [
     'InlineQueryResultVoice', 'InlineQueryResultGame', 'InputContactMessageContent', 'InputFile',
     'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
     'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
-    'ParseMode', 'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup', 'ReplyMarkup', 'Sticker',
-    'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue', 'Video',
-    'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
+    'ParseMode', 'PhotoSize', 'ReplyKeyboardRemove', 'ReplyKeyboardMarkup', 'ReplyMarkup',
+    'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
+    'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
     'Game', 'GameHighScore'

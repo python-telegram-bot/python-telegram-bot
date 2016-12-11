@@ -34,6 +34,9 @@ import telegram
 from telegram.error import BadRequest
 from tests.base import BaseTest, timeout
 
+BASE_TIME = time.time()
+HIGHSCORE_DELTA = 1450000000
+
 
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
@@ -288,6 +291,16 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_forward_channel_messgae(self):
+        text = 'test forward message'
+        msg = self._bot.sendMessage(self._channel_id, text)
+        self.assertEqual(text, msg.text)
+        fwdmsg = msg.forward(self._chat_id)
+        self.assertEqual(text, fwdmsg.text)
+        self.assertEqual(fwdmsg.forward_from_message_id, msg.message_id)
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_get_webhook_info(self):
         url = 'https://python-telegram-bot.org/test/webhook'
         self._bot.set_webhook(url)
@@ -297,23 +310,88 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_set_game_score(self):
-        # We need a game to set the score for
+    def test_set_game_score1(self):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
         game_short_name = 'python_telegram_bot_test_game'
         game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
 
         message = self._bot.set_game_score(
             user_id=self._chat_id,
-            score=int(time.time() - 1450000000),
+            score=int(BASE_TIME) - HIGHSCORE_DELTA,
             chat_id=game.chat_id,
-            message_id=game.message_id,
-            edit_message=True)
+            message_id=game.message_id)
 
         self.assertTrue(self.is_json(game.to_json()))
         self.assertEqual(message.game.description, game.game.description)
         self.assertEqual(message.game.animation.file_id, game.game.animation.file_id)
         self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
         self.assertNotEqual(message.game.text, game.game.text)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score2(self):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
+
+        message = self._bot.set_game_score(
+            user_id=self._chat_id,
+            score=score,
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+            disable_edit_message=True)
+
+        self.assertTrue(self.is_json(game.to_json()))
+        self.assertEqual(message.game.description, game.game.description)
+        self.assertEqual(message.game.animation.file_id, game.game.animation.file_id)
+        self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
+        self.assertEqual(message.game.text, game.game.text)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score3(self):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
+
+        with self.assertRaises(BadRequest) as cm:
+            self._bot.set_game_score(
+                user_id=self._chat_id,
+                score=score,
+                chat_id=game.chat_id,
+                message_id=game.message_id)
+
+        self.assertTrue('BOT_SCORE_NOT_MODIFIED' in cm.exception.message)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_set_game_score4(self):
+        # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
+        game_short_name = 'python_telegram_bot_test_game'
+        game = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+
+        score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
+
+        message = self._bot.set_game_score(
+            user_id=self._chat_id,
+            score=score,
+            chat_id=game.chat_id,
+            message_id=game.message_id,
+            force=True)
+
+        self.assertTrue(self.is_json(game.to_json()))
+        self.assertEqual(message.game.description, game.game.description)
+        self.assertEqual(message.game.animation.file_id, game.game.animation.file_id)
+        self.assertEqual(message.game.photo[0].file_size, game.game.photo[0].file_size)
+
+        # For some reason the returned message does not contain the updated score. need to fetch
+        # the game again...
+        game2 = self._bot.sendGame(game_short_name=game_short_name, chat_id=self._chat_id)
+        self.assertIn(str(score), game2.game.text)
 
     @flaky(3, 1)
     @timeout(10)

@@ -21,6 +21,7 @@
 
 import functools
 import logging
+import warnings
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
@@ -208,7 +209,7 @@ class Bot(TelegramObject):
                 ID of the original message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
                 interface options. A JSON-serialized object for an inline
-                keyboard, custom reply keyboard, instructions to hide reply
+                keyboard, custom reply keyboard, instructions to remove reply
                 keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
@@ -299,7 +300,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -360,7 +361,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -415,7 +416,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -461,7 +462,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -508,7 +509,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
 
@@ -561,7 +562,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -607,7 +608,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -656,7 +657,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -710,7 +711,7 @@ class Bot(TelegramObject):
                 message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -749,7 +750,7 @@ class Bot(TelegramObject):
                 ID of the original message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options.
                 A JSON-serialized object for an inline keyboard, custom reply keyboard,
-                instructions to hide reply keyboard or to force a reply from the user.
+                instructions to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as
                 the definitive timeout (in seconds) for urlopen() operations.
 
@@ -987,6 +988,7 @@ class Bot(TelegramObject):
                             text=None,
                             show_alert=False,
                             url=None,
+                            cache_time=None,
                             timeout=None,
                             **kwargs):
         """Use this method to send answers to callback queries sent from inline keyboards. The
@@ -999,9 +1001,12 @@ class Bot(TelegramObject):
                 to the user.
             show_alert (Optional[bool]): If `True`, an alert will be shown by the client instead of
                 a notification at the top of the chat screen. Defaults to `False`.
+            url (Optional[str]): URL that will be opened by the user's client.
+            cache_time (Optional[int]): The maximum amount of time in seconds that the result of
+                the callback query may be cached client-side. Telegram apps will support caching
+                starting in version 3.14. Defaults to 0.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
-            url (Optional[str]): URL that will be opened by the user's client.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1021,6 +1026,8 @@ class Bot(TelegramObject):
             data['show_alert'] = show_alert
         if url:
             data['url'] = url
+        if cache_time is not None:
+            data['cache_time'] = cache_time
 
         result = self._request.post(url_, data, timeout=timeout)
 
@@ -1054,7 +1061,7 @@ class Bot(TelegramObject):
             reply_markup: A JSON-serialized object for an inline keyboard.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to hide reply keyboard or to force a reply from the user.
+                to remove reply keyboard or to force a reply from the user.
             timeout (Optional[float]): If this value is specified, use it as the definitive timeout
                 (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
@@ -1434,8 +1441,31 @@ class Bot(TelegramObject):
                      message_id=None,
                      inline_message_id=None,
                      edit_message=None,
+                     force=None,
+                     disable_edit_message=None,
                      **kwargs):
         """Use this method to set the score of the specified user in a game.
+
+        Args:
+            user_id (int): User identifier.
+            score (int): New score, must be non-negative.
+            chat_id (Optional[int|str]): Required if `inline_message_id` is not specified. Unique
+                identifier for the target chat (or username of the target channel in the format
+                `@channelusername`)
+            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
+                of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            force (Optional[bool]): Pass True, if the high score is allowed to decrease. This can
+                be useful when fixing mistakes or banning cheaters.
+            disable_edit_message (Optional[bool]): Pass True, if the game message should not be
+                automatically edited to include the current scoreboard.
+            edit_message (Optional[bool]): Deprecated. Has the opposite logic for
+                `disable_edit_message`.
+
+        Keyword Args:
+            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
+                (in seconds) for urlopen() operations.
 
         Returns:
             :class:`telegram.Message` or True: The edited message, or if the
@@ -1452,8 +1482,16 @@ class Bot(TelegramObject):
             data['message_id'] = message_id
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
-        if edit_message:
-            data['edit_message'] = edit_message
+        if force is not None:
+            data['force'] = force
+        if disable_edit_message is not None:
+            data['disable_edit_message'] = disable_edit_message
+        if edit_message is not None:
+            warnings.warn('edit_message is deprecated, use disable_edit_message instead')
+            if disable_edit_message is None:
+                data['edit_message'] = edit_message
+            else:
+                warnings.warn('edit_message is ignored when disable_edit_message is used')
 
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
         if result is True:
