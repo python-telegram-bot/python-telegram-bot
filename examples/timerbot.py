@@ -22,10 +22,9 @@ import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-timers = dict()
 
 
 # Define a few command handlers. These usually take the two arguments bot and
@@ -39,7 +38,7 @@ def alarm(bot, job):
     bot.sendMessage(job.context, text='Beep!')
 
 
-def set(bot, update, args, job_queue):
+def set(bot, update, args, job_queue, chat_data):
     """Adds a job to the queue"""
     chat_id = update.message.chat_id
     try:
@@ -51,7 +50,7 @@ def set(bot, update, args, job_queue):
 
         # Add job to queue
         job = Job(alarm, due, repeat=False, context=chat_id)
-        timers[chat_id] = job
+        chat_data['job'] = job
         job_queue.put(job)
 
         update.message.reply_text('Timer successfully set!')
@@ -60,23 +59,22 @@ def set(bot, update, args, job_queue):
         update.message.reply_text('Usage: /set <seconds>')
 
 
-def unset(bot, update):
+def unset(bot, update, chat_data):
     """Removes the job if the user changed their mind"""
-    chat_id = update.message.chat_id
 
-    if chat_id not in timers:
+    if 'job' not in chat_data:
         update.message.reply_text('You have no active timer')
         return
 
-    job = timers[chat_id]
+    job = chat_data['job']
     job.schedule_removal()
-    del timers[chat_id]
+    del chat_data['job']
 
     update.message.reply_text('Timer successfully unset!')
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+    logger.warning('Update "%s" caused error "%s"' % (update, error))
 
 
 def main():
@@ -88,8 +86,11 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(CommandHandler("set", set, pass_args=True, pass_job_queue=True))
-    dp.add_handler(CommandHandler("unset", unset))
+    dp.add_handler(CommandHandler("set", set,
+                                  pass_args=True,
+                                  pass_job_queue=True,
+                                  pass_chat_data=True))
+    dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
 
     # log all errors
     dp.add_error_handler(error)
