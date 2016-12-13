@@ -221,3 +221,10 @@ class Request(object):
         buf = self._request_wrapper('GET', url)
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
+    def downbytes(self, url):
+        from io import BytesIO
+        b = BytesIO()
+        buf = self._request_wrapper('GET', url)
+        b.write(buf)
+        b.seek(0)
+        return b
