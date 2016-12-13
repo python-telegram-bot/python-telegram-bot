@@ -79,3 +79,12 @@ class File(TelegramObject):
             filename = basename(url)
 
         self.bot.request.download(url, filename)
+
+    def downbyte(self, file):
+        """
+        Args:
+            file (func):a file-like object. Must be opened in wb mode.
+        """
+        url = self.file_path
+        buf = self.bot.request.downbyte(url)
+        file.write(buf)
