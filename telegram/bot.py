@@ -1201,7 +1201,13 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=5., **kwargs):
+    def getUpdates(self,
+                   offset=None,
+                   limit=100,
+                   allowed_updates=None,
+                   timeout=0,
+                   network_delay=5.,
+                   **kwargs):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -1212,6 +1218,14 @@ class Bot(TelegramObject):
                 higher than its update_id.
             limit (Optional[int]): Limits the number of updates to be retrieved. Values between
                 1-100 are accepted. Defaults to 100.
+            allowed_updates (Optional[list[str]]): List the types of updates you want your bot to
+                receive. For example, specify
+                ``["message", "edited_channel_post", "callback_query"]`` to only receive updates of
+                these types. See ``telegram.Update`` for a complete list of available update types.
+                Specify an empty list to receive all updates regardless of type (default). If not
+                specified, the previous setting will be used.
+                Please note that this parameter doesn't affect updates created before the call to
+                the setWebhook, so unwanted updates may be received for a short period of time.
             timeout (Optional[int]): Timeout in seconds for long polling. Defaults to 0, i.e. usual
                 short polling.
             network_delay (Optional[float]): Additional timeout in seconds to allow the response
@@ -1235,6 +1249,8 @@ class Bot(TelegramObject):
             data['offset'] = offset
         if limit:
             data['limit'] = limit
+        if allowed_updates is not None:
+            data['allowed_updates'] = allowed_updates
 
         urlopen_timeout = timeout + network_delay
 
@@ -1248,17 +1264,36 @@ class Bot(TelegramObject):
         return [Update.de_json(u, self) for u in result]
 
     @log
-    def setWebhook(self, webhook_url=None, certificate=None, timeout=None, **kwargs):
+    def setWebhook(self,
+                   url=None,
+                   certificate=None,
+                   max_connections=40,
+                   allowed_updates=None,
+                   timeout=None,
+                   **kwargs):
         """Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, we will send an HTTPS POST request to the
         specified url, containing a JSON-serialized Update. In case of an unsuccessful request, we
         will give up after a reasonable amount of attempts.
 
         Args:
-            webhook_url: HTTPS url to send updates to. Use an empty string to remove webhook
-                integration
-            timeout (Optional[float]): If this value is specified, use it as
-                the definitive timeout (in seconds) for urlopen() operations.
+            url: HTTPS url to send updates to. Use an empty string to remove webhook integration.
+            certificate (file): Upload your public key certificate so that the root certificate in
+                use can be checked.
+            max_connections (Optional[int]): Maximum allowed number of simultaneous HTTPS
+                connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
+                values to limit the load on your bot's server, and higher values to increase your
+                bot's throughput.
+            allowed_updates (Optional[list[str]]): List the types of updates you want your bot to
+                receive. For example, specify
+                ``["message", "edited_channel_post", "callback_query"]`` to only receive updates of
+                these types. See ``telegram.Update`` for a complete list of available update types.
+                Specify an empty list to receive all updates regardless of type (default). If not
+                specified, the previous setting will be used.
+                Please note that this parameter doesn't affect updates created before the call to
+                the setWebhook, so unwanted updates may be received for a short period of time.
+            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
+                (in seconds) for urlopen() operations.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1268,14 +1303,50 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0}/setWebhook'.format(self.base_url)
+        url_ = '{0}/setWebhook'.format(self.base_url)
+
+        # Backwards-compatibility: 'url' used to be named 'webhook_url'
+        if 'webhook_url' in kwargs:
+            warnings.warn("The 'webhook_url' parameter has been renamed to 'url' in accordance "
+                          "with the API")
+            url = kwargs['webhook_url']
+            del kwargs['webhook_url']
 
         data = {}
 
-        if webhook_url is not None:
-            data['url'] = webhook_url
+        if url is not None:
+            data['url'] = url
         if certificate:
             data['certificate'] = certificate
+        if max_connections is not None:
+            data['max_connections'] = max_connections
+        if allowed_updates is not None:
+            data['allowed_updates'] = allowed_updates
+
+        result = self._request.post(url_, data, timeout=timeout)
+
+        return result
+
+    @log
+    def deleteWebhook(self, timeout=None, **kwargs):
+        """Use this method to remove webhook integration if you decide to switch back to
+        getUpdates. Returns True on success. Requires no parameters.
+
+        Args:
+            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
+                (in seconds) for urlopen() operations.
+            **kwargs (dict): Arbitrary keyword arguments.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/deleteWebhook'.format(self.base_url)
+
+        data = {}
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -1572,6 +1643,7 @@ class Bot(TelegramObject):
     edit_message_reply_markup = editMessageReplyMarkup
     get_updates = getUpdates
     set_webhook = setWebhook
+    delete_webhook = deleteWebhook
     leave_chat = leaveChat
     get_chat = getChat
     get_chat_administrators = getChatAdministrators
