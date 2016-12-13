@@ -68,9 +68,12 @@ class JobQueue(object):
 
         Args:
             job (telegram.ext.Job): The ``Job`` instance representing the new job
-            next_t (Optional[int, float, datetime.timedelta]): Time in which the job
-                should be executed first. Defaults to ``job.interval``. ``int`` and ``float``
-                will be interpreted as seconds.
+            next_t (Optional[int, float, datetime.timedelta, datetime.datetime, datetime.time]):
+                Time in or at which the job should be executed first. Defaults to ``job.interval``.
+                If it is an ``int`` or a ``float``, it will be interpreted as seconds. If it is
+                a ``datetime.datetime``, it will be executed at the specified date and time. If it
+                is a ``datetime.time``, it will execute at the specified time today or, if the time
+                has already passed, tomorrow.
 
         """
         job.job_queue = self
@@ -85,8 +88,20 @@ class JobQueue(object):
             else:
                 raise ValueError("The interval argument should be of type datetime.timedelta,"
                                  " int or float")
-        elif isinstance(next_t, datetime.timedelta):
-            next_t = next_t.total_second()
+
+        elif isinstance(next_t, datetime.datetime):
+            next_t = next_t - datetime.datetime.now()
+
+        elif isinstance(next_t, datetime.time):
+            next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
+
+            if datetime.datetime.now().time() > next_t:
+                next_datetime += datetime.timedelta(days=1)
+
+            next_t = next_datetime - datetime.datetime.now()
+
+        if isinstance(next_t, datetime.timedelta):
+            next_t = next_t.total_seconds()
 
         now = time.time()
         next_t += now
@@ -227,8 +242,10 @@ class Job(object):
         callback (function): The callback function that should be executed by the Job. It should
             take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
             can be used to terminate the job or modify its interval.
-        interval ([int, float, datetime.timedelta]): The interval in which the job will execute its
-            callback function. ``int`` and ``float`` will be interpreted as seconds.
+        interval (Optional[int, float, datetime.timedelta]): The interval in which the job will
+            execute its callback function. ``int`` and ``float`` will be interpreted as seconds.
+            If you don't set this value, you must set ``repeat=False`` and specify ``next_t`` when
+            you put the job into the job queue.
         repeat (Optional[bool]): If this job should be periodically execute its callback function
             (``True``) or only once (``False``). Defaults to ``True``
         context (Optional[object]): Additional data needed for the callback function. Can be
@@ -238,7 +255,7 @@ class Job(object):
     """
     job_queue = None
 
-    def __init__(self, callback, interval, repeat=True, context=None, days=Days.EVERY_DAY):
+    def __init__(self, callback, interval=None, repeat=True, context=None, days=Days.EVERY_DAY):
         self.callback = callback
         self.interval = interval
         self.repeat = repeat
@@ -250,9 +267,12 @@ class Job(object):
         if not all(isinstance(day, int) for day in days):
             raise ValueError("The elements of the 'days' argument should be of type 'int'")
 
-        if not all(day >= 0 and day <= 6 for day in days):
+        if not all(0 <= day <= 6 for day in days):
             raise ValueError("The elements of the 'days' argument should be from 0 up to and "
                              "including 6")
+
+        if interval is None and repeat:
+            raise ValueError("You must either set an interval or set 'repeat' to 'False'")
 
         self.days = days
         self.name = callback.__name__
