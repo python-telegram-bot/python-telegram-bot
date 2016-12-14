@@ -79,17 +79,9 @@ class JobQueue(object):
         job.job_queue = self
 
         if next_t is None:
-            interval = job.interval
+            next_t = job.interval
 
-            if isinstance(interval, Number):
-                next_t = interval
-            elif isinstance(interval, datetime.timedelta):
-                next_t = interval.total_seconds()
-            else:
-                raise ValueError("The interval argument should be of type datetime.timedelta,"
-                                 " int or float")
-
-        elif isinstance(next_t, datetime.datetime):
+        if isinstance(next_t, datetime.datetime):
             next_t = next_t - datetime.datetime.now()
 
         elif isinstance(next_t, datetime.time):
@@ -273,6 +265,10 @@ class Job(object):
 
         if interval is None and repeat:
             raise ValueError("You must either set an interval or set 'repeat' to 'False'")
+
+        if not (isinstance(interval, Number) or isinstance(interval, datetime.timedelta)):
+            raise ValueError("The 'interval' argument must be of type 'datetime.timedelta',"
+                             " 'int' or 'float'")
 
         self.days = days
         self.name = callback.__name__
