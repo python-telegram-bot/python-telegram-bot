@@ -1204,9 +1204,9 @@ class Bot(TelegramObject):
     def getUpdates(self,
                    offset=None,
                    limit=100,
-                   allowed_updates=None,
                    timeout=0,
                    network_delay=5.,
+                   allowed_updates=None,
                    **kwargs):
         """Use this method to receive incoming updates using long polling.
 
@@ -1267,9 +1267,9 @@ class Bot(TelegramObject):
     def setWebhook(self,
                    url=None,
                    certificate=None,
+                   timeout=None,
                    max_connections=40,
                    allowed_updates=None,
-                   timeout=None,
                    **kwargs):
         """Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, we will send an HTTPS POST request to the
@@ -1309,6 +1309,10 @@ class Bot(TelegramObject):
         if 'webhook_url' in kwargs:
             warnings.warn("The 'webhook_url' parameter has been renamed to 'url' in accordance "
                           "with the API")
+
+            if url is not None:
+                raise ValueError("The parameters 'url' and 'webhook_url' are mutually exclusive")
+
             url = kwargs['webhook_url']
             del kwargs['webhook_url']
 
