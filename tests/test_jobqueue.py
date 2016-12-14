@@ -178,10 +178,10 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def test_time_unit_int(self):
         # Testing seconds in int
-        seconds_interval = 2
-        expected_time = time.time() + seconds_interval
+        delta = 2
+        expected_time = time.time() + delta
 
-        self.jq.put(Job(self.job5, seconds_interval, repeat=False))
+        self.jq.put(Job(self.job5, delta, repeat=False))
         sleep(2.5)
         self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
 
@@ -228,6 +228,128 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
         self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
         self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
+
+    def test_one_time_job(self):
+        delta = 2
+        expected_time = time.time() + delta
+
+        self.jq.one_time_job(self.job5, delta)
+        sleep(2.5)
+        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+
+    def test_repeating_job(self):
+        interval = 0.1
+        first = 1.5
+
+        self.jq.repeating_job(self.job1, interval, first=first)
+        sleep(2.505)
+        self.assertAlmostEqual(self.result, 10, delta=1)
+
+    def test_daily_job(self):
+        delta = 1
+        current_time = datetime.datetime.now().time()
+        time_of_day = datetime.time(current_time.hour, current_time.minute,
+                                    current_time.second + delta, current_time.microsecond)
+
+        expected_time = time.time() + 60 * 60 * 24 + delta
+
+        self.jq.daily_job(self.job1, time_of_day)
+        sleep(2 * delta)
+        self.assertEqual(self.result, 1)
+        self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
+
+    def test_update_job_due_time(self):
+        job = self.jq.one_time_job(self.job1, datetime.datetime(2030, 1, 1))
+
+        sleep(0.5)
+        self.assertEqual(self.result, 0)
+
+        self.jq.update_job_due_time(job, time.time() + 1)
+
+        sleep(0.5)
+        self.assertEqual(self.result, 0)
+
+        sleep(1.5)
+        self.assertEqual(self.result, 1)
+
+    def test_job_run_immediately_one_time(self):
+        job = self.jq.one_time_job(self.job1, datetime.datetime(2030, 1, 1))
+
+        sleep(0.5)
+        self.assertEqual(self.result, 0)
+
+        job.run_immediately()
+
+        sleep(0.5)
+        self.assertEqual(self.result, 1)
+
+    def test_job_run_immediately_skip(self):
+        job = self.jq.repeating_job(self.job1, 1, first=2)
+
+        sleep(0.5)  # 0.5s | no runs
+        self.assertEqual(self.result, 0)
+
+        job.run_immediately(keep_schedule=False, skip_next=True)
+
+        sleep(0.5)  # 1s | first run at 0.5s, rescheduled with interval=1 but skipping the next run
+        self.assertEqual(self.result, 1)
+
+        sleep(1)  # 2s | run at 1.5s was skipped
+        self.assertEqual(self.result, 1)
+
+        sleep(1)  # 3s | run at 2.5s was back to normal
+        self.assertEqual(self.result, 2)
+
+        sleep(1)  # 4s | just to confirm
+        self.assertEqual(self.result, 3)
+
+    def test_job_run_immediately_keep(self):
+        job = self.jq.repeating_job(self.job1, 1)
+
+        sleep(0.5)  # 0.5s | no runs
+        self.assertEqual(self.result, 0)
+
+        job.run_immediately(keep_schedule=True, skip_next=False)
+
+        # 0.75s | first run at 0.5s, rescheduled with interval=0.5 to keep up with the schedule
+        sleep(0.25)
+        self.assertEqual(self.result, 1)
+
+        sleep(0.5)  # 1.25s | run at 1s, rescheduled with interval=1
+        self.assertEqual(self.result, 2)
+
+        sleep(0.5)  # 1.75s | last run still at 1s
+        self.assertEqual(self.result, 2)
+
+        sleep(1)  # 2.25s | run at 2s was back to normal
+        self.assertEqual(self.result, 3)
+
+        sleep(1)  # 3.25s | just to confirm
+        self.assertEqual(self.result, 4)
+
+    def test_job_run_immediately_keep_skip(self):
+        job = self.jq.repeating_job(self.job1, 1)
+
+        sleep(0.5)  # 0.5s | no runs
+        self.assertEqual(self.result, 0)
+
+        job.run_immediately(keep_schedule=True, skip_next=True)
+
+        # 0.75s | first run at 0.5s, rescheduled with interval=0.5 to keep up with the schedule...
+        sleep(0.25)
+        self.assertEqual(self.result, 1)
+
+        sleep(0.5)  # 1.25s | ...but run at 1s was skipped, rescheduled with interval=1
+        self.assertEqual(self.result, 1)
+
+        sleep(0.5)  # 1.75s | last run still at 1s
+        self.assertEqual(self.result, 1)
+
+        sleep(1)  # 2.25s | the run at 2s was back to normal
+        self.assertEqual(self.result, 2)
+
+        sleep(1)  # 3.25s | just to confirm
+        self.assertEqual(self.result, 3)
 
 
 if __name__ == '__main__':
