@@ -134,7 +134,7 @@ class JobQueue(object):
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
 
-    def one_time_job(self, callback, when, context=None, name=None):
+    def run_once(self, callback, when, context=None, name=None):
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
@@ -164,7 +164,7 @@ class JobQueue(object):
         self._put(job, next_t=when)
         return job
 
-    def repeating_job(self, callback, interval, first=None, context=None, name=None):
+    def run_repeating(self, callback, interval, first=None, context=None, name=None):
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
@@ -197,7 +197,7 @@ class JobQueue(object):
         self._put(job, next_t=first)
         return job
 
-    def daily_job(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
+    def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
         """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:

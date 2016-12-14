@@ -229,23 +229,23 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
         self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
 
-    def test_one_time_job(self):
+    def test_run_once(self):
         delta = 2
         expected_time = time.time() + delta
 
-        self.jq.one_time_job(self.job5, delta)
+        self.jq.run_once(self.job5, delta)
         sleep(2.5)
         self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
 
-    def test_repeating_job(self):
+    def test_run_repeating(self):
         interval = 0.1
         first = 1.5
 
-        self.jq.repeating_job(self.job1, interval, first=first)
+        self.jq.run_repeating(self.job1, interval, first=first)
         sleep(2.505)
         self.assertAlmostEqual(self.result, 10, delta=1)
 
-    def test_daily_job(self):
+    def test_run_daily(self):
         delta = 1
         current_time = datetime.datetime.now().time()
         time_of_day = datetime.time(current_time.hour, current_time.minute,
@@ -253,7 +253,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
         expected_time = time.time() + 60 * 60 * 24 + delta
 
-        self.jq.daily_job(self.job1, time_of_day)
+        self.jq.run_daily(self.job1, time_of_day)
         sleep(2 * delta)
         self.assertEqual(self.result, 1)
         self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
