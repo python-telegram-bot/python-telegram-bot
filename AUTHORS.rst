@@ -9,6 +9,7 @@ Contributors
 The following wonderful people contributed directly or indirectly to this project:
 
 - `Avanatiker <https://github.com/Avanatiker>`_
+- `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Balduro <https://github.com/Balduro>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `Eli Gao <https://github.com/eligao>`_
