@@ -97,4 +97,3 @@ class File(TelegramObject):
                 filename = basename(url)
 
             self.bot.request.download(url, filename)
-

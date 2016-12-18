@@ -227,4 +227,3 @@ class Request(object):
         buf = self.retrieve(url)
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
-
