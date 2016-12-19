@@ -100,8 +100,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
     def reset(self):
         self.current_state = dict()
 
-# State handlers
-
+    # State handlers
     def _set_state(self, update, state):
         self.current_state[update.message.from_user.id] = state
         return state
@@ -109,8 +108,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
     def _get_state(self, user_id):
         return self.current_state[user_id]
 
-# Actions
-
+    # Actions
     def start(self, bot, update):
         return self._set_state(update, self.THIRSTY)
 
@@ -126,8 +124,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
     def code(self, bot, update):
         return self._set_state(update, self.CODING)
 
-# Tests
-
+    # Tests
     def test_addConversationHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
@@ -211,6 +208,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         sleep(.1)
         # Assert that the Promise has been resolved and the conversation ended.
         self.assertEquals(len(handler.conversations), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

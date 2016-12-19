@@ -85,8 +85,7 @@ class StringRegexHandler(Handler):
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
-# old non-PEP8 Handler methods
-
+    # old non-PEP8 Handler methods
     m = "telegram.StringRegexHandler."
     checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
     handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
