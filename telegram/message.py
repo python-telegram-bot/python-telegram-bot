@@ -200,6 +200,8 @@ class Message(TelegramObject):
         if not data:
             return None
 
+        data = super(Message, Message).de_json(data, bot)
+
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = datetime.fromtimestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'), bot)

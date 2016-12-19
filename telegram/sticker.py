@@ -67,6 +67,8 @@ class Sticker(TelegramObject):
         if not data:
             return None
 
+        data = super(Sticker, Sticker).de_json(data, bot)
+
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
         return Sticker(**data)

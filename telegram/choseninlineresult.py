@@ -74,7 +74,8 @@ class ChosenInlineResult(TelegramObject):
         if not data:
             return None
 
-# Required
+        data = super(ChosenInlineResult, ChosenInlineResult).de_json(data, bot)
+        # Required
         data['from_user'] = User.de_json(data.pop('from'), bot)
         # Optionals
         data['location'] = Location.de_json(data.get('location'), bot)
