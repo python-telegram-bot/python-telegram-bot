@@ -279,7 +279,7 @@ class JobQueue(object):
                 self._set_next_peek(t)
                 break
 
-            if job.is_removed:
+            if job.removed:
                 self.logger.debug('Removing job %s', job.name)
                 continue
 
@@ -296,7 +296,7 @@ class JobQueue(object):
             else:
                 self.logger.debug('Skipping disabled job %s', job.name)
 
-            if job.repeat and not job.is_removed:
+            if job.repeat and not job.removed:
                 self._put(job, last_t=t)
             else:
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
@@ -428,7 +428,7 @@ class Job(object):
         self._remove.set()
 
     @property
-    def is_removed(self):
+    def removed(self):
         return self._remove.is_set()
 
     @property
