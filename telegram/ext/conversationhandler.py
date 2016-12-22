@@ -116,6 +116,10 @@ class ConversationHandler(Handler):
         if not isinstance(update, Update):
             return False
 
+        # Ignore messages in channels
+        if update.channel_post:
+            return False
+
         chat, user = extract_chat_and_user(update)
 
         key = (chat.id, user.id) if chat else (None, user.id)
