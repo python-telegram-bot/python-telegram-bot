@@ -32,6 +32,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `overquota <https://github.com/overquota>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Joscha Götzer <https://github.com/Rostgnom>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `Valentijn <https://github.com/Faalentijn>`_
