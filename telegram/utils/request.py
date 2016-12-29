@@ -196,7 +196,11 @@ class Request(object):
 
         if InputFile.is_inputfile(data):
             data = InputFile(data)
-            result = self._request_wrapper('POST', url, body=data.to_form(), headers=data.headers)
+            result = self._request_wrapper('POST',
+                                           url,
+                                           body=data.to_form(),
+                                           headers=data.headers,
+                                           **urlopen_kwargs)
         else:
             data = json.dumps(data)
             result = self._request_wrapper(
