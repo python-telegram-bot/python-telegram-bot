@@ -40,13 +40,14 @@ class File(TelegramObject):
 
     """
 
-    def __init__(self, file_id, bot, file_size=0, file_path='', **kwargs):
+    def __init__(self, file_id, bot, file_size=0, file_path=None, **kwargs):
         # Required
         self.file_id = str(file_id)
 
         # Optionals
         self.file_size = int(file_size)
-        self.file_path = str(file_path)
+        if file_path:
+            self.file_path = str(file_path)
 
         self.bot = bot
 

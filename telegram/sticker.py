@@ -44,7 +44,7 @@ class Sticker(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, width, height, thumb=None, emoji='', file_size=0, **kwargs):
+    def __init__(self, file_id, width, height, thumb=None, emoji=None, file_size=0, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)

@@ -46,9 +46,9 @@ class Audio(TelegramObject):
     def __init__(self,
                  file_id,
                  duration,
-                 performer='',
-                 title='',
-                 mime_type='',
+                 performer=None,
+                 title=None,
+                 mime_type=None,
                  file_size=0,
                  **kwargs):
         # Required
@@ -57,7 +57,8 @@ class Audio(TelegramObject):
         # Optionals
         self.performer = performer
         self.title = title
-        self.mime_type = str(mime_type)
+        if mime_type:
+            self.mime_type = str(mime_type)
         self.file_size = int(file_size)
 
     @staticmethod

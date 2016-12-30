@@ -52,7 +52,7 @@ class Video(TelegramObject):
                  height,
                  duration,
                  thumb=None,
-                 mime_type='',
+                 mime_type=None,
                  file_size=0,
                  **kwargs):
         # Required
@@ -62,7 +62,8 @@ class Video(TelegramObject):
         self.duration = int(duration)
         # Optionals
         self.thumb = thumb
-        self.mime_type = str(mime_type)
+        if mime_type:
+            self.mime_type = str(mime_type)
         self.file_size = int(file_size)
 
     @staticmethod
