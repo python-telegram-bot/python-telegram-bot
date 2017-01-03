@@ -128,6 +128,12 @@ class Request(object):
             TelegramError
 
         """
+        # Make sure to hint Telegram servers that we reuse connections by sending
+        # "Connection: keep-alive" in the HTTP headers.
+        if 'headers' not in kwargs:
+            kwargs['headers'] = {}
+        kwargs['headers']['connection'] = 'keep-alive'
+
         try:
             resp = self._con_pool.request(*args, **kwargs)
         except urllib3.exceptions.TimeoutError:
@@ -196,11 +202,8 @@ class Request(object):
 
         if InputFile.is_inputfile(data):
             data = InputFile(data)
-            result = self._request_wrapper('POST',
-                                           url,
-                                           body=data.to_form(),
-                                           headers=data.headers,
-                                           **urlopen_kwargs)
+            result = self._request_wrapper(
+                'POST', url, body=data.to_form(), headers=data.headers, **urlopen_kwargs)
         else:
             data = json.dumps(data)
             result = self._request_wrapper(
