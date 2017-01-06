@@ -158,8 +158,13 @@ class Bot(TelegramObject):
         return decorator
 
     @log
-    def getMe(self, **kwargs):
+    def getMe(self, timeout=None, **kwargs):
         """A simple method for testing your bot's auth token.
+
+        Args:
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
             :class:`telegram.User`: A :class:`telegram.User` instance representing that bot if the
@@ -171,7 +176,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getMe'.format(self.base_url)
 
-        result = self._request.get(url)
+        result = self._request.get(url, timeout=timeout)
 
         self.bot = User.de_json(result, self)
 
@@ -211,8 +216,9 @@ class Bot(TelegramObject):
                 interface options. A JSON-serialized object for an inline
                 keyboard, custom reply keyboard, instructions to remove reply
                 keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as
-                the definitive timeout (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -251,8 +257,9 @@ class Bot(TelegramObject):
             message_id: Unique message identifier.
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
                 receive a notification, Android users will receive a notification with no sound.
-            timeout (Optional[float]): If this value is specified, use it as
-                the definitive timeout (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -301,8 +308,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -362,8 +370,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -417,8 +426,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -463,8 +473,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -510,8 +521,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -563,8 +575,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -609,8 +622,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -658,8 +672,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -712,8 +727,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -734,7 +750,7 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendGame(self, chat_id, game_short_name, **kwargs):
+    def sendGame(self, chat_id, game_short_name, timeout=None, **kwargs):
         """Use this method to send a game.
 
         Args:
@@ -751,8 +767,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options.
                 A JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as
-                the definitive timeout (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -769,7 +786,7 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendChatAction(self, chat_id, action, **kwargs):
+    def sendChatAction(self, chat_id, action, timeout=None, **kwargs):
         """Use this method when you need to tell the user that something is happening on the bot's
         side. The status is set for 5 seconds or less (when a message arrives from your bot,
         Telegram clients clear its typing status).
@@ -785,6 +802,9 @@ class Bot(TelegramObject):
                     - ChatAction.UPLOAD_AUDIO for audio files,
                     - ChatAction.UPLOAD_DOCUMENT for general files,
                     - ChatAction.FIND_LOCATION for location data.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         """
@@ -826,8 +846,9 @@ class Bot(TelegramObject):
                 start message with the parameter switch_pm_parameter.
             switch_pm_parameter (Optional[str]): Parameter for the start message sent to the bot
                 when user presses the switch button.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -868,8 +889,9 @@ class Bot(TelegramObject):
                 default, all photos are returned.
             limit (Optional[int]): Limits the number of photos to be retrieved. Values between
                 1-100 are accepted. Defaults to 100.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -900,8 +922,9 @@ class Bot(TelegramObject):
 
         Args:
             file_id: File identifier to get info about.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -934,8 +957,9 @@ class Bot(TelegramObject):
             chat_id: Unique identifier for the target group or username of the target supergroup
                 (in the format @supergroupusername).
             user_id: Unique identifier of the target user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -963,8 +987,9 @@ class Bot(TelegramObject):
             chat_id: Unique identifier for the target group or username of the target supergroup
                 (in the format @supergroupusername).
             user_id: Unique identifier of the target user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1005,8 +1030,9 @@ class Bot(TelegramObject):
             cache_time (Optional[int]): The maximum amount of time in seconds that the result of
                 the callback query may be cached client-side. Telegram apps will support caching
                 starting in version 3.14. Defaults to 0.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1062,8 +1088,9 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1115,8 +1142,9 @@ class Bot(TelegramObject):
             caption (Optional[str]): New caption of the message.
             reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): A JSON-serialized
                 object for an inline keyboard.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1169,8 +1197,9 @@ class Bot(TelegramObject):
                 specified. Identifier of the inline message.
             reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): A JSON-serialized
                 object for an inline keyboard.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1201,7 +1230,13 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=5., **kwargs):
+    def getUpdates(self,
+                   offset=None,
+                   limit=100,
+                   timeout=0,
+                   network_delay=None,
+                   read_latency=2.,
+                   **kwargs):
         """Use this method to receive incoming updates using long polling.
 
         Args:
@@ -1213,12 +1248,24 @@ class Bot(TelegramObject):
             limit (Optional[int]): Limits the number of updates to be retrieved. Values between
                 1-100 are accepted. Defaults to 100.
             timeout (Optional[int]): Timeout in seconds for long polling. Defaults to 0, i.e. usual
-                short polling.
-            network_delay (Optional[float]): Additional timeout in seconds to allow the response
-                from Telegram servers. This should cover network latency around the globe, SSL
-                handshake and slowness of the Telegram servers (which unfortunately happens a lot
-                recently - 2016-05-28). Defaults to 5.
+                short polling. Be careful not to set this timeout too high, as the connection might
+                be dropped and there's no way of knowing it immediately (so most likely the failure
+                will be detected after the timeout had passed).
+            network_delay: Deprecated. Will be honoured as `read_latency` for a while but will be
+                removed in the future.
+            read_latency (Optional[float|int]): Grace time in seconds for receiving the reply from
+                server. Will be added to the `timeout` value and used as the read timeout from
+                server (Default: 2).
             **kwargs (dict): Arbitrary keyword arguments.
+
+        Notes:
+            The main problem with long polling is that a connection will be dropped and we won't
+            be getting the notification in time for it. For that, we need to use long polling, but
+            not too long as well read latency which is short, but not too short.
+            Long polling improves performance, but if it's too long and the connection is dropped
+            on many cases we won't know the connection dropped before the long polling timeout and
+            the read latency time had passed. If you experience connection timeouts, you should
+            tune these settings.
 
         Returns:
             list[:class:`telegram.Update`]
@@ -1229,6 +1276,10 @@ class Bot(TelegramObject):
         """
         url = '{0}/getUpdates'.format(self.base_url)
 
+        if network_delay is not None:
+            warnings.warn('network_delay is deprecated, use read_latency instead')
+            read_latency = network_delay
+
         data = {'timeout': timeout}
 
         if offset:
@@ -1236,9 +1287,12 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        urlopen_timeout = timeout + network_delay
-
-        result = self._request.post(url, data, timeout=urlopen_timeout)
+        # Ideally we'd use an aggressive read timeout for the polling. However,
+        # * Short polling should return within 2 seconds.
+        # * Long polling poses a different problem: the connection might have been dropped while
+        #   waiting for the server to return and there's no way of knowing the connection had been
+        #   dropped in real time.
+        result = self._request.post(url, data, timeout=float(read_latency) + float(timeout))
 
         if result:
             self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
@@ -1256,9 +1310,10 @@ class Bot(TelegramObject):
 
         Args:
             webhook_url: HTTPS url to send updates to. Use an empty string to remove webhook
-                integration
-            timeout (Optional[float]): If this value is specified, use it as
-                the definitive timeout (in seconds) for urlopen() operations.
+                integration.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1288,8 +1343,9 @@ class Bot(TelegramObject):
         Args:
             chat_id: Unique identifier for the target chat or username of the target channel (in
                 the format @channelusername).
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1315,8 +1371,9 @@ class Bot(TelegramObject):
         Args:
             chat_id: Unique identifier for the target chat or username of the target channel (in
                 the format @channelusername).
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1345,8 +1402,9 @@ class Bot(TelegramObject):
         Args:
             chat_id: Unique identifier for the target chat or username of the target channel (in
                 the format @channelusername).
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1371,8 +1429,9 @@ class Bot(TelegramObject):
         Args:
             chat_id: Unique identifier for the target chat or username of the target channel (in
                 the format @channelusername).
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1398,8 +1457,9 @@ class Bot(TelegramObject):
             chat_id: Unique identifier for the target chat or username of the target channel (in
                 the format @channelusername).
             user_id: Unique identifier of the target user.
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1417,10 +1477,15 @@ class Bot(TelegramObject):
 
         return ChatMember.de_json(result, self)
 
-    def getWebhookInfo(self, **kwargs):
+    def getWebhookInfo(self, timeout=None, **kwargs):
         """Use this method to get current webhook status.
 
         If the bot is using getUpdates, will return an object with the url field empty.
+
+        Args:
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
             :class: `telegram.WebhookInfo`
@@ -1430,7 +1495,7 @@ class Bot(TelegramObject):
 
         data = {}
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=timeout)
 
         return WebhookInfo.de_json(result, self)
 
@@ -1443,6 +1508,7 @@ class Bot(TelegramObject):
                      edit_message=None,
                      force=None,
                      disable_edit_message=None,
+                     timeout=None,
                      **kwargs):
         """Use this method to set the score of the specified user in a game.
 
@@ -1462,10 +1528,9 @@ class Bot(TelegramObject):
                 automatically edited to include the current scoreboard.
             edit_message (Optional[bool]): Deprecated. Has the opposite logic for
                 `disable_edit_message`.
-
-        Keyword Args:
-            timeout (Optional[float]): If this value is specified, use it as the definitive timeout
-                (in seconds) for urlopen() operations.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
             :class:`telegram.Message` or True: The edited message, or if the
@@ -1493,7 +1558,7 @@ class Bot(TelegramObject):
             else:
                 warnings.warn('edit_message is ignored when disable_edit_message is used')
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=timeout)
         if result is True:
             return result
         else:
@@ -1504,8 +1569,14 @@ class Bot(TelegramObject):
                           chat_id=None,
                           message_id=None,
                           inline_message_id=None,
+                          timeout=None,
                           **kwargs):
         """Use this method to get data for high score tables.
+
+        Args:
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
             list[:class:`telegram.GameHighScore`]: Scores of the specified user and several of his
@@ -1523,7 +1594,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=timeout)
 
         return [GameHighScore.de_json(hs, self) for hs in result]
 

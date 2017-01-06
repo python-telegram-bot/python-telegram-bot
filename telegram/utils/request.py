@@ -17,18 +17,19 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests"""
+import os
+import socket
+import logging
 
 try:
     import ujson as json
 except ImportError:
     import json
-import os
-import socket
-import logging
 
 import certifi
 import urllib3
 from urllib3.connection import HTTPConnection
+from urllib3.util.timeout import Timeout
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
@@ -43,15 +44,30 @@ class Request(object):
     telegram servers.
 
     Args:
+        con_pool_size (int): Number of connections to keep in the connection pool.
         proxy_url (str): The URL to the proxy server. For example: `http://127.0.0.1:3128`.
         urllib3_proxy_kwargs (dict): Arbitrary arguments passed as-is to `urllib3.ProxyManager`.
             This value will be ignored if proxy_url is not set.
+        connect_timeout (int|float): The maximum amount of time (in seconds) to wait for a
+            connection attempt to a server to succeed. None will set an infinite timeout for
+            connection attempts. (default: 5.)
+        read_timeout (int|float): The maximum amount of time (in seconds) to wait between
+            consecutive read operations for a response from the server. None will set an infinite
+            timeout. This value is usually overridden by the various ``telegram.Bot`` methods.
+            (default: 5.)
 
     """
 
-    def __init__(self, con_pool_size=1, proxy_url=None, urllib3_proxy_kwargs=None):
+    def __init__(self,
+                 con_pool_size=1,
+                 proxy_url=None,
+                 urllib3_proxy_kwargs=None,
+                 connect_timeout=5.,
+                 read_timeout=5.):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = dict()
+
+        self._connect_timeout = connect_timeout
 
         kwargs = dict(
             maxsize=con_pool_size,
@@ -59,7 +75,9 @@ class Request(object):
             ca_certs=certifi.where(),
             socket_options=HTTPConnection.default_socket_options + [
                 (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-            ])
+            ],
+            timeout=urllib3.Timeout(
+                connect=self._connect_timeout, read=read_timeout),)
 
         # Set a proxy according to the following order:
         # * proxy defined in proxy_url (+ urllib3_proxy_kwargs)
@@ -163,33 +181,14 @@ class Request(object):
         else:
             raise NetworkError('{0} ({1})'.format(message, resp.status))
 
-    def get(self, url):
+    def get(self, url, timeout=None):
         """Request an URL.
+
         Args:
-          url:
-            The web location we want to retrieve.
-
-        Returns:
-          A JSON object.
-
-        """
-        result = self._request_wrapper('GET', url)
-        return self._parse(result)
-
-    def post(self, url, data, timeout=None):
-        """Request an URL.
-        Args:
-          url:
-            The web location we want to retrieve.
-          data:
-            A dict of (str, unicode) key/value pairs.
-          timeout:
-            float. If this value is specified, use it as the definitive timeout (in
-            seconds) for urlopen() operations. [Optional]
-
-        Notes:
-          If neither `timeout` nor `data['timeout']` is specified. The underlying
-          defaults are used.
+            url (str): The web location we want to retrieve.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
         Returns:
           A JSON object.
@@ -198,7 +197,28 @@ class Request(object):
         urlopen_kwargs = {}
 
         if timeout is not None:
-            urlopen_kwargs['timeout'] = timeout
+            urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
+
+        result = self._request_wrapper('GET', url, **urlopen_kwargs)
+        return self._parse(result)
+
+    def post(self, url, data, timeout=None):
+        """Request an URL.
+        Args:
+            url (str): The web location we want to retrieve.
+            data (dict[str, str]): A dict of key/value pairs. Note: On py2.7 value is unicode.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+
+        Returns:
+          A JSON object.
+
+        """
+        urlopen_kwargs = {}
+
+        if timeout is not None:
+            urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
 
         if InputFile.is_inputfile(data):
             data = InputFile(data)
@@ -215,24 +235,34 @@ class Request(object):
 
         return self._parse(result)
 
-    def retrieve(self, url):
+    def retrieve(self, url, timeout=None):
         """Retrieve the contents of a file by its URL.
-        Args:
-          url:
-            The web location we want to retrieve.
-        """
-        return self._request_wrapper('GET', url)
 
-    def download(self, url, filename):
+        Args:
+            url (str): The web location we want to retrieve.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+
+        """
+        urlopen_kwargs = {}
+        if timeout is not None:
+            urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
+
+        return self._request_wrapper('GET', url, **urlopen_kwargs)
+
+    def download(self, url, filename, timeout=None):
         """Download a file by its URL.
         Args:
-          url:
-            The web location we want to retrieve.
+            url (str): The web location we want to retrieve.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
 
           filename:
             The filename within the path to download the file.
 
         """
-        buf = self.retrieve(url)
+        buf = self.retrieve(url, timeout=timeout)
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
