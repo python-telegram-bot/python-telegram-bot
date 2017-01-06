@@ -809,7 +809,7 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=2.):
+    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=None, read_latency=2.):
 
         if self.raise_error:
             raise TelegramError('Test Error 2')
