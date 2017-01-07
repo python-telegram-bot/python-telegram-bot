@@ -173,7 +173,7 @@ class Request(object):
         if resp.status in (401, 403):
             raise Unauthorized()
         elif resp.status == 400:
-            raise BadRequest(repr(message))
+            raise BadRequest(message)
         elif resp.status == 404:
             raise InvalidToken()
         elif resp.status == 502:
