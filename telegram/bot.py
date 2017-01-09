@@ -734,7 +734,14 @@ class Bot(TelegramObject):
 
     @log
     @message
-    def sendGame(self, chat_id, game_short_name, **kwargs):
+    def sendGame(self,
+                 chat_id,
+                 game_short_name,
+                 disable_notification=False,
+                 reply_to_message_id=None,
+                 reply_markup=None,
+                 timeout=None,
+                 **kwargs):
         """Use this method to send a game.
 
         Args:
