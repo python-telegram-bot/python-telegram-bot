@@ -51,7 +51,14 @@ class InlineKeyboardButton(TelegramObject):
 
     """
 
-    def __init__(self, text, url=None, callback_data=None, switch_inline_query=None, **kwargs):
+    def __init__(self,
+                 text,
+                 url=None,
+                 callback_data=None,
+                 switch_inline_query=None,
+                 switch_inline_query_current_chat=None,
+                 callback_game=None,
+                 **kwargs):
         # Required
         self.text = text
 
@@ -59,8 +66,8 @@ class InlineKeyboardButton(TelegramObject):
         self.url = url
         self.callback_data = callback_data
         self.switch_inline_query = switch_inline_query
-        self.switch_inline_query_current_chat = kwargs.get('switch_inline_query_current_chat')
-        self.callback_game = kwargs.get('callback_game')
+        self.switch_inline_query_current_chat = switch_inline_query_current_chat
+        self.callback_game = callback_game
 
     @staticmethod
     def de_json(data, bot):

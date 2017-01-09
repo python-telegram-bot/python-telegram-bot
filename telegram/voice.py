@@ -45,8 +45,7 @@ class Voice(TelegramObject):
         self.file_id = str(file_id)
         self.duration = int(duration)
         # Optionals
-        if mime_type:
-            self.mime_type = str(mime_type)
+        self.mime_type = mime_type
         self.file_size = int(file_size)
 
     @staticmethod

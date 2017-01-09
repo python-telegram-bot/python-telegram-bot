@@ -47,8 +47,7 @@ class Document(TelegramObject):
         # Optionals
         self.thumb = thumb
         self.file_name = file_name
-        if mime_type:
-            self.mime_type = str(mime_type)
+        self.mime_type = mime_type
         self.file_size = int(file_size)
 
     @staticmethod

@@ -62,8 +62,7 @@ class Video(TelegramObject):
         self.duration = int(duration)
         # Optionals
         self.thumb = thumb
-        if mime_type:
-            self.mime_type = str(mime_type)
+        self.mime_type = mime_type
         self.file_size = int(file_size)
 
     @staticmethod
