@@ -57,7 +57,7 @@ class Chat(TelegramObject):
                  username=None,
                  first_name=None,
                  last_name=None,
-                 all_members_are_admins=False,
+                 all_members_are_admins=None,
                  bot=None,
                  **kwargs):
         # Required

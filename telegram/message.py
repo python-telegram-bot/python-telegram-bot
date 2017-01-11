@@ -136,8 +136,8 @@ class Message(TelegramObject):
                  delete_chat_photo=False,
                  group_chat_created=False,
                  supergroup_chat_created=False,
-                 migrate_to_chat_id=0,
-                 migrate_from_chat_id=0,
+                 migrate_to_chat_id=None,
+                 migrate_from_chat_id=None,
                  channel_chat_created=False,
                  pinned_message=None,
                  forward_from_message_id=None,
@@ -174,8 +174,8 @@ class Message(TelegramObject):
         self.delete_chat_photo = bool(delete_chat_photo)
         self.group_chat_created = bool(group_chat_created)
         self.supergroup_chat_created = bool(supergroup_chat_created)
-        self.migrate_to_chat_id = int(migrate_to_chat_id)
-        self.migrate_from_chat_id = int(migrate_from_chat_id)
+        self.migrate_to_chat_id = migrate_to_chat_id
+        self.migrate_from_chat_id = migrate_from_chat_id
         self.channel_chat_created = bool(channel_chat_created)
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id

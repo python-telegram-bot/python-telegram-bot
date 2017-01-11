@@ -41,14 +41,20 @@ class Document(TelegramObject):
 
     """
 
-    def __init__(self, file_id, thumb=None, file_name=None, mime_type=None, file_size=0, **kwargs):
+    def __init__(self,
+                 file_id,
+                 thumb=None,
+                 file_name=None,
+                 mime_type=None,
+                 file_size=None,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
         # Optionals
         self.thumb = thumb
         self.file_name = file_name
         self.mime_type = mime_type
-        self.file_size = int(file_size)
+        self.file_size = file_size
 
     @staticmethod
     def de_json(data, bot):
