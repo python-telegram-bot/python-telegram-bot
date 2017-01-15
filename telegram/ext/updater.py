@@ -328,7 +328,7 @@ class Updater(object):
             try:
                 if clean:
                     # Disable webhook for cleaning
-                    self.bot.setWebhook(webhook_url='')
+                    self.bot.deleteWebhook()
                     self._clean_updates()
                     sleep(1)
 
