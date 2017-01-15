@@ -1713,6 +1713,7 @@ class Bot(TelegramObject):
     edit_message_reply_markup = editMessageReplyMarkup
     get_updates = getUpdates
     set_webhook = setWebhook
+    delete_webhook = deleteWebhook
     leave_chat = leaveChat
     get_chat = getChat
     get_chat_administrators = getChatAdministrators
