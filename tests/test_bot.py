@@ -291,7 +291,7 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_forward_channel_messgae(self):
+    def test_forward_channel_message(self):
         text = 'test forward message'
         msg = self._bot.sendMessage(self._channel_id, text)
         self.assertEqual(text, msg.text)
@@ -301,12 +301,25 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_get_webhook_info(self):
+    def test_set_webhook_get_webhook_info(self):
+        url = 'https://python-telegram-bot.org/test/webhook'
+        max_connections = 7
+        allowed_updates = ['message']
+        self._bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
+        info = self._bot.getWebhookInfo()
+        self._bot.delete_webhook()
+        self.assertEqual(url, info.url)
+        self.assertEqual(max_connections, info.max_connections)
+        self.assertListEqual(allowed_updates, info.allowed_updates)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_delete_webhook(self):
         url = 'https://python-telegram-bot.org/test/webhook'
         self._bot.set_webhook(url)
+        self._bot.delete_webhook()
         info = self._bot.getWebhookInfo()
-        self._bot.set_webhook('')
-        self.assertEqual(url, info.url)
+        self.assertEqual(info.url, '')
 
     @flaky(3, 1)
     @timeout(10)
