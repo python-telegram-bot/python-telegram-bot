@@ -61,4 +61,6 @@ class Voice(TelegramObject):
         if not data:
             return None
 
+        data = super(Voice, Voice).de_json(data, bot)
+
         return Voice(**data)

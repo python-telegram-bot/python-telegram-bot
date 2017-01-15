@@ -49,6 +49,8 @@ class GameHighScore(TelegramObject):
         if not data:
             return None
 
+        data = super(GameHighScore, GameHighScore).de_json(data, bot)
+
         data['user'] = User.de_json(data.get('user'), bot)
 
         return GameHighScore(**data)

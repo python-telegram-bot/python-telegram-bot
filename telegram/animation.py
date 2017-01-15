@@ -55,6 +55,8 @@ class Animation(TelegramObject):
         if not data:
             return None
 
+        data = super(Animation, Animation).de_json(data, bot)
+
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
         return Animation(**data)

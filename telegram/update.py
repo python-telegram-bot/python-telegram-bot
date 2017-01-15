@@ -86,6 +86,8 @@ class Update(TelegramObject):
         if not data:
             return None
 
+        data = super(Update, Update).de_json(data, bot)
+
         data['message'] = Message.de_json(data.get('message'), bot)
         data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
         data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)

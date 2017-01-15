@@ -59,6 +59,8 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
+        data = super(ChatMember, ChatMember).de_json(data, bot)
+
         data['user'] = User.de_json(data.get('user'), bot)
 
         return ChatMember(**data)

@@ -28,7 +28,9 @@ from telegram.utils.promise import Promise
 
 class ConversationHandler(Handler):
     """
-    A handler to hold a conversation with a user by managing four collections of other handlers.
+    A handler to hold a conversation with a single user by managing four collections of other
+    handlers. Note that neither posts in Telegram Channels, nor group interactions with multiple
+    users are managed by instances of this class.
 
     The first collection, a ``list`` named ``entry_points``, is used to initiate the conversation,
     for example with a ``CommandHandler`` or ``RegexHandler``.
@@ -113,7 +115,8 @@ class ConversationHandler(Handler):
 
     def check_update(self, update):
 
-        if not isinstance(update, Update):
+        # Ignore messages in channels
+        if not isinstance(update, Update) or update.channel_post:
             return False
 
         chat, user = extract_chat_and_user(update)

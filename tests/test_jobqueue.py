@@ -62,9 +62,6 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         if self.jq is not None:
             self.jq.stop()
 
-    def getSeconds(self):
-        return int(ceil(time.time()))
-
     def job1(self, bot, job):
         self.result += 1
 
@@ -79,7 +76,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         self.result += job.context
 
     def job5(self, bot, job):
-        self.job_time = self.getSeconds()
+        self.job_time = time.time()
 
     def test_basic(self):
         self.jq.put(Job(self.job1, 0.1))
@@ -181,22 +178,78 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def test_time_unit_int(self):
         # Testing seconds in int
-        seconds_interval = 5
-        expected_time = self.getSeconds() + seconds_interval
+        delta = 2
+        expected_time = time.time() + delta
 
-        self.jq.put(Job(self.job5, seconds_interval, repeat=False))
-        sleep(6)
-        self.assertEqual(self.job_time, expected_time)
+        self.jq.put(Job(self.job5, delta, repeat=False))
+        sleep(2.5)
+        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
 
-    def test_time_unit_dt_time(self):
+    def test_time_unit_dt_timedelta(self):
         # Testing seconds, minutes and hours as datetime.timedelta object
         # This is sufficient to test that it actually works.
-        interval = datetime.timedelta(seconds=5)
-        expected_time = self.getSeconds() + interval.total_seconds()
+        interval = datetime.timedelta(seconds=2)
+        expected_time = time.time() + interval.total_seconds()
 
         self.jq.put(Job(self.job5, interval, repeat=False))
-        sleep(6)
-        self.assertEqual(self.job_time, expected_time)
+        sleep(2.5)
+        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+
+    def test_time_unit_dt_datetime(self):
+        # Testing running at a specific datetime
+        delta = datetime.timedelta(seconds=2)
+        next_t = datetime.datetime.now() + delta
+        expected_time = time.time() + delta.total_seconds()
+
+        self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
+        sleep(2.5)
+        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+
+    def test_time_unit_dt_time_today(self):
+        # Testing running at a specific time today
+        delta = 2
+        next_t = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
+        expected_time = time.time() + delta
+
+        self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
+        sleep(2.5)
+        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+
+    def test_time_unit_dt_time_tomorrow(self):
+        # Testing running at a specific time that has passed today. Since we can't wait a day, we
+        # test if the jobs next_t has been calculated correctly
+        delta = -2
+        next_t = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
+        expected_time = time.time() + delta + 60 * 60 * 24
+
+        self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
+        self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
+
+    def test_run_once(self):
+        delta = 2
+        expected_time = time.time() + delta
+
+        self.jq.run_once(self.job5, delta)
+        sleep(2.5)
+        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+
+    def test_run_repeating(self):
+        interval = 0.1
+        first = 1.5
+
+        self.jq.run_repeating(self.job1, interval, first=first)
+        sleep(2.505)
+        self.assertAlmostEqual(self.result, 10, delta=1)
+
+    def test_run_daily(self):
+        delta = 1
+        time_of_day = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
+        expected_time = time.time() + 60 * 60 * 24 + delta
+
+        self.jq.run_daily(self.job1, time_of_day)
+        sleep(2 * delta)
+        self.assertEqual(self.result, 1)
+        self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
 
 
 if __name__ == '__main__':
