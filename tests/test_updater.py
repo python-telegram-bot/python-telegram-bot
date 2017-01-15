@@ -801,7 +801,7 @@ class MockBot(object):
 
         return update
 
-    def setWebhook(self, webhook_url=None, certificate=None):
+    def setWebhook(self, url=None, certificate=None):
         if self.bootstrap_retries is None:
             return
 
@@ -809,7 +809,21 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=None, read_latency=2.):
+    def deleteWebhook(self):
+        if self.bootstrap_retries is None:
+            return
+
+        if self.bootstrap_attempts < self.bootstrap_retries:
+            self.bootstrap_attempts += 1
+            raise self.bootstrap_err
+
+    def getUpdates(self,
+                   offset=None,
+                   limit=100,
+                   timeout=0,
+                   network_delay=None,
+                   read_latency=2.,
+                   allowed_updates=None):
 
         if self.raise_error:
             raise TelegramError('Test Error 2')

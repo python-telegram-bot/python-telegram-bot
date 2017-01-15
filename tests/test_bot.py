@@ -85,6 +85,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testGetUpdates(self):
+        self._bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = self._bot.getUpdates(timeout=1)
 
         if updates:
