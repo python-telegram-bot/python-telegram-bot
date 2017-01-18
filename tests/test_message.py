@@ -105,7 +105,7 @@ class MessageTest(BaseTest, unittest.TestCase):
         self.assertEquals(test_html_string, text_html)
 
     def test_text_markdown(self):
-        test_md_string = 'Test for *bold*, _italic_, `code`, [links](http://github.com/) and ```\npre\n```.'
+        test_md_string = 'Test for *bold*, _italic_, `code`, [links](http://github.com/) and ```pre```.'
         text_markdown = self.test_message.text_markdown
         self.assertEquals(test_md_string, text_markdown)
 

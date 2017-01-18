@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
-import copy
 import sys
 from datetime import datetime
 from time import mktime
@@ -609,37 +608,28 @@ class Message(TelegramObject):
             str
 
         """
-        entities = copy.deepcopy(self.parse_entities())
-        t = self.text
+        entities = self.parse_entities()
+        message_text = self.text
+        inserted = 0
 
-        for e in entities:
-            inserted = None
-            pos = e.offset
-            length = e.length
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+            pos = entity.offset + inserted
+            length = entity.length
 
-            if e.type == MessageEntity.TEXT_LINK:
-                t = '{}<a href="{}">{}</a>{}'.format(t[:pos], e.url, t[pos:pos + length],
-                                                     t[pos + length:])
-                inserted = 15 + len(e.url)
-            elif e.type == MessageEntity.BOLD:
-                t = t[:pos] + '<b>' + t[pos:pos + length] + '</b>' + t[pos + length:]
-                inserted = 7
-            elif e.type == MessageEntity.ITALIC:
-                t = t[:pos] + '<i>' + t[pos:pos + length] + '</i>' + t[pos + length:]
-                inserted = 7
-            elif e.type == MessageEntity.CODE:
-                t = t[:pos] + '<code>' + t[pos:pos + length] + '</code>' + t[pos + length:]
-                inserted = 13
-            elif e.type == MessageEntity.PRE:
-                t = t[:pos] + '<pre>' + t[pos:pos + length] + '</pre>' + t[pos + length:]
-                inserted = 11
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '<a href="{}">{}</a>'.format(entity.url, text)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '<b>' + text + '</b>'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '<i>' + text + '</i>'
+            elif entity.type == MessageEntity.CODE:
+                insert = '<code>' + text + '</code>'
+            elif entity.type == MessageEntity.PRE:
+                insert = '<pre>' + text + '</pre>'
 
-            # update offsets of all entities to the right
-            if inserted:
-                for other in entities:
-                    if other.offset > pos:
-                        other.offset += inserted
-        return t
+            inserted += len(insert) - len(text)
+            message_text = message_text[:pos] + insert + message_text[pos + length:]
+        return message_text
 
     @property
     def text_markdown(self):
@@ -653,33 +643,25 @@ class Message(TelegramObject):
         Returns:
             str
         """
-        entities = copy.deepcopy(self.parse_entities())
-        t = self.text
+        entities = self.parse_entities()
+        message_text = self.text
+        inserted = 0
 
-        for e in entities:
-            inserted = None
-            pos = e.offset
-            length = e.length
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+            pos = entity.offset + inserted
+            length = entity.length
 
-            if e.type == MessageEntity.TEXT_LINK:
-                t = "{}[{}]({}){}".format(t[:pos], t[pos:pos + length], e.url, t[pos + length:])
-                inserted = 4 + len(e.url)
-            elif e.type == MessageEntity.BOLD:
-                t = t[:pos] + '*' + t[pos:pos + length] + '*' + t[pos + length:]
-                inserted = 2
-            elif e.type == MessageEntity.ITALIC:
-                t = t[:pos] + '_' + t[pos:pos + length] + '_' + t[pos + length:]
-                inserted = 2
-            elif e.type == MessageEntity.CODE:
-                t = t[:pos] + '`' + t[pos:pos + length] + '`' + t[pos + length:]
-                inserted = 2
-            elif e.type == MessageEntity.PRE:
-                t = t[:pos] + '```\n' + t[pos:pos + length] + '\n```' + t[pos + length:]
-                inserted = 6
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = "[{}]({})".format(text, entity.url)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '*' + text + '*'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '_' + text + '_'
+            elif entity.type == MessageEntity.CODE:
+                insert = '`' + text + '`'
+            elif entity.type == MessageEntity.PRE:
+                insert = '```' + text + '```'
 
-            # update offsets of all entities to the right
-            if inserted:
-                for other in entities:
-                    if other.offset > pos:
-                        other.offset += inserted
-        return t
+            inserted += len(insert) - len(text)
+            message_text = message_text[:pos] + insert + message_text[pos + length:]
+        return message_text
