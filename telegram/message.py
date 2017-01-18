@@ -586,6 +586,7 @@ class Message(TelegramObject):
         Returns:
             dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
                 text that belongs to them, calculated based on UTF-16 codepoints.
+
         """
         if types is None:
             types = MessageEntity.ALL_TYPES
@@ -606,6 +607,7 @@ class Message(TelegramObject):
 
         Returns:
             str
+
         """
         entities = copy.deepcopy(self.parse_entities())
         t = self.text
