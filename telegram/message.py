@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
-
+import copy
 import sys
 from datetime import datetime
 from time import mktime
@@ -594,3 +594,90 @@ class Message(TelegramObject):
             entity: self.parse_entity(entity)
             for entity in self.entities if entity.type in types
         }
+
+    @property
+    def text_html(self):
+        """
+        Creates an html-formatted string from the markup entities found in the message
+        (uses ``parse_entities``).
+
+        Use this if you want to retrieve the original string sent by the bot, as opposed to the
+        plain text with corresponding markup entities.
+
+        Returns:
+            str
+        """
+        entities = copy.deepcopy(self.parse_entities())
+        t = self.text
+
+        for e in entities:
+            inserted = None
+            pos = e.offset
+            length = e.length
+
+            if e.type == MessageEntity.TEXT_LINK:
+                t = '{}<a href="{}">{}</a>{}'.format(t[:pos], e.url, t[pos:pos + length],
+                                                     t[pos + length:])
+                inserted = 15 + len(e.url)
+            elif e.type == MessageEntity.BOLD:
+                t = t[:pos] + '<b>' + t[pos:pos + length] + '</b>' + t[pos + length:]
+                inserted = 7
+            elif e.type == MessageEntity.ITALIC:
+                t = t[:pos] + '<i>' + t[pos:pos + length] + '</i>' + t[pos + length:]
+                inserted = 7
+            elif e.type == MessageEntity.CODE:
+                t = t[:pos] + '<code>' + t[pos:pos + length] + '</code>' + t[pos + length:]
+                inserted = 13
+            elif e.type == MessageEntity.PRE:
+                t = t[:pos] + '<pre>' + t[pos:pos + length] + '</pre>' + t[pos + length:]
+                inserted = 11
+
+            # update offsets of all entities to the right
+            if inserted:
+                for other in entities:
+                    if other.offset > pos:
+                        other.offset += inserted
+        return t
+
+    @property
+    def text_markdown(self):
+        """
+        Creates a markdown-formatted string from the markup entities found in the message
+        (uses ``parse_entities``).
+
+        Use this if you want to retrieve the original string sent by the bot, as opposed to the
+        plain text with corresponding markup entities.
+
+        Returns:
+            str
+        """
+        entities = copy.deepcopy(self.parse_entities())
+        t = self.text
+
+        for e in entities:
+            inserted = None
+            pos = e.offset
+            length = e.length
+
+            if e.type == MessageEntity.TEXT_LINK:
+                t = "{}[{}]({}){}".format(t[:pos], t[pos:pos + length], e.url, t[pos + length:])
+                inserted = 4 + len(e.url)
+            elif e.type == MessageEntity.BOLD:
+                t = t[:pos] + '*' + t[pos:pos + length] + '*' + t[pos + length:]
+                inserted = 2
+            elif e.type == MessageEntity.ITALIC:
+                t = t[:pos] + '_' + t[pos:pos + length] + '_' + t[pos + length:]
+                inserted = 2
+            elif e.type == MessageEntity.CODE:
+                t = t[:pos] + '`' + t[pos:pos + length] + '`' + t[pos + length:]
+                inserted = 2
+            elif e.type == MessageEntity.PRE:
+                t = t[:pos] + '```\n' + t[pos:pos + length] + '\n```' + t[pos + length:]
+                inserted = 6
+
+            # update offsets of all entities to the right
+            if inserted:
+                for other in entities:
+                    if other.offset > pos:
+                        other.offset += inserted
+        return t
