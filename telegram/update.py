@@ -98,3 +98,77 @@ class Update(TelegramObject):
         data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
 
         return Update(**data)
+
+
+def extract_chat_and_user(update):
+    """
+    Helper method to get the sender's chat and user objects from an arbitrary update
+
+    Returns:
+        tuple: of (chat, user), with None-values if no object could not be found.
+    """
+    user = None
+    chat = None
+
+    if update.message:
+        user = update.message.from_user
+        chat = update.message.chat
+
+    elif update.edited_message:
+        user = update.edited_message.from_user
+        chat = update.edited_message.chat
+
+    elif update.inline_query:
+        user = update.inline_query.from_user
+
+    elif update.chosen_inline_result:
+        user = update.chosen_inline_result.from_user
+
+    elif update.callback_query:
+        user = update.callback_query.from_user
+        chat = update.callback_query.message.chat if update.callback_query.message else None
+
+    return chat, user
+
+
+def extract_message_text(update):
+    """
+    Helper method to get the message text from an arbitrary update
+
+    Returns:
+        str: The extracted message text
+
+    Raises:
+        ValueError: If no message text was found in the update
+
+    """
+    if update.message:
+        return update.message.text
+    elif update.edited_message:
+        return update.edited_message.text
+    elif update.callback_query:
+        return update.callback_query.message.text
+    else:
+        raise ValueError("Update contains no message text.")
+
+
+def extract_entities(update):
+    """
+    Helper method to get parsed entities from an arbitrary update
+
+    Returns:
+        dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
+            text that belongs to them, calculated based on UTF-16 codepoints.
+
+    Raises:
+        ValueError: If no entities were found in the update
+
+    """
+    if update.message:
+        return update.message.parse_entities()
+    elif update.edited_message:
+        return update.edited_message.parse_entities()
+    elif update.callback_query:
+        return update.callback_query.message.parse_entities()
+    else:
+        raise ValueError("No message object found in update, therefore no entities available.")
