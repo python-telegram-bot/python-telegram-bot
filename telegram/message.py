@@ -610,11 +610,10 @@ class Message(TelegramObject):
         """
         entities = self.parse_entities()
         message_text = self.text
-        inserted = 0
+        markdown_text = ''
+        last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            pos = entity.offset + inserted
-            length = entity.length
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
@@ -626,10 +625,14 @@ class Message(TelegramObject):
                 insert = '<code>' + text + '</code>'
             elif entity.type == MessageEntity.PRE:
                 insert = '<pre>' + text + '</pre>'
+            else:
+                insert = text
 
-            inserted += len(insert) - len(text)
-            message_text = message_text[:pos] + insert + message_text[pos + length:]
-        return message_text
+            markdown_text += message_text[last_offset:entity.offset] + insert
+            last_offset = entity.offset + entity.length
+
+        markdown_text += message_text[last_offset:]
+        return markdown_text
 
     @property
     def text_markdown(self):
@@ -645,14 +648,13 @@ class Message(TelegramObject):
         """
         entities = self.parse_entities()
         message_text = self.text
-        inserted = 0
+        markdown_text = ''
+        last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            pos = entity.offset + inserted
-            length = entity.length
 
             if entity.type == MessageEntity.TEXT_LINK:
-                insert = "[{}]({})".format(text, entity.url)
+                insert = '[{}]({})'.format(text, entity.url)
             elif entity.type == MessageEntity.BOLD:
                 insert = '*' + text + '*'
             elif entity.type == MessageEntity.ITALIC:
@@ -661,7 +663,11 @@ class Message(TelegramObject):
                 insert = '`' + text + '`'
             elif entity.type == MessageEntity.PRE:
                 insert = '```' + text + '```'
+            else:
+                insert = text
 
-            inserted += len(insert) - len(text)
-            message_text = message_text[:pos] + insert + message_text[pos + length:]
-        return message_text
+            markdown_text += message_text[last_offset:entity.offset] + insert
+            last_offset = entity.offset + entity.length
+
+        markdown_text += message_text[last_offset:]
+        return markdown_text
