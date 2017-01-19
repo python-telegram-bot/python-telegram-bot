@@ -101,7 +101,9 @@ class Update(TelegramObject):
 
     def extract_chat_and_user(self):
         """
-        Helper method to get the sender's chat and user objects from an arbitrary self
+        Helper method to get the sender's chat and user objects from an arbitrary update.
+        Depending on the type of update, one of the available attributes ``message``,
+        ``edited_message`` or ``callback_query`` is used to determine the result.
 
         Returns:
             tuple: of (chat, user), with None-values if no object could not be found.
@@ -131,13 +133,15 @@ class Update(TelegramObject):
 
     def extract_message_text(self):
         """
-        Helper method to get the message text from an arbitrary self
+        Helper method to get the message text from an arbitrary update.
+        Depending on the type of update, one of the available attributes ``message``,
+        ``edited_message`` or ``callback_query`` is used to determine the result.
 
         Returns:
             str: The extracted message text
 
         Raises:
-            ValueError: If no message text was found in the self
+            ValueError: If no message text was found in the update
 
         """
         if self.message:
@@ -151,14 +155,16 @@ class Update(TelegramObject):
 
     def extract_entities(self):
         """
-        Helper method to get parsed entities from an arbitrary self
+        Helper method to get parsed entities from an arbitrary update.
+        Depending on the type of update, one of the available attributes ``message``,
+        ``edited_message`` or ``callback_query`` is used to determine the result.
 
         Returns:
             dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
                 text that belongs to them, calculated based on UTF-16 codepoints.
 
         Raises:
-            ValueError: If no entities were found in the self
+            ValueError: If no entities were found in the update
 
         """
         if self.message:
