@@ -22,7 +22,6 @@ import logging
 
 from telegram import Update
 from telegram.ext import Handler
-from telegram.utils.helpers import extract_chat_and_user
 from telegram.utils.promise import Promise
 
 
@@ -119,7 +118,7 @@ class ConversationHandler(Handler):
         if not isinstance(update, Update) or update.channel_post:
             return False
 
-        chat, user = extract_chat_and_user(update)
+        chat, user = update.extract_chat_and_user()
 
         key = (chat.id, user.id) if chat else (None, user.id)
         state = self.conversations.get(key)
