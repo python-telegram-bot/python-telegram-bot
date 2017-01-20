@@ -35,7 +35,7 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError, User, Chat, Bot
+from telegram import Update, Message, TelegramError, User, Chat, Bot, CallbackQuery
 from telegram.ext import Updater, ConversationHandler, CommandHandler
 from tests.base import BaseTest
 from tests.test_updater import MockBot
@@ -78,6 +78,11 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
             ],
         }
         self.fallbacks = [CommandHandler('eat', self.start)]
+
+        self.group = Chat(0, Chat.GROUP)
+
+    def _chat(self, user):
+        return Chat(user.id, Chat.GROUP)
 
     def _setup_updater(self, *args, **kwargs):
         bot = MockBot(*args, **kwargs)
@@ -137,35 +142,70 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         queue = self.updater.start_polling(0.01)
 
         # User one, starts the state machine.
-        message = Message(0, user, None, None, text="/start")
+        message = Message(0, user, None, self.group, text="/start")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(self.current_state[user.id] == self.THIRSTY)
 
         # The user is thirsty and wants to brew coffee.
-        message = Message(0, user, None, None, text="/brew")
+        message = Message(0, user, None, self.group, text="/brew")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(self.current_state[user.id] == self.BREWING)
 
         # Lets see if an invalid command makes sure, no state is changed.
-        message = Message(0, user, None, None, text="/nothing")
+        message = Message(0, user, None, self.group, text="/nothing")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(self.current_state[user.id] == self.BREWING)
 
         # Lets see if the state machine still works by pouring coffee.
-        message = Message(0, user, None, None, text="/pourCoffee")
+        message = Message(0, user, None, self.group, text="/pourCoffee")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(self.current_state[user.id] == self.DRINKING)
 
         # Let's now verify that for another user, who did not start yet,
         # the state has not been changed.
-        message = Message(0, second_user, None, None, text="/brew")
+        message = Message(0, second_user, None, self.group, text="/brew")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertRaises(KeyError, self._get_state, user_id=second_user.id)
+
+    def test_addConversationHandlerPerChat(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        user = User(first_name="Misses Test", id=123)
+        second_user = User(first_name="Mister Test", id=124)
+
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            per_user=False)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+
+        # User one, starts the state machine.
+        message = Message(0, user, None, self.group, text="/start")
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+
+        # The user is thirsty and wants to brew coffee.
+        message = Message(0, user, None, self.group, text="/brew")
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+
+        message = Message(0, user, None, self.group, text="/pourCoffee")
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+
+        # Let's now verify that for another user, who did not start yet,
+        # the state will be changed because they are in the same group.
+        message = Message(0, second_user, None, self.group, text="/brew")
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEquals(handler.conversations[(self.group.id,)], self.DRINKING)
 
     def test_endOnFirstMessage(self):
         self._setup_updater('', messages=0)
@@ -178,7 +218,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         queue = self.updater.start_polling(0.01)
 
         # User starts the state machine and immediately ends it.
-        message = Message(0, user, None, None, text="/start")
+        message = Message(0, user, None, self.group, text="/start")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertEquals(len(handler.conversations), 0)
@@ -197,13 +237,13 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
 
         # User starts the state machine with an async function that immediately ends the
         # conversation. Async results are resolved when the users state is queried next time.
-        message = Message(0, user, None, None, text="/start")
+        message = Message(0, user, None, self.group, text="/start")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         # Assert that the Promise has been accepted as the new state
         self.assertEquals(len(handler.conversations), 1)
 
-        message = Message(0, user, None, None, text="resolve promise pls")
+        message = Message(0, user, None, self.group, text="resolve promise pls")
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         # Assert that the Promise has been resolved and the conversation ended.
