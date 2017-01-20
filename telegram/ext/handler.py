@@ -20,7 +20,6 @@
 Dispatcher """
 
 from telegram.utils.deprecate import deprecate
-from telegram.utils.helpers import extract_chat_and_user
 
 
 class Handler(object):
@@ -105,7 +104,7 @@ class Handler(object):
         if self.pass_job_queue:
             optional_args['job_queue'] = dispatcher.job_queue
         if self.pass_user_data or self.pass_chat_data:
-            chat, user = extract_chat_and_user(update)
+            chat, user = update.extract_chat_and_user()
 
             if self.pass_user_data:
                 optional_args['user_data'] = dispatcher.user_data[user.id]

@@ -18,27 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains helper functions """
 
+import re
 
-def extract_chat_and_user(update):
-    user = None
-    chat = None
 
-    if update.message:
-        user = update.message.from_user
-        chat = update.message.chat
-
-    elif update.edited_message:
-        user = update.edited_message.from_user
-        chat = update.edited_message.chat
-
-    elif update.inline_query:
-        user = update.inline_query.from_user
-
-    elif update.chosen_inline_result:
-        user = update.chosen_inline_result.from_user
-
-    elif update.callback_query:
-        user = update.callback_query.from_user
-        chat = update.callback_query.message.chat if update.callback_query.message else None
-
-    return chat, user
+def escape_markdown(text):
+    """Helper function to escape telegram markup symbols"""
+    escape_chars = '\*_`\['
+    return re.sub(r'([%s])' % escape_chars, r'\\\1', text)

@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
-
 import sys
 from datetime import datetime
 from time import mktime
@@ -586,6 +585,7 @@ class Message(TelegramObject):
         Returns:
             dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
                 text that belongs to them, calculated based on UTF-16 codepoints.
+
         """
         if types is None:
             types = MessageEntity.ALL_TYPES
@@ -594,3 +594,80 @@ class Message(TelegramObject):
             entity: self.parse_entity(entity)
             for entity in self.entities if entity.type in types
         }
+
+    @property
+    def text_html(self):
+        """
+        Creates an html-formatted string from the markup entities found in the message
+        (uses ``parse_entities``).
+
+        Use this if you want to retrieve the original string sent by the bot, as opposed to the
+        plain text with corresponding markup entities.
+
+        Returns:
+            str
+
+        """
+        entities = self.parse_entities()
+        message_text = self.text
+        markdown_text = ''
+        last_offset = 0
+
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '<a href="{}">{}</a>'.format(entity.url, text)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '<b>' + text + '</b>'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '<i>' + text + '</i>'
+            elif entity.type == MessageEntity.CODE:
+                insert = '<code>' + text + '</code>'
+            elif entity.type == MessageEntity.PRE:
+                insert = '<pre>' + text + '</pre>'
+            else:
+                insert = text
+
+            markdown_text += message_text[last_offset:entity.offset] + insert
+            last_offset = entity.offset + entity.length
+
+        markdown_text += message_text[last_offset:]
+        return markdown_text
+
+    @property
+    def text_markdown(self):
+        """
+        Creates a markdown-formatted string from the markup entities found in the message
+        (uses ``parse_entities``).
+
+        Use this if you want to retrieve the original string sent by the bot, as opposed to the
+        plain text with corresponding markup entities.
+
+        Returns:
+            str
+        """
+        entities = self.parse_entities()
+        message_text = self.text
+        markdown_text = ''
+        last_offset = 0
+
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '[{}]({})'.format(text, entity.url)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '*' + text + '*'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '_' + text + '_'
+            elif entity.type == MessageEntity.CODE:
+                insert = '`' + text + '`'
+            elif entity.type == MessageEntity.PRE:
+                insert = '```' + text + '```'
+            else:
+                insert = text
+
+            markdown_text += message_text[last_offset:entity.offset] + insert
+            last_offset = entity.offset + entity.length
+
+        markdown_text += message_text[last_offset:]
+        return markdown_text
