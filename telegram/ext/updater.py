@@ -62,7 +62,7 @@ class Updater(object):
         bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
             the user's responsibility to create it using a `Request` instance with a large enough
             connection pool.
-        user_sig_handler (Optional[function]: A function that takes ``signum, frame`` as positional arguments.
+        user_sig_handler (Optional[function]): A function that takes ``signum, frame`` as positional arguments.
             This will be called when a stop signal is received, defaulted to (SIGINT, SIGTERM, SIGABRT) and
             setable with Updater.idle(stop_signals=(signals))
         request_kwargs (Optional[dict]): Keyword args to control the creation of a request object
