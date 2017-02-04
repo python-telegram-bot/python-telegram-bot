@@ -12,6 +12,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Balduro <https://github.com/Balduro>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
+- `d-qoi <https://github.com/d-qoi>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
