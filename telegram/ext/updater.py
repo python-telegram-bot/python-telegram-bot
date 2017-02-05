@@ -75,7 +75,7 @@ class Updater(object):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
             raise ValueError('`token` and `bot` are mutually exclusive')
-        
+
         self.logger = logging.getLogger(__name__)
         if bot is not None:
             self.bot = bot
