@@ -16,12 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram File."""
+"""This module contains an object that represents a Telegram File."""
 
 from os.path import basename
 
 from telegram import TelegramObject
-from telegram.utils.request import download as _download
 
 
 class File(TelegramObject):
@@ -34,25 +33,29 @@ class File(TelegramObject):
 
     Args:
         file_id (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
+        bot (telegram.Bot):
         file_size (Optional[int]):
         file_path (Optional[str]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, file_id, **kwargs):
+    def __init__(self, file_id, bot, file_size=0, file_path='', **kwargs):
         # Required
         self.file_id = str(file_id)
+
         # Optionals
-        self.file_size = int(kwargs.get('file_size', 0))
-        self.file_path = str(kwargs.get('file_path', ''))
+        self.file_size = int(file_size)
+        self.file_path = str(file_path)
+
+        self.bot = bot
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.File:
@@ -60,18 +63,41 @@ class File(TelegramObject):
         if not data:
             return None
 
-        return File(**data)
+        return File(bot=bot, **data)
 
-    def download(self, custom_path=None):
+    def download(self, custom_path=None, out=None, timeout=None):
         """
+        Download this file. By default, the file is saved in the current working directory with its
+        original filename as reported by Telegram. If a ``custom_path`` is supplied, it will be
+        saved to that path instead. If ``out`` is defined, the file contents will be saved to that
+        object using the ``out.write`` method. ``custom_path`` and ``out`` are mutually exclusive.
+
         Args:
-            custom_path (str):
+            custom_path (Optional[str]): Custom path.
+            out (Optional[object]): A file-like object. Must be opened in binary mode, if
+                applicable.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+
+        Raises:
+            ValueError: If both ``custom_path`` and ``out`` are passed.
+
         """
+
+        if custom_path is not None and out is not None:
+            raise ValueError('custom_path and out are mutually exclusive')
+
         url = self.file_path
 
-        if custom_path:
-            filename = custom_path
-        else:
-            filename = basename(url)
+        if out:
+            buf = self.bot.request.retrieve(url)
+            out.write(buf)
 
-        _download(url, filename)
+        else:
+            if custom_path:
+                filename = custom_path
+            else:
+                filename = basename(url)
+
+            self.bot.request.download(url, filename, timeout=timeout)

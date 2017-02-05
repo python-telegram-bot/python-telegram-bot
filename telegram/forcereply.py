@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram ForceReply."""
+"""This module contains an object that represents a Telegram ForceReply."""
 
 from telegram import ReplyMarkup
 
@@ -30,23 +30,23 @@ class ForceReply(ReplyMarkup):
 
     Args:
         force_reply (bool):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         selective (Optional[bool]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, force_reply=True, **kwargs):
+    def __init__(self, force_reply=True, selective=False, **kwargs):
         # Required
         self.force_reply = bool(force_reply)
         # Optionals
-        self.selective = bool(kwargs.get('selective', False))
+        self.selective = bool(selective)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.ForceReply:

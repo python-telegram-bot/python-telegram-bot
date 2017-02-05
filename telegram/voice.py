@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Voice."""
+"""This module contains an object that represents a Telegram Voice."""
 
 from telegram import TelegramObject
 
@@ -32,32 +32,35 @@ class Voice(TelegramObject):
 
     Args:
         file_id (str):
+        duration (Optional[int]):
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
-        duration (Optional[int]):
         mime_type (Optional[str]):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, **kwargs):
+    def __init__(self, file_id, duration, mime_type='', file_size=0, **kwargs):
         # Required
         self.file_id = str(file_id)
+        self.duration = int(duration)
         # Optionals
-        self.duration = int(kwargs.get('duration', 0))
-        self.mime_type = str(kwargs.get('mime_type', ''))
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.mime_type = str(mime_type)
+        self.file_size = int(file_size)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot)
 
         Returns:
             telegram.Voice:
         """
         if not data:
             return None
+
+        data = super(Voice, Voice).de_json(data, bot)
 
         return Voice(**data)

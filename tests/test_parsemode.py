@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram ParseMode"""
+"""This module contains an object that represents Tests for Telegram ParseMode"""
 
 import sys
 import unittest
@@ -37,17 +37,15 @@ class ParseMode(BaseTest, unittest.TestCase):
         self.formatted_text_formatted = u'bold italic link.'
 
     def test_send_message_with_parse_mode_markdown(self):
-        message = self._bot.sendMessage(chat_id=self._chat_id,
-                                        text=self.markdown_text,
-                                        parse_mode=telegram.ParseMode.MARKDOWN)
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id, text=self.markdown_text, parse_mode=telegram.ParseMode.MARKDOWN)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, self.formatted_text_formatted)
 
     def test_send_message_with_parse_mode_html(self):
-        message = self._bot.sendMessage(chat_id=self._chat_id,
-                                        text=self.html_text,
-                                        parse_mode=telegram.ParseMode.HTML)
+        message = self._bot.sendMessage(
+            chat_id=self._chat_id, text=self.html_text, parse_mode=telegram.ParseMode.HTML)
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, self.formatted_text_formatted)

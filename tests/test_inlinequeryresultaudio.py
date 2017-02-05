@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultAudio"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -42,10 +38,10 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.performer = 'performer'
         self.audio_duration = 'audio_duration'
+        self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -54,12 +50,13 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
             'title': self.title,
             'performer': self.performer,
             'audio_duration': self.audio_duration,
+            'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
 
     def test_audio_de_json(self):
-        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict)
+        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict, self._bot)
 
         self.assertEqual(audio.type, self.type)
         self.assertEqual(audio.id, self.id)
@@ -67,17 +64,18 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
         self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.audio_duration, self.audio_duration)
+        self.assertEqual(audio.caption, self.caption)
         self.assertDictEqual(audio.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
         self.assertDictEqual(audio.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_audio_to_json(self):
-        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict)
+        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(audio.to_json()))
 
     def test_audio_to_dict(self):
-        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict).to_dict()
+        audio = telegram.InlineQueryResultAudio.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(audio))
         self.assertDictEqual(self.json_dict, audio)

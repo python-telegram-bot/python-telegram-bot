@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultArticle"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -40,9 +36,8 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.type = 'article'
         self.title = 'title'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
         self.url = 'url'
         self.hide_url = True
         self.description = 'description'
@@ -65,7 +60,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         }
 
     def test_article_de_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot)
 
         self.assertEqual(article.type, self.type)
         self.assertEqual(article.id, self.id)
@@ -81,12 +76,12 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         self.assertEqual(article.thumb_width, self.thumb_width)
 
     def test_article_to_json(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict)
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(article.to_json()))
 
     def test_article_to_dict(self):
-        article = telegram.InlineQueryResultArticle.de_json(self.json_dict).to_dict()
+        article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(article))
         self.assertDictEqual(self.json_dict, article)

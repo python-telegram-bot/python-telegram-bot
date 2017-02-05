@@ -16,24 +16,26 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Emoji"""
+"""This module contains an object that represents Tests for Telegram
+MessageEntity"""
 
-import unittest
 import sys
+import unittest
+
+from telegram.utils import helpers
+
 sys.path.append('.')
 
-import telegram
-from telegram.emoji import Emoji
 from tests.base import BaseTest
 
 
-class EmojiTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Emoji."""
+class HelpersTest(BaseTest, unittest.TestCase):
+    """This object represents Tests for the Helpers Module"""
 
-    def test_emoji(self):
-        for attr in dir(Emoji):
-            if attr[0] != '_':  # TODO: dirty way to filter out functions
-                self.assertTrue(type(getattr(Emoji, attr)) is str)
+    def test_escape_markdown(self):
+        test_str = "*bold*, _italic_, `code`, [text_link](http://github.com/)"
+        expected_str = "\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)"
+        self.assertEquals(expected_str, helpers.escape_markdown(test_str))
 
 
 if __name__ == '__main__':

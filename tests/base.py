@@ -16,11 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Base class for tests"""
+"""This module contains an object that represents a Base class for tests"""
 
 import os
-import sys
 import signal
+import sys
 
 from nose.tools import make_decorator
 
@@ -36,10 +36,12 @@ class BaseTest(object):
     def __init__(self, *args, **kwargs):
         super(BaseTest, self).__init__(*args, **kwargs)
 
-        bot = telegram.Bot(os.environ.get('TOKEN',
-                                          '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
+        bot = telegram.Bot(
+            os.environ.get('TOKEN', '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
         chat_id = os.environ.get('CHAT_ID', '12173560')
 
+        self._group_id = os.environ.get('GROUP_ID', '-49740850')
+        self._channel_id = os.environ.get('CHANNEL_ID', '@pythontelegrambottests')
         self._bot = bot
         self._chat_id = chat_id
 
@@ -76,13 +78,21 @@ def timeout(time_limit):
             raise TestTimedOut(time_limit, frame)
 
         def newfunc(*args, **kwargs):
-            orig_handler = signal.signal(signal.SIGALRM, timed_out)
-            signal.alarm(time_limit)
+            try:
+                # Will only work on unix systems
+                orig_handler = signal.signal(signal.SIGALRM, timed_out)
+                signal.alarm(time_limit)
+            except AttributeError:
+                pass
             try:
                 rc = func(*args, **kwargs)
             finally:
-                signal.alarm(0)
-                signal.signal(signal.SIGALRM, orig_handler)
+                try:
+                    # Will only work on unix systems
+                    signal.alarm(0)
+                    signal.signal(signal.SIGALRM, orig_handler)
+                except AttributeError:
+                    pass
             return rc
 
         newfunc = make_decorator(func)(newfunc)

@@ -1,7 +1,7 @@
-telegram.emoji module
+telegram.venue module
 =====================
 
-.. automodule:: telegram.emoji
+.. automodule:: telegram.venue
     :members:
     :undoc-members:
     :show-inheritance:

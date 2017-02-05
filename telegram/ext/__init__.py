@@ -19,20 +19,22 @@
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .dispatcher import Dispatcher
-from .jobqueue import JobQueue
+from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
 from .choseninlineresulthandler import ChosenInlineResultHandler
 from .commandhandler import CommandHandler
 from .handler import Handler
 from .inlinequeryhandler import InlineQueryHandler
-from .messagehandler import MessageHandler, Filters
+from .messagehandler import MessageHandler
+from .filters import BaseFilter, Filters
 from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
+from .conversationhandler import ConversationHandler
 
-__all__ = ('Dispatcher', 'JobQueue', 'Updater', 'CallbackQueryHandler',
+__all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
-           'MessageHandler', 'Filters', 'RegexHandler', 'StringCommandHandler',
-           'StringRegexHandler', 'TypeHandler')
+           'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
+           'StringRegexHandler', 'TypeHandler', 'ConversationHandler')

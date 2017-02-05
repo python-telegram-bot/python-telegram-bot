@@ -25,8 +25,8 @@ class ReplyMarkup(TelegramObject):
     """Base class for Telegram ReplyMarkup Objects"""
 
     @staticmethod
-    def de_json(data):
-        data = super(ReplyMarkup, ReplyMarkup).de_json(data)
+    def de_json(data, bot):
+        data = super(ReplyMarkup, ReplyMarkup).de_json(data, bot)
 
         if not data:
             return None

@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultPhoto"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -46,9 +42,8 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         self.description = 'description'
         self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -65,7 +60,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         }
 
     def test_photo_de_json(self):
-        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
+        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot)
 
         self.assertEqual(photo.type, self.type)
         self.assertEqual(photo.id, self.id)
@@ -81,12 +76,12 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(photo.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_photo_to_json(self):
-        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict)
+        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(photo.to_json()))
 
     def test_photo_to_dict(self):
-        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict).to_dict()
+        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(photo))
         self.assertDictEqual(self.json_dict, photo)

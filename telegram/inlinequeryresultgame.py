@@ -16,14 +16,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains functions to validate function arguments"""
+"""This module contains the classes that represent Telegram
+InlineQueryResultGame"""
 
-from telegram.error import InvalidToken
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 
 
-def validate_token(token):
-    """a very basic validation on token"""
-    left, sep, _right = token.partition(':')
-    if (not sep) or (not left.isdigit()) or (len(left) < 3):
-        raise InvalidToken()
-    return token
+class InlineQueryResultGame(InlineQueryResult):
+
+    def __init__(self, id, game_short_name, reply_markup=None, **kwargs):
+        # Required
+        super(InlineQueryResultGame, self).__init__('game', id)
+        self.id = id
+        self.game_short_name = game_short_name
+
+        if reply_markup:
+            self.reply_markup = reply_markup
+
+    @staticmethod
+    def de_json(data, bot):
+        data = super(InlineQueryResultGame, InlineQueryResultGame).de_json(data, bot)
+
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+
+        return InlineQueryResultGame(**data)

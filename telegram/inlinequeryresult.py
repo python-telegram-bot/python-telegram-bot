@@ -26,20 +26,21 @@ class InlineQueryResult(TelegramObject):
     """This object represents a Telegram InlineQueryResult.
 
     Attributes:
-        type (str):
-        id (str):
+        type (str): Type of the result.
+        id (str): Unique identifier for this result, 1-64 Bytes
 
     Args:
-        type (str):
+        type (str): Type of the result.
         id (str): Unique identifier for this result, 1-64 Bytes
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, type, id):
+    def __init__(self, type, id, **kwargs):
         # Required
         self.type = str(type)
         self.id = str(id)
 
     @staticmethod
-    def de_json(data):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data)
+    def de_json(data, bot):
+        return super(InlineQueryResult, InlineQueryResult).de_json(data, bot)

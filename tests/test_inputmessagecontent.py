@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InputMessageContent"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -36,7 +32,7 @@ class InputMessageContentTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InputMessageContent."""
 
     def test_imc_de_json(self):
-        imc = telegram.InputMessageContent.de_json(None)
+        imc = telegram.InputMessageContent.de_json(None, self._bot)
 
         self.assertFalse(imc)
 

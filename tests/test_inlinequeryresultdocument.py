@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultDocument"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -47,9 +43,8 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         self.thumb_width = 10
         self.thumb_height = 15
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
             'id': self.id,
             'type': self.type,
@@ -66,7 +61,7 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         }
 
     def test_document_de_json(self):
-        document = telegram.InlineQueryResultDocument.de_json(self.json_dict)
+        document = telegram.InlineQueryResultDocument.de_json(self.json_dict, self._bot)
 
         self.assertEqual(document.id, self.id)
         self.assertEqual(document.type, self.type)
@@ -83,12 +78,12 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(document.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_document_to_json(self):
-        document = telegram.InlineQueryResultDocument.de_json(self.json_dict)
+        document = telegram.InlineQueryResultDocument.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(document.to_json()))
 
     def test_document_to_dict(self):
-        document = telegram.InlineQueryResultDocument.de_json(self.json_dict).to_dict()
+        document = telegram.InlineQueryResultDocument.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(document))
         self.assertDictEqual(self.json_dict, document)

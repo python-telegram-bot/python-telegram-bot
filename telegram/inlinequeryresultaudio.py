@@ -33,29 +33,27 @@ class InlineQueryResultAudio(InlineQueryResult):
         title (str):
         performer (Optional[str]):
         audio_duration (Optional[str]):
+        caption (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[
-            :class:`telegram.input_message_content`]):
+        input_message_content (Optional[:class:`telegram.input_message_content`]):
 
     Deprecated: 4.0
         message_text (str): Use :class:`InputTextMessageContent` instead.
 
         parse_mode (str): Use :class:`InputTextMessageContent` instead.
 
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
-        instead.
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
 
     Args:
         audio_url (str):
         title (str):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         performer (Optional[str]):
         audio_duration (Optional[str]):
+        caption (Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[
-            :class:`telegram.input_message_content`]):
+        input_message_content (Optional[:class:`telegram.input_message_content`]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,
@@ -64,6 +62,7 @@ class InlineQueryResultAudio(InlineQueryResult):
                  title,
                  performer=None,
                  audio_duration=None,
+                 caption=None,
                  reply_markup=None,
                  input_message_content=None,
                  **kwargs):
@@ -78,17 +77,19 @@ class InlineQueryResultAudio(InlineQueryResult):
             self.performer = performer
         if audio_duration:
             self.audio_duration = audio_duration
+        if caption:
+            self.caption = caption
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:
             self.input_message_content = input_message_content
 
     @staticmethod
-    def de_json(data):
-        data = super(InlineQueryResultAudio, InlineQueryResultAudio).de_json(data)
+    def de_json(data, bot):
+        data = super(InlineQueryResultAudio, InlineQueryResultAudio).de_json(data, bot)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(data.get(
-            'input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'), bot)
 
         return InlineQueryResultAudio(**data)

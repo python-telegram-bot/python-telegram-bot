@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram Audio."""
+"""This module contains an object that represents a Telegram Audio."""
 
 from telegram import TelegramObject
 
@@ -35,30 +35,37 @@ class Audio(TelegramObject):
     Args:
         file_id (str):
         duration (int):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
         performer (Optional[str]):
         title (Optional[str]):
         mime_type (Optional[str]):
         file_size (Optional[int]):
+        **kwargs: Arbitrary keyword arguments.
+
     """
 
-    def __init__(self, file_id, duration, **kwargs):
+    def __init__(self,
+                 file_id,
+                 duration,
+                 performer='',
+                 title='',
+                 mime_type='',
+                 file_size=0,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
         self.duration = int(duration)
         # Optionals
-        self.performer = kwargs.get('performer', '')
-        self.title = kwargs.get('title', '')
-        self.mime_type = str(kwargs.get('mime_type', ''))
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.performer = performer
+        self.title = title
+        self.mime_type = str(mime_type)
+        self.file_size = int(file_size)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.Audio:

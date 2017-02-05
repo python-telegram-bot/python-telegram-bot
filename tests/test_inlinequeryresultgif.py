@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultGif"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -45,9 +41,8 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.title = 'title'
         self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -63,7 +58,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         }
 
     def test_gif_de_json(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(gif.type, self.type)
         self.assertEqual(gif.id, self.id)
@@ -78,12 +73,12 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(gif.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_gif_to_json(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict)
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(gif.to_json()))
 
     def test_gif_to_dict(self):
-        gif = telegram.InlineQueryResultGif.de_json(self.json_dict).to_dict()
+        gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(gif))
         self.assertDictEqual(self.json_dict, gif)

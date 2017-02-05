@@ -16,43 +16,41 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
-ReplyKeyboardHide."""
+"""This module contains an object that represents a Telegram GameHighScore."""
 
-from telegram import ReplyMarkup
+from telegram import TelegramObject, User
 
 
-class ReplyKeyboardHide(ReplyMarkup):
-    """This object represents a Telegram ReplyKeyboardHide.
+class GameHighScore(TelegramObject):
+    """This object represents a Telegram GameHighScore.
 
     Attributes:
-        hide_keyboard (bool):
-        selective (bool):
+        position (int): Position in high score table for the game.
+        user (:class:`telegram.User`): User object.
+        score (int): Score.
 
-    Args:
-        hide_keyboard (bool):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        selective (Optional[bool]):
     """
 
-    def __init__(self, hide_keyboard=True, **kwargs):
-        # Required
-        self.hide_keyboard = bool(hide_keyboard)
-        # Optionals
-        self.selective = bool(kwargs.get('selective', False))
+    def __init__(self, position, user, score):
+        self.position = position
+        self.user = user
+        self.score = score
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
-            telegram.ReplyKeyboardHide:
+            telegram.Game:
         """
         if not data:
             return None
 
-        return ReplyKeyboardHide(**data)
+        data = super(GameHighScore, GameHighScore).de_json(data, bot)
+
+        data['user'] = User.de_json(data.get('user'), bot)
+
+        return GameHighScore(**data)

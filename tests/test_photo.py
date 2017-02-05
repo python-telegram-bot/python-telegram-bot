@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Photo"""
+"""This module contains an object that represents Tests for Telegram Photo"""
 
 import sys
 import unittest
@@ -35,15 +35,14 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.photo_file = open('tests/data/telegram.jpg', 'rb')
-        self.photo_file_id = 'AgADAQADvb8xGx8j9QcpZDKxYoFK3bfX1i8ABFX_dgMWoKDuQugAAgI'
+        self.photo_file_id = 'AgADAQADgEsyGx8j9QfmDMmwkPBrFcKRzy8ABHW8ul9nW7FoNHYBAAEC'
         self.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
         self.width = 300
         self.height = 300
         self.thumb = {
             'width': 90,
             'height': 90,
-            'file_id':
-            'AgADAQADvb8xGx8j9QcpZDKxYoFK3bfX1i8ABBxRLXFhLnhIQ-gAAgI',
+            'file_id': 'AgADAQADgEsyGx8j9QeYW9oDz2mKRsKRzy8ABD64nkFkjujeNXYBAAEC',
             'file_size': 1478
         }
         self.file_size = 10209
@@ -141,7 +140,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.height, self.height)
 
     def test_photo_de_json(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict)
+        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
         self.assertEqual(photo.file_id, self.photo_file_id)
         self.assertTrue(isinstance(photo, telegram.PhotoSize))
@@ -150,12 +149,12 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.file_size, self.file_size)
 
     def test_photo_to_json(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict)
+        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(photo.to_json()))
 
     def test_photo_to_dict(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict)
+        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(photo.to_dict()))
         self.assertEqual(photo['file_id'], self.photo_file_id)
@@ -200,6 +199,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertRaises(
             TypeError,
             lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_photo(self):
+        """Test for Message.reply_photo"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_photo(self.photo_file)
+
+        self.assertNotEqual(message.photo[0].file_id, '')
 
 
 if __name__ == '__main__':

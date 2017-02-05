@@ -1,5 +1,5 @@
 telegram.inlinequeryresultlocation module
-=================================
+=========================================
 
 .. automodule:: telegram.inlinequeryresultlocation
     :members:

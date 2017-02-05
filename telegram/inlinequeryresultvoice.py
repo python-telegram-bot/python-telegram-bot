@@ -29,6 +29,7 @@ class InlineQueryResultVoice(InlineQueryResult):
                  voice_url,
                  title,
                  voice_duration=None,
+                 caption=None,
                  reply_markup=None,
                  input_message_content=None,
                  **kwargs):
@@ -41,17 +42,19 @@ class InlineQueryResultVoice(InlineQueryResult):
         # Optional
         if voice_duration:
             self.voice_duration = voice_duration
+        if caption:
+            self.caption = caption
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:
             self.input_message_content = input_message_content
 
     @staticmethod
-    def de_json(data):
-        data = super(InlineQueryResultVoice, InlineQueryResultVoice).de_json(data)
+    def de_json(data, bot):
+        data = super(InlineQueryResultVoice, InlineQueryResultVoice).de_json(data, bot)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(data.get(
-            'input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'), bot)
 
         return InlineQueryResultVoice(**data)

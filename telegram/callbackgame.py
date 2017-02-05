@@ -16,17 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a logging NullHandler."""
+"""This module contains an object that represents a Telegram CallbackGame."""
 
-import logging
+from telegram import TelegramObject
 
 
-class NullHandler(logging.Handler):
-    """This object represents a logging NullHandler."""
-
-    def emit(self, record):
-        """
-        Args:
-            record (str):
-        """
-        pass
+class CallbackGame(TelegramObject):
+    """A placeholder, currently holds no information. Use BotFather to set up your game."""

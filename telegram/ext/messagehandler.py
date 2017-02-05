@@ -17,73 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the MessageHandler class """
+import warnings
 
 from .handler import Handler
 from telegram import Update
 from telegram.utils.deprecate import deprecate
-
-
-class Filters(object):
-    """
-    Convenient namespace (class) & methods for the filter funcs of the
-    MessageHandler class.
-    """
-
-    @staticmethod
-    def text(update):
-        return update.message.text and not update.message.text.startswith('/')
-
-    @staticmethod
-    def command(update):
-        return update.message.text and update.message.text.startswith('/')
-
-    @staticmethod
-    def audio(update):
-        return bool(update.message.audio)
-
-    @staticmethod
-    def document(update):
-        return bool(update.message.document)
-
-    @staticmethod
-    def photo(update):
-        return bool(update.message.photo)
-
-    @staticmethod
-    def sticker(update):
-        return bool(update.message.sticker)
-
-    @staticmethod
-    def video(update):
-        return bool(update.message.video)
-
-    @staticmethod
-    def voice(update):
-        return bool(update.message.voice)
-
-    @staticmethod
-    def contact(update):
-        return bool(update.message.contact)
-
-    @staticmethod
-    def location(update):
-        return bool(update.message.location)
-
-    @staticmethod
-    def venue(update):
-        return bool(update.message.venue)
-
-    @staticmethod
-    def status_update(update):
-        # yapf: disable
-        # https://github.com/google/yapf/issues/252
-        return bool(update.message.new_chat_member or update.message.left_chat_member or
-                    update.message.new_chat_title or update.message.new_chat_photo or
-                    update.message.delete_chat_photo or update.message.group_chat_created or
-                    update.message.supergroup_chat_created or
-                    update.message.channel_chat_created or update.message.migrate_to_chat_id or
-                    update.message.migrate_from_chat_id or update.message.pinned_message)
-        # yapf: enable
 
 
 class MessageHandler(Handler):
@@ -93,38 +31,96 @@ class MessageHandler(Handler):
     updates.
 
     Args:
-        filters (list[function]): A list of filter functions. Standard filters
-            can be found in the Filters class above.
-          | Each `function` takes ``Update`` as arg and returns ``bool``.
-          | All messages that match at least one of those filters will be
-            accepted. If ``bool(filters)`` evaluates to ``False``, messages are
-            not filtered.
+        filters (telegram.ext.BaseFilter): A filter inheriting from
+            :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
+            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            operators (& for and, | for or).
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
+        allow_edited (Optional[bool]): If the handler should also accept edited messages.
+            Default is ``False``
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
             be used to insert updates. Default is ``False``
+        pass_user_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``user_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the user that sent the update. For each update of
+            the same user, it will be the same ``dict``. Default is ``False``.
+        pass_chat_data (optional[bool]): If set to ``True``, a keyword argument called
+            ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
+            can use to keep any data related to the chat that the update was sent in.
+            For each update in the same chat, it will be the same ``dict``. Default is ``False``.
+        message_updates (Optional[bool]): Should "normal" message updates be handled? Default is
+            ``True``.
+        channel_posts_updates (Optional[bool]): Should channel posts updates be handled? Default is
+            ``True``.
+
     """
 
-    def __init__(self, filters, callback, pass_update_queue=False):
-        super(MessageHandler, self).__init__(callback, pass_update_queue)
+    def __init__(self,
+                 filters,
+                 callback,
+                 allow_edited=False,
+                 pass_update_queue=False,
+                 pass_job_queue=False,
+                 pass_user_data=False,
+                 pass_chat_data=False,
+                 message_updates=True,
+                 channel_posts_updates=True):
+        if not message_updates and not channel_posts_updates:
+            raise ValueError('Both message_updates & channel_post_updates are False')
+
+        super(MessageHandler, self).__init__(
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            pass_user_data=pass_user_data,
+            pass_chat_data=pass_chat_data)
         self.filters = filters
+        self.allow_edited = allow_edited
+        self.message_updates = message_updates
+        self.channel_posts_updates = channel_posts_updates
+
+        # We put this up here instead of with the rest of checking code
+        # in check_update since we don't wanna spam a ton
+        if isinstance(self.filters, list):
+            warnings.warn('Using a list of filters in MessageHandler is getting '
+                          'deprecated, please use bitwise operators (& and |) '
+                          'instead. More info: https://git.io/vPTbc.')
+
+    def _is_allowed_message(self, update):
+        return (self.message_updates
+                and (update.message or (update.edited_message and self.allow_edited)))
+
+    def _is_allowed_channel_post(self, update):
+        return (self.channel_posts_updates
+                and (update.channel_post or (update.edited_channel_post and self.allow_edited)))
 
     def check_update(self, update):
-        if isinstance(update, Update) and update.message:
+        if (isinstance(update, Update)
+                and (self._is_allowed_message(update) or self._is_allowed_channel_post(update))):
+
             if not self.filters:
                 res = True
+
             else:
-                res = any(func(update) for func in self.filters)
+                message = (update.message or update.edited_message or update.channel_post
+                           or update.edited_channel_post)
+                if isinstance(self.filters, list):
+                    res = any(func(message) for func in self.filters)
+                else:
+                    res = self.filters(message)
+
         else:
             res = False
+
         return res
 
     def handle_update(self, update, dispatcher):
-        optional_args = self.collect_optional_args(dispatcher)
+        optional_args = self.collect_optional_args(dispatcher, update)
 
-        self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(dispatcher.bot, update, **optional_args)
 
     # old non-PEP8 Handler methods
     m = "telegram.MessageHandler."

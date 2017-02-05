@@ -68,3 +68,9 @@ telegram.mp4
 telegram.ogg
 telegram.png
 telegram.webp
+
+# original files from merges
+*.orig
+
+# Exclude .exrc file for Vim
+.exrc

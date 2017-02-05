@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultCachedVoice"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -41,41 +37,40 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         self.type = 'voice'
         self.voice_file_id = 'voice file id'
         self.title = 'title'
-        self.description = 'description'
+        self.caption = 'caption'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
             'id': self.id,
             'voice_file_id': self.voice_file_id,
             'title': self.title,
-            'description': self.description,
+            'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
         }
 
     def test_voice_de_json(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict)
+        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot)
 
         self.assertEqual(voice.type, self.type)
         self.assertEqual(voice.id, self.id)
         self.assertEqual(voice.voice_file_id, self.voice_file_id)
         self.assertEqual(voice.title, self.title)
-        self.assertEqual(voice.description, self.description)
+        self.assertEqual(voice.caption, self.caption)
         self.assertDictEqual(voice.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
         self.assertDictEqual(voice.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_voice_to_json(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict)
+        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(voice.to_json()))
 
     def test_voice_to_dict(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict).to_dict()
+        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(voice))
         self.assertDictEqual(self.json_dict, voice)

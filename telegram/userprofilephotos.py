@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
+"""This module contains an object that represents a Telegram
 UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
@@ -34,16 +34,17 @@ class UserProfilePhotos(TelegramObject):
         photos (List[List[:class:`telegram.PhotoSize`]]):
     """
 
-    def __init__(self, total_count, photos):
+    def __init__(self, total_count, photos, **kwargs):
         # Required
         self.total_count = int(total_count)
         self.photos = photos
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.UserProfilePhotos:
@@ -51,7 +52,9 @@ class UserProfilePhotos(TelegramObject):
         if not data:
             return None
 
-        data['photos'] = [PhotoSize.de_list(photo) for photo in data['photos']]
+        data = super(UserProfilePhotos, UserProfilePhotos).de_json(data, bot)
+
+        data['photos'] = [PhotoSize.de_list(photo, bot) for photo in data['photos']]
 
         return UserProfilePhotos(**data)
 

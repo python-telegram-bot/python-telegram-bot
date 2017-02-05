@@ -16,10 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Location"""
+"""This module contains an object that represents Tests for Telegram Location"""
 
 import unittest
 import sys
+
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
@@ -44,9 +47,8 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.longitude, self.longitude)
 
     def test_send_location_explicit_args(self):
-        message = self._bot.sendLocation(chat_id=self._chat_id,
-                                         latitude=self.latitude,
-                                         longitude=self.longitude)
+        message = self._bot.sendLocation(
+            chat_id=self._chat_id, latitude=self.latitude, longitude=self.longitude)
 
         location = message.location
 
@@ -54,18 +56,18 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.longitude, self.longitude)
 
     def test_location_de_json(self):
-        location = telegram.Location.de_json(self.json_dict)
+        location = telegram.Location.de_json(self.json_dict, self._bot)
 
         self.assertEqual(location.latitude, self.latitude)
         self.assertEqual(location.longitude, self.longitude)
 
     def test_location_to_json(self):
-        location = telegram.Location.de_json(self.json_dict)
+        location = telegram.Location.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(location.to_json()))
 
     def test_location_to_dict(self):
-        location = telegram.Location.de_json(self.json_dict)
+        location = telegram.Location.de_json(self.json_dict, self._bot)
 
         self.assertEqual(location['latitude'], self.latitude)
         self.assertEqual(location['longitude'], self.longitude)
@@ -89,6 +91,15 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertRaises(TypeError,
                           lambda: self._bot.sendLocation(chat_id=self._chat_id,
                                                          **json_dict))
+
+    @flaky(3, 1)
+    def test_reply_location(self):
+        """Test for Message.reply_location"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_location(self.latitude, self.longitude)
+
+        self.assertEqual(message.location.latitude, self.latitude)
+        self.assertEqual(message.location.longitude, self.longitude)
 
 
 if __name__ == '__main__':

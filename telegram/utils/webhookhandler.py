@@ -1,15 +1,18 @@
 import logging
 
-from telegram import Update, NullHandler
+from telegram import Update
 from future.utils import bytes_to_native_str
 from threading import Lock
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
 try:
     import BaseHTTPServer
 except ImportError:
     import http.server as BaseHTTPServer
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class _InvalidPost(Exception):
@@ -21,11 +24,12 @@ class _InvalidPost(Exception):
 
 class WebhookServer(BaseHTTPServer.HTTPServer, object):
 
-    def __init__(self, server_address, RequestHandlerClass, update_queue, webhook_path):
+    def __init__(self, server_address, RequestHandlerClass, update_queue, webhook_path, bot):
         super(WebhookServer, self).__init__(server_address, RequestHandlerClass)
         self.logger = logging.getLogger(__name__)
         self.update_queue = update_queue
         self.webhook_path = webhook_path
+        self.bot = bot
         self.is_running = False
         self.server_lock = Lock()
         self.shutdown_lock = Lock()
@@ -82,7 +86,8 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
             self.logger.debug('Webhook received data: ' + json_string)
 
-            update = Update.de_json(json.loads(json_string))
+            update = Update.de_json(json.loads(json_string), self.server.bot)
+
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
             self.server.update_queue.put(update)
 
@@ -102,3 +107,19 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         if clen < 0:
             raise _InvalidPost(403)
         return clen
+
+    def log_message(self, format, *args):
+        """Log an arbitrary message.
+
+        This is used by all other logging functions.
+
+        It overrides ``BaseHTTPRequestHandler.log_message``, which logs to ``sys.stderr``.
+
+        The first argument, FORMAT, is a format string for the message to be logged.  If the format
+        string contains any % escapes requiring parameters, they should be specified as subsequent
+        arguments (it's just like printf!).
+
+        The client ip is prefixed to every message.
+        """
+
+        self.logger.debug("%s - - %s" % (self.address_string(), format % args))

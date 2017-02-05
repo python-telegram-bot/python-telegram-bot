@@ -35,28 +35,40 @@ class StringCommandHandler(Handler):
         pass_args (optional[bool]): If the handler should be passed the
             arguments passed to the command as a keyword argument called `
             ``args``. It will contain a list of strings, which is the text
-            following the command split on spaces. Default is ``False``
-        pass_update_queue (optional[bool]): If the handler should be passed the
-            update queue as a keyword argument called ``update_queue``. It can
-            be used to insert updates. Default is ``False``
+            following the command split on single or consecutive whitespace characters.
+            Default is ``False``
+        pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
+            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
+            instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
+            be used to insert updates. Default is ``False``.
+        pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
+            ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
+            instance created by the ``Updater`` which can be used to schedule new jobs.
+            Default is ``False``.
     """
 
-    def __init__(self, command, callback, pass_args=False, pass_update_queue=False):
-        super(StringCommandHandler, self).__init__(callback, pass_update_queue)
+    def __init__(self,
+                 command,
+                 callback,
+                 pass_args=False,
+                 pass_update_queue=False,
+                 pass_job_queue=False):
+        super(StringCommandHandler, self).__init__(
+            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.command = command
         self.pass_args = pass_args
 
     def check_update(self, update):
-        return (isinstance(update, str) and update.startswith('/') and
-                update[1:].split(' ')[0] == self.command)
+        return (isinstance(update, str) and update.startswith('/')
+                and update[1:].split(' ')[0] == self.command)
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher)
 
         if self.pass_args:
-            optional_args['args'] = update.split(' ')[1:]
+            optional_args['args'] = update.split()[1:]
 
-        self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(dispatcher.bot, update, **optional_args)
 
     # old non-PEP8 Handler methods
     m = "telegram.StringCommandHandler."

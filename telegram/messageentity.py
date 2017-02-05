@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram MessageEntity."""
+"""This module contains an object that represents a Telegram MessageEntity."""
 
-from telegram import TelegramObject
+from telegram import User, TelegramObject
 
 
 class MessageEntity(TelegramObject):
@@ -31,24 +31,28 @@ class MessageEntity(TelegramObject):
         offset (int):
         length (int):
         url (Optional[str]):
+        user (Optional[:class:`telegram.User`]):
     """
 
-    def __init__(self, type, offset, length, **kwargs):
+    def __init__(self, type, offset, length, url=None, user=None, **kwargs):
         # Required
         self.type = type
         self.offset = offset
         self.length = length
         # Optionals
-        self.url = kwargs.get('url')
+        self.url = url
+        self.user = user
 
     @staticmethod
-    def de_json(data):
-        data = super(MessageEntity, MessageEntity).de_json(data)
+    def de_json(data, bot):
+        data = super(MessageEntity, MessageEntity).de_json(data, bot)
+
+        data['user'] = User.de_json(data.get('user'), bot)
 
         return MessageEntity(**data)
 
     @staticmethod
-    def de_list(data):
+    def de_list(data, bot):
         """
         Args:
             data (list):
@@ -61,6 +65,21 @@ class MessageEntity(TelegramObject):
 
         entities = list()
         for entity in data:
-            entities.append(MessageEntity.de_json(entity))
+            entities.append(MessageEntity.de_json(entity, bot))
 
         return entities
+
+    MENTION = 'mention'
+    HASHTAG = 'hashtag'
+    BOT_COMMAND = 'bot_command'
+    URL = 'url'
+    EMAIL = 'email'
+    BOLD = 'bold'
+    ITALIC = 'italic'
+    CODE = 'code'
+    PRE = 'pre'
+    TEXT_LINK = 'text_link'
+    TEXT_MENTION = 'text_mention'
+    ALL_TYPES = [
+        MENTION, HASHTAG, BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
+    ]

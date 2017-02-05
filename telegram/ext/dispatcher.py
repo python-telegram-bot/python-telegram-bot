@@ -19,64 +19,44 @@
 """This module contains the Dispatcher class."""
 
 import logging
+import weakref
 from functools import wraps
-from threading import Thread, BoundedSemaphore, Lock, Event, current_thread
+from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
+from uuid import uuid4
+from collections import defaultdict
 
-from queue import Empty
+from queue import Queue, Empty
 
-from telegram import (TelegramError, NullHandler)
+from future.builtins import range
+
+from telegram import TelegramError
 from telegram.ext.handler import Handler
 from telegram.utils.deprecate import deprecate
+from telegram.utils.promise import Promise
 
-logging.getLogger(__name__).addHandler(NullHandler())
-
-semaphore = None
-async_threads = set()
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 """:type: set[Thread]"""
-async_lock = Lock()
 DEFAULT_GROUP = 0
 
 
 def run_async(func):
-    """
-    Function decorator that will run the function in a new thread.
+    """Function decorator that will run the function in a new thread.
+
+    Using this decorator is only possible when only a single Dispatcher exist in the system.
 
     Args:
         func (function): The function to run in the thread.
+        async_queue (Queue): The queue of the functions to be executed asynchronously.
 
     Returns:
         function:
+
     """
 
-    # TODO: handle exception in async threads
-    #       set a threading.Event to notify caller thread
-
     @wraps(func)
-    def pooled(*pargs, **kwargs):
-        """
-        A wrapper to run a thread in a thread pool
-        """
-        try:
-            result = func(*pargs, **kwargs)
-        finally:
-            semaphore.release()
-
-            with async_lock:
-                async_threads.remove(current_thread())
-        return result
-
-    @wraps(func)
-    def async_func(*pargs, **kwargs):
-        """
-        A wrapper to run a function in a thread
-        """
-        thread = Thread(target=pooled, args=pargs, kwargs=kwargs)
-        semaphore.acquire()
-        with async_lock:
-            async_threads.add(thread)
-        thread.start()
-        return thread
+    def async_func(*args, **kwargs):
+        return Dispatcher.get_instance().run_async(func, *args, **kwargs)
 
     return async_func
 
@@ -90,11 +70,27 @@ class Dispatcher(object):
             handlers
         update_queue (Queue): The synchronized queue that will contain the
             updates.
-    """
+        job_queue (Optional[telegram.ext.JobQueue]): The ``JobQueue`` instance to pass onto handler
+            callbacks
+        workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
+            decorator
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None):
+    """
+    __singleton_lock = Lock()
+    __singleton_semaphore = BoundedSemaphore()
+    __singleton = None
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
         self.update_queue = update_queue
+        self.job_queue = job_queue
+        self.workers = workers
+
+        self.user_data = defaultdict(dict)
+        """:type: dict[int, dict]"""
+        self.chat_data = defaultdict(dict)
+        """:type: dict[int, dict]"""
 
         self.handlers = {}
         """:type: dict[int, list[Handler]"""
@@ -102,16 +98,90 @@ class Dispatcher(object):
         """:type: list[int]"""
         self.error_handlers = []
 
-        self.logger = logging.getLogger(__name__)
         self.running = False
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
+        self.__async_queue = Queue()
+        self.__async_threads = set()
 
-        global semaphore
-        if not semaphore:
-            semaphore = BoundedSemaphore(value=workers)
+        # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
+        # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
+        with self.__singleton_lock:
+            if self.__singleton_semaphore.acquire(blocking=0):
+                self._set_singleton(self)
+            else:
+                self._set_singleton(None)
+
+    @classmethod
+    def _reset_singleton(cls):
+        # NOTE: This method was added mainly for test_updater benefit and specifically pypy. Never
+        #       call it in production code.
+        cls.__singleton_semaphore.release()
+
+    def _init_async_threads(self, base_name, workers):
+        base_name = '{}_'.format(base_name) if base_name else ''
+
+        for i in range(workers):
+            thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
+            self.__async_threads.add(thread)
+            thread.start()
+
+    @classmethod
+    def _set_singleton(cls, val):
+        cls.logger.debug('Setting singleton dispatcher as %s', val)
+        cls.__singleton = weakref.ref(val) if val else None
+
+    @classmethod
+    def get_instance(cls):
+        """Get the singleton instance of this class.
+
+        Returns:
+            Dispatcher
+
+        """
+        if cls.__singleton is not None:
+            return cls.__singleton()
         else:
-            self.logger.debug('Semaphore already initialized, skipping.')
+            raise RuntimeError('{} not initialized or multiple instances exist'.format(
+                cls.__name__))
+
+    def _pooled(self):
+        """
+        A wrapper to run a thread in a thread pool
+        """
+        thr_name = current_thread().getName()
+        while 1:
+            promise = self.__async_queue.get()
+
+            # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
+            if not isinstance(promise, Promise):
+                self.logger.debug("Closing run_async thread %s/%d", thr_name,
+                                  len(self.__async_threads))
+                break
+
+            try:
+                promise.run()
+
+            except:
+                self.logger.exception("run_async function raised exception")
+
+    def run_async(self, func, *args, **kwargs):
+        """Queue a function (with given args/kwargs) to be run asynchronously.
+
+        Args:
+            func (function): The function to run in the thread.
+            args (Optional[tuple]): Arguments to `func`.
+            kwargs (Optional[dict]): Keyword arguments to `func`.
+
+        Returns:
+            Promise
+
+        """
+        # TODO: handle exception in async threads
+        #       set a threading.Event to notify caller thread
+        promise = Promise(func, args, kwargs)
+        self.__async_queue.put(promise)
+        return promise
 
     def start(self):
         """
@@ -128,10 +198,11 @@ class Dispatcher(object):
             self.logger.error(msg)
             raise TelegramError(msg)
 
+        self._init_async_threads(uuid4(), self.workers)
         self.running = True
         self.logger.debug('Dispatcher started')
 
-        while True:
+        while 1:
             try:
                 # Pop update from update queue.
                 update = self.update_queue.get(True, 1)
@@ -145,7 +216,7 @@ class Dispatcher(object):
                 continue
 
             self.logger.debug('Processing Update: %s' % update)
-            self.processUpdate(update)
+            self.process_update(update)
 
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
@@ -160,7 +231,26 @@ class Dispatcher(object):
                 sleep(0.1)
             self.__stop_event.clear()
 
-    def processUpdate(self, update):
+        # async threads must be join()ed only after the dispatcher thread was joined,
+        # otherwise we can still have new async threads dispatched
+        threads = list(self.__async_threads)
+        total = len(threads)
+
+        # Stop all threads in the thread pool by put()ting one non-tuple per thread
+        for i in range(total):
+            self.__async_queue.put(None)
+
+        for i, thr in enumerate(threads):
+            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
+            thr.join()
+            self.__async_threads.remove(thr)
+            self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
+
+    @property
+    def has_running_threads(self):
+        return self.running or bool(self.__async_threads)
+
+    def process_update(self, update):
         """
         Processes a single update.
 
@@ -170,7 +260,7 @@ class Dispatcher(object):
 
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.dispatchError(None, update)
+            self.dispatch_error(None, update)
 
         else:
             for group in self.groups:
@@ -185,7 +275,7 @@ class Dispatcher(object):
                                          'Update.')
 
                         try:
-                            self.dispatchError(update, te)
+                            self.dispatch_error(update, te)
                         except Exception:
                             self.logger.exception('An uncaught error was raised while '
                                                   'handling the error')
@@ -219,7 +309,7 @@ class Dispatcher(object):
             which handlers were added to the group defines the priority.
 
         Args:
-            handler (Handler): A Handler instance
+            handler (telegram.ext.Handler): A Handler instance
             group (Optional[int]): The group identifier. Default is 0
         """
 
@@ -240,7 +330,7 @@ class Dispatcher(object):
         Remove a handler from the specified group
 
         Args:
-            handler (Handler): A Handler instance
+            handler (telegram.ext.Handler): A Handler instance
             group (optional[object]): The group identifier. Default is 0
         """
         if handler in self.handlers[group]:
@@ -271,7 +361,7 @@ class Dispatcher(object):
         if callback in self.error_handlers:
             self.error_handlers.remove(callback)
 
-    def dispatchError(self, update, error):
+    def dispatch_error(self, update, error):
         """
         Dispatches an error.
 

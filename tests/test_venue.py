@@ -16,14 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Venue"""
+"""This module contains an object that represents Tests for Telegram Venue"""
 
 import sys
+import unittest
 
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+from flaky import flaky
 
 sys.path.append('.')
 
@@ -47,24 +45,34 @@ class VenueTest(BaseTest, unittest.TestCase):
             'foursquare_id': self.foursquare_id
         }
 
-    def test_sticker_de_json(self):
-        sticker = telegram.Venue.de_json(self.json_dict)
+    def test_venue_de_json(self):
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(isinstance(sticker.location, telegram.Location))
         self.assertEqual(sticker.title, self.title)
         self.assertEqual(sticker.address, self._address)
         self.assertEqual(sticker.foursquare_id, self.foursquare_id)
 
-    def test_sticker_to_json(self):
-        sticker = telegram.Venue.de_json(self.json_dict)
+    def test_venue_to_json(self):
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Venue.de_json(self.json_dict).to_dict()
+        sticker = telegram.Venue.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)
+
+    @flaky(3, 1)
+    def test_reply_venue(self):
+        """Test for Message.reply_venue"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_venue(self.location.latitude, self.location.longitude, self.title,
+                                      self._address)
+
+        self.assertAlmostEqual(message.venue.location.latitude, self.location.latitude, 2)
+        self.assertAlmostEqual(message.venue.location.longitude, self.location.longitude, 2)
 
 
 if __name__ == '__main__':

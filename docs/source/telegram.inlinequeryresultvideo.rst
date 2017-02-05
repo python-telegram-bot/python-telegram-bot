@@ -1,5 +1,5 @@
 telegram.inlinequeryresultvideo module
-=================================
+======================================
 
 .. automodule:: telegram.inlinequeryresultvideo
     :members:

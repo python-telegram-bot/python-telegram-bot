@@ -23,6 +23,7 @@ from sys import version_info
 from .base import TelegramObject
 from .user import User
 from .chat import Chat
+from .chatmember import ChatMember
 from .photosize import PhotoSize
 from .audio import Audio
 from .voice import Voice
@@ -37,15 +38,16 @@ from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
-from .replykeyboardhide import ReplyKeyboardHide
+from .replykeyboardremove import ReplyKeyboardRemove, ReplyKeyboardHide
 from .forcereply import ForceReply
 from .error import TelegramError
 from .inputfile import InputFile
 from .file import File
-from .nullhandler import NullHandler
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
+from .animation import Animation
+from .game import Game
 from .message import Message
 from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
@@ -73,33 +75,41 @@ from .inlinequeryresultphoto import InlineQueryResultPhoto
 from .inlinequeryresultvenue import InlineQueryResultVenue
 from .inlinequeryresultvideo import InlineQueryResultVideo
 from .inlinequeryresultvoice import InlineQueryResultVoice
+from .inlinequeryresultgame import InlineQueryResultGame
 from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
+from .webhookinfo import WebhookInfo
+from .gamehighscore import GameHighScore
 from .update import Update
 from .bot import Bot
+from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,
+                        MAX_FILESIZE_DOWNLOAD, MAX_FILESIZE_UPLOAD,
+                        MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,
+                        MAX_MESSAGES_PER_MINUTE_PER_GROUP)
+from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
-__version__ = '4.1.2'
-__all__ = ['Audio', 'Bot', 'Chat', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery', 'Contact',
-           'Document', 'Emoji', 'File', 'ForceReply', 'InlineKeyboardButton',
-           'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
-           'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
-           'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
-           'InlineQueryResultCachedMpeg4Gif', 'InlineQueryResultCachedPhoto',
-           'InlineQueryResultCachedSticker', 'InlineQueryResultCachedVideo',
-           'InlineQueryResultCachedVoice', 'InlineQueryResultContact', 'InlineQueryResultDocument',
-           'InlineQueryResultGif', 'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif',
-           'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
-           'InlineQueryResultVoice', 'InputContactMessageContent', 'InputFile',
-           'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
-           'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
-           'NullHandler', 'ParseMode', 'PhotoSize', 'ReplyKeyboardHide', 'ReplyKeyboardMarkup',
-           'ReplyMarkup', 'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User',
-           'UserProfilePhotos', 'Venue', 'Video', 'Voice']
 
-if version_info < (2, 7):
-    from warnings import warn
-    warn("python-telegram-bot will stop supporting Python 2.6 in a future release. "
-         "Please upgrade your Python!")
+__all__ = [
+    'Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery',
+    'Contact', 'Document', 'Emoji', 'File', 'ForceReply', 'InlineKeyboardButton',
+    'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
+    'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
+    'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
+    'InlineQueryResultCachedMpeg4Gif', 'InlineQueryResultCachedPhoto',
+    'InlineQueryResultCachedSticker', 'InlineQueryResultCachedVideo',
+    'InlineQueryResultCachedVoice', 'InlineQueryResultContact', 'InlineQueryResultDocument',
+    'InlineQueryResultGif', 'InlineQueryResultLocation', 'InlineQueryResultMpeg4Gif',
+    'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
+    'InlineQueryResultVoice', 'InlineQueryResultGame', 'InputContactMessageContent', 'InputFile',
+    'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
+    'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
+    'ParseMode', 'PhotoSize', 'ReplyKeyboardRemove', 'ReplyKeyboardMarkup', 'ReplyMarkup',
+    'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
+    'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
+    'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
+    'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
+    'Game', 'GameHighScore'
+]

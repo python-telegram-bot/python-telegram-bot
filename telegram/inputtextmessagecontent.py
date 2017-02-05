@@ -25,7 +25,7 @@ from telegram import InputMessageContent
 class InputTextMessageContent(InputMessageContent):
     """Base class for Telegram InputTextMessageContent Objects"""
 
-    def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None):
+    def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None, **kwargs):
         # Required
         self.message_text = message_text
         # Optionals
@@ -33,5 +33,5 @@ class InputTextMessageContent(InputMessageContent):
         self.disable_web_page_preview = disable_web_page_preview
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         return InputTextMessageContent(**data)

@@ -1,3 +1,99 @@
+=======
+Changes
+=======
+
+**2016-12-11**
+
+*Released 5.3*
+
+- Implement API changes of November 21st (Bot API 2.3)
+- ``JobQueue`` now supports ``datetime.timedelta`` in addition to seconds
+- ``JobQueue`` now supports running jobs only on certain days
+- New ``Filters.reply`` filter
+- Bugfix for ``Message.edit_reply_markup``
+- Other bugfixes
+
+**2016-10-25**
+
+*Released 5.2*
+
+- Implement API changes of October 3rd (games update)
+- Add ``Message.edit_*`` methods
+- Filters for the ``MessageHandler`` can now be combined using bitwise operators (``& and |``)
+- Add a way to save user- and chat-related data temporarily
+- Other bugfixes and improvements
+
+**2016-09-24**
+
+*Released 5.1*
+
+- Drop Python 2.6 support
+- Deprecate ``telegram.Emoji``
+
+- Use ``ujson`` if available
+- Add instance methods to ``Message``, ``Chat``, ``User``, ``InlineQuery`` and ``CallbackQuery``
+- RegEx filtering for ``CallbackQueryHandler`` and ``InlineQueryHandler``
+- New ``MessageHandler`` filters: ``forwarded`` and ``entity``
+- Add ``Message.get_entity`` to correctly handle UTF-16 codepoints and ``MessageEntity`` offsets
+- Fix bug in ``ConversationHandler`` when first handler ends the conversation
+- Allow multiple ``Dispatcher`` instances
+- Add ``ChatMigrated`` Exception
+- Properly split and handle arguments in ``CommandHandler``
+
+**2016-07-15**
+
+*Released 5.0*
+
+- Rework ``JobQueue``
+- Introduce ``ConversationHandler``
+
+**2016-07-12**
+
+*Released 4.3.4*
+
+- Fix proxy support with ``urllib3`` when proxy requires auth
+
+**2016-07-08**
+
+*Released 4.3.3*
+
+- Fix proxy support with ``urllib3``
+
+**2016-07-04**
+
+*Released 4.3.2*
+
+- Fix: Use ``timeout`` parameter in all API methods
+
+**2016-06-29**
+
+*Released 4.3.1*
+
+- Update wrong requirement: ``urllib3>=1.10``
+
+**2016-06-28**
+
+*Released 4.3*
+
+- Use ``urllib3.PoolManager`` for connection re-use
+- Rewrite ``run_async`` decorator to re-use threads
+- New requirements: ``urllib3`` and ``certifi``
+
+**2016-06-10**
+
+*Released 4.2.1*
+
+- Fix ``CallbackQuery.to_dict()`` bug (thanks to @jlmadurga)
+- Fix ``editMessageText`` exception when receiving a ``CallbackQuery``
+
+**2016-05-28**
+
+*Released 4.2*
+
+- Implement Bot API 2.1
+- Move ``botan`` module to ``telegram.contrib``
+- New exception type: ``BadRequest``
+
 **2016-05-22**
 
 *Released 4.1.2*
@@ -37,7 +133,7 @@
 
 - Implement Bot API 2.0
 - Almost complete recode of ``Dispatcher``
-- Please read the `Transistion Guide to 4.0 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transistion-guide-to-Version-4.0>`_
+- Please read the `Transition Guide to 4.0 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-4.0>`_
 - **Changes from 4.0rc1**
     - The syntax of filters for ``MessageHandler`` (upper/lower cases)
     - Handler groups are now identified by ``int`` only, and ordered

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram PhotoSize."""
+"""This module contains an object that represents a Telegram PhotoSize."""
 
 from telegram import TelegramObject
 
@@ -40,25 +40,26 @@ class PhotoSize(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, width, height, **kwargs):
+    def __init__(self, file_id, width, height, file_size=0, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
         # Optionals
-        self.file_size = int(kwargs.get('file_size', 0))
+        self.file_size = int(file_size)
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        return (self.file_id == other.file_id and self.width == other.width and
-                self.height == other.height and self.file_size == other.file_size)
+        return (self.file_id == other.file_id and self.width == other.width
+                and self.height == other.height and self.file_size == other.file_size)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.PhotoSize:
@@ -69,10 +70,11 @@ class PhotoSize(TelegramObject):
         return PhotoSize(**data)
 
     @staticmethod
-    def de_list(data):
+    def de_list(data, bot):
         """
         Args:
             data (list):
+            bot (telegram.Bot):
 
         Returns:
             List<telegram.PhotoSize>:
@@ -82,6 +84,6 @@ class PhotoSize(TelegramObject):
 
         photos = list()
         for photo in data:
-            photos.append(PhotoSize.de_json(photo))
+            photos.append(PhotoSize.de_json(photo, bot))
 
         return photos

@@ -1,7 +1,7 @@
-telegram.nullhandler module
+telegram.webhookinfo module
 ===========================
 
-.. automodule:: telegram.nullhandler
+.. automodule:: telegram.webhookinfo
     :members:
     :undoc-members:
     :show-inheritance:

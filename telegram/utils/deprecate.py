@@ -21,11 +21,15 @@
 import warnings
 
 
+def warn_deprecate_obj(old, new):
+    warnings.warn('{0} is being deprecated, please use {1} from now on'.format(old, new))
+
+
 def deprecate(func, old, new):
     """Warn users invoking old to switch to the new function."""
 
     def f(*args, **kwargs):
-        warnings.warn("{0} is being deprecated, please use {1} from now on".format(old, new))
+        warn_deprecate_obj(old, new)
         return func(*args, **kwargs)
 
     return f

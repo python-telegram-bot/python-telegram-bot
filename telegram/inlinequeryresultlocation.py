@@ -16,13 +16,42 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultLocation"""
+"""This module contains the classes that represent Telegram InlineQueryResultLocation"""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultLocation(InlineQueryResult):
+    """Represents a location on a map. By default, the location will be sent by the user.
+    Alternatively, you can use input_message_content to send a message with the specified content
+    instead of the location.
+
+    Attributes:
+        latitude (float): Location latitude in degrees.
+        longitude (float): Location longitude in degrees.
+        title (str): Location title.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the location.
+        thumb_url (Optional[str]): Url of the thumbnail for the result.
+        thumb_width (Optional[int]): Thumbnail width.
+        thumb_height (Optional[int]): Thumbnail height.
+
+    Args:
+        latitude (float): Location latitude in degrees.
+        longitude (float): Location longitude in degrees.
+        title (str): Location title.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+            to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+            message to be sent instead of the location.
+        thumb_url (Optional[str]): Url of the thumbnail for the result.
+        thumb_width (Optional[int]): Thumbnail width.
+        thumb_height (Optional[int]): Thumbnail height.
+        **kwargs (dict): Arbitrary keyword arguments.
+
+    """
 
     def __init__(self,
                  id,
@@ -54,11 +83,11 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.thumb_height = thumb_height
 
     @staticmethod
-    def de_json(data):
-        data = super(InlineQueryResultLocation, InlineQueryResultLocation).de_json(data)
+    def de_json(data, bot):
+        data = super(InlineQueryResultLocation, InlineQueryResultLocation).de_json(data, bot)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(data.get(
-            'input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'), bot)
 
         return InlineQueryResultLocation(**data)

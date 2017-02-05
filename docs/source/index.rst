@@ -6,11 +6,8 @@
 Welcome to Python Telegram Bot's documentation!
 ===============================================
 
-Contents:
-
 .. toctree::
-   :maxdepth: 2
-
+   telegram
 
 
 Indices and tables

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram File"""
+"""This module contains an object that represents Tests for Telegram File"""
 
 import sys
 import unittest
@@ -101,19 +101,19 @@ class FileTest(BaseTest, unittest.TestCase):
         self.assertTrue(os.path.isfile('telegram.ogg'))
 
     def test_file_de_json(self):
-        newFile = telegram.File.de_json(self.json_dict)
+        newFile = telegram.File.de_json(self.json_dict, self._bot)
 
         self.assertEqual(newFile.file_id, self.json_dict['file_id'])
         self.assertEqual(newFile.file_path, self.json_dict['file_path'])
         self.assertEqual(newFile.file_size, self.json_dict['file_size'])
 
     def test_file_to_json(self):
-        newFile = telegram.File.de_json(self.json_dict)
+        newFile = telegram.File.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(newFile.to_json()))
 
     def test_file_to_dict(self):
-        newFile = telegram.File.de_json(self.json_dict)
+        newFile = telegram.File.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(newFile.to_dict()))
         self.assertEqual(newFile['file_id'], self.json_dict['file_id'])

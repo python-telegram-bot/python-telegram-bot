@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultVenue"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -47,9 +43,8 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.thumb_width = 10
         self.thumb_height = 15
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
             'id': self.id,
             'type': self.type,
@@ -66,7 +61,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         }
 
     def test_venue_de_json(self):
-        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict)
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot)
 
         self.assertEqual(venue.id, self.id)
         self.assertEqual(venue.type, self.type)
@@ -83,12 +78,12 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(venue.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_venue_to_json(self):
-        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict)
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(venue.to_json()))
 
     def test_venue_to_dict(self):
-        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict).to_dict()
+        venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(venue))
         self.assertDictEqual(self.json_dict, venue)

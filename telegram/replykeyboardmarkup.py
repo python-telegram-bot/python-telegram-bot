@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram
+"""This module contains an object that represents a Telegram
 ReplyKeyboardMarkup."""
 
 from telegram import ReplyMarkup, KeyboardButton
@@ -41,19 +41,25 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         selective (Optional[bool]):
     """
 
-    def __init__(self, keyboard, **kwargs):
+    def __init__(self,
+                 keyboard,
+                 resize_keyboard=False,
+                 one_time_keyboard=False,
+                 selective=False,
+                 **kwargs):
         # Required
         self.keyboard = keyboard
         # Optionals
-        self.resize_keyboard = bool(kwargs.get('resize_keyboard', False))
-        self.one_time_keyboard = bool(kwargs.get('one_time_keyboard', False))
-        self.selective = bool(kwargs.get('selective', False))
+        self.resize_keyboard = bool(resize_keyboard)
+        self.one_time_keyboard = bool(one_time_keyboard)
+        self.selective = bool(selective)
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.ReplyKeyboardMarkup:
@@ -61,7 +67,9 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
-        data['keyboard'] = [KeyboardButton.de_list(keyboard) for keyboard in data['keyboard']]
+        data = super(ReplyKeyboardMarkup, ReplyKeyboardMarkup).de_json(data, bot)
+
+        data['keyboard'] = [KeyboardButton.de_list(keyboard, bot) for keyboard in data['keyboard']]
 
         return ReplyKeyboardMarkup(**data)
 

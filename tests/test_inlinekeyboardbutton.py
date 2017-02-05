@@ -17,14 +17,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram InlineKeyboardButton"""
+"""This module contains an object that represents Tests for Telegram InlineKeyboardButton"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -49,7 +45,7 @@ class InlineKeyboardButtonTest(BaseTest, unittest.TestCase):
         }
 
     def test_inline_keyboard_button_de_json(self):
-        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(self.json_dict)
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(self.json_dict, self._bot)
 
         self.assertEqual(inline_keyboard_button.text, self.text)
         self.assertEqual(inline_keyboard_button.url, self.url)
@@ -57,22 +53,23 @@ class InlineKeyboardButtonTest(BaseTest, unittest.TestCase):
         self.assertEqual(inline_keyboard_button.switch_inline_query, self.switch_inline_query)
 
     def test_inline_keyboard_button_de_json_empty(self):
-        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(None)
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(None, self._bot)
 
         self.assertFalse(inline_keyboard_button)
 
     def test_inline_keyboard_button_de_list_empty(self):
-        inline_keyboard_button = telegram.InlineKeyboardButton.de_list(None)
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_list(None, self._bot)
 
         self.assertFalse(inline_keyboard_button)
 
     def test_inline_keyboard_button_to_json(self):
-        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(self.json_dict)
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(inline_keyboard_button.to_json()))
 
     def test_inline_keyboard_button_to_dict(self):
-        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(self.json_dict).to_dict()
+        inline_keyboard_button = telegram.InlineKeyboardButton.de_json(self.json_dict,
+                                                                       self._bot).to_dict()
 
         self.assertTrue(self.is_dict(inline_keyboard_button))
         self.assertDictEqual(self.json_dict, inline_keyboard_button)

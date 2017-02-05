@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents a Telegram User."""
+"""This module contains an object that represents a Telegram User."""
 
 from telegram import TelegramObject
 
@@ -41,16 +41,19 @@ class User(TelegramObject):
         type (Optional[str]):
         last_name (Optional[str]):
         username (Optional[str]):
+        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    def __init__(self, id, first_name, **kwargs):
+    def __init__(self, id, first_name, type='', last_name='', username='', bot=None, **kwargs):
         # Required
         self.id = int(id)
         self.first_name = first_name
         # Optionals
-        self.type = kwargs.get('type', '')
-        self.last_name = kwargs.get('last_name', '')
-        self.username = kwargs.get('username', '')
+        self.type = type
+        self.last_name = last_name
+        self.username = username
+
+        self.bot = bot
 
     @property
     def name(self):
@@ -62,10 +65,11 @@ class User(TelegramObject):
         return self.first_name
 
     @staticmethod
-    def de_json(data):
+    def de_json(data, bot):
         """
         Args:
-            data (str):
+            data (dict):
+            bot (telegram.Bot):
 
         Returns:
             telegram.User:
@@ -73,4 +77,12 @@ class User(TelegramObject):
         if not data:
             return None
 
-        return User(**data)
+        data = super(User, User).de_json(data, bot)
+
+        return User(bot=bot, **data)
+
+    def get_profile_photos(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.getUserProfilePhotos(update.message.from_user.id, *args, **kwargs)``
+        """
+        return self.bot.getUserProfilePhotos(self.id, *args, **kwargs)

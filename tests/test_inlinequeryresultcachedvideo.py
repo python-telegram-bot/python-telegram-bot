@@ -16,15 +16,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram
+"""This module contains an object that represents Tests for Telegram
 InlineQueryResultCachedVideo"""
 
 import sys
-
-if sys.version_info[0:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest
+import unittest
 
 sys.path.append('.')
 
@@ -44,9 +40,8 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
         self.caption = 'caption'
         self.description = 'description'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup([[
-            telegram.InlineKeyboardButton('reply_markup')
-        ]])
+        self.reply_markup = telegram.InlineKeyboardMarkup(
+            [[telegram.InlineKeyboardButton('reply_markup')]])
 
         self.json_dict = {
             'type': self.type,
@@ -60,7 +55,7 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
         }
 
     def test_video_de_json(self):
-        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict)
+        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot)
 
         self.assertEqual(video.type, self.type)
         self.assertEqual(video.id, self.id)
@@ -73,12 +68,12 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(video.reply_markup.to_dict(), self.reply_markup.to_dict())
 
     def test_video_to_json(self):
-        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict)
+        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(video.to_json()))
 
     def test_video_to_dict(self):
-        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict).to_dict()
+        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot).to_dict()
 
         self.assertTrue(self.is_dict(video))
         self.assertDictEqual(self.json_dict, video)

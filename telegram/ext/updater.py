@@ -22,18 +22,20 @@ Telegram bots intuitive."""
 import logging
 import os
 import ssl
+import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
-from telegram import Bot, TelegramError, NullHandler
-from telegram.ext import dispatcher, Dispatcher, JobQueue
-from telegram.error import Unauthorized, InvalidToken
+from telegram import Bot, TelegramError
+from telegram.ext import Dispatcher, JobQueue
+from telegram.error import Unauthorized, InvalidToken, RetryAfter
+from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
-logging.getLogger(__name__).addHandler(NullHandler())
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class Updater(object):
@@ -57,38 +59,50 @@ class Updater(object):
         base_url (Optional[str]):
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
-        bot (Optional[Bot]):
-        job_queue_tick_interval(Optional[float]): The interval the queue should
-            be checked for new tasks. Defaults to 1.0
+        bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
+            the user's responsibility to create it using a `Request` instance with a large enough
+            connection pool.
+        request_kwargs (Optional[dict]): Keyword args to control the creation of a request object
+            (ignored if `bot` argument is used).
 
     Raises:
         ValueError: If both `token` and `bot` are passed or none of them.
-    """
 
-    def __init__(self,
-                 token=None,
-                 base_url=None,
-                 workers=4,
-                 bot=None,
-                 job_queue_tick_interval=1.0):
+    """
+    _request = None
+
+    def __init__(self, token=None, base_url=None, workers=4, bot=None, request_kwargs=None):
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
             raise ValueError('`token` and `bot` are mutually exclusive')
 
-        self.logger = logging.getLogger(__name__)
         if bot is not None:
             self.bot = bot
         else:
-            if token is not token.strip():
-                self.logger.warning("Token contains whitespace characters")
-                token = token.strip()
-            self.bot = Bot(token, base_url)
+            # we need a connection pool the size of:
+            # * for each of the workers
+            # * 1 for Dispatcher
+            # * 1 for polling Updater (even if webhook is used, we can spare a connection)
+            # * 1 for JobQueue
+            # * 1 for main thread
+            if request_kwargs is None:
+                request_kwargs = {}
+            if 'con_pool_size' not in request_kwargs:
+                request_kwargs['con_pool_size'] = workers + 4
+            self._request = Request(**request_kwargs)
+            self.bot = Bot(token, base_url, request=self._request)
         self.update_queue = Queue()
-        self.job_queue = JobQueue(self.bot, job_queue_tick_interval)
+        self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
-        self.dispatcher = Dispatcher(self.bot, self.update_queue, workers, self.__exception_event)
+        self.dispatcher = Dispatcher(
+            self.bot,
+            self.update_queue,
+            job_queue=self.job_queue,
+            workers=workers,
+            exception_event=self.__exception_event)
         self.last_update_id = 0
+        self.logger = logging.getLogger(__name__)
         self.running = False
         self.is_idle = False
         self.httpd = None
@@ -115,39 +129,54 @@ class Updater(object):
     def start_polling(self,
                       poll_interval=0.0,
                       timeout=10,
-                      network_delay=2,
+                      network_delay=None,
                       clean=False,
-                      bootstrap_retries=0):
+                      bootstrap_retries=0,
+                      read_latency=2.):
         """
         Starts polling updates from Telegram.
 
         Args:
-            poll_interval (Optional[float]): Time to wait between polling
-                updates from Telegram in seconds. Default is 0.0
+            poll_interval (Optional[float]): Time to wait between polling updates from Telegram in
+            seconds. Default is 0.0
+
             timeout (Optional[float]): Passed to Bot.getUpdates
-            network_delay (Optional[float]): Passed to Bot.getUpdates
-            clean (Optional[bool]): Whether to clean any pending updates on
-                Telegram servers before actually starting to poll. Default is
-                False.
-            bootstrap_retries (Optional[int[): Whether the bootstrapping phase
-                of the `Updater` will retry on failures on the Telegram server.
+
+            network_delay: Deprecated. Will be honoured as `read_latency` for a while but will be
+                removed in the future.
+
+            clean (Optional[bool]): Whether to clean any pending updates on Telegram servers before
+              actually starting to poll. Default is False.
+
+            bootstrap_retries (Optional[int]): Whether the bootstrapping phase of the `Updater`
+              will retry on failures on the Telegram server.
 
                 |   < 0 - retry indefinitely
-                |   0 - no retries (default)
+                |     0 - no retries (default)
                 |   > 0 - retry up to X times
+
+            read_latency (Optional[float|int]): Grace time in seconds for receiving the reply from
+                server. Will be added to the `timeout` value and used as the read timeout from
+                server (Default: 2).
+
 
         Returns:
             Queue: The update queue that can be filled from the main thread
 
         """
+        if network_delay is not None:
+            warnings.warn('network_delay is deprecated, use read_latency instead')
+            read_latency = network_delay
+
         with self.__lock:
             if not self.running:
                 self.running = True
 
                 # Create & start threads
+                self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  network_delay, bootstrap_retries, clean)
+                                  read_latency, bootstrap_retries, clean)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -196,6 +225,7 @@ class Updater(object):
                 self.running = True
 
                 # Create & start threads
+                self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher"),
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
                                   key, bootstrap_retries, clean, webhook_url)
@@ -203,7 +233,7 @@ class Updater(object):
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
-    def _start_polling(self, poll_interval, timeout, network_delay, bootstrap_retries, clean):
+    def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean):
         """
         Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
@@ -217,9 +247,11 @@ class Updater(object):
 
         while self.running:
             try:
-                updates = self.bot.getUpdates(self.last_update_id,
-                                              timeout=timeout,
-                                              network_delay=network_delay)
+                updates = self.bot.getUpdates(
+                    self.last_update_id, timeout=timeout, read_latency=read_latency)
+            except RetryAfter as e:
+                self.logger.info(str(e))
+                cur_interval = 0.5 + e.retry_after
             except TelegramError as te:
                 self.logger.error("Error while getting Updates: {0}".format(te))
 
@@ -263,7 +295,8 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create and start server
-        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path)
+        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path,
+                                   self.bot)
 
         if use_ssl:
             self._check_ssl_cert(cert, key)
@@ -272,10 +305,11 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(max_retries=bootstrap_retries,
-                            clean=clean,
-                            webhook_url=webhook_url,
-                            cert=open(cert, 'rb'))
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                clean=clean,
+                webhook_url=webhook_url,
+                cert=open(cert, 'rb'))
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -293,10 +327,8 @@ class Updater(object):
             exit_code = 0
         if exit_code is 0:
             try:
-                self.httpd.socket = ssl.wrap_socket(self.httpd.socket,
-                                                    certfile=cert,
-                                                    keyfile=key,
-                                                    server_side=True)
+                self.httpd.socket = ssl.wrap_socket(
+                    self.httpd.socket, certfile=cert, keyfile=key, server_side=True)
             except ssl.SSLError as error:
                 self.logger.exception('Failed to init SSL socket')
                 raise TelegramError(str(error))
@@ -309,20 +341,21 @@ class Updater(object):
 
     def _bootstrap(self, max_retries, clean, webhook_url, cert=None):
         retries = 0
-        while True:
+        while 1:
 
             try:
                 if clean:
                     # Disable webhook for cleaning
                     self.bot.setWebhook(webhook_url='')
                     self._clean_updates()
+                    sleep(1)
 
                 self.bot.setWebhook(webhook_url=webhook_url, certificate=cert)
             except (Unauthorized, InvalidToken):
                 raise
             except TelegramError:
-                msg = 'error in bootstrap phase; try={0} max_retries={1}'\
-                        .format(retries, max_retries)
+                msg = 'error in bootstrap phase; try={0} max_retries={1}'.format(retries,
+                                                                                 max_retries)
                 if max_retries < 0 or retries < max_retries:
                     self.logger.warning(msg)
                     retries += 1
@@ -346,7 +379,7 @@ class Updater(object):
 
         self.job_queue.stop()
         with self.__lock:
-            if self.running:
+            if self.running or self.dispatcher.has_running_threads:
                 self.logger.debug('Stopping Updater and Dispatcher...')
 
                 self.running = False
@@ -354,10 +387,10 @@ class Updater(object):
                 self._stop_httpd()
                 self._stop_dispatcher()
                 self._join_threads()
-                # async threads must be join()ed only after the dispatcher
-                # thread was joined, otherwise we can still have new async
-                # threads dispatched
-                self._join_async_threads()
+
+                # Stop the Request instance only if it was created by the Updater
+                if self._request:
+                    self._request.stop()
 
     def _stop_httpd(self):
         if self.httpd:
@@ -370,15 +403,6 @@ class Updater(object):
     def _stop_dispatcher(self):
         self.logger.debug('Requesting Dispatcher to stop...')
         self.dispatcher.stop()
-
-    def _join_async_threads(self):
-        with dispatcher.async_lock:
-            threads = list(dispatcher.async_threads)
-        total = len(threads)
-        for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i, total))
-            thr.join()
-            self.logger.debug('async thread {0}/{1} has ended'.format(i, total))
 
     def _join_threads(self):
         for thr in self.__threads:

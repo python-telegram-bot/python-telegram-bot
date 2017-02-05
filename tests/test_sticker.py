@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains a object that represents Tests for Telegram Sticker"""
+"""This module contains an object that represents Tests for Telegram Sticker"""
 
 import sys
 import unittest
@@ -38,10 +38,12 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.sticker_file_id = 'BQADAQADHAADyIsGAAFZfq1bphjqlgI'
         self.width = 510
         self.height = 512
-        self.thumb = {'width': 90,
-                      'height': 90,
-                      'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
-                      'file_size': 2364}
+        self.thumb = {
+            'width': 90,
+            'height': 90,
+            'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
+            'file_size': 2364
+        }
         self.emoji = telegram.Emoji.FLEXED_BICEPS
         self.file_size = 39518
 
@@ -77,7 +79,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_de_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker.file_id, self.sticker_file_id)
         self.assertEqual(sticker.width, self.width)
@@ -87,12 +89,12 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.file_size, self.file_size)
 
     def test_sticker_to_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_json(sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Sticker.de_json(self.json_dict)
+        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker['file_id'], self.sticker_file_id)
         self.assertEqual(sticker['width'], self.width)
@@ -135,6 +137,15 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertRaises(
             TypeError,
             lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_reply_sticker(self):
+        """Test for Message.reply_sticker"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        message = message.reply_sticker(self.sticker_file_id)
+
+        self.assertNotEqual(message.sticker.file_id, '')
 
 
 if __name__ == '__main__':

@@ -42,21 +42,20 @@ class InlineQueryResultArticle(InlineQueryResult):
 
         parse_mode (str): Use :class:`InputTextMessageContent` instead.
 
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent`
-        instead.
+        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
 
     Args:
         id (str): Unique identifier for this result, 1-64 Bytes
         title (str):
         reply_markup (:class:`telegram.ReplyMarkup`):
-
-    Keyword Args:
         url (Optional[str]):
         hide_url (Optional[bool]):
         description (Optional[str]):
         thumb_url (Optional[str]):
         thumb_width (Optional[int]):
         thumb_height (Optional[int]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,
@@ -94,11 +93,11 @@ class InlineQueryResultArticle(InlineQueryResult):
             self.thumb_height = thumb_height
 
     @staticmethod
-    def de_json(data):
-        data = super(InlineQueryResultArticle, InlineQueryResultArticle).de_json(data)
+    def de_json(data, bot):
+        data = super(InlineQueryResultArticle, InlineQueryResultArticle).de_json(data, bot)
 
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'))
-        data['input_message_content'] = InputMessageContent.de_json(data.get(
-            'input_message_content'))
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['input_message_content'] = InputMessageContent.de_json(
+            data.get('input_message_content'), bot)
 
         return InlineQueryResultArticle(**data)
