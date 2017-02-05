@@ -29,7 +29,6 @@ except ImportError:
 import imghdr
 import mimetypes
 import os
-import sys
 
 from telegram import TelegramError
 
@@ -101,51 +100,6 @@ class InputFile(object):
             str:
         """
         return 'multipart/form-data; boundary=%s' % self.boundary
-
-    def to_form(self):
-        """
-        Returns:
-            str:
-        """
-        form = []
-        form_boundary = '--' + self.boundary
-
-        # Add data fields
-        for name in iter(self.data):
-            value = self.data[name]
-            form.extend([
-                form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
-            ])
-
-        # Add input_file to upload
-        form.extend([
-            form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' %
-            (self.input_name,
-             self.filename), 'Content-Type: %s' % self.mimetype, '', self.input_file_content
-        ])
-
-        form.append('--' + self.boundary + '--')
-        form.append('')
-
-        return self._parse(form)
-
-    @staticmethod
-    def _parse(form):
-        """
-        Returns:
-            str:
-        """
-        if sys.version_info > (3,):
-            # on Python 3 form needs to be byte encoded
-            encoded_form = []
-            for item in form:
-                try:
-                    encoded_form.append(item.encode())
-                except AttributeError:
-                    encoded_form.append(item)
-
-            return b'\r\n'.join(encoded_form)
-        return '\r\n'.join(form)
 
     @staticmethod
     def is_image(stream):
