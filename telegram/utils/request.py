@@ -21,6 +21,8 @@ import os
 import socket
 import logging
 
+from urllib3.contrib.socks import SOCKSProxyManager
+
 try:
     import ujson as json
 except ImportError:
@@ -77,7 +79,7 @@ class Request(object):
                 (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
             ],
             timeout=urllib3.Timeout(
-                connect=self._connect_timeout, read=read_timeout),)
+                connect=self._connect_timeout, read=read_timeout), )
 
         # Set a proxy according to the following order:
         # * proxy defined in proxy_url (+ urllib3_proxy_kwargs)
@@ -92,7 +94,10 @@ class Request(object):
             mgr = urllib3.PoolManager(**kwargs)
         else:
             kwargs.update(urllib3_proxy_kwargs)
-            mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
+            if proxy_url.startswith('socks'):
+                mgr = SOCKSProxyManager(proxy_url)
+            else:
+                mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
             if mgr.proxy.auth:
                 # TODO: what about other auth types?
                 auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
