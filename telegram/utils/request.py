@@ -95,13 +95,13 @@ class Request(object):
         else:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
-                mgr = SOCKSProxyManager(proxy_url)
+                mgr = SOCKSProxyManager(proxy_url, **kwargs)
             else:
                 mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
-            if mgr.proxy.auth:
-                # TODO: what about other auth types?
-                auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
-                mgr.proxy_headers.update(auth_hdrs)
+                if mgr.proxy.auth:
+                    # TODO: what about other auth types?
+                    auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
+                    mgr.proxy_headers.update(auth_hdrs)
 
         self._con_pool = mgr
 
