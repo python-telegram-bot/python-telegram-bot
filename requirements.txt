@@ -1,3 +1,4 @@
 future>=0.15.2
 urllib3>=1.10
 certifi
+urllib3[socks]
