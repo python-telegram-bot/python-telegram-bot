@@ -21,8 +21,6 @@ import os
 import socket
 import logging
 
-from urllib3.contrib.socks import SOCKSProxyManager
-
 try:
     import ujson as json
 except ImportError:
@@ -95,6 +93,7 @@ class Request(object):
         else:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
+                from urllib3.contrib.socks import SOCKSProxyManager
                 mgr = SOCKSProxyManager(proxy_url, **kwargs)
             else:
                 mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
