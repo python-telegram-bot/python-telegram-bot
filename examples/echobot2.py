@@ -26,7 +26,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-# Define a few command handlers. These usually take the two arguments bot and
+# Define a few command handlers. These usually take the two arguments, bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     update.message.reply_text('Hi!')
@@ -64,7 +64,7 @@ def main():
     # Start the Bot
     updater.start_polling()
 
-    # Run the bot until the you presses Ctrl-C or the process receives SIGINT,
+    # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
