@@ -35,7 +35,7 @@ class StickerTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Sticker."""
 
     def setUp(self):
-        self.sticker_file_id = 'BQADAQADHAADyIsGAAFZfq1bphjqlgI'
+        self.sticker_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
         self.width = 510
         self.height = 512
         self.thumb = {
