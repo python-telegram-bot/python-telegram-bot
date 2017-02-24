@@ -110,7 +110,6 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
 
     # Actions
     def start(self, bot, update):
-        print update
         return self._set_state(update, self.THIRSTY)
 
     def start_end(self, bot, update):
