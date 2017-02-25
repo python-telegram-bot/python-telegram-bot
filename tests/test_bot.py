@@ -365,7 +365,7 @@ class BotTest(BaseTest, unittest.TestCase):
                 chat_id=game.chat_id,
                 message_id=game.message_id)
 
-        self.assertTrue('BOT_SCORE_NOT_MODIFIED' in cm.exception.message)
+        self.assertTrue('BOT_SCORE_NOT_MODIFIED' in str(cm.exception.message).upper())
 
     @flaky(3, 1)
     @timeout(10)
