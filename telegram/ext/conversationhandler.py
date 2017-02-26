@@ -128,10 +128,16 @@ class ConversationHandler(Handler):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
-            new_state.result(timeout=self.run_async_timeout)
+            error = False
+            try:
+                res = new_state.result(timeout=self.run_async_timeout)
+            except Exception as exc:
+                self.logger.exception("promise function raised exception: %s" %
+                                      exc)
+                error = True
 
-            if new_state.done.is_set():
-                self.update_state(new_state.result(), key)
+            if not error and new_state.done.is_set():
+                self.update_state(res, key)
                 state = self.conversations.get(key)
 
             else:
