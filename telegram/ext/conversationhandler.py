@@ -132,8 +132,7 @@ class ConversationHandler(Handler):
             try:
                 res = new_state.result(timeout=self.run_async_timeout)
             except Exception as exc:
-                self.logger.exception("promise function raised exception: %s" %
-                                      exc)
+                self.logger.exception("Promise function raised exception")
                 error = True
 
             if not error and new_state.done.is_set():
