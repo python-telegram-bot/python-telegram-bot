@@ -21,7 +21,8 @@
 import logging
 
 from telegram import Update
-from telegram.ext import Handler
+from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
+                          ChosenInlineResultHandler)
 from telegram.utils.promise import Promise
 
 
@@ -87,7 +88,10 @@ class ConversationHandler(Handler):
                  fallbacks,
                  allow_reentry=False,
                  run_async_timeout=None,
-                 timed_out_behavior=None):
+                 timed_out_behavior=None,
+                 per_chat=True,
+                 per_user=True,
+                 per_message=False):
 
         self.entry_points = entry_points
         """:type: list[telegram.ext.Handler]"""
@@ -105,22 +109,66 @@ class ConversationHandler(Handler):
         """:type: list[telegram.ext.Handler]"""
 
         self.conversations = dict()
-        """:type: dict[(int, int): str]"""
+        self.per_user = per_user
+        self.per_chat = per_chat
+        self.per_message = per_message
+        """:type: dict[tuple: object]"""
 
         self.current_conversation = None
         self.current_handler = None
 
         self.logger = logging.getLogger(__name__)
 
+        if not any((self.per_user, self.per_chat, self.per_message)):
+            raise ValueError("'per_user', 'per_chat' and 'per_message' can't all be 'False'")
+
+        all_handlers = list()
+        all_handlers.extend(entry_points)
+        all_handlers.extend(fallbacks)
+
+        for state_handlers in states.values():
+            all_handlers.extend(state_handlers)
+
+        if self.per_message:
+            for handler in all_handlers:
+                if not isinstance(handler, CallbackQueryHandler):
+                    raise ValueError("If 'per_message=True', all entry points and state handlers"
+                                     " must be 'CallbackQueryHandler'")
+        else:
+            for handler in all_handlers:
+                if isinstance(handler, CallbackQueryHandler):
+                    raise ValueError("If 'per_message=False', 'CallbackQueryHandler' doesn't work")
+
+        if self.per_chat:
+            for handler in all_handlers:
+                if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
+                    raise ValueError("If 'per_chat=True', 'InlineQueryHandler' doesn't work")
+
+    def _get_key(self, update):
+        chat, user = update.extract_chat_and_user()
+        key = list()
+
+        if self.per_chat:
+            key.append(chat.id)
+
+        if self.per_user:
+            key.append(user.id)
+
+        if self.per_message:
+            key.append(update.callback_query.inline_message_id
+                       or update.callback_query.message.message_id)
+
+        return tuple(key)
+
     def check_update(self, update):
 
         # Ignore messages in channels
-        if not isinstance(update, Update) or update.channel_post:
+        if (not isinstance(update, Update) or update.channel_post or self.per_chat
+                and (update.inline_query or update.chosen_inline_result) or self.per_message
+                and not update.callback_query):
             return False
 
-        chat, user = update.extract_chat_and_user()
-
-        key = (chat.id, user.id) if chat else (None, user.id)
+        key = self._get_key(update)
         state = self.conversations.get(key)
 
         # Resolve promises
