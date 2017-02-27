@@ -132,7 +132,8 @@ class Updater(object):
                       network_delay=None,
                       clean=False,
                       bootstrap_retries=0,
-                      read_latency=2.):
+                      read_latency=2.,
+                      allowed_updates=None):
         """
         Starts polling updates from Telegram.
 
@@ -155,6 +156,8 @@ class Updater(object):
                 |     0 - no retries (default)
                 |   > 0 - retry up to X times
 
+            allowed_updates (Optional[list[str]]): Passed to Bot.getUpdates
+
             read_latency (Optional[float|int]): Grace time in seconds for receiving the reply from
                 server. Will be added to the `timeout` value and used as the read timeout from
                 server (Default: 2).
@@ -176,7 +179,7 @@ class Updater(object):
                 self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  read_latency, bootstrap_retries, clean)
+                                  read_latency, bootstrap_retries, clean, allowed_updates)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -233,7 +236,8 @@ class Updater(object):
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
-    def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean):
+    def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
+                       allowed_updates):
         """
         Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
@@ -248,7 +252,10 @@ class Updater(object):
         while self.running:
             try:
                 updates = self.bot.getUpdates(
-                    self.last_update_id, timeout=timeout, read_latency=read_latency)
+                    self.last_update_id,
+                    timeout=timeout,
+                    read_latency=read_latency,
+                    allowed_updates=allowed_updates)
             except RetryAfter as e:
                 self.logger.info(str(e))
                 cur_interval = 0.5 + e.retry_after
@@ -346,11 +353,11 @@ class Updater(object):
             try:
                 if clean:
                     # Disable webhook for cleaning
-                    self.bot.setWebhook(webhook_url='')
+                    self.bot.deleteWebhook()
                     self._clean_updates()
                     sleep(1)
 
-                self.bot.setWebhook(webhook_url=webhook_url, certificate=cert)
+                self.bot.setWebhook(url=webhook_url, certificate=cert)
             except (Unauthorized, InvalidToken):
                 raise
             except TelegramError:

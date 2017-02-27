@@ -40,13 +40,13 @@ class PhotoSize(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, width, height, file_size=0, **kwargs):
+    def __init__(self, file_id, width, height, file_size=None, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
         # Optionals
-        self.file_size = int(file_size)
+        self.file_size = file_size
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

@@ -85,6 +85,7 @@ class BotTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def testGetUpdates(self):
+        self._bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = self._bot.getUpdates(timeout=1)
 
         if updates:
@@ -291,7 +292,7 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_forward_channel_messgae(self):
+    def test_forward_channel_message(self):
         text = 'test forward message'
         msg = self._bot.sendMessage(self._channel_id, text)
         self.assertEqual(text, msg.text)
@@ -301,12 +302,25 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_get_webhook_info(self):
+    def test_set_webhook_get_webhook_info(self):
+        url = 'https://python-telegram-bot.org/test/webhook'
+        max_connections = 7
+        allowed_updates = ['message']
+        self._bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
+        info = self._bot.getWebhookInfo()
+        self._bot.delete_webhook()
+        self.assertEqual(url, info.url)
+        self.assertEqual(max_connections, info.max_connections)
+        self.assertListEqual(allowed_updates, info.allowed_updates)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_delete_webhook(self):
         url = 'https://python-telegram-bot.org/test/webhook'
         self._bot.set_webhook(url)
+        self._bot.delete_webhook()
         info = self._bot.getWebhookInfo()
-        self._bot.set_webhook('')
-        self.assertEqual(url, info.url)
+        self.assertEqual(info.url, '')
 
     @flaky(3, 1)
     @timeout(10)
@@ -365,7 +379,7 @@ class BotTest(BaseTest, unittest.TestCase):
                 chat_id=game.chat_id,
                 message_id=game.message_id)
 
-        self.assertTrue('BOT_SCORE_NOT_MODIFIED' in cm.exception.message)
+        self.assertTrue('BOT_SCORE_NOT_MODIFIED' in str(cm.exception.message).upper())
 
     @flaky(3, 1)
     @timeout(10)
@@ -408,7 +422,7 @@ class BotTest(BaseTest, unittest.TestCase):
         """Tests if user is our trusty @PythonTelegramBot."""
         self.assertEqual(user.id, 133505823)
         self.assertEqual(user.first_name, 'PythonTelegramBot')
-        self.assertEqual(user.last_name, '')
+        self.assertEqual(user.last_name, None)
         self.assertEqual(user.username, 'PythonTelegramBot')
         self.assertEqual(user.name, '@PythonTelegramBot')
 
@@ -418,7 +432,7 @@ class BotTest(BaseTest, unittest.TestCase):
         # tests the Bot.info decorator and associated funcs
         self.assertEqual(self._bot.id, 133505823)
         self.assertEqual(self._bot.first_name, 'PythonTelegramBot')
-        self.assertEqual(self._bot.last_name, '')
+        self.assertEqual(self._bot.last_name, None)
         self.assertEqual(self._bot.username, 'PythonTelegramBot')
         self.assertEqual(self._bot.name, '@PythonTelegramBot')
 
