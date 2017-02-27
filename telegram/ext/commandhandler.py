@@ -83,8 +83,14 @@ class CommandHandler(Handler):
                 and (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
-            return (message.text and message.text.startswith('/')
-                    and message.text[1:].split(' ')[0].split('@')[0] == self.command)
+            if message.text:
+                command = message.text[1:].split(' ')[0].split('@')
+                command.append(
+                    update.message.bot.username)  # in case the command was send without a username
+                return (message.text.startswith('/') and command[0] == self.command
+                        and command[1] == update.message.bot.username)
+            else:
+                return False
 
         else:
             return False

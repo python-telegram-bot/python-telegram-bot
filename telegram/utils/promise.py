@@ -30,17 +30,23 @@ class Promise(object):
         self.kwargs = kwargs
         self.done = Event()
         self._result = None
+        self._exception = None
 
     def run(self):
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
-        except:
-            raise
+        except Exception as exc:
+            self._exception = exc
 
         finally:
             self.done.set()
 
+    def __call__(self):
+        self.run()
+
     def result(self, timeout=None):
         self.done.wait(timeout=timeout)
+        if self._exception is not None:
+            raise self._exception
         return self._result

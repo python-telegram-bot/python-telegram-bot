@@ -36,13 +36,13 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.id = -28767330
         self.title = 'ToledosPalaceBot - Group'
         self.type = 'group'
-        self.all_members_are_admins = False
+        self.all_members_are_administrators = False
 
         self.json_dict = {
             'id': self.id,
             'title': self.title,
             'type': self.type,
-            'all_members_are_admins': self.all_members_are_admins
+            'all_members_are_administrators': self.all_members_are_administrators
         }
 
     def test_group_chat_de_json_empty_json(self):
@@ -56,7 +56,8 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.assertEqual(group_chat.id, self.id)
         self.assertEqual(group_chat.title, self.title)
         self.assertEqual(group_chat.type, self.type)
-        self.assertEqual(group_chat.all_members_are_admins, self.all_members_are_admins)
+        self.assertEqual(group_chat.all_members_are_administrators,
+                         self.all_members_are_administrators)
 
     def test_group_chat_to_json(self):
         group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
@@ -70,7 +71,8 @@ class ChatTest(BaseTest, unittest.TestCase):
         self.assertEqual(group_chat['id'], self.id)
         self.assertEqual(group_chat['title'], self.title)
         self.assertEqual(group_chat['type'], self.type)
-        self.assertEqual(group_chat['all_members_are_admins'], self.all_members_are_admins)
+        self.assertEqual(group_chat['all_members_are_administrators'],
+                         self.all_members_are_administrators)
 
     @flaky(3, 1)
     def test_send_action(self):
