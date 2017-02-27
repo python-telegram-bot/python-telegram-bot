@@ -64,10 +64,10 @@ class AudioTest(BaseTest, unittest.TestCase):
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, '')
+        self.assertNotEqual(audio.file_id, None)
         # self.assertEqual(audio.duration, 4)
-        self.assertEqual(audio.performer, '')
-        self.assertEqual(audio.title, '')
+        self.assertEqual(audio.performer, None)
+        self.assertEqual(audio.title, None)
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
 
@@ -89,7 +89,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, '')
+        self.assertNotEqual(audio.file_id, None)
         self.assertEqual(audio.duration, self.duration)
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.title, self.title)
@@ -112,7 +112,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, '')
+        self.assertNotEqual(audio.file_id, None)
         self.assertEqual(audio.duration, self.duration)
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.title, self.title)
@@ -136,7 +136,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, '')
+        self.assertNotEqual(audio.file_id, None)
         self.assertEqual(audio.duration, self.duration)
         self.assertEqual(audio.performer, self.performer)
         self.assertEqual(audio.title, self.title)
@@ -152,7 +152,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, '')
+        self.assertNotEqual(audio.file_id, None)
         self.assertEqual(audio.duration, self.duration)
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
@@ -171,7 +171,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         audio = message.audio
 
         self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, '')
+        self.assertNotEqual(audio.file_id, None)
         self.assertEqual(audio.duration, self.duration)
         self.assertEqual(audio.mime_type, self.mime_type)
         self.assertEqual(audio.file_size, self.file_size)
@@ -266,7 +266,7 @@ class AudioTest(BaseTest, unittest.TestCase):
         message = self._bot.sendMessage(self._chat_id, '.')
         message = message.reply_audio(self.audio_file)
 
-        self.assertNotEqual(message.audio.file_id, '')
+        self.assertNotEqual(message.audio.file_id, None)
 
 
 if __name__ == '__main__':
