@@ -48,5 +48,5 @@ class Promise(object):
     def result(self, timeout=None):
         self.done.wait(timeout=timeout)
         if self._exception is not None:
-            raise self._exception
+            raise self._exception  # pylint: disable=raising-bad-type
         return self._result
