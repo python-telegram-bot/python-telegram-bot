@@ -39,13 +39,13 @@ class Contact(TelegramObject):
 
     """
 
-    def __init__(self, phone_number, first_name, last_name='', user_id=0, **kwargs):
+    def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):
         # Required
         self.phone_number = str(phone_number)
         self.first_name = first_name
         # Optionals
         self.last_name = last_name
-        self.user_id = int(user_id)
+        self.user_id = user_id
 
     @staticmethod
     def de_json(data, bot):

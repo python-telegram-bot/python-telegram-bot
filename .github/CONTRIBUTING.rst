@@ -184,11 +184,11 @@ break the API classes. For example:
 .. code-block:: python
 
     # GOOD
-    def __init__(self, id, name, last_name='', **kwargs):
+    def __init__(self, id, name, last_name=None, **kwargs):
        self.last_name = last_name
 
     # BAD
-    def __init__(self, id, name, last_name=''):
+    def __init__(self, id, name, last_name=None):
        self.last_name = last_name
 
 

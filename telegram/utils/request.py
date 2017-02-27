@@ -30,6 +30,10 @@ import certifi
 import urllib3
 from urllib3.connection import HTTPConnection
 from urllib3.util.timeout import Timeout
+try:
+    from urllib3.contrib.socks import SOCKSProxyManager
+except ImportError:
+    SOCKSProxyManager = None
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
@@ -92,11 +96,16 @@ class Request(object):
             mgr = urllib3.PoolManager(**kwargs)
         else:
             kwargs.update(urllib3_proxy_kwargs)
-            mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
-            if mgr.proxy.auth:
-                # TODO: what about other auth types?
-                auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
-                mgr.proxy_headers.update(auth_hdrs)
+            if proxy_url.startswith('socks'):
+                if not SOCKSProxyManager:
+                    raise RuntimeError('PySocks is missing')
+                mgr = SOCKSProxyManager(proxy_url, **kwargs)
+            else:
+                mgr = urllib3.proxy_from_url(proxy_url, **kwargs)
+                if mgr.proxy.auth:
+                    # TODO: what about other auth types?
+                    auth_hdrs = urllib3.make_headers(proxy_basic_auth=mgr.proxy.auth)
+                    mgr.proxy_headers.update(auth_hdrs)
 
         self._con_pool = mgr
 
@@ -173,7 +182,7 @@ class Request(object):
         if resp.status in (401, 403):
             raise Unauthorized()
         elif resp.status == 400:
-            raise BadRequest(repr(message))
+            raise BadRequest(message)
         elif resp.status == 404:
             raise InvalidToken()
         elif resp.status == 502:

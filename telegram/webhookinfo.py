@@ -42,8 +42,8 @@ class WebhookInfo(TelegramObject):
 
     def __init__(self,
                  url,
-                 has_custom_certificate=None,
-                 pending_update_count=None,
+                 has_custom_certificate,
+                 pending_update_count,
                  last_error_date=None,
                  last_error_message=None,
                  max_connections=None,

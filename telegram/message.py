@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
-
 import sys
 from datetime import datetime
 from time import mktime
@@ -117,7 +116,7 @@ class Message(TelegramObject):
                  forward_date=None,
                  reply_to_message=None,
                  edit_date=None,
-                 text='',
+                 text=None,
                  entities=None,
                  audio=None,
                  document=None,
@@ -125,19 +124,19 @@ class Message(TelegramObject):
                  sticker=None,
                  video=None,
                  voice=None,
-                 caption='',
+                 caption=None,
                  contact=None,
                  location=None,
                  venue=None,
                  new_chat_member=None,
                  left_chat_member=None,
-                 new_chat_title='',
+                 new_chat_title=None,
                  new_chat_photo=None,
                  delete_chat_photo=False,
                  group_chat_created=False,
                  supergroup_chat_created=False,
-                 migrate_to_chat_id=0,
-                 migrate_from_chat_id=0,
+                 migrate_to_chat_id=None,
+                 migrate_from_chat_id=None,
                  channel_chat_created=False,
                  pinned_message=None,
                  forward_from_message_id=None,
@@ -174,8 +173,8 @@ class Message(TelegramObject):
         self.delete_chat_photo = bool(delete_chat_photo)
         self.group_chat_created = bool(group_chat_created)
         self.supergroup_chat_created = bool(supergroup_chat_created)
-        self.migrate_to_chat_id = int(migrate_to_chat_id)
-        self.migrate_from_chat_id = int(migrate_from_chat_id)
+        self.migrate_to_chat_id = migrate_to_chat_id
+        self.migrate_from_chat_id = migrate_from_chat_id
         self.channel_chat_created = bool(channel_chat_created)
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id
@@ -586,6 +585,7 @@ class Message(TelegramObject):
         Returns:
             dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
                 text that belongs to them, calculated based on UTF-16 codepoints.
+
         """
         if types is None:
             types = MessageEntity.ALL_TYPES
@@ -594,3 +594,80 @@ class Message(TelegramObject):
             entity: self.parse_entity(entity)
             for entity in self.entities if entity.type in types
         }
+
+    @property
+    def text_html(self):
+        """
+        Creates an html-formatted string from the markup entities found in the message
+        (uses ``parse_entities``).
+
+        Use this if you want to retrieve the original string sent by the bot, as opposed to the
+        plain text with corresponding markup entities.
+
+        Returns:
+            str
+
+        """
+        entities = self.parse_entities()
+        message_text = self.text
+        markdown_text = ''
+        last_offset = 0
+
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '<a href="{}">{}</a>'.format(entity.url, text)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '<b>' + text + '</b>'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '<i>' + text + '</i>'
+            elif entity.type == MessageEntity.CODE:
+                insert = '<code>' + text + '</code>'
+            elif entity.type == MessageEntity.PRE:
+                insert = '<pre>' + text + '</pre>'
+            else:
+                insert = text
+
+            markdown_text += message_text[last_offset:entity.offset] + insert
+            last_offset = entity.offset + entity.length
+
+        markdown_text += message_text[last_offset:]
+        return markdown_text
+
+    @property
+    def text_markdown(self):
+        """
+        Creates a markdown-formatted string from the markup entities found in the message
+        (uses ``parse_entities``).
+
+        Use this if you want to retrieve the original string sent by the bot, as opposed to the
+        plain text with corresponding markup entities.
+
+        Returns:
+            str
+        """
+        entities = self.parse_entities()
+        message_text = self.text
+        markdown_text = ''
+        last_offset = 0
+
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '[{}]({})'.format(text, entity.url)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '*' + text + '*'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '_' + text + '_'
+            elif entity.type == MessageEntity.CODE:
+                insert = '`' + text + '`'
+            elif entity.type == MessageEntity.PRE:
+                insert = '```' + text + '```'
+            else:
+                insert = text
+
+            markdown_text += message_text[last_offset:entity.offset] + insert
+            last_offset = entity.offset + entity.length
+
+        markdown_text += message_text[last_offset:]
+        return markdown_text

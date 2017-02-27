@@ -52,8 +52,8 @@ class Video(TelegramObject):
                  height,
                  duration,
                  thumb=None,
-                 mime_type='',
-                 file_size=0,
+                 mime_type=None,
+                 file_size=None,
                  **kwargs):
         # Required
         self.file_id = str(file_id)
@@ -62,8 +62,8 @@ class Video(TelegramObject):
         self.duration = int(duration)
         # Optionals
         self.thumb = thumb
-        self.mime_type = str(mime_type)
-        self.file_size = int(file_size)
+        self.mime_type = mime_type
+        self.file_size = file_size
 
     @staticmethod
     def de_json(data, bot):

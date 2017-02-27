@@ -231,30 +231,32 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveTelegramCommandHandler(self):
-        self._setup_updater('/test')
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         handler = CommandHandler('test', self.telegramHandlerTest)
         self.updater.dispatcher.add_handler(handler)
-        self.updater.start_polling(0.01)
+        user = User(first_name="singelton", id=404)
+        bot = self.updater.bot
+        queue = self.updater.start_polling(0.01)
+
+        # regular use
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertEqual(self.received_message, '/test')
 
-        # Remove handler
-        d.remove_handler(handler)
-        self.reset()
+        # assigned use
+        message = Message(0, user, None, None, text="/test@MockBot", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test@MockBot')
 
-        self.updater.bot.send_messages = 1
+        # directed at other bot
+        self.reset()
+        message = Message(0, user, None, None, text="/test@OtherBot", bot=bot)
+        queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(None is self.received_message)
-
-    def test_editedCommandHandler(self):
-        self._setup_updater('/test', edited=True)
-        d = self.updater.dispatcher
-        handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=True)
-        d.addHandler(handler)
-        self.updater.start_polling(0.01)
-        sleep(.1)
-        self.assertEqual(self.received_message, '/test')
 
         # Remove handler
         d.removeHandler(handler)
@@ -788,9 +790,10 @@ class MockBot(object):
         self.bootstrap_attempts = 0
         self.bootstrap_err = bootstrap_err
         self.edited = edited
+        self.username = "MockBot"
 
     def mockUpdate(self, text):
-        message = Message(0, User(0, 'Testuser'), None, Chat(0, Chat.GROUP))
+        message = Message(0, User(0, 'Testuser'), None, Chat(0, Chat.GROUP), bot=self)
         message.text = text
         update = Update(0)
 
