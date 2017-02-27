@@ -145,7 +145,9 @@ class ConversationHandler(Handler):
                     raise ValueError("If 'per_chat=True', 'InlineQueryHandler' doesn't work")
 
     def _get_key(self, update):
-        chat, user = update.extract_chat_and_user()
+        chat = update.effective_chat
+        user = update.effective_user
+
         key = list()
 
         if self.per_chat:
