@@ -32,7 +32,7 @@ class Chat(TelegramObject):
         username (str): Username, for private chats and channels if available
         first_name (str): First name of the other party in a private chat
         last_name (str): Last name of the other party in a private chat
-        all_members_are_admins (bool): True if a group has 'All Members Are Admins' enabled.
+        all_members_are_administrators (bool): True if group has 'All Members Are Administrators'
 
     Args:
         id (int):
@@ -57,7 +57,7 @@ class Chat(TelegramObject):
                  username=None,
                  first_name=None,
                  last_name=None,
-                 all_members_are_admins=None,
+                 all_members_are_administrators=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -68,7 +68,7 @@ class Chat(TelegramObject):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
-        self.all_members_are_admins = all_members_are_admins
+        self.all_members_are_administrators = all_members_are_administrators
 
         self.bot = bot
 

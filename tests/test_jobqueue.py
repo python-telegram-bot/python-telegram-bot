@@ -208,9 +208,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
     def test_time_unit_dt_time_today(self):
         # Testing running at a specific time today
         delta = 2
-        current_time = datetime.datetime.now().time()
-        next_t = datetime.time(current_time.hour, current_time.minute, current_time.second + delta,
-                               current_time.microsecond)
+        next_t = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + delta
 
         self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
@@ -221,9 +219,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
         # Testing running at a specific time that has passed today. Since we can't wait a day, we
         # test if the jobs next_t has been calculated correctly
         delta = -2
-        current_time = datetime.datetime.now().time()
-        next_t = datetime.time(current_time.hour, current_time.minute, current_time.second + delta,
-                               current_time.microsecond)
+        next_t = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + delta + 60 * 60 * 24
 
         self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
@@ -247,10 +243,7 @@ class JobQueueTest(BaseTest, unittest.TestCase):
 
     def test_run_daily(self):
         delta = 1
-        current_time = datetime.datetime.now().time()
-        time_of_day = datetime.time(current_time.hour, current_time.minute,
-                                    current_time.second + delta, current_time.microsecond)
-
+        time_of_day = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + 60 * 60 * 24 + delta
 
         self.jq.run_daily(self.job1, time_of_day)

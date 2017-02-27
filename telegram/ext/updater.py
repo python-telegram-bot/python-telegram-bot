@@ -22,6 +22,7 @@ Telegram bots intuitive."""
 import logging
 import os
 import ssl
+import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
@@ -61,6 +62,8 @@ class Updater(object):
         bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
             the user's responsibility to create it using a `Request` instance with a large enough
             connection pool.
+        request_kwargs (Optional[dict]): Keyword args to control the creation of a request object
+            (ignored if `bot` argument is used).
 
     Raises:
         ValueError: If both `token` and `bot` are passed or none of them.
@@ -68,7 +71,7 @@ class Updater(object):
     """
     _request = None
 
-    def __init__(self, token=None, base_url=None, workers=4, bot=None):
+    def __init__(self, token=None, base_url=None, workers=4, bot=None, request_kwargs=None):
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
@@ -83,7 +86,11 @@ class Updater(object):
             # * 1 for polling Updater (even if webhook is used, we can spare a connection)
             # * 1 for JobQueue
             # * 1 for main thread
-            self._request = Request(con_pool_size=workers + 4)
+            if request_kwargs is None:
+                request_kwargs = {}
+            if 'con_pool_size' not in request_kwargs:
+                request_kwargs['con_pool_size'] = workers + 4
+            self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request)
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
@@ -122,9 +129,10 @@ class Updater(object):
     def start_polling(self,
                       poll_interval=0.0,
                       timeout=10,
-                      network_delay=5.,
+                      network_delay=None,
                       clean=False,
-                      bootstrap_retries=0):
+                      bootstrap_retries=0,
+                      read_latency=2.):
         """
         Starts polling updates from Telegram.
 
@@ -134,7 +142,8 @@ class Updater(object):
 
             timeout (Optional[float]): Passed to Bot.getUpdates
 
-            network_delay (Optional[float]): Passed to Bot.getUpdates
+            network_delay: Deprecated. Will be honoured as `read_latency` for a while but will be
+                removed in the future.
 
             clean (Optional[bool]): Whether to clean any pending updates on Telegram servers before
               actually starting to poll. Default is False.
@@ -143,13 +152,22 @@ class Updater(object):
               will retry on failures on the Telegram server.
 
                 |   < 0 - retry indefinitely
-                |   0 - no retries (default)
+                |     0 - no retries (default)
                 |   > 0 - retry up to X times
+
+            read_latency (Optional[float|int]): Grace time in seconds for receiving the reply from
+                server. Will be added to the `timeout` value and used as the read timeout from
+                server (Default: 2).
+
 
         Returns:
             Queue: The update queue that can be filled from the main thread
 
         """
+        if network_delay is not None:
+            warnings.warn('network_delay is deprecated, use read_latency instead')
+            read_latency = network_delay
+
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -158,7 +176,7 @@ class Updater(object):
                 self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher")
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
-                                  network_delay, bootstrap_retries, clean)
+                                  read_latency, bootstrap_retries, clean)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -215,7 +233,7 @@ class Updater(object):
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
 
-    def _start_polling(self, poll_interval, timeout, network_delay, bootstrap_retries, clean):
+    def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean):
         """
         Thread target of thread 'updater'. Runs in background, pulls
         updates from Telegram and inserts them in the update queue of the
@@ -230,7 +248,7 @@ class Updater(object):
         while self.running:
             try:
                 updates = self.bot.getUpdates(
-                    self.last_update_id, timeout=timeout, network_delay=network_delay)
+                    self.last_update_id, timeout=timeout, read_latency=read_latency)
             except RetryAfter as e:
                 self.logger.info(str(e))
                 cur_interval = 0.5 + e.retry_after
