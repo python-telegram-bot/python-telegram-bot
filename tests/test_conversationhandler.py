@@ -36,7 +36,8 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import Update, Message, TelegramError, User, Chat, Bot, CallbackQuery
-from telegram.ext import Updater, ConversationHandler, CommandHandler
+from telegram.ext import (Updater, ConversationHandler, CommandHandler, CallbackQueryHandler,
+                          InlineQueryHandler)
 from tests.base import BaseTest
 from tests.test_updater import MockBot
 
@@ -46,7 +47,8 @@ root.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.WARN)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s ' '- %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s '
+                              '- %(mInlineQueryHandleressage)s')
 ch.setFormatter(formatter)
 root.addHandler(ch)
 
@@ -80,6 +82,7 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         self.fallbacks = [CommandHandler('eat', self.start)]
 
         self.group = Chat(0, Chat.GROUP)
+        self.second_group = Chat(1, Chat.GROUP)
 
     def _chat(self, user):
         return Chat(user.id, Chat.GROUP)
@@ -196,16 +199,109 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
 
-        message = Message(0, user, None, self.group, text="/pourCoffee", bot=self.bot)
-        queue.put(Update(update_id=0, message=message))
-        sleep(.1)
-
         # Let's now verify that for another user, who did not start yet,
         # the state will be changed because they are in the same group.
-        message = Message(0, second_user, None, self.group, text="/brew", bot=self.bot)
+        message = Message(0, second_user, None, self.group, text="/pourCoffee", bot=self.bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertEquals(handler.conversations[(self.group.id,)], self.DRINKING)
+
+    def test_addConversationHandlerPerUser(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        user = User(first_name="Misses Test", id=123)
+
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            per_chat=False)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+
+        # User one, starts the state machine.
+        message = Message(0, user, None, self.group, text="/start", bot=self.bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+
+        # The user is thirsty and wants to brew coffee.
+        message = Message(0, user, None, self.group, text="/brew", bot=self.bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+
+        # Let's now verify that for the same user in a different group, the state will still be
+        # updated
+        message = Message(0, user, None, self.second_group, text="/pourCoffee", bot=self.bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+
+        self.assertEquals(handler.conversations[(user.id,)], self.DRINKING)
+
+    def test_addConversationHandlerPerMessage(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        user = User(first_name="Misses Test", id=123)
+        second_user = User(first_name="Mister Test", id=124)
+
+        def entry(bot, update):
+            return 1
+
+        def one(bot, update):
+            return 2
+
+        def two(bot, update):
+            return ConversationHandler.END
+
+        handler = ConversationHandler(
+            entry_points=[CallbackQueryHandler(entry)],
+            states={1: [CallbackQueryHandler(one)],
+                    2: [CallbackQueryHandler(two)]},
+            fallbacks=[],
+            per_message=True)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+
+        # User one, starts the state machine.
+        message = Message(0, user, None, self.group, text="msg w/ inlinekeyboard", bot=self.bot)
+
+        cbq = CallbackQuery(0, user, None, message=message, data='data', bot=self.bot)
+        queue.put(Update(update_id=0, callback_query=cbq))
+        sleep(.1)
+        self.assertEquals(handler.conversations[(self.group.id, user.id, message.message_id)], 1)
+
+        cbq = CallbackQuery(0, user, None, message=message, data='data', bot=self.bot)
+        queue.put(Update(update_id=0, callback_query=cbq))
+        sleep(.1)
+        self.assertEquals(handler.conversations[(self.group.id, user.id, message.message_id)], 2)
+
+        # Let's now verify that for a different user in the same group, the state will not be
+        # updated
+        cbq = CallbackQuery(0, second_user, None, message=message, data='data', bot=self.bot)
+        queue.put(Update(update_id=0, callback_query=cbq))
+        sleep(.1)
+        self.assertEquals(handler.conversations[(self.group.id, user.id, message.message_id)], 2)
+
+    def test_illegal_handlers(self):
+        with self.assertRaises(ValueError):
+            ConversationHandler(
+                entry_points=[CommandHandler('/test', lambda bot, update: None)],
+                states={},
+                fallbacks=[],
+                per_message=True)
+
+        with self.assertRaises(ValueError):
+            ConversationHandler(
+                entry_points=[CallbackQueryHandler(lambda bot, update: None)],
+                states={},
+                fallbacks=[],
+                per_message=False)
+
+        with self.assertRaises(ValueError):
+            ConversationHandler(
+                entry_points=[InlineQueryHandler(lambda bot, update: None)],
+                states={},
+                fallbacks=[],
+                per_chat=True)
 
     def test_endOnFirstMessage(self):
         self._setup_updater('', messages=0)
