@@ -59,7 +59,7 @@ class AudioTest(BaseTest, unittest.TestCase):
     def test_send_audio_required_args_only(self):
         message = self._bot.sendAudio(self._chat_id, self.audio_file)
 
-        self.assertEqual(message.caption, '')
+        self.assertEqual(message.caption, None)
 
         audio = message.audio
 
