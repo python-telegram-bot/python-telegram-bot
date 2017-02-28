@@ -1,7 +1,9 @@
 Credits
 =======
 
-``python-telegram-bot`` is written and maintained by `Leandro Toledo <https://github.com/leandrotoledo>`_.
+``python-telegram-bot`` was originally created by
+`Leandro Toledo <https://github.com/leandrotoledo>`_ and is now maintained by
+`Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram).
 
 Contributors
 ------------
@@ -34,6 +36,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
 - `overquota <https://github.com/overquota>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
+- `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
