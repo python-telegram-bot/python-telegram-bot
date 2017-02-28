@@ -268,6 +268,34 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
+    def test_filterPassTelegramCommandHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CommandHandler('test', self.telegramHandlerTest, lambda msg: True)
+        self.updater.dispatcher.add_handler(handler)
+        user = User(first_name="singelton", id=404)
+        bot = self.updater.bot
+        queue = self.updater.start_polling(0.01)
+
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test')
+
+    def test_filterNotPassTelegramCommandHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CommandHandler('test', self.telegramHandlerTest, lambda msg: False)
+        self.updater.dispatcher.add_handler(handler)
+        user = User(first_name="singelton", id=404)
+        bot = self.updater.bot
+        queue = self.updater.start_polling(0.01)
+
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
     def test_addRemoveStringRegexHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher

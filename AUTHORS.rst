@@ -21,6 +21,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jh0ker <https://github.com/jh0ker>`_
+- `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
