@@ -40,13 +40,13 @@ class Voice(TelegramObject):
         file_size (Optional[int]):
     """
 
-    def __init__(self, file_id, duration, mime_type='', file_size=0, **kwargs):
+    def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.duration = int(duration)
         # Optionals
-        self.mime_type = str(mime_type)
-        self.file_size = int(file_size)
+        self.mime_type = mime_type
+        self.file_size = file_size
 
     @staticmethod
     def de_json(data, bot):

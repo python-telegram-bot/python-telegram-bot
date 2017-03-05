@@ -76,12 +76,12 @@ class VideoTest(BaseTest, unittest.TestCase):
         video = message.video
 
         self.assertTrue(isinstance(video.file_id, str))
-        self.assertNotEqual(video.file_id, '')
+        self.assertNotEqual(video.file_id, None)
         self.assertEqual(video.width, self.width)
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.mime_type, None)
         self.assertEqual(video.file_size, self.file_size)
 
     @flaky(3, 1)
@@ -97,12 +97,12 @@ class VideoTest(BaseTest, unittest.TestCase):
         video = message.video
 
         self.assertTrue(isinstance(video.file_id, str))
-        self.assertNotEqual(video.file_id, '')
+        self.assertNotEqual(video.file_id, None)
         self.assertEqual(video.width, self.width)
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.mime_type, None)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -120,12 +120,12 @@ class VideoTest(BaseTest, unittest.TestCase):
         video = message.video
 
         self.assertTrue(isinstance(video.file_id, str))
-        self.assertNotEqual(video.file_id, '')
+        self.assertNotEqual(video.file_id, None)
         self.assertEqual(video.width, self.width)
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.mime_type, None)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -149,7 +149,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.mime_type, None)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -167,11 +167,11 @@ class VideoTest(BaseTest, unittest.TestCase):
         video = message.video
 
         self.assertTrue(isinstance(video.file_id, str))
-        self.assertNotEqual(video.file_id, '')
+        self.assertNotEqual(video.file_id, None)
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb_from_url)
-        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.mime_type, None)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -191,7 +191,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.file_id, self.video_file_id)
         self.assertEqual(video.duration, 0)
         self.assertEqual(video.thumb, None)
-        self.assertEqual(video.mime_type, '')
+        self.assertEqual(video.mime_type, None)
 
         self.assertEqual(message.caption, self.caption)
 
@@ -268,7 +268,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         message = self._bot.sendMessage(self._chat_id, '.')
         message = message.reply_video(self.video_file)
 
-        self.assertNotEqual(message.video.file_id, '')
+        self.assertNotEqual(message.video.file_id, None)
 
 
 if __name__ == '__main__':

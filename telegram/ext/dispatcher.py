@@ -159,11 +159,7 @@ class Dispatcher(object):
                                   len(self.__async_threads))
                 break
 
-            try:
-                promise.run()
-
-            except:
-                self.logger.exception("run_async function raised exception")
+            promise.run()
 
     def run_async(self, func, *args, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.

@@ -231,30 +231,32 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
     def test_addRemoveTelegramCommandHandler(self):
-        self._setup_updater('/test')
+        self._setup_updater('', messages=0)
         d = self.updater.dispatcher
         handler = CommandHandler('test', self.telegramHandlerTest)
         self.updater.dispatcher.add_handler(handler)
-        self.updater.start_polling(0.01)
+        user = User(first_name="singelton", id=404)
+        bot = self.updater.bot
+        queue = self.updater.start_polling(0.01)
+
+        # regular use
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertEqual(self.received_message, '/test')
 
-        # Remove handler
-        d.remove_handler(handler)
-        self.reset()
+        # assigned use
+        message = Message(0, user, None, None, text="/test@MockBot", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test@MockBot')
 
-        self.updater.bot.send_messages = 1
+        # directed at other bot
+        self.reset()
+        message = Message(0, user, None, None, text="/test@OtherBot", bot=bot)
+        queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(None is self.received_message)
-
-    def test_editedCommandHandler(self):
-        self._setup_updater('/test', edited=True)
-        d = self.updater.dispatcher
-        handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=True)
-        d.addHandler(handler)
-        self.updater.start_polling(0.01)
-        sleep(.1)
-        self.assertEqual(self.received_message, '/test')
 
         # Remove handler
         d.removeHandler(handler)
@@ -263,6 +265,34 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.reset()
 
         self.updater.bot.send_messages = 1
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_filterPassTelegramCommandHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CommandHandler('test', self.telegramHandlerTest, lambda msg: True)
+        self.updater.dispatcher.add_handler(handler)
+        user = User(first_name="singelton", id=404)
+        bot = self.updater.bot
+        queue = self.updater.start_polling(0.01)
+
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test')
+
+    def test_filterNotPassTelegramCommandHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = CommandHandler('test', self.telegramHandlerTest, lambda msg: False)
+        self.updater.dispatcher.add_handler(handler)
+        user = User(first_name="singelton", id=404)
+        bot = self.updater.bot
+        queue = self.updater.start_polling(0.01)
+
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
@@ -761,12 +791,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def test_userSignal(self):
         self._setup_updater('Test7', messages=0)
-        
-        tempVar = 0
+
+        tempVar = {'a': 0}
+
         def userSignalInc(signum, frame):
-            nonlocal tempVar
-            tempVar = 1
-            
+            tempVar['a'] = 1
+
         self.updater.user_sig_handler = userSignalInc
         self.updater.start_polling(poll_interval=0.01)
         Thread(target=self.signalsender).start()
@@ -774,8 +804,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         # If we get this far, idle() ran through
         sleep(1)
         self.assertFalse(self.updater.running)
-        self.assertTrue(tempVar != 0)
-        
+        self.assertTrue(tempVar['a'] != 0)
+
     def test_createBot(self):
         self.updater = Updater('123:abcd')
         self.assertIsNotNone(self.updater.bot)
@@ -805,9 +835,10 @@ class MockBot(object):
         self.bootstrap_attempts = 0
         self.bootstrap_err = bootstrap_err
         self.edited = edited
+        self.username = "MockBot"
 
     def mockUpdate(self, text):
-        message = Message(0, User(0, 'Testuser'), None, Chat(0, Chat.GROUP))
+        message = Message(0, User(0, 'Testuser'), None, Chat(0, Chat.GROUP), bot=self)
         message.text = text
         update = Update(0)
 
@@ -818,7 +849,7 @@ class MockBot(object):
 
         return update
 
-    def setWebhook(self, webhook_url=None, certificate=None):
+    def setWebhook(self, url=None, certificate=None):
         if self.bootstrap_retries is None:
             return
 
@@ -826,7 +857,21 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def getUpdates(self, offset=None, limit=100, timeout=0, network_delay=None, read_latency=2.):
+    def deleteWebhook(self):
+        if self.bootstrap_retries is None:
+            return
+
+        if self.bootstrap_attempts < self.bootstrap_retries:
+            self.bootstrap_attempts += 1
+            raise self.bootstrap_err
+
+    def getUpdates(self,
+                   offset=None,
+                   limit=100,
+                   timeout=0,
+                   network_delay=None,
+                   read_latency=2.,
+                   allowed_updates=None):
 
         if self.raise_error:
             raise TelegramError('Test Error 2')
