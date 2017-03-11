@@ -463,7 +463,7 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        self._message_wrapper(
+        return self._message_wrapper(
             url,
             data,
             chat_id=chat_id,
@@ -475,7 +475,6 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             **kwargs)
-        return url, data
 
     @log
     @message
