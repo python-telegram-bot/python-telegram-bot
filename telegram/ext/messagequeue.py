@@ -294,8 +294,9 @@ def queuedmessage(method):
     The next object attributes are used by decorator:
 
     Attributes:
-        self._is_queued_out (:obj:`bool`): Value to provide class-defaults
-            to `queued` kwarg if not provided during wrapped method call.
+        self._is_messages_queued_default (:obj:`bool`): Value to provide
+            class-defaults to `queued` kwarg if not provided during wrapped
+            method call.
         self._msg_queue (:obj:`telegram.ext.messagequeue.MessageQueue`):
             The actual `MessageQueue` used to delay outbond messages according
             to specified time-limits.
@@ -320,7 +321,7 @@ def queuedmessage(method):
 
     @functools.wraps(method)
     def wrapped(self, *args, **kwargs):
-        queued = kwargs.pop('queued', self._is_queued_out)
+        queued = kwargs.pop('queued', self._is_messages_queued_default)
         isgroup = kwargs.pop('isgroup', False)
         if queued:
             prom = promise.Promise(method, args, kwargs)
