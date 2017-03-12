@@ -1,4 +1,25 @@
-'''A throughput-limiting message dispatcher for Telegram bots'''
+#!/usr/bin/env python
+#
+# Module author:
+# Tymofii A. Khodniev (thodnev) <thodnev@mail.ru>
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2017
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/]
+'''A throughput-limiting message processor for Telegram bots'''
 from telegram.utils import promise
 
 import functools
@@ -23,31 +44,31 @@ else:
 
 
 class DelayQueueError(RuntimeError):
-    '''Indicates dispatching errors'''
+    '''Indicates processing errors'''
     pass
 
 
 class DelayQueue(threading.Thread):
-    '''Dispatches callbacks from queue with specified throughput limits.
-    Creates a separate thread to dispatch callbacks with delays.
+    '''Processes callbacks from queue with specified throughput limits.
+    Creates a separate thread to process callbacks with delays.
 
     Args:
         queue (:obj:`queue.Queue`, optional): used to pass callbacks to
             thread.
             Creates `queue.Queue` implicitly if not provided.
         burst_limit (:obj:`int`, optional): numer of maximum callbacks to
-            dispatch per time-window defined by `time_limit_ms`.
+            process per time-window defined by `time_limit_ms`.
             Defaults to 30.
         time_limit_ms (:obj:`int`, optional): defines width of time-window
-            used when each dispatching limit is calculated.
+            used when each processing limit is calculated.
             Defaults to 1000.
         exc_route (:obj:`callable`, optional): a callable, accepting 1
-            positional argument; used to route exceptions from dispatcher
+            positional argument; used to route exceptions from processor
             thread to main thread; is called on `Exception` subclass
             exceptions.
             If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): if True, dispatcher is started
+        autostart (:obj:`bool`, optional): if True, processor is started
             immediately after object's creation; if False, should be
             started manually by `start` method.
             Defaults to True.
@@ -74,14 +95,14 @@ class DelayQueue(threading.Thread):
             name = '%s-%s' % (self.__class__.__name__, self.__class__._instcnt)
         super(DelayQueue, self).__init__(name=name)
         self.daemon = False
-        if autostart:  # immediately start dispatching
+        if autostart:  # immediately start processing
             super(DelayQueue, self).start()
 
     def run(self):
         '''Do not use the method except for unthreaded testing purposes,
         the method normally is automatically called by `start` method.
         '''
-        times = []  # used to store each callable dispatch time
+        times = []  # used to store each callable processing time
         while True:
             item = self._queue.get()
             if self.__exit_req:
@@ -99,7 +120,7 @@ class DelayQueue(threading.Thread):
                 times.append(now)
             if len(times) >= self.burst_limit:  # if throughput limit was hit
                 time.sleep(times[1] - t_delta)
-            # finally dispatch one
+            # finally process one
             try:
                 func, args, kwargs = item
                 func(*args, **kwargs)
@@ -107,15 +128,15 @@ class DelayQueue(threading.Thread):
                 self.exc_route(exc)  # to prevent thread exit
 
     def stop(self, timeout=None):
-        '''Used to gently stop dispatching process and shutdown its thread.
+        '''Used to gently stop processor and shutdown its thread.
 
         Args:
             timeout (:obj:`float`): indicates maximum time to wait for
-                dispatcher to stop and its thread to exit.
-                If timeout exceeds and dispatcher has not stopped, method
+                processor to stop and its thread to exit.
+                If timeout exceeds and processor has not stopped, method
                 silently returns. `is_alive` could be used afterwards
                 to check the actual status. If `timeout` set to None, blocks
-                until dispatcher is shut down.
+                until processor is shut down.
                 Defaults to None.
         Returns:
             None
@@ -132,18 +153,19 @@ class DelayQueue(threading.Thread):
         raise exc
 
     def __call__(self, func, *args, **kwargs):
-        '''Used to dispatch callbacks in throughput-limiting thread
+        '''Used to process callbacks in throughput-limiting thread
         through queue.
         Args:
             func (:obj:`callable`): the actual function (or any callable) that
-                is dispatched through queue.
+                is processed through queue.
             *args: variable-length `func` arguments.
             **kwargs: arbitrary keyword-arguments to `func`.
         Returns:
             None
         '''
         if not self.is_alive() or self.__exit_req:
-            raise DelayQueueError('Could not dispatch into stopped thread')
+            raise DelayQueueError('Could not process callback '
+                                  'in stopped thread')
         self._queue.put((func, args, kwargs))
 
 
@@ -154,45 +176,45 @@ class DelayQueue(threading.Thread):
 # This way OS threading scheduler cares of timings accuracy.
 # (see time.time, time.clock, time.perf_counter, time.sleep @ docs.python.org)
 class MessageQueue(object):
-    '''Implements callback dispatching with proper delays to avoid hitting
+    '''Implements callback processing with proper delays to avoid hitting
     Telegram's message limits.
     Contains two `DelayQueue`s, for group and for all messages, interconnected
-    in delay chain. Callables are dispatched through *group* `DelayQueue`, then
+    in delay chain. Callables are processed through *group* `DelayQueue`, then
     through *all* `DelayQueue` for group-type messages. For non-group messages,
     only the *all* `DelayQueue` is used.
 
     Args:
         all_burst_limit (:obj:`int`, optional): numer of maximum *all-type*
-            callbacks to dispatch per time-window defined by
+            callbacks to process per time-window defined by
             `all_time_limit_ms`.
             Defaults to 30.
         all_time_limit_ms (:obj:`int`, optional): defines width of *all-type*
-            time-window used when each dispatching limit is calculated.
+            time-window used when each processing limit is calculated.
             Defaults to 1000 ms.
         group_burst_limit (:obj:`int`, optional): numer of maximum *group-type*
-            callbacks to dispatch per time-window defined by
+            callbacks to process per time-window defined by
             `group_time_limit_ms`.
             Defaults to 20.
         group_time_limit_ms (:obj:`int`, optional): defines width of
-            *group-type* time-window used when each dispatching limit is
+            *group-type* time-window used when each processing limit is
             calculated.
             Defaults to 60000 ms.
         exc_route (:obj:`callable`, optional): a callable, accepting one
-            positional argument; used to route exceptions from dispatcher
+            positional argument; used to route exceptions from processor
             threads to main thread; is called on `Exception` subclass
             exceptions.
             If not provided, exceptions are routed through dummy handler,
             which re-raises them.
-        autostart (:obj:`bool`, optional): if True, dispatchers are started
+        autostart (:obj:`bool`, optional): if True, processors are started
             immediately after object's creation; if False, should be
             started manually by `start` method.
             Defaults to True.
 
     Attributes:
         _all_delayq (:obj:`telegram.ext.messagequeue.DelayQueue`): actual
-            `DelayQueue` used for *all-type* callback dispatching
+            `DelayQueue` used for *all-type* callback processing
         _group_delayq (:obj:`telegram.ext.messagequeue.DelayQueue`): actual
-            `DelayQueue` used for *group-type* callback dispatching
+            `DelayQueue` used for *group-type* callback processing
     '''
 
     def __init__(self,
@@ -215,7 +237,7 @@ class MessageQueue(object):
             autostart=autostart)
 
     def start(self):
-        '''Method is used to manually start the `MessageQueue` dispatching
+        '''Method is used to manually start the `MessageQueue` processing
 
         Returns:
             None
@@ -230,14 +252,14 @@ class MessageQueue(object):
     stop.__doc__ = DelayQueue.stop.__doc__ or ''  # reuse docsting if any
 
     def __call__(self, promise, is_group_msg=False):
-        '''Dispatches callables through troughput-limiting queues to avoid
+        '''Processes callables in troughput-limiting queues to avoid
         hitting limits (specified with \*_burst_limit and *\_time_limit_ms).
         Args:
             promise (:obj:`callable`): mainly the
                 :obj:`telegram.utils.promise.Promise` (see Notes for other
-                callables), that is dispatched through delay queues
+                callables), that is processed in delay queues
             is_group_msg (:obj:`bool`, optional): defines whether `promise`
-                would be dispatched through *group*+*all* `DelayQueue`s
+                would be processed in *group*+*all* `DelayQueue`s
                 (if set to ``True``), or only through *all* `DelayQueue`
                 (if set to ``False``), resulting in needed delays to avoid
                 hitting specified limits.
@@ -252,8 +274,7 @@ class MessageQueue(object):
             outside exceptions or the proper `exc_route` handler is provided.
 
         Returns:
-            Either :obj:`telegram.utils.promise.Promise` in case call is
-            queued, or original method's return value if it's not.
+            :obj:`callable` used as `promise` argument.
         '''
         if not is_group_msg:  # ignore middle group delay
             self._all_delayq(promise)
@@ -283,12 +304,12 @@ def queuedmessage(method):
 
     Args:
         queued (:obj:`bool`, optional): if set to ``True``, the `MessageQueue`
-            is used to dispatch output messages.
+            is used to process output messages.
             Defaults to `self._is_queued_out`.
         isgroup (:obj:`bool`, optional): if set to ``True``, the message is
             meant to be group-type (as there's no obvious way to determine its
             type in other way at the moment). Group-type messages could have
-            additional dispatch delay according to limits set in
+            additional processing delay according to limits set in
             `self._out_queue`.
             Defaults to ``False``.
 
