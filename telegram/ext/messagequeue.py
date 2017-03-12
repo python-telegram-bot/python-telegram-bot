@@ -56,7 +56,7 @@ class DelayQueue(threading.Thread):
         queue (:obj:`queue.Queue`, optional): used to pass callbacks to
             thread.
             Creates `queue.Queue` implicitly if not provided.
-        burst_limit (:obj:`int`, optional): numer of maximum callbacks to
+        burst_limit (:obj:`int`, optional): number of maximum callbacks to
             process per time-window defined by `time_limit_ms`.
             Defaults to 30.
         time_limit_ms (:obj:`int`, optional): defines width of time-window
