@@ -164,8 +164,7 @@ class DelayQueue(threading.Thread):
             None
         '''
         if not self.is_alive() or self.__exit_req:
-            raise DelayQueueError('Could not process callback '
-                                  'in stopped thread')
+            raise DelayQueueError('Could not process callback in stopped thread')
         self._queue.put((func, args, kwargs))
 
 
