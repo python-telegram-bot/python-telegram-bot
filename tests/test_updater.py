@@ -716,7 +716,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
         thr = Thread(
-            target=self.updater._start_webhook, args=(ip, port, '', None, None, 0, False, None))
+            target=self.updater._start_webhook,
+            args=(ip, port, '', None, None, 0, False, None, None))
         thr.start()
 
         sleep(0.5)
@@ -832,7 +833,7 @@ class MockBot(object):
 
         return update
 
-    def setWebhook(self, url=None, certificate=None):
+    def setWebhook(self, url=None, certificate=None, allowed_updates=None):
         if self.bootstrap_retries is None:
             return
 

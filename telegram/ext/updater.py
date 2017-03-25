@@ -192,7 +192,8 @@ class Updater(object):
                       key=None,
                       clean=False,
                       bootstrap_retries=0,
-                      webhook_url=None):
+                      webhook_url=None,
+                      allowed_updates=None):
         """
         Starts a small http server to listen for updates via webhook. If cert
         and key are not provided, the webhook will be started directly on
@@ -215,9 +216,10 @@ class Updater(object):
                 |   < 0 - retry indefinitely
                 |   0 - no retries (default)
                 |   > 0 - retry up to X times
-            webhook_url (Optional[str]): Explicitly specifiy the webhook url.
+            webhook_url (Optional[str]): Explicitly specify the webhook url.
                 Useful behind NAT, reverse proxy, etc. Default is derived from
                 `listen`, `port` & `url_path`.
+            allowed_updates (Optional[list[str]]): Passed to Bot.setWebhook
 
         Returns:
             Queue: The update queue that can be filled from the main thread
@@ -231,7 +233,7 @@ class Updater(object):
                 self.job_queue.start()
                 self._init_thread(self.dispatcher.start, "dispatcher"),
                 self._init_thread(self._start_webhook, "updater", listen, port, url_path, cert,
-                                  key, bootstrap_retries, clean, webhook_url)
+                                  key, bootstrap_retries, clean, webhook_url, allowed_updates)
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -247,7 +249,7 @@ class Updater(object):
         cur_interval = poll_interval
         self.logger.debug('Updater thread started')
 
-        self._bootstrap(bootstrap_retries, clean=clean, webhook_url='')
+        self._bootstrap(bootstrap_retries, clean=clean, webhook_url='', allowed_updates=None)
 
         while self.running:
             try:
@@ -295,7 +297,7 @@ class Updater(object):
         return current_interval
 
     def _start_webhook(self, listen, port, url_path, cert, key, bootstrap_retries, clean,
-                       webhook_url):
+                       webhook_url, allowed_updates):
         self.logger.debug('Updater thread started')
         use_ssl = cert is not None and key is not None
         if not url_path.startswith('/'):
@@ -316,7 +318,8 @@ class Updater(object):
                 max_retries=bootstrap_retries,
                 clean=clean,
                 webhook_url=webhook_url,
-                cert=open(cert, 'rb'))
+                cert=open(cert, 'rb'),
+                allowed_updates=allowed_updates)
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -346,7 +349,7 @@ class Updater(object):
     def _gen_webhook_url(listen, port, url_path):
         return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
 
-    def _bootstrap(self, max_retries, clean, webhook_url, cert=None):
+    def _bootstrap(self, max_retries, clean, webhook_url, allowed_updates, cert=None):
         retries = 0
         while 1:
 
@@ -357,7 +360,8 @@ class Updater(object):
                     self._clean_updates()
                     sleep(1)
 
-                self.bot.setWebhook(url=webhook_url, certificate=cert)
+                self.bot.setWebhook(
+                    url=webhook_url, certificate=cert, allowed_updates=allowed_updates)
             except (Unauthorized, InvalidToken):
                 raise
             except TelegramError:
