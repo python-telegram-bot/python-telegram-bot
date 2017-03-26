@@ -71,7 +71,10 @@ class RegexHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 allow_edited=False,
+                 message_updates=True,
+                 channel_post_updates=False):
         super(RegexHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -85,17 +88,30 @@ class RegexHandler(Handler):
         self.pattern = pattern
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
+        self.allow_edited = allow_edited
+        self.message_updates = message_updates
+        self.channel_post_updates = channel_post_updates
+
+    def _is_allowed_message(self, update):
+        return (self.message_updates
+                and (update.message or (update.edited_message and self.allow_edited)))
+
+    def _is_allowed_channel_post(self, update):
+        return (self.channel_post_updates
+                and (update.channel_post or (update.edited_channel_post and self.allow_edited)))
 
     def check_update(self, update):
-        if isinstance(update, Update) and update.message and update.message.text:
-            match = re.match(self.pattern, update.message.text)
+        if (isinstance(update, Update)
+                and (self._is_allowed_message(update) or self._is_allowed_channel_post(update))
+                and update.effective_message.text):
+            match = re.match(self.pattern, update.effective_message.text)
             return bool(match)
         else:
             return False
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher, update)
-        match = re.match(self.pattern, update.message.text)
+        match = re.match(self.pattern, update.effective_message.text)
 
         if self.pass_groups:
             optional_args['groups'] = match.groups()
