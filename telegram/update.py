@@ -73,6 +73,10 @@ class Update(TelegramObject):
         self.channel_post = channel_post
         self.edited_channel_post = edited_channel_post
 
+        self._effective_user = None
+        self._effective_chat = None
+        self._effective_message = None
+
     @staticmethod
     def de_json(data, bot):
         """
@@ -99,25 +103,23 @@ class Update(TelegramObject):
 
         return Update(**data)
 
-    def extract_chat_and_user(self):
+    @property
+    def effective_user(self):
         """
-        Helper method to get the sender's chat and user objects from an arbitrary update.
-        Depending on the type of update, one of the available attributes ``message``,
-        ``edited_message`` or ``callback_query`` is used to determine the result.
+        A property that contains the ``User`` that sent this update, no matter what kind of update
+        this is. Will be ``None`` for channel posts.
+        """
 
-        Returns:
-            tuple: of (chat, user), with None-values if no object could not be found.
-        """
+        if self._effective_user:
+            return self._effective_user
+
         user = None
-        chat = None
 
         if self.message:
             user = self.message.from_user
-            chat = self.message.chat
 
         elif self.edited_message:
             user = self.edited_message.from_user
-            chat = self.edited_message.chat
 
         elif self.inline_query:
             user = self.inline_query.from_user
@@ -127,51 +129,67 @@ class Update(TelegramObject):
 
         elif self.callback_query:
             user = self.callback_query.from_user
-            chat = self.callback_query.message.chat if self.callback_query.message else None
 
-        return chat, user
+        self._effective_user = user
+        return user
 
-    def extract_message_text(self):
+    @property
+    def effective_chat(self):
         """
-        Helper method to get the message text from an arbitrary update.
-        Depending on the type of update, one of the available attributes ``message``,
-        ``edited_message`` or ``callback_query`` is used to determine the result.
-
-        Returns:
-            str: The extracted message text
-
-        Raises:
-            ValueError: If no message text was found in the update
-
+        A property that contains the ``Chat`` that this update was sent in, no matter what kind of
+        update this is. Will be ``None`` for inline queries and chosen inline results.
         """
+
+        if self._effective_chat:
+            return self._effective_chat
+
+        chat = None
+
         if self.message:
-            return self.message.text
+            chat = self.message.chat
+
         elif self.edited_message:
-            return self.edited_message.text
-        elif self.callback_query:
-            return self.callback_query.message.text
-        else:
-            raise ValueError("Update contains no message text.")
+            chat = self.edited_message.chat
 
-    def extract_entities(self):
+        elif self.callback_query and self.callback_query.message:
+            chat = self.callback_query.message.chat
+
+        elif self.channel_post:
+            chat = self.channel_post.chat
+
+        elif self.edited_channel_post:
+            chat = self.edited_channel_post.chat
+
+        self._effective_chat = chat
+        return chat
+
+    @property
+    def effective_message(self):
         """
-        Helper method to get parsed entities from an arbitrary update.
-        Depending on the type of update, one of the available attributes ``message``,
-        ``edited_message`` or ``callback_query`` is used to determine the result.
-
-        Returns:
-            dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
-                text that belongs to them, calculated based on UTF-16 codepoints.
-
-        Raises:
-            ValueError: If no entities were found in the update
-
+        A property that contains the ``Message`` included in this update, no matter what kind
+        of update this is. Will be ``None`` for inline queries, chosen inline results and callback
+        queries from inline messages.
         """
+
+        if self._effective_message:
+            return self._effective_message
+
+        message = None
+
         if self.message:
-            return self.message.parse_entities()
+            message = self.message
+
         elif self.edited_message:
-            return self.edited_message.parse_entities()
+            message = self.edited_message
+
         elif self.callback_query:
-            return self.callback_query.message.parse_entities()
-        else:
-            raise ValueError("No message object found in self, therefore no entities available.")
+            message = self.callback_query.message
+
+        elif self.channel_post:
+            message = self.channel_post
+
+        elif self.edited_channel_post:
+            message = self.edited_channel_post
+
+        self._effective_message = message
+        return message
