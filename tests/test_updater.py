@@ -790,6 +790,23 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1)
         self.assertFalse(self.updater.running)
 
+    def test_userSignal(self):
+        self._setup_updater('Test7', messages=0)
+
+        tempVar = {'a': 0}
+
+        def userSignalInc(signum, frame):
+            tempVar['a'] = 1
+
+        self.updater.user_sig_handler = userSignalInc
+        self.updater.start_polling(poll_interval=0.01)
+        Thread(target=self.signalsender).start()
+        self.updater.idle()
+        # If we get this far, idle() ran through
+        sleep(1)
+        self.assertFalse(self.updater.running)
+        self.assertTrue(tempVar['a'] != 0)
+
     def test_createBot(self):
         self.updater = Updater('123:abcd')
         self.assertIsNotNone(self.updater.bot)

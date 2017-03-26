@@ -62,6 +62,9 @@ class Updater(object):
         bot (Optional[Bot]): A pre-initialized bot instance. If a pre-initizlied bot is used, it is
             the user's responsibility to create it using a `Request` instance with a large enough
             connection pool.
+        user_sig_handler (Optional[function]): Takes ``signum, frame`` as positional arguments.
+            This will be called when a signal is received, defaults are (SIGINT, SIGTERM, SIGABRT)
+            setable with Updater.idle(stop_signals=(signals))
         request_kwargs (Optional[dict]): Keyword args to control the creation of a request object
             (ignored if `bot` argument is used).
 
@@ -71,7 +74,14 @@ class Updater(object):
     """
     _request = None
 
-    def __init__(self, token=None, base_url=None, workers=4, bot=None, request_kwargs=None):
+    def __init__(self,
+                 token=None,
+                 base_url=None,
+                 workers=4,
+                 bot=None,
+                 user_sig_handler=None,
+                 request_kwargs=None):
+
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
@@ -92,6 +102,7 @@ class Updater(object):
                 request_kwargs['con_pool_size'] = workers + 4
             self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request)
+        self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
@@ -426,6 +437,8 @@ class Updater(object):
         self.is_idle = False
         if self.running:
             self.stop()
+            if self.user_sig_handler:
+                self.user_sig_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
             import os
