@@ -51,8 +51,20 @@ class BaseFilter(object):
     def __or__(self, other):
         return MergedFilter(self, or_filter=other)
 
+    def __invert__(self):
+        return InvertedFilter(self)
+
     def filter(self, message):
         raise NotImplementedError
+
+
+class InvertedFilter(BaseFilter):
+
+    def __init__(self, f):
+        self.f = f
+
+    def filter(self, message):
+        return not self.f(message)
 
 
 class MergedFilter(BaseFilter):
