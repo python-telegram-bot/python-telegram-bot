@@ -290,13 +290,6 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
 
         with self.assertRaises(ValueError):
             ConversationHandler(
-                entry_points=[CallbackQueryHandler(lambda bot, update: None)],
-                states={},
-                fallbacks=[],
-                per_message=False)
-
-        with self.assertRaises(ValueError):
-            ConversationHandler(
                 entry_points=[InlineQueryHandler(lambda bot, update: None)],
                 states={},
                 fallbacks=[],

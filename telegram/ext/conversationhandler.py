@@ -19,6 +19,7 @@
 """ This module contains the ConversationHandler """
 
 import logging
+import warnings
 
 from telegram import Update
 from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
@@ -133,16 +134,19 @@ class ConversationHandler(Handler):
             for handler in all_handlers:
                 if not isinstance(handler, CallbackQueryHandler):
                     raise ValueError("If 'per_message=True', all entry points and state handlers"
-                                     " must be 'CallbackQueryHandler'")
+                                     " must be 'CallbackQueryHandler', since no other handlers "
+                                     "have a message context.")
         else:
             for handler in all_handlers:
                 if isinstance(handler, CallbackQueryHandler):
-                    raise ValueError("If 'per_message=False', 'CallbackQueryHandler' doesn't work")
+                    warnings.warn("If 'per_message=False', 'CallbackQueryHandler' will not be "
+                                  "tracked for every message.")
 
         if self.per_chat:
             for handler in all_handlers:
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
-                    raise ValueError("If 'per_chat=True', 'InlineQueryHandler' doesn't work")
+                    raise ValueError("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
+                                     "since inline queries have no chat context.")
 
     def _get_key(self, update):
         chat = update.effective_chat
