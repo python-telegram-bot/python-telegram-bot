@@ -19,8 +19,6 @@
 """ This module contains the base class for handlers as used by the
 Dispatcher """
 
-from telegram.utils.deprecate import deprecate
-
 
 class Handler(object):
     """
@@ -114,10 +112,3 @@ class Handler(object):
                 optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
 
         return optional_args
-
-    # old non-PEP8 Handler methods
-    m = "telegram.Handler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
-    collectOptionalArgs = deprecate(collect_optional_args, m + "collectOptionalArgs",
-                                    m + "collect_optional_args")
