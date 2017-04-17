@@ -85,6 +85,12 @@ Here's how to make a one-off code change.
 
         $ make test
 
+     If you don't have ``make``, do:
+
+     .. code-block::
+
+        $ nosetests -v
+
    - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 
      .. code-block:: bash
