@@ -26,7 +26,7 @@ class BaseFilter(object):
 
     And:
 
-        >>> (Filters.text & Filters.entity(MENTION))
+        >>> (Filters.text & Filters.entity(MessageEntity.MENTION))
 
     Or:
 
@@ -38,7 +38,7 @@ class BaseFilter(object):
 
     Also works with more than two filters:
 
-        >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
+        >>> (Filters.text & (Filters.entity(MessageEntity.URL) | Filters.entity(MessageEntity.TEXT_LINK)))
         >>> Filters.text & (~ Filters.forwarded)
 
     If you want to create your own filters create a class inheriting from this class and implement
