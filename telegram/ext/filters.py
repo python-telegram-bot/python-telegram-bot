@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the Filters for use with the MessageHandler class """
+from telegram import Chat
 
 
 class BaseFilter(object):
@@ -248,3 +249,17 @@ class Filters(object):
 
         def filter(self, message):
             return any([entity.type == self.entity_type for entity in message.entities])
+
+    class _Private(BaseFilter):
+
+        def filter(self, message):
+            return message.chat.type == Chat.PRIVATE
+
+    private = _Private()
+
+    class _Group(BaseFilter):
+
+        def filter(self, message):
+            return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
+
+    group = _Group()
