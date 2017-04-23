@@ -53,7 +53,7 @@ class MessageHandler(Handler):
             For each update in the same chat, it will be the same ``dict``. Default is ``False``.
         message_updates (Optional[bool]): Should "normal" message updates be handled? Default is
             ``True``.
-        channel_posts_updates (Optional[bool]): Should channel posts updates be handled? Default is
+        channel_post_updates (Optional[bool]): Should channel posts updates be handled? Default is
             ``True``.
 
     """
@@ -67,8 +67,8 @@ class MessageHandler(Handler):
                  pass_user_data=False,
                  pass_chat_data=False,
                  message_updates=True,
-                 channel_posts_updates=True):
-        if not message_updates and not channel_posts_updates:
+                 channel_post_updates=True):
+        if not message_updates and not channel_post_updates:
             raise ValueError('Both message_updates & channel_post_updates are False')
 
         super(MessageHandler, self).__init__(
@@ -80,7 +80,7 @@ class MessageHandler(Handler):
         self.filters = filters
         self.allow_edited = allow_edited
         self.message_updates = message_updates
-        self.channel_posts_updates = channel_posts_updates
+        self.channel_post_updates = channel_post_updates
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -94,7 +94,7 @@ class MessageHandler(Handler):
                 and (update.message or (update.edited_message and self.allow_edited)))
 
     def _is_allowed_channel_post(self, update):
-        return (self.channel_posts_updates
+        return (self.channel_post_updates
                 and (update.channel_post or (update.edited_channel_post and self.allow_edited)))
 
     def check_update(self, update):
@@ -105,8 +105,7 @@ class MessageHandler(Handler):
                 res = True
 
             else:
-                message = (update.message or update.edited_message or update.channel_post
-                           or update.edited_channel_post)
+                message = update.effective_message
                 if isinstance(self.filters, list):
                     res = any(func(message) for func in self.filters)
                 else:

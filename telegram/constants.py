@@ -32,6 +32,7 @@ Attributes:
         limit, but eventually you'll begin receiving 429 errors.
     MAX_MESSAGES_PER_SECOND (int)
     MAX_MESSAGES_PER_MINUTE_PER_GROUP (int)
+    MAX_INLINE_QUERY_RESULTS (int)
 
 The following constant have been found by experimentation:
 
@@ -52,3 +53,4 @@ MAX_MESSAGES_PER_SECOND_PER_CHAT = 1
 MAX_MESSAGES_PER_SECOND = 30
 MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
 MAX_MESSAGE_ENTITIES = 100
+MAX_INLINE_QUERY_RESULTS = 50

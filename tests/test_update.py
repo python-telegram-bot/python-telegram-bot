@@ -76,16 +76,20 @@ class UpdateTest(BaseTest, unittest.TestCase):
         self.assertEqual(update['update_id'], self.update_id)
         self.assertTrue(isinstance(update['message'], telegram.Message))
 
-    def test_extract_chat_and_user(self):
+    def test_effective_chat(self):
         update = telegram.Update.de_json(self.json_dict, self._bot)
-        chat, user = update.extract_chat_and_user()
+        chat = update.effective_chat
         self.assertEqual(update.message.chat, chat)
+
+    def test_effective_user(self):
+        update = telegram.Update.de_json(self.json_dict, self._bot)
+        user = update.effective_user
         self.assertEqual(update.message.from_user, user)
 
-    def test_extract_message_text(self):
+    def test_effective_message(self):
         update = telegram.Update.de_json(self.json_dict, self._bot)
-        text = update.extract_message_text()
-        self.assertEqual(update.message.text, text)
+        message = update.effective_message
+        self.assertEqual(update.message.text, message.text)
 
 
 if __name__ == '__main__':

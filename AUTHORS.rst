@@ -1,7 +1,9 @@
 Credits
 =======
 
-``python-telegram-bot`` is written and maintained by `Leandro Toledo <https://github.com/leandrotoledo>`_.
+``python-telegram-bot`` was originally created by
+`Leandro Toledo <https://github.com/leandrotoledo>`_ and is now maintained by
+`Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram).
 
 Contributors
 ------------
@@ -12,6 +14,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Balduro <https://github.com/Balduro>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
+- `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
@@ -21,6 +24,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jh0ker <https://github.com/jh0ker>`_
+- `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
@@ -33,10 +37,12 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
 - `overquota <https://github.com/overquota>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
+- `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
+- `thodnev <https://github.com/thodnev>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
 - `wjt <https://github.com/wjt>`_

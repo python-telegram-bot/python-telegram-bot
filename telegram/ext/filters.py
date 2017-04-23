@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the Filters for use with the MessageHandler class """
+from telegram import Chat
 
 
 class BaseFilter(object):
@@ -32,9 +33,14 @@ class BaseFilter(object):
 
         >>> (Filters.audio | Filters.video)
 
+    Not:
+
+        >>> ~ Filters.command
+
     Also works with more than two filters:
 
         >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
+        >>> Filters.text & (~ Filters.forwarded)
 
     If you want to create your own filters create a class inheriting from this class and implement
     a `filter` method that returns a boolean: `True` if the message should be handled, `False`
@@ -51,8 +57,30 @@ class BaseFilter(object):
     def __or__(self, other):
         return MergedFilter(self, or_filter=other)
 
+    def __invert__(self):
+        return InvertedFilter(self)
+
     def filter(self, message):
         raise NotImplementedError
+
+
+class InvertedFilter(BaseFilter):
+    """Represents a filter that has been inverted.
+
+    Args:
+        f: The filter to invert
+    """
+
+    def __init__(self, f):
+        self.f = f
+
+    def filter(self, message):
+        return not self.f(message)
+
+    def __str__(self):
+        return "<telegram.ext.filters.InvertedFilter inverting {}>".format(self.f)
+
+    __repr__ = __str__
 
 
 class MergedFilter(BaseFilter):
@@ -221,3 +249,17 @@ class Filters(object):
 
         def filter(self, message):
             return any([entity.type == self.entity_type for entity in message.entities])
+
+    class _Private(BaseFilter):
+
+        def filter(self, message):
+            return message.chat.type == Chat.PRIVATE
+
+    private = _Private()
+
+    class _Group(BaseFilter):
+
+        def filter(self, message):
+            return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
+
+    group = _Group()

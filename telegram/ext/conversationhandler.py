@@ -145,7 +145,9 @@ class ConversationHandler(Handler):
                     raise ValueError("If 'per_chat=True', 'InlineQueryHandler' doesn't work")
 
     def _get_key(self, update):
-        chat, user = update.extract_chat_and_user()
+        chat = update.effective_chat
+        user = update.effective_user
+
         key = list()
 
         if self.per_chat:
@@ -181,6 +183,7 @@ class ConversationHandler(Handler):
                 res = new_state.result(timeout=self.run_async_timeout)
             except Exception as exc:
                 self.logger.exception("Promise function raised exception")
+                self.logger.exception("{}".format(exc))
                 error = True
 
             if not error and new_state.done.is_set():
