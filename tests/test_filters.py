@@ -178,6 +178,18 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.entities = [self.e(MessageEntity.BOLD), self.e(MessageEntity.MENTION)]
         self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
 
+    def test_private_filter(self):
+        self.assertTrue(Filters.private(self.message))
+        self.message.chat.type = "group"
+        self.assertFalse(Filters.private(self.message))
+
+    def test_group_fileter(self):
+        self.assertFalse(Filters.group(self.message))
+        self.message.chat.type = "group"
+        self.assertTrue(Filters.group(self.message))
+        self.message.chat.type = "supergroup"
+        self.assertTrue(Filters.group(self.message))
+
     def test_and_filters(self):
         self.message.text = 'test'
         self.message.forward_date = True

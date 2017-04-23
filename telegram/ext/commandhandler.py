@@ -110,7 +110,7 @@ class CommandHandler(Handler):
                     res = self.filters(message)
 
                 return res and (message.text.startswith('/') and command[0] == self.command
-                                and command[1] == update.message.bot.username)
+                                and command[1].lower() == update.message.bot.username.lower())
             else:
                 return False
 

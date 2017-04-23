@@ -248,3 +248,17 @@ class Filters(object):
 
         def filter(self, message):
             return any([entity.type == self.entity_type for entity in message.entities])
+
+    class _Private(BaseFilter):
+
+        def filter(self, message):
+            return message.chat.type == "private"
+
+    private = _Private()
+
+    class _Group(BaseFilter):
+
+        def filter(self, message):
+            return message.chat.type in ["group", "supergroup"]
+
+    group = _Group()
