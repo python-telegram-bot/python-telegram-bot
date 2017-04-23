@@ -104,10 +104,11 @@ class Handler(object):
         if self.pass_job_queue:
             optional_args['job_queue'] = dispatcher.job_queue
         if self.pass_user_data or self.pass_chat_data:
-            chat, user = update.extract_chat_and_user()
+            chat = update.effective_chat
+            user = update.effective_user
 
             if self.pass_user_data:
-                optional_args['user_data'] = dispatcher.user_data[user.id]
+                optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
 
             if self.pass_chat_data:
                 optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]

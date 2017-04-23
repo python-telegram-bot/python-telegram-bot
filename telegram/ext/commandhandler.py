@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the CommandHandler class """
+import warnings
 
 from .handler import Handler
 from telegram import Update
@@ -34,6 +35,10 @@ class CommandHandler(Handler):
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
+        filters (telegram.ext.BaseFilter): A filter inheriting from
+            :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
+            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            operators (& for and, | for or).
         allow_edited (Optional[bool]): If the handler should also accept edited messages.
             Default is ``False``
         pass_args (optional[bool]): If the handler should be passed the
@@ -62,6 +67,7 @@ class CommandHandler(Handler):
     def __init__(self,
                  command,
                  callback,
+                 filters=None,
                  allow_edited=False,
                  pass_args=False,
                  pass_update_queue=False,
@@ -75,8 +81,16 @@ class CommandHandler(Handler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
         self.command = command
+        self.filters = filters
         self.allow_edited = allow_edited
         self.pass_args = pass_args
+
+        # We put this up here instead of with the rest of checking code
+        # in check_update since we don't wanna spam a ton
+        if isinstance(self.filters, list):
+            warnings.warn('Using a list of filters in MessageHandler is getting '
+                          'deprecated, please use bitwise operators (& and |) '
+                          'instead. More info: https://git.io/vPTbc.')
 
     def check_update(self, update):
         if (isinstance(update, Update)
@@ -87,8 +101,16 @@ class CommandHandler(Handler):
                 command = message.text[1:].split(' ')[0].split('@')
                 command.append(
                     update.message.bot.username)  # in case the command was send without a username
-                return (message.text.startswith('/') and command[0] == self.command
-                        and command[1] == update.message.bot.username)
+
+                if self.filters is None:
+                    res = True
+                elif isinstance(self.filters, list):
+                    res = any(func(message) for func in self.filters)
+                else:
+                    res = self.filters(message)
+
+                return res and (message.text.startswith('/') and command[0] == self.command
+                                and command[1] == update.message.bot.username)
             else:
                 return False
 

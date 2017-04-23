@@ -226,6 +226,32 @@ class FiltersTest(BaseTest, unittest.TestCase):
             r"<telegram.ext.filters.(Filters.)?_Forwarded object at .*?> or "
             r"<telegram.ext.filters.(Filters.)?entity object at .*?>>>")
 
+    def test_inverted_filters(self):
+        self.message.text = '/test'
+        self.assertTrue((Filters.command)(self.message))
+        self.assertFalse((~Filters.command)(self.message))
+        self.message.text = 'test'
+        self.assertFalse((Filters.command)(self.message))
+        self.assertTrue((~Filters.command)(self.message))
+
+    def test_inverted_and_filters(self):
+        self.message.text = '/test'
+        self.message.forward_date = 1
+        self.assertTrue((Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((~Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((Filters.forwarded & ~Filters.command)(self.message))
+        self.assertFalse((~(Filters.forwarded & Filters.command))(self.message))
+        self.message.forward_date = None
+        self.assertFalse((Filters.forwarded & Filters.command)(self.message))
+        self.assertTrue((~Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((Filters.forwarded & ~Filters.command)(self.message))
+        self.assertTrue((~(Filters.forwarded & Filters.command))(self.message))
+        self.message.text = 'test'
+        self.assertFalse((Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((~Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((Filters.forwarded & ~Filters.command)(self.message))
+        self.assertTrue((~(Filters.forwarded & Filters.command))(self.message))
+
     def test_faulty_custom_filter(self):
 
         class _CustomFilter(BaseFilter):

@@ -32,9 +32,14 @@ class BaseFilter(object):
 
         >>> (Filters.audio | Filters.video)
 
+    Not:
+
+        >>> ~ Filters.command
+
     Also works with more than two filters:
 
         >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
+        >>> Filters.text & (~ Filters.forwarded)
 
     If you want to create your own filters create a class inheriting from this class and implement
     a `filter` method that returns a boolean: `True` if the message should be handled, `False`
@@ -51,8 +56,30 @@ class BaseFilter(object):
     def __or__(self, other):
         return MergedFilter(self, or_filter=other)
 
+    def __invert__(self):
+        return InvertedFilter(self)
+
     def filter(self, message):
         raise NotImplementedError
+
+
+class InvertedFilter(BaseFilter):
+    """Represents a filter that has been inverted.
+
+    Args:
+        f: The filter to invert
+    """
+
+    def __init__(self, f):
+        self.f = f
+
+    def filter(self, message):
+        return not self.f(message)
+
+    def __str__(self):
+        return "<telegram.ext.filters.InvertedFilter inverting {}>".format(self.f)
+
+    __repr__ = __str__
 
 
 class MergedFilter(BaseFilter):
