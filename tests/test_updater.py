@@ -250,6 +250,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertEqual(self.received_message, '/test@MockBot')
+        message.text = "/test@mockbot"
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test@mockbot')
 
         # directed at other bot
         self.reset()

@@ -38,7 +38,7 @@ else:
 #  on Windows, the best available is time.clock while time.time is on
 #  another platforms (M. Lutz, "Learning Python," 4ed, p.630-634)
 if sys.version_info.major == 3 and sys.version_info.minor >= 3:
-    curtime = time.perf_counter
+    curtime = time.perf_counter  # pylint: disable=E1101
 else:
     curtime = time.clock if sys.platform[:3] == 'win' else time.time
 
