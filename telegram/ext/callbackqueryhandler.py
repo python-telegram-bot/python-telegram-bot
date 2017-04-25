@@ -23,7 +23,6 @@ import re
 from future.utils import string_types
 
 from telegram import Update
-from telegram.utils.deprecate import deprecate
 from .handler import Handler
 
 
@@ -105,8 +104,3 @@ class CallbackQueryHandler(Handler):
                 optional_args['groupdict'] = match.groupdict()
 
         return self.callback(dispatcher.bot, update, **optional_args)
-
-    # old non-PEP8 Handler methods
-    m = "telegram.CallbackQueryHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

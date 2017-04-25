@@ -189,15 +189,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d = self.updater.dispatcher
         from telegram.ext import Filters
         handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
-        d.addHandler(handler)
+        d.add_handler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test')
 
         # Remove handler
-        d.removeHandler(handler)
+        d.remove_handler(handler)
         handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=False)
-        d.addHandler(handler)
+        d.add_handler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -263,9 +263,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
         # Remove handler
-        d.removeHandler(handler)
+        d.remove_handler(handler)
         handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=False)
-        d.addHandler(handler)
+        d.add_handler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1

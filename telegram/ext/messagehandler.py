@@ -21,7 +21,6 @@ import warnings
 
 from .handler import Handler
 from telegram import Update
-from telegram.utils.deprecate import deprecate
 
 
 class MessageHandler(Handler):
@@ -120,8 +119,3 @@ class MessageHandler(Handler):
         optional_args = self.collect_optional_args(dispatcher, update)
 
         return self.callback(dispatcher.bot, update, **optional_args)
-
-    # old non-PEP8 Handler methods
-    m = "telegram.MessageHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
