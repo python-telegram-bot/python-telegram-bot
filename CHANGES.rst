@@ -2,6 +2,12 @@
 Changes
 =======
 
+**2017-04-17**
+
+*Released 5.3.1*
+
+- Hotfix release due to bug introduced by urllib3 version 1.21
+
 **2016-12-11**
 
 *Released 5.3*
