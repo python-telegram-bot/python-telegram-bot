@@ -17,6 +17,13 @@ def requirements():
     return requirements_list
 
 
+packages = find_packages(exclude=['tests*'])
+packages.extend(['telegram.vendor.urllib3.urllib3',
+                'telegram.vendor.urllib3.urllib3.packages', 'telegram.vendor.urllib3.urllib3.packages.ssl_match_hostname',
+                'telegram.vendor.urllib3.urllib3.packages.backports', 'telegram.vendor.urllib3.urllib3.contrib',
+                'telegram.vendor.urllib3.urllib3.util',
+                ])
+
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
     fn = os.path.join('telegram', 'version.py')
     with open(fn) as fh:
@@ -32,7 +39,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           keywords='python telegram bot api wrapper',
           description="We have made you a wrapper you can't refuse",
           long_description=fd.read(),
-          packages=find_packages(exclude=['tests*']),
+          packages=packages,
           install_requires=requirements(),
           extras_require={
               'json': 'ujson',

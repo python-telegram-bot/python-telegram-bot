@@ -19,6 +19,10 @@
 """A library that provides a Python interface to the Telegram Bot API"""
 
 from sys import version_info
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'vendor', 'urllib3'))
 
 from .base import TelegramObject
 from .user import User

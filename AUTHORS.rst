@@ -3,7 +3,12 @@ Credits
 
 ``python-telegram-bot`` was originally created by
 `Leandro Toledo <https://github.com/leandrotoledo>`_ and is now maintained by
-`Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram).
+`Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram) and
+`Noam Meltzer <https://github.com/tsnoam>`_.
+
+We're vendoring urllib3 as part of ``python-telegram-bot`` which is distributed under the MIT
+license. For more info, full credits & license terms, the sources can be found here:
+`https://github.com/python-telegram-bot/urllib3`.
 
 Contributors
 ------------

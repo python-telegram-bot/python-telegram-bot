@@ -78,7 +78,7 @@ class Request(object):
                 (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
             ],
             timeout=urllib3.Timeout(
-                connect=self._connect_timeout, read=read_timeout),)
+                connect=self._connect_timeout, read=read_timeout, total=None))
 
         # Set a proxy according to the following order:
         # * proxy defined in proxy_url (+ urllib3_proxy_kwargs)

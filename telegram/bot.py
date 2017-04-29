@@ -129,31 +129,33 @@ class Bot(TelegramObject):
 
         return decorator
 
+    def _message_wrapper(self, url, data, *args, **kwargs):
+        if kwargs.get('reply_to_message_id'):
+            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
+
+        if kwargs.get('disable_notification'):
+            data['disable_notification'] = kwargs.get('disable_notification')
+
+        if kwargs.get('reply_markup'):
+            reply_markup = kwargs.get('reply_markup')
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+
+        if result is True:
+            return result
+
+        return Message.de_json(result, self)
+
     def message(func):
 
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             url, data = func(self, *args, **kwargs)
-
-            if kwargs.get('reply_to_message_id'):
-                data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
-
-            if kwargs.get('disable_notification'):
-                data['disable_notification'] = kwargs.get('disable_notification')
-
-            if kwargs.get('reply_markup'):
-                reply_markup = kwargs.get('reply_markup')
-                if isinstance(reply_markup, ReplyMarkup):
-                    data['reply_markup'] = reply_markup.to_json()
-                else:
-                    data['reply_markup'] = reply_markup
-
-            result = self._request.post(url, data, timeout=kwargs.get('timeout'))
-
-            if result is True:
-                return result
-
-            return Message.de_json(result, self)
+            return Bot._message_wrapper(self, url, data, *args, **kwargs)
 
         return decorator
 
@@ -283,7 +285,6 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @message
     def sendPhoto(self,
                   chat_id,
                   photo,
@@ -291,7 +292,7 @@ class Bot(TelegramObject):
                   disable_notification=False,
                   reply_to_message_id=None,
                   reply_markup=None,
-                  timeout=None,
+                  timeout=20.,
                   **kwargs):
         """Use this method to send photos.
 
@@ -308,9 +309,7 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -327,10 +326,19 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._message_wrapper(
+            url,
+            data,
+            chat_id=chat_id,
+            photo=photo,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            **kwargs)
 
     @log
-    @message
     def sendAudio(self,
                   chat_id,
                   audio,
@@ -341,7 +349,7 @@ class Bot(TelegramObject):
                   disable_notification=False,
                   reply_to_message_id=None,
                   reply_markup=None,
-                  timeout=None,
+                  timeout=20.,
                   **kwargs):
         """Use this method to send audio files, if you want Telegram clients to
         display them in the music player. Your audio must be in an .mp3 format.
@@ -370,9 +378,7 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -395,10 +401,22 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._message_wrapper(
+            url,
+            data,
+            chat_id=chat_id,
+            audio=audio,
+            duration=duration,
+            performer=performer,
+            title=title,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=20.,
+            **kwargs)
 
     @log
-    @message
     def sendDocument(self,
                      chat_id,
                      document,
@@ -407,7 +425,7 @@ class Bot(TelegramObject):
                      disable_notification=False,
                      reply_to_message_id=None,
                      reply_markup=None,
-                     timeout=None,
+                     timeout=20.,
                      **kwargs):
         """Use this method to send general files.
 
@@ -426,9 +444,7 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -447,7 +463,18 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._message_wrapper(
+            url,
+            data,
+            chat_id=chat_id,
+            document=document,
+            filename=filename,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            **kwargs)
 
     @log
     @message
@@ -492,7 +519,6 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @message
     def sendVideo(self,
                   chat_id,
                   video,
@@ -501,7 +527,7 @@ class Bot(TelegramObject):
                   disable_notification=False,
                   reply_to_message_id=None,
                   reply_markup=None,
-                  timeout=None,
+                  timeout=20.,
                   **kwargs):
         """Use this method to send video files, Telegram clients support mp4
         videos (other formats may be sent as telegram.Document).
@@ -521,9 +547,7 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
@@ -541,10 +565,20 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._message_wrapper(
+            url,
+            data,
+            chat_id=chat_id,
+            video=video,
+            duration=duration,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            **kwargs)
 
     @log
-    @message
     def sendVoice(self,
                   chat_id,
                   voice,
@@ -553,7 +587,7 @@ class Bot(TelegramObject):
                   disable_notification=False,
                   reply_to_message_id=None,
                   reply_markup=None,
-                  timeout=None,
+                  timeout=20.,
                   **kwargs):
         """Use this method to send audio files, if you want Telegram clients to display the file as
         a playable voice message. For this to work, your audio must be in an .ogg file encoded with
@@ -575,9 +609,7 @@ class Bot(TelegramObject):
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -596,7 +628,18 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return url, data
+        return self._message_wrapper(
+            url,
+            data,
+            chat_id=chat_id,
+            voice=voice,
+            duration=duration,
+            caption=caption,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            **kwargs)
 
     @log
     @message
