@@ -322,6 +322,14 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         # Assert that the Promise has been resolved and the conversation ended.
         self.assertEquals(len(handler.conversations), 0)
 
+    def test_perChatMessageWithoutChat(self):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
+        user = User(first_name="Misses Test", id=123)
+        cbq = CallbackQuery(0, user, None, None)
+        update = Update(0, callback_query=cbq)
+        handler.check_update(update)
+
 
 if __name__ == '__main__':
     unittest.main()
