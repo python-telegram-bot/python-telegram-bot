@@ -280,28 +280,6 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEquals(handler.conversations[(self.group.id, user.id, message.message_id)], 2)
 
-    def test_illegal_handlers(self):
-        with self.assertRaises(ValueError):
-            ConversationHandler(
-                entry_points=[CommandHandler('/test', lambda bot, update: None)],
-                states={},
-                fallbacks=[],
-                per_message=True)
-
-        with self.assertRaises(ValueError):
-            ConversationHandler(
-                entry_points=[CallbackQueryHandler(lambda bot, update: None)],
-                states={},
-                fallbacks=[],
-                per_message=False)
-
-        with self.assertRaises(ValueError):
-            ConversationHandler(
-                entry_points=[InlineQueryHandler(lambda bot, update: None)],
-                states={},
-                fallbacks=[],
-                per_chat=True)
-
     def test_endOnFirstMessage(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher

@@ -122,6 +122,10 @@ class ConversationHandler(Handler):
         if not any((self.per_user, self.per_chat, self.per_message)):
             raise ValueError("'per_user', 'per_chat' and 'per_message' can't all be 'False'")
 
+        if self.per_message and not self.per_chat:
+            logging.warning("If 'per_message=True' is used, 'per_chat=True' should also be used, "
+                            "since message IDs are not globally unique.")
+
         all_handlers = list()
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
@@ -132,17 +136,20 @@ class ConversationHandler(Handler):
         if self.per_message:
             for handler in all_handlers:
                 if not isinstance(handler, CallbackQueryHandler):
-                    raise ValueError("If 'per_message=True', all entry points and state handlers"
-                                     " must be 'CallbackQueryHandler'")
+                    logging.warning("If 'per_message=True', all entry points and state handlers"
+                                    " must be 'CallbackQueryHandler', since no other handlers "
+                                    "have a message context.")
         else:
             for handler in all_handlers:
                 if isinstance(handler, CallbackQueryHandler):
-                    raise ValueError("If 'per_message=False', 'CallbackQueryHandler' doesn't work")
+                    logging.warning("If 'per_message=False', 'CallbackQueryHandler' will not be "
+                                    "tracked for every message.")
 
         if self.per_chat:
             for handler in all_handlers:
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
-                    raise ValueError("If 'per_chat=True', 'InlineQueryHandler' doesn't work")
+                    logging.warning("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
+                                    "since inline queries have no chat context.")
 
     def _get_key(self, update):
         chat = update.effective_chat
