@@ -81,8 +81,8 @@ class JobQueue(object):
                 ``datetime.time`` will be interpreted as a specific time at which the job should
                 run. This could be either today or, if the time has already passed, tomorrow.
         """
-        warnings.warn("'JobQueue.put' is being deprecated, use 'JobQueue.one_time_job', "
-                      "'JobQueue.repeating_job' or 'JobQueue.daily_job' instead")
+        warnings.warn("'JobQueue.put' is being deprecated, use 'JobQueue.run_once', "
+                      "'JobQueue.run_daily' or 'JobQueue.run_repeating' instead")
         if job.job_queue is None:
             job.job_queue = self
         self._put(job, next_t=next_t)
