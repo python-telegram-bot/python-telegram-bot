@@ -1,5 +1,8 @@
 [run]
 source = telegram
+omit = telegram/vendor/*
 
 [report]
-omit = tests/
+omit =
+    tests/
+    telegram/vendor/*
