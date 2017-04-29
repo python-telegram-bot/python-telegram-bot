@@ -166,8 +166,8 @@ class ConversationHandler(Handler):
 
         # Ignore messages in channels
         if (not isinstance(update, Update) or update.channel_post or self.per_chat
-                and (update.inline_query or update.chosen_inline_result) or self.per_message
-                and not update.callback_query):
+                and (update.inline_query or update.chosen_inline_result or update.callback_query)
+                or self.per_message and not update.callback_query):
             return False
 
         key = self._get_key(update)
