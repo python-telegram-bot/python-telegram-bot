@@ -19,7 +19,6 @@
 """ This module contains the StringCommandHandler class """
 
 from .handler import Handler
-from telegram.utils.deprecate import deprecate
 
 
 class StringCommandHandler(Handler):
@@ -69,8 +68,3 @@ class StringCommandHandler(Handler):
             optional_args['args'] = update.split()[1:]
 
         return self.callback(dispatcher.bot, update, **optional_args)
-
-    # old non-PEP8 Handler methods
-    m = "telegram.StringCommandHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

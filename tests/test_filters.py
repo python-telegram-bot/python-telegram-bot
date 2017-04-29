@@ -178,6 +178,18 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.entities = [self.e(MessageEntity.BOLD), self.e(MessageEntity.MENTION)]
         self.assertTrue(Filters.entity(MessageEntity.MENTION)(self.message))
 
+    def test_private_filter(self):
+        self.assertTrue(Filters.private(self.message))
+        self.message.chat.type = "group"
+        self.assertFalse(Filters.private(self.message))
+
+    def test_group_fileter(self):
+        self.assertFalse(Filters.group(self.message))
+        self.message.chat.type = "group"
+        self.assertTrue(Filters.group(self.message))
+        self.message.chat.type = "supergroup"
+        self.assertTrue(Filters.group(self.message))
+
     def test_and_filters(self):
         self.message.text = 'test'
         self.message.forward_date = True
@@ -225,6 +237,32 @@ class FiltersTest(BaseTest, unittest.TestCase):
             r"Text object at .*?> and <telegram.ext.filters.MergedFilter consisting of "
             r"<telegram.ext.filters.(Filters.)?_Forwarded object at .*?> or "
             r"<telegram.ext.filters.(Filters.)?entity object at .*?>>>")
+
+    def test_inverted_filters(self):
+        self.message.text = '/test'
+        self.assertTrue((Filters.command)(self.message))
+        self.assertFalse((~Filters.command)(self.message))
+        self.message.text = 'test'
+        self.assertFalse((Filters.command)(self.message))
+        self.assertTrue((~Filters.command)(self.message))
+
+    def test_inverted_and_filters(self):
+        self.message.text = '/test'
+        self.message.forward_date = 1
+        self.assertTrue((Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((~Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((Filters.forwarded & ~Filters.command)(self.message))
+        self.assertFalse((~(Filters.forwarded & Filters.command))(self.message))
+        self.message.forward_date = None
+        self.assertFalse((Filters.forwarded & Filters.command)(self.message))
+        self.assertTrue((~Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((Filters.forwarded & ~Filters.command)(self.message))
+        self.assertTrue((~(Filters.forwarded & Filters.command))(self.message))
+        self.message.text = 'test'
+        self.assertFalse((Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((~Filters.forwarded & Filters.command)(self.message))
+        self.assertFalse((Filters.forwarded & ~Filters.command)(self.message))
+        self.assertTrue((~(Filters.forwarded & Filters.command))(self.message))
 
     def test_faulty_custom_filter(self):
 

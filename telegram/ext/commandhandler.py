@@ -21,7 +21,6 @@ import warnings
 
 from .handler import Handler
 from telegram import Update
-from telegram.utils.deprecate import deprecate
 
 
 class CommandHandler(Handler):
@@ -110,7 +109,7 @@ class CommandHandler(Handler):
                     res = self.filters(message)
 
                 return res and (message.text.startswith('/') and command[0] == self.command
-                                and command[1] == update.message.bot.username)
+                                and command[1].lower() == update.message.bot.username.lower())
             else:
                 return False
 
@@ -126,8 +125,3 @@ class CommandHandler(Handler):
             optional_args['args'] = message.text.split()[1:]
 
         return self.callback(dispatcher.bot, update, **optional_args)
-
-    # old non-PEP8 Handler methods
-    m = "telegram.CommandHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

@@ -19,6 +19,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Balduro <https://github.com/Balduro>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
+- `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
@@ -28,6 +29,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jh0ker <https://github.com/jh0ker>`_
+- `John Yong <https://github.com/whipermr5>`_
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
@@ -36,6 +38,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `macrojames <https://github.com/macrojames>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
+- `neurrone <https://github.com/neurrone>`_
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
@@ -46,6 +49,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
+- `thodnev <https://github.com/thodnev>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
 - `wjt <https://github.com/wjt>`_

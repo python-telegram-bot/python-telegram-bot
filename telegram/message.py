@@ -202,7 +202,7 @@ class Message(TelegramObject):
         data = super(Message, Message).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
-        data['date'] = datetime.fromtimestamp(data['date'])
+        data['date'] = Message._fromtimestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)

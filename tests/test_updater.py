@@ -189,15 +189,15 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         d = self.updater.dispatcher
         from telegram.ext import Filters
         handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
-        d.addHandler(handler)
+        d.add_handler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test')
 
         # Remove handler
-        d.removeHandler(handler)
+        d.remove_handler(handler)
         handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=False)
-        d.addHandler(handler)
+        d.add_handler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -250,6 +250,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertEqual(self.received_message, '/test@MockBot')
+        message.text = "/test@mockbot"
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertEqual(self.received_message, '/test@mockbot')
 
         # directed at other bot
         self.reset()
@@ -259,9 +263,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertTrue(None is self.received_message)
 
         # Remove handler
-        d.removeHandler(handler)
+        d.remove_handler(handler)
         handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=False)
-        d.addHandler(handler)
+        d.add_handler(handler)
         self.reset()
 
         self.updater.bot.send_messages = 1
@@ -716,7 +720,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
         thr = Thread(
-            target=self.updater._start_webhook, args=(ip, port, '', None, None, 0, False, None))
+            target=self.updater._start_webhook,
+            args=(ip, port, '', None, None, 0, False, None, None))
         thr.start()
 
         sleep(0.5)
@@ -789,6 +794,23 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1)
         self.assertFalse(self.updater.running)
 
+    def test_userSignal(self):
+        self._setup_updater('Test7', messages=0)
+
+        tempVar = {'a': 0}
+
+        def userSignalInc(signum, frame):
+            tempVar['a'] = 1
+
+        self.updater.user_sig_handler = userSignalInc
+        self.updater.start_polling(poll_interval=0.01)
+        Thread(target=self.signalsender).start()
+        self.updater.idle()
+        # If we get this far, idle() ran through
+        sleep(1)
+        self.assertFalse(self.updater.running)
+        self.assertTrue(tempVar['a'] != 0)
+
     def test_createBot(self):
         self.updater = Updater('123:abcd')
         self.assertIsNotNone(self.updater.bot)
@@ -832,7 +854,7 @@ class MockBot(object):
 
         return update
 
-    def setWebhook(self, url=None, certificate=None):
+    def setWebhook(self, url=None, certificate=None, allowed_updates=None):
         if self.bootstrap_retries is None:
             return
 
