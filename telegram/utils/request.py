@@ -31,10 +31,6 @@ import urllib3
 import urllib3.contrib.appengine
 from urllib3.connection import HTTPConnection
 from urllib3.util.timeout import Timeout
-try:
-    from urllib3.contrib.socks import SOCKSProxyManager
-except ImportError:
-    SOCKSProxyManager = None
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
@@ -102,7 +98,9 @@ class Request(object):
         else:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
-                if not SOCKSProxyManager:
+                try:
+                    from urllib3.contrib.socks import SOCKSProxyManager
+                except ImportError:
                     raise RuntimeError('PySocks is missing')
                 mgr = SOCKSProxyManager(proxy_url, **kwargs)
             else:
