@@ -28,6 +28,7 @@ except ImportError:
 
 import certifi
 import urllib3
+import urllib3.contrib.appengine
 from urllib3.connection import HTTPConnection
 from urllib3.util.timeout import Timeout
 try:
@@ -93,7 +94,11 @@ class Request(object):
             proxy_url = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
 
         if not proxy_url:
-            mgr = urllib3.PoolManager(**kwargs)
+            if urllib3.contrib.appengine.is_appengine_sandbox():
+                # Use URLFetch service if running in App Engine
+                mgr = urllib3.contrib.appengine.AppEngineManager()
+            else:
+                mgr = urllib3.PoolManager(**kwargs)
         else:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
