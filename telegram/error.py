@@ -62,9 +62,7 @@ class TelegramError(Exception):
 
 
 class Unauthorized(TelegramError):
-
-    def __init__(self):
-        super(Unauthorized, self).__init__('Unauthorized')
+    pass
 
 
 class InvalidToken(TelegramError):
