@@ -32,7 +32,7 @@ class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultCachedGif."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'gif'
         self.gif_file_id = 'gif file id'
         self.title = 'title'
@@ -43,7 +43,7 @@ class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'gif_file_id': self.gif_file_id,
             'title': self.title,
             'caption': self.caption,
@@ -55,7 +55,7 @@ class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
         gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(gif.type, self.type)
-        self.assertEqual(gif.id, self.id)
+        self.assertEqual(gif.id, self._id)
         self.assertEqual(gif.gif_file_id, self.gif_file_id)
         self.assertEqual(gif.title, self.title)
         self.assertEqual(gif.caption, self.caption)

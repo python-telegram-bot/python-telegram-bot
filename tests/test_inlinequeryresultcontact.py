@@ -32,7 +32,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultContact."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'contact'
         self.phone_number = 'phone_number'
         self.first_name = 'first_name'
@@ -44,7 +44,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
         self.reply_markup = telegram.InlineKeyboardMarkup(
             [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'type': self.type,
             'phone_number': self.phone_number,
             'first_name': self.first_name,
@@ -59,7 +59,7 @@ class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
     def test_contact_de_json(self):
         contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(contact.id, self.id)
+        self.assertEqual(contact.id, self._id)
         self.assertEqual(contact.type, self.type)
         self.assertEqual(contact.phone_number, self.phone_number)
         self.assertEqual(contact.first_name, self.first_name)

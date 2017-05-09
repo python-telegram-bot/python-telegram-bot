@@ -33,7 +33,7 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedDocument."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'document'
         self.document_file_id = 'document file id'
         self.title = 'title'
@@ -43,7 +43,7 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
         self.reply_markup = telegram.InlineKeyboardMarkup(
             [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'type': self.type,
             'document_file_id': self.document_file_id,
             'title': self.title,
@@ -56,7 +56,7 @@ class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
     def test_document_de_json(self):
         document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(document.id, self.id)
+        self.assertEqual(document.id, self._id)
         self.assertEqual(document.type, self.type)
         self.assertEqual(document.document_file_id, self.document_file_id)
         self.assertEqual(document.title, self.title)

@@ -32,7 +32,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultVideo."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'video'
         self.video_url = 'video url'
         self.mime_type = 'mime type'
@@ -49,7 +49,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'video_url': self.video_url,
             'mime_type': self.mime_type,
             'video_width': self.video_width,
@@ -67,7 +67,7 @@ class InlineQueryResultVideoTest(BaseTest, unittest.TestCase):
         video = telegram.InlineQueryResultVideo.de_json(self.json_dict, self._bot)
 
         self.assertEqual(video.type, self.type)
-        self.assertEqual(video.id, self.id)
+        self.assertEqual(video.id, self._id)
         self.assertEqual(video.video_url, self.video_url)
         self.assertEqual(video.mime_type, self.mime_type)
         self.assertEqual(video.video_width, self.video_width)

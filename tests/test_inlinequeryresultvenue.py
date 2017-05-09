@@ -32,7 +32,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultVenue."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'venue'
         self.latitude = 'latitude'
         self.longitude = 'longitude'
@@ -46,7 +46,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.reply_markup = telegram.InlineKeyboardMarkup(
             [[telegram.InlineKeyboardButton('reply_markup')]])
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'type': self.type,
             'latitude': self.latitude,
             'longitude': self.longitude,
@@ -63,7 +63,7 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
     def test_venue_de_json(self):
         venue = telegram.InlineQueryResultVenue.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(venue.id, self.id)
+        self.assertEqual(venue.id, self._id)
         self.assertEqual(venue.type, self.type)
         self.assertEqual(venue.latitude, self.latitude)
         self.assertEqual(venue.longitude, self.longitude)
