@@ -1,3 +1,2 @@
 future>=0.15.2
-urllib3==1.20
 certifi
