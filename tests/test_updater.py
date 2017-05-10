@@ -786,6 +786,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         os.kill(os.getpid(), signal.SIGTERM)
 
     def test_idle(self):
+        if sys.platform == "win32":
+            return
         self._setup_updater('Test6', messages=0)
         self.updater.start_polling(poll_interval=0.01)
         Thread(target=self.signalsender).start()
@@ -795,6 +797,8 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.assertFalse(self.updater.running)
 
     def test_userSignal(self):
+        if sys.platform == "win32":
+            return
         self._setup_updater('Test7', messages=0)
 
         tempVar = {'a': 0}
