@@ -183,7 +183,7 @@ class Request(object):
             raise NetworkError('Unknown HTTPError {0}'.format(resp.status))
 
         if resp.status in (401, 403):
-            raise Unauthorized()
+            raise Unauthorized(message)
         elif resp.status == 400:
             raise BadRequest(message)
         elif resp.status == 404:
