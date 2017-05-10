@@ -33,7 +33,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedVoice."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'voice'
         self.voice_file_id = 'voice file id'
         self.title = 'title'
@@ -44,7 +44,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'voice_file_id': self.voice_file_id,
             'title': self.title,
             'caption': self.caption,
@@ -56,7 +56,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot)
 
         self.assertEqual(voice.type, self.type)
-        self.assertEqual(voice.id, self.id)
+        self.assertEqual(voice.id, self._id)
         self.assertEqual(voice.voice_file_id, self.voice_file_id)
         self.assertEqual(voice.title, self.title)
         self.assertEqual(voice.caption, self.caption)

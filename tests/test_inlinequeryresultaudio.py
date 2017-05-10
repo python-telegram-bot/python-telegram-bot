@@ -32,7 +32,7 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultAudio."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'audio'
         self.audio_url = 'audio url'
         self.title = 'title'
@@ -45,7 +45,7 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'audio_url': self.audio_url,
             'title': self.title,
             'performer': self.performer,
@@ -59,7 +59,7 @@ class InlineQueryResultAudioTest(BaseTest, unittest.TestCase):
         audio = telegram.InlineQueryResultAudio.de_json(self.json_dict, self._bot)
 
         self.assertEqual(audio.type, self.type)
-        self.assertEqual(audio.id, self.id)
+        self.assertEqual(audio.id, self._id)
         self.assertEqual(audio.audio_url, self.audio_url)
         self.assertEqual(audio.title, self.title)
         self.assertEqual(audio.performer, self.performer)

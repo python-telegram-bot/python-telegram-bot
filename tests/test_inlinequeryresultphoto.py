@@ -32,7 +32,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultPhoto."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'photo'
         self.photo_url = 'photo url'
         self.photo_width = 10
@@ -47,7 +47,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'photo_url': self.photo_url,
             'photo_width': self.photo_width,
             'photo_height': self.photo_height,
@@ -63,7 +63,7 @@ class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
         photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot)
 
         self.assertEqual(photo.type, self.type)
-        self.assertEqual(photo.id, self.id)
+        self.assertEqual(photo.id, self._id)
         self.assertEqual(photo.photo_url, self.photo_url)
         self.assertEqual(photo.photo_width, self.photo_width)
         self.assertEqual(photo.photo_height, self.photo_height)

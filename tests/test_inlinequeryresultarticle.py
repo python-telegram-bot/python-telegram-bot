@@ -32,7 +32,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultArticle."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'article'
         self.title = 'title'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
@@ -47,7 +47,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'title': self.title,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
@@ -63,7 +63,7 @@ class InlineQueryResultArticleTest(BaseTest, unittest.TestCase):
         article = telegram.InlineQueryResultArticle.de_json(self.json_dict, self._bot)
 
         self.assertEqual(article.type, self.type)
-        self.assertEqual(article.id, self.id)
+        self.assertEqual(article.id, self._id)
         self.assertEqual(article.title, self.title)
         self.assertDictEqual(article.input_message_content.to_dict(),
                              self.input_message_content.to_dict())

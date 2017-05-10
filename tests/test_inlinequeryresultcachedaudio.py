@@ -33,7 +33,7 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedAudio."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'audio'
         self.audio_file_id = 'audio file id'
         self.caption = 'caption'
@@ -43,7 +43,7 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'audio_file_id': self.audio_file_id,
             'caption': self.caption,
             'input_message_content': self.input_message_content.to_dict(),
@@ -54,7 +54,7 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         audio = telegram.InlineQueryResultCachedAudio.de_json(self.json_dict, self._bot)
 
         self.assertEqual(audio.type, self.type)
-        self.assertEqual(audio.id, self.id)
+        self.assertEqual(audio.id, self._id)
         self.assertEqual(audio.audio_file_id, self.audio_file_id)
         self.assertEqual(audio.caption, self.caption)
         self.assertDictEqual(audio.input_message_content.to_dict(),

@@ -32,7 +32,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultVoice."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'voice'
         self.voice_url = 'voice url'
         self.title = 'title'
@@ -44,7 +44,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'voice_url': self.voice_url,
             'title': self.title,
             'voice_duration': self.voice_duration,
@@ -57,7 +57,7 @@ class InlineQueryResultVoiceTest(BaseTest, unittest.TestCase):
         voice = telegram.InlineQueryResultVoice.de_json(self.json_dict, self._bot)
 
         self.assertEqual(voice.type, self.type)
-        self.assertEqual(voice.id, self.id)
+        self.assertEqual(voice.id, self._id)
         self.assertEqual(voice.voice_url, self.voice_url)
         self.assertEqual(voice.title, self.title)
         self.assertEqual(voice.voice_duration, self.voice_duration)

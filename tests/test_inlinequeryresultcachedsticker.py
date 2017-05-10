@@ -33,7 +33,7 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedSticker."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'sticker'
         self.sticker_file_id = 'sticker file id'
         self.input_message_content = telegram.InputTextMessageContent('input_message_content')
@@ -42,7 +42,7 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'sticker_file_id': self.sticker_file_id,
             'input_message_content': self.input_message_content.to_dict(),
             'reply_markup': self.reply_markup.to_dict(),
@@ -52,7 +52,7 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
         sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict, self._bot)
 
         self.assertEqual(sticker.type, self.type)
-        self.assertEqual(sticker.id, self.id)
+        self.assertEqual(sticker.id, self._id)
         self.assertEqual(sticker.sticker_file_id, self.sticker_file_id)
         self.assertDictEqual(sticker.input_message_content.to_dict(),
                              self.input_message_content.to_dict())
