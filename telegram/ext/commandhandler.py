@@ -99,7 +99,7 @@ class CommandHandler(Handler):
             if message.text:
                 command = message.text[1:].split(' ')[0].split('@')
                 command.append(
-                    update.message.bot.username)  # in case the command was send without a username
+                    message.bot.username)  # in case the command was send without a username
 
                 if self.filters is None:
                     res = True
@@ -109,7 +109,7 @@ class CommandHandler(Handler):
                     res = self.filters(message)
 
                 return res and (message.text.startswith('/') and command[0] == self.command
-                                and command[1].lower() == update.message.bot.username.lower())
+                                and command[1].lower() == message.bot.username.lower())
             else:
                 return False
 
