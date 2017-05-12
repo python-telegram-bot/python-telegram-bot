@@ -152,7 +152,7 @@ class MessageTest(BaseTest, unittest.TestCase):
             text='This ^ message will not be deleted',
             reply_to_message_id=1)
 
-        with self.assertRaisesRegex(telegram.TelegramError, "can't be deleted"):
+        with self.assertRaisesRegexp(telegram.TelegramError, "can't be deleted"):
             # NOTE: This behaviour can be changed in future. See `tests/test_bot.py` for more info
             message.reply_to_message.delete()
 
