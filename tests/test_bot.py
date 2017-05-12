@@ -84,6 +84,25 @@ class BotTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_deleteMessage(self):
+        message = self._bot.send_message(
+            chat_id=self._chat_id, text='This message will be deleted')
+
+        self.assertTrue(
+            self._bot.delete_message(
+                chat_id=self._chat_id, message_id=message.message_id))
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_deleteMessage_old_message(self):
+        with self.assertRaisesRegexp(telegram.TelegramError, "can't be deleted"):
+            # NOTE: This behaviour can be changed in future because `deleteMessage` method is not
+            # documented in Bot API reference now.
+            # Considering that the first message is old enough
+            self._bot.delete_message(chat_id=self._chat_id, message_id=1)
+
+    @flaky(3, 1)
+    @timeout(10)
     def testGetUpdates(self):
         self._bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = self._bot.getUpdates(timeout=1)

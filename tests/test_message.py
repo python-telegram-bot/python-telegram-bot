@@ -136,6 +136,26 @@ class MessageTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, 'Testing class method')
 
+    @flaky(3, 1)
+    def test_delete1(self):
+        """Test for Message.delete"""
+        message = self._bot.send_message(
+            chat_id=self._chat_id, text='This message will be deleted')
+
+        self.assertTrue(message.delete())
+
+    @flaky(3, 1)
+    def test_delete2(self):
+        """Another test for Message.delete"""
+        message = self._bot.send_message(
+            chat_id=self._chat_id,
+            text='This ^ message will not be deleted',
+            reply_to_message_id=1)
+
+        with self.assertRaisesRegexp(telegram.TelegramError, "can't be deleted"):
+            # NOTE: This behaviour can be changed in future. See `tests/test_bot.py` for more info
+            message.reply_to_message.delete()
+
 
 if __name__ == '__main__':
     unittest.main()

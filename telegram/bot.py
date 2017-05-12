@@ -243,6 +243,34 @@ class Bot(TelegramObject):
 
     @log
     @message
+    def delete_message(self, chat_id, message_id):
+        """Use this method to delete messages which were sent not later than 48 hours ago.
+
+        Args:
+            chat_id (str): Unique identifier for the target chat or
+                username of the target channel (in the format
+                @channelusername).
+            message_id (int): Unique message identifier.
+
+        Note:
+            This method is not documented, so it's not guaranteed to work. Also, its behaviour can
+            be changed at any time.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/deleteMessage'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'message_id': message_id}
+
+        return url, data
+
+    @log
+    @message
     def forward_message(self,
                         chat_id,
                         from_chat_id,
@@ -1739,6 +1767,7 @@ class Bot(TelegramObject):
     # camelCase aliases
     getMe = get_me
     sendMessage = send_message
+    deleteMessage = delete_message
     forwardMessage = forward_message
     sendPhoto = send_photo
     sendAudio = send_audio
