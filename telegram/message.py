@@ -540,6 +540,21 @@ class Message(TelegramObject):
         return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        """
+        Shortcut for
+
+            >>> bot.delete_message(chat_id=message.chat_id,
+            ...                   message_id=message.message_id,
+            ...                   *args, **kwargs)
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        """
+        return self.bot.delete_message(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def parse_entity(self, entity):
         """
         Returns the text from a given :class:`telegram.MessageEntity`.
