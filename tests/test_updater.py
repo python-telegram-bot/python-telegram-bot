@@ -693,7 +693,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_bootstrap_retries_unauth(self):
         retries = 3
         self._setup_updater(
-            '', messages=0, bootstrap_retries=retries, bootstrap_err=Unauthorized())
+            '', messages=0, bootstrap_retries=retries, bootstrap_err=Unauthorized("Unauthorized"))
 
         self.assertRaises(Unauthorized, self.updater._bootstrap, retries, False, 'path', None)
         self.assertEqual(self.updater.bot.bootstrap_attempts, 1)
