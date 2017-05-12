@@ -33,13 +33,13 @@ class ChatTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Chat."""
 
     def setUp(self):
-        self.id = -28767330
+        self._id = -28767330
         self.title = 'ToledosPalaceBot - Group'
         self.type = 'group'
         self.all_members_are_administrators = False
 
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'title': self.title,
             'type': self.type,
             'all_members_are_administrators': self.all_members_are_administrators
@@ -53,7 +53,7 @@ class ChatTest(BaseTest, unittest.TestCase):
     def test_group_chat_de_json(self):
         group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(group_chat.id, self.id)
+        self.assertEqual(group_chat.id, self._id)
         self.assertEqual(group_chat.title, self.title)
         self.assertEqual(group_chat.type, self.type)
         self.assertEqual(group_chat.all_members_are_administrators,
@@ -68,7 +68,7 @@ class ChatTest(BaseTest, unittest.TestCase):
         group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(group_chat.to_dict()))
-        self.assertEqual(group_chat['id'], self.id)
+        self.assertEqual(group_chat['id'], self._id)
         self.assertEqual(group_chat['title'], self.title)
         self.assertEqual(group_chat['type'], self.type)
         self.assertEqual(group_chat['all_members_are_administrators'],

@@ -32,7 +32,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultGif."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'gif'
         self.gif_url = 'gif url'
         self.gif_width = 10
@@ -46,7 +46,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'gif_url': self.gif_url,
             'gif_width': self.gif_width,
             'gif_height': self.gif_height,
@@ -61,7 +61,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         gif = telegram.InlineQueryResultGif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(gif.type, self.type)
-        self.assertEqual(gif.id, self.id)
+        self.assertEqual(gif.id, self._id)
         self.assertEqual(gif.gif_url, self.gif_url)
         self.assertEqual(gif.gif_width, self.gif_width)
         self.assertEqual(gif.gif_height, self.gif_height)

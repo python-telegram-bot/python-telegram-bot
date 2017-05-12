@@ -33,14 +33,14 @@ class UserTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram User."""
 
     def setUp(self):
-        self.id = 12173560
+        self._id = 12173560
         self.first_name = "Leandro"
         self.last_name = "S."
         self.username = "leandrotoledo"
         self.type = "private"
 
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'username': self.username,
@@ -50,7 +50,7 @@ class UserTest(BaseTest, unittest.TestCase):
     def test_user_de_json(self):
         user = telegram.User.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(user.id, self.id)
+        self.assertEqual(user.id, self._id)
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.username, self.username)
@@ -65,7 +65,7 @@ class UserTest(BaseTest, unittest.TestCase):
 
         user = telegram.User.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(user.id, self.id)
+        self.assertEqual(user.id, self._id)
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.type, self.type)
@@ -80,7 +80,7 @@ class UserTest(BaseTest, unittest.TestCase):
 
         user = telegram.User.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(user.id, self.id)
+        self.assertEqual(user.id, self._id)
         self.assertEqual(user.first_name, self.first_name)
 
         self.assertEqual(user.name, self.first_name)
@@ -94,7 +94,7 @@ class UserTest(BaseTest, unittest.TestCase):
         user = telegram.User.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(user.to_dict()))
-        self.assertEqual(user['id'], self.id)
+        self.assertEqual(user['id'], self._id)
         self.assertEqual(user['first_name'], self.first_name)
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)

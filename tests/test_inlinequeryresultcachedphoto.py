@@ -33,7 +33,7 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedPhoto."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'photo'
         self.photo_file_id = 'photo file id'
         self.title = 'title'
@@ -45,7 +45,7 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'photo_file_id': self.photo_file_id,
             'title': self.title,
             'description': self.description,
@@ -58,7 +58,7 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
         photo = telegram.InlineQueryResultCachedPhoto.de_json(self.json_dict, self._bot)
 
         self.assertEqual(photo.type, self.type)
-        self.assertEqual(photo.id, self.id)
+        self.assertEqual(photo.id, self._id)
         self.assertEqual(photo.photo_file_id, self.photo_file_id)
         self.assertEqual(photo.title, self.title)
         self.assertEqual(photo.description, self.description)

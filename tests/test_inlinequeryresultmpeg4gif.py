@@ -32,7 +32,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram InlineQueryResultMpeg4Gif."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'mpeg4_gif'
         self.mpeg4_url = 'mpeg4 url'
         self.mpeg4_width = 10
@@ -46,7 +46,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'mpeg4_url': self.mpeg4_url,
             'mpeg4_width': self.mpeg4_width,
             'mpeg4_height': self.mpeg4_height,
@@ -61,7 +61,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         mpeg4 = telegram.InlineQueryResultMpeg4Gif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(mpeg4.type, self.type)
-        self.assertEqual(mpeg4.id, self.id)
+        self.assertEqual(mpeg4.id, self._id)
         self.assertEqual(mpeg4.mpeg4_url, self.mpeg4_url)
         self.assertEqual(mpeg4.mpeg4_width, self.mpeg4_width)
         self.assertEqual(mpeg4.mpeg4_height, self.mpeg4_height)

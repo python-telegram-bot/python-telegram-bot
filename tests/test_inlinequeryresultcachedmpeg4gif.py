@@ -33,7 +33,7 @@ class InlineQueryResultCachedMpeg4GifTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedMpeg4Gif."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'mpeg4_gif'
         self.mpeg4_file_id = 'mpeg4 file id'
         self.title = 'title'
@@ -44,7 +44,7 @@ class InlineQueryResultCachedMpeg4GifTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'mpeg4_file_id': self.mpeg4_file_id,
             'title': self.title,
             'caption': self.caption,
@@ -56,7 +56,7 @@ class InlineQueryResultCachedMpeg4GifTest(BaseTest, unittest.TestCase):
         mpeg4 = telegram.InlineQueryResultCachedMpeg4Gif.de_json(self.json_dict, self._bot)
 
         self.assertEqual(mpeg4.type, self.type)
-        self.assertEqual(mpeg4.id, self.id)
+        self.assertEqual(mpeg4.id, self._id)
         self.assertEqual(mpeg4.mpeg4_file_id, self.mpeg4_file_id)
         self.assertEqual(mpeg4.title, self.title)
         self.assertEqual(mpeg4.caption, self.caption)

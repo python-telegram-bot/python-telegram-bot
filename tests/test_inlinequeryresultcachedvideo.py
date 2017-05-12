@@ -33,7 +33,7 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
     InlineQueryResultCachedVideo."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.type = 'video'
         self.video_file_id = 'video file id'
         self.title = 'title'
@@ -45,7 +45,7 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
 
         self.json_dict = {
             'type': self.type,
-            'id': self.id,
+            'id': self._id,
             'video_file_id': self.video_file_id,
             'title': self.title,
             'caption': self.caption,
@@ -58,7 +58,7 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
         video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot)
 
         self.assertEqual(video.type, self.type)
-        self.assertEqual(video.id, self.id)
+        self.assertEqual(video.id, self._id)
         self.assertEqual(video.video_file_id, self.video_file_id)
         self.assertEqual(video.title, self.title)
         self.assertEqual(video.description, self.description)
