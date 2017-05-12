@@ -245,11 +245,16 @@ class Bot(TelegramObject):
     @message
     def delete_message(self, chat_id, message_id):
         """Use this method to delete messages which were sent not later than 48 hours ago.
+
         Args:
             chat_id (str): Unique identifier for the target chat or
                 username of the target channel (in the format
                 @channelusername).
             message_id (int): Unique message identifier.
+
+        Note:
+            This method is not documented, so it's not guaranteed to work. Also, its behaviour can
+            be changed at any time.
 
         Returns:
             bool: On success, `True` is returned.
