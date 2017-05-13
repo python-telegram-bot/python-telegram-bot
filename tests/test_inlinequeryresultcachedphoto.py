@@ -78,6 +78,26 @@ class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(photo))
         self.assertDictEqual(self.json_dict, photo)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultCachedPhoto(self._id, self.photo_file_id)
+        b = telegram.InlineQueryResultCachedPhoto(self._id, self.photo_file_id)
+        c = telegram.InlineQueryResultCachedPhoto(self._id, "")
+        d = telegram.InlineQueryResultCachedPhoto("", self.photo_file_id)
+        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -72,6 +72,26 @@ class InlineQueryResultCachedAudioTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(audio))
         self.assertDictEqual(self.json_dict, audio)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultCachedAudio(self._id, self.audio_file_id)
+        b = telegram.InlineQueryResultCachedAudio(self._id, self.audio_file_id)
+        c = telegram.InlineQueryResultCachedAudio(self._id, "")
+        d = telegram.InlineQueryResultCachedAudio("", self.audio_file_id)
+        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()
