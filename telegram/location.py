@@ -59,4 +59,4 @@ class Location(TelegramObject):
         return NotImplemented
 
     def __hash__(self):
-        return hash((self.longitude, self.latitude))
+        return hash((self.__class__, self.longitude, self.latitude))

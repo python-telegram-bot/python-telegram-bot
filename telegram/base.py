@@ -97,6 +97,8 @@ class TelegramObject(object):
 
     def __hash__(self):
         try:
-            return hash(self._get_id())
+            return hash((
+                self.__class__,
+                self._get_id(),))
         except NotImplementedError:
             return super().__hash__()

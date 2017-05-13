@@ -71,4 +71,4 @@ class ChatMember(TelegramObject):
         return NotImplemented
 
     def __hash__(self):
-        return hash((self.user, self.status))
+        return hash((self.__class__, self.user, self.status))
