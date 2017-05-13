@@ -41,6 +41,8 @@ class ChatMember(TelegramObject):
     LEFT = 'left'
     KICKED = 'kicked'
 
+    _id_keys = ('user', 'status')
+
     def __init__(self, user, status, **kwargs):
         # Required
         self.user = user
@@ -64,11 +66,3 @@ class ChatMember(TelegramObject):
         data['user'] = User.de_json(data.get('user'), bot)
 
         return ChatMember(**data)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.user == other.user and self.status == other.status
-        return NotImplemented
-
-    def __hash__(self):
-        return hash((self.__class__, self.user, self.status))

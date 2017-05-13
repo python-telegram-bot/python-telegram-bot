@@ -33,6 +33,8 @@ class Location(TelegramObject):
         latitude (float):
     """
 
+    _id_keys = ('longitude', 'latitude')
+
     def __init__(self, longitude, latitude, **kwargs):
         # Required
         self.longitude = float(longitude)
@@ -52,11 +54,3 @@ class Location(TelegramObject):
             return None
 
         return Location(**data)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.longitude == other.longitude and self.latitude == other.latitude
-        return NotImplemented
-
-    def __hash__(self):
-        return hash((self.__class__, self.longitude, self.latitude))

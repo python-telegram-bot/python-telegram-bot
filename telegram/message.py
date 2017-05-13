@@ -106,6 +106,8 @@ class Message(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
+    _id_keys = ('message_id',)
+
     def __init__(self,
                  message_id,
                  from_user,

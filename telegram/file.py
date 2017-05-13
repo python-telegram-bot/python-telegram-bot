@@ -40,6 +40,8 @@ class File(TelegramObject):
 
     """
 
+    _id_keys = ('file_id',)
+
     def __init__(self, file_id, bot, file_size=None, file_path=None, **kwargs):
         # Required
         self.file_id = str(file_id)

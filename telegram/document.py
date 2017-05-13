@@ -41,6 +41,8 @@ class Document(TelegramObject):
 
     """
 
+    _id_keys = ('file_id',)
+
     def __init__(self,
                  file_id,
                  thumb=None,

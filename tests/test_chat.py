@@ -85,6 +85,26 @@ class ChatTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(result)
 
+    def test_equality(self):
+        a = telegram.Chat(self._id, self.title, self.type)
+        b = telegram.Chat(self._id, self.title, self.type)
+        c = telegram.Chat(self._id, "", "")
+        d = telegram.Chat(0, self.title, self.type)
+        e = telegram.User(self._id, "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

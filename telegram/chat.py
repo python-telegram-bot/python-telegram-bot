@@ -50,6 +50,8 @@ class Chat(TelegramObject):
     SUPERGROUP = 'supergroup'
     CHANNEL = 'channel'
 
+    _id_keys = ('id',)
+
     def __init__(self,
                  id,
                  type,

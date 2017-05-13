@@ -46,6 +46,8 @@ class Video(TelegramObject):
         file_size (Optional[int]):
     """
 
+    _id_keys = ('file_id',)
+
     def __init__(self,
                  file_id,
                  width,

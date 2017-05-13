@@ -39,6 +39,8 @@ class Contact(TelegramObject):
 
     """
 
+    _id_keys = ('phone_number',)
+
     def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):
         # Required
         self.phone_number = str(phone_number)
@@ -61,11 +63,3 @@ class Contact(TelegramObject):
             return None
 
         return Contact(**data)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.phone_number == other.phone_number
-        return NotImplemented
-
-    def __hash__(self):
-        return hash(self.phone_number)

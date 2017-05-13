@@ -36,6 +36,8 @@ class InlineQueryResult(TelegramObject):
 
     """
 
+    _id_keys = ('id',)
+
     def __init__(self, type, id, **kwargs):
         # Required
         self.type = str(type)

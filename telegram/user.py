@@ -44,6 +44,8 @@ class User(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
+    _id_keys = ('id',)
+
     def __init__(self,
                  id,
                  first_name,

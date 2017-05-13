@@ -40,6 +40,8 @@ class Voice(TelegramObject):
         file_size (Optional[int]):
     """
 
+    _id_keys = ('file_id',)
+
     def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):
         # Required
         self.file_id = str(file_id)

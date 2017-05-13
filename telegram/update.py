@@ -52,6 +52,8 @@ class Update(TelegramObject):
 
     """
 
+    _id_keys = ('update_id',)
+
     def __init__(self,
                  update_id,
                  message=None,

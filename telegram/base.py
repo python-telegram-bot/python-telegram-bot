@@ -81,24 +81,18 @@ class TelegramObject(object):
 
         return data
 
+    _id_keys = ()
+
     def _get_id(self):
-        for x in ['id', 'file_id', 'message_id', 'result_id', 'update_id']:
-            if hasattr(self, x):
-                return getattr(self, x)
-        raise NotImplementedError
+        return tuple(getattr(self, x) for x in self._id_keys)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            try:
-                return self._get_id() == other._get_id()
-            except NotImplementedError:
-                pass  # return NotImplemented
-        return NotImplemented
+            return self._get_id() == other._get_id()
+        return super(TelegramObject, self).__eq__(other)
 
     def __hash__(self):
-        try:
-            return hash((
-                self.__class__,
-                self._get_id(),))
-        except NotImplementedError:
+        if self._id_keys:
+            return hash((self.__class__, self._get_id()))
+        else:
             return super(TelegramObject, self).__hash__()

@@ -46,6 +46,8 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
+    _id_keys = ('result_id',)
+
     def __init__(self,
                  result_id,
                  from_user,
