@@ -88,6 +88,28 @@ class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(document))
         self.assertDictEqual(self.json_dict, document)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultDocument(self._id, self.document_url, self.title,
+                                               self.mime_type)
+        b = telegram.InlineQueryResultDocument(self._id, self.document_url, self.title,
+                                               self.mime_type)
+        c = telegram.InlineQueryResultDocument(self._id, "", self.title, self.mime_type)
+        d = telegram.InlineQueryResultDocument("", self.document_url, self.title, self.mime_type)
+        e = telegram.InlineQueryResultArticle(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

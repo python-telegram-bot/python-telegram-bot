@@ -34,8 +34,8 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self._id = 'id'
         self.type = 'location'
-        self.latitude = 'latitude'
-        self.longitude = 'longitude'
+        self.latitude = 0.0
+        self.longitude = 0.0
         self.title = 'title'
         self.thumb_url = 'thumb url'
         self.thumb_width = 10
@@ -81,6 +81,26 @@ class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_dict(location))
         self.assertDictEqual(self.json_dict, location)
+
+    def test_equality(self):
+        a = telegram.InlineQueryResultLocation(self._id, self.longitude, self.latitude, self.title)
+        b = telegram.InlineQueryResultLocation(self._id, self.longitude, self.latitude, self.title)
+        c = telegram.InlineQueryResultLocation(self._id, 0, self.latitude, self.title)
+        d = telegram.InlineQueryResultLocation("", self.longitude, self.latitude, self.title)
+        e = telegram.InlineQueryResultArticle(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
 
 
 if __name__ == '__main__':

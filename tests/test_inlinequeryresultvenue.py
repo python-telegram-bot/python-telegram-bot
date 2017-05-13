@@ -88,6 +88,29 @@ class InlineQueryResultVenueTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(venue))
         self.assertDictEqual(self.json_dict, venue)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultVenue(self._id, self.longitude, self.latitude, self.title,
+                                            self._address)
+        b = telegram.InlineQueryResultVenue(self._id, self.longitude, self.latitude, self.title,
+                                            self._address)
+        c = telegram.InlineQueryResultVenue(self._id, "", self.latitude, self.title, self._address)
+        d = telegram.InlineQueryResultVenue("", self.longitude, self.latitude, self.title,
+                                            self._address)
+        e = telegram.InlineQueryResultArticle(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

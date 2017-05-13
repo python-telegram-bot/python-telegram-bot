@@ -73,3 +73,19 @@ class AnimationTest(BaseTest, unittest.TestCase):
         self.assertEqual(animation['file_name'], self.file_name)
         self.assertEqual(animation['mime_type'], self.mime_type)
         self.assertEqual(animation['file_size'], self.file_size)
+
+    def test_equality(self):
+        a = telegram.Animation(self.animation_file_id)
+        b = telegram.Animation(self.animation_file_id)
+        d = telegram.Animation("")
+        e = telegram.Voice(self.animation_file_id, 0)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))

@@ -67,6 +67,26 @@ class ContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact['last_name'], self.last_name)
         self.assertEqual(contact['user_id'], self.user_id)
 
+    def test_equality(self):
+        a = telegram.Contact(self.phone_number, self.first_name)
+        b = telegram.Contact(self.phone_number, self.first_name)
+        c = telegram.Contact(self.phone_number, "")
+        d = telegram.Contact("", self.first_name)
+        e = telegram.Voice("", 0)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 ''' Commented out, because it would cause "Too Many Requests (429)" errors.
     @flaky(3, 1)
