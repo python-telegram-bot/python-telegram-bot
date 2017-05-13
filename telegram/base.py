@@ -88,7 +88,7 @@ class TelegramObject(object):
         raise NotImplementedError
 
     def __eq__(self, other):
-        if isinstance(other, TelegramObject):
+        if isinstance(other, self.__class__):
             try:
                 return self._get_id() == other._get_id()
             except NotImplementedError:
