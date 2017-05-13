@@ -32,8 +32,6 @@ class Venue(TelegramObject):
         foursquare_id (Optional[str]):
     """
 
-    _id_keys = ('location', 'title')
-
     def __init__(self, location, title, address, foursquare_id=None, **kwargs):
         # Required
         self.location = location
@@ -41,6 +39,8 @@ class Venue(TelegramObject):
         self.address = address
         # Optionals
         self.foursquare_id = foursquare_id
+
+        self._id_attrs = (self.location, self.title)
 
     @staticmethod
     def de_json(data, bot):

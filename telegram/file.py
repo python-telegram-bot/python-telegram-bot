@@ -40,8 +40,6 @@ class File(TelegramObject):
 
     """
 
-    _id_keys = ('file_id',)
-
     def __init__(self, file_id, bot, file_size=None, file_path=None, **kwargs):
         # Required
         self.file_id = str(file_id)
@@ -52,6 +50,8 @@ class File(TelegramObject):
             self.file_path = str(file_path)
 
         self.bot = bot
+
+        self._id_attrs = (self.file_id,)
 
     @staticmethod
     def de_json(data, bot):

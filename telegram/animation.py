@@ -35,8 +35,6 @@ class Animation(TelegramObject):
 
     """
 
-    _id_keys = ('file_id',)
-
     def __init__(self,
                  file_id,
                  thumb=None,
@@ -49,6 +47,8 @@ class Animation(TelegramObject):
         self.file_name = file_name
         self.mime_type = mime_type
         self.file_size = file_size
+
+        self._id_attrs = (self.file_id,)
 
     @staticmethod
     def de_json(data, bot):

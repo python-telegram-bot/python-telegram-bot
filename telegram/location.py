@@ -33,12 +33,12 @@ class Location(TelegramObject):
         latitude (float):
     """
 
-    _id_keys = ('longitude', 'latitude')
-
     def __init__(self, longitude, latitude, **kwargs):
         # Required
         self.longitude = float(longitude)
         self.latitude = float(latitude)
+
+        self._id_attrs = (self.longitude, self.latitude)
 
     @staticmethod
     def de_json(data, bot):

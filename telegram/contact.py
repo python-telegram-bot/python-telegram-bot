@@ -39,8 +39,6 @@ class Contact(TelegramObject):
 
     """
 
-    _id_keys = ('phone_number',)
-
     def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):
         # Required
         self.phone_number = str(phone_number)
@@ -48,6 +46,8 @@ class Contact(TelegramObject):
         # Optionals
         self.last_name = last_name
         self.user_id = user_id
+
+        self._id_attrs = (self.phone_number,)
 
     @staticmethod
     def de_json(data, bot):

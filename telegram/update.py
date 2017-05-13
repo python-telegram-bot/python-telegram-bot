@@ -52,8 +52,6 @@ class Update(TelegramObject):
 
     """
 
-    _id_keys = ('update_id',)
-
     def __init__(self,
                  update_id,
                  message=None,
@@ -78,6 +76,8 @@ class Update(TelegramObject):
         self._effective_user = None
         self._effective_chat = None
         self._effective_message = None
+
+        self._id_attrs = (self.update_id,)
 
     @staticmethod
     def de_json(data, bot):

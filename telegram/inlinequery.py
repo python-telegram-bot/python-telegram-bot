@@ -44,8 +44,6 @@ class InlineQuery(TelegramObject):
 
     """
 
-    _id_keys = ('id',)
-
     def __init__(self, id, from_user, query, offset, location=None, bot=None, **kwargs):
         # Required
         self.id = id
@@ -57,6 +55,7 @@ class InlineQuery(TelegramObject):
         self.location = location
 
         self.bot = bot
+        self._id_attrs = (self.id,)
 
     @staticmethod
     def de_json(data, bot):

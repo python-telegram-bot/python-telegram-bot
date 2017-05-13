@@ -41,12 +41,12 @@ class ChatMember(TelegramObject):
     LEFT = 'left'
     KICKED = 'kicked'
 
-    _id_keys = ('user', 'status')
-
     def __init__(self, user, status, **kwargs):
         # Required
         self.user = user
         self.status = status
+
+        self._id_attrs = (self.user, self.status)
 
     @staticmethod
     def de_json(data, bot):

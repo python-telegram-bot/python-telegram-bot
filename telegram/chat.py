@@ -50,8 +50,6 @@ class Chat(TelegramObject):
     SUPERGROUP = 'supergroup'
     CHANNEL = 'channel'
 
-    _id_keys = ('id',)
-
     def __init__(self,
                  id,
                  type,
@@ -73,6 +71,7 @@ class Chat(TelegramObject):
         self.all_members_are_administrators = all_members_are_administrators
 
         self.bot = bot
+        self._id_attrs = (self.id,)
 
     @staticmethod
     def de_json(data, bot):

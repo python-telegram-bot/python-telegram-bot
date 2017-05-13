@@ -46,8 +46,6 @@ class ChosenInlineResult(TelegramObject):
 
     """
 
-    _id_keys = ('result_id',)
-
     def __init__(self,
                  result_id,
                  from_user,
@@ -62,6 +60,8 @@ class ChosenInlineResult(TelegramObject):
         # Optionals
         self.location = location
         self.inline_message_id = inline_message_id
+
+        self._id_attrs = (self.result_id,)
 
     @staticmethod
     def de_json(data, bot):

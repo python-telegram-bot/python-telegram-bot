@@ -106,8 +106,6 @@ class Message(TelegramObject):
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
-    _id_keys = ('message_id',)
-
     def __init__(self,
                  message_id,
                  from_user,
@@ -182,6 +180,8 @@ class Message(TelegramObject):
         self.forward_from_message_id = forward_from_message_id
 
         self.bot = bot
+
+        self._id_attrs = (self.message_id,)
 
     @property
     def chat_id(self):

@@ -44,8 +44,6 @@ class Sticker(TelegramObject):
         file_size (Optional[int]):
     """
 
-    _id_keys = ('file_id',)
-
     def __init__(self, file_id, width, height, thumb=None, emoji=None, file_size=None, **kwargs):
         # Required
         self.file_id = str(file_id)
@@ -55,6 +53,8 @@ class Sticker(TelegramObject):
         self.thumb = thumb
         self.emoji = emoji
         self.file_size = file_size
+
+        self._id_attrs = (self.file_id,)
 
     @staticmethod
     def de_json(data, bot):

@@ -69,7 +69,7 @@ class TelegramObject(object):
         data = dict()
 
         for key in iter(self.__dict__):
-            if key == 'bot':
+            if key in ('bot', '_id_attrs'):
                 continue
 
             value = self.__dict__[key]
@@ -81,18 +81,14 @@ class TelegramObject(object):
 
         return data
 
-    _id_keys = ()
-
-    def _get_id(self):
-        return tuple(getattr(self, x) for x in self._id_keys)
+    _id_attrs = ()
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._get_id() == other._get_id()
+            return self._id_attrs == other._id_attrs
         return super(TelegramObject, self).__eq__(other)
 
     def __hash__(self):
-        if self._id_keys:
-            return hash((self.__class__, self._get_id()))
-        else:
-            return super(TelegramObject, self).__hash__()
+        if self._id_attrs:
+            return hash((self.__class__, self._id_attrs))
+        return super(TelegramObject, self).__hash__()
