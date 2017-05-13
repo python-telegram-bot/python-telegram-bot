@@ -61,3 +61,11 @@ class Contact(TelegramObject):
             return None
 
         return Contact(**data)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.phone_number == self.phone_number
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(self.phone_number)

@@ -82,7 +82,7 @@ class TelegramObject(object):
         return data
 
     def _get_id(self):
-        for x in ['id', 'file_id', 'message_id', 'result_id', 'update_id', 'phone_number']:
+        for x in ['id', 'file_id', 'message_id', 'result_id', 'update_id']:
             if hasattr(self, x):
                 return self.__getattribute__(x)
         raise NotImplementedError
