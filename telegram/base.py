@@ -101,4 +101,4 @@ class TelegramObject(object):
                 self.__class__,
                 self._get_id(),))
         except NotImplementedError:
-            return super().__hash__()
+            return super(TelegramObject, self).__hash__()
