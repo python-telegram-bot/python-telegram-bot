@@ -137,6 +137,26 @@ class FileTest(BaseTest, unittest.TestCase):
 
         self.assertRaises(TypeError, lambda: self._bot.getFile(**json_dict))
 
+    def test_equality(self):
+        a = telegram.File(self.audio_file_id, self._bot)
+        b = telegram.File(self.audio_file_id, self._bot)
+        c = telegram.File(self.audio_file_id, None)
+        d = telegram.File(self.document_file_id, self._bot)
+        e = telegram.Voice(self.audio_file_id, 0)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

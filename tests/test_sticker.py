@@ -147,6 +147,26 @@ class StickerTest(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(message.sticker.file_id, '')
 
+    def test_equality(self):
+        a = telegram.Sticker(self.sticker_file_id, self.width, self.height)
+        b = telegram.Sticker(self.sticker_file_id, self.width, self.height)
+        c = telegram.Sticker(self.sticker_file_id, 0, 0)
+        d = telegram.Sticker("", self.width, self.height)
+        e = telegram.PhotoSize(self.sticker_file_id, self.width, self.height)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()
