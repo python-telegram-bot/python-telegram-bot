@@ -80,7 +80,7 @@ class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
         b = telegram.InlineQueryResultCachedVoice(self._id, self.voice_file_id, self.title)
         c = telegram.InlineQueryResultCachedVoice(self._id, "", self.title)
         d = telegram.InlineQueryResultCachedVoice("", self.voice_file_id, self.title)
-        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+        e = telegram.InlineQueryResultCachedAudio(self._id, "", "")
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))
