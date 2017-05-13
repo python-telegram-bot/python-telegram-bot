@@ -50,3 +50,11 @@ class Venue(TelegramObject):
         data['location'] = Location.de_json(data.get('location'), bot)
 
         return Venue(**data)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.location == other.location and self.title == other.title
+        return NotImplemented
+
+    def __hash__(self):
+        return hash((self.__class__, self.location, self.title))
