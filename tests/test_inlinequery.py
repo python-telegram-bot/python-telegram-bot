@@ -35,7 +35,7 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
         user = telegram.User(1, 'First name')
         location = telegram.Location(8.8, 53.1)
 
-        self._id = 'id'
+        self._id = 1234
         self.from_user = user
         self.query = 'query text'
         self.offset = 'offset'
@@ -68,6 +68,26 @@ class InlineQueryTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_dict(inlinequery))
         self.assertDictEqual(inlinequery, self.json_dict)
+
+    def test_equality(self):
+        a = telegram.InlineQuery(self._id, telegram.User(1, ""), "", "")
+        b = telegram.InlineQuery(self._id, telegram.User(1, ""), "", "")
+        c = telegram.InlineQuery(self._id, telegram.User(0, ""), "", "")
+        d = telegram.InlineQuery(0, telegram.User(1, ""), "", "")
+        e = telegram.Update(self._id)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
 
 
 if __name__ == '__main__':

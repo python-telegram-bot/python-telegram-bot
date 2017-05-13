@@ -111,6 +111,26 @@ class UserTest(BaseTest, unittest.TestCase):
 
         self.assertNotEquals(result, None)
 
+    def test_equality(self):
+        a = telegram.User(self._id, self.first_name, self.last_name)
+        b = telegram.User(self._id, self.first_name, self.last_name)
+        c = telegram.User(self._id, self.first_name)
+        d = telegram.User(0, self.first_name, self.last_name)
+        e = telegram.Update(self._id)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()
