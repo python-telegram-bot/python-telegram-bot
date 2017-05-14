@@ -28,8 +28,8 @@ from abc import ABCMeta
 
 class TelegramObject(object):
     """Base class for most telegram objects."""
-
     __metaclass__ = ABCMeta
+    _id_attrs = ()
 
     def __str__(self):
         return str(self.to_dict())
@@ -80,8 +80,6 @@ class TelegramObject(object):
                     data[key] = value
 
         return data
-
-    _id_attrs = ()
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
