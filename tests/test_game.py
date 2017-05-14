@@ -99,36 +99,3 @@ class GameTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(game.parse_text_entities(),
                              {entity: 'http://google.com',
                               entity_2: 'h'})
-
-
-class AnimationTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Animatiion."""
-
-    def setUp(self):
-        self.file_id = 'thisisafileid'
-        self.thumb = {'width': 640, 'height': 360, 'file_id': 'Blah', 'file_size': 0}
-        self.file_name = 'File name'
-        self.mime_type = 'something/gif'
-        self.file_size = 42
-
-        self.json_dict = {
-            'file_id': self.file_id,
-            'thumb': self.thumb,
-            'file_name': self.file_name,
-            'mime_type': self.mime_type,
-            'file_size': self.file_size
-        }
-
-    def test_animation_de_json(self):
-        animation = telegram.Animation.de_json(self.json_dict, self._bot)
-
-        self.assertEqual(animation.file_id, self.file_id)
-        self.assertTrue(isinstance(animation.thumb, telegram.PhotoSize))
-        self.assertEqual(animation.file_name, self.file_name)
-        self.assertEqual(animation.mime_type, self.mime_type)
-        self.assertEqual(animation.file_size, self.file_size)
-
-    def test_game_to_json(self):
-        animation = telegram.Animation.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(animation.to_json()))

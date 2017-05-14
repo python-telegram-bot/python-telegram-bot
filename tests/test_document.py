@@ -178,6 +178,22 @@ class DocumentTest(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(message.document.file_id, '')
 
+    def test_equality(self):
+        a = telegram.Document(self.document_file_id)
+        b = telegram.Document(self.document_file_id)
+        d = telegram.Document("")
+        e = telegram.Voice(self.document_file_id, 0)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

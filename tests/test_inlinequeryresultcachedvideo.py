@@ -78,6 +78,26 @@ class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(video))
         self.assertDictEqual(self.json_dict, video)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultCachedVideo(self._id, self.video_file_id, self.title)
+        b = telegram.InlineQueryResultCachedVideo(self._id, self.video_file_id, self.title)
+        c = telegram.InlineQueryResultCachedVideo(self._id, "", self.title)
+        d = telegram.InlineQueryResultCachedVideo("", self.video_file_id, self.title)
+        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

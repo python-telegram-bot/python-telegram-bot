@@ -47,6 +47,8 @@ class Contact(TelegramObject):
         self.last_name = last_name
         self.user_id = user_id
 
+        self._id_attrs = (self.phone_number,)
+
     @staticmethod
     def de_json(data, bot):
         """

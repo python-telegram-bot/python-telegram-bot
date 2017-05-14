@@ -74,6 +74,26 @@ class VenueTest(BaseTest, unittest.TestCase):
         self.assertAlmostEqual(message.venue.location.latitude, self.location.latitude, 2)
         self.assertAlmostEqual(message.venue.location.longitude, self.location.longitude, 2)
 
+    def test_equality(self):
+        a = telegram.Venue(telegram.Location(0, 0), "Title", "Address")
+        b = telegram.Venue(telegram.Location(0, 0), "Title", "Address")
+        c = telegram.Venue(telegram.Location(0, 0), "Title", "Not Address")
+        d = telegram.Venue(telegram.Location(0, 1), "Title", "Address")
+        d2 = telegram.Venue(telegram.Location(0, 0), "Not Title", "Address")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, d2)
+        self.assertNotEqual(hash(a), hash(d2))
+
 
 if __name__ == '__main__':
     unittest.main()

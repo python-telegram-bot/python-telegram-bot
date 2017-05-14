@@ -77,6 +77,8 @@ class Update(TelegramObject):
         self._effective_chat = None
         self._effective_message = None
 
+        self._id_attrs = (self.update_id,)
+
     @staticmethod
     def de_json(data, bot):
         """

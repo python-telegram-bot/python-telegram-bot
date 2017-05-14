@@ -270,6 +270,26 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(message.video.file_id, None)
 
+    def test_equality(self):
+        a = telegram.Video(self.video_file_id, self.width, self.height, self.duration)
+        b = telegram.Video(self.video_file_id, self.width, self.height, self.duration)
+        c = telegram.Video(self.video_file_id, 0, 0, 0)
+        d = telegram.Video("", self.width, self.height, self.duration)
+        e = telegram.Voice(self.video_file_id, self.duration)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -70,6 +70,26 @@ class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(sticker))
         self.assertDictEqual(self.json_dict, sticker)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultCachedSticker(self._id, self.sticker_file_id)
+        b = telegram.InlineQueryResultCachedSticker(self._id, self.sticker_file_id)
+        c = telegram.InlineQueryResultCachedSticker(self._id, "")
+        d = telegram.InlineQueryResultCachedSticker("", self.sticker_file_id)
+        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

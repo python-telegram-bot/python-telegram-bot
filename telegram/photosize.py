@@ -48,11 +48,7 @@ class PhotoSize(TelegramObject):
         # Optionals
         self.file_size = file_size
 
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        return (self.file_id == other.file_id and self.width == other.width
-                and self.height == other.height and self.file_size == other.file_size)
+        self._id_attrs = (self.file_id,)
 
     @staticmethod
     def de_json(data, bot):

@@ -62,6 +62,8 @@ class User(TelegramObject):
 
         self.bot = bot
 
+        self._id_attrs = (self.id,)
+
     @property
     def name(self):
         """str: """

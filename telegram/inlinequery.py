@@ -55,6 +55,7 @@ class InlineQuery(TelegramObject):
         self.location = location
 
         self.bot = bot
+        self._id_attrs = (self.id,)
 
     @staticmethod
     def de_json(data, bot):

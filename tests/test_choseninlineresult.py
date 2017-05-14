@@ -64,6 +64,26 @@ class ChosenInlineResultTest(BaseTest, unittest.TestCase):
         self.assertEqual(result['from'], self.from_user.to_dict())
         self.assertEqual(result['query'], self.query)
 
+    def test_equality(self):
+        a = telegram.ChosenInlineResult(self.result_id, None, "Query", "")
+        b = telegram.ChosenInlineResult(self.result_id, None, "Query", "")
+        c = telegram.ChosenInlineResult(self.result_id, None, "", "")
+        d = telegram.ChosenInlineResult("", None, "Query", "")
+        e = telegram.Voice(self.result_id, 0)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

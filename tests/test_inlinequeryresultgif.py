@@ -83,6 +83,26 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(gif))
         self.assertDictEqual(self.json_dict, gif)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultGif(self._id, self.gif_url, self.thumb_url)
+        b = telegram.InlineQueryResultGif(self._id, self.gif_url, self.thumb_url)
+        c = telegram.InlineQueryResultGif(self._id, "", self.thumb_url)
+        d = telegram.InlineQueryResultGif("", self.gif_url, self.thumb_url)
+        e = telegram.InlineQueryResultArticle(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

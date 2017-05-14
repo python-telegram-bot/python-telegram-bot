@@ -54,6 +54,8 @@ class Sticker(TelegramObject):
         self.emoji = emoji
         self.file_size = file_size
 
+        self._id_attrs = (self.file_id,)
+
     @staticmethod
     def de_json(data, bot):
         """

@@ -51,6 +51,8 @@ class File(TelegramObject):
 
         self.bot = bot
 
+        self._id_attrs = (self.file_id,)
+
     @staticmethod
     def de_json(data, bot):
         """

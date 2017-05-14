@@ -99,8 +99,7 @@ class MessageTest(BaseTest, unittest.TestCase):
                               entity_2: 'h'})
 
     def test_text_html(self):
-        test_html_string = 'Test for <b>bold</b>, <i>italic</i>, <code>code</code>, ' \
-                           '<a href="http://github.com/">links</a> and <pre>pre</pre>.'
+        test_html_string = 'Test for <b>bold</b>, <i>italic</i>, <code>code</code>, ' '<a href="http://github.com/">links</a> and <pre>pre</pre>.'
         text_html = self.test_message.text_html
         self.assertEquals(test_html_string, text_html)
 
@@ -155,6 +154,27 @@ class MessageTest(BaseTest, unittest.TestCase):
         with self.assertRaisesRegexp(telegram.TelegramError, "can't be deleted"):
             # NOTE: This behaviour can be changed in future. See `tests/test_bot.py` for more info
             message.reply_to_message.delete()
+
+    def test_equality(self):
+        _id = 1
+        a = telegram.Message(_id, telegram.User(1, ""), None, None)
+        b = telegram.Message(_id, telegram.User(1, ""), None, None)
+        c = telegram.Message(_id, telegram.User(0, ""), None, None)
+        d = telegram.Message(0, telegram.User(1, ""), None, None)
+        e = telegram.Update(_id)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
 
 
 if __name__ == '__main__':

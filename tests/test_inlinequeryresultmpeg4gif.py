@@ -83,6 +83,26 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.assertTrue(self.is_dict(mpeg4))
         self.assertDictEqual(self.json_dict, mpeg4)
 
+    def test_equality(self):
+        a = telegram.InlineQueryResultMpeg4Gif(self._id, self.mpeg4_url, self.thumb_url)
+        b = telegram.InlineQueryResultMpeg4Gif(self._id, self.mpeg4_url, self.thumb_url)
+        c = telegram.InlineQueryResultMpeg4Gif(self._id, "", self.thumb_url)
+        d = telegram.InlineQueryResultMpeg4Gif("", self.mpeg4_url, self.thumb_url)
+        e = telegram.InlineQueryResultArticle(self._id, "", "")
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

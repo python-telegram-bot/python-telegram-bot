@@ -65,6 +65,8 @@ class Video(TelegramObject):
         self.mime_type = mime_type
         self.file_size = file_size
 
+        self._id_attrs = (self.file_id,)
+
     @staticmethod
     def de_json(data, bot):
         """

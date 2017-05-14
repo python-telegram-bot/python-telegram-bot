@@ -268,6 +268,26 @@ class AudioTest(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(message.audio.file_id, None)
 
+    def test_equality(self):
+        a = telegram.Audio(self.audio_file_id, self.duration)
+        b = telegram.Audio(self.audio_file_id, self.duration)
+        c = telegram.Audio(self.audio_file_id, 0)
+        d = telegram.Audio("", self.duration)
+        e = telegram.Voice(self.audio_file_id, self.duration)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

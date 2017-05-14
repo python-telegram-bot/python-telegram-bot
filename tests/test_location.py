@@ -101,6 +101,18 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.location.latitude, self.latitude)
         self.assertEqual(message.location.longitude, self.longitude)
 
+    def test_equality(self):
+        a = telegram.Location(self.longitude, self.latitude)
+        b = telegram.Location(self.longitude, self.latitude)
+        d = telegram.Location(0, self.latitude)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
 
 if __name__ == '__main__':
     unittest.main()

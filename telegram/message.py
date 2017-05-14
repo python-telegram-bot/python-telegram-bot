@@ -181,6 +181,8 @@ class Message(TelegramObject):
 
         self.bot = bot
 
+        self._id_attrs = (self.message_id,)
+
     @property
     def chat_id(self):
         """int: Short for :attr:`Message.chat.id`"""

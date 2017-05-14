@@ -46,6 +46,8 @@ class ChatMember(TelegramObject):
         self.user = user
         self.status = status
 
+        self._id_attrs = (self.user, self.status)
+
     @staticmethod
     def de_json(data, bot):
         """
