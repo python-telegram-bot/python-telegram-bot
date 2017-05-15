@@ -74,8 +74,7 @@ class MessageHandler(Handler):
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')
         if allow_edited:
-            warnings.warn('allow_edited is getting deprecated, please use edited_updates instead',
-                          DeprecationWarning)
+            warnings.warn('allow_edited is getting deprecated, please use edited_updates instead')
 
         super(MessageHandler, self).__init__(
             callback,

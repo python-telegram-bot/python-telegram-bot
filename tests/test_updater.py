@@ -206,9 +206,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
-        with self.assertWarns(DeprecationWarning):
-            handler = MessageHandler(
-                Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
+        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
         d.add_handler(handler)
         self.reset()
         self.updater.bot.send_messages = 1
