@@ -51,7 +51,7 @@ class MessageHandler(Handler):
         message_updates (Optional[bool]): Should "normal" message updates be handled? Default is
             ``True``.
         allow_edited (Optional[bool]): If the handler should also accept edited messages.
-            Default is ``False`` - Depricated. use edited updates instead.
+            Default is ``False`` - Deprecated. use edited updates instead.
         channel_post_updates (Optional[bool]): Should channel posts updates be handled? Default is
             ``True``.
         edited_updates (Optional[bool]): Should "edited" message updates be handled? Default is
@@ -97,10 +97,10 @@ class MessageHandler(Handler):
                           'instead. More info: https://git.io/vPTbc.')
 
     def _is_allowed_update(self, update):
-        return any([
-            self.message_updates, update.message, (update.edited_message and self.allow_edited),
-            self.edited_updates
-        ])
+        return any([(self.message_updates and update.message),
+                    (self.allow_edited and update.edited_message),
+                    (self.edited_updates and update.edited_message),
+                    (self.channel_post_updates and update.channel_post)])
 
     def check_update(self, update):
         if isinstance(update, Update) and self._is_allowed_update(update):
