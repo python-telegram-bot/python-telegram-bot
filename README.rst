@@ -100,9 +100,15 @@ Or you can install from source with:
 
 .. code:: shell
 
-    $ git clone https://github.com/python-telegram-bot/python-telegram-bot
+    $ git clone https://github.com/python-telegram-bot/python-telegram-bot --recursive
     $ cd python-telegram-bot
     $ python setup.py install
+    
+In case you have a preciously cloned local repository already, you should initialize the added urllib3 submodule before installing with:
+
+.. code:: shell
+
+    $ git submodule --init --recursive
 
 ===============
 Getting started
