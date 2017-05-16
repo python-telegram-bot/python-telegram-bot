@@ -30,7 +30,8 @@ class CommandHandler(Handler):
     name and/or some additional text.
 
     Args:
-        command (str): The name of the command this handler should listen for.
+        commands (str|list): The name of the command or list of commands this handler should
+            listen for.
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
@@ -64,7 +65,7 @@ class CommandHandler(Handler):
     """
 
     def __init__(self,
-                 command,
+                 commands,
                  callback,
                  filters=None,
                  allow_edited=False,
@@ -79,7 +80,10 @@ class CommandHandler(Handler):
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
-        self.command = command
+        if isinstance(commands, str):
+            self.commands = [commands]
+        else:
+            self.commands = commands
         self.filters = filters
         self.allow_edited = allow_edited
         self.pass_args = pass_args
@@ -108,7 +112,7 @@ class CommandHandler(Handler):
                 else:
                     res = self.filters(message)
 
-                return res and (message.text.startswith('/') and command[0] == self.command
+                return res and (message.text.startswith('/') and command[0] in self.commands
                                 and command[1].lower() == message.bot.username.lower())
             else:
                 return False
