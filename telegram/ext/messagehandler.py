@@ -75,6 +75,7 @@ class MessageHandler(Handler):
                 'message_updates, channel_post_updates and edited_updates are all False')
         if allow_edited:
             warnings.warn('allow_edited is getting deprecated, please use edited_updates instead')
+            edited_updates = allow_edited
 
         super(MessageHandler, self).__init__(
             callback,
@@ -83,7 +84,6 @@ class MessageHandler(Handler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
         self.filters = filters
-        self.allow_edited = allow_edited
         self.message_updates = message_updates
         self.channel_post_updates = channel_post_updates
         self.edited_updates = edited_updates
@@ -97,7 +97,6 @@ class MessageHandler(Handler):
 
     def _is_allowed_update(self, update):
         return any([(self.message_updates and update.message),
-                    (self.allow_edited and update.edited_message),
                     (self.edited_updates and update.edited_message),
                     (self.channel_post_updates and update.channel_post)])
 
