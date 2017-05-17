@@ -199,7 +199,7 @@ class Bot(TelegramObject):
         """Use this method to send text messages.
 
         Args:
-            chat_id (str): Unique identifier for the target chat or
+            chat_id (int|str): Unique identifier for the target chat or
                 username of the target channel (in the format
                 @channelusername).
             text (str): Text of the message to be sent. The current maximum
@@ -247,7 +247,7 @@ class Bot(TelegramObject):
         """Use this method to delete messages which were sent not later than 48 hours ago.
 
         Args:
-            chat_id (str): Unique identifier for the target chat or
+            chat_id (int|str): Unique identifier for the target chat or
                 username of the target channel (in the format
                 @channelusername).
             message_id (int): Unique message identifier.
@@ -281,10 +281,10 @@ class Bot(TelegramObject):
         """Use this method to forward messages of any kind.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
-            from_chat_id: Unique identifier for the chat where the original message was sent
-                - Chat id.
-            message_id: Unique message identifier.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
+            from_chat_id (int|str): Unique identifier for the chat where the original message was
+                sent - Chat id.
+            message_id (int): Unique message identifier.
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
                 receive a notification, Android users will receive a notification with no sound.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
@@ -325,7 +325,7 @@ class Bot(TelegramObject):
         """Use this method to send photos.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             photo: Photo to send. You can either pass a file_id as String to resend a photo that is
                 already on the Telegram servers, or upload a new photo using multipart/form-data.
             caption (Optional[str]): Photo caption (may also be used when resending photos by
@@ -391,7 +391,7 @@ class Bot(TelegramObject):
         use sendVoice method instead.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             audio: Audio file to send. You can either pass a file_id as String to resend an audio
                 that is already on the Telegram servers, or upload a new audio file using
                 multipart/form-data.
@@ -458,7 +458,7 @@ class Bot(TelegramObject):
         """Use this method to send general files.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             document: File to send. You can either pass a file_id as String to resend a file that
                 is already on the Telegram servers, or upload a new file using multipart/form-data.
             filename (Optional[str]): File name that shows in telegram message (it is useful when
@@ -517,7 +517,7 @@ class Bot(TelegramObject):
         """Use this method to send .webp stickers.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             sticker: Sticker to send. You can either pass a file_id as String to resend a sticker
                 that is already on the Telegram servers, or upload a new sticker using
                 multipart/form-data.
@@ -561,7 +561,7 @@ class Bot(TelegramObject):
         videos (other formats may be sent as telegram.Document).
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             video: Video to send. You can either pass a file_id as String to resend a video that is
                 already on the Telegram servers, or upload a new video file using
                 multipart/form-data.
@@ -624,7 +624,7 @@ class Bot(TelegramObject):
         changed in the future.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             voice: Audio file to send. You can either pass a file_id as String to resend an audio
                 that is already on the Telegram servers, or upload a new audio file using
                 multipart/form-data.
@@ -683,7 +683,7 @@ class Bot(TelegramObject):
         """Use this method to send point on the map.
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
             latitude (float): Latitude of location.
             longitude (float): Longitude of location.
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
@@ -729,8 +729,8 @@ class Bot(TelegramObject):
         Use this method to send information about a venue.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             latitude (float): Latitude of the venue.
             longitude (float): Longitude of the venue.
             title (str): Name of the venue.
@@ -786,8 +786,8 @@ class Bot(TelegramObject):
         Use this method to send phone contacts.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             phone_number (str): Contact's phone number.
             first_name (str): Contact's first name.
             last_name (Optional[str]): Contact's last name.
@@ -832,8 +832,8 @@ class Bot(TelegramObject):
         """Use this method to send a game.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             game_short_name (str): Short name of the game, serves as the unique identifier for the
                 game.
 
@@ -870,9 +870,9 @@ class Bot(TelegramObject):
         Telegram clients clear its typing status).
 
         Args:
-            chat_id: Unique identifier for the message recipient - Chat id.
-            action: Type of action to broadcast. Choose one, depending on what the user is about to
-                receive:
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
+            action(:class:`telegram.ChatAction`|str): Type of action to broadcast. Choose one,
+                depending on what the user is about to receive:
 
                     - ChatAction.TYPING for text messages,
                     - ChatAction.UPLOAD_PHOTO for photos,
@@ -962,7 +962,7 @@ class Bot(TelegramObject):
         """Use this method to get a list of profile pictures for a user.
 
         Args:
-            user_id: Unique identifier of the target user.
+            user_id (int): Unique identifier of the target user.
             offset (Optional[int]): Sequential number of the first photo to be returned. By
                 default, all photos are returned.
             limit (Optional[int]): Limits the number of photos to be retrieved. Values between
@@ -999,7 +999,7 @@ class Bot(TelegramObject):
         moment, bots can download files of up to 20MB in size.
 
         Args:
-            file_id: File identifier to get info about.
+            file_id (str): File identifier to get info about.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1032,9 +1032,9 @@ class Bot(TelegramObject):
         group for this to work.
 
         Args:
-            chat_id: Unique identifier for the target group or username of the target supergroup
-                (in the format @supergroupusername).
-            user_id: Unique identifier of the target user.
+            chat_id (int|str): Unique identifier for the target group or username of the target
+                supergroup (in the format @supergroupusername).
+            user_id (int|str): Unique identifier of the target user.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1062,9 +1062,9 @@ class Bot(TelegramObject):
         etc. The bot must be an administrator in the group for this to work.
 
         Args:
-            chat_id: Unique identifier for the target group or username of the target supergroup
-                (in the format @supergroupusername).
-            user_id: Unique identifier of the target user.
+            chat_id (int|str): Unique identifier for the target group or username of the target
+                supergroup (in the format @supergroupusername).
+            user_id (int|str): Unique identifier of the target user.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1152,17 +1152,18 @@ class Bot(TelegramObject):
         """Use this method to edit text messages sent by the bot or via the bot (for inline bots).
 
         Args:
-            text: New text of the message.
-            chat_id: Required if inline_message_id is not specified. Unique identifier for the
-                target chat or username of the target channel (in the format @channelusername).
-            message_id: Required if inline_message_id is not specified. Unique identifier of the
-                sent message.
-            inline_message_id: Required if chat_id and message_id are not specified. Identifier of
-                the inline message.
-            parse_mode: Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-                fixed-width text or inline URLs in your bot's message.
-            disable_web_page_preview: Disables link previews for links in this message.
-            reply_markup: A JSON-serialized object for an inline keyboard.
+            text (str): New text of the message.
+            chat_id (Optional[int|str]): Required if inline_message_id is not specified. Unique
+                identifier for the target chat or username of the target channel (in the format
+                @channelusername).
+            message_id (Optional[int]): Required if inline_message_id is not specified. Unique
+                identifier of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            parse_mode (:class:`telegram.ParseMode`|str): Send Markdown or HTML, if you want
+                Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's
+                message.
+            disable_web_page_preview (bool): Disables link previews for links in this message.
             reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
@@ -1210,10 +1211,10 @@ class Bot(TelegramObject):
             bots).
 
         Args:
-            chat_id (Optional[str]): Required if inline_message_id is not specified. Unique
+            chat_id (Optional[int|str]): Required if inline_message_id is not specified. Unique
                 identifier for the target chat or username of the target channel (in the format
                 @channelusername).
-            message_id (Optional[str]): Required if inline_message_id is not specified. Unique
+            message_id (Optional[int]): Required if inline_message_id is not specified. Unique
                 identifier of the sent message.
             inline_message_id (Optional[str]): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
@@ -1266,10 +1267,10 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (Optional[str]): Required if inline_message_id is not specified. Unique
+            chat_id (Optional[int|str]): Required if inline_message_id is not specified. Unique
                 identifier for the target chat or username of the target channel (in the format
                 @channelusername).
-            message_id (Optional[str]): Required if inline_message_id is not specified. Unique
+            message_id (Optional[int]): Required if inline_message_id is not specified. Unique
                 identifier of the sent message.
             inline_message_id (Optional[str]): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
@@ -1404,7 +1405,8 @@ class Bot(TelegramObject):
         will give up after a reasonable amount of attempts.
 
         Args:
-            url: HTTPS url to send updates to. Use an empty string to remove webhook integration.
+            url (str): HTTPS url to send updates to. Use an empty string to remove webhook
+                integration.
             certificate (file): Upload your public key certificate so that the root certificate in
                 use can be checked.
             max_connections (Optional[int]): Maximum allowed number of simultaneous HTTPS
@@ -1489,8 +1491,8 @@ class Bot(TelegramObject):
         """Use this method for your bot to leave a group, supergroup or channel.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1517,8 +1519,8 @@ class Bot(TelegramObject):
         for one-on-one conversations, current username of a user, group or channel, etc.).
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1548,8 +1550,8 @@ class Bot(TelegramObject):
         creator will be returned.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1575,8 +1577,8 @@ class Bot(TelegramObject):
         """Use this method to get the number of members in a chat.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1602,9 +1604,9 @@ class Bot(TelegramObject):
         """Use this method to get information about a member of a chat.
 
         Args:
-            chat_id: Unique identifier for the target chat or username of the target channel (in
-                the format @channelusername).
-            user_id: Unique identifier of the target user.
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername).
+            user_id (int): Unique identifier of the target user.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1722,6 +1724,14 @@ class Bot(TelegramObject):
         """Use this method to get data for high score tables.
 
         Args:
+            user_id (int): User identifier.
+            chat_id (Optional[int|str]): Required if `inline_message_id` is not specified. Unique
+                identifier for the target chat (or username of the target channel in the format
+                `@channelusername`)
+            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
+                of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
