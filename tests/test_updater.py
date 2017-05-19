@@ -323,6 +323,12 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertEqual(self.received_message, '/spameggs')
 
+        self.reset()
+        message.text = '/not_in_list'
+        queue.put(Update(3, message=message))
+        sleep(.1)
+        self.assertTrue(self.received_message is None)
+
     def test_addRemoveStringRegexHandler(self):
         self._setup_updater('', messages=0)
         d = self.updater.dispatcher
