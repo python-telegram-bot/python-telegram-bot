@@ -37,33 +37,33 @@ class MessageTest(BaseTest, unittest.TestCase):
         self.test_entities = [
             {
                 'length': 4,
-                'offset': 9,
+                'offset': 10,
                 'type': 'bold'
             },
             {
-                'length': 6,
-                'offset': 15,
+                'length': 7,
+                'offset': 16,
                 'type': 'italic'
             },
             {
                 'length': 4,
-                'offset': 23,
+                'offset': 25,
                 'type': 'code'
             },
             {
                 'length': 5,
-                'offset': 29,
+                'offset': 31,
                 'type': 'text_link',
                 'url': 'http://github.com/'
             },
             {
                 'length': 3,
-                'offset': 39,
+                'offset': 41,
                 'type': 'pre'
             },
         ]
 
-        self.test_text = 'Test for bold, italic, code, links and pre.'
+        self.test_text = 'Test for <bold, ita_lic, code, links and pre.'
         self.test_message = telegram.Message(
             message_id=1,
             from_user=None,
@@ -99,12 +99,12 @@ class MessageTest(BaseTest, unittest.TestCase):
                               entity_2: 'h'})
 
     def test_text_html(self):
-        test_html_string = 'Test for <b>bold</b>, <i>italic</i>, <code>code</code>, ' '<a href="http://github.com/">links</a> and <pre>pre</pre>.'
+        test_html_string = 'Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, <a href="http://github.com/">links</a> and <pre>pre</pre>.'
         text_html = self.test_message.text_html
         self.assertEquals(test_html_string, text_html)
 
     def test_text_markdown(self):
-        test_md_string = 'Test for *bold*, _italic_, `code`, [links](http://github.com/) and ```pre```.'
+        test_md_string = 'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and ```pre```.'
         text_markdown = self.test_message.text_markdown
         self.assertEquals(test_md_string, text_markdown)
 
@@ -152,7 +152,6 @@ class MessageTest(BaseTest, unittest.TestCase):
             reply_to_message_id=1)
 
         with self.assertRaisesRegexp(telegram.TelegramError, "can't be deleted"):
-            # NOTE: This behaviour can be changed in future. See `tests/test_bot.py` for more info
             message.reply_to_message.delete()
 
     def test_equality(self):
