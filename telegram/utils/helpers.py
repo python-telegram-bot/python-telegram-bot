@@ -20,6 +20,11 @@
 
 import re
 
+try:
+    from html import escape as escape_html  # noqa: F401
+except ImportError:
+    from cgi import escape as escape_html  # noqa: F401
+
 
 def escape_markdown(text):
     """Helper function to escape telegram markup symbols"""
