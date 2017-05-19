@@ -80,7 +80,12 @@ class CommandHandler(Handler):
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
-        if isinstance(command, str):
+        try:
+            _str = basestring  # Python 2
+        except NameError:
+            _str = str  # Python 3
+
+        if isinstance(command, _str):
             self.command = [command]
         else:
             self.command = command
