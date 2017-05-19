@@ -244,7 +244,13 @@ class Bot(TelegramObject):
     @log
     @message
     def delete_message(self, chat_id, message_id):
-        """Use this method to delete messages which were sent not later than 48 hours ago.
+        """Use this method to delete a message. A message can only be deleted if it was sent less
+        than 48 hours ago. Any such recently sent outgoing message may be deleted. Additionally,
+        if the bot is an administrator in a group chat, it can delete any message. If the bot is
+        an administrator in a supergroup, it can delete messages from any other user and service
+        messages about people joining or leaving the group (other types of service messages may
+        only be removed by the group creator). In channels, bots can only remove their own
+        messages.
 
         Args:
             chat_id (int|str): Unique identifier for the target chat or
@@ -1154,6 +1160,7 @@ class Bot(TelegramObject):
                 @channelusername).
             message_id (Optional[int]): Required if inline_message_id is not specified. Unique
                 identifier of the sent message.
+            inline_message_id (Optional[str]): Required if chat_id and message_id are not
             inline_message_id (Optional[str]): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             parse_mode (:class:`telegram.ParseMode`|str): Send Markdown or HTML, if you want
