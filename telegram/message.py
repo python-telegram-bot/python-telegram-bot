@@ -551,10 +551,6 @@ class Message(TelegramObject):
             ...                   message_id=message.message_id,
             ...                   *args, **kwargs)
 
-        Note:
-            This method is not documented, so it's not guaranteed to work. Also, its behaviour can
-            be changed at any time.
-
         Returns:
             bool: On success, `True` is returned.
 
