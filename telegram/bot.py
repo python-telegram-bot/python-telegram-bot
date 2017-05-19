@@ -252,10 +252,6 @@ class Bot(TelegramObject):
                 @channelusername).
             message_id (int): Unique message identifier.
 
-        Note:
-            This method is not documented, so it's not guaranteed to work. Also, its behaviour can
-            be changed at any time.
-
         Returns:
             bool: On success, `True` is returned.
 

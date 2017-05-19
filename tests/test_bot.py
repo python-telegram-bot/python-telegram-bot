@@ -96,8 +96,6 @@ class BotTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def test_deleteMessage_old_message(self):
         with self.assertRaisesRegexp(telegram.TelegramError, "can't be deleted"):
-            # NOTE: This behaviour can be changed in future because `deleteMessage` method is not
-            # documented in Bot API reference now.
             # Considering that the first message is old enough
             self._bot.delete_message(chat_id=self._chat_id, message_id=1)
 
