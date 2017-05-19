@@ -1161,7 +1161,6 @@ class Bot(TelegramObject):
             message_id (Optional[int]): Required if inline_message_id is not specified. Unique
                 identifier of the sent message.
             inline_message_id (Optional[str]): Required if chat_id and message_id are not
-            inline_message_id (Optional[str]): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             parse_mode (:class:`telegram.ParseMode`|str): Send Markdown or HTML, if you want
                 Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's
