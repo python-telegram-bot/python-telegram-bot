@@ -84,6 +84,14 @@ from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
+from .labeledprice import LabeledPrice
+from .successfulpayment import SuccessfulPayment
+from .shippingoption import ShippingOption
+from .shippingaddress import ShippingAddress
+from .precheckoutquery import PreCheckoutQuery
+from .orderinfo import OrderInfo
+from .shippingquery import ShippingQuery
+from .invoice import Invoice
 from .webhookinfo import WebhookInfo
 from .gamehighscore import GameHighScore
 from .update import Update
@@ -115,5 +123,6 @@ __all__ = [
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
-    'Game', 'GameHighScore'
+    'Game', 'GameHighScore', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
+    'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery'
 ]
