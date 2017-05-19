@@ -650,7 +650,7 @@ class Message(TelegramObject):
             markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
             last_offset = entity.offset + entity.length
 
-        markdown_text += message_text[last_offset:]
+        markdown_text += escape_html(message_text[last_offset:])
         return markdown_text
 
     @property
@@ -689,5 +689,5 @@ class Message(TelegramObject):
             markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
             last_offset = entity.offset + entity.length
 
-        markdown_text += message_text[last_offset:]
+        markdown_text += escape_markdown(message_text[last_offset:])
         return markdown_text
