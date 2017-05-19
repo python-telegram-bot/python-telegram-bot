@@ -24,6 +24,7 @@ from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game)
+from telegram.utils.helpers import escape_html, escape_markdown
 
 
 class Message(TelegramObject):
@@ -635,6 +636,7 @@ class Message(TelegramObject):
         last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+            text = escape_html(text)
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
@@ -649,7 +651,7 @@ class Message(TelegramObject):
             else:
                 insert = text
 
-            markdown_text += message_text[last_offset:entity.offset] + insert
+            markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
             last_offset = entity.offset + entity.length
 
         markdown_text += message_text[last_offset:]
@@ -673,6 +675,7 @@ class Message(TelegramObject):
         last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+            text = escape_markdown(text)
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '[{}]({})'.format(text, entity.url)
@@ -687,7 +690,7 @@ class Message(TelegramObject):
             else:
                 insert = text
 
-            markdown_text += message_text[last_offset:entity.offset] + insert
+            markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
             last_offset = entity.offset + entity.length
 
         markdown_text += message_text[last_offset:]
