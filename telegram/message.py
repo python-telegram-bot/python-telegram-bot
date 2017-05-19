@@ -23,7 +23,7 @@ from datetime import datetime
 from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity, Game)
+                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment)
 
 
 class Message(TelegramObject):
@@ -138,6 +138,8 @@ class Message(TelegramObject):
                  channel_chat_created=False,
                  pinned_message=None,
                  forward_from_message_id=None,
+                 invoice=None,
+                 successful_payment=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -176,6 +178,8 @@ class Message(TelegramObject):
         self.channel_chat_created = bool(channel_chat_created)
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id
+        self.invoice = invoice
+        self.successful_payment = successful_payment
 
         self.bot = bot
 
@@ -224,6 +228,8 @@ class Message(TelegramObject):
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
+        data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
 
         return Message(bot=bot, **data)
 
