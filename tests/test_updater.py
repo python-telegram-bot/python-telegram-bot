@@ -108,7 +108,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.message_count += 1
 
     def telegramHandlerEditedTest(self, bot, update):
-        self.received_message = update.edited_message.text
+        self.received_message = update.effective_message.text
         self.message_count += 1
 
     def telegramInlineHandlerTest(self, bot, update):
@@ -188,21 +188,30 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self._setup_updater('Test', edited=True)
         d = self.updater.dispatcher
         from telegram.ext import Filters
-        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
+        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, edited_updates=True)
         d.add_handler(handler)
         self.updater.start_polling(0.01)
         sleep(.1)
         self.assertEqual(self.received_message, 'Test')
 
-        # Remove handler
-        d.remove_handler(handler)
-        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=False)
-        d.add_handler(handler)
         self.reset()
-
+        d.remove_handler(handler)
+        handler = MessageHandler(
+            Filters.text,
+            self.telegramHandlerEditedTest,
+            edited_updates=False,
+            message_updates=False)
+        d.add_handler(handler)
         self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
+
+        handler = MessageHandler(Filters.text, self.telegramHandlerEditedTest, allow_edited=True)
+        d.add_handler(handler)
+        self.reset()
+        self.updater.bot.send_messages = 1
+        sleep(.1)
+        self.assertEqual(self.received_message, 'Test')
 
     def test_addTelegramMessageHandlerMultipleMessages(self):
         self._setup_updater('Multiple', 100)

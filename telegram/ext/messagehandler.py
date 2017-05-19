@@ -37,8 +37,6 @@ class MessageHandler(Handler):
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
-        allow_edited (Optional[bool]): If the handler should also accept edited messages.
-            Default is ``False``
         pass_update_queue (optional[bool]): If the handler should be passed the
             update queue as a keyword argument called ``update_queue``. It can
             be used to insert updates. Default is ``False``
@@ -52,8 +50,12 @@ class MessageHandler(Handler):
             For each update in the same chat, it will be the same ``dict``. Default is ``False``.
         message_updates (Optional[bool]): Should "normal" message updates be handled? Default is
             ``True``.
+        allow_edited (Optional[bool]): If the handler should also accept edited messages.
+            Default is ``False`` - Deprecated. use edited updates instead.
         channel_post_updates (Optional[bool]): Should channel posts updates be handled? Default is
             ``True``.
+        edited_updates (Optional[bool]): Should "edited" message updates be handled? Default is
+            ``False``.
 
     """
 
@@ -66,9 +68,14 @@ class MessageHandler(Handler):
                  pass_user_data=False,
                  pass_chat_data=False,
                  message_updates=True,
-                 channel_post_updates=True):
-        if not message_updates and not channel_post_updates:
-            raise ValueError('Both message_updates & channel_post_updates are False')
+                 channel_post_updates=True,
+                 edited_updates=False):
+        if not message_updates and not channel_post_updates and not edited_updates:
+            raise ValueError(
+                'message_updates, channel_post_updates and edited_updates are all False')
+        if allow_edited:
+            warnings.warn('allow_edited is getting deprecated, please use edited_updates instead')
+            edited_updates = allow_edited
 
         super(MessageHandler, self).__init__(
             callback,
@@ -77,9 +84,9 @@ class MessageHandler(Handler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
         self.filters = filters
-        self.allow_edited = allow_edited
         self.message_updates = message_updates
         self.channel_post_updates = channel_post_updates
+        self.edited_updates = edited_updates
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -88,17 +95,13 @@ class MessageHandler(Handler):
                           'deprecated, please use bitwise operators (& and |) '
                           'instead. More info: https://git.io/vPTbc.')
 
-    def _is_allowed_message(self, update):
-        return (self.message_updates
-                and (update.message or (update.edited_message and self.allow_edited)))
-
-    def _is_allowed_channel_post(self, update):
-        return (self.channel_post_updates
-                and (update.channel_post or (update.edited_channel_post and self.allow_edited)))
+    def _is_allowed_update(self, update):
+        return any([(self.message_updates and update.message),
+                    (self.edited_updates and update.edited_message),
+                    (self.channel_post_updates and update.channel_post)])
 
     def check_update(self, update):
-        if (isinstance(update, Update)
-                and (self._is_allowed_message(update) or self._is_allowed_channel_post(update))):
+        if isinstance(update, Update) and self._is_allowed_update(update):
 
             if not self.filters:
                 res = True
