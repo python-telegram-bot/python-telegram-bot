@@ -274,6 +274,32 @@ class FiltersTest(BaseTest, unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             (custom & Filters.text)(self.message)
 
+    def test_language_filter_single(self):
+        self.message.from_user.language_code = 'en_US'
+        self.assertTrue((Filters.language('en_US'))(self.message))
+        self.assertTrue((Filters.language('en'))(self.message))
+        self.assertFalse((Filters.language('en_GB'))(self.message))
+        self.assertFalse((Filters.language('da'))(self.message))
+        self.message.from_user.language_code = 'en_GB'
+        self.assertFalse((Filters.language('en_US'))(self.message))
+        self.assertTrue((Filters.language('en'))(self.message))
+        self.assertTrue((Filters.language('en_GB'))(self.message))
+        self.assertFalse((Filters.language('da'))(self.message))
+        self.message.from_user.language_code = 'da'
+        self.assertFalse((Filters.language('en_US'))(self.message))
+        self.assertFalse((Filters.language('en'))(self.message))
+        self.assertFalse((Filters.language('en_GB'))(self.message))
+        self.assertTrue((Filters.language('da'))(self.message))
+
+    def test_language_filter_multiple(self):
+        f = Filters.language(['en_US', 'da'])
+        self.message.from_user.language_code = 'en_US'
+        self.assertTrue(f(self.message))
+        self.message.from_user.language_code = 'en_GB'
+        self.assertFalse(f(self.message))
+        self.message.from_user.language_code = 'da'
+        self.assertTrue(f(self.message))
+
 
 if __name__ == '__main__':
     unittest.main()
