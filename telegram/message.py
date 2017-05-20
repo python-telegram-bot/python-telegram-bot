@@ -658,7 +658,10 @@ class Message(TelegramObject):
 
             last_offset = entity.offset + entity.length
 
-        markdown_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
+        if sys.maxunicode == 0xffff:
+            markdown_text += escape_html(message_text[last_offset:])
+        else:
+            markdown_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
 
     @property
@@ -704,5 +707,8 @@ class Message(TelegramObject):
 
             last_offset = entity.offset + entity.length
 
-        markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
+        if sys.maxunicode == 0xffff:
+            markdown_text += escape_markdown(message_text[last_offset:])
+        else:
+            markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
