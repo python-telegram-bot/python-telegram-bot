@@ -25,6 +25,7 @@ from time import mktime
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game)
 from telegram.utils.helpers import escape_html, escape_markdown
+from telegram.videonote import VideoNote
 
 
 class Message(TelegramObject):
@@ -51,6 +52,8 @@ class Message(TelegramObject):
         sticker (:class:`telegram.Sticker`):
         video (:class:`telegram.Video`):
         voice (:class:`telegram.Voice`):
+        video_note (:class:`telegram.VideoNote`): Message is a video note, information about the
+            video message
         caption (str):
         contact (:class:`telegram.Contact`):
         location (:class:`telegram.Location`):
@@ -91,6 +94,7 @@ class Message(TelegramObject):
         sticker (Optional[:class:`telegram.Sticker`]):
         video (Optional[:class:`telegram.Video`]):
         voice (Optional[:class:`telegram.Voice`]):
+        video_note (Optional[:class:`telegram.VideoNote`]):
         caption (Optional[str]):
         contact (Optional[:class:`telegram.Contact`]):
         location (Optional[:class:`telegram.Location`]):
@@ -125,6 +129,7 @@ class Message(TelegramObject):
                  sticker=None,
                  video=None,
                  voice=None,
+                 video_note=None,
                  caption=None,
                  contact=None,
                  location=None,
@@ -163,6 +168,7 @@ class Message(TelegramObject):
         self.sticker = sticker
         self.video = video
         self.voice = voice
+        self.video_note = video_note
         self.caption = caption
         self.contact = contact
         self.location = location
@@ -220,6 +226,7 @@ class Message(TelegramObject):
         data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
         data['video'] = Video.de_json(data.get('video'), bot)
         data['voice'] = Voice.de_json(data.get('voice'), bot)
+        data['video_note'] = VideoNote.de_json(data.get('video_note'), bot)
         data['contact'] = Contact.de_json(data.get('contact'), bot)
         data['location'] = Location.de_json(data.get('location'), bot)
         data['venue'] = Venue.de_json(data.get('venue'), bot)
