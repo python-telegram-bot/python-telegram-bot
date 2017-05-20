@@ -44,6 +44,8 @@ class BaseTest(object):
         self._channel_id = os.environ.get('CHANNEL_ID', '@pythontelegrambottests')
         self._bot = bot
         self._chat_id = chat_id
+        self._payment_provider_token = os.environ.get('PAYMENT_PROVIDER_TOKEN',
+                                                      '284685063:TEST:ZGJlMmQxZDI3ZTc3 ')
 
     @staticmethod
     def is_json(string):

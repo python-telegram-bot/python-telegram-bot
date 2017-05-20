@@ -35,7 +35,7 @@ class PreCheckoutQueryTest(BaseTest, unittest.TestCase):
         self.id = 5
         self.invoice_payload = 'invoice_payload'
         self.shipping_option_id = 'shipping_option_id'
-        self.currency = 'EUD'
+        self.currency = 'EUR'
         self.total_amount = 100
         self.from_user = telegram.User(0, '')
         self.order_info = telegram.OrderInfo()

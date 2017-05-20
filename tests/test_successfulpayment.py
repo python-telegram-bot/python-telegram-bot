@@ -34,7 +34,7 @@ class SuccessfulPaymentTest(BaseTest, unittest.TestCase):
     def setUp(self):
         self.invoice_payload = 'invoice_payload'
         self.shipping_option_id = 'shipping_option_id'
-        self.currency = 'EUD'
+        self.currency = 'EUR'
         self.total_amount = 100
         self.order_info = telegram.OrderInfo()
         self.telegram_payment_charge_id = 'telegram_payment_charge_id'

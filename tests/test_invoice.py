@@ -22,21 +22,27 @@ Invoice"""
 import sys
 import unittest
 
+from flaky import flaky
+
 sys.path.append('.')
 
 import telegram
-from tests.base import BaseTest
+from tests.base import BaseTest, timeout
 
 
 class InvoiceTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Invoice."""
 
     def setUp(self):
+        self.payload = 'payload'
+        self.provider_token = self._payment_provider_token
+        self.prices = [telegram.LabeledPrice('Fish', 100), telegram.LabeledPrice('Fish Tax', 1000)]
+
         self.title = 'title'
         self.description = 'description'
         self.start_parameter = 'start_parameter'
-        self.currency = 'EUD'
-        self.total_amount = 100
+        self.currency = 'EUR'
+        self.total_amount = sum([p.amount for p in self.prices])
 
         self.json_dict = {
             'title': self.title,
@@ -65,6 +71,50 @@ class InvoiceTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_dict(invoice))
         self.assertDictEqual(self.json_dict, invoice)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_invoice_required_args_only(self):
+        message = self._bot.send_invoice(self._chat_id, self.title, self.description, self.payload,
+                                         self.provider_token, self.start_parameter, self.currency,
+                                         self.prices)
+        invoice = message.invoice
+
+        self.assertEqual(invoice.currency, self.currency)
+        self.assertEqual(invoice.start_parameter, self.start_parameter)
+        self.assertEqual(invoice.description, self.description)
+        self.assertEqual(invoice.title, self.title)
+        self.assertEqual(invoice.total_amount, self.total_amount)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_invoice_all_args(self):
+        message = self._bot.send_invoice(
+            self._chat_id,
+            self.title,
+            self.description,
+            self.payload,
+            self.provider_token,
+            self.start_parameter,
+            self.currency,
+            self.prices,
+            photo_url='https://raw.githubusercontent.com/'
+            'python-telegram-bot/logos/master/'
+            'logo/png/ptb-logo_240.png',
+            photo_size=240,
+            photo_width=240,
+            photo_height=240,
+            need_name=True,
+            need_phone_number=True,
+            need_shipping_address=True,
+            is_flexible=True)
+        invoice = message.invoice
+
+        self.assertEqual(invoice.currency, self.currency)
+        self.assertEqual(invoice.start_parameter, self.start_parameter)
+        self.assertEqual(invoice.description, self.description)
+        self.assertEqual(invoice.title, self.title)
+        self.assertEqual(invoice.total_amount, self.total_amount)
 
 
 if __name__ == '__main__':
