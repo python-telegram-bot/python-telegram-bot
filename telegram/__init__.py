@@ -52,6 +52,10 @@ from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .animation import Animation
 from .game import Game
+from .shippingaddress import ShippingAddress
+from .orderinfo import OrderInfo
+from .successfulpayment import SuccessfulPayment
+from .invoice import Invoice
 from .message import Message
 from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
@@ -85,13 +89,9 @@ from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
 from .labeledprice import LabeledPrice
-from .successfulpayment import SuccessfulPayment
 from .shippingoption import ShippingOption
-from .shippingaddress import ShippingAddress
 from .precheckoutquery import PreCheckoutQuery
-from .orderinfo import OrderInfo
 from .shippingquery import ShippingQuery
-from .invoice import Invoice
 from .webhookinfo import WebhookInfo
 from .gamehighscore import GameHighScore
 from .update import Update
