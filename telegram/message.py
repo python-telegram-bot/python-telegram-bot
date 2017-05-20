@@ -76,7 +76,7 @@ class Message(TelegramObject):
         delete_chat_photo (bool): Service message: the chat photo was deleted
         group_chat_created (bool): Service message: the group has been created
         supergroup_chat_created (bool): Service message: the supergroup has been created. This
-            field can‘t be received in a message coming through updates, because bot can’t be a
+            field can't be received in a message coming through updates, because bot can't be a
             member of a supergroup when it is created. It can only be found in reply_to_message
             if someone replies to a very first message in a directly created supergroup.
         migrate_to_chat_id (int): The group has been migrated to a supergroup with the specified
@@ -84,7 +84,7 @@ class Message(TelegramObject):
         migrate_from_chat_id (int): The supergroup has been migrated from a group with the
             specified identifier.
         channel_chat_created (bool): Service message: the channel has been created. This field
-            can‘t be received in a message coming through updates, because bot can’t be a member
+            can't be received in a message coming through updates, because bot can't be a member
             of a channel when it is created. It can only be found in reply_to_message if someone
             replies to a very first message in a channel.
         pinned_message (:class:`telegram.message`): Specified message was pinned. Note that the
