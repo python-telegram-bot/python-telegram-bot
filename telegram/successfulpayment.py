@@ -56,6 +56,8 @@ class SuccessfulPayment(TelegramObject):
         self.telegram_payment_charge_id = telegram_payment_charge_id
         self.provider_payment_charge_id = provider_payment_charge_id
 
+        self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
+
     @staticmethod
     def de_json(data, bot):
         """
