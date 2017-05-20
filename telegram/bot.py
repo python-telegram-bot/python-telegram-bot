@@ -1840,7 +1840,7 @@ class Bot(TelegramObject):
             'provider_token': provider_token,
             'start_parameter': start_parameter,
             'currency': currency,
-            'prices': prices
+            'prices': [p.to_dict() for p in prices]
         }
 
         if photo_url:
