@@ -37,6 +37,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.first_name = "Leandro"
         self.last_name = "S."
         self.username = "leandrotoledo"
+        self.language_code = "pt-BR"
         self.type = "private"
 
         self.json_dict = {
@@ -44,6 +45,7 @@ class UserTest(BaseTest, unittest.TestCase):
             'first_name': self.first_name,
             'last_name': self.last_name,
             'username': self.username,
+            'language_code': self.language_code,
             'type': self.type
         }
 
@@ -54,6 +56,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.username, self.username)
+        self.assertEqual(user.language_code, self.language_code)
         self.assertEqual(user.type, self.type)
 
         self.assertEqual(user.name, '@leandrotoledo')
@@ -98,6 +101,7 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user['first_name'], self.first_name)
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)
+        self.assertEqual(user['language_code'], self.language_code)
         self.assertEqual(user['type'], self.type)
 
     @flaky(3, 1)
