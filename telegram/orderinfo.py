@@ -49,7 +49,7 @@ class OrderInfo(TelegramObject):
             telegram.OrderInfo:
         """
         if not data:
-            return None
+            return OrderInfo()
 
         data = super(OrderInfo, OrderInfo).de_json(data, bot)
 
