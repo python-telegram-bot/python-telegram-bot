@@ -37,6 +37,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.gif_url = 'gif url'
         self.gif_width = 10
         self.gif_height = 15
+        self.gif_duration = 1
         self.thumb_url = 'thumb url'
         self.title = 'title'
         self.caption = 'caption'
@@ -50,6 +51,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
             'gif_url': self.gif_url,
             'gif_width': self.gif_width,
             'gif_height': self.gif_height,
+            'gif_duration': self.gif_duration,
             'thumb_url': self.thumb_url,
             'title': self.title,
             'caption': self.caption,
@@ -65,6 +67,7 @@ class InlineQueryResultGifTest(BaseTest, unittest.TestCase):
         self.assertEqual(gif.gif_url, self.gif_url)
         self.assertEqual(gif.gif_width, self.gif_width)
         self.assertEqual(gif.gif_height, self.gif_height)
+        self.assertEqual(gif.gif_duration, self.gif_duration)
         self.assertEqual(gif.thumb_url, self.thumb_url)
         self.assertEqual(gif.title, self.title)
         self.assertEqual(gif.caption, self.caption)
