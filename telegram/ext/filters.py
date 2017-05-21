@@ -19,6 +19,11 @@
 """ This module contains the Filters for use with the MessageHandler class """
 from telegram import Chat
 
+try:
+    str_type = base_string
+except NameError:
+    str_type = str
+
 
 class BaseFilter(object):
     """Base class for all Message Filters
@@ -263,3 +268,24 @@ class Filters(object):
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
+
+    class language(BaseFilter):
+        """
+        Filters messages to only allow those which are from users with a certain language code.
+        Note that according to telegrams documentation, every single user does not have the
+        language_code attribute.
+
+        Args:
+            lang (str|list): Which language code(s) to allow through. This will be matched using
+                .startswith meaning that 'en' will match both 'en_US' and 'en_GB'
+        """
+
+        def __init__(self, lang):
+            if isinstance(lang, str_type):
+                self.lang = [lang]
+            else:
+                self.lang = lang
+
+        def filter(self, message):
+            return message.from_user.language_code and any(
+                [message.from_user.language_code.startswith(x) for x in self.lang])

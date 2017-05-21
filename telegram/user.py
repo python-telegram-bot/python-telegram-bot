@@ -26,21 +26,23 @@ class User(TelegramObject):
     """This object represents a Telegram User.
 
     Attributes:
-        id (int):
-        first_name (str):
-        last_name (str):
-        username (str):
-        type (str):
+        id (int): Unique identifier for this user or bot
+        first_name (str): User's or bot's first name
+        last_name (str): User's or bot's last name
+        username (str): User's or bot's username
+        language_code (str): IETF language tag of the user's language
+        type (str): Deprecated
 
     Args:
-        id (int):
-        first_name (str):
+        id (int): Unique identifier for this user or bot
+        first_name (str): User's or bot's first name
         **kwargs: Arbitrary keyword arguments.
 
     Keyword Args:
-        type (Optional[str]):
-        last_name (Optional[str]):
-        username (Optional[str]):
+        type (Optional[str]): Deprecated
+        last_name (Optional[str]): User's or bot's last name
+        username (Optional[str]): User's or bot's username
+        language_code (Optional[str]): IETF language tag of the user's language
         bot (Optional[Bot]): The Bot to use for instance methods
     """
 
@@ -50,6 +52,7 @@ class User(TelegramObject):
                  type=None,
                  last_name=None,
                  username=None,
+                 language_code=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -59,6 +62,7 @@ class User(TelegramObject):
         self.type = type
         self.last_name = last_name
         self.username = username
+        self.language_code = language_code
 
         self.bot = bot
 
