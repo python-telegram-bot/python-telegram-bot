@@ -132,6 +132,7 @@ class Message(TelegramObject):
                  location=None,
                  venue=None,
                  new_chat_member=None,
+                 new_chat_members=None,
                  left_chat_member=None,
                  new_chat_title=None,
                  new_chat_photo=None,
@@ -173,6 +174,7 @@ class Message(TelegramObject):
         self.location = location
         self.venue = venue
         self.new_chat_member = new_chat_member
+        self.new_chat_members = new_chat_members
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
         self.new_chat_photo = new_chat_photo
@@ -232,6 +234,7 @@ class Message(TelegramObject):
         data['location'] = Location.de_json(data.get('location'), bot)
         data['venue'] = Venue.de_json(data.get('venue'), bot)
         data['new_chat_member'] = User.de_json(data.get('new_chat_member'), bot)
+        data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
@@ -267,6 +270,8 @@ class Message(TelegramObject):
             data['entities'] = [e.to_dict() for e in self.entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
+        if self.new_chat_members:
+            data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
         return data
 
