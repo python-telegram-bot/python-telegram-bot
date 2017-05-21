@@ -672,6 +672,66 @@ class Bot(TelegramObject):
             **kwargs)
 
     @log
+    def send_video_note(self,
+                        chat_id,
+                        video_note,
+                        duration=None,
+                        length=None,
+                        disable_notification=False,
+                        reply_to_message_id=None,
+                        reply_markup=None,
+                        timeout=20.,
+                        **kwargs):
+        """As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute
+        long. Use this method to send video messages
+
+        Args:
+            chat_id (int|str): Unique identifier for the message recipient - Chat id.
+            voice: Video note to send. Pass a file_id as String to send a video note that exists
+                on the Telegram servers (recommended) or upload a new video. Sending video notes
+                by a URL is currently unsupported
+            duration (Optional[int]): Duration of sent audio in seconds.
+            length (Optional[int]): Video width and height
+            disable_notification (Optional[bool]): Sends the message silently. iOS users will not
+                receive a notification, Android users will receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply, ID of the original
+                message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
+            **kwargs (dict): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendVideoNote'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'video_note': video_note}
+
+        if duration:
+            data['duration'] = duration
+        if length:
+            data['length'] = length
+
+        return self._message_wrapper(
+            url,
+            data,
+            chat_id=chat_id,
+            video_note=video_note,
+            duration=duration,
+            length=length,
+            disable_notification=disable_notification,
+            reply_to_message_id=reply_to_message_id,
+            reply_markup=reply_markup,
+            timeout=timeout,
+            **kwargs)
+
+    @log
     @message
     def send_location(self,
                       chat_id,
@@ -1963,6 +2023,7 @@ class Bot(TelegramObject):
     sendSticker = send_sticker
     sendVideo = send_video
     sendVoice = send_voice
+    sendVideoNote = send_video_note
     sendLocation = send_location
     sendVenue = send_venue
     sendContact = send_contact
