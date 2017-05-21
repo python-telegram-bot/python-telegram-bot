@@ -99,3 +99,22 @@ class User(TelegramObject):
         Shortcut for ``bot.getUserProfilePhotos(update.message.from_user.id, *args, **kwargs)``
         """
         return self.bot.getUserProfilePhotos(self.id, *args, **kwargs)
+
+    @staticmethod
+    def de_list(data, bot):
+        """
+        Args:
+            data (list):
+            bot (telegram.Bot):
+
+        Returns:
+            List<telegram.User>:
+        """
+        if not data:
+            return []
+
+        users = list()
+        for user in data:
+            users.append(User.de_json(user, bot))
+
+        return users
