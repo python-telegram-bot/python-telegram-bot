@@ -35,7 +35,8 @@ from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
-FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate')
+FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate',
+              'video_note')
 
 
 class InputFile(object):
@@ -66,6 +67,9 @@ class InputFile(object):
         elif 'certificate' in data:
             self.input_name = 'certificate'
             self.input_file = data.pop('certificate')
+        elif 'video_note' in data:
+            self.input_name = 'video_note'
+            self.input_file = data.pop('video_note')
         else:
             raise TelegramError('Unknown inputfile type')
 
@@ -117,7 +121,7 @@ class InputFile(object):
                 form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
             ])
 
-        # Add input_file to upload
+# Add input_file to upload
         form.extend([
             form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' %
             (self.input_name,
