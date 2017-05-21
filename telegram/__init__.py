@@ -52,6 +52,10 @@ from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .animation import Animation
 from .game import Game
+from .shippingaddress import ShippingAddress
+from .orderinfo import OrderInfo
+from .successfulpayment import SuccessfulPayment
+from .invoice import Invoice
 from .message import Message
 from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
@@ -84,6 +88,10 @@ from .inputtextmessagecontent import InputTextMessageContent
 from .inputlocationmessagecontent import InputLocationMessageContent
 from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
+from .labeledprice import LabeledPrice
+from .shippingoption import ShippingOption
+from .precheckoutquery import PreCheckoutQuery
+from .shippingquery import ShippingQuery
 from .webhookinfo import WebhookInfo
 from .gamehighscore import GameHighScore
 from .update import Update
@@ -115,5 +123,6 @@ __all__ = [
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
-    'Game', 'GameHighScore'
+    'Game', 'GameHighScore', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
+    'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery'
 ]

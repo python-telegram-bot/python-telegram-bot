@@ -23,7 +23,7 @@ from datetime import datetime
 from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity, Game)
+                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment)
 from telegram.utils.helpers import escape_html, escape_markdown
 
 
@@ -34,36 +34,67 @@ class Message(TelegramObject):
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        message_id (int):
-        from_user (:class:`telegram.User`):
-        date (:class:`datetime.datetime`):
-        forward_from (:class:`telegram.User`):
-        forward_from_chat (:class:`telegram.Chat`):
-        forward_from_message_id (int):
-        forward_date (:class:`datetime.datetime`):
-        reply_to_message (:class:`telegram.Message`):
-        edit_date (:class:`datetime.datetime`):
-        text (str):
-        audio (:class:`telegram.Audio`):
-        document (:class:`telegram.Document`):
-        game (:class:`telegram.Game`):
-        photo (List[:class:`telegram.PhotoSize`]):
-        sticker (:class:`telegram.Sticker`):
-        video (:class:`telegram.Video`):
-        voice (:class:`telegram.Voice`):
-        caption (str):
-        contact (:class:`telegram.Contact`):
-        location (:class:`telegram.Location`):
-        new_chat_member (:class:`telegram.User`):
-        left_chat_member (:class:`telegram.User`):
-        new_chat_title (str):
-        new_chat_photo (List[:class:`telegram.PhotoSize`]):
-        delete_chat_photo (bool):
-        group_chat_created (bool):
-        supergroup_chat_created (bool):
-        migrate_to_chat_id (int):
-        migrate_from_chat_id (int):
-        channel_chat_created (bool):
+        message_id (int): Unique message identifier inside this chat
+        from_user (:class:`telegram.User`): Sender, can be empty for messages sent to channels
+        date (:class:`datetime.datetime`): Date the message was sent in Unix time
+        chat (:class:`telegram.Chat`): Conversation the message belongs to
+        forward_from (:class:`telegram.User`): For forwarded messages, sender of the original
+            message
+        forward_from_chat (:class:`telegram.Chat`): For messages forwarded from a channel,
+            information about the original channel
+        forward_from_message_id (int): For forwarded channel posts, identifier of the original
+            message in the channel
+        forward_date (:class:`datetime.datetime`): For forwarded messages, date the original
+            message was sent in Unix time
+        reply_to_message (:class:`telegram.Message`): For replies, the original message. Note
+            that the Message object in this field will not contain further reply_to_message
+            fields even if it itself is a reply.
+        edit_date (:class:`datetime.datetime`): Date the message was last edited in Unix time
+        text (str): For text messages, the actual UTF-8 text of the message, 0-4096 characters.
+        entities (List[:class:`telegram.MessageEntity`]): For text messages, special entities
+            like usernames, URLs, bot commands, etc. that appear in the text. See
+            parse_entity and parse_entities methods for how to use properly
+        audio (:class:`telegram.Audio`): Message is an audio file, information about the file
+        document (:class:`telegram.Document`): Message is a general file, information about the
+            file
+        game (:class:`telegram.Game`):Message is a game, information about the game
+        photo (List[:class:`telegram.PhotoSize`]): Message is a photo, available sizes of the photo
+        sticker (:class:`telegram.Sticker`): Message is a sticker, information about the sticker
+        video (:class:`telegram.Video`): Message is a video, information about the video
+        voice (:class:`telegram.Voice`): Message is a voice message, information about the file
+        caption (str): Caption for the document, photo or video, 0-200 characters
+        contact (:class:`telegram.Contact`): Message is a shared contact, information about the
+            contact
+        location (:class:`telegram.Location`): Message is a shared location, information about the
+            location
+        new_chat_member (:class:`telegram.User`): A new member was added to the group,
+            information about them (this member may be the bot itself)
+        left_chat_member (:class:`telegram.User`): A member was removed from the group,
+            information about them (this member may be the bot itself)
+        new_chat_title (str): A chat title was changed to this value
+        new_chat_photo (List[:class:`telegram.PhotoSize`]): A chat photo was change to this value
+        delete_chat_photo (bool): Service message: the chat photo was deleted
+        group_chat_created (bool): Service message: the group has been created
+        supergroup_chat_created (bool): Service message: the supergroup has been created. This
+            field can't be received in a message coming through updates, because bot can't be a
+            member of a supergroup when it is created. It can only be found in reply_to_message
+            if someone replies to a very first message in a directly created supergroup.
+        migrate_to_chat_id (int): The group has been migrated to a supergroup with the specified
+            identifier.
+        migrate_from_chat_id (int): The supergroup has been migrated from a group with the
+            specified identifier.
+        channel_chat_created (bool): Service message: the channel has been created. This field
+            can't be received in a message coming through updates, because bot can't be a member
+            of a channel when it is created. It can only be found in reply_to_message if someone
+            replies to a very first message in a channel.
+        pinned_message (:class:`telegram.message`): Specified message was pinned. Note that the
+            Message object in this field will not contain further reply_to_message fields even if
+            it is itself a reply.
+        invoice (:class:`telegram.Invoice`): Message is an invoice for a payment, information
+            about the invoice.
+        successful_payment (:class:`telegram.SuccessfulPayment`): Message is a service message
+            about a successful payment, information about the payment.
+        bot (Optional[Bot]): The Bot to use for instance methods
 
     Deprecated: 4.0
         new_chat_participant (:class:`telegram.User`): Use `new_chat_member`
@@ -72,39 +103,6 @@ class Message(TelegramObject):
         left_chat_participant  (:class:`telegram.User`): Use `left_chat_member`
         instead.
 
-    Args:
-        message_id (int):
-        from_user (:class:`telegram.User`):
-        date (:class:`datetime.datetime`):
-        chat (:class:`telegram.Chat`):
-        forward_from (Optional[:class:`telegram.User`]):
-        forward_from_chat (Optional[:class:`telegram.Chat`]):
-        forward_from_message_id (Optional[int]):
-        forward_date (Optional[:class:`datetime.datetime`]):
-        reply_to_message (Optional[:class:`telegram.Message`]):
-        edit_date (Optional[:class:`datetime.datetime`]):
-        text (Optional[str]):
-        audio (Optional[:class:`telegram.Audio`]):
-        document (Optional[:class:`telegram.Document`]):
-        game (Optional[:class:`telegram.Game`]):
-        photo (Optional[List[:class:`telegram.PhotoSize`]]):
-        sticker (Optional[:class:`telegram.Sticker`]):
-        video (Optional[:class:`telegram.Video`]):
-        voice (Optional[:class:`telegram.Voice`]):
-        caption (Optional[str]):
-        contact (Optional[:class:`telegram.Contact`]):
-        location (Optional[:class:`telegram.Location`]):
-        new_chat_member (Optional[:class:`telegram.User`]):
-        left_chat_member (Optional[:class:`telegram.User`]):
-        new_chat_title (Optional[str]):
-        new_chat_photo (Optional[List[:class:`telegram.PhotoSize`]):
-        delete_chat_photo (Optional[bool]):
-        group_chat_created (Optional[bool]):
-        supergroup_chat_created (Optional[bool]):
-        migrate_to_chat_id (Optional[int]):
-        migrate_from_chat_id (Optional[int]):
-        channel_chat_created (Optional[bool]):
-        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
     def __init__(self,
@@ -141,6 +139,8 @@ class Message(TelegramObject):
                  channel_chat_created=False,
                  pinned_message=None,
                  forward_from_message_id=None,
+                 invoice=None,
+                 successful_payment=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -179,6 +179,8 @@ class Message(TelegramObject):
         self.channel_chat_created = bool(channel_chat_created)
         self.pinned_message = pinned_message
         self.forward_from_message_id = forward_from_message_id
+        self.invoice = invoice
+        self.successful_payment = successful_payment
 
         self.bot = bot
 
@@ -227,6 +229,8 @@ class Message(TelegramObject):
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
+        data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
 
         return Message(bot=bot, **data)
 

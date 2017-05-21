@@ -1758,6 +1758,182 @@ class Bot(TelegramObject):
 
         return [GameHighScore.de_json(hs, self) for hs in result]
 
+    @log
+    @message
+    def send_invoice(self,
+                     chat_id,
+                     title,
+                     description,
+                     payload,
+                     provider_token,
+                     start_parameter,
+                     currency,
+                     prices,
+                     photo_url=None,
+                     photo_size=None,
+                     photo_width=None,
+                     photo_height=None,
+                     need_name=None,
+                     need_phone_number=None,
+                     need_shipping_address=None,
+                     is_flexible=None,
+                     disable_notification=False,
+                     reply_to_message_id=None,
+                     reply_markup=None,
+                     timeout=None,
+                     **kwargs):
+        """
+        Use this method to send invoices.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target private chat
+            title (str): Product name
+            description (str): Product description
+            payload (str): Bot-defined invoice payload, 1-128 bytes. This will not be displayed
+                to the user, use for your internal processes.
+            provider_token (str): Payments provider token, obtained via Botfather
+            start_parameter (str): Unique deep-linking parameter that can be used to generate
+                this invoice when used as a start parameter
+            currency (str): Three-letter ISO 4217 currency code
+            prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a list of components
+                (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+            photo_url (Optional[str]): URL of the product photo for the invoice. Can be a photo of
+                the goods or a marketing image for a service. People like it better when they
+                see what they are paying for.
+            photo_size (Optional[str]): Photo size
+            photo_width (Optional[int]): Photo width
+            photo_height (Optional[int]): Photo height
+            need_name (Optional[bool]): Pass True, if you require the user's full name to complete
+                the order
+            need_phone_number (Optional[bool]): Pass True, if you require the user's phone number
+                to complete the order
+            need_shipping_address (Optional[bool]): Pass True, if you require the user's shipping
+                address to complete the order
+            is_flexible (Optional[bool]): Pass True, if the final price depends on the shipping
+                method
+            disable_notification (Optional[bool]): Sends the message silently. iOS users will not
+                receive a notification, Android users will receive a notification with no sound.
+            reply_to_message_id (Optional[int]): If the message is a reply, ID of the original
+                message.
+            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options.
+                An inlinekeyboard. If empty, one 'Pay total price' button will be shown. If not
+                empty, the first button must be a Pay button.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendInvoice'.format(self.base_url)
+
+        data = {
+            'chat_id': chat_id,
+            'title': title,
+            'description': description,
+            'payload': payload,
+            'provider_token': provider_token,
+            'start_parameter': start_parameter,
+            'currency': currency,
+            'prices': [p.to_dict() for p in prices]
+        }
+
+        if photo_url:
+            data['photo_url'] = photo_url
+        if photo_size:
+            data['photo_size'] = photo_size
+        if photo_width:
+            data['photo_width'] = photo_width
+        if photo_height:
+            data['photo_height'] = photo_height
+        if need_name:
+            data['need_name'] = need_name
+        if need_phone_number:
+            data['need_phone_number'] = need_phone_number
+        if need_shipping_address:
+            data['need_shipping_address'] = need_shipping_address
+        if is_flexible:
+            data['is_flexible'] = is_flexible
+
+        return url, data
+
+    def answer_shipping_query(self,
+                              shipping_query_id,
+                              ok,
+                              shipping_options=None,
+                              error_message=None):
+        """
+        If you sent an invoice requesting a shipping address and the parameter is_flexible was
+        specified, the Bot API will send an Update with a shipping_query field to the bot. Use
+        this method to reply to shipping queries.
+
+        Args:
+            shipping_query_id (str): Unique identifier for the query to be answered
+            ok (bool): Specify True if delivery to the specified address is possible and False if
+                there are any problems (for example, if delivery to the specified address
+                is not possible)
+            shipping_options (List[:class:`telegram.ShippingOption`]): Required if ok is True. A
+                list of available shipping options.
+            error_message (str): Required if ok is False. Error message in human readable form
+                that explains why it is impossible to complete the order (e.g. "Sorry, delivery
+                to your desired address is unavailable'). Telegram will display this message
+                to the user.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0]/answerShippingQuery'.format(self.base_url)
+
+        data = {'shipping_query_id': shipping_query_id, 'ok': ok}
+
+        if shipping_options:
+            data['shipping_options'] = shipping_options
+        if error_message:
+            data['error_message'] = error_message
+
+        return url, data
+
+    def answer_pre_checkout_query(self, pre_checkout_query_id, ok, error_message=None):
+        """
+        If you sent an invoice requesting a shipping address and the parameter is_flexible was
+        specified, the Bot API will send an Update with a shipping_query field to the bot.
+        Use this method to reply to shipping queries.
+
+        Args:
+            pre_checkout_query_id (str): Unique identifier for the query to be answered
+            ok (bool): Specify True if everything is alright (goods are available, etc.) and the
+                bot is ready to proceed with the order. Use False if there are any problems.
+            error_message (str): Required if ok is False. Error message in human readable form that
+                explains the reason for failure to proceed with the checkout (e.g. "Sorry, somebody
+                just bought the last of our amazing black T-shirts while you were busy filling out
+                your payment details. Please choose a different color or garment!"). Telegram will
+                display this message to the user.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0]/answerPreCheckoutQuery'.format(self.base_url)
+
+        data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
+
+        if error_message:
+            data['error_message'] = error_message
+
+        return url, data
+
     @staticmethod
     def de_json(data, bot):
         data = super(Bot, Bot).de_json(data, bot)
@@ -1812,3 +1988,6 @@ class Bot(TelegramObject):
     getWebhookInfo = get_webhook_info
     setGameScore = set_game_score
     getGameHighScores = get_game_high_scores
+    sendInvoice = send_invoice
+    answerShippingQuery = answer_shipping_query
+    answerPreCheckoutQuery = answer_pre_checkout_query
