@@ -415,6 +415,23 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.sendVideo(self.chat_id, *args, **kwargs)
 
+    def reply_video_note(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.send_video_note(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+
+        self._quote(kwargs)
+        return self.bot.send_video_note(self.chat_id, *args, **kwargs)
+
     def reply_voice(self, *args, **kwargs):
         """
         Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``
