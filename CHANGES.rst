@@ -2,6 +2,13 @@
 Changes
 =======
 
+**2017-05-21**
+
+*Released 6.0.1*
+
+- Add support for ``User.language_code``
+- Fix ``Message.text_html`` and ``Message.text_markdown`` for messages with emoji
+
 **2017-05-19**
 
 *Released 6.0.0*
