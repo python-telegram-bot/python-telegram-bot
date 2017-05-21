@@ -63,17 +63,17 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         # It would also seem that it is in fact a required parameter, so the original test below
         # fails. Therefore I decided I check for the error instead - that way we'll also know
         # when telegram fixes their shit
-        with self.assertRaisesRegex(telegram.error.BadRequest, r'Wrong video note length'):
+        with self.assertRaisesRegexp(telegram.error.BadRequest, r'Wrong video note length'):
             message = self._bot.sendVideoNote(self._chat_id, self.videonote_file, timeout=10)
 
-# videonote = message.videonote
-#
-# self.assertTrue(isinstance(videonote.file_id, str))
-# self.assertNotEqual(videonote.file_id, None)
-# self.assertEqual(videonote.duration, self.duration)
-# self.assertEqual(videonote.length, self.length)
-# self.assertEqual(videonote.thumb, self.thumb)
-# self.assertEqual(videonote.file_size, self.file_size)
+        # videonote = message.videonote
+        #
+        # self.assertTrue(isinstance(videonote.file_id, str))
+        # self.assertNotEqual(videonote.file_id, None)
+        # self.assertEqual(videonote.duration, self.duration)
+        # self.assertEqual(videonote.length, self.length)
+        # self.assertEqual(videonote.thumb, self.thumb)
+        # self.assertEqual(videonote.file_size, self.file_size)
 
     @flaky(3, 1)
     @timeout(10)
