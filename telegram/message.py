@@ -628,6 +628,9 @@ class Message(TelegramObject):
         """
         entities = self.parse_entities()
         message_text = self.text
+        if not sys.maxunicode == 0xffff:
+            message_text = message_text.encode('utf-16-le')
+
         markdown_text = ''
         last_offset = 0
 
@@ -647,10 +650,18 @@ class Message(TelegramObject):
             else:
                 insert = text
 
-            markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
+            if sys.maxunicode == 0xffff:
+                markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
+            else:
+                markdown_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
+                                             .decode('utf-16-le')) + insert
+
             last_offset = entity.offset + entity.length
 
-        markdown_text += escape_html(message_text[last_offset:])
+        if sys.maxunicode == 0xffff:
+            markdown_text += escape_html(message_text[last_offset:])
+        else:
+            markdown_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
 
     @property
@@ -667,6 +678,9 @@ class Message(TelegramObject):
         """
         entities = self.parse_entities()
         message_text = self.text
+        if not sys.maxunicode == 0xffff:
+            message_text = message_text.encode('utf-16-le')
+
         markdown_text = ''
         last_offset = 0
 
@@ -685,9 +699,16 @@ class Message(TelegramObject):
                 insert = '```' + text + '```'
             else:
                 insert = text
+            if sys.maxunicode == 0xffff:
+                markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
+            else:
+                markdown_text += escape_markdown(message_text[last_offset * 2:entity.offset * 2]
+                                                 .decode('utf-16-le')) + insert
 
-            markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
             last_offset = entity.offset + entity.length
 
-        markdown_text += escape_markdown(message_text[last_offset:])
+        if sys.maxunicode == 0xffff:
+            markdown_text += escape_markdown(message_text[last_offset:])
+        else:
+            markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
