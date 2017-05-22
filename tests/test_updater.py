@@ -125,7 +125,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.message_count += 1
 
     def telegramPreCheckoutHandlerTest(self, bot, update):
-        self.received_message = update.pre_checkout_query_query
+        self.received_message = update.pre_checkout_query
         self.message_count += 1
 
     @run_async
