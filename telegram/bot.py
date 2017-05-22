@@ -1953,11 +1953,22 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+
+        if ok is True and (shipping_options is None or error_message is not None):
+            raise TelegramError(
+                'answerShippingQuery: If ok is True, shipping_options '
+                'should not be empty and there should not be error_message')
+
+        if ok is False and (shipping_options is not None or error_message is None):
+            raise TelegramError(
+                'answerShippingQuery: If ok is False, error_message '
+                'should not be empty and there should not be shipping_options')
+
         url = '{0}/answerShippingQuery'.format(self.base_url)
 
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
-        if shipping_options:
+        if ok is True:
             data['shipping_options'] = shipping_options
         if error_message:
             data['error_message'] = error_message
@@ -1989,6 +2000,13 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+
+        if (ok is not True and error_message is None) or (ok is True and error_message is not None):
+            raise TelegramError(
+                'answerPreCheckoutQuery: If ok is True, there should '
+                'not be error_message; if ok is False, error_message '
+                'should not be empty')
+
         url = '{0}/answerPreCheckoutQuery'.format(self.base_url)
 
         data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
