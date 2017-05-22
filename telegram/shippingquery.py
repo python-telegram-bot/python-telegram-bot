@@ -73,3 +73,7 @@ class ShippingQuery(TelegramObject):
         data['from'] = data.pop('from_user', None)
 
         return data
+
+    def answer(self, *args, **kwargs):
+        """Shortcut for ``bot.answerShippingQuery(update.shipping_query.id, *args, **kwargs)``"""
+        return self.bot.answerShippingQuery(self.id, *args, **kwargs)

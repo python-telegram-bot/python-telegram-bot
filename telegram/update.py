@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult, CallbackQuery)
+from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
+                      CallbackQuery, ShippingQuery, PreCheckoutQuery)
 
 
 class Update(TelegramObject):
@@ -31,6 +32,8 @@ class Update(TelegramObject):
         edited_message (:class:`telegram.Message`): New version of a message that is known to the
             bot and was edited
         inline_query (:class:`telegram.InlineQuery`): New incoming inline query.
+        shipping_query (:class:`telegram.ShippingQuery`): New incoming shipping query.
+        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): New incoming pre-checkout query.
         chosen_inline_result (:class:`telegram.ChosenInlineResult`): The result of an inline query
             that was chosen by a user and sent to their chat partner.
         callback_query (:class:`telegram.CallbackQuery`): New incoming callback query.
@@ -46,6 +49,8 @@ class Update(TelegramObject):
         inline_query (Optional[:class:`telegram.InlineQuery`]):
         chosen_inline_result (Optional[:class:`telegram.ChosenInlineResult`])
         callback_query (Optional[:class:`telegram.CallbackQuery`]):
+        shipping_query (Optional[:class:`telegram.ShippingQuery`]):
+        pre_checkout_query (Optional[:class:`telegram.PreCheckoutQuery`]):
         channel_post (Optional[:class:`telegram.Message`]):
         edited_channel_post (Optional[:class:`telegram.Message`]):
         **kwargs: Arbitrary keyword arguments.
@@ -59,6 +64,8 @@ class Update(TelegramObject):
                  inline_query=None,
                  chosen_inline_result=None,
                  callback_query=None,
+                 shipping_query=None,
+                 pre_checkout_query=None,
                  channel_post=None,
                  edited_channel_post=None,
                  **kwargs):
@@ -70,6 +77,8 @@ class Update(TelegramObject):
         self.inline_query = inline_query
         self.chosen_inline_result = chosen_inline_result
         self.callback_query = callback_query
+        self.shipping_query = shipping_query
+        self.pre_checkout_query = pre_checkout_query
         self.channel_post = channel_post
         self.edited_channel_post = edited_channel_post
 
@@ -100,6 +109,8 @@ class Update(TelegramObject):
         data['chosen_inline_result'] = ChosenInlineResult.de_json(
             data.get('chosen_inline_result'), bot)
         data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
+        data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
+        data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)
         data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
         data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
 
@@ -131,6 +142,12 @@ class Update(TelegramObject):
 
         elif self.callback_query:
             user = self.callback_query.from_user
+
+        elif self.shipping_query:
+            user = self.shipping_query.from_user
+
+        elif self.pre_checkout_query:
+            user = self.pre_checkout_query.from_user
 
         self._effective_user = user
         return user
