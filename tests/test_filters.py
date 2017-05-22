@@ -120,7 +120,7 @@ class FiltersTest(BaseTest, unittest.TestCase):
 
     def test_filters_successful_payment(self):
         self.message.successful_payment = 'test'
-        self.asserTrue(Filters.successful_payment(self.message))
+        self.assertTrue(Filters.successful_payment(self.message))
         self.message.successful_payment = None
         self.assertFalse(Filters.successful_payment(self.message))
 
