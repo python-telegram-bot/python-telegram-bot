@@ -33,8 +33,11 @@ from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
 from .conversationhandler import ConversationHandler
+from .precheckoutqueryhandler import PreCheckoutQueryHandler
+from .shippingqueryhandler import ShippingQueryHandler
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
            'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
-           'StringRegexHandler', 'TypeHandler', 'ConversationHandler')
+           'StringRegexHandler', 'TypeHandler', 'ConversationHandler',
+           'PreCheckoutQueryHandler', 'ShippingQueryHandler')
