@@ -15,6 +15,8 @@ class Botan(object):
     token = ''
     url_template = 'https://api.botan.io/track?token={token}' \
                    '&uid={uid}&name={name}&src=python-telegram-bot'
+    shorten_template = 'https://api.botan.io/s?token={token}' \
+                       '&user_ids={user_ids}&url={url}&src=python-telegram-bot'
 
     def __init__(self, token):
         self.token = token
@@ -41,3 +43,23 @@ class Botan(object):
         except URLError as error:
             self.logger.warn('Botan track error ' + str(error.reason))
             return False
+
+    def shorten(self, url, user_id):
+        if not (url.startswith('http://') or url.startswith('https://')):
+            url = 'http://' + url
+        try:
+            url2 = self.shorten_template.format(token=str(self.token),
+                                                user_ids=str(user_id),
+                                                url=str(url))
+            request = Request(url2,
+                              headers={'Content-Type': 'application/json'})
+            with urlopen(request) as response:
+                shortened_url = response.read()
+            return shortened_url.decode('utf-8')
+        except HTTPError as error:
+            self.logger.warn('Botan track error ' + str(error.code) + ':' + error.read().decode(
+                'utf-8'))
+            return None
+        except URLError as error:
+            self.logger.warn('Botan track error ' + str(error.reason))
+            return None
