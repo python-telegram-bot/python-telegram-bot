@@ -238,6 +238,13 @@ class Filters(object):
 
     game = _Game()
 
+    class _ShippingQuery(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.shipping_query)
+
+    shipping_query = _ShippingQuery()
+
     class entity(BaseFilter):
         """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.
