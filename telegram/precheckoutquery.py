@@ -90,5 +90,5 @@ class PreCheckoutQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """Shortcut for ``bot.answerPreCheckoutQuery(update.callback_query.id, *args, **kwargs)``"""
+        """Shortcut for ``bot.answerPreCheckoutQuery(update.pre_checkout_query.id, *args, **kwargs)``"""
         return self.bot.answerPreCheckoutQuery(self.id, *args, **kwargs)
