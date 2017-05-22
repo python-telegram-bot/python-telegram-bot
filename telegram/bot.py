@@ -1926,7 +1926,8 @@ class Bot(TelegramObject):
                               shipping_query_id,
                               ok,
                               shipping_options=None,
-                              error_message=None):
+                              error_message=None,
+                              **kwargs):
         """
         If you sent an invoice requesting a shipping address and the parameter is_flexible was
         specified, the Bot API will send an Update with a shipping_query field to the bot. Use
@@ -1943,6 +1944,7 @@ class Bot(TelegramObject):
                 that explains why it is impossible to complete the order (e.g. "Sorry, delivery
                 to your desired address is unavailable'). Telegram will display this message
                 to the user.
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1962,7 +1964,8 @@ class Bot(TelegramObject):
 
         return url, data
 
-    def answer_pre_checkout_query(self, pre_checkout_query_id, ok, error_message=None):
+    def answer_pre_checkout_query(self, pre_checkout_query_id, ok,
+                                  error_message=None, **kwargs):
         """
         If you sent an invoice requesting a shipping address and the parameter is_flexible was
         specified, the Bot API will send an Update with a shipping_query field to the bot.
@@ -1977,6 +1980,7 @@ class Bot(TelegramObject):
                 just bought the last of our amazing black T-shirts while you were busy filling out
                 your payment details. Please choose a different color or garment!"). Telegram will
                 display this message to the user.
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             bool: On success, `True` is returned.
