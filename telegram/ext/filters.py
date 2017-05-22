@@ -263,3 +263,17 @@ class Filters(object):
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
+
+    class _Invoice(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.invoice)
+
+    invoice = _Invoice()
+
+    class _SuccessfulPayment(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.successful_payment)
+
+    successful_payment = _SuccessfulPayment()
