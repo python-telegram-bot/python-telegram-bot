@@ -35,11 +35,13 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    def __init__(self, id, from_user, invoice_payload, shipping_address):
+    def __init__(self, id, from_user, invoice_payload, shipping_address, bot=None, **kwargs):
         self.id = id
         self.from_user = from_user
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
+
+        self.bot = bot
 
         self._id_attrs = (self.id,)
 

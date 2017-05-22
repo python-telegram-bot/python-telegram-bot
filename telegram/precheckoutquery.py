@@ -47,7 +47,9 @@ class PreCheckoutQuery(TelegramObject):
                  total_amount,
                  invoice_payload,
                  shipping_option_id=None,
-                 order_info=None):
+                 order_info=None,
+                 bot=None,
+                 **kwargs):
         self.id = id
         self.from_user = from_user
         self.currency = currency
@@ -55,6 +57,8 @@ class PreCheckoutQuery(TelegramObject):
         self.invoice_payload = invoice_payload
         self.shipping_option_id = shipping_option_id
         self.order_info = order_info
+
+        self.bot = bot
 
         self._id_attrs = (self.id,)
 

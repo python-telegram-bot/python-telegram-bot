@@ -1951,7 +1951,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0]/answerShippingQuery'.format(self.base_url)
+        url = '{0}/answerShippingQuery'.format(self.base_url)
 
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
@@ -1985,7 +1985,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0]/answerPreCheckoutQuery'.format(self.base_url)
+        url = '{0}/answerPreCheckoutQuery'.format(self.base_url)
 
         data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
 
