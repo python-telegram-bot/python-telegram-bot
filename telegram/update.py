@@ -147,7 +147,7 @@ class Update(TelegramObject):
             user = self.shipping_query.from_user
 
         elif self.pre_checkout_query:
-            user = self.pre_checkout_query
+            user = self.pre_checkout_query.from_user
 
         self._effective_user = user
         return user
