@@ -1835,6 +1835,7 @@ class Bot(TelegramObject):
                      photo_height=None,
                      need_name=None,
                      need_phone_number=None,
+                     need_email=None
                      need_shipping_address=None,
                      is_flexible=None,
                      disable_notification=False,
@@ -1867,6 +1868,8 @@ class Bot(TelegramObject):
                 the order
             need_phone_number (Optional[bool]): Pass True, if you require the user's phone number
                 to complete the order
+            need_email (Optional[bool]): Pass True, if you require the user's email to
+                complete the order
             need_shipping_address (Optional[bool]): Pass True, if you require the user's shipping
                 address to complete the order
             is_flexible (Optional[bool]): Pass True, if the final price depends on the shipping
@@ -1915,6 +1918,8 @@ class Bot(TelegramObject):
             data['need_name'] = need_name
         if need_phone_number:
             data['need_phone_number'] = need_phone_number
+        if need_email:
+            data['need_email'] = need_email
         if need_shipping_address:
             data['need_shipping_address'] = need_shipping_address
         if is_flexible:
@@ -2004,7 +2009,8 @@ class Bot(TelegramObject):
 
         """
 
-        if (ok is not True and error_message is None) or (ok is True and error_message is not None):
+        if ((ok is not True and error_message is None) or
+                (ok is True and error_message is not None)):
             raise TelegramError(
                 'answerPreCheckoutQuery: If ok is True, there should '
                 'not be error_message; if ok is False, error_message '
