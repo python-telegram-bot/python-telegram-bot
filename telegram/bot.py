@@ -1835,7 +1835,7 @@ class Bot(TelegramObject):
                      photo_height=None,
                      need_name=None,
                      need_phone_number=None,
-                     need_email=None
+                     need_email=None,
                      need_shipping_address=None,
                      is_flexible=None,
                      disable_notification=False,
