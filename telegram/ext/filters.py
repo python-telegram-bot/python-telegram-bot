@@ -215,7 +215,7 @@ class Filters(object):
     class _StatusUpdate(BaseFilter):
 
         def filter(self, message):
-            return bool(message.new_chat_member or message.left_chat_member
+            return bool(message.new_chat_members or message.left_chat_member
                         or message.new_chat_title or message.new_chat_photo
                         or message.delete_chat_photo or message.group_chat_created
                         or message.supergroup_chat_created or message.channel_chat_created
