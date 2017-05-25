@@ -46,30 +46,11 @@ class InputFile(object):
         self.data = data
         self.boundary = choose_boundary()
 
-        if 'audio' in data:
-            self.input_name = 'audio'
-            self.input_file = data.pop('audio')
-        elif 'document' in data:
-            self.input_name = 'document'
-            self.input_file = data.pop('document')
-        elif 'photo' in data:
-            self.input_name = 'photo'
-            self.input_file = data.pop('photo')
-        elif 'sticker' in data:
-            self.input_name = 'sticker'
-            self.input_file = data.pop('sticker')
-        elif 'video' in data:
-            self.input_name = 'video'
-            self.input_file = data.pop('video')
-        elif 'voice' in data:
-            self.input_name = 'voice'
-            self.input_file = data.pop('voice')
-        elif 'certificate' in data:
-            self.input_name = 'certificate'
-            self.input_file = data.pop('certificate')
-        elif 'video_note' in data:
-            self.input_name = 'video_note'
-            self.input_file = data.pop('video_note')
+        for t in FILE_TYPES:
+            if t in data:
+                self.input_name = t
+                self.input_file = data.pop(t)
+                break
         else:
             raise TelegramError('Unknown inputfile type')
 
@@ -121,7 +102,7 @@ class InputFile(object):
                 form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
             ])
 
-# Add input_file to upload
+        # Add input_file to upload
         form.extend([
             form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' %
             (self.input_name,

@@ -129,7 +129,6 @@ class Message(TelegramObject):
                  sticker=None,
                  video=None,
                  voice=None,
-                 video_note=None,
                  caption=None,
                  contact=None,
                  location=None,
@@ -147,6 +146,7 @@ class Message(TelegramObject):
                  pinned_message=None,
                  forward_from_message_id=None,
                  bot=None,
+                 video_note=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)

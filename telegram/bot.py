@@ -687,9 +687,9 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (int|str): Unique identifier for the message recipient - Chat id.
-            voice: Video note to send. Pass a file_id as String to send a video note that exists
-                on the Telegram servers (recommended) or upload a new video. Sending video notes
-                by a URL is currently unsupported
+            video_note (InputFile|str): Video note to send. Pass a file_id as String to send a
+                video note that exists on the Telegram servers (recommended) or upload a new video.
+                Sending video notes by a URL is currently unsupported
             duration (Optional[int]): Duration of sent audio in seconds.
             length (Optional[int]): Video width and height
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
