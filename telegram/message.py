@@ -24,6 +24,7 @@ from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game)
+from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown
 
 
@@ -168,7 +169,7 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self.new_chat_member = new_chat_member
+        self._new_chat_member = new_chat_member
         self.new_chat_members = new_chat_members
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
@@ -260,6 +261,7 @@ class Message(TelegramObject):
             data['entities'] = [e.to_dict() for e in self.entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
+        data['new_chat_member'] = data.pop('_new_chat_member', None)
         if self.new_chat_members:
             data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
@@ -717,3 +719,8 @@ class Message(TelegramObject):
         else:
             markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
+
+    @property
+    def new_chat_member(self):
+        warn_deprecate_obj('new_chat_member', 'new_chat_members')
+        return self._new_chat_member
