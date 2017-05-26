@@ -713,9 +713,9 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'video_note': video_note}
 
-        if duration:
+        if duration is not None:
             data['duration'] = duration
-        if length:
+        if length is not None:
             data['length'] = length
 
         return self._message_wrapper(
