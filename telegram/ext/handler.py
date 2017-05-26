@@ -26,7 +26,7 @@ class Handler(object):
     by inheriting from this class.
 
     Args:
-        callback (function): A function that takes ``bot, update`` as
+        callback (optional[function]): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``
             has determined that an update should be processed by this handler.
         pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
@@ -48,12 +48,13 @@ class Handler(object):
     """
 
     def __init__(self,
-                 callback,
+                 callback=None,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False):
-        self.callback = callback
+        if callback is not None:
+            self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
