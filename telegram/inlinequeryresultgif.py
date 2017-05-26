@@ -32,6 +32,7 @@ class InlineQueryResultGif(InlineQueryResult):
         thumb_url (str): URL of the static thumbnail for the result (jpeg or gif).
         gif_width (Optional[int]): Width of the GIF.
         gif_height (Optional[int]): Height of the GIF.
+        gif_duration (Optional[int]): Duration of the GIF.
         title (Optional[str]): Title for the result.
         caption	(Optional[str]): Caption of the GIF file to be sent, 0-200 characters.
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
@@ -45,6 +46,7 @@ class InlineQueryResultGif(InlineQueryResult):
         thumb_url (str):
         gif_width (Optional[int]):
         gif_height (Optional[int]):
+        gif_duration (Optional[int]):
         title (Optional[str]):
         caption	(Optional[str]):
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
@@ -63,6 +65,7 @@ class InlineQueryResultGif(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
+                 gif_duration=None,
                  **kwargs):
 
         # Required
@@ -75,6 +78,8 @@ class InlineQueryResultGif(InlineQueryResult):
             self.gif_width = gif_width
         if gif_height:
             self.gif_height = gif_height
+        if gif_duration:
+            self.gif_duration = gif_duration
         if title:
             self.title = title
         if caption:

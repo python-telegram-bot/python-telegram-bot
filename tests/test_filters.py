@@ -121,9 +121,9 @@ class FiltersTest(BaseTest, unittest.TestCase):
     def test_filters_status_update(self):
         self.assertFalse(Filters.status_update(self.message))
 
-        self.message.new_chat_member = 'test'
+        self.message.new_chat_members = ['test']
         self.assertTrue(Filters.status_update(self.message))
-        self.message.new_chat_member = None
+        self.message.new_chat_members = None
 
         self.message.left_chat_member = 'test'
         self.assertTrue(Filters.status_update(self.message))
