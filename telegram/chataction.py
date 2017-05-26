@@ -31,3 +31,5 @@ class ChatAction(object):
     UPLOAD_AUDIO = 'upload_audio'
     UPLOAD_DOCUMENT = 'upload_document'
     FIND_LOCATION = 'find_location'
+    RECORD_VIDEO_NOTE = 'record_video_note'
+    UPLOAD_VIDEO_NOTE = 'upload_video_note'

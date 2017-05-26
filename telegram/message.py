@@ -26,6 +26,7 @@ from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Stick
                       User, Video, Voice, Venue, MessageEntity, Game)
 from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown
+from telegram.videonote import VideoNote
 
 
 class Message(TelegramObject):
@@ -52,6 +53,8 @@ class Message(TelegramObject):
         sticker (:class:`telegram.Sticker`):
         video (:class:`telegram.Video`):
         voice (:class:`telegram.Voice`):
+        video_note (:class:`telegram.VideoNote`): Message is a video note, information about the
+            video message
         caption (str):
         contact (:class:`telegram.Contact`):
         location (:class:`telegram.Location`):
@@ -92,6 +95,7 @@ class Message(TelegramObject):
         sticker (Optional[:class:`telegram.Sticker`]):
         video (Optional[:class:`telegram.Video`]):
         voice (Optional[:class:`telegram.Voice`]):
+        video_note (Optional[:class:`telegram.VideoNote`]):
         caption (Optional[str]):
         contact (Optional[:class:`telegram.Contact`]):
         location (Optional[:class:`telegram.Location`]):
@@ -144,6 +148,7 @@ class Message(TelegramObject):
                  pinned_message=None,
                  forward_from_message_id=None,
                  bot=None,
+                 video_note=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -165,6 +170,7 @@ class Message(TelegramObject):
         self.sticker = sticker
         self.video = video
         self.voice = voice
+        self.video_note = video_note
         self.caption = caption
         self.contact = contact
         self.location = location
@@ -223,6 +229,7 @@ class Message(TelegramObject):
         data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
         data['video'] = Video.de_json(data.get('video'), bot)
         data['voice'] = Voice.de_json(data.get('voice'), bot)
+        data['video_note'] = VideoNote.de_json(data.get('video_note'), bot)
         data['contact'] = Contact.de_json(data.get('contact'), bot)
         data['location'] = Location.de_json(data.get('location'), bot)
         data['venue'] = Venue.de_json(data.get('venue'), bot)
@@ -414,6 +421,23 @@ class Message(TelegramObject):
 
         self._quote(kwargs)
         return self.bot.sendVideo(self.chat_id, *args, **kwargs)
+
+    def reply_video_note(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.send_video_note(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+
+        self._quote(kwargs)
+        return self.bot.send_video_note(self.chat_id, *args, **kwargs)
 
     def reply_voice(self, *args, **kwargs):
         """

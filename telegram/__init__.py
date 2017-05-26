@@ -84,6 +84,7 @@ from .inputvenuemessagecontent import InputVenueMessageContent
 from .inputcontactmessagecontent import InputContactMessageContent
 from .webhookinfo import WebhookInfo
 from .gamehighscore import GameHighScore
+from .videonote import VideoNote
 from .update import Update
 from .bot import Bot
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,
@@ -113,5 +114,5 @@ __all__ = [
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
-    'Game', 'GameHighScore'
+    'Game', 'GameHighScore', 'VideoNote'
 ]
