@@ -34,7 +34,7 @@ class MainMenu(Menu):
 
     def buttons(self):
         return [
-            [Button('Test', menu=SubMenu1), Button('Test2', menu=SubMenu2)],
+            [Button('Test', menu=sub_menu1), Button('Test2', menu=sub_menu2)],
             [Button('Exit', callback=start)]
         ]
 
@@ -45,7 +45,7 @@ class SubMenu1(Menu):
     def buttons(self):
         return [
             # [ToggleButton('Toggleable', 'on'), ToggleButton('Toggleable', 'on')],
-            [Button('Recursion', menu=SubMenu1), Button('Other menu!', menu=SubMenu2)],
+            [Button('Recursion', menu=sub_menu1), Button('Other menu!', menu=sub_menu2)],
             [BackButton('Back')]
         ]
 
@@ -59,8 +59,13 @@ class SubMenu2(Menu):
             [BackButton('Back')]
         ]
 
-dp.add_handler(MenuHandler(MainMenu))
-dp.add_handler(CommandHandler('menu', MainMenu.start, pass_user_data=True, pass_chat_data=True))
+
+main_menu = MainMenu()
+sub_menu1 = SubMenu1()
+sub_menu2 = SubMenu2()
+
+dp.add_handler(MenuHandler(main_menu))
+dp.add_handler(CommandHandler('menu', main_menu.start, pass_user_data=True, pass_chat_data=True))
 
 # Or maybe?
 # dp.add_handler(MenuHandler(MainMenu, entry=CommandHandler('menu'))

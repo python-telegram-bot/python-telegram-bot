@@ -28,14 +28,14 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest
 from telegram.ext import Handler
 
-try:
-    str_type = str
-except NameError:
-    str_type = basestring  # noqa pylint: disable=undefined-variable
+
+def id_from_update(update):
+    if update.callback_query.message:
+        return update.callback_query.message.chat_id, update.callback_query.message.message_id
+    return update.callback_query.inline_message_id
 
 
 class Menu(object):
-    _instance = None
     _buttons = None
     text = ''
     buttons = None
@@ -43,15 +43,8 @@ class Menu(object):
     root_menu = None  # populated in menuhandler
     stack = None  # Only used in root menu assigned in menuhandler
 
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super(Menu, cls).__new__(cls)
-        return cls._instance
-
     def callback(self, bot, update, user_data, chat_data):
-        _id = (update.callback_query.message.chat_id, update.callback_query.message.message_id
-               ) if update.callback_query.message else update.callback_query.inline_message_id
-        self.root_menu().stack[_id].append(self)
+        self.root_menu.stack[id_from_update(update)].append(self)
         try:
             return update.callback_query.edit_message_text(self.get_text(update),
                                                            reply_markup=self.keyboard(user_data,
@@ -62,11 +55,10 @@ class Menu(object):
             else:
                 raise
 
-    @classmethod
-    def start(cls, bot, update, user_data=None, chat_data=None):
+    def start(self, bot, update, user_data=None, chat_data=None):
         # user_ and chat_data is only needed if we wanna do stuff that need state (ie.
         # ToggleButtons)
-        return update.message.reply_text(cls().get_text(update), reply_markup=cls().keyboard(
+        return update.message.reply_text(self.get_text(update), reply_markup=self.keyboard(
             user_data, chat_data))
 
     def keyboard(self, user_data, chat_data):
@@ -109,7 +101,7 @@ class Button(Handler):
             raise RuntimeError
         self.callback = callback
         if menu is not None:
-            self.callback = menu().callback
+            self.callback = menu.callback
             pass_user_data = True
             pass_chat_data = True
         self.menu = menu
@@ -158,15 +150,12 @@ class BackButton(Button):
                                          pass_user_data=True, pass_chat_data=True, name=name)
 
     def _callback(self, bot, update, user_data, chat_data):
-        _id = (update.callback_query.message.chat_id, update.callback_query.message.message_id
-               ) if update.callback_query.message else update.callback_query.inline_message_id
-
-        stack = self.parent_menu().root_menu().stack[_id]
+        stack = self.parent_menu.root_menu.stack[id_from_update(update)]
         try:
             stack.pop()
             last_menu = stack.pop()
         except IndexError:
-            last_menu = self.parent_menu().root_menu()
+            last_menu = self.parent_menu.root_menu
         last_menu.callback(bot, update, user_data, chat_data)
 
 
@@ -186,7 +175,7 @@ class MenuHandler(Handler):
 
     def collect_buttons(self, menu):
         menu.root_menu = self.menu
-        for button in chain.from_iterable(menu().get_buttons()):
+        for button in chain.from_iterable(menu.get_buttons()):
             button.parent_menu = menu
             if button.name not in self.buttons and (button.callback is not None or
                                                     button.menu is not None):
