@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects helps with creating menus for telegram bots."""
 
-# pylint: disable=undefined-variable, not-callable
+# pylint: disable=not-callable
 
 import uuid
+from collections import defaultdict
 from itertools import chain
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -30,7 +31,7 @@ from telegram.ext import Handler
 try:
     str_type = str
 except NameError:
-    str_type = basestring  # noqa
+    str_type = basestring  # noqa pylint: disable=undefined-variable
 
 
 class Menu(object):
@@ -39,6 +40,8 @@ class Menu(object):
     text = ''
     buttons = None
     data = {}
+    root_menu = None  # populated in menuhandler
+    stack = None  # Only used in root menu assigned in menuhandler
 
     def __new__(cls):
         if not cls._instance:
@@ -46,6 +49,9 @@ class Menu(object):
         return cls._instance
 
     def callback(self, bot, update, user_data, chat_data):
+        _id = (update.callback_query.message.chat_id, update.callback_query.message.message_id
+               ) if update.callback_query.message else update.callback_query.inline_message_id
+        self.root_menu().stack[_id].append(self)
         try:
             return update.callback_query.edit_message_text(self.get_text(update),
                                                            reply_markup=self.keyboard(user_data,
@@ -70,7 +76,7 @@ class Menu(object):
     def get_buttons(self):
         if self._buttons is None:
             if callable(self.buttons):
-                self._buttons = self.buttons()
+                self._buttons = self.buttons()  # noqa
             else:
                 self._buttons = self.buttons
         return self._buttons
@@ -119,6 +125,7 @@ class Button(Handler):
             self.name = str(uuid.uuid4())
 
         self.parent_menu = None
+        self.root_menu = None
 
         super(Button, self).__init__(
             pass_update_queue=pass_update_queue,
@@ -145,11 +152,31 @@ class Button(Handler):
         return self._text
 
 
+class BackButton(Button):
+    def __init__(self, text, name=None):
+        super(BackButton, self).__init__(text, callback=self._callback,
+                                         pass_user_data=True, pass_chat_data=True, name=name)
+
+    def _callback(self, bot, update, user_data, chat_data):
+        _id = (update.callback_query.message.chat_id, update.callback_query.message.message_id
+               ) if update.callback_query.message else update.callback_query.inline_message_id
+
+        stack = self.parent_menu().root_menu().stack[_id]
+        try:
+            stack.pop()
+            last_menu = stack.pop()
+        except IndexError:
+            last_menu = self.parent_menu().root_menu()
+        last_menu.callback(bot, update, user_data, chat_data)
+
+
 class MenuHandler(Handler):
     def __init__(self, menu):
         self.menu = menu
         self.buttons = {}
         self.collect_buttons(self.menu)
+
+        menu.stack = defaultdict(list)
 
         super(MenuHandler, self).__init__(
             pass_update_queue=None,
@@ -158,6 +185,7 @@ class MenuHandler(Handler):
             pass_chat_data=None)
 
     def collect_buttons(self, menu):
+        menu.root_menu = self.menu
         for button in chain.from_iterable(menu().get_buttons()):
             button.parent_menu = menu
             if button.name not in self.buttons and (button.callback is not None or

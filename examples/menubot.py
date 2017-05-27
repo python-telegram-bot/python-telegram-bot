@@ -8,14 +8,14 @@ import logging
 
 import telegram.ext
 from telegram.ext import CommandHandler
-from telegram.ext.menu import Menu, MenuHandler, Button
+from telegram.ext.menu import Menu, MenuHandler, Button, BackButton
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
-updater = telegram.ext.Updater('TOKEN')
+updater = telegram.ext.Updater('225497476:AAGzbYE3aAYJFmOtRNqIL0qEBisdzx2xdSc')
 dp = updater.dispatcher
 
 
@@ -46,7 +46,7 @@ class SubMenu1(Menu):
         return [
             # [ToggleButton('Toggleable', 'on'), ToggleButton('Toggleable', 'on')],
             [Button('Recursion', menu=SubMenu1), Button('Other menu!', menu=SubMenu2)],
-            [Button('Back to main menu', menu=MainMenu)]  # [BackButton('Back')]
+            [BackButton('Back')]
         ]
 
 
@@ -56,7 +56,7 @@ class SubMenu2(Menu):
     buttons = [
             [Button('Start', start), Button('URL', url='https://google.com')],
             # [RadioButton('Option1', 1, group=1), RadioButton('Option2', 2, group=1)],
-            [Button('Back to main menu', menu=MainMenu)]  # [BackButton('Back')]
+            [BackButton('Back')]
         ]
 
 dp.add_handler(MenuHandler(MainMenu))
