@@ -8,7 +8,7 @@ import logging
 
 import telegram.ext
 from telegram.ext import CommandHandler
-from telegram.ext.menu import Menu, MenuHandler, Button, BackButton
+from telegram.ext.menu import Menu, MenuHandler, Button, BackButton, ToggleButton, RadioButton
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
@@ -28,6 +28,11 @@ def start(bot, update):
     update.effective_message.reply_text('Hello!')
 
 
+def submit(bot, update, menu_data):
+    update.callback_query.answer()
+    update.effective_message.reply_text(str(menu_data))
+
+
 class MainMenu(Menu):
     def text(self, update):
         return 'Hello {}. This is the main menu!'.format(update.effective_user.first_name)
@@ -44,7 +49,7 @@ class SubMenu1(Menu):
 
     def buttons(self):
         return [
-            # [ToggleButton('Toggleable', 'on'), ToggleButton('Toggleable', 'on')],
+            [Button('URL', url='https://google.com')],
             [Button('Recursion', menu=sub_menu1), Button('Other menu!', menu=sub_menu2)],
             [BackButton('Back')]
         ]
@@ -54,9 +59,23 @@ class SubMenu2(Menu):
     text = 'This is sub menu 2'
 
     buttons = [
-            [Button('Start', start), Button('URL', url='https://google.com')],
-            # [RadioButton('Option1', 1, group=1), RadioButton('Option2', 2, group=1)],
-            [BackButton('Back')]
+            [
+                ToggleButton('test', 'Test'),
+                ToggleButton('count', states=((1, '1'), (2, '2'), (3, '3')), default=2)
+            ],
+            [
+                RadioButton('options', 1, 'Option 1'),
+                RadioButton('options', 2, 'Option 2', enabled=True),
+                RadioButton('options', 3, 'Option 3')
+            ],
+            [
+                RadioButton('custom', 1, ('[ ] Custom', '[x] Custom')),
+                RadioButton('custom', 2, ('[ ] Custom 2', '[x] Custom 2'), enabled=True)
+            ],
+            [
+                Button('Submit', submit, pass_menu_data=True),
+                BackButton('Back')
+            ]
         ]
 
 
@@ -65,7 +84,7 @@ sub_menu1 = SubMenu1()
 sub_menu2 = SubMenu2()
 
 dp.add_handler(MenuHandler(main_menu))
-dp.add_handler(CommandHandler('menu', main_menu.start, pass_user_data=True, pass_chat_data=True))
+dp.add_handler(CommandHandler('menu', main_menu.start))
 
 # Or maybe?
 # dp.add_handler(MenuHandler(MainMenu, entry=CommandHandler('menu'))
