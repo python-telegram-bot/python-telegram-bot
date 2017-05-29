@@ -4,6 +4,12 @@ Changes
 
 **2017-05-29**
 
+*Released 6.0.3*
+
+- Faulty PyPI release
+
+**2017-05-29**
+
 *Released 6.0.2*
 
 - Avoid confusion with user's ``urllib3`` by renaming vendored ``urllib3`` to ``ptb_urllib3``
