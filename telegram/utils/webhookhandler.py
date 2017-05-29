@@ -90,6 +90,12 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
             self.server.update_queue.put(update)
+    
+    def log_message(self, format, *args):
+        # The client ip address and current date and time are prefixed 
+        # to every message logged by original function 
+        self.logger.debug(('%s - - ' + format) % (client_address[0], args))
+        return
 
     def _validate_post(self):
         if not (self.path == self.server.webhook_path and 'content-type' in self.headers and
