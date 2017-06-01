@@ -272,9 +272,10 @@ class Filters(object):
         pinned_message = _PinnedMessage()
 
         def filter(self, message):
-            return (self.new_chat_members | self.left_chat_member | self.new_chat_title |
-                    self.new_chat_photo | self.delete_chat_photo | self.chat_created |
-                    self.migrate | self.pinned_message)(message)
+            return bool(self.new_chat_members(message) or self.left_chat_member(message) or
+                        self.new_chat_title(message) or self.new_chat_photo(message) or
+                        self.delete_chat_photo(message) or self.chat_created(message) or
+                        self.migrate(message) or self.pinned_message(message))
 
     status_update = _StatusUpdate()
 
