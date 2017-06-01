@@ -31,10 +31,11 @@ class ShippingAddress(TelegramObject):
         street_line1 (str): First line for the address
         street_line2 (str): Second line for the address
         post_code (str): Address post code
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, country_code, state, city, street_line1, street_line2, post_code):
+    def __init__(self, country_code, state, city, street_line1, street_line2, post_code, **kwargs):
         self.country_code = country_code
         self.state = state
         self.city = city

@@ -28,14 +28,15 @@ class ShippingQuery(TelegramObject):
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (int): Unique query identifier
+        id (str): Unique query identifier
         from_user (:class:`telegram.User`): User who sent the query
         invoice_payload (str): Bot specified invoice payload
         shipping_address (:class:`telegram.ShippingQuery`): User specified shipping address
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, id, from_user, invoice_payload, shipping_address):
+    def __init__(self, id, from_user, invoice_payload, shipping_address, **kwargs):
         self.id = id
         self.from_user = from_user
         self.invoice_payload = invoice_payload
