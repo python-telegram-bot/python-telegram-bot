@@ -317,7 +317,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(text, fwdmsg.text)
         self.assertEqual(fwdmsg.forward_from_message_id, msg.message_id)
 
-    @flaky(3, 1)
+    @flaky(20, 1)
     @timeout(10)
     def test_set_webhook_get_webhook_info(self):
         url = 'https://python-telegram-bot.org/test/webhook'
