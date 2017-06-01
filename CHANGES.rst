@@ -86,6 +86,7 @@ Changes
 
 - Rework ``JobQueue``
 - Introduce ``ConversationHandler``
+- Introduce ``telegram.constants`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/342
 
 **2016-07-12**
 
