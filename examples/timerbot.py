@@ -35,7 +35,7 @@ def start(bot, update):
 
 def alarm(bot, job):
     """Function to send the alarm message"""
-    bot.sendMessage(job.context, text='Beep!')
+    bot.send_message(job.context, text='Beep!')
 
 
 def set(bot, update, args, job_queue, chat_data):
@@ -49,9 +49,8 @@ def set(bot, update, args, job_queue, chat_data):
             return
 
         # Add job to queue
-        job = Job(alarm, due, repeat=False, context=chat_id)
+        job = job_queue.run_once(alarm, due, context=chat_id)
         chat_data['job'] = job
-        job_queue.put(job)
 
         update.message.reply_text('Timer successfully set!')
 

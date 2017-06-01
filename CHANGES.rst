@@ -2,6 +2,40 @@
 Changes
 =======
 
+**2017-05-29**
+
+*Released 6.0.2*
+
+- Avoid confusion with user's ``urllib3`` by renaming vendored ``urllib3`` to ``ptb_urllib3``
+
+**2017-05-19**
+
+*Released 6.0.1*
+
+- Add support for ``User.language_code``
+- Fix ``Message.text_html`` and ``Message.text_markdown`` for messages with emoji
+
+**2017-05-19**
+
+*Released 6.0.0*
+
+- Add support for Bot API 2.3.1
+- Add support for ``deleteMessage`` API method
+- New, simpler API for ``JobQueue`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/484
+- Download files into file-like objects - https://github.com/python-telegram-bot/python-telegram-bot/pull/459
+- Use vendor ``urllib3`` to address issues with timeouts
+  - The default timeout for messages is now 5 seconds. For sending media, the default timeout is now 20 seconds.
+- String attributes that are not set are now ``None`` by default, instead of empty strings
+- Add ``text_markdown`` and ``text_html`` properties to ``Message`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/507
+- Add support for Socks5 proxy - https://github.com/python-telegram-bot/python-telegram-bot/pull/518
+- Add support for filters in ``CommandHandler`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/536
+- Add the ability to invert (not) filters - https://github.com/python-telegram-bot/python-telegram-bot/pull/552
+- Add ``Filters.group`` and ``Filters.private``
+- Compatibility with GAE via ``urllib3.contrib`` package - https://github.com/python-telegram-bot/python-telegram-bot/pull/583
+- Add equality rich comparision operators to telegram objects - https://github.com/python-telegram-bot/python-telegram-bot/pull/604
+- Several bugfixes and other improvements
+- Remove some deprecated code
+
 **2017-04-17**
 
 *Released 5.3.1*
@@ -52,6 +86,7 @@ Changes
 
 - Rework ``JobQueue``
 - Introduce ``ConversationHandler``
+- Introduce ``telegram.constants`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/342
 
 **2016-07-12**
 

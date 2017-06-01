@@ -21,8 +21,18 @@
 import warnings
 
 
-def warn_deprecate_obj(old, new):
-    warnings.warn('{0} is being deprecated, please use {1} from now on'.format(old, new))
+# We use our own DeprecationWarning since they are muted by default and "UserWarning" makes it
+# seem like it's the user that issued the warning
+# We name it something else so that you don't get confused when you attempt to suppress it
+class TelegramDeprecationWarning(Warning):
+    pass
+
+
+def warn_deprecate_obj(old, new, stacklevel=3):
+    warnings.warn(
+        '{0} is being deprecated, please use {1} from now on.'.format(old, new),
+        category=TelegramDeprecationWarning,
+        stacklevel=stacklevel)
 
 
 def deprecate(func, old, new):

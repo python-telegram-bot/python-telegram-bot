@@ -98,15 +98,45 @@ class MessageTest(BaseTest, unittest.TestCase):
                              {entity: 'http://google.com',
                               entity_2: 'h'})
 
-    def test_text_html(self):
+    def test_text_html_simple(self):
         test_html_string = 'Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, <a href="http://github.com/">links</a> and <pre>pre</pre>.'
         text_html = self.test_message.text_html
         self.assertEquals(test_html_string, text_html)
 
-    def test_text_markdown(self):
+    def test_text_markdown_simple(self):
         test_md_string = 'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and ```pre```.'
         text_markdown = self.test_message.text_markdown
         self.assertEquals(test_md_string, text_markdown)
+
+    def test_text_html_emoji(self):
+        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d ABC').decode('unicode-escape')
+        expected = (b'\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>').decode('unicode-escape')
+        bold_entity = telegram.MessageEntity(type=telegram.MessageEntity.BOLD, offset=7, length=3)
+        message = telegram.Message(
+            message_id=1, from_user=None, date=None, chat=None, text=text, entities=[bold_entity])
+        self.assertEquals(expected, message.text_html)
+
+    def test_text_markdown_emoji(self):
+        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d ABC').decode('unicode-escape')
+        expected = (b'\\U0001f469\\u200d\\U0001f469\\u200d *ABC*').decode('unicode-escape')
+        bold_entity = telegram.MessageEntity(type=telegram.MessageEntity.BOLD, offset=7, length=3)
+        message = telegram.Message(
+            message_id=1, from_user=None, date=None, chat=None, text=text, entities=[bold_entity])
+        self.assertEquals(expected, message.text_markdown)
+
+    def test_parse_entities_url_emoji(self):
+        url = b'http://github.com/?unicode=\\u2713\\U0001f469'.decode('unicode-escape')
+        text = 'some url'
+        link_entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=0, length=8, url=url)
+        message = telegram.Message(
+            message_id=1,
+            from_user=None,
+            date=None,
+            chat=None,
+            text=text,
+            entities=[link_entity])
+        self.assertDictEqual(message.parse_entities(), {link_entity: text})
+        self.assertEqual(next(iter(message.parse_entities())).url, url)
 
     @flaky(3, 1)
     def test_reply_text(self):

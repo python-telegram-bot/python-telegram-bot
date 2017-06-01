@@ -121,48 +121,59 @@ class FiltersTest(BaseTest, unittest.TestCase):
     def test_filters_status_update(self):
         self.assertFalse(Filters.status_update(self.message))
 
-        self.message.new_chat_member = 'test'
+        self.message.new_chat_members = ['test']
         self.assertTrue(Filters.status_update(self.message))
-        self.message.new_chat_member = None
+        self.assertTrue(Filters.status_update.new_chat_members(self.message))
+        self.message.new_chat_members = None
 
         self.message.left_chat_member = 'test'
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.left_chat_member(self.message))
         self.message.left_chat_member = None
 
         self.message.new_chat_title = 'test'
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.new_chat_title(self.message))
         self.message.new_chat_title = ''
 
         self.message.new_chat_photo = 'test'
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.new_chat_photo(self.message))
         self.message.new_chat_photo = None
 
         self.message.delete_chat_photo = True
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.delete_chat_photo(self.message))
         self.message.delete_chat_photo = False
 
         self.message.group_chat_created = True
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.chat_created(self.message))
         self.message.group_chat_created = False
 
         self.message.supergroup_chat_created = True
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.chat_created(self.message))
         self.message.supergroup_chat_created = False
 
         self.message.migrate_to_chat_id = 100
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.migrate(self.message))
         self.message.migrate_to_chat_id = 0
 
         self.message.migrate_from_chat_id = 100
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.migrate(self.message))
         self.message.migrate_from_chat_id = 0
 
         self.message.channel_chat_created = True
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.chat_created(self.message))
         self.message.channel_chat_created = False
 
         self.message.pinned_message = 'test'
         self.assertTrue(Filters.status_update(self.message))
+        self.assertTrue(Filters.status_update.pinned_message(self.message))
         self.message.pinned_message = None
 
     def test_entities_filter(self):
@@ -273,6 +284,32 @@ class FiltersTest(BaseTest, unittest.TestCase):
 
         with self.assertRaises(NotImplementedError):
             (custom & Filters.text)(self.message)
+
+    def test_language_filter_single(self):
+        self.message.from_user.language_code = 'en_US'
+        self.assertTrue((Filters.language('en_US'))(self.message))
+        self.assertTrue((Filters.language('en'))(self.message))
+        self.assertFalse((Filters.language('en_GB'))(self.message))
+        self.assertFalse((Filters.language('da'))(self.message))
+        self.message.from_user.language_code = 'en_GB'
+        self.assertFalse((Filters.language('en_US'))(self.message))
+        self.assertTrue((Filters.language('en'))(self.message))
+        self.assertTrue((Filters.language('en_GB'))(self.message))
+        self.assertFalse((Filters.language('da'))(self.message))
+        self.message.from_user.language_code = 'da'
+        self.assertFalse((Filters.language('en_US'))(self.message))
+        self.assertFalse((Filters.language('en'))(self.message))
+        self.assertFalse((Filters.language('en_GB'))(self.message))
+        self.assertTrue((Filters.language('da'))(self.message))
+
+    def test_language_filter_multiple(self):
+        f = Filters.language(['en_US', 'da'])
+        self.message.from_user.language_code = 'en_US'
+        self.assertTrue(f(self.message))
+        self.message.from_user.language_code = 'en_GB'
+        self.assertFalse(f(self.message))
+        self.message.from_user.language_code = 'da'
+        self.assertTrue(f(self.message))
 
 
 if __name__ == '__main__':

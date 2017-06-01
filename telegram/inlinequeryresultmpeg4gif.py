@@ -32,6 +32,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         thumb_url (str): URL of the static thumbnail (jpeg or gif) for the result.
         mpeg4_width (Optional[int]): Video width.
         mpeg4_height (Optional[int]): Video height.
+        mpeg4_duration (Optional[int]): Video duration
         title (Optional[str]): Title for the result.
         caption	(Optional[str]): Caption of the MPEG-4 file to be sent, 0-200 characters.
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
@@ -44,6 +45,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         thumb_url (str): URL of the static thumbnail (jpeg or gif) for the result.
         mpeg4_width (Optional[int]): Video width.
         mpeg4_height (Optional[int]): Video height.
+        mpeg4_duration (Optional[int]): Video duration
         title (Optional[str]): Title for the result.
         caption	(Optional[str]): Caption of the MPEG-4 file to be sent, 0-200 characters.
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
@@ -64,6 +66,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
+                 mpeg4_duration=None,
                  **kwargs):
 
         # Required
@@ -76,6 +79,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             self.mpeg4_width = mpeg4_width
         if mpeg4_height:
             self.mpeg4_height = mpeg4_height
+        if mpeg4_duration:
+            self.mpeg4_duration = mpeg4_duration
         if title:
             self.title = title
         if caption:

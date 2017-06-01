@@ -56,7 +56,7 @@ def gender(bot, update):
 
 def photo(bot, update):
     user = update.message.from_user
-    photo_file = bot.getFile(update.message.photo[-1].file_id)
+    photo_file = bot.get_file(update.message.photo[-1].file_id)
     photo_file.download('user_photo.jpg')
     logger.info("Photo of %s: %s" % (user.first_name, 'user_photo.jpg'))
     update.message.reply_text('Gorgeous! Now, send me your location please, '

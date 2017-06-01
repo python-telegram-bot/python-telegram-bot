@@ -84,7 +84,13 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **4. Dec 2016**, all types and methods of the Telegram Bot API are supported.
+As of **21. May 2017**, all types and methods of the Telegram Bot API 2.3.1 are supported. Additionally, the ``deleteMessage`` API function and the field ``User.language_code`` are supported.
+
+Also, version 6.1 beta 0 is available, offering full but experimental Bot API 3.0 coverage:
+
+.. code:: shell
+
+    $ pip install python-telegram-bot==6.1b0
 
 ==========
 Installing

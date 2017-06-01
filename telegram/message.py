@@ -24,7 +24,9 @@ from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment)
+from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown
+from telegram.videonote import VideoNote
 
 
 class Message(TelegramObject):
@@ -54,6 +56,8 @@ class Message(TelegramObject):
         entities (List[:class:`telegram.MessageEntity`]): For text messages, special entities
             like usernames, URLs, bot commands, etc. that appear in the text. See
             parse_entity and parse_entities methods for how to use properly
+        video_note (:class:`telegram.VideoNote`): Message is a video note, information about the
+            video message
         audio (:class:`telegram.Audio`): Message is an audio file, information about the file
         document (:class:`telegram.Document`): Message is a general file, information about the
             file
@@ -128,6 +132,7 @@ class Message(TelegramObject):
                  location=None,
                  venue=None,
                  new_chat_member=None,
+                 new_chat_members=None,
                  left_chat_member=None,
                  new_chat_title=None,
                  new_chat_photo=None,
@@ -142,6 +147,7 @@ class Message(TelegramObject):
                  invoice=None,
                  successful_payment=None,
                  bot=None,
+                 video_note=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -163,11 +169,13 @@ class Message(TelegramObject):
         self.sticker = sticker
         self.video = video
         self.voice = voice
+        self.video_note = video_note
         self.caption = caption
         self.contact = contact
         self.location = location
         self.venue = venue
-        self.new_chat_member = new_chat_member
+        self._new_chat_member = new_chat_member
+        self.new_chat_members = new_chat_members
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
         self.new_chat_photo = new_chat_photo
@@ -222,10 +230,12 @@ class Message(TelegramObject):
         data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
         data['video'] = Video.de_json(data.get('video'), bot)
         data['voice'] = Voice.de_json(data.get('voice'), bot)
+        data['video_note'] = VideoNote.de_json(data.get('video_note'), bot)
         data['contact'] = Contact.de_json(data.get('contact'), bot)
         data['location'] = Location.de_json(data.get('location'), bot)
         data['venue'] = Venue.de_json(data.get('venue'), bot)
         data['new_chat_member'] = User.de_json(data.get('new_chat_member'), bot)
+        data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
@@ -261,6 +271,9 @@ class Message(TelegramObject):
             data['entities'] = [e.to_dict() for e in self.entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
+        data['new_chat_member'] = data.pop('_new_chat_member', None)
+        if self.new_chat_members:
+            data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
         return data
 
@@ -411,6 +424,23 @@ class Message(TelegramObject):
 
         self._quote(kwargs)
         return self.bot.sendVideo(self.chat_id, *args, **kwargs)
+
+    def reply_video_note(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.send_video_note(update.message.chat_id, *args, **kwargs)``
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+
+        self._quote(kwargs)
+        return self.bot.send_video_note(self.chat_id, *args, **kwargs)
 
     def reply_voice(self, *args, **kwargs):
         """
@@ -632,6 +662,9 @@ class Message(TelegramObject):
         """
         entities = self.parse_entities()
         message_text = self.text
+        if not sys.maxunicode == 0xffff:
+            message_text = message_text.encode('utf-16-le')
+
         markdown_text = ''
         last_offset = 0
 
@@ -651,10 +684,18 @@ class Message(TelegramObject):
             else:
                 insert = text
 
-            markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
+            if sys.maxunicode == 0xffff:
+                markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
+            else:
+                markdown_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
+                                             .decode('utf-16-le')) + insert
+
             last_offset = entity.offset + entity.length
 
-        markdown_text += message_text[last_offset:]
+        if sys.maxunicode == 0xffff:
+            markdown_text += escape_html(message_text[last_offset:])
+        else:
+            markdown_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
 
     @property
@@ -671,6 +712,9 @@ class Message(TelegramObject):
         """
         entities = self.parse_entities()
         message_text = self.text
+        if not sys.maxunicode == 0xffff:
+            message_text = message_text.encode('utf-16-le')
+
         markdown_text = ''
         last_offset = 0
 
@@ -689,9 +733,21 @@ class Message(TelegramObject):
                 insert = '```' + text + '```'
             else:
                 insert = text
+            if sys.maxunicode == 0xffff:
+                markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
+            else:
+                markdown_text += escape_markdown(message_text[last_offset * 2:entity.offset * 2]
+                                                 .decode('utf-16-le')) + insert
 
-            markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
             last_offset = entity.offset + entity.length
 
-        markdown_text += message_text[last_offset:]
+        if sys.maxunicode == 0xffff:
+            markdown_text += escape_markdown(message_text[last_offset:])
+        else:
+            markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
+
+    @property
+    def new_chat_member(self):
+        warn_deprecate_obj('new_chat_member', 'new_chat_members')
+        return self._new_chat_member

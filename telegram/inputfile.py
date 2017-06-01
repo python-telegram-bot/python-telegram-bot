@@ -35,7 +35,8 @@ from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
-FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate')
+FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate',
+              'video_note')
 
 
 class InputFile(object):
@@ -45,27 +46,11 @@ class InputFile(object):
         self.data = data
         self.boundary = choose_boundary()
 
-        if 'audio' in data:
-            self.input_name = 'audio'
-            self.input_file = data.pop('audio')
-        elif 'document' in data:
-            self.input_name = 'document'
-            self.input_file = data.pop('document')
-        elif 'photo' in data:
-            self.input_name = 'photo'
-            self.input_file = data.pop('photo')
-        elif 'sticker' in data:
-            self.input_name = 'sticker'
-            self.input_file = data.pop('sticker')
-        elif 'video' in data:
-            self.input_name = 'video'
-            self.input_file = data.pop('video')
-        elif 'voice' in data:
-            self.input_name = 'voice'
-            self.input_file = data.pop('voice')
-        elif 'certificate' in data:
-            self.input_name = 'certificate'
-            self.input_file = data.pop('certificate')
+        for t in FILE_TYPES:
+            if t in data:
+                self.input_name = t
+                self.input_file = data.pop(t)
+                break
         else:
             raise TelegramError('Unknown inputfile type')
 

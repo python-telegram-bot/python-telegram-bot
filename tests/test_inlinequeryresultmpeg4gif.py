@@ -37,6 +37,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.mpeg4_url = 'mpeg4 url'
         self.mpeg4_width = 10
         self.mpeg4_height = 15
+        self.mpeg4_duration = 1
         self.thumb_url = 'thumb url'
         self.title = 'title'
         self.caption = 'caption'
@@ -50,6 +51,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
             'mpeg4_url': self.mpeg4_url,
             'mpeg4_width': self.mpeg4_width,
             'mpeg4_height': self.mpeg4_height,
+            'mpeg4_duration': self.mpeg4_duration,
             'thumb_url': self.thumb_url,
             'title': self.title,
             'caption': self.caption,
@@ -65,6 +67,7 @@ class InlineQueryResultMpeg4GifTest(BaseTest, unittest.TestCase):
         self.assertEqual(mpeg4.mpeg4_url, self.mpeg4_url)
         self.assertEqual(mpeg4.mpeg4_width, self.mpeg4_width)
         self.assertEqual(mpeg4.mpeg4_height, self.mpeg4_height)
+        self.assertEqual(mpeg4.mpeg4_duration, self.mpeg4_duration)
         self.assertEqual(mpeg4.thumb_url, self.thumb_url)
         self.assertEqual(mpeg4.title, self.title)
         self.assertEqual(mpeg4.caption, self.caption)

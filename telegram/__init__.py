@@ -22,8 +22,6 @@ from sys import version_info
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'vendor', 'urllib3'))
-
 from .base import TelegramObject
 from .user import User
 from .chat import Chat
@@ -94,6 +92,7 @@ from .precheckoutquery import PreCheckoutQuery
 from .shippingquery import ShippingQuery
 from .webhookinfo import WebhookInfo
 from .gamehighscore import GameHighScore
+from .videonote import VideoNote
 from .update import Update
 from .bot import Bot
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,
@@ -123,6 +122,6 @@ __all__ = [
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
-    'Game', 'GameHighScore', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
+    'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery'
 ]
