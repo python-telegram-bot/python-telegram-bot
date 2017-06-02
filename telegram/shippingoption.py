@@ -28,13 +28,14 @@ class ShippingOption(TelegramObject):
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (int): Shipping option identifier
+        id (str): Shipping option identifier
         title (str): Option title
         prices (List[:class:`telegram.LabeledPrice`]): List of price portions
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, id, title, prices):
+    def __init__(self, id, title, prices, **kwargs):
         self.id = id
         self.title = title
         self.prices = prices

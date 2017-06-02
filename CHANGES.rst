@@ -2,7 +2,13 @@
 Changes
 =======
 
-**2017-05-21**
+**2017-05-29**
+
+*Released 6.0.2*
+
+- Avoid confusion with user's ``urllib3`` by renaming vendored ``urllib3`` to ``ptb_urllib3``
+
+**2017-05-19**
 
 *Released 6.0.1*
 
@@ -80,6 +86,7 @@ Changes
 
 - Rework ``JobQueue``
 - Introduce ``ConversationHandler``
+- Introduce ``telegram.constants`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/342
 
 **2016-07-12**
 

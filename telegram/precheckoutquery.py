@@ -28,7 +28,7 @@ class PreCheckoutQuery(TelegramObject):
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (int): Unique query identifier
+        id (str): Unique query identifier
         from_user (:class:`telegram.User`): User who sent the query
         currency (str): Three-letter ISO 4217 currency code
         total_amount (int): Total price in the smallest units of the currency (integer)
@@ -37,6 +37,7 @@ class PreCheckoutQuery(TelegramObject):
     Keyword Args:
         shipping_option_id (Optional[str]): Identifier of the shipping option chosen by the user
         order_info (Optional[:class:`telegram.OrderInfo`]): Order info provided by the user
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 

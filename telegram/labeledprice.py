@@ -27,9 +27,10 @@ class LabeledPrice(TelegramObject):
     Attributes:
         label (str): Portion label
         amount (int): Price of the product in the smallest units of the currency (integer)
+        **kwargs (dict): Arbitrary keyword arguments.
     """
 
-    def __init__(self, label, amount):
+    def __init__(self, label, amount, **kwargs):
         self.label = label
         self.amount = amount
 

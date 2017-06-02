@@ -29,10 +29,11 @@ class OrderInfo(TelegramObject):
         phone_number (Optional[str]): User's phone number
         email (Optional[str]): User email
         shipping_address (Optional[:class:`telegram.ShippingAddress`]): User shipping address
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, name=None, phone_number=None, email=None, shipping_address=None):
+    def __init__(self, name=None, phone_number=None, email=None, shipping_address=None, **kwargs):
         self.name = name
         self.phone_number = phone_number
         self.email = email

@@ -33,10 +33,9 @@ class SuccessfulPayment(TelegramObject):
         invoice_payload (str): Bot specified invoice payload
         telegram_payment_charge_id (str): Telegram payment identifier
         provider_payment_charge_id (str): Provider payment identifier
-
-    Keyword Args:
         shipping_option_id (Optional[str]): Identifier of the shipping option chosen by the user
         order_info (Optional[:class:`telegram.OrderInfo`]): Order info provided by the user
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
@@ -47,7 +46,8 @@ class SuccessfulPayment(TelegramObject):
                  telegram_payment_charge_id,
                  provider_payment_charge_id,
                  shipping_option_id=None,
-                 order_info=None):
+                 order_info=None,
+                 **kwargs):
         self.currency = currency
         self.total_amount = total_amount
         self.invoice_payload = invoice_payload
