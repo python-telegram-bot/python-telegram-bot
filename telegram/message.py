@@ -106,44 +106,6 @@ class Message(TelegramObject):
 
         left_chat_participant  (:class:`telegram.User`): Use `left_chat_member`
         instead.
-
-<<<<<<<<< Temporary merge branch 1
-=========
-    Args:
-        message_id (int):
-        from_user (:class:`telegram.User`):
-        date (:class:`datetime.datetime`):
-        chat (:class:`telegram.Chat`):
-        forward_from (Optional[:class:`telegram.User`]):
-        forward_from_chat (Optional[:class:`telegram.Chat`]):
-        forward_from_message_id (Optional[int]):
-        forward_date (Optional[:class:`datetime.datetime`]):
-        reply_to_message (Optional[:class:`telegram.Message`]):
-        edit_date (Optional[:class:`datetime.datetime`]):
-        text (Optional[str]):
-        audio (Optional[:class:`telegram.Audio`]):
-        document (Optional[:class:`telegram.Document`]):
-        game (Optional[:class:`telegram.Game`]):
-        photo (Optional[List[:class:`telegram.PhotoSize`]]):
-        sticker (Optional[:class:`telegram.Sticker`]):
-        video (Optional[:class:`telegram.Video`]):
-        voice (Optional[:class:`telegram.Voice`]):
-        video_note (Optional[:class:`telegram.VideoNote`]):
-        caption (Optional[str]):
-        contact (Optional[:class:`telegram.Contact`]):
-        location (Optional[:class:`telegram.Location`]):
-        new_chat_member (Optional[:class:`telegram.User`]):
-        left_chat_member (Optional[:class:`telegram.User`]):
-        new_chat_title (Optional[str]):
-        new_chat_photo (Optional[List[:class:`telegram.PhotoSize`]):
-        delete_chat_photo (Optional[bool]):
-        group_chat_created (Optional[bool]):
-        supergroup_chat_created (Optional[bool]):
-        migrate_to_chat_id (Optional[int]):
-        migrate_from_chat_id (Optional[int]):
-        channel_chat_created (Optional[bool]):
-        bot (Optional[Bot]): The Bot to use for instance methods
->>>>>>>>> Temporary merge branch 2
     """
 
     def __init__(self,

@@ -124,6 +124,12 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.successful_payment = None
         self.assertFalse(Filters.successful_payment(self.message))
 
+    def test_filters_invoice(self):
+        self.message.invoice = 'test'
+        self.assertTrue(Filters.invoice(self.message))
+        self.message.invoice = None
+        self.assertFalse(Filters.imvoice(self.message))
+
     def test_filters_status_update(self):
         self.assertFalse(Filters.status_update(self.message))
 

@@ -293,13 +293,6 @@ class Filters(object):
 
     game = _Game()
 
-    class _SuccessfulPayment(BaseFilter):
-
-        def filter(self, message):
-            return bool(message.successful_payment)
-
-    successful_payment = _SuccessfulPayment()
-
     class entity(BaseFilter):
         """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.
