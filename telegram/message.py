@@ -23,9 +23,10 @@ from datetime import datetime
 from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
-                      VideoNote)
+                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment)
+from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown
+from telegram.videonote import VideoNote
 
 
 class Message(TelegramObject):
@@ -55,6 +56,8 @@ class Message(TelegramObject):
         entities (List[:class:`telegram.MessageEntity`]): For text messages, special entities
             like usernames, URLs, bot commands, etc. that appear in the text. See
             parse_entity and parse_entities methods for how to use properly
+        video_note (:class:`telegram.VideoNote`): Message is a video note, information about the
+            video message
         audio (:class:`telegram.Audio`): Message is an audio file, information about the file
         document (:class:`telegram.Document`): Message is a general file, information about the
             file
@@ -63,8 +66,6 @@ class Message(TelegramObject):
         sticker (:class:`telegram.Sticker`): Message is a sticker, information about the sticker
         video (:class:`telegram.Video`): Message is a video, information about the video
         voice (:class:`telegram.Voice`): Message is a voice message, information about the file
-        video_note (:class:`telegram.VideoNote`): Message is a video note, information about the
-            video message
         caption (str): Caption for the document, photo or video, 0-200 characters
         contact (:class:`telegram.Contact`): Message is a shared contact, information about the
             contact
@@ -106,6 +107,43 @@ class Message(TelegramObject):
         left_chat_participant  (:class:`telegram.User`): Use `left_chat_member`
         instead.
 
+<<<<<<<<< Temporary merge branch 1
+=========
+    Args:
+        message_id (int):
+        from_user (:class:`telegram.User`):
+        date (:class:`datetime.datetime`):
+        chat (:class:`telegram.Chat`):
+        forward_from (Optional[:class:`telegram.User`]):
+        forward_from_chat (Optional[:class:`telegram.Chat`]):
+        forward_from_message_id (Optional[int]):
+        forward_date (Optional[:class:`datetime.datetime`]):
+        reply_to_message (Optional[:class:`telegram.Message`]):
+        edit_date (Optional[:class:`datetime.datetime`]):
+        text (Optional[str]):
+        audio (Optional[:class:`telegram.Audio`]):
+        document (Optional[:class:`telegram.Document`]):
+        game (Optional[:class:`telegram.Game`]):
+        photo (Optional[List[:class:`telegram.PhotoSize`]]):
+        sticker (Optional[:class:`telegram.Sticker`]):
+        video (Optional[:class:`telegram.Video`]):
+        voice (Optional[:class:`telegram.Voice`]):
+        video_note (Optional[:class:`telegram.VideoNote`]):
+        caption (Optional[str]):
+        contact (Optional[:class:`telegram.Contact`]):
+        location (Optional[:class:`telegram.Location`]):
+        new_chat_member (Optional[:class:`telegram.User`]):
+        left_chat_member (Optional[:class:`telegram.User`]):
+        new_chat_title (Optional[str]):
+        new_chat_photo (Optional[List[:class:`telegram.PhotoSize`]):
+        delete_chat_photo (Optional[bool]):
+        group_chat_created (Optional[bool]):
+        supergroup_chat_created (Optional[bool]):
+        migrate_to_chat_id (Optional[int]):
+        migrate_from_chat_id (Optional[int]):
+        channel_chat_created (Optional[bool]):
+        bot (Optional[Bot]): The Bot to use for instance methods
+>>>>>>>>> Temporary merge branch 2
     """
 
     def __init__(self,
@@ -126,7 +164,6 @@ class Message(TelegramObject):
                  sticker=None,
                  video=None,
                  voice=None,
-                 video_note=None,
                  caption=None,
                  contact=None,
                  location=None,
@@ -147,6 +184,7 @@ class Message(TelegramObject):
                  invoice=None,
                  successful_payment=None,
                  bot=None,
+                 video_note=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -173,7 +211,7 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self.new_chat_member = new_chat_member
+        self._new_chat_member = new_chat_member
         self.new_chat_members = new_chat_members
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
@@ -270,6 +308,7 @@ class Message(TelegramObject):
             data['entities'] = [e.to_dict() for e in self.entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
+        data['new_chat_member'] = data.pop('_new_chat_member', None)
         if self.new_chat_members:
             data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
@@ -744,3 +783,8 @@ class Message(TelegramObject):
         else:
             markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
+
+    @property
+    def new_chat_member(self):
+        warn_deprecate_obj('new_chat_member', 'new_chat_members')
+        return self._new_chat_member

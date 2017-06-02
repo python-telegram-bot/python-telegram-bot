@@ -61,11 +61,11 @@ class InlineQueryResultGif(InlineQueryResult):
                  thumb_url,
                  gif_width=None,
                  gif_height=None,
-                 gif_duration=None,
                  title=None,
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
+                 gif_duration=None,
                  **kwargs):
 
         # Required

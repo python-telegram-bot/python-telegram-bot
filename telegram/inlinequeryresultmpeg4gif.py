@@ -62,11 +62,11 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  thumb_url,
                  mpeg4_width=None,
                  mpeg4_height=None,
-                 mpeg4_duration=None,
                  title=None,
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
+                 mpeg4_duration=None,
                  **kwargs):
 
         # Required

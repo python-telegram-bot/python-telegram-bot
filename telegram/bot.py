@@ -687,9 +687,9 @@ class Bot(TelegramObject):
 
         Args:
             chat_id (int|str): Unique identifier for the message recipient - Chat id.
-            voice: Video note to send. Pass a file_id as String to send a video note that exists
-                on the Telegram servers (recommended) or upload a new video. Sending video notes
-                by a URL is currently unsupported
+            video_note (InputFile|str): Video note to send. Pass a file_id as String to send a
+                video note that exists on the Telegram servers (recommended) or upload a new video.
+                Sending video notes by a URL is currently unsupported
             duration (Optional[int]): Duration of sent audio in seconds.
             length (Optional[int]): Video width and height
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
@@ -713,9 +713,9 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'video_note': video_note}
 
-        if duration:
+        if duration is not None:
             data['duration'] = duration
-        if length:
+        if length is not None:
             data['length'] = length
 
         return self._message_wrapper(
@@ -1906,23 +1906,23 @@ class Bot(TelegramObject):
             'prices': [p.to_dict() for p in prices]
         }
 
-        if photo_url:
+        if photo_url is not None:
             data['photo_url'] = photo_url
-        if photo_size:
+        if photo_size is not None:
             data['photo_size'] = photo_size
-        if photo_width:
+        if photo_width is not None:
             data['photo_width'] = photo_width
-        if photo_height:
+        if photo_height is not None:
             data['photo_height'] = photo_height
-        if need_name:
+        if need_name is not None:
             data['need_name'] = need_name
-        if need_phone_number:
+        if need_phone_number is not None:
             data['need_phone_number'] = need_phone_number
         if need_email:
             data['need_email'] = need_email
-        if need_shipping_address:
+        if need_shipping_address is not None:
             data['need_shipping_address'] = need_shipping_address
-        if is_flexible:
+        if is_flexible is not None:
             data['is_flexible'] = is_flexible
 
         return url, data
@@ -1944,12 +1944,12 @@ class Bot(TelegramObject):
             ok (bool): Specify True if delivery to the specified address is possible and False if
                 there are any problems (for example, if delivery to the specified address
                 is not possible)
-            shipping_options (List[:class:`telegram.ShippingOption`]): Required if ok is True. A
-                list of available shipping options.
-            error_message (str): Required if ok is False. Error message in human readable form
-                that explains why it is impossible to complete the order (e.g. "Sorry, delivery
-                to your desired address is unavailable'). Telegram will display this message
-                to the user.
+            shipping_options (Optional[List[:class:`telegram.ShippingOption`]]): Required if ok is
+                True. A list of available shipping options.
+            error_message (Optional[str]): Required if ok is False. Error message in human readable
+                form that explains why it is impossible to complete the order (e.g. "Sorry,
+                delivery to your desired address is unavailable'). Telegram will display this
+                message to the user.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1976,7 +1976,7 @@ class Bot(TelegramObject):
 
         if ok is True:
             data['shipping_options'] = shipping_options
-        if error_message:
+        if error_message is not None:
             data['error_message'] = error_message
 
         result = self._request.post(url_, data, timeout=timeout)
@@ -1994,11 +1994,11 @@ class Bot(TelegramObject):
             pre_checkout_query_id (str): Unique identifier for the query to be answered
             ok (bool): Specify True if everything is alright (goods are available, etc.) and the
                 bot is ready to proceed with the order. Use False if there are any problems.
-            error_message (str): Required if ok is False. Error message in human readable form that
-                explains the reason for failure to proceed with the checkout (e.g. "Sorry, somebody
-                just bought the last of our amazing black T-shirts while you were busy filling out
-                your payment details. Please choose a different color or garment!"). Telegram will
-                display this message to the user.
+            error_message (Optional[str]): Required if ok is False. Error message in human readable
+                form that explains the reason for failure to proceed with the checkout (e.g.
+                "Sorry, somebody just bought the last of our amazing black T-shirts while you were
+                busy filling out your payment details. Please choose a different color or
+                garment!"). Telegram will display this message to the user.
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -2020,7 +2020,7 @@ class Bot(TelegramObject):
 
         data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
 
-        if error_message:
+        if error_message is not None:
             data['error_message'] = error_message
 
         result = self._request.post(url_, data, timeout=timeout)

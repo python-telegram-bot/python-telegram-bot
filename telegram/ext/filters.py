@@ -214,13 +214,68 @@ class Filters(object):
 
     class _StatusUpdate(BaseFilter):
 
+        class _NewChatMembers(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.new_chat_members)
+
+        new_chat_members = _NewChatMembers()
+
+        class _LeftChatMember(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.left_chat_member)
+
+        left_chat_member = _LeftChatMember()
+
+        class _NewChatTitle(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.new_chat_title)
+
+        new_chat_title = _NewChatTitle()
+
+        class _NewChatPhoto(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.new_chat_photo)
+
+        new_chat_photo = _NewChatPhoto()
+
+        class _DeleteChatPhoto(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.delete_chat_photo)
+
+        delete_chat_photo = _DeleteChatPhoto()
+
+        class _ChatCreated(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.group_chat_created or message.supergroup_chat_created or
+                            message.channel_chat_created)
+
+        chat_created = _ChatCreated()
+
+        class _Migrate(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
+
+        migrate = _Migrate()
+
+        class _PinnedMessage(BaseFilter):
+
+            def filter(self, message):
+                return bool(message.pinned_message)
+
+        pinned_message = _PinnedMessage()
+
         def filter(self, message):
-            return bool(message.new_chat_member or message.left_chat_member
-                        or message.new_chat_title or message.new_chat_photo
-                        or message.delete_chat_photo or message.group_chat_created
-                        or message.supergroup_chat_created or message.channel_chat_created
-                        or message.migrate_to_chat_id or message.migrate_from_chat_id
-                        or message.pinned_message)
+            return bool(self.new_chat_members(message) or self.left_chat_member(message) or
+                        self.new_chat_title(message) or self.new_chat_photo(message) or
+                        self.delete_chat_photo(message) or self.chat_created(message) or
+                        self.migrate(message) or self.pinned_message(message))
 
     status_update = _StatusUpdate()
 
@@ -275,6 +330,20 @@ class Filters(object):
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
+
+    class _Invoice(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.invoice)
+
+    invoice = _Invoice()
+
+    class _SuccessfulPayment(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.successful_payment)
+
+    successful_payment = _SuccessfulPayment()
 
     class language(BaseFilter):
         """

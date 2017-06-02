@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram VideoNote"""
-
+import numbers
 import sys
 import unittest
 import os
@@ -37,7 +37,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         self.videonote_file = open('tests/data/telegram.mp4', 'rb')
         self.videonote_file_id = 'DQADAQADBwAD5VIIRYemhHpbPmIQAg'
         self.duration = 5
-        self.length = 1  # No bloody clue what this does, see note in first test
+        self.length = 1  # No bloody clue what this does
         self.thumb = telegram.PhotoSize.de_json({
             'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
             'width': 51,
@@ -56,32 +56,8 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_error_send_videonote_required_args_only(self):
-        # This is where it gets weird....
-        # According to telegram length is Video width and height.. but how that works with one
-        # parameter I couldn't tell you
-        # It would also seem that it is in fact a required parameter, so the original test below
-        # fails. Therefore I decided I check for the error instead - that way we'll also know
-        # when telegram fixes their shit
-        with self.assertRaisesRegexp(telegram.error.BadRequest, r'Wrong video note length'):
-            message = self._bot.sendVideoNote(self._chat_id, self.videonote_file, timeout=10)
-
-        # videonote = message.videonote
-        #
-        # self.assertTrue(isinstance(videonote.file_id, str))
-        # self.assertNotEqual(videonote.file_id, None)
-        # self.assertEqual(videonote.duration, self.duration)
-        # self.assertEqual(videonote.length, self.length)
-        # self.assertEqual(videonote.thumb, self.thumb)
-        # self.assertEqual(videonote.file_size, self.file_size)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_videonote_actual_required_args_only(self):
-        # See above test... if you pass any number that's > 0 and < some high number, it seems
-        # to work
-        message = self._bot.sendVideoNote(
-            self._chat_id, self.videonote_file, length=self.length, timeout=10)
+    def test_send_videonote_required_args_only(self):
+        message = self._bot.sendVideoNote(self._chat_id, self.videonote_file, timeout=10)
 
         videonote = message.video_note
 
@@ -89,6 +65,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(videonote.file_id, None)
         self.assertEqual(videonote.duration, self.duration)
         # self.assertEqual(videonote.length, self.length)
+        self.assertIsInstance(videonote.length, numbers.Number)
         self.assertEqual(videonote.thumb, self.thumb)
         self.assertEqual(videonote.file_size, self.file_size)
 
@@ -107,6 +84,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         self.assertTrue(isinstance(videonote.file_id, str))
         self.assertNotEqual(videonote.file_id, None)
         # self.assertEqual(videonote.length, self.length)
+        self.assertIsInstance(videonote.length, numbers.Number)
         self.assertEqual(videonote.duration, self.duration)
         self.assertEqual(videonote.thumb, self.thumb)
         self.assertEqual(videonote.file_size, self.file_size)
@@ -125,15 +103,17 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(videonote.file_id, self.videonote_file_id)
         # self.assertEqual(videonote.length, self.length)
+        self.assertIsInstance(videonote.length, numbers.Number)
         self.assertEqual(videonote.duration, self.duration)
         self.assertEqual(videonote.thumb, self.thumb)
-        self.assertEqual(videonote.file_size, self.file_size)
+        # Telegram doesn't send file_size for resends?
+        # self.assertEqual(videonote.file_size, self.file_size)
 
     def test_videonote_de_json(self):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
 
         self.assertEqual(videonote.file_id, self.videonote_file_id)
-        # self.assertEqual(videonote.duration, self.duration)
+        self.assertEqual(videonote.duration, self.duration)
         self.assertEqual(videonote.thumb, self.thumb)
         self.assertEqual(videonote.length, self.length)
         self.assertEqual(videonote.file_size, self.file_size)

@@ -20,6 +20,7 @@
 import os
 import socket
 import logging
+import warnings
 
 try:
     import ujson as json
@@ -27,10 +28,15 @@ except ImportError:
     import json
 
 import certifi
-import urllib3
-import urllib3.contrib.appengine
-from urllib3.connection import HTTPConnection
-from urllib3.util.timeout import Timeout
+try:
+    import telegram.vendor.ptb_urllib3.urllib3 as urllib3
+    import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
+    from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
+    from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
+except ImportError:
+    warnings.warn("python-telegram-bot wasn't properly installed. Please refer to README.rst on "
+                  "how to properly install.")
+    raise
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
@@ -90,16 +96,16 @@ class Request(object):
             proxy_url = os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy')
 
         if not proxy_url:
-            if urllib3.contrib.appengine.is_appengine_sandbox():
+            if appengine.is_appengine_sandbox():
                 # Use URLFetch service if running in App Engine
-                mgr = urllib3.contrib.appengine.AppEngineManager()
+                mgr = appengine.AppEngineManager()
             else:
                 mgr = urllib3.PoolManager(**kwargs)
         else:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
                 try:
-                    from urllib3.contrib.socks import SOCKSProxyManager
+                    from telegram.vendor.ptb_urllib3.urllib3.contrib.socks import SOCKSProxyManager
                 except ImportError:
                     raise RuntimeError('PySocks is missing')
                 mgr = SOCKSProxyManager(proxy_url, **kwargs)

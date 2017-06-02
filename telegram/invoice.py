@@ -31,10 +31,11 @@ class Invoice(TelegramObject):
             be used to generate this invoice
         currency (str): Three-letter ISO 4217 currency code
         total_amount (int): Total price in the smallest units of the currency (integer)
+        **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, title, description, start_parameter, currency, total_amount):
+    def __init__(self, title, description, start_parameter, currency, total_amount, **kwargs):
         self.title = title
         self.description = description
         self.start_parameter = start_parameter
