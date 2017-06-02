@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram Photo"""
 
+from io import BytesIO
 import sys
 import unittest
 import os
@@ -37,6 +38,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.photo_file = open('tests/data/telegram.jpg', 'rb')
         self.photo_file_id = 'AgADAQADgEsyGx8j9QfmDMmwkPBrFcKRzy8ABHW8ul9nW7FoNHYBAAEC'
         self.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
+        self.photo_bytes_jpg_no_standard = 'tests/data/telegram_no_standard_header.jpg'
         self.width = 300
         self.height = 300
         self.thumb = {
@@ -121,6 +123,32 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.width, self.width)
         self.assertEqual(photo.height, self.height)
         self.assertEqual(photo.file_size, self.file_size)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_photo_bytesio_jpg_file(self):
+        from telegram.inputfile import InputFile
+        # raw image bytes
+        raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
+        inputfile = InputFile({"photo": raw_bytes})
+        self.assertEqual(inputfile.mimetype, 'application/octet-stream')
+
+        # raw image bytes with name info
+        raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
+        raw_bytes.name = self.photo_bytes_jpg_no_standard
+        inputfile = InputFile({"photo": raw_bytes})
+        self.assertEqual(inputfile.mimetype, 'image/jpeg')
+
+        # send raw photo
+        raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
+        message = self._bot.sendPhoto(self._chat_id, photo=raw_bytes)
+        photo = message.photo[-1]
+        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertNotEqual(photo.file_id, '')
+        self.assertTrue(isinstance(photo, telegram.PhotoSize))
+        self.assertEqual(photo.width, 1920)
+        self.assertEqual(photo.height, 1080)
+        self.assertEqual(photo.file_size, 30907)
 
     @flaky(3, 1)
     @timeout(10)

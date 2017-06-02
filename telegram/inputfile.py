@@ -69,7 +69,11 @@ class InputFile(object):
                 if not self.filename or '.' not in self.filename:
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
-                self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
+                if self.filename:
+                    self.mimetype = mimetypes.guess_type(
+                        self.filename)[0] or DEFAULT_MIME_TYPE
+                else:
+                    self.mimetype = DEFAULT_MIME_TYPE
 
     @property
     def headers(self):
