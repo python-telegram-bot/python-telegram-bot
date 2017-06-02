@@ -324,6 +324,20 @@ class Filters(object):
 
     group = _Group()
 
+    class _Invoice(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.invoice)
+
+    invoice = _Invoice()
+
+    class _SuccessfulPayment(BaseFilter):
+
+        def filter(self, message):
+            return bool(message.successful_payment)
+
+    successful_payment = _SuccessfulPayment()
+
     class language(BaseFilter):
         """
         Filters messages to only allow those which are from users with a certain language code.
