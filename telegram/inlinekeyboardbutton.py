@@ -46,7 +46,10 @@ class InlineKeyboardButton(TelegramObject):
             the bot's username and the specified inline query in the current chat's input field.
             Can be empty, in which case only the bot's username will be inserted.
         callback_game (Optional[:class:`telegram.CallbackGame`]): Description of the game that will
-            be launched when the user presses the button.
+            be launched when the user presses the button. NOTE: This type of button must always be
+            the first button in the first row.
+        pay (Optional[bool]): Specify True, to send a Pay button. NOTE: This type of button must
+            always be the first button in the first row.
         **kwargs (dict): Arbitrary keyword arguments.
 
     """
@@ -58,6 +61,7 @@ class InlineKeyboardButton(TelegramObject):
                  switch_inline_query=None,
                  switch_inline_query_current_chat=None,
                  callback_game=None,
+                 pay=None,
                  **kwargs):
         # Required
         self.text = text
@@ -68,6 +72,7 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query = switch_inline_query
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
+        self.pay = pay
 
     @staticmethod
     def de_json(data, bot):

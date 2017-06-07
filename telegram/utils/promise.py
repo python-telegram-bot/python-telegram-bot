@@ -18,7 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the Promise class """
 
+import logging
 from threading import Event
+
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class Promise(object):
@@ -37,6 +42,7 @@ class Promise(object):
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
         except Exception as exc:
+            logger.exception('An uncaught error was raised while running the promise')
             self._exception = exc
 
         finally:
