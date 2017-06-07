@@ -27,7 +27,7 @@ class TypeHandler(Handler):
     Handler class to handle updates of custom types.
 
     Args:
-        type (type): The ``type`` of updates this handler should process, as
+        type (class): The ``type`` of updates this handler should process, as
             determined by ``isinstance``
         callback (function): A function that takes ``bot, update`` as
             positional arguments. It will be called when the ``check_update``

@@ -40,7 +40,7 @@ class InlineQuery(TelegramObject):
         query (str):
         offset (str):
         location (optional[:class:`telegram.Location`]):
-        bot (Optional[Bot]): The Bot to use for instance methods
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """

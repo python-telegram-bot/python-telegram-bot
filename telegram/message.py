@@ -109,7 +109,7 @@ class Message(TelegramObject):
         migrate_to_chat_id (Optional[int]):
         migrate_from_chat_id (Optional[int]):
         channel_chat_created (Optional[bool]):
-        bot (Optional[Bot]): The Bot to use for instance methods
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods
     """
 
     def __init__(self,

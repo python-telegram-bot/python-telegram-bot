@@ -166,7 +166,8 @@ class JobQueue(object):
             name (Optional[str]): The name of the new job. Defaults to ``callback.__name__``
 
         Returns:
-            Job: The new ``Job`` instance that has been added to the job queue.
+            telegram.ext.jobqueue.Job: The new ``Job`` instance that has been added to the
+                job queue.
 
         """
         job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
@@ -201,7 +202,8 @@ class JobQueue(object):
             name (Optional[str]): The name of the new job. Defaults to ``callback.__name__``
 
         Returns:
-            Job: The new ``Job`` instance that has been added to the job queue.
+            telegram.ext.jobqueue.Job: The new ``Job`` instance that has been added to the
+                job queue.
 
         """
         job = Job(callback,
@@ -228,7 +230,8 @@ class JobQueue(object):
             name (Optional[str]): The name of the new job. Defaults to ``callback.__name__``
 
         Returns:
-            Job: The new ``Job`` instance that has been added to the job queue.
+            telegram.ext.jobqueue.Job: The new ``Job`` instance that has been added to the
+                job queue.
 
         """
         job = Job(callback,
@@ -366,7 +369,7 @@ class Job(object):
             job runs
         repeat (bool): If the job runs periodically or only once
         name (str): The name of this job
-        job_queue (JobQueue): The ``JobQueue`` this job belongs to
+        job_queue (telegram.ext.JobQueue): The ``JobQueue`` this job belongs to
         enabled (bool): Boolean property that decides if this job is currently active
 
     Args:
