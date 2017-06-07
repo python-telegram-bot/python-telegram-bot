@@ -129,6 +129,7 @@ Other references:
 
 - `Telegram API documentation <https://core.telegram.org/bots/api>`_
 - `python-telegram-bot documentation <https://python-telegram-bot.readthedocs.io/>`_
+- `Our Rules-Bot for FAQ and links to this GitHub Page <https://t.me/roolsbot>`_
 
 -------------------
 Learning by example
