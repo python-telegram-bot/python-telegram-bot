@@ -295,9 +295,12 @@ import inspect
 
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
-    if inspect.getmodule(obj).__name__.startswith('telegram') and inspect.isfunction(obj):
-        if name.lower() != name:
-            return True
+    try:
+        if inspect.getmodule(obj).__name__.startswith('telegram') and inspect.isfunction(obj):
+            if name.lower() != name:
+                return True
+    except AttributeError:
+        pass
     # Return None so napoleon can handle it
 
 
