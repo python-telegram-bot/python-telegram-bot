@@ -75,7 +75,7 @@ class InputFile(object):
     def headers(self):
         """
         Returns:
-            str:
+            str
         """
         return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
 
@@ -83,14 +83,14 @@ class InputFile(object):
     def content_type(self):
         """
         Returns:
-            str:
+            str
         """
         return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
         """
         Returns:
-            str:
+            str
         """
         form = []
         form_boundary = '--' + self.boundary
@@ -118,7 +118,7 @@ class InputFile(object):
     def _parse(form):
         """
         Returns:
-            str:
+            str
         """
         if sys.version_info > (3,):
             # on Python 3 form needs to be byte encoded
