@@ -271,6 +271,19 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(.1)
         self.assertTrue(None is self.received_message)
 
+        # case insensitivity
+        self.reset()
+        message = Message(0, user, None, None, text="/Test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertTrue(self.received_message, '/Test')
+        handler = CommandHandler('Test', self.telegramHandlerTest)
+        self.updater.dispatcher.add_handler(handler)
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertTrue(self.received_message, '/test')
+
         # Remove handler
         d.remove_handler(handler)
         handler = CommandHandler('test', self.telegramHandlerEditedTest, allow_edited=False)
