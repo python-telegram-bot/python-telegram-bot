@@ -86,9 +86,9 @@ class CommandHandler(Handler):
             _str = str  # Python 3
 
         if isinstance(command, _str):
-            self.command = [command]
+            self.command = [command.lower()]
         else:
-            self.command = command
+            self.command = [x.lower() for x in command]
         self.filters = filters
         self.allow_edited = allow_edited
         self.pass_args = pass_args
@@ -117,7 +117,7 @@ class CommandHandler(Handler):
                 else:
                     res = self.filters(message)
 
-                return res and (message.text.startswith('/') and command[0] in self.command
+                return res and (message.text.startswith('/') and command[0].lower() in self.command
                                 and command[1].lower() == message.bot.username.lower())
             else:
                 return False
