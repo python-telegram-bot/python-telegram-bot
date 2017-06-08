@@ -34,17 +34,24 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram VideoNote."""
 
     def setUp(self):
-        self.videonote_file = open('tests/data/telegram.mp4', 'rb')
+        self.videonote_file = open('tests/data/telegram2.mp4', 'rb')
         self.videonote_file_id = 'DQADAQADBwAD5VIIRYemhHpbPmIQAg'
-        self.duration = 5
+        self.duration = 3
         self.length = 1  # No bloody clue what this does
         self.thumb = telegram.PhotoSize.de_json({
+            'file_id': 'AAQBABMsDPcvAAQX7NUVpGq-s34OAAIC',
+            'width': 90,
+            'file_size': 3043,
+            'height': 90
+        }, self._bot)
+        self.thumb_resend = telegram.PhotoSize.de_json({
             'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
             'width': 51,
             'file_size': 645,
             'height': 90
         }, self._bot)
-        self.file_size = 326534
+
+        self.file_size = 132084
 
         self.json_dict = {
             'file_id': self.videonote_file_id,
@@ -95,17 +102,16 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         message = self._bot.sendVideoNote(
             chat_id=self._chat_id,
             video_note=self.videonote_file_id,
-            timeout=10,
-            duration=self.duration,
-            length=self.length)
+            timeout=10
+        )
 
         videonote = message.video_note
 
         self.assertEqual(videonote.file_id, self.videonote_file_id)
         # self.assertEqual(videonote.length, self.length)
         self.assertIsInstance(videonote.length, numbers.Number)
-        self.assertEqual(videonote.duration, self.duration)
-        self.assertEqual(videonote.thumb, self.thumb)
+        self.assertEqual(videonote.duration, 5)
+        self.assertEqual(videonote.thumb, self.thumb_resend)
         # Telegram doesn't send file_size for resends?
         # self.assertEqual(videonote.file_size, self.file_size)
 
