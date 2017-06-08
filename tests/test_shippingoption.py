@@ -32,7 +32,7 @@ class ShippingOptionTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram ShippingOption."""
 
     def setUp(self):
-        self.id = 'id'
+        self._id = 'id'
         self.title = 'title'
         self.prices = [
             telegram.LabeledPrice('Fish Container', 100),
@@ -40,7 +40,7 @@ class ShippingOptionTest(BaseTest, unittest.TestCase):
         ]
 
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'title': self.title,
             'prices': [x.to_dict() for x in self.prices]
         }
@@ -48,7 +48,7 @@ class ShippingOptionTest(BaseTest, unittest.TestCase):
     def test_shippingoption_de_json(self):
         shippingoption = telegram.ShippingOption.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(shippingoption.id, self.id)
+        self.assertEqual(shippingoption.id, self._id)
         self.assertEqual(shippingoption.title, self.title)
         self.assertEqual(shippingoption.prices, self.prices)
 
@@ -64,11 +64,11 @@ class ShippingOptionTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(self.json_dict, shippingoption)
 
     def test_equality(self):
-        a = telegram.ShippingOption(self.id, self.title, self.prices)
-        b = telegram.ShippingOption(self.id, self.title, self.prices)
-        c = telegram.ShippingOption(self.id, '', [])
+        a = telegram.ShippingOption(self._id, self.title, self.prices)
+        b = telegram.ShippingOption(self._id, self.title, self.prices)
+        c = telegram.ShippingOption(self._id, '', [])
         d = telegram.ShippingOption(0, self.title, self.prices)
-        e = telegram.Voice(self.id, 0)
+        e = telegram.Voice(self._id, 0)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))

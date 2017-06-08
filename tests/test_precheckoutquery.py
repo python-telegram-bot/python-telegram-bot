@@ -32,7 +32,7 @@ class PreCheckoutQueryTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram PreCheckoutQuery."""
 
     def setUp(self):
-        self.id = 5
+        self._id = 5
         self.invoice_payload = 'invoice_payload'
         self.shipping_option_id = 'shipping_option_id'
         self.currency = 'EUR'
@@ -41,7 +41,7 @@ class PreCheckoutQueryTest(BaseTest, unittest.TestCase):
         self.order_info = telegram.OrderInfo()
 
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'invoice_payload': self.invoice_payload,
             'shipping_option_id': self.shipping_option_id,
             'currency': self.currency,
@@ -53,7 +53,7 @@ class PreCheckoutQueryTest(BaseTest, unittest.TestCase):
     def test_precheckoutquery_de_json(self):
         precheckoutquery = telegram.PreCheckoutQuery.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(precheckoutquery.id, self.id)
+        self.assertEqual(precheckoutquery.id, self._id)
         self.assertEqual(precheckoutquery.invoice_payload, self.invoice_payload)
         self.assertEqual(precheckoutquery.shipping_option_id, self.shipping_option_id)
         self.assertEqual(precheckoutquery.currency, self.currency)
@@ -72,14 +72,14 @@ class PreCheckoutQueryTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(self.json_dict, precheckoutquery)
 
     def test_equality(self):
-        a = telegram.PreCheckoutQuery(self.id, self.from_user, self.currency, self.total_amount,
+        a = telegram.PreCheckoutQuery(self._id, self.from_user, self.currency, self.total_amount,
                                       self.invoice_payload)
-        b = telegram.PreCheckoutQuery(self.id, self.from_user, self.currency, self.total_amount,
+        b = telegram.PreCheckoutQuery(self._id, self.from_user, self.currency, self.total_amount,
                                       self.invoice_payload)
-        c = telegram.PreCheckoutQuery(self.id, None, '', 0, '')
+        c = telegram.PreCheckoutQuery(self._id, None, '', 0, '')
         d = telegram.PreCheckoutQuery(0, self.from_user, self.currency, self.total_amount,
                                       self.invoice_payload)
-        e = telegram.Update(self.id)
+        e = telegram.Update(self._id)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))

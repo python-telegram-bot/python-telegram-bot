@@ -32,14 +32,14 @@ class ShippingQueryTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram ShippingQuery."""
 
     def setUp(self):
-        self.id = 5
+        self._id = 5
         self.invoice_payload = 'invoice_payload'
         self.from_user = telegram.User(0, '')
         self.shipping_address = telegram.ShippingAddress('GB', '', 'London', '12 Grimmauld Place',
                                                          '', 'WC1')
 
         self.json_dict = {
-            'id': self.id,
+            'id': self._id,
             'invoice_payload': self.invoice_payload,
             'from': self.from_user.to_dict(),
             'shipping_address': self.shipping_address.to_dict()
@@ -48,7 +48,7 @@ class ShippingQueryTest(BaseTest, unittest.TestCase):
     def test_shippingquery_de_json(self):
         shippingquery = telegram.ShippingQuery.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(shippingquery.id, self.id)
+        self.assertEqual(shippingquery.id, self._id)
         self.assertEqual(shippingquery.invoice_payload, self.invoice_payload)
         self.assertEqual(shippingquery.from_user, self.from_user)
         self.assertEqual(shippingquery.shipping_address, self.shipping_address)
@@ -65,13 +65,13 @@ class ShippingQueryTest(BaseTest, unittest.TestCase):
         self.assertDictEqual(self.json_dict, shippingquery)
 
     def test_equality(self):
-        a = telegram.ShippingQuery(self.id, self.from_user, self.invoice_payload,
+        a = telegram.ShippingQuery(self._id, self.from_user, self.invoice_payload,
                                    self.shipping_address)
-        b = telegram.ShippingQuery(self.id, self.from_user, self.invoice_payload,
+        b = telegram.ShippingQuery(self._id, self.from_user, self.invoice_payload,
                                    self.shipping_address)
-        c = telegram.ShippingQuery(self.id, None, '', None)
+        c = telegram.ShippingQuery(self._id, None, '', None)
         d = telegram.ShippingQuery(0, self.from_user, self.invoice_payload, self.shipping_address)
-        e = telegram.Update(self.id)
+        e = telegram.Update(self._id)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))
