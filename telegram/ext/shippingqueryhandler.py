@@ -62,8 +62,7 @@ class ShippingQueryHandler(Handler):
             pass_chat_data=pass_chat_data)
 
     def check_update(self, update):
-        if isinstance(update, Update) and update.shipping_query:
-            return True
+        return isinstance(update, Update) and update.shipping_query
 
     def handle_update(self, update, dispatcher):
         optional_args = self.collect_optional_args(dispatcher, update)

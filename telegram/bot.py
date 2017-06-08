@@ -1918,7 +1918,7 @@ class Bot(TelegramObject):
             data['need_name'] = need_name
         if need_phone_number is not None:
             data['need_phone_number'] = need_phone_number
-        if need_email:
+        if need_email is not None:
             data['need_email'] = need_email
         if need_shipping_address is not None:
             data['need_shipping_address'] = need_shipping_address
@@ -2009,8 +2009,7 @@ class Bot(TelegramObject):
 
         """
 
-        if ((ok is not True and error_message is None) or
-                (ok is True and error_message is not None)):
+        if not (ok ^ (error_message is None)):
             raise TelegramError(
                 'answerPreCheckoutQuery: If ok is True, there should '
                 'not be error_message; if ok is False, error_message '

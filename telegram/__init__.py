@@ -54,7 +54,6 @@ from .shippingaddress import ShippingAddress
 from .orderinfo import OrderInfo
 from .successfulpayment import SuccessfulPayment
 from .invoice import Invoice
-from .videonote import VideoNote
 from .message import Message
 from .inputmessagecontent import InputMessageContent
 from .callbackquery import CallbackQuery
@@ -93,6 +92,7 @@ from .precheckoutquery import PreCheckoutQuery
 from .shippingquery import ShippingQuery
 from .webhookinfo import WebhookInfo
 from .gamehighscore import GameHighScore
+from .videonote import VideoNote
 from .update import Update
 from .bot import Bot
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,

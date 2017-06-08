@@ -32,8 +32,6 @@ class Update(TelegramObject):
         edited_message (:class:`telegram.Message`): New version of a message that is known to the
             bot and was edited
         inline_query (:class:`telegram.InlineQuery`): New incoming inline query.
-        shipping_query (:class:`telegram.ShippingQuery`): New incoming shipping query.
-        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): New incoming pre-checkout query.
         chosen_inline_result (:class:`telegram.ChosenInlineResult`): The result of an inline query
             that was chosen by a user and sent to their chat partner.
         callback_query (:class:`telegram.CallbackQuery`): New incoming callback query.
@@ -41,6 +39,9 @@ class Update(TelegramObject):
             text, photo, sticker, etc.
         edited_channel_post (Optional[:class:`telegram.Message`]): New version of a channel post
             that is known to the bot and was edited.
+        shipping_query (:class:`telegram.ShippingQuery`): New incoming shipping query.
+        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): New incoming pre-checkout query.
+
 
     Args:
         update_id (int):
@@ -49,10 +50,10 @@ class Update(TelegramObject):
         inline_query (Optional[:class:`telegram.InlineQuery`]):
         chosen_inline_result (Optional[:class:`telegram.ChosenInlineResult`])
         callback_query (Optional[:class:`telegram.CallbackQuery`]):
-        shipping_query (Optional[:class:`telegram.ShippingQuery`]):
-        pre_checkout_query (Optional[:class:`telegram.PreCheckoutQuery`]):
         channel_post (Optional[:class:`telegram.Message`]):
         edited_channel_post (Optional[:class:`telegram.Message`]):
+        shipping_query (Optional[:class:`telegram.ShippingQuery`]):
+        pre_checkout_query (Optional[:class:`telegram.PreCheckoutQuery`]):
         **kwargs: Arbitrary keyword arguments.
 
     """
@@ -64,10 +65,10 @@ class Update(TelegramObject):
                  inline_query=None,
                  chosen_inline_result=None,
                  callback_query=None,
-                 shipping_query=None,
-                 pre_checkout_query=None,
                  channel_post=None,
                  edited_channel_post=None,
+                 shipping_query=None,
+                 pre_checkout_query=None,
                  **kwargs):
         # Required
         self.update_id = int(update_id)

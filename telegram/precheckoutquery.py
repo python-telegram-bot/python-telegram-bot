@@ -33,10 +33,9 @@ class PreCheckoutQuery(TelegramObject):
         currency (str): Three-letter ISO 4217 currency code
         total_amount (int): Total price in the smallest units of the currency (integer)
         invoice_payload (str): Bot specified invoice payload
-
-    Keyword Args:
         shipping_option_id (Optional[str]): Identifier of the shipping option chosen by the user
         order_info (Optional[:class:`telegram.OrderInfo`]): Order info provided by the user
+        bot (Optional[Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """

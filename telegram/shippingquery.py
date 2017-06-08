@@ -32,6 +32,7 @@ class ShippingQuery(TelegramObject):
         from_user (:class:`telegram.User`): User who sent the query
         invoice_payload (str): Bot specified invoice payload
         shipping_address (:class:`telegram.ShippingQuery`): User specified shipping address
+        bot (Optional[Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """

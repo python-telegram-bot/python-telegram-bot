@@ -106,6 +106,7 @@ class Message(TelegramObject):
 
         left_chat_participant  (:class:`telegram.User`): Use `left_chat_member`
         instead.
+
     """
 
     def __init__(self,
