@@ -38,7 +38,7 @@ except ImportError:
                   "how to properly install.")
     raise
 
-from telegram import (InputFile, TelegramError)
+from telegram import InputFile, TelegramError
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken)
 
@@ -241,7 +241,11 @@ class Request(object):
         if InputFile.is_inputfile(data):
             data = InputFile(data)
             result = self._request_wrapper(
-                'POST', url, body=data.to_form(), headers=data.headers, **urlopen_kwargs)
+                'POST',
+                url,
+                body=data.input_file_content,
+                headers={'Content-Type': data.mimetype},
+                **urlopen_kwargs)
         else:
             data = json.dumps(data)
             result = self._request_wrapper(
