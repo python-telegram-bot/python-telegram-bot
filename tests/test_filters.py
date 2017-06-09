@@ -118,6 +118,18 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.game = None
         self.assertFalse(Filters.game(self.message))
 
+    def test_filters_successful_payment(self):
+        self.message.successful_payment = 'test'
+        self.assertTrue(Filters.successful_payment(self.message))
+        self.message.successful_payment = None
+        self.assertFalse(Filters.successful_payment(self.message))
+
+    def test_filters_invoice(self):
+        self.message.invoice = 'test'
+        self.assertTrue(Filters.invoice(self.message))
+        self.message.invoice = None
+        self.assertFalse(Filters.invoice(self.message))
+
     def test_filters_status_update(self):
         self.assertFalse(Filters.status_update(self.message))
 

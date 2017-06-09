@@ -1835,6 +1835,7 @@ class Bot(TelegramObject):
                      photo_height=None,
                      need_name=None,
                      need_phone_number=None,
+                     need_email=None,
                      need_shipping_address=None,
                      is_flexible=None,
                      disable_notification=False,
@@ -1867,6 +1868,8 @@ class Bot(TelegramObject):
                 the order
             need_phone_number (Optional[bool]): Pass True, if you require the user's phone number
                 to complete the order
+            need_email (Optional[bool]): Pass True, if you require the user's email to
+                complete the order
             need_shipping_address (Optional[bool]): Pass True, if you require the user's shipping
                 address to complete the order
             is_flexible (Optional[bool]): Pass True, if the final price depends on the shipping
@@ -1915,6 +1918,8 @@ class Bot(TelegramObject):
             data['need_name'] = need_name
         if need_phone_number is not None:
             data['need_phone_number'] = need_phone_number
+        if need_email is not None:
+            data['need_email'] = need_email
         if need_shipping_address is not None:
             data['need_shipping_address'] = need_shipping_address
         if is_flexible is not None:
@@ -1926,7 +1931,9 @@ class Bot(TelegramObject):
                               shipping_query_id,
                               ok,
                               shipping_options=None,
-                              error_message=None):
+                              error_message=None,
+                              timeout=None,
+                              **kwargs):
         """
         If you sent an invoice requesting a shipping address and the parameter is_flexible was
         specified, the Bot API will send an Update with a shipping_query field to the bot. Use
@@ -1943,6 +1950,7 @@ class Bot(TelegramObject):
                 form that explains why it is impossible to complete the order (e.g. "Sorry,
                 delivery to your desired address is unavailable'). Telegram will display this
                 message to the user.
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1951,18 +1959,32 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0]/answerShippingQuery'.format(self.base_url)
+
+        if ok is True and (shipping_options is None or error_message is not None):
+            raise TelegramError(
+                'answerShippingQuery: If ok is True, shipping_options '
+                'should not be empty and there should not be error_message')
+
+        if ok is False and (shipping_options is not None or error_message is None):
+            raise TelegramError(
+                'answerShippingQuery: If ok is False, error_message '
+                'should not be empty and there should not be shipping_options')
+
+        url_ = '{0}/answerShippingQuery'.format(self.base_url)
 
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
-        if shipping_options is not None:
+        if ok is True:
             data['shipping_options'] = shipping_options
         if error_message is not None:
             data['error_message'] = error_message
 
-        return url, data
+        result = self._request.post(url_, data, timeout=timeout)
 
-    def answer_pre_checkout_query(self, pre_checkout_query_id, ok, error_message=None):
+        return result
+
+    def answer_pre_checkout_query(self, pre_checkout_query_id, ok,
+                                  error_message=None, timeout=None, **kwargs):
         """
         If you sent an invoice requesting a shipping address and the parameter is_flexible was
         specified, the Bot API will send an Update with a shipping_query field to the bot.
@@ -1977,6 +1999,7 @@ class Bot(TelegramObject):
                 "Sorry, somebody just bought the last of our amazing black T-shirts while you were
                 busy filling out your payment details. Please choose a different color or
                 garment!"). Telegram will display this message to the user.
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1985,14 +2008,23 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
-        url = '{0]/answerPreCheckoutQuery'.format(self.base_url)
+
+        if not (ok ^ (error_message is None)):
+            raise TelegramError(
+                'answerPreCheckoutQuery: If ok is True, there should '
+                'not be error_message; if ok is False, error_message '
+                'should not be empty')
+
+        url_ = '{0}/answerPreCheckoutQuery'.format(self.base_url)
 
         data = {'pre_checkout_query_id': pre_checkout_query_id, 'ok': ok}
 
         if error_message is not None:
             data['error_message'] = error_message
 
-        return url, data
+        result = self._request.post(url_, data, timeout=timeout)
+
+        return result
 
     @staticmethod
     def de_json(data, bot):

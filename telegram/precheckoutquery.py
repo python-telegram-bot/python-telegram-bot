@@ -35,6 +35,7 @@ class PreCheckoutQuery(TelegramObject):
         invoice_payload (str): Bot specified invoice payload
         shipping_option_id (Optional[str]): Identifier of the shipping option chosen by the user
         order_info (Optional[:class:`telegram.OrderInfo`]): Order info provided by the user
+        bot (Optional[Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """
@@ -47,6 +48,7 @@ class PreCheckoutQuery(TelegramObject):
                  invoice_payload,
                  shipping_option_id=None,
                  order_info=None,
+                 bot=None,
                  **kwargs):
         self.id = id
         self.from_user = from_user
@@ -55,6 +57,8 @@ class PreCheckoutQuery(TelegramObject):
         self.invoice_payload = invoice_payload
         self.shipping_option_id = shipping_option_id
         self.order_info = order_info
+
+        self.bot = bot
 
         self._id_attrs = (self.id,)
 
@@ -88,3 +92,9 @@ class PreCheckoutQuery(TelegramObject):
         data['from'] = data.pop('from_user', None)
 
         return data
+
+    def answer(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.answerPreCheckoutQuery(update.pre_checkout_query.id, *args, **kwargs)``
+        """
+        return self.bot.answerPreCheckoutQuery(self.id, *args, **kwargs)

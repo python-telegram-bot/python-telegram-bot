@@ -32,15 +32,18 @@ class ShippingQuery(TelegramObject):
         from_user (:class:`telegram.User`): User who sent the query
         invoice_payload (str): Bot specified invoice payload
         shipping_address (:class:`telegram.ShippingQuery`): User specified shipping address
+        bot (Optional[Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, id, from_user, invoice_payload, shipping_address, **kwargs):
+    def __init__(self, id, from_user, invoice_payload, shipping_address, bot=None, **kwargs):
         self.id = id
         self.from_user = from_user
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
+
+        self.bot = bot
 
         self._id_attrs = (self.id,)
 
@@ -74,3 +77,7 @@ class ShippingQuery(TelegramObject):
         data['from'] = data.pop('from_user', None)
 
         return data
+
+    def answer(self, *args, **kwargs):
+        """Shortcut for ``bot.answerShippingQuery(update.shipping_query.id, *args, **kwargs)``"""
+        return self.bot.answerShippingQuery(self.id, *args, **kwargs)
