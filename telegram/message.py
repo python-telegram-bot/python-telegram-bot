@@ -98,7 +98,7 @@ class Message(TelegramObject):
             about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`): Message is a service message
             about a successful payment, information about the payment.
-        bot (Optional[Bot]): The Bot to use for instance methods
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods
 
     Deprecated: 4.0
         new_chat_participant (:class:`telegram.User`): Use `new_chat_member`
@@ -106,7 +106,6 @@ class Message(TelegramObject):
 
         left_chat_participant  (:class:`telegram.User`): Use `left_chat_member`
         instead.
-
     """
 
     def __init__(self,
