@@ -12,7 +12,7 @@ def main():
     if pyversion=="pypy-5.3.1":
         pr = os.environ.get('TRAVIS_PULL_REQUEST', None)
         print("TRAVIS_PULL_REQUEST: {}".format(pr))
-        if pr:
+        if pr != 'false':
             PAYLOAD_APPVEYOR = {
                 'accountName': 'Eldinnie',
                 'projectSlug': 'python-telegram-bot-6akeh',
