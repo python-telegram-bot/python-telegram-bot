@@ -24,11 +24,13 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
+- `Eugenio Panadero <https://github.com/azogue>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
+- `jeffffc <https://github.com/jeffffc>`_
 - `jh0ker <https://github.com/jh0ker>`_
 - `John Yong <https://github.com/whipermr5>`_
 - `jossalgon <https://github.com/jossalgon>`_

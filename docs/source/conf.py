@@ -11,7 +11,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
 import sys
 import os
 import shlex
@@ -25,7 +24,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.0'
+needs_sphinx = '1.5.4'  # fixes issues with autodoc-skip-member and napoleon
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -136,7 +135,7 @@ html_logo = 'ptb-logo-orange.png'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+html_favicon = 'ptb-logo-orange.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -289,3 +288,21 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# -- script stuff --------------------------------------------------------
+
+import inspect
+
+
+def autodoc_skip_member(app, what, name, obj, skip, options):
+    try:
+        if inspect.getmodule(obj).__name__.startswith('telegram') and inspect.isfunction(obj):
+            if name.lower() != name:
+                return True
+    except AttributeError:
+        pass
+    # Return None so napoleon can handle it
+
+
+def setup(app):
+    app.connect('autodoc-skip-member', autodoc_skip_member)

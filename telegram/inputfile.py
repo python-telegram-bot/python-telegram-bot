@@ -69,13 +69,17 @@ class InputFile(object):
                 if not self.filename or '.' not in self.filename:
                     self.filename = self.mimetype.replace('/', '.')
             except TelegramError:
-                self.mimetype = mimetypes.guess_type(self.filename)[0] or DEFAULT_MIME_TYPE
+                if self.filename:
+                    self.mimetype = mimetypes.guess_type(
+                        self.filename)[0] or DEFAULT_MIME_TYPE
+                else:
+                    self.mimetype = DEFAULT_MIME_TYPE
 
     @property
     def headers(self):
         """
         Returns:
-            str:
+            str
         """
         return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
 
@@ -83,14 +87,14 @@ class InputFile(object):
     def content_type(self):
         """
         Returns:
-            str:
+            str
         """
         return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
         """
         Returns:
-            str:
+            str
         """
         form = []
         form_boundary = '--' + self.boundary
@@ -118,7 +122,7 @@ class InputFile(object):
     def _parse(form):
         """
         Returns:
-            str:
+            str
         """
         if sys.version_info > (3,):
             # on Python 3 form needs to be byte encoded

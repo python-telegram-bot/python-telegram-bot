@@ -46,7 +46,8 @@ except ImportError:
 
 sys.path.append('.')
 
-from telegram import Update, Message, TelegramError, User, Chat, Bot, InlineQuery, CallbackQuery
+from telegram import (Update, Message, TelegramError, User, Chat, Bot,
+                      InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
@@ -117,6 +118,14 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
     def telegramCallbackHandlerTest(self, bot, update):
         self.received_message = update.callback_query
+        self.message_count += 1
+
+    def telegramShippingHandlerTest(self, bot, update):
+        self.received_message = update.shipping_query
+        self.message_count += 1
+
+    def telegramPreCheckoutHandlerTest(self, bot, update):
+        self.received_message = update.pre_checkout_query
         self.message_count += 1
 
     @run_async
@@ -270,6 +279,19 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         self.assertTrue(None is self.received_message)
+
+        # case insensitivity
+        self.reset()
+        message = Message(0, user, None, None, text="/Test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertTrue(self.received_message, '/Test')
+        handler = CommandHandler('Test', self.telegramHandlerTest)
+        self.updater.dispatcher.add_handler(handler)
+        message = Message(0, user, None, None, text="/test", bot=bot)
+        queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        self.assertTrue(self.received_message, '/test')
 
         # Remove handler
         d.remove_handler(handler)
@@ -479,6 +501,44 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         queue.put(update)
         sleep(.1)
         self.assertEqual(self.received_message, "testcallback")
+
+        # Remove handler
+        d.remove_handler(handler)
+        self.reset()
+
+        queue.put(update)
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_addRemoveShippingQueryHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = ShippingQueryHandler(self.telegramShippingHandlerTest)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+        update = Update(update_id=0, shipping_query="testshipping")
+        queue.put(update)
+        sleep(.1)
+        self.assertEqual(self.received_message, "testshipping")
+
+        # Remove handler
+        d.remove_handler(handler)
+        self.reset()
+
+        queue.put(update)
+        sleep(.1)
+        self.assertTrue(None is self.received_message)
+
+    def test_addRemovePreCheckoutQueryHandler(self):
+        self._setup_updater('', messages=0)
+        d = self.updater.dispatcher
+        handler = PreCheckoutQueryHandler(self.telegramPreCheckoutHandlerTest)
+        d.add_handler(handler)
+        queue = self.updater.start_polling(0.01)
+        update = Update(update_id=0, pre_checkout_query="testprecheckout")
+        queue.put(update)
+        sleep(.1)
+        self.assertEqual(self.received_message, "testprecheckout")
 
         # Remove handler
         d.remove_handler(handler)

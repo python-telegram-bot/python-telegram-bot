@@ -41,7 +41,7 @@ class Chat(TelegramObject):
         username(Optional[str]):
         first_name(Optional[str]):
         last_name(Optional[str]):
-        bot (Optional[Bot]): The Bot to use for instance methods
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """

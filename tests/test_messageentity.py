@@ -44,24 +44,24 @@ class MessageEntityTest(BaseTest, unittest.TestCase):
             'url': self.url
         }
 
-    def test_sticker_de_json(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict, self._bot)
+    def test_messageentity_de_json(self):
+        entity = telegram.MessageEntity.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(sticker.type, self.type)
-        self.assertEqual(sticker.offset, self.offset)
-        self.assertEqual(sticker.length, self.length)
-        self.assertEqual(sticker.url, self.url)
+        self.assertEqual(entity.type, self.type)
+        self.assertEqual(entity.offset, self.offset)
+        self.assertEqual(entity.length, self.length)
+        self.assertEqual(entity.url, self.url)
 
-    def test_sticker_to_json(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict, self._bot)
+    def test_messageentity_to_json(self):
+        entity = telegram.MessageEntity.de_json(self.json_dict, self._bot)
 
-        self.assertTrue(self.is_json(sticker.to_json()))
+        self.assertTrue(self.is_json(entity.to_json()))
 
-    def test_sticker_to_dict(self):
-        sticker = telegram.MessageEntity.de_json(self.json_dict, self._bot).to_dict()
+    def test_messageentity_to_dict(self):
+        entity = telegram.MessageEntity.de_json(self.json_dict, self._bot).to_dict()
 
-        self.assertTrue(self.is_dict(sticker))
-        self.assertDictEqual(self.json_dict, sticker)
+        self.assertTrue(self.is_dict(entity))
+        self.assertDictEqual(self.json_dict, entity)
 
 
 if __name__ == '__main__':

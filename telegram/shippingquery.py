@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=R0902,R0912,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
@@ -17,45 +16,35 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram InlineQuery"""
+"""This module contains an object that represents a Telegram ShippingQuery."""
 
-from telegram import TelegramObject, User, Location
+from telegram import TelegramObject, User, ShippingAddress
 
 
-class InlineQuery(TelegramObject):
-    """This object represents a Telegram InlineQuery.
+class ShippingQuery(TelegramObject):
+    """This object contains information about an incoming shipping query.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (str):
-        from_user (:class:`telegram.User`):
-        query (str):
-        offset (str):
-
-    Args:
-        id (int):
-        from_user (:class:`telegram.User`):
-        query (str):
-        offset (str):
-        location (optional[:class:`telegram.Location`]):
-        bot (Optional[telegram.Bot]): The Bot to use for instance methods
+        id (str): Unique query identifier
+        from_user (:class:`telegram.User`): User who sent the query
+        invoice_payload (str): Bot specified invoice payload
+        shipping_address (:class:`telegram.ShippingQuery`): User specified shipping address
+        bot (Optional[Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, id, from_user, query, offset, location=None, bot=None, **kwargs):
-        # Required
+    def __init__(self, id, from_user, invoice_payload, shipping_address, bot=None, **kwargs):
         self.id = id
         self.from_user = from_user
-        self.query = query
-        self.offset = offset
-
-        # Optional
-        self.location = location
+        self.invoice_payload = invoice_payload
+        self.shipping_address = shipping_address
 
         self.bot = bot
+
         self._id_attrs = (self.id,)
 
     @staticmethod
@@ -66,30 +55,29 @@ class InlineQuery(TelegramObject):
             bot (telegram.Bot):
 
         Returns:
-            telegram.InlineQuery:
+            telegram.ShippingQuery:
         """
-        data = super(InlineQuery, InlineQuery).de_json(data, bot)
-
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'), bot)
-        data['location'] = Location.de_json(data.get('location'), bot)
+        data = super(ShippingQuery, ShippingQuery).de_json(data, bot)
 
-        return InlineQuery(bot=bot, **data)
+        data['from_user'] = User.de_json(data.pop('from'), bot)
+        data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
+
+        return ShippingQuery(**data)
 
     def to_dict(self):
         """
         Returns:
             dict:
         """
-        data = super(InlineQuery, self).to_dict()
+        data = super(ShippingQuery, self).to_dict()
 
-        # Required
         data['from'] = data.pop('from_user', None)
 
         return data
 
     def answer(self, *args, **kwargs):
-        """Shortcut for ``bot.answerInlineQuery(update.inline_query.id, *args, **kwargs)``"""
-        return self.bot.answerInlineQuery(self.id, *args, **kwargs)
+        """Shortcut for ``bot.answerShippingQuery(update.shipping_query.id, *args, **kwargs)``"""
+        return self.bot.answerShippingQuery(self.id, *args, **kwargs)

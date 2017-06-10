@@ -43,7 +43,7 @@ class User(TelegramObject):
         last_name (Optional[str]): User's or bot's last name
         username (Optional[str]): User's or bot's username
         language_code (Optional[str]): IETF language tag of the user's language
-        bot (Optional[Bot]): The Bot to use for instance methods
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods
     """
 
     def __init__(self,
