@@ -19,7 +19,7 @@ install:
   - ps: |
       $Headers = @{
        'User-Agent' = 'AppveyorWaits/1.0.0'
-       'Accept = 'application/vnd.travis-ci.2+json'
+       'Accept' = 'application/vnd.travis-ci.2+json'
        }
       Invoke-RestMethod -Uri 'https://api.travis-ci.org/repos/Eldinnie/python-telegram-bot/builds' -Method Get -Headers = $Headers
 
