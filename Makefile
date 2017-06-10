@@ -29,7 +29,7 @@ lint:
 	$(PYLINT) -E telegram --disable=no-name-in-module,import-error
 
 test:
-	$(NOSETESTS) -v
+	$(NOSETESTS) -v --with-randomly tests
 
 install:
 	$(PIP)  install -r requirements.txt -r requirements-dev.txt
