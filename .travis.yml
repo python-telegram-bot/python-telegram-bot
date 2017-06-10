@@ -18,19 +18,19 @@ install:
 script:
 #  - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/ tests
   - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pre-commit run --all-files; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy3' ]]
+  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy3' ]];
     then
-      if [[ $TRAVIS_PULL_REQUEST ]]
+      if [[ $TRAVIS_PULL_REQUEST ]];
       then
         PAYLOAD_APPVEYOR = {
           'accountName' = 'Eldinnie'
           'projectSlug' = 'python-telegram-bot-6akeh'
           'pullRequestId' = $TRAVIS_PULL_REQUEST
-          }
+          };
         HEADERS = {
           'Content-Type' = 'application/json'
-          }
-        "curl -H $HEADERS -X POST -d $PAYLOAD_APPVEYOR" 'https://ci.appveyor.com//api/builds'
+          };
+        "curl -H $HEADERS -X POST -d $PAYLOAD_APPVEYOR" 'https://ci.appveyor.com//api/builds';
       fi
       else
         PAYLOAD_APPVEYOR = {
@@ -38,12 +38,12 @@ script:
           'projectSlug' = 'python-telegram-bot-6akeh'
           'branch' = $TRAVIS_BRANCH
           'commitId' = $TRAVIS_COMMIT
-          }
+          };
         HEADERS = {
           'Content-Type' = 'application/json'
-          }
-        "curl -H $HEADERS -X POST -d $PAYLOAD_APPVEYOR" 'https://ci.appveyor.com//api/builds'
+          };
+        "curl -H $HEADERS -X POST -d $PAYLOAD_APPVEYOR" 'https://ci.appveyor.com//api/builds';
     fi
-  - python ./setup.py bdist_dumb
+#  - python ./setup.py bdist_dumb
 after_success:
   coveralls
