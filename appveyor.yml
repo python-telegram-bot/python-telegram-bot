@@ -21,7 +21,7 @@ install:
        'User-Agent' = 'AppveyorWaits/1.0.0'
        'Accept' = 'application/vnd.travis-ci.2+json'
        }
-      Invoke-RestMethod -Uri 'https://api.travis-ci.org/repos/Eldinnie/python-telegram-bot/builds' -Method Get -Headers = $Headers
+      Invoke-RestMethod -Uri 'https://api.travis-ci.org/repos/Eldinnie/python-telegram-bot/builds' -Method Get -Headers $Headers
 
 #    while ((Invoke-RestMethod -Uri 'https://ci.appveyor.com/api/projects/<your_account)namr>/<your_project_slug>' -Headers $headers  -Method Get).build.status -eq "running") {
 #    write-host "waiting for Appveyor build to stop running"
