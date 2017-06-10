@@ -18,7 +18,7 @@ def main():
                 'projectSlug': 'python-telegram-bot-6akeh',
                 'pullRequestId': pr
             }
-            r = requests.post(URL, data=PAYLOAD_APPVEYOR, headers=HEADERS)
+            r = requests.post(URL, json=PAYLOAD_APPVEYOR, headers=HEADERS)
             print(r.json())
         else:
             branch = os.environ.get('TRAVIS_BRANCH', None)
@@ -31,7 +31,7 @@ def main():
                 'branch': branch,
                 'commitId': commit_id
             }
-            r = requests.post(URL, data=PAYLOAD_APPVEYOR, headers=HEADERS)
+            r = requests.post(URL, json=PAYLOAD_APPVEYOR, headers=HEADERS)
             print(r.json())
 
 if __name__=="__main__":
