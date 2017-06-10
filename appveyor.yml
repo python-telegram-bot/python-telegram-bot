@@ -16,6 +16,16 @@ install:
   - "%PYTHON%\\python.exe -m pip install wheel"
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
   - "%PYTHON%\\python.exe -m pip install -r requirements-dev.txt"
+  - ps: >-
+    $Host = 'https://api.travis-ci.org.'
+    $headers = @{
+          "accept" = "application/vnd.travis-ci.2+json"
+        }
+    write-host Invoke-RestMethod -Uri '$host/repos/eldinnie/python-telegram-bot/builds' -Headers $headers -Method Get
+#    while ((Invoke-RestMethod -Uri 'https://ci.appveyor.com/api/projects/<your_account)namr>/<your_project_slug>' -Headers $headers  -Method Get).build.status -eq "running") {
+#    write-host "waiting for Appveyor build to stop running"
+#    Start-sleep 1
+}
 
 build: off
 
@@ -27,7 +37,7 @@ test_script:
   # Note that you must use the environment variable %PYTHON% to refer to
   # the interpreter you're using - Appveyor does not do anything special
   # to put the Python version you want to use on PATH.
-  - "nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/ tests"
+  - "%python%\\Scripts\nosetests -v --with-flaky --no-flaky-report tests"
 
 after_test:
   # This step builds your wheels.
