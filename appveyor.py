@@ -4,7 +4,10 @@ import requests
 
 def main():
     pyversion = os.environ.get('TRAVIS_PYTHON_VERSION', "didn't get it")
-    HEADERS = {'Content-Type':'application/json'}
+    HEADERS = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer vooe775fjw49jt0iu0d1'
+               }
     URL = 'https://ci.appveyor.com//api/builds'
     if pyversion=="pypy-5.3.1":
         pr = os.environ.get('$TRAVIS_PULL_REQUEST', None)
