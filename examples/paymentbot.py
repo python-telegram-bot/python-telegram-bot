@@ -38,6 +38,7 @@ def start_with_shipping_callback(bot, update):
     # price in dollars
     price = 1
     # price * 100 so as to include 2 d.p.
+    # check https://core.telegram.org/bots/payments#supported-currencies for more details
     prices = [LabeledPrice("Test", price * 100)]
 
     # optionally pass need_name=True, need_phone_number=True,
