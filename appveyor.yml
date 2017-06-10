@@ -17,8 +17,7 @@ install:
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
   - "%PYTHON%\\python.exe -m pip install -r requirements-dev.txt"
   - ps: |
-      $Travishost = 'https://api.travis-ci.org.'
-      $Test = Invoke-RestMethod -Uri '$Travishost/repos/eldinnie/python-telegram-bot/builds' -Method Get
+      $Test = Invoke-RestMethod -Uri 'https://api.travis-ci.org/repos/eldinnie/python-telegram-bot/builds' -Method Get
       Add-AppveyorMessage $Test
 #    while ((Invoke-RestMethod -Uri 'https://ci.appveyor.com/api/projects/<your_account)namr>/<your_project_slug>' -Headers $headers  -Method Get).build.status -eq "running") {
 #    write-host "waiting for Appveyor build to stop running"
