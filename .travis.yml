@@ -11,7 +11,6 @@ branches:
   only:
     - master
 install:
-  - git submodule update --init --recursive
   - pip install coveralls
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
