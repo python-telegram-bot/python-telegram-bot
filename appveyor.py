@@ -1,9 +1,8 @@
-import json
 import os
-import requests
 import sys
-
 import time
+
+import requests
 
 
 def build():
@@ -11,9 +10,9 @@ def build():
     HEADERS = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer vooe775fjw49jt0iu0d1'
-               }
+    }
     URL = 'https://ci.appveyor.com//api/builds'
-    if pyversion=="pypy-5.3.1":
+    if pyversion == "pypy-5.3.1":
         pr = os.environ.get('TRAVIS_PULL_REQUEST', None)
         print("TRAVIS_PULL_REQUEST: {}".format(pr))
         if pr != 'false':
@@ -37,6 +36,7 @@ def build():
             }
             r = requests.post(URL, json=PAYLOAD_APPVEYOR, headers=HEADERS)
             print("Started build on Appveyor")
+
 
 def wait():
     HEADERS = {
@@ -94,7 +94,7 @@ def wait():
                         sys.exit()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     arg = sys.argv[1]
     if arg == 'build':
         build()
