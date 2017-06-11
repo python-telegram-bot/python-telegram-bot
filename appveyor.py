@@ -67,9 +67,13 @@ def wait():
             else:
                 waiting()
         else:
+            try:
+                appveyor_pr = result['build']['pullRequestId']
+            except KeyError:
+                appveyor_pr = ''
             branch = os.environ.get('TRAVIS_BRANCH', None)
             appveyor_branch = result['build']['branch']
-            if branch == appveyor_branch:
+            if branch == appveyor_branch and not appveyor_pr:
                 print("New commit on the same branch, canceling build on Appveyor")
                 version = result['build']['version']
                 URL = "https://ci.appveyor.com/api/builds/Eldinnie/python-telegram-bot-6akeh/{}".format(version)
