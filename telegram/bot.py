@@ -1960,12 +1960,12 @@ class Bot(TelegramObject):
 
         """
 
-        if ok is True and (shipping_options is None or error_message is not None):
+        if ok and (shipping_options is None or error_message is not None):
             raise TelegramError(
                 'answerShippingQuery: If ok is True, shipping_options '
                 'should not be empty and there should not be error_message')
 
-        if ok is False and (shipping_options is not None or error_message is None):
+        if not ok and (shipping_options is not None or error_message is None):
             raise TelegramError(
                 'answerShippingQuery: If ok is False, error_message '
                 'should not be empty and there should not be shipping_options')
@@ -1974,7 +1974,7 @@ class Bot(TelegramObject):
 
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
-        if ok is True:
+        if ok:
             data['shipping_options'] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
             data['error_message'] = error_message
