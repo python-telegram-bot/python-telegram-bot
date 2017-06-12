@@ -12,7 +12,7 @@ Setting things up
 
    .. code-block:: bash
 
-      $ git clone https://github.com/<your username>/python-telegram-bot
+      $ git clone https://github.com/<your username>/python-telegram-bot --recursive
       $ cd python-telegram-bot
 
 3. Add a track to the original repository:
