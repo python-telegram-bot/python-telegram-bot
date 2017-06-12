@@ -443,7 +443,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=20.,
+            timeout=timeout,
             **kwargs)
 
     @log
