@@ -89,29 +89,29 @@ class Chat(TelegramObject):
         return Chat(bot=bot, **data)
 
     def send_action(self, *args, **kwargs):
-        """Shortcut for ``bot.sendChatAction(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.sendChatAction(self.id, *args, **kwargs)
+        """Shortcut for ``bot.send_chat_action(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.send_chat_action(self.id, *args, **kwargs)
 
     def leave(self, *args, **kwargs):
-        """Shortcut for ``bot.leaveChat(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.leaveChat(self.id, *args, **kwargs)
+        """Shortcut for ``bot.leave_chat(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.leave_chat(self.id, *args, **kwargs)
 
     def get_administrators(self, *args, **kwargs):
-        """Shortcut for ``bot.getChatAdministrators(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.getChatAdministrators(self.id, *args, **kwargs)
+        """Shortcut for ``bot.get_chat_administrators(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.get_chat_administrators(self.id, *args, **kwargs)
 
     def get_members_count(self, *args, **kwargs):
-        """Shortcut for ``bot.getChatMembersCount(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.getChatMembersCount(self.id, *args, **kwargs)
+        """Shortcut for ``bot.get_chat_members_count(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.get_chat_members_count(self.id, *args, **kwargs)
 
     def get_member(self, *args, **kwargs):
-        """Shortcut for ``bot.getChatMember(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.getChatMember(self.id, *args, **kwargs)
+        """Shortcut for ``bot.get_chat_member(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.get_chat_member(self.id, *args, **kwargs)
 
     def kick_member(self, *args, **kwargs):
-        """Shortcut for ``bot.kickChatMember(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.kickChatMember(self.id, *args, **kwargs)
+        """Shortcut for ``bot.kick_chat_member(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.kick_chat_member(self.id, *args, **kwargs)
 
     def unban_member(self, *args, **kwargs):
-        """Shortcut for ``bot.unbanChatMember(update.message.chat.id, *args, **kwargs)``"""
-        return self.bot.unbanChatMember(self.id, *args, **kwargs)
+        """Shortcut for ``bot.unban_chat_member(update.message.chat.id, *args, **kwargs)``"""
+        return self.bot.unban_chat_member(self.id, *args, **kwargs)

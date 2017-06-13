@@ -264,7 +264,7 @@ class Updater(object):
 
         while self.running:
             try:
-                updates = self.bot.getUpdates(
+                updates = self.bot.get_updates(
                     self.last_update_id,
                     timeout=timeout,
                     read_latency=read_latency,
@@ -367,11 +367,11 @@ class Updater(object):
             try:
                 if clean:
                     # Disable webhook for cleaning
-                    self.bot.deleteWebhook()
+                    self.bot.delete_webhook()
                     self._clean_updates()
                     sleep(1)
 
-                self.bot.setWebhook(
+                self.bot.set_webhook(
                     url=webhook_url, certificate=cert, allowed_updates=allowed_updates)
             except (Unauthorized, InvalidToken):
                 raise
@@ -390,9 +390,9 @@ class Updater(object):
 
     def _clean_updates(self):
         self.logger.debug('Cleaning updates from Telegram server')
-        updates = self.bot.getUpdates()
+        updates = self.bot.get_updates()
         while updates:
-            updates = self.bot.getUpdates(updates[-1].update_id + 1)
+            updates = self.bot.get_updates(updates[-1].update_id + 1)
 
     def stop(self):
         """

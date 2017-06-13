@@ -944,7 +944,7 @@ class MockBot(object):
         self.edited = edited
         self.username = "MockBot"
 
-    def mockUpdate(self, text):
+    def mock_update(self, text):
         message = Message(0, User(0, 'Testuser'), None, Chat(0, Chat.GROUP), bot=self)
         message.text = text
         update = Update(0)
@@ -956,7 +956,7 @@ class MockBot(object):
 
         return update
 
-    def setWebhook(self, url=None, certificate=None, allowed_updates=None):
+    def set_webhook(self, url=None, certificate=None, allowed_updates=None):
         if self.bootstrap_retries is None:
             return
 
@@ -964,7 +964,7 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def deleteWebhook(self):
+    def delete_webhook(self):
         if self.bootstrap_retries is None:
             return
 
@@ -972,7 +972,7 @@ class MockBot(object):
             self.bootstrap_attempts += 1
             raise self.bootstrap_err
 
-    def getUpdates(self,
+    def get_updates(self,
                    offset=None,
                    limit=100,
                    timeout=0,
@@ -984,10 +984,10 @@ class MockBot(object):
             raise TelegramError('Test Error 2')
         elif self.send_messages >= 2:
             self.send_messages -= 2
-            return self.mockUpdate(self.text), self.mockUpdate(self.text)
+            return self.mock_update(self.text), self.mock_update(self.text)
         elif self.send_messages == 1:
             self.send_messages -= 1
-            return self.mockUpdate(self.text),
+            return self.mock_update(self.text),
         else:
             return []
 

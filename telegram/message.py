@@ -328,7 +328,7 @@ class Message(TelegramObject):
 
     def reply_text(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendMessage(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_message(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
@@ -337,11 +337,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_photo(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendPhoto(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_photo(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the photo is sent as an actual reply to
@@ -354,11 +354,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendPhoto(self.chat_id, *args, **kwargs)
+        return self.bot.send_photo(self.chat_id, *args, **kwargs)
 
     def reply_audio(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendAudio(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_audio(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the audio is sent as an actual reply to
@@ -371,11 +371,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendAudio(self.chat_id, *args, **kwargs)
+        return self.bot.send_audio(self.chat_id, *args, **kwargs)
 
     def reply_document(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendDocument(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_document(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the document is sent as an actual reply to
@@ -388,11 +388,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendDocument(self.chat_id, *args, **kwargs)
+        return self.bot.send_document(self.chat_id, *args, **kwargs)
 
     def reply_sticker(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendSticker(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_sticker(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the sticker is sent as an actual reply to
@@ -405,11 +405,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendSticker(self.chat_id, *args, **kwargs)
+        return self.bot.send_sticker(self.chat_id, *args, **kwargs)
 
     def reply_video(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendVideo(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_video(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
@@ -422,7 +422,7 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendVideo(self.chat_id, *args, **kwargs)
+        return self.bot.send_video(self.chat_id, *args, **kwargs)
 
     def reply_video_note(self, *args, **kwargs):
         """
@@ -443,7 +443,7 @@ class Message(TelegramObject):
 
     def reply_voice(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendVoice(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_voice(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the voice is sent as an actual reply to
@@ -456,11 +456,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendVoice(self.chat_id, *args, **kwargs)
+        return self.bot.send_voice(self.chat_id, *args, **kwargs)
 
     def reply_location(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendLocation(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_location(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the location is sent as an actual reply to
@@ -473,11 +473,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendLocation(self.chat_id, *args, **kwargs)
+        return self.bot.send_location(self.chat_id, *args, **kwargs)
 
     def reply_venue(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendVenue(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_venue(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the venue is sent as an actual reply to
@@ -490,11 +490,11 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendVenue(self.chat_id, *args, **kwargs)
+        return self.bot.send_venue(self.chat_id, *args, **kwargs)
 
     def reply_contact(self, *args, **kwargs):
         """
-        Shortcut for ``bot.sendContact(update.message.chat_id, *args, **kwargs)``
+        Shortcut for ``bot.send_contact(update.message.chat_id, *args, **kwargs)``
 
         Keyword Args:
             quote (Optional[bool]): If set to ``True``, the contact is sent as an actual reply to
@@ -507,12 +507,12 @@ class Message(TelegramObject):
         """
 
         self._quote(kwargs)
-        return self.bot.sendContact(self.chat_id, *args, **kwargs)
+        return self.bot.send_contact(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, disable_notification=False):
         """Shortcut for
 
-            >>> bot.forwardMessage(chat_id=chat_id,
+            >>> bot.forward_message(chat_id=chat_id,
             ...                    from_chat_id=update.message.chat_id,
             ...                    disable_notification=disable_notification,
             ...                    message_id=update.message.message_id)
@@ -521,7 +521,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message forwarded.
 
         """
-        return self.bot.forwardMessage(
+        return self.bot.forward_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
             disable_notification=disable_notification,
@@ -531,7 +531,7 @@ class Message(TelegramObject):
         """
         Shortcut for
 
-            >>> bot.editMessageText(chat_id=message.chat_id,
+            >>> bot.edit_message_text(chat_id=message.chat_id,
             ...                     message_id=message.message_id,
             ...                     *args, **kwargs)
 
@@ -548,7 +548,7 @@ class Message(TelegramObject):
         """
         Shortcut for
 
-            >>> bot.editMessageCaption(chat_id=message.chat_id,
+            >>> bot.edit_message_caption(chat_id=message.chat_id,
             ...                        message_id=message.message_id,
             ...                        *args, **kwargs)
 
@@ -564,7 +564,7 @@ class Message(TelegramObject):
         """
         Shortcut for
 
-            >>> bot.editReplyMarkup(chat_id=message.chat_id,
+            >>> bot.edit_message_reply_markup(chat_id=message.chat_id,
             ...                     message_id=message.message_id,
             ...                     *args, **kwargs)
 

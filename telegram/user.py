@@ -96,9 +96,9 @@ class User(TelegramObject):
 
     def get_profile_photos(self, *args, **kwargs):
         """
-        Shortcut for ``bot.getUserProfilePhotos(update.message.from_user.id, *args, **kwargs)``
+        Shortcut for ``bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)``
         """
-        return self.bot.getUserProfilePhotos(self.id, *args, **kwargs)
+        return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
 
     @staticmethod
     def de_list(data, bot):

@@ -85,7 +85,7 @@ class Bot(TelegramObject):
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             if not self.bot:
-                self.getMe()
+                self.get_me()
 
             result = func(self, *args, **kwargs)
             return result
