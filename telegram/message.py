@@ -147,6 +147,7 @@ class Message(TelegramObject):
                  successful_payment=None,
                  bot=None,
                  video_note=None,
+                 game=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -162,7 +163,7 @@ class Message(TelegramObject):
         self.text = text
         self.entities = entities or list()
         self.audio = audio
-        self.game = kwargs.get('game')
+        self.game = game
         self.document = document
         self.photo = photo
         self.sticker = sticker
