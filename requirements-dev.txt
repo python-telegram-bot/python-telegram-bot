@@ -6,3 +6,4 @@ flaky
 yapf
 pre-commit
 pre-commit-hooks
+beautifulsoup4
