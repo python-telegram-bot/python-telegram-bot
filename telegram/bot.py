@@ -85,7 +85,7 @@ class Bot(TelegramObject):
         @functools.wraps(func)
         def decorator(self, *args, **kwargs):
             if not self.bot:
-                self.getMe()
+                self.get_me()
 
             result = func(self, *args, **kwargs)
             return result
@@ -443,7 +443,7 @@ class Bot(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=20.,
+            timeout=timeout,
             **kwargs)
 
     @log
@@ -1975,7 +1975,7 @@ class Bot(TelegramObject):
         data = {'shipping_query_id': shipping_query_id, 'ok': ok}
 
         if ok is True:
-            data['shipping_options'] = shipping_options
+            data['shipping_options'] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
             data['error_message'] = error_message
 
@@ -2009,7 +2009,7 @@ class Bot(TelegramObject):
 
         """
 
-        if not (ok ^ (error_message is None)):
+        if not (ok ^ (error_message is not None)):
             raise TelegramError(
                 'answerPreCheckoutQuery: If ok is True, there should '
                 'not be error_message; if ok is False, error_message '

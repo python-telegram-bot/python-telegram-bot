@@ -91,5 +91,5 @@ class InlineQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """Shortcut for ``bot.answerInlineQuery(update.inline_query.id, *args, **kwargs)``"""
-        return self.bot.answerInlineQuery(self.id, *args, **kwargs)
+        """Shortcut for ``bot.answer_inline_query(update.inline_query.id, *args, **kwargs)``"""
+        return self.bot.answer_inline_query(self.id, *args, **kwargs)

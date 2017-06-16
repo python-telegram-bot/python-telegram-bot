@@ -15,6 +15,7 @@ Contributors
 
 The following wonderful people contributed directly or indirectly to this project:
 
+- `Alateas <https://github.com/alateas>`_
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Balduro <https://github.com/Balduro>`_
@@ -50,6 +51,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Joscha Götzer <https://github.com/Rostgnom>`_
+- `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `thodnev <https://github.com/thodnev>`_
