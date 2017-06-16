@@ -1960,6 +1960,8 @@ class Bot(TelegramObject):
 
         """
 
+        ok = bool(ok)
+
         if ok and (shipping_options is None or error_message is not None):
             raise TelegramError(
                 'answerShippingQuery: If ok is True, shipping_options '
@@ -2008,6 +2010,8 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
 
         """
+
+        ok = bool(ok)
 
         if not (ok ^ (error_message is not None)):
             raise TelegramError(
