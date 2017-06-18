@@ -31,10 +31,45 @@ from telegram.utils.request import Request
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
+def info(func):
+    @functools.wraps(func)
+    def decorator(self, *args, **kwargs):
+        if not self.bot:
+            self.get_me()
+
+        result = func(self, *args, **kwargs)
+        return result
+
+    return decorator
+
+
+def log(func):
+    logger = logging.getLogger(func.__module__)
+
+    @functools.wraps(func)
+    def decorator(self, *args, **kwargs):
+        logger.debug('Entering: %s', func.__name__)
+        result = func(self, *args, **kwargs)
+        logger.debug(result)
+        logger.debug('Exiting: %s', func.__name__)
+        return result
+
+    return decorator
+
+
+def message(func):
+    @functools.wraps(func)
+    def decorator(self, *args, **kwargs):
+        url, data = func(self, *args, **kwargs)
+        return self._message_wrapper(url, data, *args, **kwargs)
+
+    return decorator
+
+
 class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
-    Attributes:
+    Properties:
         id (int): Unique identifier for this bot.
         first_name (str): Bot's first name.
         last_name (str): Bot's last name.
@@ -80,18 +115,6 @@ class Bot(TelegramObject):
 
         return token
 
-    def info(func):
-
-        @functools.wraps(func)
-        def decorator(self, *args, **kwargs):
-            if not self.bot:
-                self.get_me()
-
-            result = func(self, *args, **kwargs)
-            return result
-
-        return decorator
-
     @property
     @info
     def id(self):
@@ -116,19 +139,6 @@ class Bot(TelegramObject):
     def name(self):
         return '@{0}'.format(self.username)
 
-    def log(func):
-        logger = logging.getLogger(func.__module__)
-
-        @functools.wraps(func)
-        def decorator(self, *args, **kwargs):
-            logger.debug('Entering: %s', func.__name__)
-            result = func(self, *args, **kwargs)
-            logger.debug(result)
-            logger.debug('Exiting: %s', func.__name__)
-            return result
-
-        return decorator
-
     def _message_wrapper(self, url, data, *args, **kwargs):
         if kwargs.get('reply_to_message_id'):
             data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
@@ -149,15 +159,6 @@ class Bot(TelegramObject):
             return result
 
         return Message.de_json(result, self)
-
-    def message(func):
-
-        @functools.wraps(func)
-        def decorator(self, *args, **kwargs):
-            url, data = func(self, *args, **kwargs)
-            return Bot._message_wrapper(self, url, data, *args, **kwargs)
-
-        return decorator
 
     @log
     def get_me(self, timeout=None, **kwargs):
@@ -242,8 +243,7 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @message
-    def delete_message(self, chat_id, message_id):
+    def delete_message(self, chat_id, message_id, timeout=None, **kwargs):
         """Use this method to delete a message. A message can only be deleted if it was sent less
         than 48 hours ago. Any such recently sent outgoing message may be deleted. Additionally,
         if the bot is an administrator in a group chat, it can delete any message. If the bot is
@@ -257,6 +257,10 @@ class Bot(TelegramObject):
                 username of the target channel (in the format
                 @channelusername).
             message_id (int): Unique message identifier.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             bool: On success, `True` is returned.
@@ -269,7 +273,9 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'message_id': message_id}
 
-        return url, data
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
 
     @log
     @message
@@ -315,6 +321,7 @@ class Bot(TelegramObject):
         return url, data
 
     @log
+    @message
     def send_photo(self,
                    chat_id,
                    photo,
@@ -356,19 +363,10 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return self._message_wrapper(
-            url,
-            data,
-            chat_id=chat_id,
-            photo=photo,
-            caption=caption,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup,
-            timeout=timeout,
-            **kwargs)
+        return url, data
 
     @log
+    @message
     def send_audio(self,
                    chat_id,
                    audio,
@@ -431,22 +429,10 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return self._message_wrapper(
-            url,
-            data,
-            chat_id=chat_id,
-            audio=audio,
-            duration=duration,
-            performer=performer,
-            title=title,
-            caption=caption,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup,
-            timeout=timeout,
-            **kwargs)
+        return url, data
 
     @log
+    @message
     def send_document(self,
                       chat_id,
                       document,
@@ -493,18 +479,7 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return self._message_wrapper(
-            url,
-            data,
-            chat_id=chat_id,
-            document=document,
-            filename=filename,
-            caption=caption,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup,
-            timeout=timeout,
-            **kwargs)
+        return url, data
 
     @log
     @message
@@ -549,6 +524,7 @@ class Bot(TelegramObject):
         return url, data
 
     @log
+    @message
     def send_video(self,
                    chat_id,
                    video,
@@ -595,20 +571,10 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return self._message_wrapper(
-            url,
-            data,
-            chat_id=chat_id,
-            video=video,
-            duration=duration,
-            caption=caption,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup,
-            timeout=timeout,
-            **kwargs)
+        return url, data
 
     @log
+    @message
     def send_voice(self,
                    chat_id,
                    voice,
@@ -658,20 +624,10 @@ class Bot(TelegramObject):
         if caption:
             data['caption'] = caption
 
-        return self._message_wrapper(
-            url,
-            data,
-            chat_id=chat_id,
-            voice=voice,
-            duration=duration,
-            caption=caption,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup,
-            timeout=timeout,
-            **kwargs)
+        return url, data
 
     @log
+    @message
     def send_video_note(self,
                         chat_id,
                         video_note,
@@ -718,18 +674,7 @@ class Bot(TelegramObject):
         if length is not None:
             data['length'] = length
 
-        return self._message_wrapper(
-            url,
-            data,
-            chat_id=chat_id,
-            video_note=video_note,
-            duration=duration,
-            length=length,
-            disable_notification=disable_notification,
-            reply_to_message_id=reply_to_message_id,
-            reply_markup=reply_markup,
-            timeout=timeout,
-            **kwargs)
+        return url, data
 
     @log
     @message
@@ -898,8 +843,6 @@ class Bot(TelegramObject):
                 channel (in the format @channelusername).
             game_short_name (str): Short name of the game, serves as the unique identifier for the
                 game.
-
-        Keyword Args:
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
                 receive a notification, Android users will receive a notification with no sound.
             reply_to_message_id (Optional[int]): If the message is a reply,
@@ -910,6 +853,7 @@ class Bot(TelegramObject):
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -925,7 +869,6 @@ class Bot(TelegramObject):
         return url, data
 
     @log
-    @message
     def send_chat_action(self, chat_id, action, timeout=None, **kwargs):
         """Use this method when you need to tell the user that something is happening on the bot's
         side. The status is set for 5 seconds or less (when a message arrives from your bot,
@@ -952,7 +895,9 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'action': action}
 
-        return url, data
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
 
     @log
     def answer_inline_query(self,
@@ -1698,6 +1643,7 @@ class Bot(TelegramObject):
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             :class: `telegram.WebhookInfo`
@@ -1711,6 +1657,8 @@ class Bot(TelegramObject):
 
         return WebhookInfo.de_json(result, self)
 
+    @log
+    @message
     def set_game_score(self,
                        user_id,
                        score,
@@ -1743,6 +1691,7 @@ class Bot(TelegramObject):
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message` or True: The edited message, or if the
@@ -1770,12 +1719,9 @@ class Bot(TelegramObject):
             else:
                 warnings.warn('edit_message is ignored when disable_edit_message is used')
 
-        result = self._request.post(url, data, timeout=timeout)
-        if result is True:
-            return result
-        else:
-            return Message.de_json(result, self)
+        return url, data
 
+    @log
     def get_game_high_scores(self,
                              user_id,
                              chat_id=None,
@@ -1797,6 +1743,7 @@ class Bot(TelegramObject):
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
+            **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
             list[:class:`telegram.GameHighScore`]: Scores of the specified user and several of his
@@ -1927,6 +1874,7 @@ class Bot(TelegramObject):
 
         return url, data
 
+    @log
     def answer_shipping_query(self,
                               shipping_query_id,
                               ok,
@@ -1950,6 +1898,9 @@ class Bot(TelegramObject):
                 form that explains why it is impossible to complete the order (e.g. "Sorry,
                 delivery to your desired address is unavailable'). Telegram will display this
                 message to the user.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
@@ -1985,6 +1936,7 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
     def answer_pre_checkout_query(self, pre_checkout_query_id, ok,
                                   error_message=None, timeout=None, **kwargs):
         """
@@ -2001,6 +1953,9 @@ class Bot(TelegramObject):
                 "Sorry, somebody just bought the last of our amazing black T-shirts while you were
                 busy filling out your payment details. Please choose a different color or
                 garment!"). Telegram will display this message to the user.
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
             **kwargs (dict): Arbitrary keyword arguments.
 
         Returns:
