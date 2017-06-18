@@ -2,6 +2,14 @@
 Changes
 =======
 
+**2017-06-18**
+
+*Released 6.1.0*
+
+- Fully support Bot API 3.0
+- Add more fine-grained filters for status updates
+- Bug fixes and other improvements
+
 **2017-05-29**
 
 *Released 6.0.3*
