@@ -53,7 +53,7 @@ class BaseFilter(object):
     (so remember to initialize your filter classes).
     """
 
-    def __init__(self, *, name=None):
+    def __init__(self, *args, name=None):
         self.name = name
 
     def __call__(self, message):
