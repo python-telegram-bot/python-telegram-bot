@@ -89,7 +89,7 @@ class InvertedFilter(BaseFilter):
     """
 
     def __init__(self, f):
-        super().__init__()
+        super(InvertedFilter, self).__init__()
         self.f = f
 
     def filter(self, message):
@@ -111,7 +111,7 @@ class MergedFilter(BaseFilter):
     """
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
-        super().__init__()
+        super(MergedFilter, self).__init__()
         self.base_filter = base_filter
         self.and_filter = and_filter
         self.or_filter = or_filter
@@ -319,7 +319,8 @@ class Filters(object):
 
         def __init__(self, entity_type):
             self.entity_type = entity_type
-            super().__init__(name='Filters.entity({})'.format(self.entity_type))
+            super(Filters.entity, self).__init__(name='Filters.entity({})'.format(
+                self.entity_type))
 
         def filter(self, message):
             return any([entity.type == self.entity_type for entity in message.entities])
@@ -368,7 +369,7 @@ class Filters(object):
                 self.lang = [lang]
             else:
                 self.lang = lang
-            super().__init__(name='Filters.language({})'.format(self.lang))
+            super(Filters.language, self).__init__(name='Filters.language({})'.format(self.lang))
 
         def filter(self, message):
             return message.from_user.language_code and any(
