@@ -22,9 +22,9 @@ import re
 
 from future.utils import string_types
 
-from .handler import Handler
 from telegram import Update
 from telegram.utils.deprecate import deprecate
+from telegram.ext import Handler, Groups, Groupdict
 
 
 class RegexHandler(Handler):
@@ -66,12 +66,12 @@ class RegexHandler(Handler):
     def __init__(self,
                  pattern,
                  callback,
-                 pass_groups=False,
-                 pass_groupdict=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False,
+                 pass_groups=None,
+                 pass_groupdict=None,
+                 pass_update_queue=None,
+                 pass_job_queue=None,
+                 pass_user_data=None,
+                 pass_chat_data=None,
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False):
@@ -86,8 +86,8 @@ class RegexHandler(Handler):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
-        self.pass_groups = pass_groups
-        self.pass_groupdict = pass_groupdict
+        self.pass_groups = self.should_pass(Groups, pass_groups, 'groups')
+        self.pass_groupdict = self.should_pass(Groupdict, pass_groupdict, 'groupdict')
         self.allow_edited = allow_edited
         self.message_updates = message_updates
         self.channel_post_updates = channel_post_updates
@@ -114,9 +114,9 @@ class RegexHandler(Handler):
         match = re.match(self.pattern, update.effective_message.text)
 
         if self.pass_groups:
-            optional_args['groups'] = match.groups()
+            optional_args[self.pass_groups] = Groups(match.groups())
         if self.pass_groupdict:
-            optional_args['groupdict'] = match.groupdict()
+            optional_args[self.pass_groupdict] = Groupdict(match.groupdict())
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
