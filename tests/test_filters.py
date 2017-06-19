@@ -213,6 +213,20 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.chat.type = "supergroup"
         self.assertTrue(Filters.group(self.message))
 
+    def test_filters_chat(self):
+        self.assertFalse(Filters.chat(-1)(self.message))
+        self.message.chat.id = -1
+        self.assertTrue(Filters.chat(-1)(self.message))
+        self.message.chat.id = -2
+        self.assertFalse(Filters.chat(-1)(self.message))
+
+    def test_filters_user(self):
+        self.assertFalse(Filters.user(1)(self.message))
+        self.message.from_user.id = 1
+        self.assertTrue(Filters.user(1)(self.message))
+        self.message.from_user.id = 2
+        self.assertFalse(Filters.user(1)(self.message))
+
     def test_and_filters(self):
         self.message.text = 'test'
         self.message.forward_date = True
