@@ -321,6 +321,14 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.from_user.language_code = 'da'
         self.assertTrue(f(self.message))
 
+    def test_custom_unnamed_filter(self):
+        class Unnamed(BaseFilter):
+            def filter(self, message):
+                return True
+
+        unnamed = Unnamed()
+        self.assertEqual(str(unnamed), Unnamed.__name__)
+
 
 if __name__ == '__main__':
     unittest.main()
