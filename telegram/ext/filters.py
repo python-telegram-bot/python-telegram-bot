@@ -324,6 +324,32 @@ class Filters(object):
 
     group = _Group()
 
+    class user(BaseFilter):
+        """Filters messages to allow only those which are from specified user ID
+
+        Args:
+            user_id(int): which user ID to allow through
+        """
+
+        def __init__(self, user_id):
+            self.user_id = user_id
+
+        def filter(self, message):
+            return bool(message.from_user and message.from_user.id == self.user_id)
+
+    class chat(BaseFilter):
+        """Filters messages to allow only those which are from specified chat ID
+
+        Args:
+            chat_id(int): which chat ID to allow through
+        """
+
+        def __init__(self, chat_id):
+            self.chat_id = chat_id
+
+        def filter(self, message):
+            return bool(message.chat_id == self.chat_id)
+
     class _Invoice(BaseFilter):
 
         def filter(self, message):
