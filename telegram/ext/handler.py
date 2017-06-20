@@ -114,7 +114,8 @@ class Handler(object):
     def should_pass(self, type_, overwrite, default_name):
         if overwrite:
             return default_name
-        for name, annotation in self.callback.__annotations__.items():
-            if annotation == type_:
-                return name
+        elif overwrite is None:
+            for name, annotation in self.callback.__annotations__.items():
+                if annotation == type_:
+                    return name
         return False
