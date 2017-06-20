@@ -31,6 +31,7 @@ from flaky import flaky
 sys.path.append('.')
 
 import telegram
+from telegram.utils.request import Request
 from telegram.error import BadRequest
 from tests.base import BaseTest, timeout
 
@@ -467,6 +468,24 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(name, message.contact.first_name)
         self.assertEqual(last, message.contact.last_name)
 
+    def test_timeout_propagation(self):
+        class OkException(Exception):
+            pass
+
+        class MockRequest(Request):
+            def post(self, url, data, timeout=None):
+                raise OkException(timeout)
+
+        _request = self._bot._request
+        self._bot._request = MockRequest()
+
+        timeout = 500
+
+        with self.assertRaises(OkException) as ok:
+            self._bot.send_photo(self._chat_id, open('tests/data/telegram.jpg'), timeout=timeout)
+        self.assertEqual(ok.exception.args[0], timeout)
+
+        self._bot._request = _request
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,29 @@
+environment:
+
+  matrix:
+    # For Python versions available on Appveyor, see
+    # http://www.appveyor.com/docs/installed-software#python
+    # The list here is complete (excluding Python 2.6, which
+    # isn't covered by this document) at the time of writing.
+
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python33"
+    - PYTHON: "C:\\Python34"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python36"
+
+install:
+  # We need wheel installed to build wheels
+  - "git submodule update --init --recursive"
+  - "%PYTHON%\\python.exe -m pip install wheel"
+  - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
+  - "%PYTHON%\\python.exe -m pip install -r requirements-dev.txt"
+
+build: off
+
+test_script:
+  - "%python%\\Scripts\\nosetests -v --with-flaky --no-flaky-report tests"
+
+after_test:
+  # This step builds your wheels.
+  - "%PYTHON%\\python.exe setup.py bdist_wheel"
