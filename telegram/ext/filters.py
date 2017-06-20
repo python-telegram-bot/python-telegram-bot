@@ -68,14 +68,12 @@ class BaseFilter(object):
     def __invert__(self):
         return InvertedFilter(self)
 
-    def __str__(self):
+    def __repr__(self):
         # Do not rely on classes overwriting __init__ to set a name
         # so we can keep backwards compatibility
         if not hasattr(self, 'name') or self.name is None:
             self.name = self.__class__.__name__
         return self.name
-
-    __repr__ = __str__
 
     def filter(self, message):
         raise NotImplementedError
@@ -95,10 +93,8 @@ class InvertedFilter(BaseFilter):
     def filter(self, message):
         return not self.f(message)
 
-    def __str__(self):
+    def __repr__(self):
         return "<inverted {}>".format(self.f)
-
-    __repr__ = __str__
 
 
 class MergedFilter(BaseFilter):
@@ -122,11 +118,9 @@ class MergedFilter(BaseFilter):
         elif self.or_filter:
             return self.base_filter(message) or self.or_filter(message)
 
-    def __str__(self):
+    def __repr__(self):
         return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
                                    self.and_filter or self.or_filter)
-
-    __repr__ = __str__
 
 
 class Filters(object):
