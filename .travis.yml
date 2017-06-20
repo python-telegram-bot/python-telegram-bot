@@ -6,7 +6,7 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-  - "pypy-5.3.8"
+  - "pypy-5.3.1"
 branches:
   only:
     - master
