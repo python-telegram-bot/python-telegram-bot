@@ -22,10 +22,10 @@ from .annotations import UpdateQueue, ChatData, Groupdict, Groups, UserData, Arg
 from .jobqueue import JobQueue, Job
 from .dispatcher import Dispatcher
 from .updater import Updater
+from .handler import Handler
 from .callbackqueryhandler import CallbackQueryHandler
 from .choseninlineresulthandler import ChosenInlineResultHandler
 from .commandhandler import CommandHandler
-from .handler import Handler
 from .inlinequeryhandler import InlineQueryHandler
 from .messagehandler import MessageHandler
 from .filters import BaseFilter, Filters
