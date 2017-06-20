@@ -19,7 +19,6 @@
 """This module contains an object that represents Tests for Telegram Voice"""
 
 import os
-import sys
 import unittest
 
 from flaky import flaky
@@ -43,7 +42,6 @@ class VoiceTest(BaseTest, unittest.TestCase):
         cls.duration = voice.duration
         cls.mime_type = voice.mime_type
         cls.file_size = voice.file_size
-
 
     def setUp(self):
         self.voice_file = open('tests/data/telegram.ogg', 'rb')

@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram Video"""
 
-import sys
-import unittest
 import os
+import unittest
 
 from flaky import flaky
 
@@ -31,6 +30,7 @@ from tests.bots import get_bot
 
 class VideoTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Video."""
+
     @classmethod
     def setUpClass(cls):
         bot_info = get_bot()
@@ -101,7 +101,6 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_send_video_mp4_file(self):
         # identical to all_args so obsolete
         self.assertEqual(True, True)
-
 
     @flaky(3, 1)
     @timeout(10)
@@ -214,7 +213,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         json_dict['video'] = ''
 
         with self.assertRaises(telegram.TelegramError):
-            self._bot.sendVideo(chat_id=self._chat_id,timeout=10,**json_dict)
+            self._bot.sendVideo(chat_id=self._chat_id, timeout=10, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)

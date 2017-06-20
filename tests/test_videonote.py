@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram VideoNote"""
 import os
-import sys
 import unittest
 
 from flaky import flaky
