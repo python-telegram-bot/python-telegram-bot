@@ -24,6 +24,8 @@ import os
 
 from flaky import flaky
 
+from tests.bots import get_bot
+
 sys.path.append('.')
 
 import telegram
@@ -33,26 +35,21 @@ from tests.base import BaseTest, timeout
 class VideoNoteTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram VideoNote."""
 
+    @classmethod
+    def setUpClass(cls):
+        bot_info = get_bot()
+        cls._chat_id = bot_info['chat_id']
+        cls._bot = telegram.Bot(bot_info['token'])
+        videonote_file = open('tests/data/telegram2.mp4', 'rb')
+        video_note = cls._bot.send_video_note(cls._chat_id, video_note=videonote_file, timeout=10).video_note
+        cls.videonote_file_id = video_note.file_id
+        cls.duration = video_note.duration
+        cls.length = video_note.length
+        cls.thumb = video_note.thumb
+        cls.file_size = video_note.file_size
+
     def setUp(self):
         self.videonote_file = open('tests/data/telegram2.mp4', 'rb')
-        self.videonote_file_id = 'DQADAQADBwAD5VIIRYemhHpbPmIQAg'
-        self.duration = 3
-        self.length = 1  # No bloody clue what this does
-        self.thumb = telegram.PhotoSize.de_json({
-            'file_id': 'AAQBABMsDPcvAAQX7NUVpGq-s34OAAIC',
-            'width': 90,
-            'file_size': 3043,
-            'height': 90
-        }, self._bot)
-        self.thumb_resend = telegram.PhotoSize.de_json({
-            'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
-            'width': 51,
-            'file_size': 645,
-            'height': 90
-        }, self._bot)
-
-        self.file_size = 132084
-
         self.json_dict = {
             'file_id': self.videonote_file_id,
             'duration': self.duration,
@@ -64,17 +61,8 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_videonote_required_args_only(self):
-        message = self._bot.sendVideoNote(self._chat_id, self.videonote_file, timeout=10)
-
-        videonote = message.video_note
-
-        self.assertTrue(isinstance(videonote.file_id, str))
-        self.assertNotEqual(videonote.file_id, None)
-        self.assertEqual(videonote.duration, self.duration)
-        # self.assertEqual(videonote.length, self.length)
-        self.assertIsInstance(videonote.length, numbers.Number)
-        self.assertEqual(videonote.thumb, self.thumb)
-        self.assertEqual(videonote.file_size, self.file_size)
+        # obsolete, testen in setUpClass
+        self.assertEqual(True, True)
 
     @flaky(3, 1)
     @timeout(10)
@@ -84,14 +72,14 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
             self.videonote_file,
             timeout=10,
             duration=self.duration,
-            length=self.length)
+            length=self.length,
+            disable_notification=False)
 
         videonote = message.video_note
 
         self.assertTrue(isinstance(videonote.file_id, str))
         self.assertNotEqual(videonote.file_id, None)
-        # self.assertEqual(videonote.length, self.length)
-        self.assertIsInstance(videonote.length, numbers.Number)
+        self.assertEqual(videonote.length, self.length)
         self.assertEqual(videonote.duration, self.duration)
         self.assertEqual(videonote.thumb, self.thumb)
         self.assertEqual(videonote.file_size, self.file_size)
@@ -108,12 +96,10 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         videonote = message.video_note
 
         self.assertEqual(videonote.file_id, self.videonote_file_id)
-        # self.assertEqual(videonote.length, self.length)
-        self.assertIsInstance(videonote.length, numbers.Number)
-        self.assertEqual(videonote.duration, 5)
-        self.assertEqual(videonote.thumb, self.thumb_resend)
-        # Telegram doesn't send file_size for resends?
-        # self.assertEqual(videonote.file_size, self.file_size)
+        self.assertEqual(videonote.length, self.length)
+        self.assertEqual(videonote.duration, self.duration)
+        self.assertEqual(videonote.thumb, self.thumb)
+        self.assertEqual(videonote.file_size, self.file_size)
 
     def test_videonote_de_json(self):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
@@ -146,10 +132,8 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['video_note'] = open(os.devnull, 'rb')
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendVideoNote(chat_id=self._chat_id,
-                                                          timeout=10,
-                                                          **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendVideoNote(chat_id=self._chat_id, timeout=10, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
@@ -159,18 +143,15 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['video_note'] = ''
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendVideoNote(chat_id=self._chat_id,
-                                                      timeout=10,
-                                                      **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendVideoNote(chat_id=self._chat_id, timeout=10, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
     def test_reply_videonote(self):
         """Test for Message.reply_videonote"""
         message = self._bot.sendMessage(self._chat_id, '.')
-        # Length is needed... see first test
-        message = message.reply_video_note(self.videonote_file, length=self.length)
+        message = message.reply_video_note(self.videonote_file)
 
         self.assertNotEqual(message.video_note.file_id, None)
 

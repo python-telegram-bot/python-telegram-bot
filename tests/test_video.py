@@ -39,7 +39,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         cls._chat_id = bot_info['chat_id']
         cls._bot = telegram.Bot(bot_info['token'])
         video_file = open('tests/data/telegram.mp4', 'rb')
-        video = cls._bot.send_video(cls._chat_id, video_file, timeout=10).video
+        video = cls._bot.send_video(cls._chat_id, video=video_file, timeout=10).video
         cls.video_file_id = video.file_id
         cls.width = video.width
         cls.height = video.height
