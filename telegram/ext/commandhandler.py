@@ -19,7 +19,7 @@
 """ This module contains the CommandHandler class """
 import warnings
 
-from .handler import Handler
+from telegram.ext import Handler, Args
 from telegram import Update
 
 
@@ -69,7 +69,7 @@ class CommandHandler(Handler):
                  callback,
                  filters=None,
                  allow_edited=False,
-                 pass_args=False,
+                 pass_args=None,
                  pass_update_queue=None,
                  pass_job_queue=None,
                  pass_user_data=None,
@@ -91,7 +91,7 @@ class CommandHandler(Handler):
             self.command = [x.lower() for x in command]
         self.filters = filters
         self.allow_edited = allow_edited
-        self.pass_args = pass_args
+        self.pass_args = self.should_pass(Args, pass_args, 'args')
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -131,6 +131,6 @@ class CommandHandler(Handler):
         message = update.message or update.edited_message
 
         if self.pass_args:
-            optional_args['args'] = message.text.split()[1:]
+            optional_args[self.pass_args] = message.text.split()[1:]
 
         return self.callback(dispatcher.bot, update, **optional_args)

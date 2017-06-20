@@ -21,4 +21,8 @@ class UserData(defaultdict):
 class UpdateQueue(Queue):
     pass
 
+
+class Args(list):
+    pass
+
 # Also JobQueue

@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the StringCommandHandler class """
-
-from .handler import Handler
+from telegram.ext import Handler, Args
 
 
 class StringCommandHandler(Handler):
@@ -49,13 +48,13 @@ class StringCommandHandler(Handler):
     def __init__(self,
                  command,
                  callback,
-                 pass_args=False,
+                 pass_args=None,
                  pass_update_queue=None,
                  pass_job_queue=None):
         super(StringCommandHandler, self).__init__(
             callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.command = command
-        self.pass_args = pass_args
+        self.pass_args = self.should_pass(Args, pass_args, 'args')
 
     def check_update(self, update):
         return (isinstance(update, str) and update.startswith('/')
@@ -65,6 +64,6 @@ class StringCommandHandler(Handler):
         optional_args = self.collect_optional_args(dispatcher)
 
         if self.pass_args:
-            optional_args['args'] = update.split()[1:]
+            optional_args[self.pass_args] = update.split()[1:]
 
         return self.callback(dispatcher.bot, update, **optional_args)
