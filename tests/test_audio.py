@@ -28,6 +28,7 @@ sys.path.append('.')
 
 import telegram
 from tests.base import BaseTest, timeout
+from tests.reupload import get_file_id
 
 
 class AudioTest(BaseTest, unittest.TestCase):
@@ -35,7 +36,7 @@ class AudioTest(BaseTest, unittest.TestCase):
 
     def setUp(self):
         self.audio_file = open('tests/data/telegram.mp3', 'rb')
-        self.audio_file_id = 'CQADAQADDwADHyP1B6PSPq2HjX8kAg'
+        self.audio_file_id = get_file_id('audio')
         self.audio_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp3'
         self.duration = 4
         self.performer = 'Leandro Toledo'

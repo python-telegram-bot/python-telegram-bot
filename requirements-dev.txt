@@ -1,5 +1,6 @@
 flake8
 nose
+nose-randomly
 pep257
 pylint
 flaky
