@@ -82,7 +82,8 @@ class VideoTest(BaseTest, unittest.TestCase):
             self.video_file,
             timeout=10,
             duration=self.duration,
-            caption=self.caption)
+            caption=self.caption,
+            disable_notification=False)
 
         video = message.video
 
