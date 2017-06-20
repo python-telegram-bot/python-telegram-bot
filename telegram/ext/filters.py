@@ -328,27 +328,60 @@ class Filters(object):
         """Filters messages to allow only those which are from specified user ID
 
         Args:
-            user_id(int): which user ID to allow through
+            user_id(Optional[int]): which user ID to allow through. Required if username is not
+                specified
+            username(Optional[str]): which username to allow through. Required if user_id is not
+                specified
+
+        Raises:
+            ValueError
         """
 
-        def __init__(self, user_id):
+        def __init__(self, user_id=None, username=None):
+            if (user_id is None and username is None) or (bool(user_id) and bool(username)):
+                raise ValueError('You must specify either user_id or username')
+            if username is not None and username.startswith('@'):
+                self.username = username[1:]
+            else:
+                self.username = username
             self.user_id = user_id
 
         def filter(self, message):
-            return bool(message.from_user and message.from_user.id == self.user_id)
+            if self.user_id is not None:
+                return bool(message.from_user and message.from_user.id == self.user_id)
+            else:
+                # self.username is not None
+                return bool(message.from_user and message.from_user.username and
+                            message.from_user.username == self.username)
 
     class chat(BaseFilter):
         """Filters messages to allow only those which are from specified chat ID
 
         Args:
-            chat_id(int): which chat ID to allow through
+            chat_id(Optional[int]): which chat ID to allow through. Required if username is not
+                specified
+            username(Optional[str]): which username to allow through. Required if chat_id is not
+                specified
+
+        Raises:
+            ValueError
         """
 
-        def __init__(self, chat_id):
+        def __init__(self, chat_id=None, username=None):
+            if (chat_id is None and username is None) or (bool(chat_id) and bool(username)):
+                raise ValueError('You must specify either chat_id or username')
+            if username is not None and username.startswith('@'):
+                self.username = username[1:]
+            else:
+                self.username = username
             self.chat_id = chat_id
 
         def filter(self, message):
-            return bool(message.chat_id == self.chat_id)
+            if self.chat_id is not None:
+                return message.chat_id == self.chat_id
+            else:
+                # self.username is not None
+                return bool(message.chat.username and message.chat.username == self.username)
 
     class _Invoice(BaseFilter):
 
