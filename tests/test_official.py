@@ -139,7 +139,7 @@ def test_official():
             if test:
                 def fn():
                     return test(h4)
-                fn.description = '{}({})'.format(test.__name__, h4.text)
+                fn.description = '{}({}) ({})'.format(test.__name__, h4.text, __name__)
                 yield fn
 
 
