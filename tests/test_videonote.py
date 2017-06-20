@@ -17,19 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram VideoNote"""
-import numbers
+import os
 import sys
 import unittest
-import os
 
 from flaky import flaky
 
-from tests.bots import get_bot
-
-sys.path.append('.')
-
 import telegram
 from tests.base import BaseTest, timeout
+from tests.bots import get_bot
 
 
 class VideoNoteTest(BaseTest, unittest.TestCase):
@@ -174,6 +170,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
         self.assertNotEqual(a, e)
         self.assertNotEqual(hash(a), hash(e))
+
 
 if __name__ == '__main__':
     unittest.main()

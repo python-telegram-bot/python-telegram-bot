@@ -24,8 +24,6 @@ import os
 
 from flaky import flaky
 
-sys.path.append('.')
-
 import telegram
 from tests.base import BaseTest, timeout
 from tests.bots import get_bot
