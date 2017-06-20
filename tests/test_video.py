@@ -47,21 +47,17 @@ class VideoTest(BaseTest, unittest.TestCase):
         cls.thumb = video.thumb
         cls.mime_type = video.mime_type
         cls.file_size = video.file_size
-
-
-    def setUp(self):
-        self.video_file = open('tests/data/telegram.mp4', 'rb')
-        self.video_file_url = 'https://python-telegram-bot.org/static/website/telegram.mp4'
-        self.thumb_from_url = telegram.PhotoSize.de_json({
+        cls.video_file_url = 'https://python-telegram-bot.org/static/website/telegram.mp4'
+        cls.caption = u'VideoTest - Caption'
+        cls.thumb_from_url = telegram.PhotoSize.de_json({
             'file_id': 'AAQEABPZU2EZAAQ_tPcvcRTF4i1GAQABAg',
             'file_size': 645,
             'height': 90,
             'width': 51
-        }, self._bot)
+        }, cls._bot)
 
-        # caption is part of sendVideo method but not Video object
-        self.caption = u'VideoTest - Caption'
-
+    def setUp(self):
+        self.video_file = open('tests/data/telegram.mp4', 'rb')
         self.json_dict = {
             'file_id': self.video_file_id,
             'width': self.width,
@@ -75,18 +71,8 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_required_args_only(self):
-        message = self._bot.sendVideo(self._chat_id, self.video_file, timeout=10)
-
-        video = message.video
-
-        self.assertTrue(isinstance(video.file_id, str))
-        self.assertNotEqual(video.file_id, None)
-        self.assertEqual(video.width, self.width)
-        self.assertEqual(video.height, self.height)
-        self.assertEqual(video.duration, self.duration)
-        self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, 'video/mp4')
-        self.assertEqual(video.file_size, self.file_size)
+        # obsolete since it's done in the setUpClass
+        self.assertEqual(True, True)
 
     @flaky(3, 1)
     @timeout(10)
@@ -106,7 +92,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, 'video/mp4')
+        self.assertEqual(video.mime_type, self.mime_type)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -114,25 +100,9 @@ class VideoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_video_mp4_file(self):
-        message = self._bot.sendVideo(
-            chat_id=self._chat_id,
-            video=self.video_file,
-            timeout=10,
-            duration=self.duration,
-            caption=self.caption)
+        # identical to all_args so obsolete
+        self.assertEqual(True, True)
 
-        video = message.video
-
-        self.assertTrue(isinstance(video.file_id, str))
-        self.assertNotEqual(video.file_id, None)
-        self.assertEqual(video.width, self.width)
-        self.assertEqual(video.height, self.height)
-        self.assertEqual(video.duration, self.duration)
-        self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, 'video/mp4')
-        self.assertEqual(video.file_size, self.file_size)
-
-        self.assertEqual(message.caption, self.caption)
 
     @flaky(3, 1)
     @timeout(10)
@@ -153,7 +123,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb)
-        self.assertEqual(video.mime_type, 'video/mp4')
+        self.assertEqual(video.mime_type, self.mime_type)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -165,7 +135,6 @@ class VideoTest(BaseTest, unittest.TestCase):
             chat_id=self._chat_id,
             video=self.video_file_url,
             timeout=10,
-            duration=self.duration,
             caption=self.caption)
 
         video = message.video
@@ -175,7 +144,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.height, self.height)
         self.assertEqual(video.duration, self.duration)
         self.assertEqual(video.thumb, self.thumb_from_url)
-        self.assertEqual(video.mime_type, 'video/mp4')
+        self.assertEqual(video.mime_type, self.mime_type)
         self.assertEqual(video.file_size, self.file_size)
 
         self.assertEqual(message.caption, self.caption)
@@ -193,9 +162,9 @@ class VideoTest(BaseTest, unittest.TestCase):
         video = message.video
 
         self.assertEqual(video.file_id, self.video_file_id)
-        self.assertEqual(video.duration, 5)
-        self.assertEqual(video.thumb, None)
-        self.assertEqual(video.mime_type, 'video/mp4')
+        self.assertEqual(video.duration, self.duration)
+        self.assertEqual(video.thumb, self.thumb)
+        self.assertEqual(video.mime_type, self.mime_type)
 
         self.assertEqual(message.caption, self.caption)
 
@@ -234,10 +203,8 @@ class VideoTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['video'] = open(os.devnull, 'rb')
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendVideo(chat_id=self._chat_id,
-                                                      timeout=10,
-                                                      **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendVideo(chat_id=self._chat_id, timeout=10, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
@@ -247,23 +214,14 @@ class VideoTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['video'] = ''
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendVideo(chat_id=self._chat_id,
-                                                      timeout=10,
-                                                      **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendVideo(chat_id=self._chat_id,timeout=10,**json_dict)
 
     @flaky(3, 1)
     @timeout(10)
     def test_error_video_without_required_args(self):
-        json_dict = self.json_dict
-
-        del (json_dict['file_id'])
-        del (json_dict['duration'])
-
-        self.assertRaises(TypeError,
-                          lambda: self._bot.sendVideo(chat_id=self._chat_id,
-                                                      timeout=10,
-                                                      **json_dict))
+        # Obsolete: only required args are chat_id and video. Both tested above
+        self.assertEqual(True, True)
 
     @flaky(3, 1)
     @timeout(10)
