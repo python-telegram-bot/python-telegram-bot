@@ -99,9 +99,9 @@ class InlineQueryHandler(Handler):
             match = re.match(self.pattern, update.inline_query.query)
 
             if self.pass_groups:
-                optional_args[self.pass_groups] = match.groups()
+                optional_args[self.pass_groups] = Groups(match.groups())
             if self.pass_groupdict:
-                optional_args[self.pass_groupdict] = match.groupdict()
+                optional_args[self.pass_groupdict] = Groupdict(match.groupdict())
 
         return self.callback(dispatcher.bot, update, **optional_args)
 

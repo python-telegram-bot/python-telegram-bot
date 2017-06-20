@@ -64,6 +64,6 @@ class StringCommandHandler(Handler):
         optional_args = self.collect_optional_args(dispatcher)
 
         if self.pass_args:
-            optional_args[self.pass_args] = update.split()[1:]
+            optional_args[self.pass_args] = Args(update.split()[1:])
 
         return self.callback(dispatcher.bot, update, **optional_args)

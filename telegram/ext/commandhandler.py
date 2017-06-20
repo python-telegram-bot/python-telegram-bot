@@ -131,6 +131,6 @@ class CommandHandler(Handler):
         message = update.message or update.edited_message
 
         if self.pass_args:
-            optional_args[self.pass_args] = message.text.split()[1:]
+            optional_args[self.pass_args] = Args(message.text.split()[1:])
 
         return self.callback(dispatcher.bot, update, **optional_args)
