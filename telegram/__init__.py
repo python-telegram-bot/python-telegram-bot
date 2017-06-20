@@ -31,6 +31,7 @@ from .files.video import Video
 from .files.contact import Contact
 from .files.location import Location
 from .files.venue import Venue
+from .files.videonote import VideoNote
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
@@ -88,7 +89,6 @@ from .payment.precheckoutquery import PreCheckoutQuery
 from .payment.shippingquery import ShippingQuery
 from .webhookinfo import WebhookInfo
 from .games.gamehighscore import GameHighScore
-from .files.videonote import VideoNote
 from .update import Update
 from .bot import Bot
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,

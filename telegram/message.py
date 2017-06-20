@@ -23,10 +23,10 @@ from datetime import datetime
 from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment)
+                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
+                      VideoNote)
 from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown
-from telegram.videonote import VideoNote
 
 
 class Message(TelegramObject):
