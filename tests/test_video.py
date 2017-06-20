@@ -28,32 +28,36 @@ sys.path.append('.')
 
 import telegram
 from tests.base import BaseTest, timeout
+from tests.bots import get_bot
 
 
 class VideoTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Video."""
+    @classmethod
+    def setUpClass(cls):
+        bot_info = get_bot()
+        cls._chat_id = bot_info['chat_id']
+        cls._bot = telegram.Bot(bot_info['token'])
+        video_file = open('tests/data/telegram.mp4', 'rb')
+        video = cls._bot.send_video(cls._chat_id, video_file, timeout=10).video
+        cls.video_file_id = video.file_id
+        cls.width = video.width
+        cls.height = video.height
+        cls.duration = video.duration
+        cls.thumb = video.thumb
+        cls.mime_type = video.mime_type
+        cls.file_size = video.file_size
+
 
     def setUp(self):
         self.video_file = open('tests/data/telegram.mp4', 'rb')
-        self.video_file_id = 'BAADAQADXwADHyP1BwJFTcmY2RYCAg'
         self.video_file_url = 'https://python-telegram-bot.org/static/website/telegram.mp4'
-        self.width = 360
-        self.height = 640
-        self.duration = 5
-        self.thumb = telegram.PhotoSize.de_json({
-            'file_id': 'AAQBABOMsecvAAQqqoY1Pee_MqcyAAIC',
-            'file_size': 645,
-            'height': 90,
-            'width': 51
-        }, self._bot)
         self.thumb_from_url = telegram.PhotoSize.de_json({
             'file_id': 'AAQEABPZU2EZAAQ_tPcvcRTF4i1GAQABAg',
             'file_size': 645,
             'height': 90,
             'width': 51
         }, self._bot)
-        self.mime_type = 'video/mp4'
-        self.file_size = 326534
 
         # caption is part of sendVideo method but not Video object
         self.caption = u'VideoTest - Caption'
@@ -189,7 +193,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         video = message.video
 
         self.assertEqual(video.file_id, self.video_file_id)
-        self.assertEqual(video.duration, 0)
+        self.assertEqual(video.duration, 5)
         self.assertEqual(video.thumb, None)
         self.assertEqual(video.mime_type, 'video/mp4')
 
