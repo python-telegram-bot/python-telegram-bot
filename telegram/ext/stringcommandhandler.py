@@ -50,8 +50,8 @@ class StringCommandHandler(Handler):
                  command,
                  callback,
                  pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_update_queue=None,
+                 pass_job_queue=None):
         super(StringCommandHandler, self).__init__(
             callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.command = command
