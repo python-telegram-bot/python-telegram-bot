@@ -74,7 +74,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
-    def test_sendphotoo_all_args(self):
+    def test_sendphoto_all_args(self):
         message = self._bot.sendPhoto(self._chat_id, self.photo_file, caption=self.caption, disable_notification=False)
         thumb, photo = message.photo
 
@@ -117,6 +117,38 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_send_photo_url_png_file(self):
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
+
+        thumb, photo = message.photo
+
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
+        self.assertNotEqual(thumb.file_id, '')
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_photo_url_gif_file(self):
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram', chat_id=self._chat_id)
+
+        thumb, photo = message.photo
+
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
+        self.assertNotEqual(thumb.file_id, '')
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_photo_bytesio_jpg_file(self):
         from telegram.inputfile import InputFile
         # raw image bytes
@@ -140,6 +172,20 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertEqual(photo.width, 1920)
         self.assertEqual(photo.height, 1080)
         self.assertEqual(photo.file_size, 30907)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_silent_send_photo(self):
+        message = self._bot.sendPhoto(photo=self.photo_file, chat_id=self._chat_id, disable_notification=True)
+        thumb, photo = message.photo
+
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
+        self.assertNotEqual(thumb.file_id, '')
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
 
     @flaky(3, 1)
     @timeout(10)
