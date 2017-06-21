@@ -104,21 +104,15 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
     def test_videonote_de_json(self):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(videonote.file_id, self.videonote.file_id)
-        self.assertEqual(videonote.duration, self.videonote.duration)
-        self.assertEqual(videonote.thumb, self.videonote.thumb)
-        self.assertEqual(videonote.length, self.videonote.length)
-        self.assertEqual(videonote.file_size, self.videonote.file_size)
+        self.assertEqual(videonote, self.videonote)
 
     def test_videonote_to_json(self):
-        videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(videonote.to_json()))
+        self.assertTrue(self.is_json(self.videonote.to_json()))
 
     def test_videonote_to_dict(self):
-        videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
+        videonote = self.videonote.to_dict()
 
-        self.assertTrue(self.is_dict(videonote.to_dict()))
+        self.assertTrue(self.is_dict(videonote))
         self.assertEqual(videonote['file_id'], self.videonote.file_id)
         self.assertEqual(videonote['duration'], self.videonote.duration)
         self.assertEqual(videonote['length'], self.videonote.length)

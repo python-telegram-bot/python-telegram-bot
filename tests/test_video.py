@@ -138,23 +138,15 @@ class VideoTest(BaseTest, unittest.TestCase):
     def test_video_de_json(self):
         video = telegram.Video.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(video.file_id, self.video.file_id)
-        self.assertEqual(video.width, self.video.width)
-        self.assertEqual(video.height, self.video.height)
-        self.assertEqual(video.duration, self.video.duration)
-        self.assertEqual(video.thumb, self.video.thumb)
-        self.assertEqual(video.mime_type, self.video.mime_type)
-        self.assertEqual(video.file_size, self.video.file_size)
+        self.assertEqual(video, self.video)
 
     def test_video_to_json(self):
-        video = telegram.Video.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(video.to_json()))
+        self.assertTrue(self.is_json(self.video.to_json()))
 
     def test_video_to_dict(self):
-        video = telegram.Video.de_json(self.json_dict, self._bot)
+        video = self.video.to_dict()
 
-        self.assertTrue(self.is_dict(video.to_dict()))
+        self.assertTrue(self.is_dict(video))
         self.assertEqual(video['file_id'], self.video.file_id)
         self.assertEqual(video['width'], self.video.width)
         self.assertEqual(video['height'], self.video.height)

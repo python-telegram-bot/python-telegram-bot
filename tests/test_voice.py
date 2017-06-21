@@ -139,20 +139,15 @@ class VoiceTest(BaseTest, unittest.TestCase):
     def test_voice_de_json(self):
         voice = telegram.Voice.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(voice.file_id, self.voice.file_id)
-        self.assertEqual(voice.duration, self.voice.duration)
-        self.assertEqual(voice.mime_type, self.voice.mime_type)
-        self.assertEqual(voice.file_size, self.voice.file_size)
+        self.assertEqual(voice, self.voice)
 
     def test_voice_to_json(self):
-        voice = telegram.Voice.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(voice.to_json()))
+        self.assertTrue(self.is_json(self.voice.to_json()))
 
     def test_voice_to_dict(self):
-        voice = telegram.Voice.de_json(self.json_dict, self._bot)
+        voice = self.voice.to_dict()
 
-        self.assertTrue(self.is_dict(voice.to_dict()))
+        self.assertTrue(self.is_dict(voice))
         self.assertEqual(voice['file_id'], self.voice.file_id)
         self.assertEqual(voice['duration'], self.voice.duration)
         self.assertEqual(voice['mime_type'], self.voice.mime_type)

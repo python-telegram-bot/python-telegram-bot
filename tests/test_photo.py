@@ -78,15 +78,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
         message = self._bot.sendPhoto(self._chat_id, self.photo_file, caption=self.caption, disable_notification=False)
         thumb, photo = message.photo
 
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertTrue(isinstance(thumb.file_id, str))
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
         self.assertNotEqual(thumb.file_id, '')
         self.assertEqual(thumb.width, self.thumb.width)
         self.assertEqual(thumb.height, self.thumb.height)
         self.assertEqual(thumb.file_size, self.thumb.file_size)
 
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
         self.assertEqual(photo.width, self.photo.width)
         self.assertEqual(photo.height, self.photo.height)
@@ -101,15 +101,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
         thumb, photo = message.photo
 
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertTrue(isinstance(thumb.file_id, str))
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
         self.assertNotEqual(thumb.file_id, '')
         self.assertEqual(thumb.width, self.thumb.width)
         self.assertEqual(thumb.height, self.thumb.height)
         self.assertEqual(thumb.file_size, self.thumb.file_size)
 
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
         self.assertEqual(photo.width, self.photo.width)
         self.assertEqual(photo.height, self.photo.height)
@@ -134,9 +134,9 @@ class PhotoTest(BaseTest, unittest.TestCase):
         raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
         message = self._bot.sendPhoto(self._chat_id, photo=raw_bytes)
         photo = message.photo[-1]
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
+        self.assertIsInstance(photo, telegram.PhotoSize)
         self.assertEqual(photo.width, 1920)
         self.assertEqual(photo.height, 1080)
         self.assertEqual(photo.file_size, 30907)
@@ -148,13 +148,13 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
         thumb, photo = message.photo
 
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
+        self.assertIsInstance(thumb, telegram.PhotoSize)
         self.assertEqual(thumb.file_id, self.thumb.file_id)
         self.assertEqual(thumb.width, self.thumb.width)
         self.assertEqual(thumb.height, self.thumb.height)
         self.assertEqual(thumb.file_size, self.thumb.file_size)
 
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
+        self.assertIsInstance(photo, telegram.PhotoSize)
         self.assertEqual(photo.file_id, self.photo.file_id)
         self.assertEqual(photo.width, self.photo.width)
         self.assertEqual(photo.height, self.photo.height)
@@ -163,19 +163,13 @@ class PhotoTest(BaseTest, unittest.TestCase):
     def test_photo_de_json(self):
         photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo.file_id, self.photo.file_id)
-        self.assertEqual(photo.width, self.photo.width)
-        self.assertEqual(photo.height, self.photo.height)
-        self.assertEqual(photo.file_size, self.photo.file_size)
+        self.assertEqual(photo, self.photo)
 
     def test_photo_to_json(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(photo.to_json()))
+        self.assertTrue(self.is_json(self.photo.to_json()))
 
     def test_photo_to_dict(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot).to_dict()
+        photo = self.photo.to_dict()
 
         self.assertTrue(self.is_dict(photo))
         self.assertEqual(photo['file_id'], self.photo.file_id)
@@ -224,12 +218,12 @@ class PhotoTest(BaseTest, unittest.TestCase):
         message = self._bot.sendMessage(self._chat_id, '.')
         thumb, photo = message.reply_photo(self.photo_file).photo
 
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertTrue(isinstance(thumb.file_id, str))
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
         self.assertNotEqual(thumb.file_id, '')
 
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
 
     def test_equality(self):
