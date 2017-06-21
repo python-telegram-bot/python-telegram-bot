@@ -254,12 +254,10 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.assertTrue((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION))
                         )(self.message))
 
-        self.assertRegexpMatches(
+        self.assertEqual(
             str((Filters.text & (Filters.forwarded | Filters.entity(MessageEntity.MENTION)))),
-            r"<telegram.ext.filters.MergedFilter consisting of <telegram.ext.filters.(Filters.)?_"
-            r"Text object at .*?> and <telegram.ext.filters.MergedFilter consisting of "
-            r"<telegram.ext.filters.(Filters.)?_Forwarded object at .*?> or "
-            r"<telegram.ext.filters.(Filters.)?entity object at .*?>>>")
+            '<Filters.text and <Filters.forwarded or Filters.entity(mention)>>'
+        )
 
     def test_inverted_filters(self):
         self.message.text = '/test'
@@ -322,6 +320,14 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.assertFalse(f(self.message))
         self.message.from_user.language_code = 'da'
         self.assertTrue(f(self.message))
+
+    def test_custom_unnamed_filter(self):
+        class Unnamed(BaseFilter):
+            def filter(self, message):
+                return True
+
+        unnamed = Unnamed()
+        self.assertEqual(str(unnamed), Unnamed.__name__)
 
 
 if __name__ == '__main__':
