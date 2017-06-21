@@ -121,11 +121,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
         message = self._bot.sendPhoto(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
 
-        thumb, photo = message.photo
-
-        self.assertIsInstance(thumb, telegram.PhotoSize)
-        self.assertIsInstance(thumb.file_id, str)
-        self.assertNotEqual(thumb.file_id, '')
+        photo = message.photo[-1]
 
         self.assertIsInstance(photo, telegram.PhotoSize)
         self.assertIsInstance(photo.file_id, str)
@@ -135,13 +131,9 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @timeout(10)
     def test_send_photo_url_gif_file(self):
         message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram', chat_id=self._chat_id)
+            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
 
-        thumb, photo = message.photo
-
-        self.assertIsInstance(thumb, telegram.PhotoSize)
-        self.assertIsInstance(thumb.file_id, str)
-        self.assertNotEqual(thumb.file_id, '')
+        photo = message.photo[-1]
 
         self.assertIsInstance(photo, telegram.PhotoSize)
         self.assertIsInstance(photo.file_id, str)
