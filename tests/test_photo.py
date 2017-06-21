@@ -18,19 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram Photo"""
 
-from io import BytesIO
-import sys
-import unittest
 import os
+import unittest
+from io import BytesIO
 
 from flaky import flaky
 
-from tests.bots import get_bot
-
-sys.path.append('.')
-
 import telegram
 from tests.base import BaseTest, timeout
+from tests.bots import get_bot
 
 
 class PhotoTest(BaseTest, unittest.TestCase):
