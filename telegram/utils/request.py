@@ -183,6 +183,11 @@ class Request(object):
             # 200-299 range are HTTP success statuses
             return resp.data
 
+        try:
+            message = self._parse(resp.data)
+        except ValueError:
+            message = 'Unknown HTTPError'
+
         if resp.status in (401, 403):
             raise Unauthorized(message)
         elif resp.status == 400:
@@ -190,16 +195,13 @@ class Request(object):
         elif resp.status == 404:
             raise InvalidToken()
         elif resp.status == 413:
-            raise NetworkError('File too large. Check telegram api limits https://core.telegram.org/bots/api#senddocument')
+            raise NetworkError('File too large. Check telegram api limits '
+                               'https://core.telegram.org/bots/api#senddocument')
+
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
             raise NetworkError('{0} ({1})'.format(message, resp.status))
-
-        try:
-            message = self._parse(resp.data)
-        except ValueError:
-            raise NetworkError('Unknown HTTPError {0}'.format(resp.status))
 
     def get(self, url, timeout=None):
         """Request an URL.
