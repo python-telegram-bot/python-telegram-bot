@@ -17,20 +17,50 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provide a bot to tests"""
+import os
 
-import telegram
+import sys
 
-bots = [
-    {
-        'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
-        'chat_id': '12173560',
-        'group_id': '-49740850',
-        'channel_id': '@pythontelegrambottests',
-        'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3',
-        'user': telegram.User(133505823, 'PythonTelegramBot', username='PythonTelegramBot')
-    }
-]
+
+bot_settings = {
+    'APPVEYOR':
+        {
+            'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
+            'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3'
+        },
+    'TRAVIS':
+        {
+            'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
+            'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3'
+        },
+    'FALLBACK':
+        {
+            'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
+            'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3'
+        }
+}
 
 
 def get_bot():
-    return bots[0]
+    # TODO: Add version info with different bots
+    # ver = sys.version_info
+    # pyver = "{}{}".format(ver[0], ver[1])
+    #
+    bot = None
+    if os.environ.get('TRAVIS', False):
+        bot = bot_settings.get('TRAVIS', None)
+        # TODO:
+        # bot = bot_setting.get('TRAVIS'+pyver, None)
+    elif os.environ.get('APPVEYOR', False):
+        bot = bot_settings.get('APPVEYOR', None)
+        # TODO:
+        # bot = bot_setting.get('TRAVIS'+pyver, None)
+    if not bot:
+        bot = bot_settings['FALLBACK']
+
+    bot.update({
+        'chat_id': '12173560',
+        'group_id': '-49740850',
+        'channel_id': '@pythontelegrambottests'
+    })
+    return bot
