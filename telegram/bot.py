@@ -534,6 +534,8 @@ class Bot(TelegramObject):
                    reply_to_message_id=None,
                    reply_markup=None,
                    timeout=20.,
+                   width=None,
+                   height=None,
                    **kwargs):
         """Use this method to send video files, Telegram clients support mp4
         videos (other formats may be sent as telegram.Document).
@@ -544,6 +546,8 @@ class Bot(TelegramObject):
                 already on the Telegram servers, or upload a new video file using
                 multipart/form-data.
             duration (Optional[int]): Duration of sent video in seconds.
+            width (Optional[int)): Video width.
+            height (Optional[int]): Video height.
             caption (Optional[str]): Video caption (may also be used when resending videos by
                 file_id).
             disable_notification (Optional[bool]): Sends the message silently. iOS users will not
@@ -570,6 +574,10 @@ class Bot(TelegramObject):
             data['duration'] = duration
         if caption:
             data['caption'] = caption
+        if width:
+            data['width'] = width
+        if height:
+            data['height'] = height
 
         return url, data
 
