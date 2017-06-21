@@ -45,9 +45,10 @@ class VoiceTest(BaseTest, unittest.TestCase):
         cls.voice = voice
 
         # Make sure file has been uploaded.
-        cls.assertIsInstance(cls(), cls.voice, telegram.Voice)
-        cls.assertIsInstance(cls(), cls.voice.file_id, str)
-        cls.assertNotEqual(cls(), cls.voice.file_id, '')
+        # Simple assertions PY2 Only
+        assert isinstance(cls.voice, telegram.Voice)
+        assert isinstance(cls.voice.file_id, str)
+        assert cls.voice.file_id is not ''
 
     def setUp(self):
         self.voice_file = open('tests/data/telegram.ogg', 'rb')

@@ -42,9 +42,10 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         cls.videonote = video_note
 
         # Make sure file has been uploaded.
-        cls.assertIsInstance(cls(), cls.videonote, telegram.VideoNote)
-        cls.assertIsInstance(cls(), cls.videonote.file_id, str)
-        cls.assertNotEqual(cls(), cls.videonote.file_id, '')
+        # Simple assertions PY2 Only
+        assert isinstance(cls.videonote, telegram.VideoNote)
+        assert isinstance(cls.videonote.file_id, str)
+        assert cls.videonote.file_id is not ''
 
     def setUp(self):
         self.videonote_file = open('tests/data/telegram2.mp4', 'rb')
