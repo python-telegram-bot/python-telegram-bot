@@ -33,33 +33,39 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.voice_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.ogg'
+        cls.caption = u"Test voice"
+
+        voice_file = open('tests/data/telegram.ogg', 'rb')
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']
         cls._bot = telegram.Bot(bot_info['token'])
-        voice_file = open('tests/data/telegram.ogg', 'rb')
+
         voice = cls._bot.send_voice(cls._chat_id, voice=voice_file).voice
-        cls.voice_file_id = voice.file_id
-        cls.duration = voice.duration
-        cls.mime_type = voice.mime_type
-        cls.file_size = voice.file_size
+        cls.voice = voice
+
+        # Make sure file has been uploaded.
+        cls.assertIsInstance(cls(), cls.voice, telegram.Voice)
+        cls.assertIsInstance(cls(), cls.voice.file_id, str)
+        cls.assertNotEqual(cls(), cls.voice.file_id, '')
 
     def setUp(self):
         self.voice_file = open('tests/data/telegram.ogg', 'rb')
-        self.voice_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.ogg'
-        self.caption = "Test voice"
+
         self.json_dict = {
-            'file_id': self.voice_file_id,
-            'duration': self.duration,
+            'file_id': self.voice.file_id,
+            'duration': self.voice.duration,
             'caption': self.caption,
-            'mime_type': self.mime_type,
-            'file_size': self.file_size
+            'mime_type': self.voice.mime_type,
+            'file_size': self.voice.file_size
         }
 
     @flaky(3, 1)
     @timeout(10)
-    def test_send_voice_required_args_only(self):
-        # Obsolete, tested in setUpClass
-        self.assertEqual(True, True)
+    def test_expected_values(self):
+        self.assertEqual(self.voice.duration, 3)
+        self.assertEqual(self.voice.mime_type, 'audio/ogg')
+        self.assertEqual(self.voice.file_size, 9199)
 
     @flaky(3, 1)
     @timeout(10)
@@ -67,10 +73,10 @@ class VoiceTest(BaseTest, unittest.TestCase):
         message = self._bot.sendVoice(
             self._chat_id,
             self.voice_file,
-            duration=self.duration,
+            duration=self.voice.duration,
             caption=self.caption,
-            mime_type=self.mime_type,
-            file_size=self.file_size,
+            mime_type=self.voice.mime_type,
+            file_size=self.voice.file_size,
             disable_notification=False)
 
         self.assertEqual(message.caption, self.caption)
@@ -79,49 +85,23 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(isinstance(voice.file_id, str))
         self.assertNotEqual(voice.file_id, '')
-        self.assertEqual(voice.duration, self.duration)
-        self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, self.file_size)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_voice_ogg_file(self):
-        # obsolete: Same as all_args
-        self.assertEqual(True, True)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_voice_ogg_file_with_custom_filename(self):
-        message = self._bot.sendVoice(
-            chat_id=self._chat_id,
-            voice=self.voice_file,
-            duration=self.duration,
-            caption=self.caption,
-            filename='telegram_custom.ogg')
-
-        self.assertEqual(message.caption, self.caption)
-
-        voice = message.voice
-
-        self.assertTrue(isinstance(voice.file_id, str))
-        self.assertNotEqual(voice.file_id, '')
-        self.assertEqual(voice.duration, self.duration)
-        self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, self.file_size)
+        self.assertEqual(voice.duration, self.voice.duration)
+        self.assertEqual(voice.mime_type, self.voice.mime_type)
+        self.assertEqual(voice.file_size, self.voice.file_size)
 
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_ogg_url_file(self):
         message = self._bot.sendVoice(
-            chat_id=self._chat_id, voice=self.voice_file_url, duration=self.duration)
+            chat_id=self._chat_id, voice=self.voice_file_url, duration=self.voice.duration)
 
         voice = message.voice
 
         self.assertTrue(isinstance(voice.file_id, str))
         self.assertNotEqual(voice.file_id, '')
-        self.assertEqual(voice.duration, self.duration)
-        self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, self.file_size)
+        self.assertEqual(voice.duration, self.voice.duration)
+        self.assertEqual(voice.mime_type, self.voice.mime_type)
+        self.assertEqual(voice.file_size, self.voice.file_size)
 
     @flaky(3, 1)
     @timeout(10)
@@ -129,7 +109,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
         message = self._bot.sendVoice(
             chat_id=self._chat_id,
             voice=self.voice_file_url,
-            duration=self.duration,
+            duration=self.voice.duration,
             caption=self.caption)
 
         self.assertEqual(message.caption, self.caption)
@@ -138,30 +118,30 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(isinstance(voice.file_id, str))
         self.assertNotEqual(voice.file_id, '')
-        self.assertEqual(voice.duration, self.duration)
-        self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, self.file_size)
+        self.assertEqual(voice.duration, self.voice.duration)
+        self.assertEqual(voice.mime_type, self.voice.mime_type)
+        self.assertEqual(voice.file_size, self.voice.file_size)
 
     @flaky(3, 1)
     @timeout(10)
     def test_send_voice_resend(self):
         message = self._bot.sendVoice(
             chat_id=self._chat_id,
-            voice=self.voice_file_id)
+            voice=self.voice.file_id)
 
         voice = message.voice
 
-        self.assertEqual(voice.file_id, self.voice_file_id)
-        self.assertEqual(voice.duration, self.duration)
-        self.assertEqual(voice.mime_type, self.mime_type)
+        self.assertEqual(voice.file_id, self.voice.file_id)
+        self.assertEqual(voice.duration, self.voice.duration)
+        self.assertEqual(voice.mime_type, self.voice.mime_type)
 
     def test_voice_de_json(self):
         voice = telegram.Voice.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(voice.file_id, self.voice_file_id)
-        self.assertEqual(voice.duration, self.duration)
-        self.assertEqual(voice.mime_type, self.mime_type)
-        self.assertEqual(voice.file_size, self.file_size)
+        self.assertEqual(voice.file_id, self.voice.file_id)
+        self.assertEqual(voice.duration, self.voice.duration)
+        self.assertEqual(voice.mime_type, self.voice.mime_type)
+        self.assertEqual(voice.file_size, self.voice.file_size)
 
     def test_voice_to_json(self):
         voice = telegram.Voice.de_json(self.json_dict, self._bot)
@@ -172,10 +152,10 @@ class VoiceTest(BaseTest, unittest.TestCase):
         voice = telegram.Voice.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(voice.to_dict()))
-        self.assertEqual(voice['file_id'], self.voice_file_id)
-        self.assertEqual(voice['duration'], self.duration)
-        self.assertEqual(voice['mime_type'], self.mime_type)
-        self.assertEqual(voice['file_size'], self.file_size)
+        self.assertEqual(voice['file_id'], self.voice.file_id)
+        self.assertEqual(voice['duration'], self.voice.duration)
+        self.assertEqual(voice['mime_type'], self.voice.mime_type)
+        self.assertEqual(voice['file_size'], self.voice.file_size)
 
     @flaky(3, 1)
     @timeout(10)
@@ -219,11 +199,11 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(message.voice.file_id, '')
 
     def test_equality(self):
-        a = telegram.Voice(self.voice_file_id, self.duration)
-        b = telegram.Voice(self.voice_file_id, self.duration)
-        c = telegram.Voice(self.voice_file_id, 0)
-        d = telegram.Voice("", self.duration)
-        e = telegram.Audio(self.voice_file_id, self.duration)
+        a = telegram.Voice(self.voice.file_id, self.voice.duration)
+        b = telegram.Voice(self.voice.file_id, self.voice.duration)
+        c = telegram.Voice(self.voice.file_id, 0)
+        d = telegram.Voice("", self.voice.duration)
+        e = telegram.Audio(self.voice.file_id, self.voice.duration)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))

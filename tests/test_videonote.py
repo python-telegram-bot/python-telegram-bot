@@ -35,29 +35,33 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']
         cls._bot = telegram.Bot(bot_info['token'])
+
         videonote_file = open('tests/data/telegram2.mp4', 'rb')
         video_note = cls._bot.send_video_note(cls._chat_id, video_note=videonote_file, timeout=10).video_note
-        cls.videonote_file_id = video_note.file_id
-        cls.duration = video_note.duration
-        cls.length = video_note.length
-        cls.thumb = video_note.thumb
-        cls.file_size = video_note.file_size
+
+        cls.videonote = video_note
+
+        # Make sure file has been uploaded.
+        cls.assertIsInstance(cls(), cls.videonote, telegram.VideoNote)
+        cls.assertIsInstance(cls(), cls.videonote.file_id, str)
+        cls.assertNotEqual(cls(), cls.videonote.file_id, '')
 
     def setUp(self):
         self.videonote_file = open('tests/data/telegram2.mp4', 'rb')
         self.json_dict = {
-            'file_id': self.videonote_file_id,
-            'duration': self.duration,
-            'length': self.length,
-            'thumb': self.thumb.to_dict(),
-            'file_size': self.file_size
+            'file_id': self.videonote.file_id,
+            'duration': self.videonote.duration,
+            'length': self.videonote.length,
+            'thumb': self.videonote.thumb.to_dict(),
+            'file_size': self.videonote.file_size
         }
 
     @flaky(3, 1)
     @timeout(10)
-    def test_send_videonote_required_args_only(self):
-        # obsolete, testen in setUpClass
-        self.assertEqual(True, True)
+    def test_expected_values(self):
+        self.assertEqual(self.videonote.duration, 3)
+        self.assertEqual(self.videonote.length, 240)
+        self.assertEqual(self.videonote.file_size, 132084)
 
     @flaky(3, 1)
     @timeout(10)
@@ -66,44 +70,44 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
             self._chat_id,
             self.videonote_file,
             timeout=10,
-            duration=self.duration,
-            length=self.length,
+            duration=self.videonote.duration,
+            length=self.videonote.length,
             disable_notification=False)
 
         videonote = message.video_note
 
         self.assertTrue(isinstance(videonote.file_id, str))
         self.assertNotEqual(videonote.file_id, None)
-        self.assertEqual(videonote.length, self.length)
-        self.assertEqual(videonote.duration, self.duration)
-        self.assertEqual(videonote.thumb, self.thumb)
-        self.assertEqual(videonote.file_size, self.file_size)
+        self.assertEqual(videonote.length, self.videonote.length)
+        self.assertEqual(videonote.duration, self.videonote.duration)
+        self.assertEqual(videonote.thumb, self.videonote.thumb)
+        self.assertEqual(videonote.file_size, self.videonote.file_size)
 
     @flaky(3, 1)
     @timeout(10)
     def test_send_videonote_resend(self):
         message = self._bot.sendVideoNote(
             chat_id=self._chat_id,
-            video_note=self.videonote_file_id,
+            video_note=self.videonote.file_id,
             timeout=10
         )
 
         videonote = message.video_note
 
-        self.assertEqual(videonote.file_id, self.videonote_file_id)
-        self.assertEqual(videonote.length, self.length)
-        self.assertEqual(videonote.duration, self.duration)
-        self.assertEqual(videonote.thumb, self.thumb)
-        self.assertEqual(videonote.file_size, self.file_size)
+        self.assertEqual(videonote.file_id, self.videonote.file_id)
+        self.assertEqual(videonote.length, self.videonote.length)
+        self.assertEqual(videonote.duration, self.videonote.duration)
+        self.assertEqual(videonote.thumb, self.videonote.thumb)
+        self.assertEqual(videonote.file_size, self.videonote.file_size)
 
     def test_videonote_de_json(self):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(videonote.file_id, self.videonote_file_id)
-        self.assertEqual(videonote.duration, self.duration)
-        self.assertEqual(videonote.thumb, self.thumb)
-        self.assertEqual(videonote.length, self.length)
-        self.assertEqual(videonote.file_size, self.file_size)
+        self.assertEqual(videonote.file_id, self.videonote.file_id)
+        self.assertEqual(videonote.duration, self.videonote.duration)
+        self.assertEqual(videonote.thumb, self.videonote.thumb)
+        self.assertEqual(videonote.length, self.videonote.length)
+        self.assertEqual(videonote.file_size, self.videonote.file_size)
 
     def test_videonote_to_json(self):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
@@ -114,10 +118,10 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(videonote.to_dict()))
-        self.assertEqual(videonote['file_id'], self.videonote_file_id)
-        self.assertEqual(videonote['duration'], self.duration)
-        self.assertEqual(videonote['length'], self.length)
-        self.assertEqual(videonote['file_size'], self.file_size)
+        self.assertEqual(videonote['file_id'], self.videonote.file_id)
+        self.assertEqual(videonote['duration'], self.videonote.duration)
+        self.assertEqual(videonote['length'], self.videonote.length)
+        self.assertEqual(videonote['file_size'], self.videonote.file_size)
 
     @flaky(3, 1)
     @timeout(10)
@@ -151,11 +155,11 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(message.video_note.file_id, None)
 
     def test_equality(self):
-        a = telegram.VideoNote(self.videonote_file_id, self.length, self.duration)
-        b = telegram.VideoNote(self.videonote_file_id, self.length, self.duration)
-        c = telegram.VideoNote(self.videonote_file_id, 0, 0, 0)
-        d = telegram.VideoNote("", self.length, self.duration)
-        e = telegram.Voice(self.videonote_file_id, self.duration)
+        a = telegram.VideoNote(self.videonote.file_id, self.videonote.length, self.videonote.duration)
+        b = telegram.VideoNote(self.videonote.file_id, self.videonote.length, self.videonote.duration)
+        c = telegram.VideoNote(self.videonote.file_id, 0, 0, 0)
+        d = telegram.VideoNote("", self.videonote.length, self.videonote.duration)
+        e = telegram.Voice(self.videonote.file_id, self.videonote.duration)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))
