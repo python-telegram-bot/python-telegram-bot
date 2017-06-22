@@ -127,16 +127,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_send_photo_bytesio_jpg_file(self):
-        from telegram.inputfile import InputFile
         # raw image bytes
         raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
-        inputfile = InputFile({"photo": raw_bytes})
+        inputfile = telegram.InputFile({"photo": raw_bytes})
         self.assertEqual(inputfile.mimetype, 'application/octet-stream')
 
         # raw image bytes with name info
         raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
         raw_bytes.name = self.photo_bytes_jpg_no_standard
-        inputfile = InputFile({"photo": raw_bytes})
+        inputfile = telegram.InputFile({"photo": raw_bytes})
         self.assertEqual(inputfile.mimetype, 'image/jpeg')
 
         # send raw photo
