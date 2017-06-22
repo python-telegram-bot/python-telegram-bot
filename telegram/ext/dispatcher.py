@@ -30,7 +30,7 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import TelegramError
+from telegram import TelegramError, StopPropagation
 from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
 
@@ -259,29 +259,35 @@ class Dispatcher(object):
 
         else:
             for group in self.groups:
-                for handler in self.handlers[group]:
-                    try:
-                        if handler.check_update(update):
-                            handler.handle_update(update, self)
-                            break
-                    # Dispatch any errors
-                    except TelegramError as te:
-                        self.logger.warn('A TelegramError was raised while processing the '
-                                         'Update.')
-
+                try:
+                    for handler in self.handlers[group]:
                         try:
-                            self.dispatch_error(update, te)
+                            if handler.check_update(update):
+                                handler.handle_update(update, self)
+                                break
+                        except StopPropagation as e:
+                            raise e
+                        # Dispatch any errors
+                        except TelegramError as te:
+                            self.logger.warn('A TelegramError was raised while processing the '
+                                             'Update.')
+
+                            try:
+                                self.dispatch_error(update, te)
+                            except Exception:
+                                self.logger.exception('An uncaught error was raised while '
+                                                      'handling the error')
+                            finally:
+                                break
+
+                        # Errors should not stop the thread
                         except Exception:
                             self.logger.exception('An uncaught error was raised while '
-                                                  'handling the error')
-                        finally:
+                                                  'processing the update')
                             break
-
-                    # Errors should not stop the thread
-                    except Exception:
-                        self.logger.exception('An uncaught error was raised while '
-                                              'processing the update')
-                        break
+                except StopPropagation:
+                    self.logger.debug('Handler has stopped handling chain')
+                    break
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """

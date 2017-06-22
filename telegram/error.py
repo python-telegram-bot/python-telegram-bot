@@ -109,3 +109,7 @@ class RetryAfter(TelegramError):
         super(RetryAfter,
               self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
         self.retry_after = float(retry_after)
+
+
+class StopPropagation(Exception):
+    pass

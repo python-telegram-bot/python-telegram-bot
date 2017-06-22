@@ -42,7 +42,7 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove, ReplyKeyboardHide
 from .forcereply import ForceReply
-from .error import TelegramError
+from .error import TelegramError, StopPropagation
 from .inputfile import InputFile
 from .file import File
 from .emoji import Emoji
@@ -118,7 +118,7 @@ __all__ = [
     'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
     'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
     'ParseMode', 'PhotoSize', 'ReplyKeyboardRemove', 'ReplyKeyboardMarkup', 'ReplyMarkup',
-    'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
+    'Sticker', 'TelegramError', 'StopPropagation', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
