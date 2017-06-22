@@ -331,9 +331,9 @@ class Filters(object):
             Only one of chat_id or username must be used here.
 
         Args:
-            user_id(Optional[int]): which user ID to allow through.
-            username(Optional[str]): which username to allow through. If username starts with '@'
-                symbol, it will be ignored.
+            user_id(Optional[int|list]): which user ID(s) to allow through.
+            username(Optional[str|list]): which username(s) to allow through. If username starts
+                with '@' symbol, it will be ignored.
 
         Raises:
             ValueError
@@ -342,19 +342,24 @@ class Filters(object):
         def __init__(self, user_id=None, username=None):
             if not (bool(user_id) ^ bool(username)):
                 raise ValueError('One and only one of user_id or username must be used')
-            if username is not None and username.startswith('@'):
-                self.username = username[1:]
+            if user_id is not None and isinstance(user_id, int):
+                self.user_ids = [user_id]
             else:
-                self.username = username
-            self.user_id = user_id
+                self.user_ids = user_id
+            if username is None:
+                self.usernames = username
+            elif isinstance(username, str_type):
+                self.usernames = [username.replace('@', '')]
+            else:
+                self.usernames = [user.replace('@', '') for user in username]
 
         def filter(self, message):
-            if self.user_id is not None:
-                return bool(message.from_user and message.from_user.id == self.user_id)
+            if self.user_ids is not None:
+                return bool(message.from_user and message.from_user.id in self.user_ids)
             else:
-                # self.username is not None
+                # self.usernames is not None
                 return bool(message.from_user and message.from_user.username and
-                            message.from_user.username == self.username)
+                            message.from_user.username in self.usernames)
 
     class chat(BaseFilter):
         """Filters messages to allow only those which are from specified chat ID.
@@ -363,9 +368,9 @@ class Filters(object):
             Only one of chat_id or username must be used here.
 
         Args:
-            chat_id(Optional[int]): which chat ID to allow through.
-            username(Optional[str]): which username to allow through. If username starts with '@'
-                symbol, it will be ignored.
+            chat_id(Optional[int|list]): which chat ID(s) to allow through.
+            username(Optional[str|list]): which username(s) to allow through. If username starts
+                with '@' symbol, it will be ignored.
 
         Raises:
             ValueError
@@ -373,19 +378,24 @@ class Filters(object):
 
         def __init__(self, chat_id=None, username=None):
             if not (bool(chat_id) ^ bool(username)):
-                raise ValueError('One and only one of user_id or username must be used')
-            if username is not None and username.startswith('@'):
-                self.username = username[1:]
+                raise ValueError('One and only one of chat_id or username must be used')
+            if chat_id is not None and isinstance(chat_id, int):
+                self.chat_ids = [chat_id]
             else:
-                self.username = username
-            self.chat_id = chat_id
+                self.chat_ids = chat_id
+            if username is None:
+                self.usernames = username
+            elif isinstance(username, str_type):
+                self.usernames = [username.replace('@', '')]
+            else:
+                self.usernames = [chat.replace('@', '') for chat in username]
 
         def filter(self, message):
-            if self.chat_id is not None:
-                return message.chat_id == self.chat_id
+            if self.chat_ids is not None:
+                return bool(message.chat_id in self.chat_ids)
             else:
-                # self.username is not None
-                return bool(message.chat.username and message.chat.username == self.username)
+                # self.usernames is not None
+                return bool(message.chat.username and message.chat.username in self.usernames)
 
     class _Invoice(BaseFilter):
 
