@@ -5,19 +5,33 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "pypy"
-  - "pypy3"
+  - "pypy-5.7.1"
+  - "pypy3.5-5.8.0"
+
+dist: trusty
+sudo: false
+
 branches:
   only:
     - master
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
 install:
   - pip install coveralls
+  - pip install -U wheel
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
+
 script:
   - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/ tests
   - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pre-commit run --all-files; fi
   - python ./setup.py bdist_dumb
+
 after_success:
   coveralls
