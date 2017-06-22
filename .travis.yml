@@ -8,6 +8,9 @@ python:
   - "pypy"
   - "pypy3"
 
+dist: trusty
+sudo: false
+
 branches:
   only:
     - master
