@@ -2,6 +2,7 @@ import sys
 import inspect
 import warnings
 from collections import namedtuple
+import platform
 
 import certifi
 import logging
@@ -110,9 +111,9 @@ def check_object(h4):
 
 
 def test_official():
-    if not sys.version_info >= (3, 5):
-        warnings.warn('Not running tests, since follow_wrapped is not supported on this platform'
-                      '(python version >= 3.5 required)')
+    if not sys.version_info >= (3, 5) or platform.python_implementation() != 'CPython':
+        warnings.warn('Not running "official" tests, since follow_wrapped is not supported'
+                      'on this platform (cpython version >= 3.5 required)')
         return
 
     http = urllib3.PoolManager(
