@@ -104,7 +104,7 @@ class VideoTest(BaseTest, unittest.TestCase):
 
         video = message.video
 
-        self.assertTrue(isinstance(video.file_id, str))
+        self.assertIsInstance(video.file_id, str)
         self.assertNotEqual(video.file_id, None)
         self.assertEqual(video.height, self.video.height)
         self.assertEqual(video.duration, self.video.duration)
@@ -122,9 +122,7 @@ class VideoTest(BaseTest, unittest.TestCase):
         message = self._bot.sendVideo(
             chat_id=self._chat_id,
             video=self.video.file_id,
-            timeout=10,
-            duration=self.video.duration,
-            caption=self.caption)
+            timeout=10)
 
         video = message.video
 

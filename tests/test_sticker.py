@@ -18,90 +18,136 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram Sticker"""
 
-import sys
-import unittest
 import os
+import unittest
 
 from flaky import flaky
 from future.utils import PY2
 
-sys.path.append('.')
-
 import telegram
 from tests.base import BaseTest, timeout
+from tests.bots import get_bot
 
 
 class StickerTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Sticker."""
 
-    def setUp(self):
-        self.sticker_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
-        self.width = 510
-        self.height = 512
-        self.thumb = {
-            'width': 90,
-            'height': 90,
-            'file_id': 'BQADAQADoQADHyP1B0mzJMVyzcB0Ag',
-            'file_size': 2364
-        }
-        self.emoji = telegram.Emoji.FLEXED_BICEPS
-        self.file_size = 39518
+    @classmethod
+    def setUpClass(cls):
+        cls.emoji = telegram.Emoji.FLEXED_BICEPS
+        cls.sticker_file_url = "https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.webp"  # noqa
 
+        bot_info = get_bot()
+        cls._chat_id = bot_info['chat_id']
+        cls._bot = telegram.Bot(bot_info['token'])
+
+        sticker_file = open('tests/data/telegram.webp', 'rb')
+        sticker = cls._bot.send_sticker(cls._chat_id, sticker=sticker_file, timeout=10).sticker
+        cls.sticker = sticker
+        cls.thumb = sticker.thumb
+
+        # Make sure file has been uploaded.
+        # Simple assertions PY2 Only
+        assert isinstance(cls.sticker, telegram.Sticker)
+        assert isinstance(cls.sticker.file_id, str)
+        assert cls.sticker.file_id is not ''
+        assert isinstance(cls.thumb, telegram.PhotoSize)
+        assert isinstance(cls.thumb.file_id, str)
+        assert cls.thumb.file_id is not ''
+
+    def setUp(self):
+        self.sticker_file = open('tests/data/telegram.webp', 'rb')
         self.json_dict = {
-            'file_id': self.sticker_file_id,
-            'width': self.width,
-            'height': self.height,
-            'thumb': self.thumb,
+            'file_id': self.sticker.file_id,
+            'width': self.sticker.width,
+            'height': self.sticker.height,
+            'thumb': self.thumb.to_dict(),
             'emoji': self.emoji,
-            'file_size': self.file_size
+            'file_size': self.sticker.file_size
         }
+
+    def test_expected_values(self):
+        self.assertEqual(self.sticker.width, 510)
+        self.assertEqual(self.sticker.height, 512)
+        self.assertEqual(self.sticker.file_size, 39518)
+        self.assertEqual(self.thumb.width, 90)
+        self.assertEqual(self.thumb.height, 90)
+        self.assertEqual(self.thumb.file_size, 3672)
 
     @flaky(3, 1)
     @timeout(10)
-    def test_send_sticker_file(self):
-        pass
+    def test_send_sticker_all_args(self):
+        message = self._bot.sendSticker(chat_id=self._chat_id, sticker=self.sticker.file_id, disable_notification=False)
+        sticker = message.sticker
+
+        self.assertEqual(sticker, self.sticker)
 
     @flaky(3, 1)
     @timeout(10)
     def test_send_sticker_resend(self):
-        message = self._bot.sendSticker(chat_id=self._chat_id, sticker=self.sticker_file_id)
+        message = self._bot.sendSticker(chat_id=self._chat_id, sticker=self.sticker.file_id)
 
         sticker = message.sticker
 
-        self.assertEqual(sticker.file_id, self.sticker_file_id)
-        self.assertEqual(sticker.width, self.width)
-        self.assertEqual(sticker.height, self.height)
-        self.assertTrue(isinstance(sticker.thumb, telegram.PhotoSize))
+        self.assertEqual(sticker.file_id, self.sticker.file_id)
+        self.assertEqual(sticker.width, self.sticker.width)
+        self.assertEqual(sticker.height, self.sticker.height)
+        self.assertIsInstance(sticker.thumb, telegram.PhotoSize)
+        self.assertEqual(sticker.file_size, self.sticker.file_size)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_sticker_on_server_emoji(self):
+        server_file_id = "CAADAQADHAADyIsGAAFZfq1bphjqlgI"
+        message = self._bot.sendSticker(chat_id=self._chat_id, sticker=server_file_id)
+        sticker = message.sticker
         if PY2:
             self.assertEqual(sticker.emoji, self.emoji.decode('utf-8'))
         else:
             self.assertEqual(sticker.emoji, self.emoji)
-        # self.assertEqual(sticker.file_size, self.file_size)  # TODO
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_sticker_from_url(self):
+        message = self._bot.sendSticker(chat_id=self._chat_id, sticker=self.sticker_file_url)
+        sticker = message.sticker
+
+        self.assertIsInstance(sticker, telegram.Sticker)
+        self.assertIsInstance(sticker.file_id, str)
+        self.assertNotEqual(sticker.file_id, '')
+        self.assertEqual(sticker.file_size, self.sticker.file_size)
+        self.assertEqual(sticker.height, self.sticker.height)
+        self.assertEqual(sticker.width, self.sticker.width)
+        thumb = sticker.thumb
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
+        self.assertNotEqual(thumb.file_id, '')
+        self.assertEqual(thumb.file_size, self.thumb.file_size)
+        self.assertEqual(thumb.width, self.thumb.width)
+        self.assertEqual(thumb.height, self.thumb.height)
 
     def test_sticker_de_json(self):
         sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(sticker.file_id, self.sticker_file_id)
-        self.assertEqual(sticker.width, self.width)
-        self.assertEqual(sticker.height, self.height)
-        self.assertTrue(isinstance(sticker.thumb, telegram.PhotoSize))
+        self.assertEqual(sticker.file_id, self.sticker.file_id)
+        self.assertEqual(sticker.width, self.sticker.width)
+        self.assertEqual(sticker.height, self.sticker.height)
+        self.assertIsInstance(sticker.thumb, telegram.PhotoSize)
         self.assertEqual(sticker.emoji, self.emoji)
-        self.assertEqual(sticker.file_size, self.file_size)
+        self.assertEqual(sticker.file_size, self.sticker.file_size)
 
     def test_sticker_to_json(self):
-        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(sticker.to_json()))
+        self.assertTrue(self.is_json(self.sticker.to_json()))
 
     def test_sticker_to_dict(self):
-        sticker = telegram.Sticker.de_json(self.json_dict, self._bot)
+        sticker = self.sticker.to_dict()
 
-        self.assertEqual(sticker['file_id'], self.sticker_file_id)
-        self.assertEqual(sticker['width'], self.width)
-        self.assertEqual(sticker['height'], self.height)
-        self.assertTrue(isinstance(sticker['thumb'], telegram.PhotoSize))
-        self.assertEqual(sticker['emoji'], self.emoji)
-        self.assertEqual(sticker['file_size'], self.file_size)
+        self.is_dict(sticker)
+        self.assertEqual(sticker['file_id'], self.sticker.file_id)
+        self.assertEqual(sticker['width'], self.sticker.width)
+        self.assertEqual(sticker['height'], self.sticker.height)
+        self.assertIsInstance(sticker['thumb'], telegram.PhotoSize)
+        self.assertEqual(sticker['file_size'], self.sticker.file_size)
 
     @flaky(3, 1)
     @timeout(10)
@@ -111,9 +157,8 @@ class StickerTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['sticker'] = open(os.devnull, 'rb')
 
-        self.assertRaises(
-            telegram.TelegramError,
-            lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendSticker(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
@@ -123,9 +168,8 @@ class StickerTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['sticker'] = ''
 
-        self.assertRaises(
-            telegram.TelegramError,
-            lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendSticker(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
@@ -134,25 +178,24 @@ class StickerTest(BaseTest, unittest.TestCase):
 
         del (json_dict['file_id'])
 
-        self.assertRaises(
-            TypeError,
-            lambda: self._bot.sendSticker(chat_id=self._chat_id, **json_dict))
+        with self.assertRaises(TypeError):
+            self._bot.sendSticker(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
     def test_reply_sticker(self):
         """Test for Message.reply_sticker"""
         message = self._bot.sendMessage(self._chat_id, '.')
-        message = message.reply_sticker(self.sticker_file_id)
+        message = message.reply_sticker(self.sticker.file_id)
 
         self.assertNotEqual(message.sticker.file_id, '')
 
     def test_equality(self):
-        a = telegram.Sticker(self.sticker_file_id, self.width, self.height)
-        b = telegram.Sticker(self.sticker_file_id, self.width, self.height)
-        c = telegram.Sticker(self.sticker_file_id, 0, 0)
-        d = telegram.Sticker("", self.width, self.height)
-        e = telegram.PhotoSize(self.sticker_file_id, self.width, self.height)
+        a = telegram.Sticker(self.sticker.file_id, self.sticker.width, self.sticker.height)
+        b = telegram.Sticker(self.sticker.file_id, self.sticker.width, self.sticker.height)
+        c = telegram.Sticker(self.sticker.file_id, 0, 0)
+        d = telegram.Sticker("", self.sticker.width, self.sticker.height)
+        e = telegram.PhotoSize(self.sticker.file_id, self.sticker.width, self.sticker.height)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))
