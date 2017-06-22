@@ -84,6 +84,19 @@ class StickerTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_get_and_download_sticker(self):
+        new_file = self._bot.getFile(self.sticker.file_id)
+
+        self.assertEqual(new_file.file_size, self.sticker.file_size)
+        self.assertEqual(new_file.file_id, self.sticker.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
+
+        new_file.download('telegram.webp')
+
+        self.assertTrue(os.path.isfile('telegram.webp'))
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_sticker_resend(self):
         message = self._bot.sendSticker(chat_id=self._chat_id, sticker=self.sticker.file_id)
 
@@ -146,7 +159,7 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker['file_id'], self.sticker.file_id)
         self.assertEqual(sticker['width'], self.sticker.width)
         self.assertEqual(sticker['height'], self.sticker.height)
-        self.assertIsInstance(sticker['thumb'], telegram.PhotoSize)
+        self.assertIsInstance(sticker['thumb'], dict)
         self.assertEqual(sticker['file_size'], self.sticker.file_size)
 
     @flaky(3, 1)

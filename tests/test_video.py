@@ -95,6 +95,19 @@ class VideoTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_get_and_download_video(self):
+        new_file = self._bot.getFile(self.video.file_id)
+
+        self.assertEqual(new_file.file_size, self.video.file_size)
+        self.assertEqual(new_file.file_id, self.video.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
+
+        new_file.download('telegram.mp4')
+
+        self.assertTrue(os.path.isfile('telegram.mp4'))
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_video_mp4_file_url(self):
         message = self._bot.sendVideo(
             chat_id=self._chat_id,
@@ -130,8 +143,6 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.duration, self.video.duration)
         self.assertEqual(video.thumb, self.video.thumb)
         self.assertEqual(video.mime_type, self.video.mime_type)
-
-        self.assertEqual(message.caption, self.caption)
 
     def test_video_de_json(self):
         video = telegram.Video.de_json(self.json_dict, self._bot)

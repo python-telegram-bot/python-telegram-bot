@@ -92,6 +92,19 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_get_and_download_voice(self):
+        new_file = self._bot.getFile(self.voice.file_id)
+
+        self.assertEqual(new_file.file_size, self.voice.file_size)
+        self.assertEqual(new_file.file_id, self.voice.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
+
+        new_file.download('telegram.ogg')
+
+        self.assertTrue(os.path.isfile('telegram.ogg'))
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_voice_ogg_url_file(self):
         message = self._bot.sendVoice(
             chat_id=self._chat_id, voice=self.voice_file_url, duration=self.voice.duration)

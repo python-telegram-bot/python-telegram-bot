@@ -87,6 +87,19 @@ class DocumentTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_get_and_download_document(self):
+        new_file = self._bot.getFile(self.document.file_id)
+
+        self.assertEqual(new_file.file_size, self.document.file_size)
+        self.assertEqual(new_file.file_id, self.document.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
+
+        new_file.download('telegram.png')
+
+        self.assertTrue(os.path.isfile('telegram.png'))
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_document_png_file_with_custom_file_name(self):
         message = self._bot.sendDocument(
             self._chat_id, self.document_file, filename='telegram_custom.png')

@@ -96,6 +96,20 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_get_and_download_photo(self):
+        new_file = self._bot.getFile(self.photo.file_id)
+
+        self.assertEqual(new_file.file_size, self.photo.file_size)
+        self.assertEqual(new_file.file_id, self.photo.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
+
+        new_file.download('telegram.jpg')
+
+        self.assertTrue(os.path.isfile('telegram.jpg'))
+
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_photo_url_jpg_file(self):
         message = self._bot.sendPhoto(self._chat_id, photo=self.photo_file_url)
 

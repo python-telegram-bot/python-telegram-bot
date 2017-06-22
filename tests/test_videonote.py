@@ -86,6 +86,19 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
     @flaky(3, 1)
     @timeout(10)
+    def test_get_and_download_videonote(self):
+        new_file = self._bot.getFile(self.videonote.file_id)
+
+        self.assertEqual(new_file.file_size, self.videonote.file_size)
+        self.assertEqual(new_file.file_id, self.videonote.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
+
+        new_file.download('telegram2.mp4')
+
+        self.assertTrue(os.path.isfile('telegram2.mp4'))
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_videonote_resend(self):
         message = self._bot.sendVideoNote(
             chat_id=self._chat_id,
