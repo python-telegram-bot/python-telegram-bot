@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram File."""
-
 from os.path import basename
+
+from future.backports.urllib import parse as urllib_parse
 
 from telegram import TelegramObject
 
@@ -46,8 +47,7 @@ class File(TelegramObject):
 
         # Optionals
         self.file_size = file_size
-        if file_path:
-            self.file_path = str(file_path)
+        self.file_path = file_path
 
         self.bot = bot
 
@@ -91,7 +91,10 @@ class File(TelegramObject):
         if custom_path is not None and out is not None:
             raise ValueError('custom_path and out are mutually exclusive')
 
-        url = self.file_path
+        # Convert any UTF-8 char into a url encoded ASCII string.
+        sres = urllib_parse.urlsplit(self.file_path)
+        url = urllib_parse.urlunsplit(urllib_parse.SplitResult(
+            sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
 
         if out:
             buf = self.bot.request.retrieve(url)
@@ -101,6 +104,6 @@ class File(TelegramObject):
             if custom_path:
                 filename = custom_path
             else:
-                filename = basename(url)
+                filename = basename(self.file_path)
 
             self.bot.request.download(url, filename, timeout=timeout)
