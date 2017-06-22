@@ -1,12 +1,6 @@
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "pypy"
-  - "pypy3-5.8"
+  - "pypy3.5-5.8.0"
 branches:
   only:
     - master
