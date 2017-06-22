@@ -325,21 +325,23 @@ class Filters(object):
     group = _Group()
 
     class user(BaseFilter):
-        """Filters messages to allow only those which are from specified user ID
+        """Filters messages to allow only those which are from specified user ID.
+
+        Notes:
+            Only one of chat_id or username must be used here.
 
         Args:
-            user_id(Optional[int]): which user ID to allow through. Required if username is not
-                specified
-            username(Optional[str]): which username to allow through. Required if user_id is not
-                specified
+            user_id(Optional[int]): which user ID to allow through.
+            username(Optional[str]): which username to allow through. If username starts with '@'
+                symbol, it will be ignored.
 
         Raises:
             ValueError
         """
 
         def __init__(self, user_id=None, username=None):
-            if (user_id is None and username is None) or (bool(user_id) and bool(username)):
-                raise ValueError('You must specify either user_id or username')
+            if not (bool(user_id) ^ bool(username)):
+                raise ValueError('One and only one of user_id or username must be used')
             if username is not None and username.startswith('@'):
                 self.username = username[1:]
             else:
@@ -355,21 +357,23 @@ class Filters(object):
                             message.from_user.username == self.username)
 
     class chat(BaseFilter):
-        """Filters messages to allow only those which are from specified chat ID
+        """Filters messages to allow only those which are from specified chat ID.
+
+        Notes:
+            Only one of chat_id or username must be used here.
 
         Args:
-            chat_id(Optional[int]): which chat ID to allow through. Required if username is not
-                specified
-            username(Optional[str]): which username to allow through. Required if chat_id is not
-                specified
+            chat_id(Optional[int]): which chat ID to allow through.
+            username(Optional[str]): which username to allow through. If username starts with '@'
+                symbol, it will be ignored.
 
         Raises:
             ValueError
         """
 
         def __init__(self, chat_id=None, username=None):
-            if (chat_id is None and username is None) or (bool(chat_id) and bool(username)):
-                raise ValueError('You must specify either chat_id or username')
+            if not (bool(chat_id) ^ bool(username)):
+                raise ValueError('One and only one of user_id or username must be used')
             if username is not None and username.startswith('@'):
                 self.username = username[1:]
             else:
