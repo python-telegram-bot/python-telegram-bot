@@ -6,7 +6,7 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-  - "pypy3"
+  - "pypy3.5-5.8.0"
 branches:
   only:
     - master
@@ -17,7 +17,7 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 script:
   - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/ tests
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pre-commit run --all-files; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pre-commit run --all-files; fi
   - python ./setup.py bdist_dumb
 after_success:
   coveralls
