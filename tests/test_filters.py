@@ -214,8 +214,9 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.assertTrue(Filters.group(self.message))
 
     def test_filters_chat(self):
-        with self.assertRaisesRegexp(ValueError, 'either chat_id or username'):
-            Filters.chat(chat_id=0, username='chat')
+        with self.assertRaisesRegexp(ValueError, 'chat_id or username'):
+            Filters.chat(chat_id=-1, username='chat')
+        with self.assertRaisesRegexp(ValueError, 'chat_id or username'):
             Filters.chat()
 
     def test_filters_chat_id(self):
@@ -223,6 +224,7 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.chat.id = -1
         self.assertTrue(Filters.chat(chat_id=-1)(self.message))
         self.message.chat.id = -2
+        self.assertTrue(Filters.chat(chat_id=[-1, -2])(self.message))
         self.assertFalse(Filters.chat(chat_id=-1)(self.message))
 
     def test_filters_chat_username(self):
@@ -230,11 +232,13 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.chat.username = 'chat'
         self.assertTrue(Filters.chat(username='@chat')(self.message))
         self.assertTrue(Filters.chat(username='chat')(self.message))
-        self.assertFalse(Filters.chat(username='@chat_username')(self.message))
+        self.assertTrue(Filters.chat(username=['chat1', 'chat', 'chat2'])(self.message))
+        self.assertFalse(Filters.chat(username=['@chat1', 'chat_2'])(self.message))
 
     def test_filters_user(self):
-        with self.assertRaisesRegexp(ValueError, 'either user_id or username'):
-            Filters.user(user_id=0, username='user')
+        with self.assertRaisesRegexp(ValueError, 'user_id or username'):
+            Filters.user(user_id=1, username='user')
+        with self.assertRaisesRegexp(ValueError, 'user_id or username'):
             Filters.user()
 
     def test_filters_user_id(self):
@@ -242,6 +246,7 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.from_user.id = 1
         self.assertTrue(Filters.user(user_id=1)(self.message))
         self.message.from_user.id = 2
+        self.assertTrue(Filters.user(user_id=[1, 2])(self.message))
         self.assertFalse(Filters.user(user_id=1)(self.message))
 
     def test_filters_username(self):
@@ -250,7 +255,8 @@ class FiltersTest(BaseTest, unittest.TestCase):
         self.message.from_user.username = 'user'
         self.assertTrue(Filters.user(username='@user')(self.message))
         self.assertTrue(Filters.user(username='user')(self.message))
-        self.assertFalse(Filters.user(username='@username')(self.message))
+        self.assertTrue(Filters.user(username=['user1', 'user', 'user2'])(self.message))
+        self.assertFalse(Filters.user(username=['@username', '@user_2'])(self.message))
 
     def test_and_filters(self):
         self.message.text = 'test'
