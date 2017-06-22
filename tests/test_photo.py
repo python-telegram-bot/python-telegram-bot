@@ -18,111 +18,140 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Tests for Telegram Photo"""
 
-from io import BytesIO
-import sys
-import unittest
 import os
+import unittest
+from io import BytesIO
 
 from flaky import flaky
 
-sys.path.append('.')
-
 import telegram
 from tests.base import BaseTest, timeout
+from tests.bots import get_bot
 
 
 class PhotoTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Photo."""
 
+    @classmethod
+    def setUpClass(cls):
+        cls.caption = u'PhotoTest - Caption'
+        cls.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
+
+        bot_info = get_bot()
+        cls._chat_id = bot_info['chat_id']
+        cls._bot = telegram.Bot(bot_info['token'])
+
+        photo_file = open('tests/data/telegram.jpg', 'rb')
+        photo = cls._bot.send_photo(cls._chat_id, photo=photo_file, timeout=10).photo
+        cls.thumb, cls.photo = photo
+
+        # Make sure file has been uploaded.
+        # Simple assertions PY2 Only
+        assert isinstance(cls.photo, telegram.PhotoSize)
+        assert isinstance(cls.thumb, telegram.PhotoSize)
+        assert isinstance(cls.photo.file_id, str)
+        assert isinstance(cls.thumb.file_id, str)
+        assert cls.photo.file_id is not ''
+        assert cls.thumb.file_id is not ''
+
     def setUp(self):
         self.photo_file = open('tests/data/telegram.jpg', 'rb')
-        self.photo_file_id = 'AgADAQADgEsyGx8j9QfmDMmwkPBrFcKRzy8ABHW8ul9nW7FoNHYBAAEC'
-        self.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
         self.photo_bytes_jpg_no_standard = 'tests/data/telegram_no_standard_header.jpg'
-        self.width = 300
-        self.height = 300
-        self.thumb = {
-            'width': 90,
-            'height': 90,
-            'file_id': 'AgADAQADgEsyGx8j9QeYW9oDz2mKRsKRzy8ABD64nkFkjujeNXYBAAEC',
-            'file_size': 1478
-        }
-        self.file_size = 10209
-
-        # caption is part of sendPhoto method but not Photo object
-        self.caption = u'PhotoTest - Caption'
-
         self.json_dict = {
-            'file_id': self.photo_file_id,
-            'width': self.width,
-            'height': self.height,
-            'file_size': self.file_size
+            'file_id': self.photo.file_id,
+            'width': self.photo.width,
+            'height': self.photo.height,
+            'file_size': self.photo.file_size
         }
+
+    def test_expected_values(self):
+        self.assertEqual(self.photo.width, 300)
+        self.assertEqual(self.photo.height, 300)
+        self.assertEqual(self.photo.file_size, 10209)
+        self.assertEqual(self.thumb.width, 90)
+        self.assertEqual(self.thumb.height, 90)
+        self.assertEqual(self.thumb.file_size, 1478)
 
     @flaky(3, 1)
     @timeout(10)
-    def test_sendphotoo_all_args(self):
-        message = self._bot.sendPhoto(self._chat_id, self.photo_file, caption=self.caption)
-
+    def test_sendphoto_all_args(self):
+        message = self._bot.sendPhoto(self._chat_id, self.photo_file, caption=self.caption, disable_notification=False)
         thumb, photo = message.photo
 
-        self.assertTrue(isinstance(thumb.file_id, str))
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
         self.assertNotEqual(thumb.file_id, '')
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertEqual(thumb.width, self.thumb['width'])
-        self.assertEqual(thumb.height, self.thumb['height'])
-        self.assertEqual(thumb.file_size, self.thumb['file_size'])
+        self.assertEqual(thumb.width, self.thumb.width)
+        self.assertEqual(thumb.height, self.thumb.height)
+        self.assertEqual(thumb.file_size, self.thumb.file_size)
 
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo.width, self.width)
-        self.assertEqual(photo.height, self.height)
-        self.assertEqual(photo.file_size, self.file_size)
+        self.assertEqual(photo.width, self.photo.width)
+        self.assertEqual(photo.height, self.photo.height)
+        self.assertEqual(photo.file_size, self.photo.file_size)
 
         self.assertEqual(message.caption, self.caption)
 
     @flaky(3, 1)
     @timeout(10)
-    def test_send_photo_jpg_file(self):
-        message = self._bot.sendPhoto(self._chat_id, self.photo_file)
+    def test_get_and_download_photo(self):
+        new_file = self._bot.getFile(self.photo.file_id)
 
-        thumb, photo = message.photo
+        self.assertEqual(new_file.file_size, self.photo.file_size)
+        self.assertEqual(new_file.file_id, self.photo.file_id)
+        self.assertTrue(new_file.file_path.startswith('https://'))
 
-        self.assertTrue(isinstance(thumb.file_id, str))
-        self.assertNotEqual(thumb.file_id, '')
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertEqual(thumb.width, self.thumb['width'])
-        self.assertEqual(thumb.height, self.thumb['height'])
-        self.assertEqual(thumb.file_size, self.thumb['file_size'])
+        new_file.download('telegram.jpg')
 
-        self.assertTrue(isinstance(photo.file_id, str))
-        self.assertNotEqual(photo.file_id, '')
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo.width, self.width)
-        self.assertEqual(photo.height, self.height)
-        self.assertEqual(photo.file_size, self.file_size)
+        self.assertTrue(os.path.isfile('telegram.jpg'))
+
 
     @flaky(3, 1)
     @timeout(10)
     def test_send_photo_url_jpg_file(self):
-        message = self._bot.sendPhoto(self._chat_id, self.photo_file_url)
+        message = self._bot.sendPhoto(self._chat_id, photo=self.photo_file_url)
 
         thumb, photo = message.photo
 
-        self.assertTrue(isinstance(thumb.file_id, str))
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
         self.assertNotEqual(thumb.file_id, '')
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertEqual(thumb.width, self.thumb['width'])
-        self.assertEqual(thumb.height, self.thumb['height'])
-        self.assertEqual(thumb.file_size, self.thumb['file_size'])
+        self.assertEqual(thumb.width, self.thumb.width)
+        self.assertEqual(thumb.height, self.thumb.height)
+        self.assertEqual(thumb.file_size, self.thumb.file_size)
 
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo.width, self.width)
-        self.assertEqual(photo.height, self.height)
-        self.assertEqual(photo.file_size, self.file_size)
+        self.assertEqual(photo.width, self.photo.width)
+        self.assertEqual(photo.height, self.photo.height)
+        self.assertEqual(photo.file_size, self.photo.file_size)
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_photo_url_png_file(self):
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
+
+        photo = message.photo[-1]
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_photo_url_gif_file(self):
+        message = self._bot.sendPhoto(
+            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
+
+        photo = message.photo[-1]
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
 
     @flaky(3, 1)
     @timeout(10)
@@ -142,53 +171,62 @@ class PhotoTest(BaseTest, unittest.TestCase):
         raw_bytes = BytesIO(open(self.photo_bytes_jpg_no_standard, 'rb').read())
         message = self._bot.sendPhoto(self._chat_id, photo=raw_bytes)
         photo = message.photo[-1]
-        self.assertTrue(isinstance(photo.file_id, str))
+        self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
+        self.assertIsInstance(photo, telegram.PhotoSize)
         self.assertEqual(photo.width, 1920)
         self.assertEqual(photo.height, 1080)
         self.assertEqual(photo.file_size, 30907)
 
     @flaky(3, 1)
     @timeout(10)
+    def test_silent_send_photo(self):
+        message = self._bot.sendPhoto(photo=self.photo_file, chat_id=self._chat_id, disable_notification=True)
+        thumb, photo = message.photo
+
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
+        self.assertNotEqual(thumb.file_id, '')
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
+
+    @flaky(3, 1)
+    @timeout(10)
     def test_send_photo_resend(self):
-        message = self._bot.sendPhoto(chat_id=self._chat_id, photo=self.photo_file_id)
+        message = self._bot.sendPhoto(chat_id=self._chat_id, photo=self.photo.file_id)
 
         thumb, photo = message.photo
 
-        self.assertEqual(thumb.file_id, self.thumb['file_id'])
-        self.assertTrue(isinstance(thumb, telegram.PhotoSize))
-        self.assertEqual(thumb.width, self.thumb['width'])
-        self.assertEqual(thumb.height, self.thumb['height'])
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertEqual(thumb.file_id, self.thumb.file_id)
+        self.assertEqual(thumb.width, self.thumb.width)
+        self.assertEqual(thumb.height, self.thumb.height)
+        self.assertEqual(thumb.file_size, self.thumb.file_size)
 
-        self.assertEqual(photo.file_id, self.photo_file_id)
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo.width, self.width)
-        self.assertEqual(photo.height, self.height)
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertEqual(photo.file_id, self.photo.file_id)
+        self.assertEqual(photo.width, self.photo.width)
+        self.assertEqual(photo.height, self.photo.height)
+        self.assertEqual(photo.file_size, self.photo.file_size)
 
     def test_photo_de_json(self):
         photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(photo.file_id, self.photo_file_id)
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo.width, self.width)
-        self.assertEqual(photo.height, self.height)
-        self.assertEqual(photo.file_size, self.file_size)
+        self.assertEqual(photo, self.photo)
 
     def test_photo_to_json(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(photo.to_json()))
+        self.assertTrue(self.is_json(self.photo.to_json()))
 
     def test_photo_to_dict(self):
-        photo = telegram.PhotoSize.de_json(self.json_dict, self._bot)
+        photo = self.photo.to_dict()
 
-        self.assertTrue(self.is_dict(photo.to_dict()))
-        self.assertEqual(photo['file_id'], self.photo_file_id)
-        self.assertTrue(isinstance(photo, telegram.PhotoSize))
-        self.assertEqual(photo['width'], self.width)
-        self.assertEqual(photo['height'], self.height)
-        self.assertEqual(photo['file_size'], self.file_size)
+        self.assertTrue(self.is_dict(photo))
+        self.assertEqual(photo['file_id'], self.photo.file_id)
+        self.assertEqual(photo['width'], self.photo.width)
+        self.assertEqual(photo['height'], self.photo.height)
+        self.assertEqual(photo['file_size'], self.photo.file_size)
 
     @flaky(3, 1)
     @timeout(10)
@@ -198,9 +236,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['photo'] = open(os.devnull, 'rb')
 
-        self.assertRaises(
-            telegram.TelegramError,
-            lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendPhoto(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
@@ -210,9 +247,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
         del (json_dict['file_id'])
         json_dict['photo'] = ''
 
-        self.assertRaises(
-            telegram.TelegramError,
-            lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
+        with self.assertRaises(telegram.TelegramError):
+            self._bot.sendPhoto(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
@@ -223,25 +259,30 @@ class PhotoTest(BaseTest, unittest.TestCase):
         del (json_dict['width'])
         del (json_dict['height'])
 
-        self.assertRaises(
-            TypeError,
-            lambda: self._bot.sendPhoto(chat_id=self._chat_id, **json_dict))
+        with self.assertRaises(TypeError):
+            self._bot.sendPhoto(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     @timeout(10)
     def test_reply_photo(self):
         """Test for Message.reply_photo"""
         message = self._bot.sendMessage(self._chat_id, '.')
-        message = message.reply_photo(self.photo_file)
+        thumb, photo = message.reply_photo(self.photo_file).photo
 
-        self.assertNotEqual(message.photo[0].file_id, '')
+        self.assertIsInstance(thumb, telegram.PhotoSize)
+        self.assertIsInstance(thumb.file_id, str)
+        self.assertNotEqual(thumb.file_id, '')
+
+        self.assertIsInstance(photo, telegram.PhotoSize)
+        self.assertIsInstance(photo.file_id, str)
+        self.assertNotEqual(photo.file_id, '')
 
     def test_equality(self):
-        a = telegram.PhotoSize(self.photo_file_id, self.width, self.height)
-        b = telegram.PhotoSize(self.photo_file_id, self.width, self.height)
-        c = telegram.PhotoSize(self.photo_file_id, 0, 0)
-        d = telegram.PhotoSize("", self.width, self.height)
-        e = telegram.Sticker(self.photo_file_id, self.width, self.height)
+        a = telegram.PhotoSize(self.photo.file_id, self.photo.width, self.photo.height)
+        b = telegram.PhotoSize(self.photo.file_id, self.photo.width, self.photo.height)
+        c = telegram.PhotoSize(self.photo.file_id, 0, 0)
+        d = telegram.PhotoSize("", self.photo.width, self.photo.height)
+        e = telegram.Sticker(self.photo.file_id, self.photo.width, self.photo.height)
 
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))
