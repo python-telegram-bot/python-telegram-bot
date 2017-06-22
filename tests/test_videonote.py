@@ -77,7 +77,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
         videonote = message.video_note
 
-        self.assertTrue(isinstance(videonote.file_id, str))
+        self.assertIsInstance(videonote.file_id, str)
         self.assertNotEqual(videonote.file_id, None)
         self.assertEqual(videonote.length, self.videonote.length)
         self.assertEqual(videonote.duration, self.videonote.duration)

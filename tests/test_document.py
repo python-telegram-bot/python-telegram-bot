@@ -76,7 +76,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         document = message.document
 
         self.assertIsInstance(document, telegram.Document)
-        self.assertTrue(isinstance(document.file_id, str))
+        self.assertIsInstance(document.file_id, str)
         self.assertNotEqual(document.file_id, '')
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
         self.assertEqual(document.file_name, self.document.file_name)
@@ -103,7 +103,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         document = message.document
 
         self.assertIsInstance(document, telegram.Document)
-        self.assertTrue(isinstance(document.file_id, str))
+        self.assertIsInstance(document.file_id, str)
         self.assertNotEqual(document.file_id, '')
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
         self.assertEqual(document.file_name, 'telegram.gif')
@@ -177,7 +177,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
         document = message.document
 
         self.assertIsInstance(document, telegram.Document)
-        self.assertTrue(isinstance(document.file_id, str))
+        self.assertIsInstance(document.file_id, str)
         self.assertNotEqual(document.file_id, '')
         self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
 

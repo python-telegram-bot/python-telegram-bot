@@ -84,7 +84,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
         voice = message.voice
 
-        self.assertTrue(isinstance(voice.file_id, str))
+        self.assertIsInstance(voice.file_id, str)
         self.assertNotEqual(voice.file_id, '')
         self.assertEqual(voice.duration, self.voice.duration)
         self.assertEqual(voice.mime_type, self.voice.mime_type)
@@ -98,7 +98,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
         voice = message.voice
 
-        self.assertTrue(isinstance(voice.file_id, str))
+        self.assertIsInstance(voice.file_id, str)
         self.assertNotEqual(voice.file_id, '')
         self.assertEqual(voice.duration, self.voice.duration)
         self.assertEqual(voice.mime_type, self.voice.mime_type)
@@ -117,7 +117,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
         voice = message.voice
 
-        self.assertTrue(isinstance(voice.file_id, str))
+        self.assertIsInstance(voice.file_id, str)
         self.assertNotEqual(voice.file_id, '')
         self.assertEqual(voice.duration, self.voice.duration)
         self.assertEqual(voice.mime_type, self.voice.mime_type)
