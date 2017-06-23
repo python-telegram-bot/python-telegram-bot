@@ -35,7 +35,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.caption = u'PhotoTest - Caption'
-        cls.photo_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.jpg'
+        cls.photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
 
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']

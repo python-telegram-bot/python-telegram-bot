@@ -35,8 +35,7 @@ class StickerTest(BaseTest, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.emoji = telegram.Emoji.FLEXED_BICEPS
-        cls.sticker_file_url = "https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.webp"  # noqa
-
+        cls.sticker_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.webp"
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']
         cls._bot = telegram.Bot(bot_info['token'])

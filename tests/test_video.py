@@ -34,7 +34,7 @@ class VideoTest(BaseTest, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.caption = u'VideoTest - Caption'
-        cls.video_file_url = 'https://python-telegram-bot.org/static/website/telegram.mp4'
+        cls.video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
 
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']

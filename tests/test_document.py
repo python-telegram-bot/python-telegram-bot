@@ -33,7 +33,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.caption = u'DocumentTest - Caption'
-        cls.document_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.gif'
+        cls.document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
 
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']
