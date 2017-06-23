@@ -36,7 +36,9 @@ class AudioTest(BaseTest, unittest.TestCase):
         cls.caption = "Test audio"
         cls.performer = 'Leandro Toledo'
         cls.title = 'Teste'
-        cls.audio_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp3'
+        # cls.audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
+        # Shortened link, the above one is cached with the wrong duration.
+        cls.audio_file_url = "https://goo.gl/3En24v"
 
         bot_info = get_bot()
         cls._chat_id = bot_info['chat_id']
