@@ -52,7 +52,7 @@ def fold(foldname, comment=None, stream=sys.stdout):
         print('travis_fold:start:{}'.format(foldname), file=stream, end='')
 
     if comment:
-        print('\r{}'.format(comment), file=stream)
+        print('\n{}'.format(comment), file=stream)
     else:
         print('', file=stream)
 
