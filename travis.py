@@ -77,7 +77,7 @@ def main():
         fold('pre-commit', 'Running pre-commits')
         # TODO: Only run pre-commit hooks on changed files
         # Using something like git diff-tree and $TRAVIS_COMMIT_RANGE
-        pre_commit = subprocess.call(['pre-commit', 'run', '--all-files'])
+        pre_commit = subprocess.call(['pre-commit', 'run', '--all-files']) == 0
         if pre_commit:
             fold('pre-commit')
 
