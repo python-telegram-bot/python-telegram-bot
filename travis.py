@@ -73,7 +73,7 @@ def main():
 
     # Only run pre-commit hooks once
     pre_commit = True
-    if sys.version_info[:2] == (3, 5) and python_implementation() == 'CPython':
+    if sys.version_info[:2] == (3, 6) and python_implementation() == 'CPython':
         fold('pre-commit', 'Running pre-commits')
         # TODO: Only run pre-commit hooks on changed files
         # Using something like git diff-tree and $TRAVIS_COMMIT_RANGE
