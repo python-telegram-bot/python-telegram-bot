@@ -36,7 +36,9 @@ class FoldPlugin(Plugin):
         if inspect.ismodule(context) and context != tests:
             fold(context.__name__, context.__name__, stream=self.stream)
 
-    stopContext = startContext
+    def stopContext(self, context):
+        if inspect.ismodule(context) and context != tests:
+            fold(context.__name__, stream=self.stream)
 
 folds = set()
 
@@ -65,7 +67,8 @@ def main():
                      addplugins=[FoldPlugin(), CustomCoverage()],
                      config=config)
     print('\n' * 2)
-    fold('tests')
+    if tests:
+        fold('tests')
 
     # Only run pre-commit hooks once
     pre_commit = True
