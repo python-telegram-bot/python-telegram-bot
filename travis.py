@@ -46,7 +46,7 @@ folds = set()
 def fold(foldname, comment=None, stream=sys.stdout):
     if foldname in folds:
         folds.remove(foldname)
-        print('travis_fold:end:{}'.format(foldname), file=stream, end='')
+        print('\ntravis_fold:end:{}'.format(foldname), file=stream, end='')
     else:
         folds.add(foldname)
         print('travis_fold:start:{}'.format(foldname), file=stream, end='')
