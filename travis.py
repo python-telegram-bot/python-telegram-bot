@@ -60,9 +60,10 @@ def fold(foldname, comment=None, stream=sys.stdout):
 def main():
     print('Starting...')
     fold('tests', 'Running tests...')
-    config = Config(verbosity=2, plugins=DefaultPluginManager())
-    tests = nose.run(argv=['--with-flaky', '--no-flaky-report', '--with-coverage',
-                           '--with-travis-fold', '--cover-package=telegram/',
+    config = Config(verbosity=2, plugins=DefaultPluginManager(), env={'NOSE_REDNOSE': '1'})
+    tests = nose.run(argv=['--with-flaky', '--no-flaky-report',
+                           '--with-coverage', '--cover-package=telegram/',
+                           '--with-travis-fold',
                            'tests'],
                      addplugins=[FoldPlugin(), CustomCoverage()],
                      config=config)
