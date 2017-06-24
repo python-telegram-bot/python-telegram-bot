@@ -23,7 +23,7 @@ import re
 from future.utils import string_types
 
 from telegram import Update
-from .handler import Handler
+from telegram.ext import Handler, Groups, Groupdict
 
 
 class CallbackQueryHandler(Handler):
@@ -66,10 +66,10 @@ class CallbackQueryHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pattern=None,
-                 pass_groups=False,
-                 pass_groupdict=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_groups=None,
+                 pass_groupdict=None,
+                 pass_user_data=None,
+                 pass_chat_data=None):
         super(CallbackQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -81,8 +81,8 @@ class CallbackQueryHandler(Handler):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
-        self.pass_groups = pass_groups
-        self.pass_groupdict = pass_groupdict
+        self.pass_groups = self.should_pass(Groups, pass_groups, 'groups')
+        self.pass_groupdict = self.should_pass(Groupdict, pass_groups, 'groups')
 
     def check_update(self, update):
         if isinstance(update, Update) and update.callback_query:
@@ -99,8 +99,8 @@ class CallbackQueryHandler(Handler):
             match = re.match(self.pattern, update.callback_query.data)
 
             if self.pass_groups:
-                optional_args['groups'] = match.groups()
+                optional_args[self.pass_groups] = Groups(match.groups())
             if self.pass_groupdict:
-                optional_args['groupdict'] = match.groupdict()
+                optional_args[self.pass_groupdict] = Groupdict(match.groupdict())
 
         return self.callback(dispatcher.bot, update, **optional_args)

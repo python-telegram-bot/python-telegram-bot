@@ -24,13 +24,13 @@ from functools import wraps
 from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
 from uuid import uuid4
-from collections import defaultdict
 
 from queue import Queue, Empty
 
 from future.builtins import range
 
 from telegram import TelegramError
+from telegram.ext import ChatData, UserData
 from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
 
@@ -86,9 +86,9 @@ class Dispatcher(object):
         self.job_queue = job_queue
         self.workers = workers
 
-        self.user_data = defaultdict(dict)
+        self.user_data = UserData(dict)
         """:type: dict[int, dict]"""
-        self.chat_data = defaultdict(dict)
+        self.chat_data = ChatData(dict)
         """:type: dict[int, dict]"""
 
         self.handlers = {}

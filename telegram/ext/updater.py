@@ -27,10 +27,9 @@ from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
-from queue import Queue
 
 from telegram import Bot, TelegramError
-from telegram.ext import Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue, UpdateQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
@@ -103,7 +102,7 @@ class Updater(object):
             self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request)
         self.user_sig_handler = user_sig_handler
-        self.update_queue = Queue()
+        self.update_queue = UpdateQueue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
         self.dispatcher = Dispatcher(

@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the base class for handlers as used by the
 Dispatcher """
+from telegram.ext import UpdateQueue, JobQueue, UserData, ChatData
 
 
 class Handler(object):
@@ -49,15 +50,15 @@ class Handler(object):
 
     def __init__(self,
                  callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_update_queue=None,
+                 pass_job_queue=None,
+                 pass_user_data=None,
+                 pass_chat_data=None):
         self.callback = callback
-        self.pass_update_queue = pass_update_queue
-        self.pass_job_queue = pass_job_queue
-        self.pass_user_data = pass_user_data
-        self.pass_chat_data = pass_chat_data
+        self.pass_update_queue = self.should_pass(UpdateQueue, pass_update_queue, 'update_queue')
+        self.pass_job_queue = self.should_pass(JobQueue, pass_job_queue, 'job_queue')
+        self.pass_user_data = self.should_pass(UserData, pass_user_data, 'user_data')
+        self.pass_chat_data = self.should_pass(ChatData, pass_chat_data, 'chat_data')
 
     def check_update(self, update):
         """
@@ -98,17 +99,23 @@ class Handler(object):
         optional_args = dict()
 
         if self.pass_update_queue:
-            optional_args['update_queue'] = dispatcher.update_queue
+            optional_args[self.pass_update_queue] = dispatcher.update_queue
         if self.pass_job_queue:
-            optional_args['job_queue'] = dispatcher.job_queue
-        if self.pass_user_data or self.pass_chat_data:
-            chat = update.effective_chat
+            optional_args[self.pass_job_queue] = dispatcher.job_queue
+        if self.pass_user_data:
             user = update.effective_user
-
-            if self.pass_user_data:
-                optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
-
-            if self.pass_chat_data:
-                optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
+            optional_args[self.pass_user_data] = dispatcher.user_data[user.id if user else None]
+        if self.pass_chat_data:
+            chat = update.effective_chat
+            optional_args[self.pass_chat_data] = dispatcher.chat_data[chat.id if chat else None]
 
         return optional_args
+
+    def should_pass(self, type_, overwrite, default_name):
+        if overwrite:
+            return default_name
+        elif overwrite is None:
+            for name, annotation in self.callback.__annotations__.items():
+                if annotation == type_:
+                    return name
+        return False

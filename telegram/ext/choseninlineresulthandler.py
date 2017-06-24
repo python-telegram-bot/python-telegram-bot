@@ -52,10 +52,10 @@ class ChosenInlineResultHandler(Handler):
 
     def __init__(self,
                  callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_update_queue=None,
+                 pass_job_queue=None,
+                 pass_user_data=None,
+                 pass_chat_data=None):
         super(ChosenInlineResultHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,

@@ -22,8 +22,8 @@ import re
 from future.utils import string_types
 
 from telegram import Update
+from telegram.ext import Handler, Groups, Groupdict
 from telegram.utils.deprecate import deprecate
-from .handler import Handler
 
 
 class InlineQueryHandler(Handler):
@@ -63,13 +63,13 @@ class InlineQueryHandler(Handler):
 
     def __init__(self,
                  callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
+                 pass_update_queue=None,
+                 pass_job_queue=None,
                  pattern=None,
-                 pass_groups=False,
-                 pass_groupdict=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_groups=None,
+                 pass_groupdict=None,
+                 pass_user_data=None,
+                 pass_chat_data=None):
         super(InlineQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -81,8 +81,8 @@ class InlineQueryHandler(Handler):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
-        self.pass_groups = pass_groups
-        self.pass_groupdict = pass_groupdict
+        self.pass_groups = self.should_pass(Groups, pass_groups, 'groups')
+        self.pass_groupdict = self.should_pass(Groupdict, pass_groupdict, 'groupdict')
 
     def check_update(self, update):
         if isinstance(update, Update) and update.inline_query:
@@ -99,9 +99,9 @@ class InlineQueryHandler(Handler):
             match = re.match(self.pattern, update.inline_query.query)
 
             if self.pass_groups:
-                optional_args['groups'] = match.groups()
+                optional_args[self.pass_groups] = Groups(match.groups())
             if self.pass_groupdict:
-                optional_args['groupdict'] = match.groupdict()
+                optional_args[self.pass_groupdict] = Groupdict(match.groupdict())
 
         return self.callback(dispatcher.bot, update, **optional_args)
 
