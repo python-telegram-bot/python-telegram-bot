@@ -29,9 +29,7 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - nosetests -v --with-flaky --no-flaky-report --with-coverage --cover-package=telegram/ tests
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pre-commit run --all-files; fi
-  - python ./setup.py bdist_dumb
+  - python travis.py
 
 after_success:
   coveralls
