@@ -22,24 +22,29 @@ from telegram import User, TelegramObject
 
 
 class ChatMember(TelegramObject):
-    """This object represents a Telegram ChatMember.
+    """This object contains information about one member of the chat.
 
     Attributes:
         user (:class:`telegram.User`): Information about the user.
-        status (str): The member's status in the chat. Can be 'creator', 'administrator', 'member',
-            'left' or 'kicked'.
+        status (str): The member's status in the chat. Can be “creator”, “administrator”,
+                “member”, “left” or “kicked”.
 
     Args:
-        user (:class:`telegram.User`):
-        status (str):
+        user (:class:`telegram.User`): Information about the user.
+        status (str): The member's status in the chat. Can be “creator”, “administrator”, “member”,
+                “left” or “kicked”.
         **kwargs (dict): Arbitrary keyword arguments.
 
+   Note:
+        The following helper attributes are available ass class-constants: ADMINISTRATOR, CREATOR,
+        KICKED, LEFT and MEMBER
+
     """
-    CREATOR = 'creator'
     ADMINISTRATOR = 'administrator'
-    MEMBER = 'member'
-    LEFT = 'left'
+    CREATOR = 'creator'
     KICKED = 'kicked'
+    LEFT = 'left'
+    MEMBER = 'member'
 
     def __init__(self, user, status, **kwargs):
         # Required
@@ -53,10 +58,10 @@ class ChatMember(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.ChatMember:
+            :class:`telegram.ChatMember`:
         """
         if not data:
             return None

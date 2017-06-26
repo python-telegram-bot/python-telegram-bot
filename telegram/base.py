@@ -42,10 +42,10 @@ class TelegramObject(object):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            dict:
+            dict
         """
         if not data:
             return None
@@ -57,14 +57,14 @@ class TelegramObject(object):
     def to_json(self):
         """
         Returns:
-            str:
+            str
         """
         return json.dumps(self.to_dict())
 
     def to_dict(self):
         """
         Returns:
-            dict:
+            dict
         """
         data = dict()
 
@@ -84,7 +84,7 @@ class TelegramObject(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._id_attrs == other._id_attrs
-        return super(TelegramObject, self).__eq__(other)
+        return super(TelegramObject, self).__eq__(other)  # pylint: disable=E1101
 
     def __hash__(self):
         if self._id_attrs:

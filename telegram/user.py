@@ -23,33 +23,28 @@ from telegram import TelegramObject
 
 
 class User(TelegramObject):
-    """This object represents a Telegram User.
+    """This object represents a Telegram user or bot.
 
     Attributes:
-        id (int): Unique identifier for this user or bot
-        first_name (str): User's or bot's first name
-        last_name (str): User's or bot's last name
-        username (str): User's or bot's username
-        language_code (str): IETF language tag of the user's language
-        type (str): Deprecated
+        id (int): Unique identifier for this user or bot.
+        first_name (str): User's or bot's first name.
+        last_name (str): Optional. User's or bot's last name.
+        username (str): Optional. User‘s or bot’s last name.
+        language_code (str): Optional. IETF language tag of the user's language.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        id (int): Unique identifier for this user or bot
-        first_name (str): User's or bot's first name
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        type (Optional[str]): Deprecated
-        last_name (Optional[str]): User's or bot's last name
-        username (Optional[str]): User's or bot's username
-        language_code (Optional[str]): IETF language tag of the user's language
-        bot (Optional[telegram.Bot]): The Bot to use for instance methods
+        id (int): Unique identifier for this user or bot.
+        first_name (str): User's or bot's first name.
+        last_name (Optional[str]): User's or bot's last name.
+        username (Optional[str]): User's or bot's username.
+        language_code (Optional[str]): IETF language tag of the user's language.
+        bot (Optional[:class:`telegram.Bot`]): The Bot to use for instance methods.
     """
 
     def __init__(self,
                  id,
                  first_name,
-                 type=None,
                  last_name=None,
                  username=None,
                  language_code=None,
@@ -59,7 +54,6 @@ class User(TelegramObject):
         self.id = int(id)
         self.first_name = first_name
         # Optionals
-        self.type = type
         self.last_name = last_name
         self.username = username
         self.language_code = language_code
@@ -70,7 +64,13 @@ class User(TelegramObject):
 
     @property
     def name(self):
-        """str: """
+        """Returns the users username if available, if not it returns the first name and if present
+        first name and lastname.
+
+        Returns:
+            str
+        """
+
         if self.username:
             return '@%s' % self.username
         if self.last_name:
@@ -82,10 +82,10 @@ class User(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.User:
+            :class:`telegram.User`:
         """
         if not data:
             return None
@@ -105,10 +105,10 @@ class User(TelegramObject):
         """
         Args:
             data (list):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            List<telegram.User>:
+            list(:class:`telegram.User`):
         """
         if not data:
             return []

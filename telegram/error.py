@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Error."""
+"""This module contains an object that represents Telegram errors."""
 
 
 def _lstrip_str(in_s, lstr):
@@ -37,16 +37,7 @@ def _lstrip_str(in_s, lstr):
 
 
 class TelegramError(Exception):
-    """This object represents a Telegram Error."""
-
     def __init__(self, message):
-        """
-        Args:
-            message (str):
-
-        Returns:
-
-        """
         super(TelegramError, self).__init__()
 
         msg = _lstrip_str(message, 'Error: ')
