@@ -1,7 +1,6 @@
 telegram.inputvenuemessagecontent module
 ========================================
 
-.. automodule:: telegram.inputvenuemessagecontent
+.. automodule:: telegram.inline.inputvenuemessagecontent
     :members:
-    :undoc-members:
     :show-inheritance:

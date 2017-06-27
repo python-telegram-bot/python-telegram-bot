@@ -1,7 +1,6 @@
 telegram.inlinequeryresultcontact module
 ========================================
 
-.. automodule:: telegram.inlinequeryresultcontact
+.. automodule:: telegram.inline.inlinequeryresultcontact
     :members:
-    :undoc-members:
     :show-inheritance:

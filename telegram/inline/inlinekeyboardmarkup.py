@@ -23,15 +23,17 @@ from telegram import ReplyMarkup, InlineKeyboardButton
 
 
 class InlineKeyboardMarkup(ReplyMarkup):
-    """This object represents a Telegram InlineKeyboardMarkup.
+    """
+    This object represents an inline keyboard that appears right next to the message it belongs to.
 
     Attributes:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
+        inline_keyboard ([[:class:`telegram.InlineKeyboardButton`]]): Array of button rows, each
+                represented by an Array of InlineKeyboardButton objects.
 
     Args:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
+        inline_keyboard (list(list(:class:`telegram.InlineKeyboardButton`))): Array of button rows,
+                each represented by an Array of InlineKeyboardButton objects.
         **kwargs (dict): Arbitrary keyword arguments.
-
     """
 
     def __init__(self, inline_keyboard, **kwargs):
@@ -43,12 +45,12 @@ class InlineKeyboardMarkup(ReplyMarkup):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.InlineKeyboardMarkup:
-
+            :class:`telegram.InlineKeyboardMarkup`
         """
+
         data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data, bot)
 
         if not data:

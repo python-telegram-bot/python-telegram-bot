@@ -26,36 +26,34 @@ class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
     Attributes:
-        id (str):
-        title (str):
-        input_message_content (:class:`telegram.InputMessageContent`):
-        reply_markup (:class:`telegram.ReplyMarkup`):
-        url (str):
-        hide_url (bool):
-        description (str):
-        thumb_url (str):
-        thumb_width (int):
-        thumb_height (int):
-
-    Deprecated: 4.0
-        message_text (str): Use :class:`InputTextMessageContent` instead.
-
-        parse_mode (str): Use :class:`InputTextMessageContent` instead.
-
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
+        type (str): 'article'.
+        id (str): Unique identifier for this result, 1-64 Bytes.
+        title (str): Title of the result.
+        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
+                be sent.
+        reply_markup (:class:`telegram.ReplyMarkup`): Optional. Inline keyboard attached to
+                the message
+        url (str): Optional. URL of the result.
+        hide_url (bool): Optional. Pass True, if you don't want the URL to be shown in the message.
+        description (str): Optional. Short description of the result.
+        thumb_url (str): Optional. Url of the thumbnail for the result.
+        thumb_width (int): Optional. Thumbnail width.
+        thumb_height (int): Optional. Thumbnail height.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 Bytes
-        title (str):
-        reply_markup (:class:`telegram.ReplyMarkup`):
-        url (Optional[str]):
-        hide_url (Optional[bool]):
-        description (Optional[str]):
-        thumb_url (Optional[str]):
-        thumb_width (Optional[int]):
-        thumb_height (Optional[int]):
+        id (str): Unique identifier for this result, 1-64 Bytes.
+        title (str): Title of the result.
+        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
+                be sent.
+        reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Inline keyboard attached to
+                the message
+        url (Optional[str]): URL of the result.
+        hide_url (Optional[bool]): Pass True, if you don't want the URL to be shown in the message.
+        description (Optional[str]): Short description of the result.
+        thumb_url (Optional[str]): Url of the thumbnail for the result.
+        thumb_width (Optional[int]): Thumbnail width.
+        thumb_height (Optional[int]): Thumbnail height.
         **kwargs (dict): Arbitrary keyword arguments.
-
     """
 
     def __init__(self,

@@ -23,7 +23,24 @@ from telegram import InputMessageContent
 
 
 class InputTextMessageContent(InputMessageContent):
-    """Base class for Telegram InputTextMessageContent Objects"""
+    """
+    Represents the content of a text message to be sent as the result of an inline query.
+
+    Attributes:
+        message_text (str): Text of the message to be sent, 1-4096 characters.
+        parse_mode (str): Optional. Send Markdown or HTML, if you want Telegram apps to show bold,
+                italic, fixed-width text or inline URLs in your bot's message.
+        disable_web_page_preview (bool): Optional. Disables link previews for links in the
+                sent message.
+
+    Args:
+        message_text (str): Text of the message to be sent, 1-4096 characters.
+        parse_mode (Optional[str]): Send Markdown or HTML, if you want Telegram apps to show bold,
+                italic, fixed-width text or inline URLs in your bot's message.
+        disable_web_page_preview (Optional[bool]): Disables link previews for links in the
+                sent message.
+        **kwargs (dict): Arbitrary keyword arguments.
+    """
 
     def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None, **kwargs):
         # Required

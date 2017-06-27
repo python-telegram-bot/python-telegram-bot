@@ -22,30 +22,34 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultLocation(InlineQueryResult):
-    """Represents a location on a map. By default, the location will be sent by the user.
-    Alternatively, you can use input_message_content to send a message with the specified content
-    instead of the location.
+    """
+    Represents a location on a map. By default, the location will be sent by the user.
+    Alternatively, you can use :attr:`input_message_content` to send a message with the specified
+    content instead of the location.
 
     Attributes:
+        type (str): 'location'.
+        id (str): Unique identifier for this result, 1-64 bytes.
         latitude (float): Location latitude in degrees.
         longitude (float): Location longitude in degrees.
         title (str): Location title.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-            to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-            message to be sent instead of the location.
-        thumb_url (Optional[str]): Url of the thumbnail for the result.
-        thumb_width (Optional[int]): Thumbnail width.
-        thumb_height (Optional[int]): Thumbnail height.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+                to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+                message to be sent instead of the location.
+        thumb_url (str): Optional. Url of the thumbnail for the result.
+        thumb_width (int): Optional. Thumbnail width.
+        thumb_height (int): Optional. Thumbnail height.
 
     Args:
+        id (str): Unique identifier for this result, 1-64 bytes.
         latitude (float): Location latitude in degrees.
         longitude (float): Location longitude in degrees.
         title (str): Location title.
         reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-            to the message.
+                to the message.
         input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-            message to be sent instead of the location.
+                message to be sent instead of the location.
         thumb_url (Optional[str]): Url of the thumbnail for the result.
         thumb_width (Optional[int]): Thumbnail width.
         thumb_height (Optional[int]): Thumbnail height.

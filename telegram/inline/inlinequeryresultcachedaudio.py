@@ -23,31 +23,30 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultCachedAudio(InlineQueryResult):
-    """Represents a link to an mp3 audio file stored on the Telegram servers. By default, this
-    audio file will be sent by the user. Alternatively, you can use input_message_content to send a
-    message with the specified content instead of the audio.
+    """
+    Represents a link to an mp3 audio file stored on the Telegram servers. By default, this audio
+    file will be sent by the user. Alternatively, you can use :attr:`input_message_content` to
+    send amessage with the specified content instead of the audio.
 
     Attributes:
-        id (str):
-        audio_file_id (str):
-        caption (Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.input_message_content`]):
-
-    Deprecated: 4.0
-        message_text (str): Use :class:`InputTextMessageContent` instead.
-
-        parse_mode (str): Use :class:`InputTextMessageContent` instead.
-
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
+        type (str): 'audio'.
+        id (str): Unique identifier for this result, 1-64 bytes.
+        audio_file_id (str): A valid file identifier for the audio file.
+        caption (str): Optional. Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+                to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+                message to be sent instead of the audio.
 
     Args:
-        audio_file_id (str):
-        caption (Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.input_message_content`]):
+        id (str): Unique identifier for this result, 1-64 bytes.
+        audio_file_id (str): A valid file identifier for the audio file.
+        caption (Optional[str]): Caption, 0-200 characters
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+                to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+                message to be sent instead of the audio.
         **kwargs (dict): Arbitrary keyword arguments.
-
     """
 
     def __init__(self,

@@ -16,13 +16,49 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultVenue"""
+"""This module contains the classes that represent Telegram InlineQueryResultVenue"""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
 
 class InlineQueryResultVenue(InlineQueryResult):
+    """
+    Represents a venue. By default, the venue will be sent by the user. Alternatively, you can
+    use :attr:`input_message_content` to send a message with the specified content instead of the
+    venue.
+
+    Attributes:
+        type (str): 'venue'.
+        id (str): Unique identifier for this result, 1-64 Bytes.
+        latitude (float): Latitude of the venue location in degrees.
+        longitude (float): Longitude of the venue location in degrees.
+        title (str): Title of the venue.
+        address (str): Address of the venue.
+        foursquare_id (str): Optional. Foursquare identifier of the venue if known.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+                to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+                message to be sent instead of the venue.
+        thumb_url (str): Optional. Url of the thumbnail for the result.
+        thumb_width (int): Optional. Thumbnail width.
+        thumb_height (int): Optional. Thumbnail height.
+
+    Args:
+        id (str): Unique identifier for this result, 1-64 Bytes.
+        latitude (float): Latitude of the venue location in degrees.
+        longitude (float): Longitude of the venue location in degrees.
+        title (str): Title of the venue.
+        address (str): Address of the venue.
+        foursquare_id (Optional[str]): Foursquare identifier of the venue if known.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+                to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+                message to be sent instead of the location.
+        thumb_url (Optional[str]): Url of the thumbnail for the result.
+        thumb_width (Optional[int]): Thumbnail width.
+        thumb_height (Optional[int]): Thumbnail height.
+        **kwargs (dict): Arbitrary keyword arguments.
+    """
 
     def __init__(self,
                  id,

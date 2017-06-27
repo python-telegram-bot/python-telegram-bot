@@ -23,6 +23,46 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultVideo(InlineQueryResult):
+    """
+    Represents a link to a page containing an embedded video player or a video file. By default,
+    this video file will be sent by the user with an optional caption. Alternatively, you can use
+    :attr:`input_message_content` to send a message with the specified content instead of
+    the video.
+
+    Attributes:
+        type (str): 'video'.
+        id (str): Unique identifier for this result, 1-64 bytes.
+        video_url (str): A valid URL for the embedded video player or video file.
+        mime_type (str): Mime type of the content of video url, "text/html" or "video/mp4".
+        thumb_url (str): URL of the thumbnail (jpeg only) for the video.
+        title (str): Title for the result.
+        caption (str): Optional. Caption, 0-200 characters
+        video_width (int): Optional. Video width.
+        video_height (int): Optional. Video height.
+        video_duration (int): Optional. Video duration in seconds.
+        description (str): Optional. Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+                to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+                message to be sent instead of the video.
+
+    Args:
+        id (str): Unique identifier for this result, 1-64 bytes.
+        video_url (str): A valid URL for the embedded video player or video file.
+        mime_type (str): Mime type of the content of video url, "text/html" or "video/mp4".
+        thumb_url (str): URL of the thumbnail (jpeg only) for the video.
+        title (str): Title for the result.
+        caption (Optional[str]): Caption, 0-200 characters.
+        video_width (Optional[int]): Video width.
+        video_height (Optional[int]): Video height.
+        video_duration (Optional[int]): Video duration in seconds.
+        description (Optional[str]): Short description of the result.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+                to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+                message to be sent instead of the video.
+        **kwargs (dict): Arbitrary keyword arguments.
+    """
 
     def __init__(self,
                  id,

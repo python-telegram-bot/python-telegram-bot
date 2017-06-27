@@ -23,26 +23,30 @@ from telegram import TelegramObject, User, Location
 
 
 class InlineQuery(TelegramObject):
-    """This object represents a Telegram InlineQuery.
+    """
+    This object represents an incoming inline query. When the user sends an empty query, your bot
+    could return some default or trending results.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (str):
-        from_user (:class:`telegram.User`):
-        query (str):
-        offset (str):
+        id (str): Unique identifier for this query.
+        from_user (:class:`telegram.User`): Sender.
+        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
+                request user location.
+        query (str): Text of the query (up to 512 characters).
+        offset (str): Offset of the results to be returned, can be controlled by the bot.
 
     Args:
-        id (int):
-        from_user (:class:`telegram.User`):
-        query (str):
-        offset (str):
-        location (optional[:class:`telegram.Location`]):
-        bot (Optional[telegram.Bot]): The Bot to use for instance methods
+        id (str): Unique identifier for this query.
+        from_user (:class:`telegram.User`): Sender.
+        location (Optional[:class:`telegram.Location`]): Sender location, only for bots that
+                request user location.
+        query (str): Text of the query (up to 512 characters).
+        offset (str): Offset of the results to be returned, can be controlled by the bot.
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods.
         **kwargs (dict): Arbitrary keyword arguments.
-
     """
 
     def __init__(self, id, from_user, query, offset, location=None, bot=None, **kwargs):
@@ -63,11 +67,12 @@ class InlineQuery(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.InlineQuery:
+            :class:`telegram.InlineQuery`
         """
+
         data = super(InlineQuery, InlineQuery).de_json(data, bot)
 
         if not data:
@@ -81,8 +86,9 @@ class InlineQuery(TelegramObject):
     def to_dict(self):
         """
         Returns:
-            dict:
+            dict
         """
+
         data = super(InlineQuery, self).to_dict()
 
         # Required
@@ -91,5 +97,29 @@ class InlineQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """Shortcut for ``bot.answer_inline_query(update.inline_query.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+                bot.answer_inline_query(update.inline_query.id, *args, **kwargs)
+
+        Args:
+            results (list(:class:`telegram.InlineQueryResult`)): A list of results for the inline
+                    query.
+            cache_time (Optional[int]): The maximum amount of time in seconds that the result of
+                    the inline query may be cached on the server. Defaults to 300.
+            is_personal (Optional[bool]): Pass True, if results may be cached on the server side
+                    only for the user that sent the query. By default, results may be returned to
+                    any user who sends the same query.
+            next_offset (Optional[str]): Pass the offset that a client should send in the next
+                    query with the same text to receive more results. Pass an empty string if there
+                    are no more results or if you don't support pagination. Offset length can't
+                    exceed 64 bytes.
+            switch_pm_text (Optional[str]): If passed, clients will display a button with specified
+                    text that switches the user to a private chat with the bot and sends the bot
+                    a start message with the parameter switch_pm_parameter.
+            switch_pm_parameter (Optional[str]): Deep-linking parameter for the /start message sent
+                    to the bot when user presses the switch button. 1-64 characters,
+                    only A-Z, a-z, 0-9, _ and - are allowed.
+        """
+
         return self.bot.answer_inline_query(self.id, *args, **kwargs)

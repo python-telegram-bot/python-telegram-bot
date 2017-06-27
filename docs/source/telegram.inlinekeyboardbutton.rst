@@ -1,7 +1,6 @@
 telegram.inlinekeyboardbutton module
 ====================================
 
-.. automodule:: telegram.inlinekeyboardbutton
+.. automodule:: telegram.inline.inlinekeyboardbutton
     :members:
-    :undoc-members:
     :show-inheritance:

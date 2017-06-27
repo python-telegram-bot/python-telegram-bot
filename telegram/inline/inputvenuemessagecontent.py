@@ -23,7 +23,24 @@ from telegram import InputMessageContent
 
 
 class InputVenueMessageContent(InputMessageContent):
-    """Base class for Telegram InputVenueMessageContent Objects"""
+    """
+    Represents the content of a venue message to be sent as the result of an inline query.
+
+    Attributes:
+        latitude (float): Latitude of the location in degrees.
+        longitude (float): Longitude of the location in degrees.
+        title (str); Name of the venue.
+        address (str): Address of the venue.
+        foursquare_id (str): Optional. Foursquare identifier of the venue, if known.
+
+    Args:
+        latitude (float): Latitude of the location in degrees.
+        longitude (float): Longitude of the location in degrees.
+        title (str); Name of the venue.
+        address (str): Address of the venue.
+        foursquare_id (Optional[str]): Foursquare identifier of the venue, if known.
+        **kwargs (dict): Arbitrary keyword arguments.
+    """
 
     def __init__(self, latitude, longitude, title, address, foursquare_id=None, **kwargs):
         # Required

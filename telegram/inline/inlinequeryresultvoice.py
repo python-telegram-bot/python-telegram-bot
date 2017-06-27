@@ -23,6 +23,36 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultVoice(InlineQueryResult):
+    """
+    Represents a link to a voice recording in an .ogg container encoded with OPUS. By default,
+    this voice recording will be sent by the user. Alternatively, you can use
+    :attr:`input_message_content` to send a message with the specified content instead of the
+    the voice message.
+
+    Attributes:
+        type (str): 'voice'.
+        id (str): Unique identifier for this result, 1-64 bytes.
+        voice_url (str): A valid URL for the voice recording.
+        title (str): Voice message title.
+        caption (str): Optional. Caption, 0-200 characters.
+        voice_duration (int): Optional. Recording duration in seconds.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+                to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+                message to be sent instead of the voice.
+
+    Args:
+        id (str): Unique identifier for this result, 1-64 bytes.
+        voice_url (str): A valid URL for the voice recording.
+        title (str): Voice message title.
+        caption (Optional[str]): Caption, 0-200 characters.
+        voice_duration (Optional[int]): Recording duration in seconds.
+        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+                to the message.
+        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+                message to be sent instead of the voice.
+        **kwargs (dict): Arbitrary keyword arguments.
+    """
 
     def __init__(self,
                  id,
