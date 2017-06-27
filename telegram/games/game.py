@@ -24,24 +24,37 @@ from telegram import MessageEntity, TelegramObject, Animation, PhotoSize
 
 
 class Game(TelegramObject):
-    """This object represents a Telegram Game.
+    """
+    This object represents a game. Use BotFather to create and edit games, their short names will
+    act as unique identifiers.
 
     Attributes:
         title (str): Title of the game.
         description (str): Description of the game.
-        photo (list[:class:`telegram.PhotoSize`]): List of photos that will be displayed in the
-            game message in chats.
+        photo ([:class:`telegram.PhotoSize`]): Photo that will be displayed in the game message
+                in chats.
+        text (str): Optional. Brief description of the game or high scores included in the game
+                message. Can be automatically edited to include current high scores for the game
+                when the bot calls setGameScore, or manually edited using editMessageText. 0-4096
+                characters.
+        text_entities ([:class:`telegram.MessageEntity`]): Optional. Special entities that appear
+                in text, such as usernames, URLs, bot commands, etc.
+        animation (:class:`telegram.Animation`): Optional. Animation that will be displayed in the
+                game message in chats. Upload via BotFather.
 
-    Keyword Args:
+    Args:
+        title (str): Title of the game.
+        description (str): Description of the game.
+        photo (list(:class:`telegram.PhotoSize`)): Photo that will be displayed in the game message
+                in chats.
         text (Optional[str]): Brief description of the game or high scores included in the game
-            message. Can be automatically edited to include current high scores for the game when
-            the bot calls setGameScore, or manually edited using editMessageText.
-            0-4096 characters.
-        text_entities (Optional[list[:class:`telegram.MessageEntity`]]): Special entities that
-            appear in text, such as usernames, URLs, bot commands, etc.
+                message. Can be automatically edited to include current high scores for the game
+                when the bot calls setGameScore, or manually edited using editMessageText. 0-4096
+                characters.
+        text_entities (Optional[list(:class:`telegram.MessageEntity`)]): Special entities that
+                appear in text, such as usernames, URLs, bot commands, etc.
         animation (Optional[:class:`telegram.Animation`]): Animation that will be displayed in the
-            game message in chats. Upload via BotFather.
-
+                game message in chats. Upload via BotFather.
     """
 
     def __init__(self,
@@ -64,10 +77,10 @@ class Game(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Game:
+            :class:`telegram.Game`
 
         """
         if not data:
@@ -84,7 +97,7 @@ class Game(TelegramObject):
     def to_dict(self):
         """
         Returns:
-            dict:
+            dict
         """
         data = super(Game, self).to_dict()
 
@@ -103,12 +116,13 @@ class Game(TelegramObject):
             (That is, you can't just slice ``Message.text`` with the offset and length.)
 
         Args:
-            entity (telegram.MessageEntity): The entity to extract the text from. It must be an
-                entity that belongs to this message.
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+                    be an entity that belongs to this message.
 
         Returns:
             str: The text of the given entity
         """
+
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.text[entity.offset:entity.offset + entity.length]
@@ -127,18 +141,18 @@ class Game(TelegramObject):
         Note:
             This method should always be used instead of the ``entities`` attribute, since it
             calculates the correct substring from the message text based on UTF-16 codepoints.
-            See ``get_entity_text`` for more info.
+            See :attr:`parse_text_entity` for more info.
 
         Args:
-            types (Optional[list]): List of ``MessageEntity`` types as strings. If the ``type``
-                attribute of an entity is contained in this list, it will be returned.
-                Defaults to a list of all types. All types can be found as constants in
-                :class:`telegram.MessageEntity`.
+            types (Optional[list(str)]): List of ``MessageEntity`` types as strings. If the
+                    ``type`` attribute of an entity is contained in this list, it will be returned.
+                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
-            dict[:class:`telegram.MessageEntity`, ``str``]: A dictionary of entities mapped to the
-                text that belongs to them, calculated based on UTF-16 codepoints.
+            dict(:class:`telegram.MessageEntity`, str]: A dictionary of entities mapped to the
+            text that belongs to them, calculated based on UTF-16 codepoints.
         """
+
         if types is None:
             types = MessageEntity.ALL_TYPES
 

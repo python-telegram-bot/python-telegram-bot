@@ -1,7 +1,7 @@
 telegram.callbackgame module
 ============================
 
-.. automodule:: telegram.callbackgame
+.. automodule:: telegram.games.callbackgame
     :members:
     :undoc-members:
     :show-inheritance:

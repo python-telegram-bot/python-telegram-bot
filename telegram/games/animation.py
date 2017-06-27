@@ -22,17 +22,26 @@ from telegram import TelegramObject
 
 
 class Animation(TelegramObject):
-    """This object represents a Telegram Animation.
+    """
+    You can provide an animation for your game so that it looks stylish in chats (check out
+    Lumberjack for an example). This object represents an animation file to be displayed in the
+    message containing a game.
 
     Attributes:
         file_id (str): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined
+                by sender.
+        file_name (str): Optional. Original animation filename as defined by sender.
+        mime_type (str): Optional. MIME type of the file as defined by sender.
+        file_size (int): Optional. File size.
 
-    Keyword Args:
+    Args:
+        Attributes:
+        file_id (str): Unique file identifier.
         thumb (Optional[:class:`telegram.PhotoSize`]): Animation thumbnail as defined by sender.
         file_name (Optional[str]): Original animation filename as defined by sender.
         mime_type (Optional[str]): MIME type of the file as defined by sender.
         file_size (Optional[int]): File size.
-
     """
 
     def __init__(self,
@@ -55,10 +64,10 @@ class Animation(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Game:
+            :class:`telegram.Game`
         """
         if not data:
             return None
