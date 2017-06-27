@@ -38,15 +38,13 @@ class UserTest(BaseTest, unittest.TestCase):
         self.last_name = "S."
         self.username = "leandrotoledo"
         self.language_code = "pt-BR"
-        self.type = "private"
 
         self.json_dict = {
             'id': self._id,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'username': self.username,
-            'language_code': self.language_code,
-            'type': self.type
+            'language_code': self.language_code
         }
 
     def test_user_de_json(self):
@@ -57,7 +55,6 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.last_name, self.last_name)
         self.assertEqual(user.username, self.username)
         self.assertEqual(user.language_code, self.language_code)
-        self.assertEqual(user.type, self.type)
 
         self.assertEqual(user.name, '@leandrotoledo')
 
@@ -71,7 +68,6 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user.id, self._id)
         self.assertEqual(user.first_name, self.first_name)
         self.assertEqual(user.last_name, self.last_name)
-        self.assertEqual(user.type, self.type)
 
         self.assertEqual(user.name, '%s %s' % (self.first_name, self.last_name))
 
@@ -102,7 +98,6 @@ class UserTest(BaseTest, unittest.TestCase):
         self.assertEqual(user['last_name'], self.last_name)
         self.assertEqual(user['username'], self.username)
         self.assertEqual(user['language_code'], self.language_code)
-        self.assertEqual(user['type'], self.type)
 
     @flaky(3, 1)
     def test_get_profile_photos(self):

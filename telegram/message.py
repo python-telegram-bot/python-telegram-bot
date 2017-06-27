@@ -92,12 +92,12 @@ class Message(TelegramObject):
         delete_chat_photo (bool): 	Optional. Service message: the chat photo was deleted.
         group_chat_created (bool): 	Optional. Service message: the group has been created.
         supergroup_chat_created (bool): Optional. Service message: the supergroup has been created.
-                This field can‘t be received in a message coming through updates, because bot can’t
+                This field can't be received in a message coming through updates, because bot can't
                 be a member of a supergroup when it is created. It can only be found in
                 ``reply_to_message`` if someone replies to a very first message in a directly
                 created supergroup.
         channel_chat_created (bool): Optional. Service message: the channel has been created. This
-                field can‘t be received in a message coming through updates, because bot can’t be a
+                field can't be received in a message coming through updates, because bot can't be a
                 member of a channel when it is created. It can only be found in
                 ``reply_to_message`` if someone replies to a very first message in a channel.
         migrate_to_chat_id (int): Optional. The group has been migrated to a supergroup with the
@@ -179,12 +179,12 @@ class Message(TelegramObject):
         delete_chat_photo (Optional[bool]): Service message: the chat photo was deleted.
         group_chat_created (Optional[bool]): Service message: the group has been created.
         supergroup_chat_created (Optional[bool]): Service message: the supergroup has been created.
-                This field can‘t be received in a message coming through updates, because bot can’t
+                This field can't be received in a message coming through updates, because bot can't
                 be a member of a supergroup when it is created. It can only be found in
                 ``reply_to_message`` if someone replies to a very first message in a directly
                 created supergroup.
         channel_chat_created (Optional[bool]): Service message: the channel has been created. This
-                field can‘t be received in a message coming through updates, because bot can’t be a
+                field can't be received in a message coming through updates, because bot can't be a
                 member of a channel when it is created. It can only be found in
                 ``reply_to_message`` if someone replies to a very first message in a channel.
         migrate_to_chat_id (Optional[int]): The group has been migrated to a supergroup with the

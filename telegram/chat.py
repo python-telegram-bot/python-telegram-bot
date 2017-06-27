@@ -30,14 +30,14 @@ class Chat(TelegramObject):
                 some programming languages may have difficulty/silent defects in interpreting it.
                 But it is smaller than 52 bits, so a signed 64 bit integer or double-precision
                 float type are safe for storing this identifier.
-        type (str): Type of chat, can be either “private”, “group”, “supergroup” or “channel”.
+        type (str): Type of chat, can be either 'private', 'group', 'supergroup' or 'channel'.
         title (str): Optional. Title, for supergroups, channels and group chats.
         username (str): Optional. Username, for private chats, supergroups
                 and channels if available.
         first_name (str): Optional. First name of the other party in a private chat.
         last_name (str): Optional. Last name of the other party in a private chat.
-        all_members_are_administrators (bool): Optional. True if a group has ‘All Members Are
-                Admins’ enabled.
+        all_members_are_administrators (bool): Optional. True if a group has `All Members Are
+                Admins` enabled.
 
         CHANNEL (str): 'channel'
         GROUP (str): 'group'
@@ -49,14 +49,14 @@ class Chat(TelegramObject):
                 some programming languages may have difficulty/silent defects in interpreting it.
                 But it is smaller than 52 bits, so a signed 64 bit integer or double-precision
                 float type are safe for storing this identifier.
-        type (str): Type of chat, can be either “private”, “group”, “supergroup” or “channel”.
+        type (str): Type of chat, can be either 'private', 'group', 'supergroup' or 'channel'.
         title (Optional[str]): Title, for supergroups, channels and group chats.
         username(Optional[str]): Username, for private chats, supergroups
                 and channels if available.
         first_name(Optional[str]): First name of the other party in a private chat.
         last_name(Optional[str]): Last name of the other party in a private chat.
-        all_members_are_administrators (Optional[bool]): Optional. True if a group has ‘All Members
-                Are Admins’ enabled.
+        all_members_are_administrators (Optional[bool]): Optional. True if a group has `All Members
+                Are Admins` enabled.
         bot (Optional[:class:`telegram.Bot`]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
@@ -179,7 +179,7 @@ class Chat(TelegramObject):
             bool: If the action was sent succesfully.
 
         Note:
-            This method will only work if the ‘All Members Are Admins’ setting is off in the
+            This method will only work if the `All Members Are Admins` setting is off in the
             target group. Otherwise members may only be removed by the group's creator or by the
             member that added them.
         """

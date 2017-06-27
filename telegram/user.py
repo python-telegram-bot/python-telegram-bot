@@ -29,7 +29,7 @@ class User(TelegramObject):
         id (int): Unique identifier for this user or bot.
         first_name (str): User's or bot's first name.
         last_name (str): Optional. User's or bot's last name.
-        username (str): Optional. User‘s or bot’s last name.
+        username (str): Optional. User's or bot's last name.
         language_code (str): Optional. IETF language tag of the user's language.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 

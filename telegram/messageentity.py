@@ -33,9 +33,9 @@ class MessageEntity(TelegramObject):
                 without usernames).
         offset (int): Offset in UTF-16 code units to the start of the entity.
         length (int): Length of the entity in UTF-16 code units.
-        url (str): Optional. For “text_link” only, url that will be opened
+        url (str): Optional. For "text_link" only, url that will be opened
                 after user taps on the text
-        user (:class:`telegram.User`): Optional. For “text_mention” only,
+        user (:class:`telegram.User`): Optional. For "text_mention" only,
                 the mentioned user
 
     Note:
@@ -50,9 +50,9 @@ class MessageEntity(TelegramObject):
                 without usernames).
         offset (int): Offset in UTF-16 code units to the start of the entity.
         length (int): Length of the entity in UTF-16 code units.
-        url (Optional[str]): For “text_link” only, url that will be opened after user
+        url (Optional[str]): For "text_link" only, url that will be opened after user
                 taps on the text.
-        user (Optional[:class:`telegram.User`]): For “text_mention” only, the mentioned user.
+        user (Optional[:class:`telegram.User`]): For "text_mention" only, the mentioned user.
     """
 
     def __init__(self, type, offset, length, url=None, user=None, **kwargs):

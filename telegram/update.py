@@ -29,9 +29,9 @@ class Update(TelegramObject):
         At most one of the optional parameters can be present in any given update.
 
     Attributes:
-        update_id (int): The update‘s unique identifier. Update identifiers start
+        update_id (int): The update's unique identifier. Update identifiers start
                          from a certain positive number and increase sequentially.
-                         This ID becomes especially handy if you’re using Webhooks,
+                         This ID becomes especially handy if you're using Webhooks,
                          since it allows you to ignore repeated updates or to restore
                          the correct update sequence, should they get out of order.
         message (:class:`telegram.Message`): Optional. New incoming message of any
@@ -57,9 +57,9 @@ class Update(TelegramObject):
 
 
     Args:
-        update_id (int): The update‘s unique identifier. Update identifiers start
+        update_id (int): The update's unique identifier. Update identifiers start
                          from a certain positive number and increase sequentially.
-                         This ID becomes especially handy if you’re using Webhooks,
+                         This ID becomes especially handy if you're using Webhooks,
                          since it allows you to ignore repeated updates or to restore
                          the correct update sequence, should they get out of order.
         message (Optional[:class:`telegram.Message`]): New incoming message of

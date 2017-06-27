@@ -993,7 +993,7 @@ class Bot(TelegramObject):
                     any user who sends the same query.
             next_offset (Optional[str]): Pass the offset that a client should send in the next
                     query with the same text to receive more results. Pass an empty string if there
-                    are no more results or if you don‘t support pagination. Offset length can’t
+                    are no more results or if you don't support pagination. Offset length can't
                     exceed 64 bytes.
             switch_pm_text (Optional[str]): If passed, clients will display a button with specified
                     text that switches the user to a private chat with the bot and sends the bot
@@ -1009,7 +1009,7 @@ class Bot(TelegramObject):
         Example:
             An inline bot that sends YouTube videos can ask the user to connect the bot to their
             YouTube account to adapt search results accordingly. To do this, it displays a
-            ‘Connect your YouTube account’ button above the results, or even before showing any.
+            'Connect your YouTube account' button above the results, or even before showing any.
             The user presses the button, switches to a private chat with the bot and, in doing so,
             passes a start parameter that instructs the bot to return an oauth link. Once done, the
             bot can offer a switch_inline button so that the user can easily return to the chat
@@ -1201,7 +1201,7 @@ class Bot(TelegramObject):
                     a notification at the top of the chat screen. Defaults to false.
             url (Optional[str]): URL that will be opened by the user's client. If you have created
                     a Game and accepted the conditions via @Botfather, specify the URL that opens
-                    your game – note that this will only work if the query comes from a callback
+                    your game - note that this will only work if the query comes from a callback
                     game button. Otherwise, you may use links like t.me/your_bot?start=XXXX that
                     open your bot with a parameter.
             cache_time (Optional[int]): The maximum amount of time in seconds that the result of
@@ -1436,8 +1436,8 @@ class Bot(TelegramObject):
                     usual short polling. Should be positive, short polling should be used for
                     testing purposes only.
             allowed_updates (Optional[list(str)]): List the types of updates you want your bot to
-                    receive. For example, specify [“message”, “edited_channel_post”,
-                    “callback_query”] to only receive updates of these types. See
+                    receive. For example, specify ["message", "edited_channel_post",
+                    "callback_query"] to only receive updates of these types. See
                     :class:`telegram.Update` for a complete list of available update types.
                     Specify an empty list to receive all updates regardless of type (default).
                     If not specified, the previous setting will be used. Please note that this
@@ -1502,7 +1502,7 @@ class Bot(TelegramObject):
 
         If you'd like to make sure that the Webhook request comes from Telegram, we recommend
         using a secret path in the URL, e.g. https://www.example.com/<token>. Since nobody else
-        knows your bot‘s token, you can be pretty sure it’s us.
+        knows your bot's token, you can be pretty sure it's us.
 
         Args:
             url (str): HTTPS url to send updates to. Use an empty string to remove webhook
@@ -1511,11 +1511,11 @@ class Bot(TelegramObject):
                     in use can be checked. See our self-signed guide for details.
             max_connections (Optional[int]): Maximum allowed number of simultaneous HTTPS
                     connections to the webhook for update delivery, 1-100. Defaults to 40. Use
-                    lower values to limit the load on your bot‘s server, and higher values to
-                    increase your bot’s throughput.
+                    lower values to limit the load on your bot's server, and higher values to
+                    increase your bot's throughput.
             allowed_updates (Optional[list[str]]): List the types of updates you want your bot to
-                    receive. For example, specify [“message”, “edited_channel_post”,
-                    “callback_query”] to only receive updates of these types. See
+                    receive. For example, specify ["message", "edited_channel_post",
+                    "callback_query"] to only receive updates of these types. See
                     :clas:`telegram.Update` for a complete list of available update types. Specify
                     an empty list to receive all updates regardless of type (default). If not
                     specified, the previous setting will be used. Please note that this parameter

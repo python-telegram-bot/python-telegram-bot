@@ -26,13 +26,13 @@ class ChatMember(TelegramObject):
 
     Attributes:
         user (:class:`telegram.User`): Information about the user.
-        status (str): The member's status in the chat. Can be “creator”, “administrator”,
-                “member”, “left” or “kicked”.
+        status (str): The member's status in the chat. Can be 'creator', 'administrator',
+                'member', 'left' or 'kicked'.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
-        status (str): The member's status in the chat. Can be “creator”, “administrator”, “member”,
-                “left” or “kicked”.
+        status (str): The member's status in the chat. Can be 'creator', 'administrator', 'member',
+                'left' or 'kicked'.
         **kwargs (dict): Arbitrary keyword arguments.
 
    Note:
