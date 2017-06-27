@@ -22,15 +22,21 @@ from telegram import TelegramObject, ShippingAddress
 
 
 class OrderInfo(TelegramObject):
-    """This object represents information about an order.
+    """
+    This object represents information about an order.
 
     Attributes:
-        name (Optional[str]): User name
-        phone_number (Optional[str]): User's phone number
-        email (Optional[str]): User email
-        shipping_address (Optional[:class:`telegram.ShippingAddress`]): User shipping address
-        **kwargs (dict): Arbitrary keyword arguments.
+        name (str): Optional. User name.
+        phone_number (str): Optional. User's phone number.
+        email (str): Optional. User email.
+        shipping_address (:class:`telegram.ShippingAddress`): Optional. User shipping address.
 
+    Args:
+        name (Optional[str]):User name.
+        phone_number (Optional[str]):User's phone number.
+        email (Optional[str]): User email.
+        shipping_address (Optional[:class:`telegram.ShippingAddress`]): User shipping address.
+        **kwargs (dict): Arbitrary keyword arguments.
     """
 
     def __init__(self, name=None, phone_number=None, email=None, shipping_address=None, **kwargs):
@@ -44,11 +50,12 @@ class OrderInfo(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.OrderInfo:
+            :class:`telegram.OrderInfo`
         """
+
         if not data:
             return OrderInfo()
 

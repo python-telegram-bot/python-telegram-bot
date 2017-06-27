@@ -22,17 +22,26 @@ from telegram import TelegramObject
 
 
 class ShippingAddress(TelegramObject):
-    """This object represents a Telegram ShippingAddress.
+    """
+    This object represents a Telegram ShippingAddress.
 
     Attributes:
-        country_code (str): ISO 3166-1 alpha-2 country code
-        state (str): State, if applicable
-        city (str): City
-        street_line1 (str): First line for the address
-        street_line2 (str): Second line for the address
-        post_code (str): Address post code
+        country_code (str): ISO 3166-1 alpha-2 country code.
+        state (str): State, if applicable.
+        city (str): City.
+        street_line1 (str): First line for the address.
+        street_line2 (str): Second line for the address.
+        post_code (str): Address post code.
         **kwargs (dict): Arbitrary keyword arguments.
 
+    Args:
+        country_code (str): ISO 3166-1 alpha-2 country code.
+        state (str): State, if applicable.
+        city (str): City.
+        street_line1 (str): First line for the address.
+        street_line2 (str): Second line for the address.
+        post_code (str): Address post code.
+        **kwargs (dict): Arbitrary keyword arguments.
     """
 
     def __init__(self, country_code, state, city, street_line1, street_line2, post_code, **kwargs):
@@ -51,11 +60,12 @@ class ShippingAddress(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.ShippingAddress:
+            :class:`telegram.ShippingAddress`
         """
+
         if not data:
             return None
 

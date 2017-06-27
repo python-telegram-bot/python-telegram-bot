@@ -22,11 +22,22 @@ from telegram import TelegramObject
 
 
 class LabeledPrice(TelegramObject):
-    """This object represents a portion of the price for goods or services.
+    """
+    This object represents a portion of the price for goods or services.
 
     Attributes:
         label (str): Portion label
-        amount (int): Price of the product in the smallest units of the currency (integer)
+        amount (int): Price of the product in the smallest units of the currency (integer, not
+                float/double). For example, for a price of US$ 1.45 pass amount = 145. See the
+                exp parameter in currencies.json, it shows the number of digits past the decimal
+                point for each currency (2 for the majority of currencies).
+
+    Args:
+        label (str): Portion label
+        amount (int): Price of the product in the smallest units of the currency (integer, not
+                float/double). For example, for a price of US$ 1.45 pass amount = 145. See the
+                exp parameter in currencies.json, it shows the number of digits past the decimal
+                point for each currency (2 for the majority of currencies).
         **kwargs (dict): Arbitrary keyword arguments.
     """
 
@@ -39,12 +50,12 @@ class LabeledPrice(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.LabeledPrice:
-
+            :class:`telegram.LabeledPrice`
         """
+
         if not data:
             return None
 
@@ -55,11 +66,12 @@ class LabeledPrice(TelegramObject):
         """
         Args:
             data (list):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            List<telegram.PhotoSize>:
+            list(:class:`telegram.LabeledPrice`)
         """
+
         if not data:
             return []
 
