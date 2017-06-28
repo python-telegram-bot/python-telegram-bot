@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
@@ -34,7 +35,7 @@ class StickerTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.emoji = telegram.Emoji.FLEXED_BICEPS
+        cls.emoji = '💪'
         # cls.sticker_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.webp"
         # Serving sticker from gh since our server sends wrong content_type
         cls.sticker_file_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/data/telegram.webp?raw=true"  # noqa

@@ -2,6 +2,12 @@
 Changes
 =======
 
+**2017-XX-XX**
+
+*Development version 7.0*
+
+- Remove ``telegram.Emoji``
+
 **2017-06-18**
 
 *Released 6.1.0*

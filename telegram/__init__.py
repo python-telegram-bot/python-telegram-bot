@@ -42,7 +42,6 @@ from .forcereply import ForceReply
 from .error import TelegramError
 from .files.inputfile import InputFile
 from .files.file import File
-from .emoji import Emoji
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.animation import Animation
@@ -101,7 +100,7 @@ __author__ = 'devs@python-telegram-bot.org'
 
 __all__ = [
     'Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery',
-    'Contact', 'Document', 'Emoji', 'File', 'ForceReply', 'InlineKeyboardButton',
+    'Contact', 'Document', 'File', 'ForceReply', 'InlineKeyboardButton',
     'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
     'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
     'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
