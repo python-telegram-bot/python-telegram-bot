@@ -22,21 +22,21 @@ from telegram import TelegramObject
 
 
 class Contact(TelegramObject):
-    """This object represents a Telegram Contact.
+    """
+    This object represents a phone contact.
 
     Attributes:
-        phone_number (str):
-        first_name (str):
-        last_name (str):
-        user_id (int):
+        phone_number (str): Contact's phone number.
+        first_name (str): Contact's first name.
+        last_name (str): Optional. Contact's last name.
+        user_id (int): Optional. Contact's user identifier in Telegram.
 
     Args:
-        phone_number (str):
-        first_name (str):
-        last_name (Optional[str]):
-        user_id (Optional[int]):
+        phone_number (str): Contact's phone number.
+        first_name (str): Contact's first name.
+        last_name (Optional[str]): Contact's last name.
+        user_id (Optional[int]): Contact's user identifier in Telegram.
         **kwargs: Arbitrary keyword arguments.
-
     """
 
     def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):
@@ -54,11 +54,12 @@ class Contact(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Contact:
+            :class:`telegram.Contact`
         """
+
         if not data:
             return None
 

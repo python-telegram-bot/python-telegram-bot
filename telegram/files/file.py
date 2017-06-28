@@ -25,23 +25,28 @@ from telegram import TelegramObject
 
 
 class File(TelegramObject):
-    """This object represents a Telegram File.
+    """
+    This object represents a file ready to be downloaded. The file can be downloaded with
+    :attr:`download`. It is guaranteed that the link will be valid for at least 1 hour. When the
+    link expires, a new one can be requested by calling getFile.
+
+    Note:
+        Maximum file size to download is 20 MB
 
     Attributes:
-        file_id (str):
-        file_size (str):
-        file_path (str):
+        file_id (str): Unique identifier for this file.
+        file_size (str): Optional. File size, if known.
+        file_path (str): Optional. File path. Use :attr:`download` to get the file.
 
     Args:
-        file_id (str):
-        bot (telegram.Bot):
-        file_size (Optional[int]):
-        file_path (Optional[str]):
+        file_id (str): Unique identifier for this file.
+        file_size (Optional[int]): Optional. File size, if known.
+        file_path (Optional[str]): File path. Use :attr:`download` to get the file.
+        bot (telegram.Bot): Bot to use with shortcut method.
         **kwargs (dict): Arbitrary keyword arguments.
-
     """
 
-    def __init__(self, file_id, bot, file_size=None, file_path=None, **kwargs):
+    def __init__(self, file_id, bot=None, file_size=None, file_path=None, **kwargs):
         # Required
         self.file_id = str(file_id)
 
@@ -58,11 +63,12 @@ class File(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.File:
+            :class:`telegram.File`
         """
+
         if not data:
             return None
 
@@ -71,21 +77,23 @@ class File(TelegramObject):
     def download(self, custom_path=None, out=None, timeout=None):
         """
         Download this file. By default, the file is saved in the current working directory with its
-        original filename as reported by Telegram. If a ``custom_path`` is supplied, it will be
-        saved to that path instead. If ``out`` is defined, the file contents will be saved to that
-        object using the ``out.write`` method. ``custom_path`` and ``out`` are mutually exclusive.
+        original filename as reported by Telegram. If a :attr:`custom_path` is supplied, it will be
+        saved to that path instead. If :attr:`out` is defined, the file contents will be saved to
+        that object using the ``out.write`` method.
+
+        Note:
+            `custom_path` and `out` are mutually exclusive.
 
         Args:
             custom_path (Optional[str]): Custom path.
             out (Optional[object]): A file-like object. Must be opened in binary mode, if
-                applicable.
+                    applicable.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+                    from the server (instead of the one specified during creation of the connection
+                    pool).
 
         Raises:
             ValueError: If both ``custom_path`` and ``out`` are passed.
-
         """
 
         if custom_path is not None and out is not None:

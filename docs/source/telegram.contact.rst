@@ -1,7 +1,6 @@
 telegram.contact module
 =======================
 
-.. automodule:: telegram.contact
+.. automodule:: telegram.files.contact
     :members:
-    :undoc-members:
     :show-inheritance:

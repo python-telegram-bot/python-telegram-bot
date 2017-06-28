@@ -1,7 +1,6 @@
 telegram.location module
 ========================
 
-.. automodule:: telegram.location
+.. automodule:: telegram.files.location
     :members:
-    :undoc-members:
     :show-inheritance:

@@ -22,23 +22,23 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Document(TelegramObject):
-    """This object represents a Telegram Document.
+    """
+    This object represents a general file (as opposed to photos, voice messages and audio files).
 
     Attributes:
-        file_id (str):
-        thumb (:class:`telegram.PhotoSize`):
-        file_name (str):
-        mime_type (str):
-        file_size (int):
+        file_id (str): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
+        file_name (str): Original filename as defined by sender.
+        mime_type (str): MIME type of the file as defined by sender.
+        file_size (int): Optional. File size.
 
     Args:
-        file_id (str):
-        thumb (Optional[:class:`telegram.PhotoSize`]):
-        file_name (Optional[str]):
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
+        file_id (str): Unique file identifier
+        thumb (Optional[:class:`telegram.PhotoSize`]): Document thumbnail as defined by sender.
+        file_name (Optional[str]): Original filename as defined by sender.
+        mime_type (Optional[str]): MIME type of the file as defined by sender.
+        file_size (Optional[int]): File size.
         **kwargs (dict): Arbitrary keyword arguments.
-
     """
 
     _id_keys = ('file_id',)
@@ -65,11 +65,12 @@ class Document(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Document:
+            :class:`telegram.Document`
         """
+
         if not data:
             return None
 

@@ -25,11 +25,18 @@ class Venue(TelegramObject):
     """
     This object represents a venue.
 
+    Attributes:
+        location (:class:`telegram.Location`): Venue location.
+        title (str): Name of the venue.
+        address (str): Address of the venue.
+        foursquare_id (str): Optional. Foursquare identifier of the venue.
+
     Args:
-        location (:class:`telegram.Location`):
-        title (str):
-        address (str):
-        foursquare_id (Optional[str]):
+        location (:class:`telegram.Location`): Venue location.
+        title (str): Name of the venue.
+        address (str): Address of the venue.
+        foursquare_id (Optional[str]): Foursquare identifier of the venue.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     def __init__(self, location, title, address, foursquare_id=None, **kwargs):
@@ -44,6 +51,15 @@ class Venue(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
+        """
+        Args:
+            data (dict):
+            bot (:class:`telegram.Bot`):
+
+        Returns:
+            :class:`telegram.Venue`
+        """
+
         data = super(Venue, Venue).de_json(data, bot)
 
         if not data:

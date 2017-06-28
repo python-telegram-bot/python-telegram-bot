@@ -1,7 +1,6 @@
 telegram.voice module
 =====================
 
-.. automodule:: telegram.voice
+.. automodule:: telegram.files.voice
     :members:
-    :undoc-members:
     :show-inheritance:

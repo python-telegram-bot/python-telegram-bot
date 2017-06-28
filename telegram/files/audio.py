@@ -22,25 +22,25 @@ from telegram import TelegramObject
 
 
 class Audio(TelegramObject):
-    """This object represents a Telegram Audio.
+    """
+    This object represents an audio file to be treated as music by the Telegram clients.
 
     Attributes:
-        file_id (str):
-        duration (int):
-        performer (str):
-        title (str):
-        mime_type (str):
-        file_size (int):
+        file_id (str): Unique identifier for this file.
+        duration (int): Duration of the audio in seconds as defined by sender.
+        performer (str): Optional. Performer of the audio as defined by sender or by audio tags.
+        title (str): Optional. Title of the audio as defined by sender or by audio tags.
+        mime_type (str): Optional. MIME type of the file as defined by sender.
+        file_size (int): Optional. File size.
 
     Args:
-        file_id (str):
-        duration (int):
-        performer (Optional[str]):
-        title (Optional[str]):
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
+        file_id (str): Unique identifier for this file.
+        duration (int): Duration of the audio in seconds as defined by sender.
+        performer (Optional[str]): Performer of the audio as defined by sender or by audio tags.
+        title (Optional[str]): Title of the audio as defined by sender or by audio tags.
+        mime_type (Optional[str]): MIME type of the file as defined by sender.
+        file_size (Optional[int]): File size.
         **kwargs: Arbitrary keyword arguments.
-
     """
 
     def __init__(self,
@@ -67,11 +67,12 @@ class Audio(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Audio:
+            :class:`telegram.Audio`
         """
+
         if not data:
             return None
 

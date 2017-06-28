@@ -22,28 +22,27 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Video(TelegramObject):
-    """This object represents a Telegram Video.
+    """
+    This object represents a video file.
 
     Attributes:
-        file_id (str):
-        width (int):
-        height (int):
-        duration (int):
-        thumb (:class:`telegram.PhotoSize`):
-        mime_type (str):
-        file_size (int):
+        file_id (str): Unique identifier for this file.
+        width (int): Video width as defined by sender.
+        height (int): Video height as defined by sender.
+        duration (int): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
+        mime_type (str): Optional. Mime type of a file as defined by sender.
+        file_size (int): Optional. File size.
 
     Args:
-        file_id (str):
-        width (int):
-        height (int):
-        duration (int):
+        file_id (str): Unique identifier for this file.
+        width (int): Video width as defined by sender.
+        height (int): Video height as defined by sender.
+        duration (int): Duration of the video in seconds as defined by sender.
+        thumb (Optional[:class:`telegram.PhotoSize`]): Video thumbnail.
+        mime_type (Optional[str]): Mime type of a file as defined by sender.
+        file_size (Optional[int]): File size.
         **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        thumb (Optional[:class:`telegram.PhotoSize`]):
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
     """
 
     def __init__(self,
@@ -72,11 +71,12 @@ class Video(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Video:
+            :class:`telegram.Video`
         """
+
         if not data:
             return None
 

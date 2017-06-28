@@ -1,7 +1,6 @@
 telegram.photosize module
 =========================
 
-.. automodule:: telegram.photosize
+.. automodule:: telegram.files.photosize
     :members:
-    :undoc-members:
     :show-inheritance:

@@ -22,26 +22,25 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Sticker(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """
+    This object represents a sticker.
 
     Attributes:
-        file_id (str):
-        width (int):
-        height (int):
-        thumb (:class:`telegram.PhotoSize`):
-        emoji (str):
-        file_size (int):
+        file_id (str): Unique identifier for this file.
+        width (int): Sticker width.
+        height (int): Sticker height.
+        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in .webp or .jpg format.
+        emoji (str): Optional. Emoji associated with the sticker.
+        file_size (int): Optional. File size.
 
     Args:
-        file_id (str):
-        width (int):
-        height (int):
+        file_id (str): Unique identifier for this file.
+        width (int): Sticker width.
+        height (int): Sticker height.
+        thumb (Optional[:class:`telegram.PhotoSize`]): Sticker thumbnail in .webp or .jpg format.
+        emoji (Optional[str]): Emoji associated with the sticker.
+        file_size (Optional[int]): File size.
         **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        thumb (Optional[:class:`telegram.PhotoSize`]):
-        emoji (Optional[str]):
-        file_size (Optional[int]):
     """
 
     def __init__(self, file_id, width, height, thumb=None, emoji=None, file_size=None, **kwargs):
@@ -61,11 +60,12 @@ class Sticker(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Sticker:
+            :class:`telegram.Sticker`
         """
+
         if not data:
             return None
 

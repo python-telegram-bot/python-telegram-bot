@@ -22,14 +22,23 @@ from telegram import PhotoSize, TelegramObject
 
 
 class VideoNote(TelegramObject):
-    """This object represents a Telegram VideoNote.
+    """
+    This object represents a video message (available in Telegram apps as of v.4.0).
 
     Attributes:
-        file_id (str): Unique identifier for this file
-        length (int): Video width and height as defined by sender
-        duration (int): Duration of the video in seconds as defined by sender
-        thumb (Optional[:class:`telegram.PhotoSize`]): Video thumbnail
-        file_size (Optional[int]): File size
+        file_id (str): Unique identifier for this file.
+        length (int): Video width and height as defined by sender.
+        duration (int): Duration of the video in seconds as defined by sender.
+        thumb (Optional[:class:`telegram.PhotoSize`]): Optional. Video thumbnail.
+        file_size (Optional[int]): Optional. File size.
+
+    Args:
+        file_id (str): Unique identifier for this file.
+        length (int): Video width and height as defined by sender.
+        duration (int): Duration of the video in seconds as defined by sender.
+        thumb (Optional[:class:`telegram.PhotoSize`]): Video thumbnail.
+        file_size (Optional[int]): File size.
+        **kwargs: Arbitrary keyword arguments.
     """
 
     def __init__(self, file_id, length, duration, thumb=None, file_size=None, **kwargs):
@@ -48,11 +57,12 @@ class VideoNote(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.VideoNote:
+            :class:`telegram.VideoNote`
         """
+
         if not data:
             return None
 
