@@ -37,7 +37,7 @@ from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
-from .replykeyboardremove import ReplyKeyboardRemove, ReplyKeyboardHide
+from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
 from .error import TelegramError
 from .files.inputfile import InputFile
