@@ -365,5 +365,13 @@ class Dispatcher(object):
             error (telegram.TelegramError): The Telegram error that was raised.
         """
 
-        for callback in self.error_handlers:
-            callback(self.bot, update, error)
+        if self.error_handlers:
+            for callback in self.error_handlers:
+                callback(self.bot, update, error)
+
+        else:
+            try:
+                raise error
+
+            except:
+                self.logger.exception('No error handlers are registered, logging exception...')
