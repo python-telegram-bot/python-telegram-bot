@@ -2200,6 +2200,173 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
+    def delete_chat_photo(self, chat_id, timeout=None, **kwargs):
+        """Use this method to delete a chat photo.
+
+        Photos can't be changed for private chats. The bot must be an administrator in the chat
+        for this to work and must have the appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Note:
+            In regular groups (non-supergroups), this method will only work if the
+            ‘All Members Are Admins’ setting is off in the target group.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/deleteChatPhoto'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_chat_title(self, chat_id, title, timeout=None, **kwargs):
+        """Use this method to change the title of a chat.
+
+        Titles can't be changed for private chats. The bot must be an administrator in the chat
+        for this to work and must have the appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            title (str): New chat title, 1-255 characters
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Note:
+            In regular groups (non-supergroups), this method will only work if the
+            ‘All Members Are Admins’ setting is off in the target group.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatTitle'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'title': title}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_chat_description(self, chat_id, description, timeout=None, **kwargs):
+        """Use this method to change the description of a supergroup or a channel.
+
+        The bot must be an administrator in the chat for this to work and must have the
+            appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            description (str): New chat description, 1-255 characters
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatDescription'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'description': description}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def pin_chat_message(self, chat_id, message_id, disable_notification=None, timeout=None,
+                         **kwargs):
+        """Use this method to pin a message in a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must have the
+            appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            message_id (int): Identifier of a message to pin
+            disable_notification (boolean): Pass True, if it is not necessary to send a
+                notification to all group members about the new pinned message
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/pinChatMessage'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'message_id': message_id}
+
+        if disable_notification is not None:
+            data['disable_notification'] = disable_notification
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def unpin_chat_message(self, chat_id, timeout=None, **kwargs):
+        """Use this method to unpin a message in a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must have the
+            appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/unpinChatMessage'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
     @staticmethod
     def de_json(data, bot):
         data = super(Bot, Bot).de_json(data, bot)
@@ -2262,3 +2429,8 @@ class Bot(TelegramObject):
     promoteChatMemmber = promote_chat_member
     exportChatInviteLink = export_chat_invite_link
     setChatPhoto = set_chat_photo
+    deleteChatPhoto = delete_chat_photo
+    setChatTitle = set_chat_title
+    setChatDescription = set_chat_description
+    pinChatMessage = pin_chat_message
+    unpinChatMessage = unpin_chat_message
