@@ -19,6 +19,8 @@
 """ This module contains helper functions """
 
 import re
+from datetime import datetime
+from time import mktime
 
 try:
     from html import escape as escape_html  # noqa: F401
@@ -30,3 +32,36 @@ def escape_markdown(text):
     """Helper function to escape telegram markup symbols"""
     escape_chars = '\*_`\['
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
+
+
+def to_timestamp(dt_obj):
+    """
+    Args:
+        dt_obj (:class:`datetime.datetime`):
+
+    Returns:
+        int:
+    """
+    if not dt_obj:
+        return None
+
+    try:
+        # Python 3.3+
+        return int(dt_obj.timestamp())
+    except AttributeError:
+        # Python 3 (< 3.3) and Python 2
+        return int(mktime(dt_obj.timetuple()))
+
+
+def from_timestamp(unixtime):
+    """
+    Args:
+        unixtime (int):
+
+    Returns:
+        datetime.datetime:
+    """
+    if not unixtime:
+        return None
+
+    return datetime.fromtimestamp(unixtime)

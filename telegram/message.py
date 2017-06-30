@@ -19,14 +19,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import sys
-from datetime import datetime
-from time import mktime
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
 from telegram.utils.deprecate import warn_deprecate_obj
-from telegram.utils.helpers import escape_html, escape_markdown
+from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
 
 class Message(TelegramObject):
@@ -215,14 +213,14 @@ class Message(TelegramObject):
         data = super(Message, Message).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
-        data['date'] = Message._fromtimestamp(data['date'])
+        data['date'] = from_timestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
         data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
-        data['forward_date'] = Message._fromtimestamp(data.get('forward_date'))
+        data['forward_date'] = from_timestamp(data.get('forward_date'))
         data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
-        data['edit_date'] = Message._fromtimestamp(data.get('edit_date'))
+        data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
         data['game'] = Game.de_json(data.get('game'), bot)
@@ -259,12 +257,12 @@ class Message(TelegramObject):
 
         # Required
         data['from'] = data.pop('from_user', None)
-        data['date'] = self._totimestamp(self.date)
+        data['date'] = to_timestamp(self.date)
         # Optionals
         if self.forward_date:
-            data['forward_date'] = self._totimestamp(self.forward_date)
+            data['forward_date'] = to_timestamp(self.forward_date)
         if self.edit_date:
-            data['edit_date'] = self._totimestamp(self.edit_date)
+            data['edit_date'] = to_timestamp(self.edit_date)
         if self.photo:
             data['photo'] = [p.to_dict() for p in self.photo]
         if self.entities:
@@ -276,39 +274,6 @@ class Message(TelegramObject):
             data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
         return data
-
-    @staticmethod
-    def _fromtimestamp(unixtime):
-        """
-        Args:
-            unixtime (int):
-
-        Returns:
-            datetime.datetime:
-        """
-        if not unixtime:
-            return None
-
-        return datetime.fromtimestamp(unixtime)
-
-    @staticmethod
-    def _totimestamp(dt_obj):
-        """
-        Args:
-            dt_obj (:class:`datetime.datetime`):
-
-        Returns:
-            int:
-        """
-        if not dt_obj:
-            return None
-
-        try:
-            # Python 3.3+
-            return int(dt_obj.timestamp())
-        except AttributeError:
-            # Python 3 (< 3.3) and Python 2
-            return int(mktime(dt_obj.timetuple()))
 
     def _quote(self, kwargs):
         """Modify kwargs for replying with or without quoting"""
