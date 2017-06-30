@@ -27,6 +27,7 @@ from datetime import datetime
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
 from telegram.error import InvalidToken, TelegramError
+from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -1077,7 +1078,7 @@ class Bot(TelegramObject):
 
         if until_date is not None:
             if isinstance(until_date, datetime):
-                until_date = int(until_date.timestamp())
+                until_date = to_timestamp(until_date)
             data['until_date'] = until_date
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2050,7 +2051,7 @@ class Bot(TelegramObject):
 
         if until_date is not None:
             if isinstance(until_date, datetime):
-                until_date = int(until_date.timestamp())
+                until_date = to_timestamp(until_date)
             data['until_date'] = until_date
         if can_send_messages is not None:
             data['can_send_messages'] = can_send_messages
