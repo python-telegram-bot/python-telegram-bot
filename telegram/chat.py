@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, ChatPhoto
 
 
 class Chat(TelegramObject):
@@ -90,6 +90,8 @@ class Chat(TelegramObject):
         """
         if not data:
             return None
+
+        data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
 
         return Chat(bot=bot, **data)
 
