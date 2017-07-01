@@ -21,7 +21,7 @@
 
 import io
 import re
-from future.backports.datetime import datetime
+from datetime import datetime
 import time
 import sys
 import unittest
