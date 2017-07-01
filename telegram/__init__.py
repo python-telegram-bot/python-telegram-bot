@@ -20,6 +20,7 @@
 
 from .base import TelegramObject
 from .user import User
+from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatmember import ChatMember
 from .files.photosize import PhotoSize
@@ -32,7 +33,6 @@ from .files.contact import Contact
 from .files.location import Location
 from .files.venue import Venue
 from .files.videonote import VideoNote
-from .files.chatphoto import ChatPhoto
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
