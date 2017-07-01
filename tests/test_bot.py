@@ -264,7 +264,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(max_connections, info.max_connections)
         self.assertListEqual(allowed_updates, info.allowed_updates)
 
-    @flaky(3, 1)
+    @flaky(20, 1, _stall_retry)
     @timeout(10)
     def test_delete_webhook(self):
         url = 'https://python-telegram-bot.org/test/webhook'
