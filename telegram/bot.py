@@ -1062,7 +1062,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins’ setting is off in the target group. Otherwise
+            'All Members Are Admins' setting is off in the target group. Otherwise
             members may only be removed by the group's creator or by the member that added them.
 
         Returns:
@@ -2184,7 +2184,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins’ setting is off in the target group.
+            ‘All Members Are Admins' setting is off in the target group.
 
         Returns:
             bool: On success, `True` is returned.
@@ -2218,7 +2218,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins’ setting is off in the target group.
+            ‘All Members Are Admins' setting is off in the target group.
 
         Returns:
             bool: On success, `True` is returned.
@@ -2253,7 +2253,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins’ setting is off in the target group.
+            ‘All Members Are Admins' setting is off in the target group.
 
         Returns:
             bool: On success, `True` is returned.
@@ -2427,7 +2427,7 @@ class Bot(TelegramObject):
     answerShippingQuery = answer_shipping_query
     answerPreCheckoutQuery = answer_pre_checkout_query
     restrictChatMember = restrict_chat_member
-    promoteChatMemmber = promote_chat_member
+    promoteChatMember = promote_chat_member
     exportChatInviteLink = export_chat_invite_link
     setChatPhoto = set_chat_photo
     deleteChatPhoto = delete_chat_photo
