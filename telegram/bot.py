@@ -27,7 +27,7 @@ from datetime import datetime
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
-from telegram.error import InvalidToken, TelegramError
+from telegram.utils.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
 

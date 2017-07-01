@@ -31,7 +31,7 @@ import mimetypes
 import os
 import sys
 
-from telegram import TelegramError
+from telegram.utils.error import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
