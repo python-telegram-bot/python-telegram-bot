@@ -16,10 +16,58 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-InlineKeyboardButton"""
+"""This module contains objects that represent InlineKeyboardMarkup and Buttons"""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, ReplyMarkup
+
+
+class InlineKeyboardMarkup(ReplyMarkup):
+    """This object represents a Telegram InlineKeyboardMarkup.
+
+    Attributes:
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
+
+    Args:
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
+        **kwargs (dict): Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self, inline_keyboard, **kwargs):
+        # Required
+        self.inline_keyboard = inline_keyboard
+
+    @staticmethod
+    def de_json(data, bot):
+        """
+        Args:
+            data (dict):
+            bot (telegram.Bot):
+
+        Returns:
+            telegram.InlineKeyboardMarkup:
+
+        """
+        data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data, bot)
+
+        if not data:
+            return None
+
+        data['inline_keyboard'] = [
+            InlineKeyboardButton.de_list(inline_keyboard, bot)
+            for inline_keyboard in data['inline_keyboard']
+        ]
+
+        return InlineKeyboardMarkup(**data)
+
+    def to_dict(self):
+        data = super(InlineKeyboardMarkup, self).to_dict()
+
+        data['inline_keyboard'] = []
+        for inline_keyboard in self.inline_keyboard:
+            data['inline_keyboard'].append([x.to_dict() for x in inline_keyboard])
+
+        return data
 
 
 class InlineKeyboardButton(TelegramObject):
