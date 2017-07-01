@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
@@ -2184,7 +2185,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins' setting is off in the target group.
+            'All Members Are Admins' setting is off in the target group.
 
         Returns:
             bool: On success, `True` is returned.
@@ -2218,7 +2219,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins' setting is off in the target group.
+            'All Members Are Admins' setting is off in the target group.
 
         Returns:
             bool: On success, `True` is returned.
@@ -2253,7 +2254,7 @@ class Bot(TelegramObject):
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
-            ‘All Members Are Admins' setting is off in the target group.
+            'All Members Are Admins' setting is off in the target group.
 
         Returns:
             bool: On success, `True` is returned.
