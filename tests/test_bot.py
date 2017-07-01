@@ -39,6 +39,11 @@ BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
 
 
+def _stall_retry(*_args, **_kwargs):
+    time.sleep(3)
+    return True
+
+
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
 
@@ -246,7 +251,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(text, fwdmsg.text)
         self.assertEqual(fwdmsg.forward_from_message_id, msg.message_id)
 
-    @flaky(20, 1)
+    @flaky(20, 1, _stall_retry)
     @timeout(10)
     def test_set_webhook_get_webhook_info(self):
         url = 'https://python-telegram-bot.org/test/webhook'
@@ -259,7 +264,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(max_connections, info.max_connections)
         self.assertListEqual(allowed_updates, info.allowed_updates)
 
-    @flaky(3, 1)
+    @flaky(20, 1, _stall_retry)
     @timeout(10)
     def test_delete_webhook(self):
         url = 'https://python-telegram-bot.org/test/webhook'

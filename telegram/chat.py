@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, ChatPhoto
 
 
 class Chat(TelegramObject):
@@ -33,14 +33,13 @@ class Chat(TelegramObject):
         first_name (str): First name of the other party in a private chat
         last_name (str): Last name of the other party in a private chat
         all_members_are_administrators (bool): True if group has 'All Members Are Administrators'
+        photo (Optional[`telegram.ChatPhoto`]): Chat photo. Returned only in getChat.
+        description (str): Description, for supergroups and channel chats. Returned
+            only in getChat.
+        invite_link (str): Chat invite link, for supergroups and channel chats. Returned
+            only in getChat.
 
     Args:
-        id (int):
-        type (str):
-        title (Optional[str]):
-        username(Optional[str]):
-        first_name(Optional[str]):
-        last_name(Optional[str]):
         bot (Optional[telegram.Bot]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
@@ -59,6 +58,9 @@ class Chat(TelegramObject):
                  last_name=None,
                  all_members_are_administrators=None,
                  bot=None,
+                 photo=None,
+                 description=None,
+                 invite_link=None,
                  **kwargs):
         # Required
         self.id = int(id)
@@ -69,6 +71,9 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         self.all_members_are_administrators = all_members_are_administrators
+        self.photo = photo
+        self.description = description
+        self.invite_link = invite_link
 
         self.bot = bot
         self._id_attrs = (self.id,)
@@ -85,6 +90,8 @@ class Chat(TelegramObject):
         """
         if not data:
             return None
+
+        data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
 
         return Chat(bot=bot, **data)
 
