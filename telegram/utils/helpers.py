@@ -19,8 +19,8 @@
 """ This module contains helper functions """
 
 import re
-from datetime import datetime
-from time import mktime
+
+from future.backports.datetime import datetime
 
 try:
     from html import escape as escape_html  # noqa: F401
@@ -45,12 +45,7 @@ def to_timestamp(dt_obj):
     if not dt_obj:
         return None
 
-    try:
-        # Python 3.3+
-        return int(dt_obj.timestamp())
-    except AttributeError:
-        # Python 3 (< 3.3) and Python 2
-        return int(mktime(dt_obj.timetuple()))
+    return int(dt_obj.timestamp())
 
 
 def from_timestamp(unixtime):
