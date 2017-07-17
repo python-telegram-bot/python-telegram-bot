@@ -206,8 +206,8 @@ class Bot(TelegramObject):
             chat_id (int|str): Unique identifier for the target chat or
                 username of the target channel (in the format
                 @channelusername).
-            text (str): Text of the message to be sent. The current maximum
-                length is 4096 UTF-8 characters.
+            text (str): Text of the message to be sent. The maximum length
+                is available at ``telegram.constants.MAX_MESSAGE_LENGTH``.
             parse_mode (Optional[str]): Send Markdown or HTML, if you want
                 Telegram apps to show bold, italic, fixed-width text or inline
                 URLs in your bot's message.

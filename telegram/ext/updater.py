@@ -59,7 +59,7 @@ class Updater(object):
         base_url (Optional[str]):
         workers (Optional[int]): Amount of threads in the thread pool for
             functions decorated with @run_async
-        bot (Optional[telegram.Bot]): A pre-initialized bot instance. If a pre-initizlied bot is
+        bot (Optional[telegram.Bot]): A pre-initialized bot instance. If a pre-initialized bot is
             used, it is the user's responsibility to create it using a `Request` instance with
             a large enough connection pool.
         user_sig_handler (Optional[function]): Takes ``signum, frame`` as positional arguments.
