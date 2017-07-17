@@ -83,11 +83,14 @@ class Bot(TelegramObject):
         token (str): Bot's unique authentication.
         base_url (Optional[str]): Telegram Bot API service URL.
         base_file_url (Optional[str]): Telegram Bot API file URL.
+        timeout (Optional[int|float]): The read timeout from the server, used
+            for all methods. When a method also specifies its own timeout, the
+            longest one is used.
         request (Optional[Request]): Pre initialized `Request` class.
 
     """
 
-    def __init__(self, token, base_url=None, base_file_url=None, request=None):
+    def __init__(self, token, base_url=None, base_file_url=None, request=None, timeout=None):
         self.token = self._validate_token(token)
 
         if base_url is None:
@@ -100,6 +103,7 @@ class Bot(TelegramObject):
         self.base_file_url = str(base_file_url) + str(self.token)
         self.bot = None
         self._request = request or Request()
+        self.timeout = timeout
         self.logger = logging.getLogger(__name__)
 
     @property
@@ -156,7 +160,7 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=self._get_timeout(kwargs.get('timeout')))
 
         if result is True:
             return result
@@ -182,7 +186,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/getMe'.format(self.base_url)
 
-        result = self._request.get(url, timeout=timeout)
+        result = self._request.get(url, timeout=self._get_timeout(timeout))
 
         self.bot = User.de_json(result, self)
 
@@ -276,7 +280,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'message_id': message_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -906,7 +910,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'action': action}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -971,7 +975,7 @@ class Bot(TelegramObject):
         if switch_pm_parameter:
             data['switch_pm_parameter'] = switch_pm_parameter
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1007,7 +1011,7 @@ class Bot(TelegramObject):
         if limit:
             data['limit'] = limit
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return UserProfilePhotos.de_json(result, self)
 
@@ -1034,7 +1038,7 @@ class Bot(TelegramObject):
 
         data = {'file_id': file_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         if result.get('file_path'):
             result['file_path'] = '%s/%s' % (self.base_file_url, result['file_path'])
@@ -1082,7 +1086,7 @@ class Bot(TelegramObject):
                 until_date = to_timestamp(until_date)
             data['until_date'] = until_date
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1112,7 +1116,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'user_id': user_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1164,7 +1168,7 @@ class Bot(TelegramObject):
         if cache_time is not None:
             data['cache_time'] = cache_time
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._request.post(url_, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1488,7 +1492,7 @@ class Bot(TelegramObject):
         if allowed_updates is not None:
             data['allowed_updates'] = allowed_updates
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._request.post(url_, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1513,7 +1517,7 @@ class Bot(TelegramObject):
 
         data = {}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1540,7 +1544,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1569,7 +1573,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return Chat.de_json(result, self)
 
@@ -1599,7 +1603,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return [ChatMember.de_json(x, self) for x in result]
 
@@ -1626,7 +1630,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -1654,7 +1658,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'user_id': user_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return ChatMember.de_json(result, self)
 
@@ -1677,7 +1681,7 @@ class Bot(TelegramObject):
 
         data = {}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return WebhookInfo.de_json(result, self)
 
@@ -1785,7 +1789,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return [GameHighScore.de_json(hs, self) for hs in result]
 
@@ -1956,7 +1960,7 @@ class Bot(TelegramObject):
         if error_message is not None:
             data['error_message'] = error_message
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._request.post(url_, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2005,7 +2009,7 @@ class Bot(TelegramObject):
         if error_message is not None:
             data['error_message'] = error_message
 
-        result = self._request.post(url_, data, timeout=timeout)
+        result = self._request.post(url_, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2063,7 +2067,7 @@ class Bot(TelegramObject):
         if can_add_web_page_previews is not None:
             data['can_add_web_page_previews'] = can_add_web_page_previews
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2133,7 +2137,7 @@ class Bot(TelegramObject):
         if can_promote_members is not None:
             data['can_promote_members'] = can_promote_members
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2163,7 +2167,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2198,7 +2202,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'photo': photo}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2232,7 +2236,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2267,7 +2271,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'title': title}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2298,7 +2302,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'description': description}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2335,7 +2339,7 @@ class Bot(TelegramObject):
         if disable_notification is not None:
             data['disable_notification'] = disable_notification
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
 
@@ -2365,9 +2369,15 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id}
 
-        result = self._request.post(url, data, timeout=timeout)
+        result = self._request.post(url, data, timeout=self._get_timeout(timeout))
 
         return result
+
+    def _get_timeout(self, t):
+        timeout = t or self.timeout
+        if timeout and self.timeout:
+            timeout = max(timeout, self.timeout)
+        return timeout
 
     @staticmethod
     def de_json(data, bot):
