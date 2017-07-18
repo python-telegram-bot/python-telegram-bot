@@ -26,26 +26,41 @@ class PreCheckoutQueryHandler(Handler):
     """
     Handler class to handle Telegram PreCheckout callback queries.
 
+    Attributes:
+        callback (function): The callback function for this handler.
+        pass_update_queue (bool): Optional. Determines whether ``update_queue`` will be passed to
+                the callback function.
+        pass_job_queue (bool): Optional. Determines whether ``job_queue`` will be passed to the
+                callback function.
+        pass_user_data (bool): Optional. Determines whether ``user_data`` will be passed to the
+                callback function.
+        pass_chat_data (bool): Optional. Determines whether ``chat_data`` will be passed to the
+                callback function.
+
+    Note:
+        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
+        can use to keep any data in will be sent to the :attr:`callback` function.. Related to
+        either the user or the chat that the update was sent in. For each update from the same user
+        or in the same chat, it will be the same ``dict``.
+
     Args:
-        callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``check_update``
-            has determined that an update should be processed by this handler.
-        pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
-            be used to insert updates. Default is ``False``.
-        pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
-            instance created by the ``Updater`` which can be used to schedule new jobs.
-            Default is ``False``.
-        pass_user_data (optional[bool]): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. It will be a ``dict`` you
-            can use to keep any data related to the user that sent the update. For each update of
-            the same user, it will be the same ``dict``. Default is ``False``.
-        pass_chat_data (optional[bool]): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
-            can use to keep any data related to the chat that the update was sent in.
-            For each update in the same chat, it will be the same ``dict``. Default is ``False``.
+        callback (function): A function that takes ``bot, update`` as positional arguments. It will
+                be called when the :attr:`check_update` has determined that an update should be
+                processed by this handler.
+        pass_update_queue (Optional[bool]): If set to ``True``, a keyword argument called
+                ``update_queue`` will be passed to the callback function. It will be the ``Queue``
+                instance used by the :class:`telegram.ext.Updater` and
+                :class:`telegram.ext.Dispatcher` that contains new updates which can be used to
+                insert updates. Default is ``False``.
+        pass_job_queue (Optional[bool]): If set to ``True``, a keyword argument called
+                ``job_queue`` will be passed to the callback function. It will be a
+                :class:`telegram.ext.JobQueue` instance created by the
+                :class:`telegram.ext.Updater` which can be used to schedule new jobs. Default is
+                ``False``.
+        pass_user_data (Optional[bool]): If set to ``True``, a keyword argument called
+                ``user_data`` will be passed to the callback function. Default is ``False``.
+        pass_chat_data (Optional[bool]): If set to ``True``, a keyword argument called
+                ``chat_data`` will be passed to the callback function. Default is ``False``.
     """
 
     def __init__(self,
@@ -62,8 +77,27 @@ class PreCheckoutQueryHandler(Handler):
             pass_chat_data=pass_chat_data)
 
     def check_update(self, update):
+        """
+        Determines whether an update should be passed to this handlers :attr:`callback`.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+
+        Returns:
+            bool
+        """
+
         return isinstance(update, Update) and update.pre_checkout_query
 
     def handle_update(self, update, dispatcher):
+        """
+        Send the update to the :attr:`callback`.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated
+            the Update.
+        """
+
         optional_args = self.collect_optional_args(dispatcher, update)
         return self.callback(dispatcher.bot, update, **optional_args)
