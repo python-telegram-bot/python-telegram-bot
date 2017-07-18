@@ -2,6 +2,13 @@
 Changes
 =======
 
+**DATE TBD**
+*WIP 6.2.0*
+- Improved filters for user_id/username/chat.
+- Internal restructure of files.
+- Improved unitests.
+- Fully support Bot API 3.1.
+
 **2017-06-18**
 
 *Released 6.1.0*

@@ -18,11 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the Filters for use with the MessageHandler class """
 from telegram import Chat
-
-try:
-    str_type = base_string
-except NameError:
-    str_type = str
+from future.utils import string_types
 
 
 class BaseFilter(object):
@@ -383,7 +379,7 @@ class Filters(object):
                 self.user_ids = user_id
             if username is None:
                 self.usernames = username
-            elif isinstance(username, str_type):
+            elif isinstance(username, string_types):
                 self.usernames = [username.replace('@', '')]
             else:
                 self.usernames = [user.replace('@', '') for user in username]
@@ -420,7 +416,7 @@ class Filters(object):
                 self.chat_ids = chat_id
             if username is None:
                 self.usernames = username
-            elif isinstance(username, str_type):
+            elif isinstance(username, string_types):
                 self.usernames = [username.replace('@', '')]
             else:
                 self.usernames = [chat.replace('@', '') for chat in username]
@@ -460,7 +456,7 @@ class Filters(object):
         """
 
         def __init__(self, lang):
-            if isinstance(lang, str_type):
+            if isinstance(lang, string_types):
                 self.lang = [lang]
             else:
                 self.lang = lang

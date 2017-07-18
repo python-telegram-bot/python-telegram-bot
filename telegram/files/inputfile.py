@@ -94,7 +94,7 @@ class InputFile(object):
 
     @property
     def content_type(self):
-       return 'multipart/form-data; boundary=%s' % self.boundary
+        return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
         """
