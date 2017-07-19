@@ -17,6 +17,7 @@ Submodules
    telegram.chat
    telegram.chataction
    telegram.chatmember
+   telegram.chatphoto
    telegram.choseninlineresult
    telegram.constants
    telegram.contact
@@ -79,6 +80,7 @@ Submodules
    telegram.userprofilephotos
    telegram.venue
    telegram.video
+   telegram.videonote
    telegram.voice
    telegram.webhookinfo
 
