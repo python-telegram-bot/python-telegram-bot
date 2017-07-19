@@ -53,8 +53,8 @@ class Message(TelegramObject):
                 ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited
                 in Unix time. Converted to :class:`datetime.datetime`.
-        text (str): Optional. For text messages, the actual UTF-8 text of the
-                message, 0-4096 characters.
+        text (str): Optional. For text messages, the actual UTF-8 text of the message,
+                0-4096 characters.  Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         entities ([:class:`telegram.MessageEntity`]): Optional. For text messages, special
                 entities like usernames, URLs, bot commands, etc. that appear in the text. See
                 :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
@@ -140,8 +140,8 @@ class Message(TelegramObject):
                 ``reply_to_message`` fields even if it itself is a reply.
         edit_date (Optional[:class:`datetime.datetime`]): Date the message was last edited
                 in Unix time. Converted to :class:`datetime.datetime`.
-        text (Optional[str]): For text messages, the actual UTF-8 text of the
-                message, 0-4096 characters.
+        text (Optional[str]): For text messages, the actual UTF-8 text of the message, 0-4096
+                characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         entities (Optional[list(:class:`telegram.MessageEntity`)]): For text messages, special
                 entities like usernames, URLs, bot commands, etc. that appear in the text. See
                 ``parse_entity`` and ``parse_entities`` methods for how to use properly.

@@ -35,8 +35,8 @@ class Game(TelegramObject):
                 in chats.
         text (str): Optional. Brief description of the game or high scores included in the game
                 message. Can be automatically edited to include current high scores for the game
-                when the bot calls setGameScore, or manually edited using editMessageText. 0-4096
-                characters.
+                when the bot calls set_game_score, or manually edited using edit_message_text.
+                0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         text_entities ([:class:`telegram.MessageEntity`]): Optional. Special entities that appear
                 in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`): Optional. Animation that will be displayed in the
@@ -49,8 +49,8 @@ class Game(TelegramObject):
                 in chats.
         text (Optional[str]): Brief description of the game or high scores included in the game
                 message. Can be automatically edited to include current high scores for the game
-                when the bot calls setGameScore, or manually edited using editMessageText. 0-4096
-                characters.
+                when the bot calls set_game_score, or manually edited using edit_message_text.
+                0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         text_entities (Optional[list(:class:`telegram.MessageEntity`)]): Special entities that
                 appear in text, such as usernames, URLs, bot commands, etc.
         animation (Optional[:class:`telegram.Animation`]): Animation that will be displayed in the
