@@ -7,3 +7,4 @@ yapf
 pre-commit
 pre-commit-hooks
 beautifulsoup4
+rednose

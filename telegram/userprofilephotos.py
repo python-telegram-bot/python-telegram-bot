@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-UserProfilePhotos."""
+"""This module contains an object that represents a Telegram UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
 
@@ -25,13 +24,17 @@ from telegram import PhotoSize, TelegramObject
 class UserProfilePhotos(TelegramObject):
     """This object represents a Telegram UserProfilePhotos.
 
+    This object represent a user's profile pictures.
+
     Attributes:
-        total_count (int):
-        photos (List[List[:class:`telegram.PhotoSize`]]):
+        total_count (int): Total number of profile pictures the target user has.
+        photos ([[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to
+                                                  4 sizes each).
 
     Args:
-        total_count (int):
-        photos (List[List[:class:`telegram.PhotoSize`]]):
+        total_count (int): Total number of profile pictures the target user has.
+        photos (list(list(:class:`telegram.PhotoSize`))): Requested profile pictures (in
+                                                          up to 4 sizes each).
     """
 
     def __init__(self, total_count, photos, **kwargs):
@@ -44,10 +47,10 @@ class UserProfilePhotos(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.UserProfilePhotos:
+            :class:`telegram.UserProfilePhotos`:
         """
         if not data:
             return None

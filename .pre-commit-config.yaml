@@ -1,17 +1,17 @@
 -   repo: git://github.com/python-telegram-bot/mirrors-yapf
-    sha: v0.12.2
+    sha: master
     hooks:
     -   id: yapf
         files: ^(telegram|tests)/.*\.py$
         args:
         - --diff
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 18d7035de5388cc7775be57f529c154bf541aab9
+    sha: 78818b90cd694c29333ba54d38f9e60b6359ccfc
     hooks:
     -   id: flake8
         files: ^telegram/.*\.py$
 -   repo: git://github.com/pre-commit/mirrors-pylint
-    sha: v1.5.5
+    sha: v1.7.1
     hooks:
     -   id: pylint
         files: ^telegram/.*\.py$

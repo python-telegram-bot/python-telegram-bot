@@ -1,7 +1,6 @@
 telegram.video module
 =====================
 
-.. automodule:: telegram.video
+.. automodule:: telegram.files.video
     :members:
-    :undoc-members:
     :show-inheritance:

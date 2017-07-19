@@ -23,15 +23,36 @@ from telegram import User, TelegramObject
 
 class MessageEntity(TelegramObject):
     """
-    This object represents one special entity in a text message. For example,
-    hashtags, usernames, URLs, etc.
+    This object represents one special entity in a text message. For example, hashtags,
+    usernames, URLs, etc.
+
+    Attributes:
+        type (str): Type of the entity. Can be mention (@username), hashtag, bot_command, url,
+                email, bold (bold text), italic (italic text), code (monowidth string), pre
+                (monowidth block), text_link (for clickable text URLs), text_mention (for users
+                without usernames).
+        offset (int): Offset in UTF-16 code units to the start of the entity.
+        length (int): Length of the entity in UTF-16 code units.
+        url (str): Optional. For "text_link" only, url that will be opened
+                after user taps on the text
+        user (:class:`telegram.User`): Optional. For "text_mention" only,
+                the mentioned user
+
+    Note:
+        The following helper attributes are available ass class-constants: MENTION, HASHTAG,
+        BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION or ALL_TYPES
+        for a list of all the above.
 
     Args:
-        type (str):
-        offset (int):
-        length (int):
-        url (Optional[str]):
-        user (Optional[:class:`telegram.User`]):
+        type (str): Type of the entity. Can be mention (@username), hashtag, bot_command, url,
+                email, bold (bold text), italic (italic text), code (monowidth string), pre
+                (monowidth block), text_link (for clickable text URLs), text_mention (for users
+                without usernames).
+        offset (int): Offset in UTF-16 code units to the start of the entity.
+        length (int): Length of the entity in UTF-16 code units.
+        url (Optional[str]): For "text_link" only, url that will be opened after user
+                taps on the text.
+        user (Optional[:class:`telegram.User`]): For "text_mention" only, the mentioned user.
     """
 
     def __init__(self, type, offset, length, url=None, user=None, **kwargs):
@@ -58,7 +79,7 @@ class MessageEntity(TelegramObject):
             data (list):
 
         Returns:
-            List<telegram.MessageEntity>:
+            list(:class:`telegram.MessageEntity`):
         """
         if not data:
             return list()

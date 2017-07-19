@@ -1,2 +1,2 @@
-future>=0.15.2
+future>=0.16.0
 certifi

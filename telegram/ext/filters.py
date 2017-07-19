@@ -18,11 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """ This module contains the Filters for use with the MessageHandler class """
 from telegram import Chat
-
-try:
-    str_type = base_string
-except NameError:
-    str_type = str
+from future.utils import string_types
 
 
 class BaseFilter(object):
@@ -55,6 +51,9 @@ class BaseFilter(object):
     By default the filters name (what will get printed when converted to a string for display)
     will be the class name. If you want to overwrite this assign a better name to the `name`
     class variable.
+
+    Attributes:
+        name (str): Name for this filter. Defaults to ``None``.
     """
 
     name = None
@@ -78,15 +77,26 @@ class BaseFilter(object):
         return self.name
 
     def filter(self, message):
+        """
+        This method must be overwritten.
+
+        Args:
+            message (:class:`telegram.Message`): The message that is tested.
+
+        Returns:
+            bool
+        """
+
         raise NotImplementedError
 
 
 class InvertedFilter(BaseFilter):
-    """Represents a filter that has been inverted.
-
-    Args:
-        f: The filter to invert
-    """
+    # """Represents a filter that has been inverted.
+    #
+    # Args:
+    #     f: The filter to invert.
+    # """
+    # Commented docstring for clarity in docs.
 
     def __init__(self, f):
         self.f = f
@@ -99,13 +109,14 @@ class InvertedFilter(BaseFilter):
 
 
 class MergedFilter(BaseFilter):
-    """Represents a filter consisting of two other filters.
-
-    Args:
-        base_filter: Filter 1 of the merged filter
-        and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
-        or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
-    """
+    # """Represents a filter consisting of two other filters.
+    #
+    # Args:
+    #     base_filter: Filter 1 of the merged filter
+    #     and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
+    #     or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
+    # """
+    # Commented docstring for clarity in docs.
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
@@ -126,6 +137,31 @@ class MergedFilter(BaseFilter):
 class Filters(object):
     """
     Predefined filters for use with the `filter` argument of :class:`telegram.ext.MessageHandler`.
+
+    Note:
+        Example use ``MessageHandler(Filters.video, callback_method)`` to filter all video
+        messages. use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
+
+    Attributes:
+        all: All Messages.
+        text: Text Messages.
+        command: Messages starting with ``/``.
+        reply: Messages that are a reply to another message.
+        audio: Messages that contain :class:`telegram.Audio`.
+        document: Messages that contain :class:`telegram.Document`.
+        photo: Messages that contain :class:`telegram.PhotoSize`.
+        sticker: Messages that contain :class:`telegram.Sticker`.
+        video: Messages that contain :class:`telegram.Video`.
+        voice: Messages that contain :class:`telegram.Voice`.
+        contact: Messages that contain :class:`telegram.Contact`.
+        location: Messages that contain :class:`telegram.Location`.
+        venue: Messages that contain :class:`telegram.Venue`.
+        forwarded: Messages that are forwarded.
+        game: Messages that contain :class:`telegram.Game`.
+        private: Messages sent in a private chat.
+        group: Messages sent in a group chat.
+        invoice: Messages that contain :class:`telegram.Invoice`.
+        successful_payment: Messages that confirm a succesfull payment.
     """
 
     class _All(BaseFilter):
@@ -233,6 +269,25 @@ class Filters(object):
     venue = _Venue()
 
     class _StatusUpdate(BaseFilter):
+        """
+        subset for messages containing a status update.
+
+        Note:
+            Use these filters like: ``Filters.status_update.new_chat_member`` etc.
+
+        Attributes:
+            new_chat_member: Messages that contain :attr:`telegram.Message.new_chat_member`.
+            left_chat_member: Messages that contain :attr:`telegram.Message.left_chat_member`.
+            new_chat_title: Messages that contain :attr:`telegram.Message.new_chat_title`.
+            new_chat_photo: Messages that contain :attr:`telegram.Message.new_chat_photo`.
+            delete_chat_photo: Messages that contain :attr:`telegram.Message.delete_chat_photo`.
+            chat_created: Messages that contain :attr:`telegram.Message.group_chat_created`
+                    :attr:`telegram.Message.supergroup_chat_created` or
+                    :attr:`telegram.Message.channel_chat_created`.
+            migrate: Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
+                    :attr:`telegram.Message.migrate_from_chat_id`.
+            pinned_message: Messages that contain :attr:`telegram.Message.pinned_message`.
+        """
 
         class _NewChatMembers(BaseFilter):
             name = 'Filters.status_update.new_chat_members'
@@ -329,6 +384,9 @@ class Filters(object):
         """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.
 
+        Note:
+            Example ``MessageHandler(Filters.entity("hashtag"), callback_method)``
+
         Args:
             entity_type: Entity type to check for. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
@@ -359,6 +417,79 @@ class Filters(object):
 
     group = _Group()
 
+    class user(BaseFilter):
+        """Filters messages to allow only those which are from specified user ID.
+
+        Note:
+            Example: ``MessageHandler(Filters.user(1234), callback_method)``
+
+        Args:
+            user_id(Optional[int|list]): which user ID(s) to allow through.
+            username(Optional[str|list]): which username(s) to allow through. If username starts
+                with '@' symbol, it will be ignored.
+
+        Raises:
+            ValueError
+        """
+
+        def __init__(self, user_id=None, username=None):
+            if not (bool(user_id) ^ bool(username)):
+                raise ValueError('One and only one of user_id or username must be used')
+            if user_id is not None and isinstance(user_id, int):
+                self.user_ids = [user_id]
+            else:
+                self.user_ids = user_id
+            if username is None:
+                self.usernames = username
+            elif isinstance(username, string_types):
+                self.usernames = [username.replace('@', '')]
+            else:
+                self.usernames = [user.replace('@', '') for user in username]
+
+        def filter(self, message):
+            if self.user_ids is not None:
+                return bool(message.from_user and message.from_user.id in self.user_ids)
+            else:
+                # self.usernames is not None
+                return bool(message.from_user and message.from_user.username and
+                            message.from_user.username in self.usernames)
+
+    class chat(BaseFilter):
+        """Filters messages to allow only those which are from specified chat ID.
+
+        Note:
+            Example: ``MessageHandler(Filters.chat(-1234), callback_method)``
+
+        Args:
+            chat_id(Optional[int|list]): which chat ID(s) to allow through.
+            username(Optional[str|list]): which username(s) to allow through. If username starts
+                with '@' symbol, it will be ignored.
+
+        Raises:
+            ValueError
+        """
+
+        def __init__(self, chat_id=None, username=None):
+            if not (bool(chat_id) ^ bool(username)):
+                raise ValueError('One and only one of chat_id or username must be used')
+            if chat_id is not None and isinstance(chat_id, int):
+                self.chat_ids = [chat_id]
+            else:
+                self.chat_ids = chat_id
+            if username is None:
+                self.usernames = username
+            elif isinstance(username, string_types):
+                self.usernames = [username.replace('@', '')]
+            else:
+                self.usernames = [chat.replace('@', '') for chat in username]
+
+        def filter(self, message):
+            if self.chat_ids is not None:
+                return bool(message.chat_id in self.chat_ids)
+            else:
+                # self.usernames is not None
+                return bool(message.chat.username and message.chat.username in self.usernames)
+
     class _Invoice(BaseFilter):
         name = 'Filters.invoice'
 
@@ -381,13 +512,16 @@ class Filters(object):
         Note that according to telegrams documentation, every single user does not have the
         language_code attribute.
 
+        Note:
+            example ``MessageHandler(Filters.language("en"), callback_method)``
+
         Args:
             lang (str|list): Which language code(s) to allow through. This will be matched using
                 .startswith meaning that 'en' will match both 'en_US' and 'en_GB'
         """
 
         def __init__(self, lang):
-            if isinstance(lang, str_type):
+            if isinstance(lang, string_types):
                 self.lang = [lang]
             else:
                 self.lang = lang

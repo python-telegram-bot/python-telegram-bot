@@ -1,7 +1,6 @@
 telegram.sticker module
 =======================
 
-.. automodule:: telegram.sticker
+.. automodule:: telegram.files.sticker
     :members:
-    :undoc-members:
     :show-inheritance:

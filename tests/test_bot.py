@@ -39,6 +39,11 @@ BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
 
 
+def _stall_retry(*_args, **_kwargs):
+    time.sleep(3)
+    return True
+
+
 class BotTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Bot."""
 
@@ -120,78 +125,6 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, 'teste')
         self.assertEqual(message.forward_from.username, 'leandrotoledo')
         self.assertTrue(isinstance(message.forward_date, datetime))
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testSendPhoto(self):
-        message = self._bot.sendPhoto(
-            photo=open('tests/data/telegram.png', 'rb'),
-            caption='testSendPhoto',
-            chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 1451)
-        self.assertEqual(message.caption, 'testSendPhoto')
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testSilentSendPhoto(self):
-        message = self._bot.sendPhoto(
-            photo=open('tests/data/telegram.png', 'rb'),
-            caption='testSendPhoto',
-            chat_id=self._chat_id,
-            disable_notification=True)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 1451)
-        self.assertEqual(message.caption, 'testSendPhoto')
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testResendPhoto(self):
-        message = self._bot.sendPhoto(
-            photo='AgADAQAD1y0yGx8j9Qf8f_m3CKeS6Iy95y8ABI1ggfVJ4-UvwJcAAgI', chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_id,
-                         'AgADAQAD1y0yGx8j9Qf8f_m3CKeS6Iy95y8ABI1ggfVJ4-UvwJcAAgI')
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testSendJPGURLPhoto(self):
-        message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.jpg&text=telegram', chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 813)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testSendPNGURLPhoto(self):
-        message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 670)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testSendGIFURLPhoto(self):
-        message = self._bot.sendPhoto(
-            photo='http://dummyimage.com/600x400/000/fff.gif&text=telegram', chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 670)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testSendBufferedReaderPhoto(self):
-        photo = open('tests/data/telegram.png', 'rb')
-        br_photo = io.BufferedReader(io.BytesIO(photo.read()))
-        message = self._bot.sendPhoto(photo=br_photo, chat_id=self._chat_id)
-
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.photo[0].file_size, 1451)
 
     @flaky(3, 1)
     @timeout(10)
@@ -318,7 +251,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(text, fwdmsg.text)
         self.assertEqual(fwdmsg.forward_from_message_id, msg.message_id)
 
-    @flaky(20, 1)
+    @flaky(20, 1, _stall_retry)
     @timeout(10)
     def test_set_webhook_get_webhook_info(self):
         url = 'https://python-telegram-bot.org/test/webhook'
@@ -331,7 +264,7 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(max_connections, info.max_connections)
         self.assertListEqual(allowed_updates, info.allowed_updates)
 
-    @flaky(3, 1)
+    @flaky(20, 1, _stall_retry)
     @timeout(10)
     def test_delete_webhook(self):
         url = 'https://python-telegram-bot.org/test/webhook'

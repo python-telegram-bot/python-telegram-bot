@@ -1,7 +1,6 @@
 telegram.inputcontactmessagecontent module
 ==========================================
 
-.. automodule:: telegram.inputcontactmessagecontent
+.. automodule:: telegram.inline.inputcontactmessagecontent
     :members:
-    :undoc-members:
     :show-inheritance:

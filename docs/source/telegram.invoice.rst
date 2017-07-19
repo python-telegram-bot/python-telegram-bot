@@ -1,6 +1,6 @@
-telegram\.invoice module
-========================
+telegram.invoice module
+=======================
 
-.. automodule:: telegram.invoice
+.. automodule:: telegram.payment.invoice
     :members:
     :show-inheritance:

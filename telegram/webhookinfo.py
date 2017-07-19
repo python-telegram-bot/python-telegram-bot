@@ -24,20 +24,37 @@ from telegram import TelegramObject
 class WebhookInfo(TelegramObject):
     """This object represents a Telegram WebhookInfo.
 
+    Contains information about the current status of a webhook.
+
     Attributes:
         url (str): Webhook URL, may be empty if webhook is not set up.
-        has_custom_certificate (bool):
-        pending_update_count (int):
-        last_error_date (int):
-        last_error_message (str):
+        has_custom_certificate (bool): True, if a custom certificate was provided for webhook
+                                       certificate checks.
+        pending_update_count (int): Number of updates awaiting delivery.
+        last_error_date (int): Optional. Unix time for the most recent error that happened
+                               when trying todeliver an update via webhook.
+        last_error_message (str): Optional. Error message in human-readable format for the most
+                                  recent error that happened when trying to deliver
+                                  an update via webhook.
+        max_connections (int): Optional. Maximum allowed number of simultaneous HTTPS connections
+                                to the webhook for update delivery.
+        allowed_updates ([str]): Optional. A list of update types the bot is subscribed to.
+                                 Defaults to all update types.
 
     Args:
         url (str): Webhook URL, may be empty if webhook is not set up.
-        has_custom_certificate (bool):
-        pending_update_count (int):
-        last_error_date (Optional[int]):
-        last_error_message (Optional[str]):
-
+        has_custom_certificate (bool): True, if a custom certificate was provided for webhook
+                                       certificate checks.
+        pending_update_count (int): Number of updates awaiting delivery.
+        last_error_date (Optional[int]): Unix time for the most recent error that happened
+                                         when trying todeliver an update via webhook.
+        last_error_message (Optional[str]): Error message in human-readable format for the most
+                                            recent error that happened when trying to deliver
+                                            an update via webhook.
+        max_connections (Optional[int]): Maximum allowed number of simultaneous HTTPS connections
+                                         to the webhook for update delivery.
+        allowed_updates (Optional[list(str)]): A list of update types the bot is subscribed to.
+                                               Defaults to all update types.
     """
 
     def __init__(self,
@@ -63,10 +80,10 @@ class WebhookInfo(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.WebhookInfo:
+            :class:`telegram.WebhookInfo`:
 
         """
         if not data:

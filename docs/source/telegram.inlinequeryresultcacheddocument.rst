@@ -1,7 +1,6 @@
 telegram.inlinequeryresultcacheddocument module
 ===============================================
 
-.. automodule:: telegram.inlinequeryresultcacheddocument
+.. automodule:: telegram.inline.inlinequeryresultcacheddocument
     :members:
-    :undoc-members:
     :show-inheritance:

@@ -1,7 +1,6 @@
 telegram.inlinequeryresultcachedsticker module
 ==============================================
 
-.. automodule:: telegram.inlinequeryresultcachedsticker
+.. automodule:: telegram.inline.inlinequeryresultcachedsticker
     :members:
-    :undoc-members:
     :show-inheritance:

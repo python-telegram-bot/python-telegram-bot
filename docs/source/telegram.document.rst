@@ -1,7 +1,6 @@
 telegram.document module
 ========================
 
-.. automodule:: telegram.document
+.. automodule:: telegram.files.document
     :members:
-    :undoc-members:
     :show-inheritance:

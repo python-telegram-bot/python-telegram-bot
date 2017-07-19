@@ -1,7 +1,6 @@
 telegram.inlinequeryresultgame module
 =====================================
 
-.. automodule:: telegram.inlinequeryresultgame
+.. automodule:: telegram.inline.inlinequeryresultgame
     :members:
-    :undoc-members:
     :show-inheritance:

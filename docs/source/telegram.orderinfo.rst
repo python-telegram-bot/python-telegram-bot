@@ -1,6 +1,6 @@
-telegram\.orderinfo module
-==========================
+telegram.orderinfo module
+=========================
 
-.. automodule:: telegram.orderinfo
+.. automodule:: telegram.payment.orderinfo
     :members:
     :show-inheritance:

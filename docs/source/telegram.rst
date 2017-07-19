@@ -17,6 +17,7 @@ Submodules
    telegram.chat
    telegram.chataction
    telegram.chatmember
+   telegram.chatphoto
    telegram.choseninlineresult
    telegram.constants
    telegram.contact
@@ -56,21 +57,30 @@ Submodules
    telegram.inputmessagecontent
    telegram.inputtextmessagecontent
    telegram.inputvenuemessagecontent
+   telegram.invoice
    telegram.keyboardbutton
+   telegram.labeledprice
    telegram.location
    telegram.message
    telegram.messageentity
+   telegram.orderinfo
    telegram.parsemode
    telegram.photosize
+   telegram.precheckoutquery
    telegram.replykeyboardremove
    telegram.replykeyboardmarkup
    telegram.replymarkup
+   telegram.shippingaddress
+   telegram.shippingoption
+   telegram.shippingquery
    telegram.sticker
+   telegram.successfulpayment
    telegram.update
    telegram.user
    telegram.userprofilephotos
    telegram.venue
    telegram.video
+   telegram.videonote
    telegram.voice
    telegram.webhookinfo
 

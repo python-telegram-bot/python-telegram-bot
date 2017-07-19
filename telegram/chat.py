@@ -19,32 +19,59 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, ChatPhoto
 
 
 class Chat(TelegramObject):
-    """This object represents a Telegram Chat.
+    """This object represents a chat.
 
     Attributes:
-        id (int):
-        type (str): Can be 'private', 'group', 'supergroup' or 'channel'
-        title (str): Title, for channels and group chats
-        username (str): Username, for private chats and channels if available
-        first_name (str): First name of the other party in a private chat
-        last_name (str): Last name of the other party in a private chat
-        all_members_are_administrators (bool): True if group has 'All Members Are Administrators'
+        id (int): Unique identifier for this chat. This number may be greater than 32 bits and
+                some programming languages may have difficulty/silent defects in interpreting it.
+                But it is smaller than 52 bits, so a signed 64 bit integer or double-precision
+                float type are safe for storing this identifier.
+        type (str): Type of chat, can be either 'private', 'group', 'supergroup' or 'channel'.
+        title (str): Optional. Title, for supergroups, channels and group chats.
+        username (str): Optional. Username, for private chats, supergroups
+                and channels if available.
+        first_name (str): Optional. First name of the other party in a private chat.
+        last_name (str): Optional. Last name of the other party in a private chat.
+        all_members_are_administrators (bool): Optional. True if a group has `All Members Are
+                Admins` enabled.
+        photo (:class:`telegram.ChatPhoto`): Optional. Chat photo. Returned only in getChat.
+        description	(str): Optional. Description, for supergroups and channel chats. Returned
+                only in getChat.
+        invite_link (str): Optional. Chat invite link, for supergroups and channel chats. Returned
+                only in getChat.
+
+        CHANNEL (str): 'channel'
+        GROUP (str): 'group'
+        PRIVATE (str): 'private'
+        SUPERGROUP (str): 'supergroup'
 
     Args:
-        id (int):
-        type (str):
-        title (Optional[str]):
-        username(Optional[str]):
-        first_name(Optional[str]):
-        last_name(Optional[str]):
-        bot (Optional[telegram.Bot]): The Bot to use for instance methods
+        id (int): Unique identifier for this chat. This number may be greater than 32 bits and
+                some programming languages may have difficulty/silent defects in interpreting it.
+                But it is smaller than 52 bits, so a signed 64 bit integer or double-precision
+                float type are safe for storing this identifier.
+        type (str): Type of chat, can be either 'private', 'group', 'supergroup' or 'channel'.
+        title (Optional[str]): Title, for supergroups, channels and group chats.
+        username(Optional[str]): Username, for private chats, supergroups
+                and channels if available.
+        first_name(Optional[str]): First name of the other party in a private chat.
+        last_name(Optional[str]): Last name of the other party in a private chat.
+        all_members_are_administrators (Optional[bool]): Optional. True if a group has `All Members
+                Are Admins` enabled.
+        photo (Optional[:class:`telegram.ChatPhoto`]): Chat photo. Returned only in getChat.
+        description	(Optional[str]): Description, for supergroups and channel chats. Returned
+                only in getChat.
+        invite_link (Optional[str]): Chat invite link, for supergroups and channel chats. Returned
+                only in getChat.
+        bot (Optional[:class:`telegram.Bot`]): The Bot to use for instance methods
         **kwargs (dict): Arbitrary keyword arguments.
 
     """
+
     PRIVATE = 'private'
     GROUP = 'group'
     SUPERGROUP = 'supergroup'
@@ -59,6 +86,9 @@ class Chat(TelegramObject):
                  last_name=None,
                  all_members_are_administrators=None,
                  bot=None,
+                 photo=None,
+                 description=None,
+                 invite_link=None,
                  **kwargs):
         # Required
         self.id = int(id)
@@ -69,6 +99,9 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         self.all_members_are_administrators = all_members_are_administrators
+        self.photo = photo
+        self.description = description
+        self.invite_link = invite_link
 
         self.bot = bot
         self._id_attrs = (self.id,)
@@ -78,40 +111,106 @@ class Chat(TelegramObject):
         """
         Args:
             data (dict):
-            bot (telegram.Bot):
+            bot (:class:`telegram.Bot`):
 
         Returns:
-            telegram.Chat:
+            :class:`telegram.Chat`:
         """
+
         if not data:
             return None
+
+        data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
 
         return Chat(bot=bot, **data)
 
     def send_action(self, *args, **kwargs):
-        """Shortcut for ``bot.send_chat_action(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.send_chat_action(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            bool: If the action was sent succesfully.
+        """
+
         return self.bot.send_chat_action(self.id, *args, **kwargs)
 
     def leave(self, *args, **kwargs):
-        """Shortcut for ``bot.leave_chat(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.leave_chat(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            bool: If the action was sent succesfully.
+        """
+
         return self.bot.leave_chat(self.id, *args, **kwargs)
 
     def get_administrators(self, *args, **kwargs):
-        """Shortcut for ``bot.get_chat_administrators(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.get_chat_administrators(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            list(:class:`telegram.ChatMember`): A list of administrators in a chat. An Array of
+                    :class:`telegram.ChatMember` objects that contains information about all
+                    chat administrators except other bots. If the chat is a group or a supergroup
+                    and no administrators were appointed, only the creator will be returned
+        """
+
         return self.bot.get_chat_administrators(self.id, *args, **kwargs)
 
     def get_members_count(self, *args, **kwargs):
-        """Shortcut for ``bot.get_chat_members_count(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.get_chat_members_count(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            int
+        """
+
         return self.bot.get_chat_members_count(self.id, *args, **kwargs)
 
     def get_member(self, *args, **kwargs):
-        """Shortcut for ``bot.get_chat_member(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.get_chat_member(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            :class:`telegram.ChatMember`
+        """
+
         return self.bot.get_chat_member(self.id, *args, **kwargs)
 
     def kick_member(self, *args, **kwargs):
-        """Shortcut for ``bot.kick_chat_member(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.kick_chat_member(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            bool: If the action was sent succesfully.
+
+        Note:
+            This method will only work if the `All Members Are Admins` setting is off in the
+            target group. Otherwise members may only be removed by the group's creator or by the
+            member that added them.
+        """
+
         return self.bot.kick_chat_member(self.id, *args, **kwargs)
 
     def unban_member(self, *args, **kwargs):
-        """Shortcut for ``bot.unban_chat_member(update.message.chat.id, *args, **kwargs)``"""
+        """
+        Shortcut for::
+
+            bot.unban_chat_member(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+            bool: If the action was sent succesfully.
+        """
         return self.bot.unban_chat_member(self.id, *args, **kwargs)

@@ -1,6 +1,6 @@
-telegram\.videonote module
-==========================
+telegram.videonote module
+=========================
 
-.. automodule:: telegram.videonote
+.. automodule:: telegram.files.videonote
     :members:
     :show-inheritance:
