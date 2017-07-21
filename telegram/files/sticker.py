@@ -100,10 +100,10 @@ class Sticker(TelegramObject):
 
 
 class StickerSet(TelegramObject):
-    def __init__(self, name, title, is_mask, stickers):
+    def __init__(self, name, title, is_masks, stickers):
         self.name = name
         self.title = title
-        self.is_mask = is_mask
+        self.is_masks = is_masks
         self.stickers = stickers
 
         self._id_attrs = (self.name,)
