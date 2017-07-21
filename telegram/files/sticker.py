@@ -92,15 +92,11 @@ class Sticker(TelegramObject):
         if not data:
             return list()
 
-        stickers = list()
-        for sticker in data:
-            stickers.append(Sticker.de_json(sticker, bot))
-
-        return stickers
+        return [Sticker.de_json(d, bot) for d in data]
 
 
 class StickerSet(TelegramObject):
-    def __init__(self, name, title, contains_masks, stickers, **kwargs):
+    def __init__(self, name, title, contains_masks, stickers, bot=None, **kwargs):
         # TODO: telegrams docs claim contains_masks is called is_masks
         # remove these lines or change once we get answer from support
         self.name = name
@@ -119,7 +115,7 @@ class StickerSet(TelegramObject):
 
         data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
 
-        return StickerSet(**data)
+        return StickerSet(bot=bot, **data)
 
     def to_dict(self):
         data = super(StickerSet, self).to_dict()

@@ -2382,7 +2382,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegramStickerSet`
+            :class:`telegram.StickerSet`
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2399,7 +2399,7 @@ class Bot(TelegramObject):
     def upload_sticker_file(self, user_id, png_sticker, timeout=None, **kwargs):
         """
         Use this method to upload a .png file with a sticker for later use in
-        :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set methods` (can be used multiple
+        :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
         times).
 
         Note:
@@ -2407,7 +2407,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            user_id (int): User identifier of sticker file owner.
+            user_id (:obj:`int`): User identifier of sticker file owner.
             png_sticker (:obj:`str` | `filelike object`): Png image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px.
@@ -2448,7 +2448,7 @@ class Bot(TelegramObject):
                 Must begin with a letter, can't contain consecutive underscores and
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
                 1-64 characters.
-            title (:obj:`str`): Sticker set title, 1-64 characters
+            title (:obj:`str`): Sticker set title, 1-64 characters.
             png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
                 to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
@@ -2458,15 +2458,15 @@ class Bot(TelegramObject):
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             is_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
                 created.
-            mask_position (:class:`MaskPosition`, optional): Position where the mask should be
-                placed on faces.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should be placed on faces.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool` On success, ``True`` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2497,7 +2497,7 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
-            name (:obj:`str`): Sticker set name
+            name (:obj:`str`): Sticker set name.
             png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
                 to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
@@ -2505,15 +2505,15 @@ class Bot(TelegramObject):
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
-            mask_position (:class:`MaskPosition`, optional): Position where the mask should be
-                placed on faces.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should beplaced on faces.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool` On success, ``True`` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2535,15 +2535,15 @@ class Bot(TelegramObject):
         Use this method to move a sticker in a set created by the bot to a specific position.
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker
-            position (:obj:`int`): New sticker position in the set, zero-based
+            sticker (:obj:`str`): File identifier of the sticker.
+            position (:obj:`int`): New sticker position in the set, zero-based.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool` On success, ``True`` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2561,14 +2561,14 @@ class Bot(TelegramObject):
         Use this method to delete a sticker from a set created by the bot.
 
         Args:
-            sticker (:obj:`str`): File identifier of the sticker
+            sticker (:obj:`str`): File identifier of the sticker.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :obj:`bool` On success, ``True`` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
