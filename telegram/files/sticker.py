@@ -100,10 +100,12 @@ class Sticker(TelegramObject):
 
 
 class StickerSet(TelegramObject):
-    def __init__(self, name, title, is_masks, stickers):
+    def __init__(self, name, title, contains_masks, stickers, **kwargs):
+        # TODO: telegrams docs claim contains_masks is called is_masks
+        # remove these lines or change once we get answer from support
         self.name = name
         self.title = title
-        self.is_masks = is_masks
+        self.contains_masks = contains_masks
         self.stickers = stickers
 
         self._id_attrs = (self.name,)
@@ -126,7 +128,7 @@ class MaskPosition(TelegramObject):
     MOUTH = 'mouth'
     CHIN = 'chin'
 
-    def __init__(self, point, x_shift, y_shift, zoom):
+    def __init__(self, point, x_shift, y_shift, zoom, **kwargs):
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift
