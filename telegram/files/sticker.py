@@ -121,6 +121,13 @@ class StickerSet(TelegramObject):
 
         return StickerSet(**data)
 
+    def to_dict(self):
+        data = super(StickerSet, self).to_dict()
+
+        data['stickers'] = [s.to_dict() for s in data.get('stickers')]
+
+        return data
+
 
 class MaskPosition(TelegramObject):
     FOREHEAD = 'forehead'
