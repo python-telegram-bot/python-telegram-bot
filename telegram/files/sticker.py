@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Sticker."""
+"""This module contains objects that represents stickers."""
 
-from telegram import PhotoSize, TelegramObject, MaskPosition
+from telegram import PhotoSize, TelegramObject
 
 
 class Sticker(TelegramObject):
@@ -86,3 +86,55 @@ class Sticker(TelegramObject):
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
         return Sticker(**data)
+
+    @staticmethod
+    def de_list(data, bot):
+        if not data:
+            return list()
+
+        stickers = list()
+        for sticker in data:
+            stickers.append(Sticker.de_json(sticker, bot))
+
+        return stickers
+
+
+class StickerSet(TelegramObject):
+    def __init__(self, name, title, is_mask, stickers):
+        self.name = name
+        self.title = title
+        self.is_mask = is_mask
+        self.stickers = stickers
+
+        self._id_attrs = (self.name,)
+
+    @staticmethod
+    def de_json(data, bot):
+        if not data:
+            return None
+
+        data = super(StickerSet, StickerSet).de_json(data, bot)
+
+        data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
+
+        return StickerSet(**data)
+
+
+class MaskPosition(TelegramObject):
+    FOREHEAD = 'forehead'
+    EYES = 'eyes'
+    MOUTH = 'mouth'
+    CHIN = 'chin'
+
+    def __init__(self, point, x_shift, y_shift, zoom):
+        self.point = point
+        self.x_shift = x_shift
+        self.y_shift = y_shift
+        self.zoom = zoom
+
+    @staticmethod
+    def de_json(data, bot):
+        if data is None:
+            return None
+
+        return MaskPosition(**data)
