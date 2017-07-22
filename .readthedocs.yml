@@ -1,0 +1,6 @@
+# syntax: https://docs.readthedocs.io/en/latest/yaml-config.html
+
+formats:
+    - pdf
+
+requirements_file: docs/requirements-docs.txt
