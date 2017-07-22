@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Sticker."""
+"""This module contains objects that represents stickers."""
 
 from telegram import PhotoSize, TelegramObject
 
@@ -25,26 +25,42 @@ class Sticker(TelegramObject):
     """This object represents a Telegram Sticker.
 
     Attributes:
-        file_id (str):
-        width (int):
-        height (int):
-        thumb (:class:`telegram.PhotoSize`):
-        emoji (str):
-        file_size (int):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Sticker width.
+        height (:obj:`int`): Sticker height.
+        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
+            format.
+        emoji (:obj:`str`): Optional. Emoji associated with the sticker.
+        set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
+        mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
+            where the mask should be placed.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        width (int):
-        height (int):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        thumb (Optional[:class:`telegram.PhotoSize`]):
-        emoji (Optional[str]):
-        file_size (Optional[int]):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Sticker width.
+        height (:obj:`int`): Sticker height.
+        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .webp or .jpg
+            format.
+        emoji (:obj:`str`, optional): Emoji associated with the sticker
+        set_name (:obj:`str`, optional): Name of the sticker set to which the sticker
+            belongs.
+        mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
+            position where the mask should be placed.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (obj:`dict`): Arbitrary keyword arguments.
     """
 
-    def __init__(self, file_id, width, height, thumb=None, emoji=None, file_size=None, **kwargs):
+    def __init__(self,
+                 file_id,
+                 width,
+                 height,
+                 thumb=None,
+                 emoji=None,
+                 file_size=None,
+                 set_name=None,
+                 mask_position=None,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)
@@ -53,6 +69,8 @@ class Sticker(TelegramObject):
         self.thumb = thumb
         self.emoji = emoji
         self.file_size = file_size
+        self.set_name = set_name
+        self.mask_position = mask_position
 
         self._id_attrs = (self.file_id,)
 
@@ -60,11 +78,11 @@ class Sticker(TelegramObject):
     def de_json(data, bot):
         """
         Args:
-            data (dict):
+            data (:obj:`dict`):
             bot (telegram.Bot):
 
         Returns:
-            telegram.Sticker:
+            :obj:`telegram.Sticker`
         """
         if not data:
             return None
@@ -72,5 +90,109 @@ class Sticker(TelegramObject):
         data = super(Sticker, Sticker).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
+        data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
         return Sticker(**data)
+
+    @staticmethod
+    def de_list(data, bot):
+        if not data:
+            return list()
+
+        return [Sticker.de_json(d, bot) for d in data]
+
+
+class StickerSet(TelegramObject):
+    """
+    This object represents a sticker set.
+
+    Attributes:
+        name (:obj:`str`): Sticker set name.
+        title (:obj:`str`): Sticker set title.
+        is_masks (:obj:`bool`): True, if the sticker set contains masks.
+        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+
+    Args:
+        name (:obj:`str`): Sticker set name.
+        title (:obj:`str`): Sticker set title.
+        is_masks (:obj:`bool`): True, if the sticker set contains masks.
+        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+    """
+
+    def __init__(self, name, title, contains_masks, stickers, bot=None, **kwargs):
+        # TODO: telegrams docs claim contains_masks is called is_masks
+        # remove these lines or change once we get answer from support
+        self.name = name
+        self.title = title
+        self.contains_masks = contains_masks
+        self.stickers = stickers
+
+        self._id_attrs = (self.name,)
+
+    @staticmethod
+    def de_json(data, bot):
+        if not data:
+            return None
+
+        data = super(StickerSet, StickerSet).de_json(data, bot)
+
+        data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
+
+        return StickerSet(bot=bot, **data)
+
+    def to_dict(self):
+        data = super(StickerSet, self).to_dict()
+
+        data['stickers'] = [s.to_dict() for s in data.get('stickers')]
+
+        return data
+
+
+class MaskPosition(TelegramObject):
+    """
+    This object describes the position on faces where a mask should be placed by default.
+
+    Attributes:
+        point (:obj:`str`): The part of the face relative to which the mask should be placed.
+        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
+            size, from left to right.
+        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
+            size, from top to bottom.
+        zoom (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+
+    Notes:
+        :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
+        use the classconstants for those.
+
+    Args:
+        point (:obj:`str`): The part of the face relative to which the mask should be placed.
+        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
+            size, from left to right. For example, choosing -1.0 will place mask just to the left
+            of the default mask position.
+        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
+            size, from top to bottom. For example, 1.0 will place the mask just below the default
+            mask position.
+        zoom (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+    """
+
+    FOREHEAD = 'forehead'
+    """:obj:`str`: 'forehead'"""
+    EYES = 'eyes'
+    """:obj:`str`: 'eyes'"""
+    MOUTH = 'mouth'
+    """:obj:`str`: 'mouth'"""
+    CHIN = 'chin'
+    """:obj:`str`: 'chin'"""
+
+    def __init__(self, point, x_shift, y_shift, zoom, **kwargs):
+        self.point = point
+        self.x_shift = x_shift
+        self.y_shift = y_shift
+        self.zoom = zoom
+
+    @staticmethod
+    def de_json(data, bot):
+        if data is None:
+            return None
+
+        return MaskPosition(**data)

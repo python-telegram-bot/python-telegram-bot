@@ -226,5 +226,95 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(hash(a), hash(e))
 
 
+class TestStickerSet(BaseTest, unittest.TestCase):
+    # TODO: Implement bot tests for StickerSet
+    # It's hard to test creation when we can't delete sticker sets
+    def setUp(self):
+        self.name = 'test_by_{0}'.format(self._bot.username)
+        self.title = 'Test stickers'
+        self.contains_masks = False
+        self.stickers = [telegram.Sticker('file_id', 512, 512)]
+
+        self.json_dict = {
+            'name': self.name,
+            'title': self.title,
+            'contains_masks': self.contains_masks,
+            'stickers': [x.to_dict() for x in self.stickers]
+        }
+
+    def test_sticker_set_de_json(self):
+        sticker_set = telegram.StickerSet.de_json(self.json_dict, self._bot)
+
+        self.assertEqual(sticker_set.name, self.name)
+        self.assertEqual(sticker_set.title, self.title)
+        self.assertEqual(sticker_set.contains_masks, self.contains_masks)
+        self.assertEqual(sticker_set.stickers, self.stickers)
+
+    def test_sticker_set_to_json(self):
+        sticker_set = telegram.StickerSet.de_json(self.json_dict, self._bot)
+
+        self.assertTrue(self.is_json(sticker_set.to_json()))
+
+    def test_sticker_set_to_dict(self):
+        sticker_set = telegram.StickerSet.de_json(self.json_dict, self._bot).to_dict()
+
+        self.assertTrue(self.is_dict(sticker_set))
+        self.assertDictEqual(self.json_dict, sticker_set)
+
+    def test_equality(self):
+        a = telegram.StickerSet(self.name, self.title, self.contains_masks, self.stickers)
+        b = telegram.StickerSet(self.name, self.title, self.contains_masks, self.stickers)
+        c = telegram.StickerSet(self.name, None, None, None)
+        d = telegram.StickerSet('blah', self.title, self.contains_masks, self.stickers)
+        e = telegram.Audio(self.name, 0, None, None)
+
+        self.assertEqual(a, b)
+        self.assertEqual(hash(a), hash(b))
+        self.assertIsNot(a, b)
+
+        self.assertEqual(a, c)
+        self.assertEqual(hash(a), hash(c))
+
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(hash(a), hash(d))
+
+        self.assertNotEqual(a, e)
+        self.assertNotEqual(hash(a), hash(e))
+
+
+class TestMaskPosition(BaseTest, unittest.TestCase):
+    def setUp(self):
+        self.point = telegram.MaskPosition.EYES
+        self.x_shift = -1
+        self.y_shift = 1
+        self.zoom = 2
+
+        self.json_dict = {
+            'point': self.point,
+            'x_shift': self.x_shift,
+            'y_shift': self.y_shift,
+            'zoom': self.zoom
+        }
+
+    def test_mask_position_de_json(self):
+        mask_position = telegram.MaskPosition.de_json(self.json_dict, self._bot)
+
+        self.assertEqual(mask_position.point, self.point)
+        self.assertEqual(mask_position.x_shift, self.x_shift)
+        self.assertEqual(mask_position.y_shift, self.y_shift)
+        self.assertEqual(mask_position.zoom, self.zoom)
+
+    def test_mask_positiont_to_json(self):
+        mask_position = telegram.MaskPosition.de_json(self.json_dict, self._bot)
+
+        self.assertTrue(self.is_json(mask_position.to_json()))
+
+    def test_mask_position_to_dict(self):
+        mask_position = telegram.MaskPosition.de_json(self.json_dict, self._bot).to_dict()
+
+        self.assertTrue(self.is_dict(mask_position))
+        self.assertDictEqual(self.json_dict, mask_position)
+
+
 if __name__ == '__main__':
     unittest.main()

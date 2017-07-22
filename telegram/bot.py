@@ -26,7 +26,7 @@ import warnings
 from datetime import datetime
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
+                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
@@ -2369,6 +2369,218 @@ class Bot(TelegramObject):
 
         return result
 
+    def get_sticker_set(self, name, timeout=None, **kwargs):
+        """
+        Use this method to get a sticker set.
+
+        Args:
+            name (:obj:`str`): Short name of the sticker set that is used in t.me/addstickers/
+                URLs (e.g., animals)
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.StickerSet`
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/getStickerSet'.format(self.base_url)
+
+        data = {'name': name}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return StickerSet.de_json(result, self)
+
+    def upload_sticker_file(self, user_id, png_sticker, timeout=None, **kwargs):
+        """
+        Use this method to upload a .png file with a sticker for later use in
+        :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
+        times).
+
+        Note:
+            The png_sticker argument can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            user_id (:obj:`int`): User identifier of sticker file owner.
+            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker,
+                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
+                and either width or height must be exactly 512px.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`: The uploaded File
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/uploadStickerFile'.format(self.base_url)
+
+        data = {'user_id': user_id, 'png_sticker': png_sticker}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return File.de_json(result, self)
+
+    def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis, is_masks=None,
+                               mask_position=None, timeout=None, **kwargs):
+        """
+        Use this method to create new sticker set owned by a user.
+        The bot will be able to edit the created sticker set.
+
+        Note:
+            The png_sticker argument can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            name (:obj:`str`): Short name of sticker set, to be used in t.me/addstickers/ URLs
+                (e.g., animals). Can contain only english letters, digits and underscores.
+                Must begin with a letter, can't contain consecutive underscores and
+                must end in "_by_<bot username>". <bot_username> is case insensitive.
+                1-64 characters.
+            title (:obj:`str`): Sticker set title, 1-64 characters.
+            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
+                to 512 kilobytes in size, dimensions must not exceed 512px,
+                and either width or height must be exactly 512px. Pass a file_id as a String to
+                send a file that already exists on the Telegram servers, pass an HTTP URL as a
+                String for Telegram to get a file from the Internet, or upload a new one
+                using multipart/form-data.
+            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
+            is_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
+                created.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should be placed on faces.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/createNewStickerSet'.format(self.base_url)
+
+        data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
+                'emojis': emojis}
+
+        if is_masks is not None:
+            data['is_masks'] = is_masks
+        if mask_position is not None:
+            data['mask_position'] = mask_position
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def add_sticker_to_set(self, user_id, name, png_sticker, emojis, mask_position=None,
+                           timeout=None, **kwargs):
+        """
+        Use this method to add a new sticker to a set created by the bot.
+
+        Note:
+            The png_sticker argument can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            name (:obj:`str`): Sticker set name.
+            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
+                to 512 kilobytes in size, dimensions must not exceed 512px,
+                and either width or height must be exactly 512px. Pass a file_id as a String to
+                send a file that already exists on the Telegram servers, pass an HTTP URL as a
+                String for Telegram to get a file from the Internet, or upload a new one
+                using multipart/form-data.
+            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should beplaced on faces.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/addStickerToSet'.format(self.base_url)
+
+        data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker, 'emojis': emojis}
+
+        if mask_position is not None:
+            data['mask_position'] = mask_position
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def set_sticker_position_in_set(self, sticker, position, timeout=None, **kwargs):
+        """
+        Use this method to move a sticker in a set created by the bot to a specific position.
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            position (:obj:`int`): New sticker position in the set, zero-based.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        url = '{0}/setStickerPositionInSet'.format(self.base_url)
+
+        data = {'sticker': sticker, 'position': position}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def delete_sticker_from_set(self, sticker, timeout=None, **kwargs):
+        """
+        Use this method to delete a sticker from a set created by the bot.
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        url = '{0}/deleteStickerFromSet'.format(self.base_url)
+
+        data = {'sticker': sticker}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
     @staticmethod
     def de_json(data, bot):
         data = super(Bot, Bot).de_json(data, bot)
@@ -2436,3 +2648,9 @@ class Bot(TelegramObject):
     setChatDescription = set_chat_description
     pinChatMessage = pin_chat_message
     unpinChatMessage = unpin_chat_message
+    getStickerSet = get_sticker_set
+    uploadStickerFile = upload_sticker_file
+    createNewStickerSet = create_new_sticker_set
+    addStickerToSet = add_sticker_to_set
+    setStickerPositionInSet = set_sticker_position_in_set
+    deleteStickerFromSet = delete_sticker_from_set
