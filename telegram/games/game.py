@@ -36,7 +36,6 @@ class Game(TelegramObject):
         text (:obj:`str`): Optional. Brief description of the game or high scores included in the
             game message. Can be automatically edited to include current high scores for the game
             when the bot calls set_game_score, or manually edited using edit_message_text.
-            0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
         text_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`): Optional. Animation that will be displayed in the

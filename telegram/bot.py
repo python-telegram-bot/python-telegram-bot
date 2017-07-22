@@ -219,10 +219,10 @@ class Bot(TelegramObject):
         Use this method to send text messages.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             text (:obj:`str`): Text of the message to be sent. Max 4096 characters. Also found as
-                ``telegram.constants.MAX_MESSAGE_LENGTH``.
+                :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps
             to show
                 bold, italic, fixed-width text or inline URLs in your bot's message.
@@ -270,7 +270,7 @@ class Bot(TelegramObject):
         messages.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of the message to delete.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -307,9 +307,9 @@ class Bot(TelegramObject):
         Use this method to forward messages of any kind.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            from_chat_id (:obj:`int` | :obj:`float`): Unique identifier for the chat where the
+            from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format @channelusername).
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -359,7 +359,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             photo (:obj:`str` | `filelike object`): Photo to send. Pass a file_id as String to send
                 a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a
@@ -420,7 +420,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             audio (:obj:`str` | `filelike object`): Audio file to send. Pass a file_id as String to
                 send an audio file that exists on the Telegram servers (recommended), pass an HTTP
@@ -482,7 +482,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             document (:obj:`str` | `filelike object`): File to send. Pass a file_id as String to
                 send a file that exists on the Telegram servers (recommended), pass an HTTP URL as
@@ -538,7 +538,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             sticker (:obj:`str` | `filelike object`): Sticker to send. Pass a file_id as String to
                 send a file that exists on the Telegram servers (recommended), pass an HTTP URL as
@@ -590,7 +590,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             video (:obj:`str` | `filelike object`): Video file to send. Pass a file_id as String to
                 send an video file that exists on the Telegram servers (recommended), pass an HTTP
@@ -655,7 +655,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             voice (:obj:`str` | `filelike object`): Voice file to send. Pass a file_id as String
                 to send an voice file that exists on the Telegram servers (recommended), pass an
@@ -704,7 +704,6 @@ class Bot(TelegramObject):
                         timeout=20.,
                         **kwargs):
         """
-        As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
         Use this method to send video messages.
 
         Note:
@@ -712,7 +711,7 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             video_note (:obj:`str` | `filelike object`): Video note to send. Pass a file_id as
                 String to send a video note that exists on the Telegram servers (recommended) or
@@ -763,7 +762,7 @@ class Bot(TelegramObject):
         Use this method to send point on the map.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             latitude (:obj:`float`): Latitude of location.
             longitude (:obj:`float`): Longitude of location.
@@ -810,7 +809,7 @@ class Bot(TelegramObject):
         Use this method to send information about a venue.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             latitude (:obj:`float`): Latitude of venue.
             longitude (:obj:`float`): Longitude of venue.
@@ -867,7 +866,7 @@ class Bot(TelegramObject):
         Use this method to send phone contacts.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             phone_number (:obj:`str`): Contact's phone number.
             first_name (:obj:`str`): Contact's first name.
@@ -914,7 +913,7 @@ class Bot(TelegramObject):
         Use this method to send a game.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
                 for the game. Set up your games via Botfather.
@@ -951,7 +950,7 @@ class Bot(TelegramObject):
         Telegram clients clear its typing status).
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             action(:class:`telegram.ChatAction` | :obj:`str`): Type of action to broadcast. Choose
                 one, depending on what the user is about to receive:
@@ -996,8 +995,8 @@ class Bot(TelegramObject):
                             timeout=None,
                             **kwargs):
         """
-        Use this method to send answers to an inline query. On success, True is returned. No more
-        than 50 results per query are allowed.
+        Use this method to send answers to an inline query. No more than 50 results per query are
+        allowed.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
@@ -1138,9 +1137,9 @@ class Bot(TelegramObject):
         unless unbanned first. The bot must be an administrator in the group for this to work.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or  username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or  username
                 of the target channel (in the format @channelusername).
-            user_id (:obj:`int` | :obj:`float`): Unique identifier of the target user.
+            user_id (:obj:`int`): Unique identifier of the target user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1182,9 +1181,9 @@ class Bot(TelegramObject):
         etc. The bot must be an administrator in the group for this to work.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
-            user_id (:obj:`int` | :obj:`float`): Unique identifier of the target user.
+            user_id (:obj:`int`): Unique identifier of the target user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1283,8 +1282,8 @@ class Bot(TelegramObject):
         bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
-                of the target`channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -1341,7 +1340,7 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
@@ -1398,7 +1397,7 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
@@ -1463,7 +1462,7 @@ class Bot(TelegramObject):
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to 0,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
-            allowed_updates (List[:obj:`str`), optional]: List the types of updates you want your
+            allowed_updates (List[:obj:`str`]), optional): List the types of updates you want your
                 bot to receive. For example, specify ["message", "edited_channel_post",
                 "callback_query"] to only receive updates of these types. See
                 :class:`telegram.Update` for a complete list of available update types.
@@ -1477,6 +1476,7 @@ class Bot(TelegramObject):
             1. This method will not work if an outgoing webhook is set up.
             2. In order to avoid getting duplicate updates, recalculate offset after each
                server response.
+            3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
 
         Returns:
             List[:class:`telegram.Update`]
@@ -1532,22 +1532,27 @@ class Bot(TelegramObject):
         using a secret path in the URL, e.g. https://www.example.com/<token>. Since nobody else
         knows your bot's token, you can be pretty sure it's us.
 
+        Note:
+            The certificate argument should be a file from disk ``open(filename, 'rb')``.
+
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook
                 integration.
-            certificate (file): Upload your public key certificate so that the root certificate in
-                use can be checked. See our self-signed guide for details.
+            certificate (:obj:`filelike`): Upload your public key certificate so that the root
+                certificate in use can be checked. See our self-signed guide for details.
+                (https://goo.gl/rw7w6Y)
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
                 connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
                 values to limit the load on your bot's server, and higher values to increase your
                 bot's throughput.
-            allowed_updates (list[str], optional): List the types of updates you want your bot to
-                receive. For example, specify ["message", "edited_channel_post", "callback_query"]
-                to only receive updates of these types. See :class:`telegram.Update` for a complete
-                list of available update types. Specify an empty list to receive all updates
-                regardless of type (default). If not specified, the previous setting will be used.
-                Please note that this parameter doesn't affect updates created before the call to
-                the set_webhook, so unwanted updates may be received for a short period of time.
+            allowed_updates (List[:obj:`str`], optional): List the types of updates you want your
+                bot to receive. For example, specify ["message", "edited_channel_post",
+                "callback_query"] to only receive updates of these types. See
+                :class:`telegram.Update` for a complete list of available update types. Specify an
+                empty list to receive all updates regardless of type (default). If not specified,
+                the previous setting will be used. Please note that this parameter doesn't affect
+                updates created before the call to the set_webhook, so unwanted updates may be
+                received for a short period of time.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1629,7 +1634,7 @@ class Bot(TelegramObject):
         Use this method for your bot to leave a group, supergroup or channel.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -1658,7 +1663,7 @@ class Bot(TelegramObject):
         one-on-one conversations, current username of a user, group or channel, etc.).
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -1689,7 +1694,7 @@ class Bot(TelegramObject):
         only the creator will be returned.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -1717,7 +1722,7 @@ class Bot(TelegramObject):
         Use this method to get the number of members in a chat
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -1745,7 +1750,7 @@ class Bot(TelegramObject):
         Use this method to get information about a member of a chat.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             user_id (:obj:`int`): Unique identifier of the target user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -1874,8 +1879,8 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier.
-            chat_id (int|str, optional): Required if inline_message_id is not specified. Unique
-                identifier for the target chat.
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat.
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -1936,7 +1941,7 @@ class Bot(TelegramObject):
         Use this method to send invoices.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target private chat.
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
             title (:obj:`str`): Product name.
             description (:obj:`str`): Product description.
             payload (:obj:`str`): Bot-defined invoice payload, 1-128 bytes. This will not be
@@ -2034,11 +2039,11 @@ class Bot(TelegramObject):
             ok (:obj:`bool`): Specify True if delivery to the specified address is possible and
                 False if there are any problems (for example, if delivery to the specified address
                 is not possible).
-            shipping_options (List[:class:`telegram.ShippingOption`), optional]: Required if ok is
+            shipping_options (List[:class:`telegram.ShippingOption`]), optional]: Required if ok is
                 True. A JSON-serialized array of available shipping options.
             error_message (:obj:`str`, optional): Required if ok is False. Error message in
                 human readable form that explains why it is impossible to complete the order (e.g.
-                "Sorry, delivery to your desired address is unavailable'). Telegram will display
+                "Sorry, delivery to your desired address is unavailable"). Telegram will display
                 this message to the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -2139,21 +2144,21 @@ class Bot(TelegramObject):
         all boolean parameters to lift restrictions from a user.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             user_id (:obj:`int`): Unique identifier of the target user.
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when restrictions
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
-            can_send_messages (:obj:`boolean`, optional): Pass True, if the user can send text
+            can_send_messages (:obj:`bool`, optional): Pass True, if the user can send text
                 messages, contacts, locations and venues.
-            can_send_media_messages (:obj:`boolean`, optional): Pass True, if the user can send
+            can_send_media_messages (:obj:`bool`, optional): Pass True, if the user can send
                 audios, documents, photos, videos, video notes and voice notes, implies
                 can_send_messages.
-            can_send_other_messages (:obj:`boolean`, optional): Pass True, if the user can send
+            can_send_other_messages (:obj:`bool`, optional): Pass True, if the user can send
                 animations, games, stickers and use inline bots, implies can_send_media_messages.
-            can_add_web_page_previews (:obj:`boolean`, optional): Pass True, if the user may add
+            can_add_web_page_previews (:obj:`bool`, optional): Pass True, if the user may add
                 web page previews to their messages, implies can_send_media_messages.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -2200,24 +2205,24 @@ class Bot(TelegramObject):
         Pass False for all boolean parameters to demote a user
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             user_id (:obj:`int`): Unique identifier of the target user.
-            can_change_info (:obj:`boolean`, optional): Pass True, if the administrator can change
+            can_change_info (:obj:`bool`, optional): Pass True, if the administrator can change
                 chat title, photo and other settings.
-            can_post_messages (:obj:`boolean`, optional): Pass True, if the administrator can
+            can_post_messages (:obj:`bool`, optional): Pass True, if the administrator can
                 create channel posts, channels only.
-            can_edit_messages (:obj:`boolean`, optional): Pass True, if the administrator can edit
+            can_edit_messages (:obj:`bool`, optional): Pass True, if the administrator can edit
                 messages of other users, channels only.
-            can_delete_messages (:obj:`boolean`, optional): Pass True, if the administrator can
+            can_delete_messages (:obj:`bool`, optional): Pass True, if the administrator can
                 delete messages of other users.
-            can_invite_users (:obj:`boolean`, optional): Pass True, if the administrator can invite
+            can_invite_users (:obj:`bool`, optional): Pass True, if the administrator can invite
                 new users to the chat.
-            can_restrict_members (:obj:`boolean`, optional): Pass True, if the administrator can
+            can_restrict_members (:obj:`bool`, optional): Pass True, if the administrator can
                 restrict, ban or unban chat members.
-            can_pin_messages (:obj:`boolean`, optional): Pass True, if the administrator can pin
+            can_pin_messages (:obj:`bool`, optional): Pass True, if the administrator can pin
                 messages, supergroups only.
-            can_promote_members (:obj:`boolean`, optional): Pass True, if the administrator can add
+            can_promote_members (:obj:`bool`, optional): Pass True, if the administrator can add
                 new administrators with a subset of his own privileges or demote administrators
                 that he has promoted, directly or indirectly (promoted by administrators that were
                 appointed by him).
@@ -2265,7 +2270,7 @@ class Bot(TelegramObject):
         administrator in the chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -2273,7 +2278,7 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            :obj:`str`: Exported invite link as String on success.
+            :obj:`str`: Exported invite link on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2295,7 +2300,7 @@ class Bot(TelegramObject):
         for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             photo (`telegram.InputFile`): New chat photo.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2330,7 +2335,7 @@ class Bot(TelegramObject):
         rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -2364,7 +2369,7 @@ class Bot(TelegramObject):
         admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             title (:obj:`str`): New chat title, 1-255 characters.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2398,7 +2403,7 @@ class Bot(TelegramObject):
         administrator in the chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             description (:obj:`str`): New chat description, 1-255 characters.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2429,11 +2434,11 @@ class Bot(TelegramObject):
         chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             message_id (:obj:`int`): Identifier of a message to pin.
-            disable_notification (Optional[bool): Pass True, if it is not necessary to send a
-                notification to all group members about the new pinned message.
+            disable_notification (:obj:`bool`, optional): Pass True, if it is not necessary to send
+                a notification to all group members about the new pinned message.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2464,7 +2469,7 @@ class Bot(TelegramObject):
         chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of

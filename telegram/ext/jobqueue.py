@@ -68,9 +68,13 @@ class JobQueue(object):
         """
         Queue a new job.
 
+        Note:
+            This method is deprecated. Please use: :attr:`run_once`, :attr:`run_daily`
+            or :attr:`run_repeating` instead.
+
         Args:
             job (:class:`telegram.ext.Job`): The ``Job`` instance representing the new job.
-            next_t (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`):
+            next_t (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Time in or at which the job should run for the first time. This parameter will
                 be interpreted depending on its type.
 
@@ -146,7 +150,7 @@ class JobQueue(object):
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-            ``callback.__name__``.
+                ``callback.__name__``.
 
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
@@ -169,7 +173,7 @@ class JobQueue(object):
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
-            first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`):
+            first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Time in or at which the job should run. This parameter will be interpreted
                 depending on its type.
 

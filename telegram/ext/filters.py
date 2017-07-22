@@ -92,12 +92,11 @@ class BaseFilter(object):
 
 
 class InvertedFilter(BaseFilter):
-    # """Represents a filter that has been inverted.
-    #
-    # Args:
-    #     f: The filter to invert.
-    # """
-    # Commented docstring for clarity in docs.
+    """Represents a filter that has been inverted.
+
+    Args:
+        f: The filter to invert.
+    """
 
     def __init__(self, f):
         self.f = f
@@ -110,14 +109,13 @@ class InvertedFilter(BaseFilter):
 
 
 class MergedFilter(BaseFilter):
-    # """Represents a filter consisting of two other filters.
-    #
-    # Args:
-    #     base_filter: Filter 1 of the merged filter
-    #     and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
-    #     or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
-    # """
-    # Commented docstring for clarity in docs.
+    """Represents a filter consisting of two other filters.
+
+    Args:
+        base_filter: Filter 1 of the merged filter
+        and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
+        or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
+    """
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
@@ -139,8 +137,8 @@ class Filters(object):
     """
     Predefined filters for use with the `filter` argument of :class:`telegram.ext.MessageHandler`.
 
-    Note:
-        Example use ``MessageHandler(Filters.video, callback_method)`` to filter all video
+    Examples:
+        Use ``MessageHandler(Filters.video, callback_method)`` to filter all video
         messages. Use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
     """
 
@@ -265,7 +263,7 @@ class Filters(object):
         """
         Subset for messages containing a status update.
 
-        Note:
+        Examples:
             Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
             ``Filters.status_update`` for all status update messages.
         """
@@ -379,14 +377,12 @@ class Filters(object):
         Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.
 
-        Note:
+        Examples:
             Example ``MessageHandler(Filters.entity("hashtag"), callback_method)``
 
         Args:
             entity_type: Entity type to check for. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
-
-        Returns: Function to use as filter
         """
 
         def __init__(self, entity_type):
@@ -418,16 +414,16 @@ class Filters(object):
         """
         Filters messages to allow only those which are from specified user ID.
 
-        Note:
-            Example: ``MessageHandler(Filters.user(1234), callback_method)``
+        Examples:
+            ``MessageHandler(Filters.user(1234), callback_method)``
 
         Args:
-            user_id(:obj:`int` | List[:obj:`int`]): Which user ID(s) to allow through.
-            username(:obj:`str` | List[:obj:`str`` ]): Which username(s) to allow through. If
-                username starts with '@' symbol, it will be ignored.
+            user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow through.
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
+                If username starts with '@' symbol, it will be ignored.
 
         Raises:
-            ValueError
+            ValueError: If chat_id and username are both present, or neither is.
         """
 
         def __init__(self, user_id=None, username=None):
@@ -456,16 +452,16 @@ class Filters(object):
         """
         Filters messages to allow only those which are from specified chat ID.
 
-        Note:
-            Example: ``MessageHandler(Filters.chat(-1234), callback_method)``
+        Examples:
+            ``MessageHandler(Filters.chat(-1234), callback_method)``
 
         Args:
-            chat_id(:obj:`int` | List[:obj:`int`]): Which chat ID(s) to allow through.
-            username(:obj:`str` | List[:obj:`str`]): Which username(s) to allow through. If
-                username start swith '@' symbol, it will be ignored.
+            chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow through.
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
+                If username start swith '@' symbol, it will be ignored.
 
         Raises:
-            ValueError
+            ValueError: If chat_id and username are both present, or neither is.
         """
 
         def __init__(self, chat_id=None, username=None):
@@ -505,7 +501,7 @@ class Filters(object):
             return bool(message.successful_payment)
 
     successful_payment = _SuccessfulPayment()
-    """:obj:`Filter`: Messages that confirm a successful payment."""
+    """:obj:`Filter`: Messages that confirm a :class:`telegram.SuccessfulPayment`."""
 
     class language(BaseFilter):
         """
@@ -513,8 +509,8 @@ class Filters(object):
         Note that according to telegrams documentation, every single user does not have the
         language_code attribute.
 
-        Note:
-            example ``MessageHandler(Filters.language("en"), callback_method)``
+        Examples:
+            ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
             lang (:obj:`str` | List[:obj:`str`]): Which language code(s) to allow through. This

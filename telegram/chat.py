@@ -35,7 +35,7 @@ class Chat(TelegramObject):
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
         all_members_are_administrators (:obj:`bool`): Optional.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        description	(:obj:`str`): Optional. Description, for supergroups and channel chats.
+        description (:obj:`str`): Optional. Description, for supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
 
     Args:
@@ -53,7 +53,7 @@ class Chat(TelegramObject):
         all_members_are_administrators (:obj:`bool`, optional): True if a group has `All Members
             Are Admins` enabled.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo. Returned only in getChat.
-        description	(:obj:`str`, optional): Description, for supergroups and channel chats.
+        description (:obj:`str`, optional): Description, for supergroups and channel chats.
             Returned only in get_chat.
         invite_link (:obj:`str`, optional): Chat invite link, for supergroups and channel chats.
             Returned only in get_chat.

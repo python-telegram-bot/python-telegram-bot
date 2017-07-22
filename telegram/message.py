@@ -69,7 +69,7 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`): Optional. Information about the user that left
             the group. (this member may be the bot itself).
         new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (List[:class:`telegram.PhotoSize`]): Optional. A chat photo was change to
+        new_chat_photo (List[:class:`telegram.PhotoSize`]): Optional. A chat photo was changed to
             this value.
         delete_chat_photo (:obj:`bool`): Optional. The chat photo was deleted.
         group_chat_created (:obj:`bool`): Optional. The group has been created.
@@ -92,7 +92,7 @@ class Message(TelegramObject):
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`, optional): Sender, can be empty for messages sent
             to channels.
-        date (:class:`datetime.time`): Date the message was sent in Unix time. Converted to
+        date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
@@ -109,7 +109,7 @@ class Message(TelegramObject):
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
         text (str, optional): For text messages, the actual UTF-8 text of the message, 0-4096
-            characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
+            characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             attr:`parse_entity` and attr:`parse_entities` methods for how to use properly.
@@ -260,7 +260,7 @@ class Message(TelegramObject):
     @property
     def chat_id(self):
         """
-        :attr:`telegram.Chat.id`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`.
+        :obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`.
         """
         return self.chat.id
 
@@ -331,6 +331,7 @@ class Message(TelegramObject):
         return data
 
     def _quote(self, kwargs):
+        """Modify kwargs for replying with or without quoting"""
         if 'reply_to_message_id' in kwargs:
             if 'quote' in kwargs:
                 del kwargs['quote']

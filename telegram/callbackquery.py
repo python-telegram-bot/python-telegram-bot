@@ -26,8 +26,8 @@ class CallbackQuery(TelegramObject):
     This object represents an incoming callback query from a callback button in an inline keyboard.
 
     If the button that originated the query was attached to a message sent by the bot, the field
-    message will be present. If the button was attached to a message sent via the bot (in
-    inline mode), the field inline_message_id will be present.
+    :attr:`message` will be present. If the button was attached to a message sent via the bot (in
+    inline mode), the field :attr:`inline_message_id` will be present.
 
     Note:
         Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
@@ -63,7 +63,7 @@ class CallbackQuery(TelegramObject):
     Note:
         After the user presses an inline button, Telegram clients will display a progress bar
         until you call :attr:`answer`. It is, therefore, necessary to react
-        by calling :attr:`telegram.bot.answer_callback_query` even if no notification to the user
+        by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
         is needed (e.g., without specifying any of the optional parameters).
     """
 

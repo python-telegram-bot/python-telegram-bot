@@ -169,8 +169,8 @@ class Dispatcher(object):
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
-            args (:obj:`tuple`, optional): Arguments to `func`.
-            kwargs (:obj:`dict`, optional): Keyword arguments to `func`.
+            *args (:obj:`tuple`, optional): Arguments to `func`.
+            **kwargs (:obj:`dict`, optional): Keyword arguments to `func`.
 
         Returns:
             Promise

@@ -84,8 +84,8 @@ Inline Mode
    telegram.inputcontactmessagecontent
    telegram.choseninlineresult
 
-Payements
----------
+Payments
+--------
 
 .. toctree::
 

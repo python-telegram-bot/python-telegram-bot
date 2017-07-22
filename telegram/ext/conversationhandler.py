@@ -55,7 +55,7 @@ class ConversationHandler(Handler):
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. To end the conversation, the callback function must
-    return ``CallbackHandler.END`` or ``-1``.
+    return :attr`END` or ``-1``.
 
     Attributes:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can

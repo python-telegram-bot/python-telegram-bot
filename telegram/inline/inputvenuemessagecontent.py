@@ -29,14 +29,14 @@ class InputVenueMessageContent(InputMessageContent):
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
-        title (:obj:`str`); Name of the venue.
+        title (:obj:`str`): Name of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue, if known.
 
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
-        title (:obj:`str`); Name of the venue.
+        title (:obj:`str`): Name of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue, if known.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.

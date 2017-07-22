@@ -89,7 +89,7 @@ class InputFile(object):
     @property
     def headers(self):
         """
-        :obj:`str`: Headers.
+        :obj:`dict`: Headers.
         """
 
         return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
@@ -170,7 +170,7 @@ class InputFile(object):
         Check if the request is a file request.
 
         Args:
-            data (:obj:`dict`): A dict of (str, unicode) key/value pairs.
+            data (Dict[:obj:`str`, :obj:`str`]): A dict of (str, str) key/value pairs.
 
         Returns:
             :obj:`bool`
