@@ -38,9 +38,9 @@ except ImportError:
                   "how to properly install.")
     raise
 
-from telegram import (InputFile, TelegramError)
-from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
-                            RetryAfter, InvalidToken)
+from telegram import InputFile
+from telegram.utils.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
+                                  RetryAfter, InvalidToken, TelegramError)
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 

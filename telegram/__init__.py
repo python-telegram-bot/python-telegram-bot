@@ -33,65 +33,50 @@ from .files.contact import Contact
 from .files.location import Location
 from .files.venue import Venue
 from .files.videonote import VideoNote
+from .files.animation import Animation
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
-from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
-from .replykeyboardmarkup import ReplyKeyboardMarkup
-from .replykeyboardremove import ReplyKeyboardRemove, ReplyKeyboardHide
+from .replykeyboard import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from .forcereply import ForceReply
-from .error import TelegramError
 from .files.inputfile import InputFile
 from .files.file import File
 from .emoji import Emoji
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
-from .games.animation import Animation
-from .games.game import Game
-from .payment.shippingaddress import ShippingAddress
-from .payment.orderinfo import OrderInfo
-from .payment.successfulpayment import SuccessfulPayment
-from .payment.invoice import Invoice
+from .game import Game
+from .payments.shippingaddress import ShippingAddress
+from .payments.orderinfo import OrderInfo
+from .payments.successfulpayment import SuccessfulPayment
+from .payments.invoice import Invoice
 from .message import Message
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
-from .inline.inlinekeyboardbutton import InlineKeyboardButton
-from .inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from .inline.inputmessagecontent import InputMessageContent
-from .inline.inlinequery import InlineQuery
-from .inline.inlinequeryresult import InlineQueryResult
-from .inline.inlinequeryresultarticle import InlineQueryResultArticle
-from .inline.inlinequeryresultaudio import InlineQueryResultAudio
-from .inline.inlinequeryresultcachedaudio import InlineQueryResultCachedAudio
-from .inline.inlinequeryresultcacheddocument import InlineQueryResultCachedDocument
-from .inline.inlinequeryresultcachedgif import InlineQueryResultCachedGif
-from .inline.inlinequeryresultcachedmpeg4gif import InlineQueryResultCachedMpeg4Gif
-from .inline.inlinequeryresultcachedphoto import InlineQueryResultCachedPhoto
-from .inline.inlinequeryresultcachedsticker import InlineQueryResultCachedSticker
-from .inline.inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
-from .inline.inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
-from .inline.inlinequeryresultcontact import InlineQueryResultContact
-from .inline.inlinequeryresultdocument import InlineQueryResultDocument
-from .inline.inlinequeryresultgif import InlineQueryResultGif
-from .inline.inlinequeryresultlocation import InlineQueryResultLocation
-from .inline.inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
-from .inline.inlinequeryresultphoto import InlineQueryResultPhoto
-from .inline.inlinequeryresultvenue import InlineQueryResultVenue
-from .inline.inlinequeryresultvideo import InlineQueryResultVideo
-from .inline.inlinequeryresultvoice import InlineQueryResultVoice
-from .inline.inlinequeryresultgame import InlineQueryResultGame
-from .inline.inputtextmessagecontent import InputTextMessageContent
-from .inline.inputlocationmessagecontent import InputLocationMessageContent
-from .inline.inputvenuemessagecontent import InputVenueMessageContent
-from .inline.inputcontactmessagecontent import InputContactMessageContent
-from .payment.labeledprice import LabeledPrice
-from .payment.shippingoption import ShippingOption
-from .payment.precheckoutquery import PreCheckoutQuery
-from .payment.shippingquery import ShippingQuery
+from .inlinekeyboard import InlineKeyboardMarkup, InlineKeyboardButton
+from .inputmessagecontents import (InputContactMessageContent, InputLocationMessageContent,
+                                   InputMessageContent, InputTextMessageContent,
+                                   InputVenueMessageContent)
+from .inlinequeryresults import (InlineQueryResultArticle, InlineQueryResultAudio,
+                                 InlineQueryResultCachedAudio, InlineQueryResultCachedDocument,
+                                 InlineQueryResultCachedGif, InlineQueryResultCachedMpeg4Gif,
+                                 InlineQueryResultCachedPhoto, InlineQueryResultCachedSticker,
+                                 InlineQueryResultCachedVideo, InlineQueryResultCachedVoice,
+                                 InlineQueryResultContact, InlineQueryResultDocument,
+                                 InlineQueryResultGame, InlineQueryResultGif,
+                                 InlineQueryResultLocation, InlineQueryResultMpeg4Gif,
+                                 InlineQueryResultPhoto, InlineQueryResultVenue,
+                                 InlineQueryResultVideo, InlineQueryResultVoice,
+                                 InlineQueryResult)
+from .inlinequery import InlineQuery
+from .payments.labeledprice import LabeledPrice
+from .payments.shippingoption import ShippingOption
+from .payments.precheckoutquery import PreCheckoutQuery
+from .payments.shippingquery import ShippingQuery
 from .webhookinfo import WebhookInfo
-from .games.gamehighscore import GameHighScore
+from .gamehighscore import GameHighScore
 from .update import Update
 from .bot import Bot
+from .utils.error import TelegramError
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,
                         MAX_FILESIZE_DOWNLOAD, MAX_FILESIZE_UPLOAD,
                         MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,

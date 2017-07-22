@@ -16,10 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-ReplyKeyboardMarkup."""
-
-from telegram import ReplyMarkup, KeyboardButton
+"""This module contains objects that represent reply keyboards and buttons."""
+from telegram import TelegramObject, ReplyMarkup
+from telegram.utils.deprecate import warn_deprecate_obj
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
@@ -86,3 +85,91 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                     r.append(button)  # str
             data['keyboard'].append(r)
         return data
+
+
+class ReplyKeyboardRemove(ReplyMarkup):
+    """This object represents a Telegram ReplyKeyboardRemove.
+
+    Attributes:
+        remove_keyboard (bool): Always True.
+        selective (bool):
+
+    Args:
+        selective (Optional[bool]): Use this parameter if you want to remove the keyboard for
+            specific users only. Targets:
+
+            - users that are @mentioned in the text of the Message object
+            - if the bot's message is a reply (has reply_to_message_id), sender of the
+              original message.
+
+        **kwargs: Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self, selective=False, **kwargs):
+        # Required
+        self.remove_keyboard = True
+        # Optionals
+        self.selective = bool(selective)
+
+    @staticmethod
+    def de_json(data, bot):
+        """
+        Args:
+            data (dict):
+            bot(telegram.Bot):
+
+        Returns:
+            telegram.ReplyKeyboardRemove
+
+        """
+        if not data:
+            return None
+
+        return ReplyKeyboardRemove(**data)
+
+
+class ReplyKeyboardHide(object):
+    def __new__(cls, hide_keyboard=True, selective=False, **kwargs):
+        warn_deprecate_obj(ReplyKeyboardHide.__name__, ReplyKeyboardRemove.__name__)
+        obj = ReplyKeyboardRemove.__new__(ReplyKeyboardRemove, selective)
+        obj.__init__(selective)
+        return obj
+
+
+class KeyboardButton(TelegramObject):
+    """
+    This object represents one button of the reply keyboard. For simple
+    text buttons String can be used instead of this object to specify text
+    of the button.
+
+    Args:
+        text (str):
+        request_location (Optional[bool]):
+        request_contact (Optional[bool]):
+    """
+
+    def __init__(self, text, request_contact=None, request_location=None, **kwargs):
+        # Required
+        self.text = text
+        # Optionals
+        self.request_contact = request_contact
+        self.request_location = request_location
+
+    @staticmethod
+    def de_json(data, bot):
+        if not data:
+            return None
+
+        return KeyboardButton(**data)
+
+    @staticmethod
+    def de_list(data, bot):
+        if not data:
+            return []
+
+        keyboards = list()
+        for keyboard in data:
+            keyboards.append(KeyboardButton.de_json(keyboard, bot))
+
+        return keyboards
