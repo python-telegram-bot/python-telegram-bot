@@ -258,6 +258,7 @@ class BotTest(BaseTest, unittest.TestCase):
         max_connections = 7
         allowed_updates = ['message']
         self._bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
+        time.sleep(2)  # Give TG servers some time to process the setting of the webhook
         info = self._bot.getWebhookInfo()
         self._bot.delete_webhook()
         self.assertEqual(url, info.url)
@@ -269,6 +270,7 @@ class BotTest(BaseTest, unittest.TestCase):
     def test_delete_webhook(self):
         url = 'https://python-telegram-bot.org/test/webhook'
         self._bot.set_webhook(url)
+        time.sleep(2)  # Give TG servers some time to process the setting of the webhook
         self._bot.delete_webhook()
         info = self._bot.getWebhookInfo()
         self.assertEqual(info.url, '')
