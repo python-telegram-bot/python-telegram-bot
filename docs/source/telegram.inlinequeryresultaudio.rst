@@ -1,6 +1,6 @@
-telegram.inlinequeryresultaudio module
-======================================
+telegram.InlineQueryResultAudio
+===============================
 
-.. automodule:: telegram.inline.inlinequeryresultaudio
+.. autoclass:: telegram.InlineQueryResultAudio
     :members:
     :show-inheritance:

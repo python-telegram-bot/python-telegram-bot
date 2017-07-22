@@ -1,6 +1,6 @@
-telegram.callbackgame module
-============================
+telegram.Callbackgame
+=====================
 
-.. automodule:: telegram.games.callbackgame
+.. autoclass:: telegram.CallbackGame
     :members:
     :show-inheritance:

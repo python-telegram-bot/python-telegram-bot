@@ -1,6 +1,6 @@
-telegram.inlinequeryresultphoto module
-======================================
+telegram.InlineQueryResultPhoto
+===============================
 
-.. automodule:: telegram.inline.inlinequeryresultphoto
+.. autoclass:: telegram.InlineQueryResultPhoto
     :members:
     :show-inheritance:

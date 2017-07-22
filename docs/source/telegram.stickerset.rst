@@ -1,6 +1,6 @@
-telegram.ForceReply
+telegram.StickerSet
 ===================
 
-.. autoclass:: telegram.ForceReply
+.. autoclass:: telegram.StickerSet
     :members:
     :show-inheritance:

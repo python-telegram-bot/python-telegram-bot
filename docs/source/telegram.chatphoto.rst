@@ -1,6 +1,6 @@
-telegram.chatphoto module
-=========================
+telegram.ChatPhoto
+==================
 
-.. automodule:: telegram.files.chatphoto
+.. autoclass:: telegram.ChatPhoto
     :members:
     :show-inheritance:

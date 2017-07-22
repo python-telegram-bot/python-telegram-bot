@@ -1,6 +1,6 @@
-telegram.callbackquery module
-=============================
+telegram.CallbackQuery
+======================
 
-.. automodule:: telegram.callbackquery
+.. autoclass:: telegram.CallbackQuery
     :members:
     :show-inheritance:

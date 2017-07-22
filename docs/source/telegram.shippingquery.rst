@@ -1,6 +1,6 @@
-telegram.shippingquery module
-=============================
+telegram.ShippingQuery
+======================
 
-.. automodule:: telegram.payment.shippingquery
+.. autoclass:: telegram.ShippingQuery
     :members:
     :show-inheritance:

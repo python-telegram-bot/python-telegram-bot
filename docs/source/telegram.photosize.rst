@@ -1,6 +1,6 @@
-telegram.photosize module
-=========================
+telegram.PhotoSize
+==================
 
-.. automodule:: telegram.files.photosize
+.. autoclass:: telegram.PhotoSize
     :members:
     :show-inheritance:

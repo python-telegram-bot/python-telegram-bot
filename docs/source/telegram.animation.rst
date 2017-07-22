@@ -1,6 +1,6 @@
-telegram.animation module
-=========================
+telegram.Animation
+==================
 
-.. automodule:: telegram.games.animation
+.. autoclass:: telegram.Animation
     :members:
     :show-inheritance:

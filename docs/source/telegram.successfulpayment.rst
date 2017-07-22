@@ -1,6 +1,6 @@
-telegram.successfulpayment module
-=================================
+telegram.SuccessfulPayment
+==========================
 
-.. automodule:: telegram.payment.successfulpayment
+.. autoclass:: telegram.SuccessfulPayment
     :members:
     :show-inheritance:

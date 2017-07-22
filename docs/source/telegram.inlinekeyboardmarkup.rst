@@ -1,6 +1,6 @@
-telegram.inlinekeyboardmarkup module
-====================================
+telegram.InlineKeyboardMarkup
+=============================
 
-.. automodule:: telegram.inline.inlinekeyboardmarkup
+.. autoclass:: telegram.InlineKeyboardMarkup
     :members:
     :show-inheritance:

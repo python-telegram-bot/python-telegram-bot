@@ -1,34 +1,60 @@
 telegram package
 ================
 
-Submodules
-----------
-
 .. toctree::
 
    telegram.contrib
    telegram.ext
-   telegram.animation
    telegram.audio
-   telegram.base
    telegram.bot
-   telegram.callbackgame
    telegram.callbackquery
    telegram.chat
    telegram.chataction
    telegram.chatmember
    telegram.chatphoto
-   telegram.choseninlineresult
    telegram.constants
    telegram.contact
    telegram.document
    telegram.error
    telegram.file
    telegram.forcereply
-   telegram.game
-   telegram.gamehighscore
    telegram.inlinekeyboardbutton
    telegram.inlinekeyboardmarkup
+   telegram.inputfile
+   telegram.keyboardbutton
+   telegram.location
+   telegram.message
+   telegram.messageentity
+   telegram.parsemode
+   telegram.photosize
+   telegram.replykeyboardremove
+   telegram.replykeyboardmarkup
+   telegram.replymarkup
+   telegram.telegramobject
+   telegram.update
+   telegram.user
+   telegram.userprofilephotos
+   telegram.venue
+   telegram.video
+   telegram.videonote
+   telegram.voice
+   telegram.webhookinfo
+   telegram.stickers
+
+Stickers
+--------
+
+.. toctree::
+
+   telegram.sticker
+   telegram.stickerset
+   telegram.maskposition
+
+Inline Mode
+-----------
+
+.. toctree::
+
    telegram.inlinequery
    telegram.inlinequeryresult
    telegram.inlinequeryresultarticle
@@ -51,38 +77,37 @@ Submodules
    telegram.inlinequeryresultvenue
    telegram.inlinequeryresultvideo
    telegram.inlinequeryresultvoice
-   telegram.inputcontactmessagecontent
-   telegram.inputfile
-   telegram.inputlocationmessagecontent
    telegram.inputmessagecontent
    telegram.inputtextmessagecontent
+   telegram.inputlocationmessagecontent
    telegram.inputvenuemessagecontent
-   telegram.invoice
-   telegram.keyboardbutton
+   telegram.inputcontactmessagecontent
+   telegram.choseninlineresult
+
+Payements
+---------
+
+.. toctree::
+
    telegram.labeledprice
-   telegram.location
-   telegram.message
-   telegram.messageentity
-   telegram.orderinfo
-   telegram.parsemode
-   telegram.photosize
-   telegram.precheckoutquery
-   telegram.replykeyboardremove
-   telegram.replykeyboardmarkup
-   telegram.replymarkup
+   telegram.invoice
    telegram.shippingaddress
+   telegram.orderinfo
    telegram.shippingoption
-   telegram.shippingquery
-   telegram.sticker
    telegram.successfulpayment
-   telegram.update
-   telegram.user
-   telegram.userprofilephotos
-   telegram.venue
-   telegram.video
-   telegram.videonote
-   telegram.voice
-   telegram.webhookinfo
+   telegram.shippingquery
+   telegram.precheckoutquery
+
+Games
+-----
+
+.. toctree::
+
+   telegram.game
+   telegram.animation
+   telegram.callbackgame
+   telegram.gamehighscore
+
 
 Module contents
 ---------------
@@ -91,3 +116,4 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:

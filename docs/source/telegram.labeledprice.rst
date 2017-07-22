@@ -1,6 +1,6 @@
-telegram.labeledprice module
-============================
+telegram.LabeledPrice
+=====================
 
-.. automodule:: telegram.payment.labeledprice
+.. autoclass:: telegram.LabeledPrice
     :members:
     :show-inheritance:

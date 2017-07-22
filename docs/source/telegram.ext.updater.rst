@@ -1,6 +1,6 @@
-telegram.ext.updater module
-===========================
+telegram.ext.Updater
+====================
 
-.. automodule:: telegram.ext.updater
+.. autoclass:: telegram.ext.Updater
     :members:
     :show-inheritance:

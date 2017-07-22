@@ -1,6 +1,6 @@
-telegram.file module
-====================
+telegram.File
+=============
 
-.. automodule:: telegram.files.file
+.. autoclass:: telegram.File
     :members:
     :show-inheritance:

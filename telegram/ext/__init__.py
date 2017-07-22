@@ -35,9 +35,11 @@ from .typehandler import TypeHandler
 from .conversationhandler import ConversationHandler
 from .precheckoutqueryhandler import PreCheckoutQueryHandler
 from .shippingqueryhandler import ShippingQueryHandler
+from .messagequeue import MessageQueue
+from .messagequeue import DelayQueue
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
            'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
            'StringRegexHandler', 'TypeHandler', 'ConversationHandler',
-           'PreCheckoutQueryHandler', 'ShippingQueryHandler')
+           'PreCheckoutQueryHandler', 'ShippingQueryHandler', 'MessageQueue', 'DelayQueue')

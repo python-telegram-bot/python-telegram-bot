@@ -1,6 +1,6 @@
-telegram.game module
-====================
+telegram.Game
+=============
 
-.. automodule:: telegram.games.game
+.. autoclass:: telegram.Game
     :members:
     :show-inheritance:

@@ -1,6 +1,6 @@
-telegram.replykeyboardremove module
-===================================
+telegram.ReplyKeyboardRemove
+============================
 
-.. automodule:: telegram.replykeyboardremove
+.. autoclass:: telegram.ReplyKeyboardRemove
     :members:
     :show-inheritance:

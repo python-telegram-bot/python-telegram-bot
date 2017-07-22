@@ -1,6 +1,6 @@
-telegram.shippingaddress module
-===============================
+telegram.ShippingAddress
+========================
 
-.. automodule:: telegram.payment.shippingaddress
+.. autoclass:: telegram.ShippingAddress
     :members:
     :show-inheritance:

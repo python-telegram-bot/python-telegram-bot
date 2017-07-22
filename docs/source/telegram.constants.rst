@@ -1,4 +1,4 @@
-telegram.constants module
+telegram.constants Module
 =========================
 
 .. automodule:: telegram.constants

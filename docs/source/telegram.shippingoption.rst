@@ -1,6 +1,6 @@
-telegram.shippingoption module
-==============================
+telegram.ShippingOption
+=======================
 
-.. automodule:: telegram.payment.shippingoption
+.. autoclass:: telegram.ShippingOption
     :members:
     :show-inheritance:

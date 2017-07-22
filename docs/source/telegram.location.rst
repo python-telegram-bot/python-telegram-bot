@@ -1,6 +1,6 @@
-telegram.location module
-========================
+telegram.Location
+=================
 
-.. automodule:: telegram.files.location
+.. autoclass:: telegram.Location
     :members:
     :show-inheritance:

@@ -1,6 +1,6 @@
-telegram.chatmember module
-==========================
+telegram.ChatMember
+===================
 
-.. automodule:: telegram.chatmember
+.. autoclass:: telegram.ChatMember
     :members:
     :show-inheritance:

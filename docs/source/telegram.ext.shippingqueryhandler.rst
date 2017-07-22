@@ -1,6 +1,6 @@
-telegram\.ext\.shippingqueryhandler module
-==========================================
+telegram.ext.ShippingQueryHandler
+=================================
 
-.. automodule:: telegram.ext.shippingqueryhandler
+.. autoclass:: telegram.ext.ShippingQueryHandler
     :members:
     :show-inheritance:

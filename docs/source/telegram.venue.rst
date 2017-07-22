@@ -1,6 +1,6 @@
-telegram.venue module
-=====================
+telegram.Venue
+==============
 
-.. automodule:: telegram.files.venue
+.. autoclass:: telegram.Venue
     :members:
     :show-inheritance:

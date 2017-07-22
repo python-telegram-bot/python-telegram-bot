@@ -1,6 +1,6 @@
-telegram.ext.stringregexhandler module
-======================================
+telegram.ext.StringRegexHandler
+===============================
 
-.. automodule:: telegram.ext.stringregexhandler
+.. autoclass:: telegram.ext.StringRegexHandler
     :members:
     :show-inheritance:

@@ -1,6 +1,6 @@
-telegram.gamehighscore module
-=============================
+telegram.GameHighScore
+======================
 
-.. automodule:: telegram.games.gamehighscore
+.. autoclass:: telegram.GameHighScore
     :members:
     :show-inheritance:

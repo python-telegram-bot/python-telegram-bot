@@ -1,6 +1,6 @@
-telegram.inlinequeryresultcachedvideo module
-============================================
+telegram.InlineQueryResultCachedVideo
+=====================================
 
-.. automodule:: telegram.inline.inlinequeryresultcachedvideo
+.. autoclass:: telegram.InlineQueryResultCachedVideo
     :members:
     :show-inheritance:

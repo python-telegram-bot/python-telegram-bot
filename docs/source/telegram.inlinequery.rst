@@ -1,6 +1,6 @@
-telegram.inlinequery module
-===========================
+telegram.InlineQuery
+====================
 
-.. automodule:: telegram.inline.inlinequery
+.. autoclass:: telegram.InlineQuery
     :members:
     :show-inheritance:

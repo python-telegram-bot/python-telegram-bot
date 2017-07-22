@@ -1,6 +1,6 @@
-telegram.sticker module
-=======================
+telegram.Sticker
+================
 
-.. automodule:: telegram.files.sticker
+.. autoclass:: telegram.Sticker
     :members:
     :show-inheritance:

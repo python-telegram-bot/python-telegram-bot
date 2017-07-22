@@ -1,6 +1,6 @@
-telegram.voice module
-=====================
+telegram.Voice
+==============
 
-.. automodule:: telegram.files.voice
+.. autoclass:: telegram.Voice
     :members:
     :show-inheritance:

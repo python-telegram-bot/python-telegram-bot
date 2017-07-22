@@ -1,6 +1,6 @@
-telegram.inlinequeryresultvenue module
-======================================
+telegram.InlineQueryResultVenue
+===============================
 
-.. automodule:: telegram.inline.inlinequeryresultvenue
+.. autoclass:: telegram.InlineQueryResultVenue
     :members:
     :show-inheritance:

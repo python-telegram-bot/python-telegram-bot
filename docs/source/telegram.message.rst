@@ -1,6 +1,6 @@
-telegram.message module
-=======================
+telegram.Message
+================
 
-.. automodule:: telegram.message
+.. autoclass:: telegram.Message
     :members:
     :show-inheritance:

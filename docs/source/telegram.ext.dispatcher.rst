@@ -1,6 +1,6 @@
-telegram.ext.dispatcher module
-==============================
+telegram.ext.Dispatcher
+=======================
 
-.. automodule:: telegram.ext.dispatcher
+.. autoclass:: telegram.ext.Dispatcher
     :members:
     :show-inheritance:

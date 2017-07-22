@@ -1,6 +1,6 @@
-telegram.video module
-=====================
+telegram.Video
+==============
 
-.. automodule:: telegram.files.video
+.. autoclass:: telegram.Video
     :members:
     :show-inheritance:

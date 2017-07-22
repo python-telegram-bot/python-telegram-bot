@@ -1,6 +1,6 @@
-telegram.messageentity module
-=============================
+telegram.MessageEntity
+======================
 
-.. automodule:: telegram.messageentity
+.. autoclass:: telegram.MessageEntity
     :members:
     :show-inheritance:

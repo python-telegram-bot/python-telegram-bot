@@ -1,6 +1,6 @@
-telegram.inputfile module
-=========================
+telegram.InputFile
+==================
 
-.. automodule:: telegram.files.inputfile
+.. autoclass:: telegram.InputFile
     :members:
     :show-inheritance:

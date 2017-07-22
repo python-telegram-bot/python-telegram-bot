@@ -1,6 +1,6 @@
-telegram.ext.JobQueue
+telegram.MaskPosition
 =====================
 
-.. autoclass:: telegram.ext.JobQueue
+.. autoclass:: telegram.MaskPosition
     :members:
     :show-inheritance:

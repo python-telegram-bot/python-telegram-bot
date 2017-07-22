@@ -1,6 +1,6 @@
-telegram.precheckoutquery module
-================================
+telegram.PreCheckoutQuery
+=========================
 
-.. automodule:: telegram.payment.precheckoutquery
+.. autoclass:: telegram.PreCheckoutQuery
     :members:
     :show-inheritance:

@@ -1,6 +1,6 @@
-telegram.ext.typehandler module
-===============================
+telegram.ext.TypeHandler
+========================
 
-.. automodule:: telegram.ext.typehandler
+.. autoclass:: telegram.ext.TypeHandler
     :members:
     :show-inheritance:
