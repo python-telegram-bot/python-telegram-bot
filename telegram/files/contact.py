@@ -26,17 +26,17 @@ class Contact(TelegramObject):
     This object represents a phone contact.
 
     Attributes:
-        phone_number (str): Contact's phone number.
-        first_name (str): Contact's first name.
-        last_name (str): Optional. Contact's last name.
-        user_id (int): Optional. Contact's user identifier in Telegram.
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`): Optional. Contact's last name.
+        user_id (:obj:`int`): Optional. Contact's user identifier in Telegram.
 
     Args:
-        phone_number (str): Contact's phone number.
-        first_name (str): Contact's first name.
-        last_name (Optional[str]): Contact's last name.
-        user_id (Optional[int]): Contact's user identifier in Telegram.
-        **kwargs: Arbitrary keyword arguments.
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`, optional): Contact's last name.
+        user_id (:obj:`int`, optional): Contact's user identifier in Telegram.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):
@@ -51,15 +51,6 @@ class Contact(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Contact`
-        """
-
         if not data:
             return None
 

@@ -29,30 +29,30 @@ class InlineQueryResultAudio(InlineQueryResult):
     content instead of the audio.
 
     Attributes:
-        type (str): 'audio'.
-        id (str): Unique identifier for this result, 1-64 bytes.
-        audio_url (str): A valid URL for the audio file.
-        title (str): Title.
-        performer (str): Optional. Caption, 0-200 characters.
-        audio_duration (str): Optional. Performer.
-        caption (str): Optional. Audio duration in seconds.
+        type (:obj:`str`): 'audio'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        audio_url (:obj:`str`): A valid URL for the audio file.
+        title (:obj:`str`): Title.
+        performer (:obj:`str`): Optional. Caption, 0-200 characters.
+        audio_duration (:obj:`str`): Optional. Performer.
+        caption (:obj:`str`): Optional. Audio duration in seconds.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the audio.
+            message to be sent instead of the audio.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 bytes.
-        audio_url (str): A valid URL for the audio file.
-        title (str): Title.
-        performer (Optional[str]): Caption, 0-200 characters.
-        audio_duration (Optional[str]): Performer.
-        caption (Optional[str]): Audio duration in seconds.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-                to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-                message to be sent instead of the audio.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        audio_url (:obj:`str`): A valid URL for the audio file.
+        title (:obj:`str`): Title.
+        performer (:obj:`str`, optional): Caption, 0-200 characters.
+        audio_duration (:obj:`str`, optional): Performer.
+        caption (:obj:`str`, optional): Audio duration in seconds.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the audio.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

@@ -70,21 +70,15 @@ def message(func):
 
 
 class Bot(TelegramObject):
-    """This object represents a Telegram Bot.
-
-    Properties:
-        id (int): Unique identifier for this bot.
-        first_name (str): Bot's first name.
-        last_name (str): Optional. Bot's last name.
-        username (str): Bot's username.
-        name (str): Bot's @username.
+    """
+    This object represents a Telegram Bot.
 
     Args:
-        token (str): Bot's unique authentication.
-        base_url (Optional[str]): Telegram Bot API service URL.
-        base_file_url (Optional[str]): Telegram Bot API file URL.
-        request (Optional[Request]): Pre initialized :class:`telegram.utils.Request`.
-
+        token (:obj:`str`): Bot's unique authentication.
+        base_url (:obj:`str`, optional): Telegram Bot API service URL.
+        base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
+        request (:obj:`telegram.utils.Request`, optional): Pre initialized
+            :obj:`telegram.utils.Request`.
     """
 
     def __init__(self, token, base_url=None, base_file_url=None, request=None):
@@ -121,25 +115,45 @@ class Bot(TelegramObject):
     @property
     @info
     def id(self):
+        """
+        :obj:`int`: Unique identifier for this bot.
+        """
+
         return self.bot.id
 
     @property
     @info
     def first_name(self):
+        """
+        :obj:`str`: Bot's first name.
+        """
+
         return self.bot.first_name
 
     @property
     @info
     def last_name(self):
+        """
+        :obj:`str`: Optional. Bot's last name.
+        """
+
         return self.bot.last_name
 
     @property
     @info
     def username(self):
+        """
+        :obj:`str`: Bot's username.
+        """
+
         return self.bot.username
 
     @property
     def name(self):
+        """
+        :obj:`str`: Bot's @username.
+        """
+
         return '@{0}'.format(self.username)
 
     def _message_wrapper(self, url, data, *args, **kwargs):
@@ -169,13 +183,13 @@ class Bot(TelegramObject):
         A simple method for testing your bot's auth token. Requires no parameters.
 
         Args:
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
 
         Returns:
             :class:`telegram.User`: A :class:`telegram.User` instance representing that bot if the
-                credentials are valid, `None` otherwise.
+            credentials are valid, :obj:`None` otherwise.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -205,28 +219,26 @@ class Bot(TelegramObject):
         Use this method to send text messages.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or
-                    username of the target channel (in the format
-                    @channelusername).
-            text (str): Text of the message to be sent. Max 4096 characters. Also found as
-                    ``telegram.constants.MAX_MESSAGE_LENGTH``.
-            parse_mode (Optional[str]): Send Markdown or HTML, if you want
-                    Telegram apps to show bold, italic, fixed-width text or inline
-                    URLs in your bot's message.
-            disable_web_page_preview (Optional[bool]): Disables link previews
-                    for links in this message.
-            disable_notification (Optional[bool]): Sends the message silently. Users will
-                    receive a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply,
-                    ID of the original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional
-                    interface options. A JSON-serialized object for an inline
-                    keyboard, custom reply keyboard, instructions to remove reply
-                    keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            text (:obj:`str`): Text of the message to be sent. Max 4096 characters. Also found as
+                ``telegram.constants.MAX_MESSAGE_LENGTH``.
+            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps
+            to show
+                bold, italic, fixed-width text or inline URLs in your bot's message.
+            disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
+                this message.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -258,17 +270,17 @@ class Bot(TelegramObject):
         messages.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or
-                    username of the target channel (in the format
-                    @channelusername).
-            message_id (int): Identifier of the message to delete
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`): Identifier of the message to delete.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+            the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -295,17 +307,18 @@ class Bot(TelegramObject):
         Use this method to forward messages of any kind.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            from_chat_id (int|str): Unique identifier for the chat where the original message was
-                    sent (or channel username in the format @channelusername).
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            message_id (int): Message identifier in the chat specified in from_chat_id.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            from_chat_id (:obj:`int` | :obj:`float`): Unique identifier for the chat where the
+                original message was sent (or channel username in the format @channelusername).
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+            the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -346,23 +359,23 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            photo (str|filelike object): Photo to send. Pass a file_id as String to send a photo
-                    that exists on the Telegram servers (recommended), pass an HTTP URL as a String
-                    for Telegram to get a photo from the Internet, or upload a new photo using
-                    multipart/form-data.
-            caption (Optional[str]): Photo caption (may also be used when resending photos by
-                    file_id), 0-200 characters
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            photo (:obj:`str` | `filelike object`): Photo to send. Pass a file_id as String to send
+                a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a
+                String for Telegram to get a photo from the Internet, or upload a new photo using
+                multipart/form-data.
+            caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
+                by file_id), 0-200 characters.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -407,25 +420,25 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            audio (str|filelike object): Audio file to send. Pass a file_id as String to send an
-                    audio file that exists on the Telegram servers (recommended), pass an HTTP URL
-                    as a String for Telegram to get an audio file from the Internet, or upload a
-                    new one using multipart/form-data.
-            caption (Optional[str]): Audio caption, 0-200 characters.
-            duration (Optional[int]): Duration of sent audio in seconds.
-            performer (Optional[str]): Performer.
-            title (Optional[str]): Track name.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            audio (:obj:`str` | `filelike object`): Audio file to send. Pass a file_id as String to
+                send an audio file that exists on the Telegram servers (recommended), pass an HTTP
+                URL as a String for Telegram to get an audio file from the Internet, or upload a
+                new one using multipart/form-data.
+            caption (:obj:`str`, optional): Audio caption, 0-200 characters.
+            duration (:obj:`int`, optional): Duration of sent audio in seconds.
+            performer (:obj:`str`, optional): Performer.
+            title (:obj:`str`, optional): Track name.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -469,25 +482,25 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            document (str|filelike object): File to send. Pass a file_id as String to send a
-                    file that exists on the Telegram servers (recommended), pass an HTTP URL
-                    as a String for Telegram to get a file from the Internet, or upload a
-                    new one using multipart/form-data.
-            filename (Optional[str]): File name that shows in telegram message (it is useful when
-                    you send file generated by temp module, for example). Undocumented.
-            caption (Optional[str]): Document caption (may also be used when resending documents
-                    by file_id), 0-200 characters
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            document (:obj:`str` | `filelike object`): File to send. Pass a file_id as String to
+                send a file that exists on the Telegram servers (recommended), pass an HTTP URL as
+                a String for Telegram to get a file from the Internet, or upload a new one using
+                multipart/form-data.
+            filename (:obj:`str`, optional): File name that shows in telegram message (it is useful
+                when you send file generated by temp module, for example). Undocumented.
+            caption (:obj:`str`, optional): Document caption (may also be used when resending
+                documents by file_id), 0-200 characters.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -525,21 +538,21 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            sticker (str|filelike object): Sticker to send. Pass a file_id as String to send a file
-                    that exists on the Telegram servers (recommended), pass an HTTP URL as a String
-                    for Telegram to get a .webp file from the Internet, or upload a new one using
-                    multipart/form-data.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            sticker (:obj:`str` | `filelike object`): Sticker to send. Pass a file_id as String to
+                send a file that exists on the Telegram servers (recommended), pass an HTTP URL as
+                a String for Telegram to get a .webp file from the Internet, or upload a new one
+                using multipart/form-data.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -577,26 +590,26 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            video (str|filelike object): Video file to send. Pass a file_id as String to send an
-                    video file that exists on the Telegram servers (recommended), pass an HTTP URL
-                    as a String for Telegram to get an video file from the Internet, or upload a
-                    new one using multipart/form-data.
-            duration (Optional[int]): Duration of sent video in seconds.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            video (:obj:`str` | `filelike object`): Video file to send. Pass a file_id as String to
+                send an video file that exists on the Telegram servers (recommended), pass an HTTP
+                URL as a String for Telegram to get an video file from the Internet, or upload a
+                new one using multipart/form-data.
+            duration (:obj:`int`, optional): Duration of sent video in seconds.
             width (Optional[int)): Video width.
-            height (Optional[int]): Video height.
-            caption (Optional[str]): Video caption (may also be used when resending videos by
-                    file_id), 0-200 characters.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            height (:obj:`int`, optional): Video height.
+            caption (:obj:`str`, optional): Video caption (may also be used when resending videos
+                by file_id), 0-200 characters.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -642,23 +655,23 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            voice (str|filelike object): Voice file to send. Pass a file_id as String to send an
-                    voice file that exists on the Telegram servers (recommended), pass an HTTP URL
-                    as a String for Telegram to get an voice file from the Internet, or upload a
-                    new one using multipart/form-data.
-            caption (Optional[str]): Voice message caption, 0-200 characters.
-            duration (Optional[int]): Duration of the voice message in seconds.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            voice (:obj:`str` | `filelike object`): Voice file to send. Pass a file_id as String
+                to send an voice file that exists on the Telegram servers (recommended), pass an
+                HTTP URL as a String for Telegram to get an voice file from the Internet, or upload
+                a new one using multipart/form-data.
+            caption (:obj:`str`, optional): Voice message caption, 0-200 characters.
+            duration (:obj:`int`, optional): Duration of the voice message in seconds.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -699,23 +712,23 @@ class Bot(TelegramObject):
             ``open(filename, 'rb')``
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            video_note (str|filelike object): Video note to send. Pass a file_id as String to send
-                    a video note that exists on the Telegram servers (recommended) or upload a new
-                    video using multipart/form-data.
-                    Sending video notes by a URL is currently unsupported.
-            duration (Optional[int]): Duration of sent video in seconds
-            length (Optional[int]): Video width and height
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): Send file timeout (default: 20 seconds).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            video_note (:obj:`str` | `filelike object`): Video note to send. Pass a file_id as
+                String to send a video note that exists on the Telegram servers (recommended) or
+                upload a new video using multipart/form-data. Sending video notes by a URL is
+                currently unsupported.
+            duration (:obj:`int`, optional): Duration of sent video in seconds.
+            length (:obj:`int`, optional): Video width and height
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -750,21 +763,21 @@ class Bot(TelegramObject):
         Use this method to send point on the map.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            latitude (float): Latitude of location.
-            longitude (float): Longitude of location.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            latitude (:obj:`float`): Latitude of location.
+            longitude (:obj:`float`): Longitude of location.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                     original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -797,24 +810,24 @@ class Bot(TelegramObject):
         Use this method to send information about a venue.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            latitude (float): Latitude of venue.
-            longitude (float): Longitude of venue.
-            title (str): Name of the venue.
-            address (str): Address of the venue.
-            foursquare_id (Optional[str]): Foursquare identifier of the venue.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            latitude (:obj:`float`): Latitude of venue.
+            longitude (:obj:`float`): Longitude of venue.
+            title (:obj:`str`): Name of the venue.
+            address (:obj:`str`): Address of the venue.
+            foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -854,22 +867,22 @@ class Bot(TelegramObject):
         Use this method to send phone contacts.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            phone_number (str): Contact's phone number.
-            first_name (str): Contact's first name.
-            last_name (Optional[str]): Contact's last name.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            phone_number (:obj:`str`): Contact's phone number.
+            first_name (:obj:`str`): Contact's first name.
+            last_name (:obj:`str`, optional): Contact's last name.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -901,21 +914,21 @@ class Bot(TelegramObject):
         Use this method to send a game.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            game_short_name (str): Short name of the game, serves as the unique identifier for the
-                    game. Set up your games via Botfather.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the
-                    original message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
+                for the game. Set up your games via Botfather.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -938,26 +951,26 @@ class Bot(TelegramObject):
         Telegram clients clear its typing status).
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            action(:class:`telegram.ChatAction`|str): Type of action to broadcast. Choose one,
-                    depending on what the user is about to receive:
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            action(:class:`telegram.ChatAction` | :obj:`str`): Type of action to broadcast. Choose
+                one, depending on what the user is about to receive:
 
-                    - typing for text messages
-                    - upload_photo for photos
-                    - record_video or upload_video for videos
-                    - record_audio or upload_audio for audio files
-                    - upload_document for general files
-                    - find_location for location data
-                    - record_video_note or upload_video_note for video notes
+                * typing for text messages
+                * upload_photo for photos
+                * record_video or upload_video for videos
+                * record_audio or upload_audio for audio files
+                * upload_document for general files
+                * find_location for location data
+                * record_video_note or upload_video_note for video notes
 
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: True on success.
+            :obj:`bool`: ``True`` on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -987,28 +1000,28 @@ class Bot(TelegramObject):
         than 50 results per query are allowed.
 
         Args:
-            inline_query_id (str): Unique identifier for the answered query.
-            results (list(:class:`telegram.InlineQueryResult`)): A list of results for the inline
-                    query.
-            cache_time (Optional[int]): The maximum amount of time in seconds that the result of
-                    the inline query may be cached on the server. Defaults to 300.
-            is_personal (Optional[bool]): Pass True, if results may be cached on the server side
-                    only for the user that sent the query. By default, results may be returned to
-                    any user who sends the same query.
-            next_offset (Optional[str]): Pass the offset that a client should send in the next
-                    query with the same text to receive more results. Pass an empty string if there
-                    are no more results or if you don't support pagination. Offset length can't
-                    exceed 64 bytes.
-            switch_pm_text (Optional[str]): If passed, clients will display a button with specified
-                    text that switches the user to a private chat with the bot and sends the bot
-                    a start message with the parameter switch_pm_parameter.
-            switch_pm_parameter (Optional[str]): Deep-linking parameter for the /start message sent
-                    to the bot when user presses the switch button. 1-64 characters,
-                    only A-Z, a-z, 0-9, _ and - are allowed.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            inline_query_id (:obj:`str`): Unique identifier for the answered query.
+            results (List[:class:`telegram.InlineQueryResult`)]: A list of results for the inline
+                query.
+            cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
+                result of the inline query may be cached on the server. Defaults to 300.
+            is_personal (:obj:`bool`, optional): Pass True, if results may be cached on the server
+                side only for the user that sent the query. By default, results may be returned to
+                any user who sends the same query.
+            next_offset (:obj:`str`, optional): Pass the offset that a client should send in the
+                next query with the same text to receive more results. Pass an empty string if
+                there are no more results or if you don't support pagination. Offset length can't
+                exceed 64 bytes.
+            switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
+                specified text that switches the user to a private chat with the bot and sends the
+                bot a start message with the parameter switch_pm_parameter.
+            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
+                message sent to the bot when user presses the switch button. 1-64 characters,
+                only A-Z, a-z, 0-9, _ and - are allowed.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                he read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Example:
             An inline bot that sends YouTube videos can ask the user to connect the bot to their
@@ -1020,7 +1033,7 @@ class Bot(TelegramObject):
             where they wanted to use the bot's inline capabilities.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1053,15 +1066,15 @@ class Bot(TelegramObject):
         Use this method to get a list of profile pictures for a user.
 
         Args:
-            user_id (int): Unique identifier of the target user.
-            offset (Optional[int]): Sequential number of the first photo to be returned.
-                    By default, all photos are returned.
-            limit (Optional[int]): Limits the number of photos to be retrieved. Values between
-                    1-100 are accepted. Defaults to 100.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            user_id (:obj:`int`): Unique identifier of the target user.
+            offset (:obj:`int`, optional): Sequential number of the first photo to be returned.
+                By default, all photos are returned.
+            limit (:obj:`int`, optional): Limits the number of photos to be retrieved. Values
+                between 1-100 are accepted. Defaults to 100.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.UserProfilePhotos`
@@ -1093,11 +1106,11 @@ class Bot(TelegramObject):
         calling getFile again.
 
         Args:
-            file_id (str): File identifier to get info about.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            file_id (:obj:`str`): File identifier to get info about.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.File`
@@ -1125,16 +1138,16 @@ class Bot(TelegramObject):
         unless unbanned first. The bot must be an administrator in the group for this to work.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            user_id (int|str): Unique identifier of the target user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
-            until_date (Optional[int|datetime]): Date when the user will be unbanned,
-                unix time. If user is banned for more than 366 days or less than 30 seconds from
-                the current time they are considered to be banned forever
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or  username
+                of the target channel (in the format @channelusername).
+            user_id (:obj:`int` | :obj:`float`): Unique identifier of the target user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
+                be unbanned, unix time. If user is banned for more than 366 days or less than 30
+                seconds from the current time they are considered to be banned forever.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
@@ -1142,7 +1155,7 @@ class Bot(TelegramObject):
             members may only be removed by the group's creator or by the member that added them.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1169,16 +1182,16 @@ class Bot(TelegramObject):
         etc. The bot must be an administrator in the group for this to work.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            user_id (int|str): Unique identifier of the target user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            user_id (:obj:`int` | :obj:`float`): Unique identifier of the target user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1211,26 +1224,26 @@ class Bot(TelegramObject):
         a parameter.
 
         Args:
-            callback_query_id (str): Unique identifier for the query to be answered.
-            text (Optional[str]): Text of the notification. If not specified, nothing will be
-                    shown to the user, 0-200 characters.
-            show_alert (Optional[bool]): If true, an alert will be shown by the client instead of
-                    a notification at the top of the chat screen. Defaults to false.
-            url (Optional[str]): URL that will be opened by the user's client. If you have created
-                    a Game and accepted the conditions via @Botfather, specify the URL that opens
-                    your game - note that this will only work if the query comes from a callback
-                    game button. Otherwise, you may use links like t.me/your_bot?start=XXXX that
-                    open your bot with a parameter.
-            cache_time (Optional[int]): The maximum amount of time in seconds that the result of
-                    the callback query may be cached client-side. Telegram apps will support
-                    caching starting in version 3.14. Defaults to 0.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            callback_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            text (:obj:`str`, optional): Text of the notification. If not specified, nothing will
+                be shown to the user, 0-200 characters.
+            show_alert (:obj:`bool`, optional): If true, an alert will be shown by the client
+                instead of a notification at the top of the chat screen. Defaults to false.
+            url (:obj:`str`, optional): URL that will be opened by the user's client. If you have
+                created a Game and accepted the conditions via @Botfather, specify the URL that
+                opens your game - note that this will only work if the query comes from a callback
+                game button. Otherwise, you may use links like t.me/your_bot?start=XXXX that open
+                your bot with a parameter.
+            cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
+                result of the callback query may be cached client-side. Telegram apps will support
+                caching starting in version 3.14. Defaults to 0.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1270,29 +1283,27 @@ class Bot(TelegramObject):
         bots).
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
-                    of the sent message.
-            inline_message_id (Optional[str]): Required if chat_id and message_id are not
-                    specified. Identifier of the inline message.
-            text (str): New text of the message.
-            parse_mode (:class:`telegram.ParseMode`|str): Send Markdown or HTML, if you want
-                    Telegram apps to show bold, italic, fixed-width text or inline URLs in
-                    your bot's message.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            text (:obj:`str`): New text of the message.
+            parse_mode (:class:`telegram.ParseMode` | :obj:`str`): Send Markdown or HTML, if you
+                want Telegram apps to show bold, italic, fixed-width text or inline URLs in your
+                bot's message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.Message`|bool: On success, if edited message is sent by the bot, the
-            editedMessage is returned, otherwise True is returned.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1330,24 +1341,24 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
-                    of the sent message.
-            inline_message_id (Optional[str]): Required if chat_id and message_id are not
-                    specified. Identifier of the inline message.
-            caption (Optional[str]): New caption of the message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            caption (:obj:`str`, optional): New caption of the message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.Message`|bool: On success, if edited message is sent by the bot, the
-            editedMessage is returned, otherwise True is returned.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1387,23 +1398,23 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
-                    of the sent message.
-            inline_message_id (Optional[str]): Required if chat_id and message_id are not
-                    specified. Identifier of the inline message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options. A
-                    JSON-serialized object for an inline keyboard, custom reply keyboard,
-                    instructions to remove reply keyboard or to force a reply from the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.Message`|bool: On success, if edited message is sent by the bot, the
-            editedMessage is returned, otherwise True is returned.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            editedMessage is returned, otherwise ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1440,27 +1451,27 @@ class Bot(TelegramObject):
         Use this method to receive incoming updates using long polling.
 
         Args:
-            offset (Optional[int]): Identifier of the first update to be returned. Must be greater
-                    by one than the highest among the identifiers of previously received updates.
-                    By default, updates starting with the earliest unconfirmed update are returned.
-                    An update is considered confirmed as soon as getUpdates is called with an
-                    offset higher than its update_id. The negative offset can be specified to
-                    retrieve updates starting from -offset update from the end of the updates
-                    queue. All previous updates will forgotten.
-            limit (Optional[int]): Limits the number of updates to be retrieved. Values between
-                    1-100 are accepted. Defaults to 100.
-            timeout (Optional[int]): Timeout in seconds for long polling. Defaults to 0, i.e.
-                    usual short polling. Should be positive, short polling should be used for
-                    testing purposes only.
-            allowed_updates (Optional[list(str)]): List the types of updates you want your bot to
-                    receive. For example, specify ["message", "edited_channel_post",
-                    "callback_query"] to only receive updates of these types. See
-                    :class:`telegram.Update` for a complete list of available update types.
-                    Specify an empty list to receive all updates regardless of type (default).
-                    If not specified, the previous setting will be used. Please note that this
-                    parameter doesn't affect updates created before the call to the getUpdates,
-                    so unwanted updates may be received for a short period of time.
-            **kwargs (dict): Arbitrary keyword arguments.
+            offset (:obj:`int`, optional): Identifier of the first update to be returned. Must be
+                greater by one than the highest among the identifiers of previously received
+                updates. By default, updates starting with the earliest unconfirmed update are
+                returned. An update is considered confirmed as soon as getUpdates is called with an
+                offset higher than its update_id. The negative offset can be specified to retrieve
+                updates starting from -offset update from the end of the updates queue. All
+                previous updates will forgotten.
+            limit (:obj:`int`, optional): Limits the number of updates to be retrieved. Values
+                between 1-100 are accepted. Defaults to 100.
+            timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to 0,
+                i.e. usual short polling. Should be positive, short polling should be used for
+                testing purposes only.
+            allowed_updates (List[:obj:`str`), optional]: List the types of updates you want your
+                bot to receive. For example, specify ["message", "edited_channel_post",
+                "callback_query"] to only receive updates of these types. See
+                :class:`telegram.Update` for a complete list of available update types.
+                Specify an empty list to receive all updates regardless of type (default). If not
+                specified, the previous setting will be used. Please note that this parameter
+                doesn't affect updates created before the call to the get_updates, so unwanted
+                updates may be received for a short period of time.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Notes:
             1. This method will not work if an outgoing webhook is set up.
@@ -1468,7 +1479,7 @@ class Bot(TelegramObject):
                server response.
 
         Returns:
-            list(:class:`telegram.Update`)
+            List[:class:`telegram.Update`]
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1522,29 +1533,28 @@ class Bot(TelegramObject):
         knows your bot's token, you can be pretty sure it's us.
 
         Args:
-            url (str): HTTPS url to send updates to. Use an empty string to remove webhook
-                    integration.
-            certificate (file): Upload your public key certificate so that the root certificate
-                    in use can be checked. See our self-signed guide for details.
-            max_connections (Optional[int]): Maximum allowed number of simultaneous HTTPS
-                    connections to the webhook for update delivery, 1-100. Defaults to 40. Use
-                    lower values to limit the load on your bot's server, and higher values to
-                    increase your bot's throughput.
-            allowed_updates (Optional[list[str]]): List the types of updates you want your bot to
-                    receive. For example, specify ["message", "edited_channel_post",
-                    "callback_query"] to only receive updates of these types. See
-                    :clas:`telegram.Update` for a complete list of available update types. Specify
-                    an empty list to receive all updates regardless of type (default). If not
-                    specified, the previous setting will be used. Please note that this parameter
-                    doesn't affect updates created before the call to the setWebhook, so unwanted
-                    updates may be received for a short period of time.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook
+                integration.
+            certificate (file): Upload your public key certificate so that the root certificate in
+                use can be checked. See our self-signed guide for details.
+            max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
+                connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
+                values to limit the load on your bot's server, and higher values to increase your
+                bot's throughput.
+            allowed_updates (list[str], optional): List the types of updates you want your bot to
+                receive. For example, specify ["message", "edited_channel_post", "callback_query"]
+                to only receive updates of these types. See :class:`telegram.Update` for a complete
+                list of available update types. Specify an empty list to receive all updates
+                regardless of type (default). If not specified, the previous setting will be used.
+                Please note that this parameter doesn't affect updates created before the call to
+                the set_webhook, so unwanted updates may be received for a short period of time.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Note:
-            1. You will not be able to receive updates using getUpdates for as long as an outgoing
+            1. You will not be able to receive updates using get_updates for as long as an outgoing
                webhook is set up.
             2. To use a self-signed certificate, you need to upload your public key certificate
                using certificate parameter. Please upload as InputFile, sending a String will not
@@ -1552,7 +1562,7 @@ class Bot(TelegramObject):
             3. Ports currently supported for Webhooks: 443, 80, 88, 8443.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1593,13 +1603,13 @@ class Bot(TelegramObject):
         getUpdates. Requires no parameters.
 
         Args:
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1619,15 +1629,15 @@ class Bot(TelegramObject):
         Use this method for your bot to leave a group, supergroup or channel.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1648,12 +1658,12 @@ class Bot(TelegramObject):
         one-on-one conversations, current username of a user, group or channel, etc.).
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Chat`
@@ -1679,15 +1689,15 @@ class Bot(TelegramObject):
         only the creator will be returned.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            list(:class:`telegram.ChatMember`)
+            List[:class:`telegram.ChatMember`]
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1707,12 +1717,12 @@ class Bot(TelegramObject):
         Use this method to get the number of members in a chat
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             int: Number of members in the chat.
@@ -1735,13 +1745,13 @@ class Bot(TelegramObject):
         Use this method to get information about a member of a chat.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            user_id (int): Unique identifier of the target user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.ChatMember`
@@ -1764,13 +1774,13 @@ class Bot(TelegramObject):
         If the bot is using getUpdates, will return an object with the url field empty.
 
         Args:
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class: `telegram.WebhookInfo`
+            :class:`telegram.WebhookInfo`
         """
 
         url = '{0}/getWebhookInfo'.format(self.base_url)
@@ -1801,29 +1811,30 @@ class Bot(TelegramObject):
         force is False.
 
         Args:
-            user_id (int): User identifier.
-            score (int): New score, must be non-negative.
-            force (Optional[bool]): Pass True, if the high score is allowed to decrease. This can
-                    be useful when fixing mistakes or banning cheaters
-            disable_edit_message (Optional[bool]): Pass True, if the game message should not be
-                    automatically edited to include the current scoreboard.
-            chat_id (Optional[int|str]): Required if inline_message_id is not specified.
-                    Unique identifier for the target chat
-            message_id (Optional[int]): Required if inline_message_id is not specified.
-                    Identifier of the sent message.
-            inline_message_id (Optional[str]): Required if chat_id and message_id are not
-                    specified. Identifier of the inline message.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            user_id (:obj:`int`): User identifier.
+            score (:obj:`int`): New score, must be non-negative.
+            force (:obj:`bool`, optional): Pass True, if the high score is allowed to decrease.
+                This can be useful when fixing mistakes or banning cheaters
+            disable_edit_message (:obj:`bool`, optional): Pass True, if the game message should not
+                be automatically edited to include the current scoreboard.
+            chat_id (int|str, optional): Required if inline_message_id is not specified. Unique
+                identifier for the target chat.
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.Message`|bool: The edited message, or if the message wasn't sent by
-            the bot, True.
+            :class:`telegram.Message`: The edited message, or if the message wasn't sent by the bot
+            , ``True``.
 
         Raises:
-            :class:`telegram.TelegramError`
+            :class:`telegram.TelegramError`: If the new score is not greater than the user's
+            current score in the chat and force is False.
         """
 
         url = '{0}/setGameScore'.format(self.base_url)
@@ -1862,20 +1873,20 @@ class Bot(TelegramObject):
         user and several of his neighbors in a game
 
         Args:
-            user_id (int): User identifier.
-            chat_id (Optional[int|str]): Required if inline_message_id is not specified. Unique
-                    identifier for the target chat.
-            message_id (Optional[int]): Required if inline_message_id is not specified. Identifier
-                    of the sent message.
-            inline_message_id (Optional[str]): Required if chat_id and message_id are not
-                    specified. Identifier of the inline message.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            user_id (:obj:`int`): User identifier.
+            chat_id (int|str, optional): Required if inline_message_id is not specified. Unique
+                identifier for the target chat.
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            list(:class:`telegram.GameHighScore`)
+            List[:class:`telegram.GameHighScore`]
 
         Raises:
             :class:`telegram.TelegramError`
@@ -1925,44 +1936,44 @@ class Bot(TelegramObject):
         Use this method to send invoices.
 
         Args:
-            chat_id (int|str): Unique identifier for the target private chat.
-            title (str): Product name.
-            description (str): Product description.
-            payload (str): Bot-defined invoice payload, 1-128 bytes. This will not be displayed
-                    to the user, use for your internal processes.
-            provider_token (str): Payments provider token, obtained via Botfather.
-            start_parameter (str): Unique deep-linking parameter that can be used to generate
-                    this invoice when used as a start parameter.
-            currency (str): Three-letter ISO 4217 currency code
-            prices (list(:class:`telegram.LabeledPrice`)): Price breakdown, a list of components
-                    (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
-            photo_url (Optional[str]): URL of the product photo for the invoice. Can be a photo of
-                    the goods or a marketing image for a service. People like it better when they
-                    see what they are paying for.
-            photo_size (Optional[str]): Photo size
-            photo_width (Optional[int]): Photo width
-            photo_height (Optional[int]): Photo height
-            need_name (Optional[bool]): Pass True, if you require the user's full name to complete
-                    the order.
-            need_phone_number (Optional[bool]): Pass True, if you require the user's phone number
-                    to complete the order.
-            need_email (Optional[bool]): Pass True, if you require the user's email to
-                    complete the order.
-            need_shipping_address (Optional[bool]): Pass True, if you require the user's shipping
-                    address to complete the order.
-            is_flexible (Optional[bool]): Pass True, if the final price depends on the shipping
-                    method.
-            disable_notification (Optional[bool]): Sends the message silently. Users will receive
-                    a notification with no sound.
-            reply_to_message_id (Optional[int]): If the message is a reply, ID of the original
-                    message.
-            reply_markup (Optional[:class:`telegram.ReplyMarkup`]): Additional interface options.
-                        An inlinekeyboard. If empty, one 'Pay total price' button will be shown.
-                        If not empty, the first button must be a Pay button.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target private chat.
+            title (:obj:`str`): Product name.
+            description (:obj:`str`): Product description.
+            payload (:obj:`str`): Bot-defined invoice payload, 1-128 bytes. This will not be
+                displayed to the user, use for your internal processes.
+            provider_token (:obj:`str`): Payments provider token, obtained via Botfather.
+            start_parameter (:obj:`str`): Unique deep-linking parameter that can be used to
+                generate this invoice when used as a start parameter.
+            currency (:obj:`str`): Three-letter ISO 4217 currency code.
+            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list of components
+                (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.).
+            photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a
+                photo of the goods or a marketing image for a service. People like it better when
+                they see what they are paying for.
+            photo_size (:obj:`str`, optional): Photo size.
+            photo_width (:obj:`int`, optional): Photo width.
+            photo_height (:obj:`int`, optional): Photo height.
+            need_name (:obj:`bool`, optional): Pass True, if you require the user's full name to
+                complete the order.
+            need_phone_number (:obj:`bool`, optional): Pass True, if you require the user's
+                phone number to complete the order.
+            need_email (:obj:`bool`, optional): Pass True, if you require the user's email to
+                complete the order.
+            need_shipping_address (:obj:`bool`, optional): Pass True, if you require the user's
+                shipping address to complete the order.
+            is_flexible (:obj:`bool`, optional): Pass True, if the final price depends on the
+                shipping method.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An inlinekeyboard. If empty, one 'Pay total price' button will be shown.
+                If not empty, the first button must be a Pay button.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2019,23 +2030,23 @@ class Bot(TelegramObject):
         this method to reply to shipping queries.
 
         Args:
-            shipping_query_id (str): Unique identifier for the query to be answered.
-            ok (bool): Specify True if delivery to the specified address is possible and False if
-                    there are any problems (for example, if delivery to the specified address
-                    is not possible).
-            shipping_options (Optional[list(:class:`telegram.ShippingOption`)]): Required if ok is
-                    True. A JSON-serialized array of available shipping options.
-            error_message (Optional[str]): Required if ok is False. Error message in human readable
-                    form that explains why it is impossible to complete the order (e.g. "Sorry,
-                    delivery to your desired address is unavailable'). Telegram will display this
-                    message to the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            ok (:obj:`bool`): Specify True if delivery to the specified address is possible and
+                False if there are any problems (for example, if delivery to the specified address
+                is not possible).
+            shipping_options (List[:class:`telegram.ShippingOption`), optional]: Required if ok is
+                True. A JSON-serialized array of available shipping options.
+            error_message (:obj:`str`, optional): Required if ok is False. Error message in
+                human readable form that explains why it is impossible to complete the order (e.g.
+                "Sorry, delivery to your desired address is unavailable'). Telegram will display
+                this message to the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, True is returned.
+            :obj:`bool`; On success, True is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2079,21 +2090,21 @@ class Bot(TelegramObject):
             query was sent.
 
         Args:
-            pre_checkout_query_id (str): Unique identifier for the query to be answered.
-            ok (bool): Specify True if everything is alright (goods are available, etc.) and the
-                    bot is ready to proceed with the order. Use False if there are any problems.
-            error_message (Optional[str]): Required if ok is False. Error message in human readable
-                    form that explains the reason for failure to proceed with the checkout (e.g.
-                    "Sorry, somebody just bought the last of our amazing black T-shirts while you
-                    were busy filling out your payment details. Please choose a different color or
-                    garment!"). Telegram will display this message to the user.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments.
+            pre_checkout_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            ok (:obj:`bool`): Specify True if everything is alright (goods are available, etc.) and
+                the bot is ready to proceed with the order. Use False if there are any problems.
+            error_message (:obj:`str`, optional): Required if ok is False. Error message in  human
+                readable form that explains the reason for failure to proceed with the checkout
+                (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you
+                were busy filling out your payment details. Please choose a different color or
+                garment!"). Telegram will display this message to the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2128,29 +2139,29 @@ class Bot(TelegramObject):
         all boolean parameters to lift restrictions from a user.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    supergroup (in the format @supergroupusername).
-            user_id (int): Unique identifier of the target user.
-            until_date (Optional[int|datetime]): Date when restrictions will be lifted for the
-                    user, unix time. If user is restricted for more than 366 days or less than 30
-                    seconds from the current time, they are considered to be restricted forever.
-            can_send_messages (Optional[boolean]): Pass True, if the user can send text messages,
-                    contacts, locations and venues.
-            can_send_media_messages (Optional[boolean]): Pass True, if the user can send audios,
-                    documents, photos, videos, video notes and voice notes, implies
-                    can_send_messages.
-            can_send_other_messages (Optional[boolean]): Pass True, if the user can send
-                    animations, games, stickers and use inline bots, implies
-                    can_send_media_messages.
-            can_add_web_page_previews (Optional[boolean]): Pass True, if the user may add web page
-                    previews to their messages, implies can_send_media_messages.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target supergroup (in the format @supergroupusername).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when restrictions
+                will be lifted for the user, unix time. If user is restricted for more than 366
+                days or less than 30 seconds from the current time, they are considered to be
+                restricted forever.
+            can_send_messages (:obj:`boolean`, optional): Pass True, if the user can send text
+                messages, contacts, locations and venues.
+            can_send_media_messages (:obj:`boolean`, optional): Pass True, if the user can send
+                audios, documents, photos, videos, video notes and voice notes, implies
+                can_send_messages.
+            can_send_other_messages (:obj:`boolean`, optional): Pass True, if the user can send
+                animations, games, stickers and use inline bots, implies can_send_media_messages.
+            can_add_web_page_previews (:obj:`boolean`, optional): Pass True, if the user may add
+                web page previews to their messages, implies can_send_media_messages.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns True on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2189,34 +2200,34 @@ class Bot(TelegramObject):
         Pass False for all boolean parameters to demote a user
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    supergroup (in the format @supergroupusername).
-            user_id (int): Unique identifier of the target user.
-            can_change_info (Optional[boolean]): Pass True, if the administrator can change chat
-                    title, photo and other settings.
-            can_post_messages (Optional[boolean]): Pass True, if the administrator can create
-                    channel posts, channels only.
-            can_edit_messages (Optional[boolean]): Pass True, if the administrator can edit
-                    messages of other users, channels only.
-            can_delete_messages (Optional[boolean]): Pass True, if the administrator can delete
-                    messages of other users.
-            can_invite_users (Optional[boolean]): Pass True, if the administrator can invite new
-                    users to the chat.
-            can_restrict_members (Optional[boolean]): Pass True, if the administrator can restrict,
-                    ban or unban chat members.
-            can_pin_messages (Optional[boolean]): Pass True, if the administrator can pin messages,
-                    supergroups only.
-            can_promote_members (Optional[boolean]): Pass True, if the administrator can add new
-                    administrators with a subset of his own privileges or demote administrators
-                    that he has promoted, directly or indirectly (promoted by administrators that
-                    were appointed by him).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target supergroup (in the format @supergroupusername).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            can_change_info (:obj:`boolean`, optional): Pass True, if the administrator can change
+                chat title, photo and other settings.
+            can_post_messages (:obj:`boolean`, optional): Pass True, if the administrator can
+                create channel posts, channels only.
+            can_edit_messages (:obj:`boolean`, optional): Pass True, if the administrator can edit
+                messages of other users, channels only.
+            can_delete_messages (:obj:`boolean`, optional): Pass True, if the administrator can
+                delete messages of other users.
+            can_invite_users (:obj:`boolean`, optional): Pass True, if the administrator can invite
+                new users to the chat.
+            can_restrict_members (:obj:`boolean`, optional): Pass True, if the administrator can
+                restrict, ban or unban chat members.
+            can_pin_messages (:obj:`boolean`, optional): Pass True, if the administrator can pin
+                messages, supergroups only.
+            can_promote_members (:obj:`boolean`, optional): Pass True, if the administrator can add
+                new administrators with a subset of his own privileges or demote administrators
+                that he has promoted, directly or indirectly (promoted by administrators that were
+                appointed by him).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns True on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2254,15 +2265,15 @@ class Bot(TelegramObject):
         administrator in the chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            str: Returns exported invite link as String on success.
+            :obj:`str`: Exported invite link as String on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2284,20 +2295,20 @@ class Bot(TelegramObject):
         for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
             photo (`telegram.InputFile`): New chat photo.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
             'All Members Are Admins' setting is off in the target group.
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns True on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2319,19 +2330,19 @@ class Bot(TelegramObject):
         rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
             'All Members Are Admins' setting is off in the target group.
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns ``True`` on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2353,20 +2364,20 @@ class Bot(TelegramObject):
         admin rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            title (str): New chat title, 1-255 characters.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            title (:obj:`str`): New chat title, 1-255 characters.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Note:
             In regular groups (non-supergroups), this method will only work if the
             'All Members Are Admins' setting is off in the target group.
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns ``True`` on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2387,16 +2398,16 @@ class Bot(TelegramObject):
         administrator in the chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            description (str): New chat description, 1-255 characters.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            description (:obj:`str`): New chat description, 1-255 characters.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns ``True`` on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2418,18 +2429,18 @@ class Bot(TelegramObject):
         chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            message_id (int): Identifier of a message to pin.
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            message_id (:obj:`int`): Identifier of a message to pin.
             disable_notification (Optional[bool): Pass True, if it is not necessary to send a
-                    notification to all group members about the new pinned message.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+                notification to all group members about the new pinned message.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns ``True`` on success.
 
         Raises:
             :class:`telegram.TelegramError`
@@ -2453,15 +2464,15 @@ class Bot(TelegramObject):
         chat for this to work and must have the appropriate admin rights.
 
         Args:
-            chat_id (int|str): Unique identifier for the target chat or username of the target
-                    channel (in the format @channelusername).
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                    from the server (instead of the one specified during creation of the connection
-                    pool).
-            **kwargs (dict): Arbitrary keyword arguments
+            chat_id (:obj:`int` | :obj:`float`): Unique identifier for the target chat or username
+                of the target`channel (in the format @channelusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
 
         Returns:
-            bool: Returns True on success.
+            :obj:`bool`: Returns ``True`` on success.
 
         Raises:
             :class:`telegram.TelegramError`

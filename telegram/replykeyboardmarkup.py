@@ -16,51 +16,47 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-ReplyKeyboardMarkup."""
+"""This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from telegram import ReplyMarkup, KeyboardButton
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
-    """This object represents a custom keyboard with reply options.
+    """
+    This object represents a custom keyboard with reply options.
 
     Attributes:
-        keyboard ([[:class:`telegram.KeyboardButton`]]): Array of button rows,
-                each represented by an Array of :class:`telegram.KeyboardButton` objects.
-        resize_keyboard (bool): Optional. Requests clients to resize the keyboard
-                vertically for optimal fit (e.g., make the keyboard smaller if there
-                are just two rows of buttons). Defaults to false, in which case the custom
-                keyboard is always of the same height as the app's standard keyboard.
-        one_time_keyboard (bool): Optional. Requests clients to hide the keyboard as soon as it's
-                been used. The keyboard will still be available, but clients will automatically
-                display the usual letter-keyboard in the chat - the user can press a special
-                button in the input field to see the custom keyboard again. Defaults to false.
-        selective (bool): Optional. Use this parameter if you want to show the keyboard to
-                specific users only. Targets: 1) users that are @mentioned in the text of the
-                Message object; 2) if the bot's message is a reply (has reply_to_message_id),
-                sender of the original message.
+        keyboard (List[List[:class:`telegram.KeyboardButton`]]): Array of button rows.
+        resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
+        one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
+            it's been used.
+        selective (:obj:`bool`): Optional. Show the keyboard to specific users only.
 
     Example:
         A user requests to change the bot's language, bot replies to the request with a keyboard
         to select the new language. Other users in the group don't see the keyboard.
 
     Args:
-        keyboard (list(list([str | :class:`telegram.KeyboardButton` ]))): Array of button rows,
+        keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
                 each represented by an Array of :class:`telegram.KeyboardButton` objects.
-        resize_keyboard (Optional[bool]): Requests clients to resize the keyboard vertically for
-                optimal fit (e.g., make the keyboard smaller if there are just two rows of
-                buttons). Defaults to false, in which case the custom keyboard is always of the
-                same height as the app's standard keyboard.
-        one_time_keyboard (Optional[bool]): Requests clients to hide the keyboard as soon as it's
-                been used. The keyboard will still be available, but clients will automatically
-                display the usual letter-keyboard in the chat - the user can press a special
-                button in the input field to see the custom keyboard again. Defaults to false.
-        selective (Optional[bool]): Use this parameter if you want to show the keyboard to
-                specific users only. Targets: 1) users that are @mentioned in the text of the
-                Message object; 2) if the bot's message is a reply (has reply_to_message_id),
-                sender of the original message.
-        **kwargs: Arbitrary keyword arguments.
+        resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
+            for optimal fit (e.g., make the keyboard smaller if there are just two rows of
+            buttons). Defaults to false, in which case the custom keyboard is always of the same
+            height as the app's standard keyboard. Defaults to ``False``
+        one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as soon as
+            it's been used. The keyboard will still be available, but clients will automatically
+            display the usual letter-keyboard in the chat - the user can press a special button in
+            the input field to see the custom keyboard again. Defaults to ``False``.
+        selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard to
+            specific users only. Targets:
+
+            1) users that are @mentioned in the text of the Message object
+            2) if the bot's message is a reply (has reply_to_message_id), sender of the original
+               message.
+
+            Defaults to ``False``.
+
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -78,14 +74,6 @@ class ReplyKeyboardMarkup(ReplyMarkup):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.ReplyKeyboardMarkup`:
-        """
         if not data:
             return None
 

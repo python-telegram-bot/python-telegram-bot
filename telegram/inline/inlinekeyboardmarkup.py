@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-InlineKeyboardMarkup"""
+"""This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
 from telegram import ReplyMarkup, InlineKeyboardButton
 
@@ -27,13 +26,13 @@ class InlineKeyboardMarkup(ReplyMarkup):
     This object represents an inline keyboard that appears right next to the message it belongs to.
 
     Attributes:
-        inline_keyboard ([[:class:`telegram.InlineKeyboardButton`]]): Array of button rows, each
-                represented by an Array of InlineKeyboardButton objects.
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
+            each represented by an Array of InlineKeyboardButton objects.
 
     Args:
-        inline_keyboard (list(list(:class:`telegram.InlineKeyboardButton`))): Array of button rows,
-                each represented by an Array of InlineKeyboardButton objects.
-        **kwargs (dict): Arbitrary keyword arguments.
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
+            each represented by an Array of InlineKeyboardButton objects.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, inline_keyboard, **kwargs):
@@ -42,15 +41,6 @@ class InlineKeyboardMarkup(ReplyMarkup):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.InlineKeyboardMarkup`
-        """
-
         data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data, bot)
 
         if not data:

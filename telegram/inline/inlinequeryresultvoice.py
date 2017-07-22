@@ -30,28 +30,28 @@ class InlineQueryResultVoice(InlineQueryResult):
     the voice message.
 
     Attributes:
-        type (str): 'voice'.
-        id (str): Unique identifier for this result, 1-64 bytes.
-        voice_url (str): A valid URL for the voice recording.
-        title (str): Voice message title.
-        caption (str): Optional. Caption, 0-200 characters.
-        voice_duration (int): Optional. Recording duration in seconds.
+        type (:obj:`str`): 'voice'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_url (:obj:`str`): A valid URL for the voice recording.
+        title (:obj:`str`): Voice message title.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        voice_duration (:obj:`int`): Optional. Recording duration in seconds.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the voice.
+            message to be sent instead of the voice.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 bytes.
-        voice_url (str): A valid URL for the voice recording.
-        title (str): Voice message title.
-        caption (Optional[str]): Caption, 0-200 characters.
-        voice_duration (Optional[int]): Recording duration in seconds.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-                to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-                message to be sent instead of the voice.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_url (:obj:`str`): A valid URL for the voice recording.
+        title (:obj:`str`): Voice message title.
+        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        voice_duration (:obj:`int`, optional): Recording duration in seconds.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the voice.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

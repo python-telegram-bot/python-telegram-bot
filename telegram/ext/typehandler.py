@@ -26,34 +26,31 @@ class TypeHandler(Handler):
     Handler class to handle updates of custom types.
 
     Attributes:
-        type (class): The ``type`` of updates this handler should process.
-        callback (function): The callback function for this handler.
-        strict (optional[bool]): Use ``type`` instead of ``isinstance``.
-                Default is ``False``
-        pass_update_queue (bool): Optional. Determines whether ``update_queue`` will be passed to
-                the callback function.
-        pass_job_queue (bool): Optional. Determines whether ``job_queue`` will be passed to the
-                callback function.
-
+        type (:obj:`class`): The ``type`` of updates this handler should process.
+        callback (:obj:`callable`): The callback function for this handler.
+        strict (:obj:`bool`): Optional. Use ``type`` instead of ``isinstance``.
+            Default is ``False``
+        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+            the callback function.
 
     Args:
-        type (class): The ``type`` of updates this handler should process, as
-                determined by ``isinstance``
-        callback (function): A function that takes ``bot, update`` as positional arguments. It will
-                be called when the :attr:`check_update` has determined that an update should be
-                processed by this handler.
-        strict (optional[bool]): Use ``type`` instead of ``isinstance``.
-                Default is ``False``
-        pass_update_queue (Optional[bool]): If set to ``True``, a keyword argument called
-                ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-                instance used by the :class:`telegram.ext.Updater` and
-                :class:`telegram.ext.Dispatcher` that contains new updates which can be used to
-                insert updates. Default is ``False``.
-        pass_job_queue (Optional[bool]): If set to ``True``, a keyword argument called
-                ``job_queue`` will be passed to the callback function. It will be a
-                :class:`telegram.ext.JobQueue` instance created by the
-                :class:`telegram.ext.Updater` which can be used to schedule new jobs. Default is
-                ``False``.
+        type (:obj:`class`): The ``type`` of updates this handler should process, as
+            determined by ``isinstance``
+        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
+            It will be called when the :attr:`check_update` has determined that an update should be
+            processed by this handler.
+        strict (:obj:`bool`, optional): Use ``type`` instead of ``isinstance``.
+            Default is ``False``
+        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
+            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
+            that contains new updates which can be used to insert updates. Default is ``False``.
+        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``job_queue`` will be passed to the callback function. It will be a
+            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
+            which can be used to schedule new jobs. Default is ``False``.
     """
 
     def __init__(self, type, callback, strict=False, pass_update_queue=False,
@@ -71,7 +68,7 @@ class TypeHandler(Handler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            bool
+            :obj:`bool`
         """
 
         if not self.strict:
@@ -85,8 +82,7 @@ class TypeHandler(Handler):
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated
-            the Update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
         """
 
         optional_args = self.collect_optional_args(dispatcher)

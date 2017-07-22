@@ -22,39 +22,35 @@ from telegram import TelegramObject
 
 
 class WebhookInfo(TelegramObject):
-    """This object represents a Telegram WebhookInfo.
+    """
+    This object represents a Telegram WebhookInfo.
 
     Contains information about the current status of a webhook.
 
     Attributes:
-        url (str): Webhook URL, may be empty if webhook is not set up.
-        has_custom_certificate (bool): True, if a custom certificate was provided for webhook
-                                       certificate checks.
-        pending_update_count (int): Number of updates awaiting delivery.
-        last_error_date (int): Optional. Unix time for the most recent error that happened
-                               when trying todeliver an update via webhook.
-        last_error_message (str): Optional. Error message in human-readable format for the most
-                                  recent error that happened when trying to deliver
-                                  an update via webhook.
-        max_connections (int): Optional. Maximum allowed number of simultaneous HTTPS connections
-                                to the webhook for update delivery.
-        allowed_updates ([str]): Optional. A list of update types the bot is subscribed to.
-                                 Defaults to all update types.
+        url (:obj:`str`): Webhook URL.
+        has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.
+        pending_update_count (:obj:`int`): Number of updates awaiting delivery.
+        last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened.
+        last_error_message (:obj:`str`): Optional. Error message in human-readable format.
+        max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
+            connections.
+        allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
+            to.
 
     Args:
-        url (str): Webhook URL, may be empty if webhook is not set up.
-        has_custom_certificate (bool): True, if a custom certificate was provided for webhook
-                                       certificate checks.
-        pending_update_count (int): Number of updates awaiting delivery.
-        last_error_date (Optional[int]): Unix time for the most recent error that happened
-                                         when trying todeliver an update via webhook.
-        last_error_message (Optional[str]): Error message in human-readable format for the most
-                                            recent error that happened when trying to deliver
-                                            an update via webhook.
-        max_connections (Optional[int]): Maximum allowed number of simultaneous HTTPS connections
-                                         to the webhook for update delivery.
-        allowed_updates (Optional[list(str)]): A list of update types the bot is subscribed to.
-                                               Defaults to all update types.
+        url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
+        has_custom_certificate (:obj:`bool`): True, if a custom certificate was provided for
+            webhook certificate checks.
+        pending_update_count (:obj:`int`): Number of updates awaiting delivery.
+        last_error_date (:obj:`int`, optional): Unix time for the most recent error that happened
+            when trying todeliver an update via webhook.
+        last_error_message (:obj:`str`, optional): Error message in human-readable format for the
+            most recent error that happened when trying to deliver an update via webhook.
+        max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
+            connections to the webhook for update delivery.
+        allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
+            to. Defaults to all update types.
     """
 
     def __init__(self,
@@ -77,15 +73,6 @@ class WebhookInfo(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.WebhookInfo`:
-
-        """
         if not data:
             return None
 

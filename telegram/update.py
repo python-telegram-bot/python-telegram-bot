@@ -23,66 +23,48 @@ from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
 
 
 class Update(TelegramObject):
-    """This object represents an incoming update.
+    """
+    This object represents an incoming update.
 
     Note:
         At most one of the optional parameters can be present in any given update.
 
     Attributes:
-        update_id (int): The update's unique identifier. Update identifiers start
-                         from a certain positive number and increase sequentially.
-                         This ID becomes especially handy if you're using Webhooks,
-                         since it allows you to ignore repeated updates or to restore
-                         the correct update sequence, should they get out of order.
-        message (:class:`telegram.Message`): Optional. New incoming message of any
-                kind - text, photo, sticker, etc.
-        edited_message (:class:`telegram.Message`): Optional. New version of a message
-                that is known to the bot and was edited.
-        channel_post (:class:`telegram.Message`): Optional. New incoming channel
-                post of any kind - text, photo, sticker, etc.
-        edited_channel_post (:class:`telegram.Message`): Optional. New version of a
-                channel post that is known to the bot and was edited.
-        inline_query (:class:`telegram.InlineQuery`): Optional. New incoming inline
-                query.
-        chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The
-                result of an inline query that was chosen by a user and sent to
-                their chat partner.
-        callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming
-                callback query.
-        shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming
-                shipping query. Only for invoices with flexible price.
-        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New
-                incoming pre-checkout query. Contains full information
-                about checkout
-
+        update_id (:obj:`int`): The update's unique identifier.
+        message (:class:`telegram.Message`): Optional. New incoming message.
+        edited_message (:class:`telegram.Message`): Optional. New version of a message.
+        channel_post (:class:`telegram.Message`): Optional. New incoming channel post.
+        edited_channel_post (:class:`telegram.Message`): Optional. New version of a channel post.
+        inline_query (:class:`telegram.InlineQuery`): Optional. New incoming inline query.
+        chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The result of an
+            inline query that was chosen by a user.
+        callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
+        shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
+        pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
+            pre-checkout query.
 
     Args:
-        update_id (int): The update's unique identifier. Update identifiers start
-                         from a certain positive number and increase sequentially.
-                         This ID becomes especially handy if you're using Webhooks,
-                         since it allows you to ignore repeated updates or to restore
-                         the correct update sequence, should they get out of order.
-        message (Optional[:class:`telegram.Message`]): New incoming message of
-                any kind - text, photo, sticker, etc.
-        edited_message (Optional[:class:`telegram.Message`]): New version of
-                a message that is known to the bot and was edited.
-        channel_post (Optional[:class:`telegram.Message`]): New incoming
-                channel post of any kind - text, photo, sticker, etc.
-        edited_channel_post (Optional[:class:`telegram.Message`]): New version
-                of a channel post that is known to the bot and was edited.
-        inline_query (Optional[:class:`telegram.InlineQuery`]): New incoming
-                inline query.
-        chosen_inline_result (Optional[:class:`telegram.ChosenInlineResult`]): The
-                result of an inline query that was chosen by a user and sent
-                to their chat partner.
-        callback_query (Optional[:class:`telegram.CallbackQuery`]): New incoming
-                callback query.
-        shipping_query (Optional[:class:`telegram.ShippingQuery`]): New incoming
-                shipping query. Only for invoices with flexible price.
-        pre_checkout_query (Optional[:class:`telegram.PreCheckoutQuery`]): New
-                incoming pre-checkout query. Contains full information about checkout
-        **kwargs: Arbitrary keyword arguments.
-
+        update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
+            certain positive number and increase sequentially. This ID becomes especially handy if
+            you're using Webhooks, since it allows you to ignore repeated updates or to restore the
+            correct update sequence, should they get out of order.
+        message (:class:`telegram.Message`, optional): New incoming message of any kind - text,
+            photo, sticker, etc.
+        edited_message (:class:`telegram.Message`, optional): New version of a message that is
+            known to the bot and was edited.
+        channel_post (:class:`telegram.Message`, optional): New incoming channel post of any kind
+            - text, photo, sticker, etc.
+        edited_channel_post (:class:`telegram.Message`, optional): New version of a channel post
+            that is known to the bot and was edited.
+        inline_query (:class:`telegram.InlineQuery`, optional): New incoming inline query.
+        chosen_inline_result (:class:`telegram.ChosenInlineResult`, optional): The result of an
+            inline query that was chosen by a user and sent to their chat partner.
+        callback_query (:class:`telegram.CallbackQuery`, optional): New incoming callback query.
+        shipping_query (:class:`telegram.ShippingQuery`, optional): New incoming shipping query.
+            Only for invoices with flexible price.
+        pre_checkout_query (:class:`telegram.PreCheckoutQuery`, optional): New incoming
+            pre-checkout query. Contains full information about checkout
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -116,39 +98,11 @@ class Update(TelegramObject):
 
         self._id_attrs = (self.update_id,)
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Update`:
-        """
-        if not data:
-            return None
-
-        data = super(Update, Update).de_json(data, bot)
-
-        data['message'] = Message.de_json(data.get('message'), bot)
-        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
-        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
-        data['chosen_inline_result'] = ChosenInlineResult.de_json(
-            data.get('chosen_inline_result'), bot)
-        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
-        data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
-        data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)
-        data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
-        data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
-
-        return Update(**data)
-
     @property
     def effective_user(self):
         """
-        A property that contains the :class:`telegram.User` that sent this update,
-        no matter what kind of update this is. Will be ``None`` for channel posts.
+        :class:`telegram.User`: The user that sent this update, no matter what kind of update this
+            is. Will be ``None`` for :attr:`channel_post`.
         """
 
         if self._effective_user:
@@ -183,9 +137,9 @@ class Update(TelegramObject):
     @property
     def effective_chat(self):
         """
-        A property that contains the :class:`telegram.Chat` that this update was sent in,
-        no matter what kind of update this is. Will be ``None`` for inline queries, chosen
-        inline results, shipping queries and pre chechout queries.
+        :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
+            update this is. Will be ``None`` for :attr:`inline_query`,
+            :attr:`chosen_inline_result`, :attr:`shipping_query` and :attr:`pre_checkout_query`.
         """
 
         if self._effective_chat:
@@ -214,10 +168,10 @@ class Update(TelegramObject):
     @property
     def effective_message(self):
         """
-        A property that contains the :class:`telegram.Message` included in this update,
-        no matter what kind of update this is. Will be ``None`` for inline queries,
-        chosen inline results, callback queries from inline messages, shipping queries
-        and pre checkout queries.
+        :class:`telegram.Message`: The message included in this update, no matter what kind of
+            update this is. Will be ``None`` for :attr:`inline_query`,
+            :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
+            :attr:`shipping_query` and :attr:`pre_checkout_query`.
         """
 
         if self._effective_message:
@@ -242,3 +196,23 @@ class Update(TelegramObject):
 
         self._effective_message = message
         return message
+
+    @staticmethod
+    def de_json(data, bot):
+        if not data:
+            return None
+
+        data = super(Update, Update).de_json(data, bot)
+
+        data['message'] = Message.de_json(data.get('message'), bot)
+        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
+        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
+        data['chosen_inline_result'] = ChosenInlineResult.de_json(
+            data.get('chosen_inline_result'), bot)
+        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
+        data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
+        data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)
+        data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
+        data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
+
+        return Update(**data)

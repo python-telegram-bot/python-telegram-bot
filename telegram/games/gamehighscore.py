@@ -26,14 +26,14 @@ class GameHighScore(TelegramObject):
     This object represents one row of the high scores table for a game.
 
     Attributes:
-        position (int): Position in high score table for the game.
+        position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
-        score (int): Score.
+        score (:obj:`int`): Score.
 
     Args:
-        position (int): Position in high score table for the game.
+        position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
-        score (int): Score.
+        score (:obj:`int`): Score.
     """
 
     def __init__(self, position, user, score):
@@ -43,15 +43,6 @@ class GameHighScore(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Game`
-        """
-
         if not data:
             return None
 

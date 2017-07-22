@@ -27,15 +27,15 @@ class InputContactMessageContent(InputMessageContent):
     Represents the content of a contact message to be sent as the result of an inline query.
 
     Attributes:
-        phone_number (str): Contact's phone number.
-        first_name (str): Contact's first name.
-        last_name (str): Optional. Contact's last name.
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`): Optional. Contact's last name.
 
     Args:
-        phone_number (str): Contact's phone number.
-        first_name (str): Contact's first name.
-        last_name (optional([str]): Contact's last name.
-        **kwargs (dict): Arbitrary keyword arguments.
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`, optional): Contact's last name.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, phone_number, first_name, last_name=None, **kwargs):

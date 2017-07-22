@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPhoto."""
 
+# TODO: add direct download shortcuts.
+
 from telegram import TelegramObject
 
 
@@ -26,35 +28,24 @@ class ChatPhoto(TelegramObject):
     This object represents a chat photo.
 
     Attributes:
-        small_file_id (str): Unique file identifier of small (160x160) chat photo. This file_id
-                can be used only for photo download.
-        big_file_id (str): Unique file identifier of big (640x640) chat photo. This file_id can be
-                used only for photo download.
+        small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo.
+        big_file_id (:obj:`str`): Unique file identifier of big (640x640) chat photo.
 
     Args:
-        small_file_id (str): Unique file identifier of small (160x160) chat photo. This file_id
-                can be used only for photo download.
-        big_file_id (str): Unique file identifier of big (640x640) chat photo. This file_id can be
-                used only for photo download.
-        bot (Optional[telegram.Bot]): The Bot to use for instance methods
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo. This
+            file_id can be used only for photo download.
+        big_file_id (:obj:`str`): Unique file identifier of big (640x640) chat photo. This file_id
+            can be used only for photo download.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
+
     def __init__(self, small_file_id, big_file_id, bot=None, **kwargs):
         self.small_file_id = small_file_id
         self.big_file_id = big_file_id
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.ChatPhoto`:
-        """
-
         if not data:
             return None
 

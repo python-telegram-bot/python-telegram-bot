@@ -26,19 +26,19 @@ class Document(TelegramObject):
     This object represents a general file (as opposed to photos, voice messages and audio files).
 
     Attributes:
-        file_id (str): Unique file identifier.
-        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
-        file_name (str): Original filename as defined by sender.
-        mime_type (str): MIME type of the file as defined by sender.
-        file_size (int): Optional. File size.
+        file_id (:obj:`str`): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail.
+        file_name (:obj:`str`): Original filename.
+        mime_type (:obj:`str`): Optional. MIME type of the file.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str): Unique file identifier
-        thumb (Optional[:class:`telegram.PhotoSize`]): Document thumbnail as defined by sender.
-        file_name (Optional[str]): Original filename as defined by sender.
-        mime_type (Optional[str]): MIME type of the file as defined by sender.
-        file_size (Optional[int]): File size.
-        **kwargs (dict): Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique file identifier
+        thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
+        file_name (:obj:`str`, optional): Original filename as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     _id_keys = ('file_id',)
@@ -62,15 +62,6 @@ class Document(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Document`
-        """
-
         if not data:
             return None
 

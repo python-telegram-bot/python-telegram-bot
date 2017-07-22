@@ -33,43 +33,38 @@ class CallbackQuery(TelegramObject):
         Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
 
     Attributes:
-        id (str): Unique identifier for this query.
+        id (:obj:`str`): Unique identifier for this query.
         from (:class:`telegram.User`): Sender.
         message (:class:`telegram.Message`): Optional. Message with the callback button that
-                originated the query. Note that message content and message date will not
-                be available if the message is too old.
-        inline_message_id (str): Optional. Identifier of the message sent via the bot in
+            originated the query.
+        inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
-        chat_instance (str): Optional. Global identifier, uniquely corresponding to the chat to
-                which the message with the callback button was sent. Useful for high scores
-                in games.
-        data (str): Optional. Data associated with the callback button. Be aware that a bad
-                client can send arbitrary data in this field.
-        game_short_name (str): Optional. Short name of a Game to be returned, serves as
-                the unique identifier for the game
+        chat_instance (:obj:`str`): Optional. Global identifier, uniquely corresponding to the chat
+            to which the message with the callback button was sent.
+        data (:obj:`str`): Optional. Data associated with the callback button.
+        game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
 
     Args:
-        id (str): Unique identifier for this query.
+        id (:obj:`str`): Unique identifier for this query.
         from (:class:`telegram.User`): Sender.
-        message (Optional[:class:`telegram.Message`]): Message with the callback button that
-                originated the query. Note that message content and message date will not
-                be available if the message is too old.
-        inline_message_id (Optional[str]): Identifier of the message sent via the bot in
-                inline mode, that originated the query.
-        chat_instance (Optional[str]): Global identifier, uniquely corresponding to the chat to
-                which the message with the callback button was sent. Useful for high scores in
-                games.
-        data (Optional[str]): Data associated with the callback button. Be aware that a bad
-                client can send arbitrary data in this field.
-        game_short_name (Optional[str]): Short name of a Game to be returned, serves as
-                the unique identifier for the game
+        message (:class:`telegram.Message`, optional): Message with the callback button that
+            originated the query. Note that message content and message date will not be available
+            if the message is too old.
+        inline_message_id (:obj:`str`, optional): Identifier of the message sent via the bot in
+            inline mode, that originated the query.
+        chat_instance (:obj:`str`, optional): Global identifier, uniquely corresponding to the chat
+            to which the message with the callback button was sent. Useful for high scores in
+            games.
+        data (:obj:`str`, optional): Data associated with the callback button. Be aware that a bad
+            client can send arbitrary data in this field.
+        game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
+            the unique identifier for the game
 
     Note:
         After the user presses an inline button, Telegram clients will display a progress bar
         until you call :attr:`answer`. It is, therefore, necessary to react
-        by calling answerCallbackQuery even if no notification to the user is needed
-        (e.g., without specifying any of the optional parameters).
-
+        by calling :attr:`telegram.bot.answer_callback_query` even if no notification to the user
+        is needed (e.g., without specifying any of the optional parameters).
     """
 
     def __init__(self,
@@ -96,15 +91,6 @@ class CallbackQuery(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.CallbackQuery`:
-        """
-
         if not data:
             return None
 
@@ -116,10 +102,6 @@ class CallbackQuery(TelegramObject):
         return CallbackQuery(bot=bot, **data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = super(CallbackQuery, self).to_dict()
 
         # Required
@@ -130,10 +112,10 @@ class CallbackQuery(TelegramObject):
         """
         Shortcut for::
 
-            bot.answerCallbackQuery(update.callback_query.id, *args, **kwargs)
+            bot.answer_callback_query(update.callback_query.id, *args, **kwargs)
 
         Returns:
-            bool: On success, True is returned.
+            :obj:`bool`: On success, ``True`` is returned.
         """
 
         return self.bot.answerCallbackQuery(self.id, *args, **kwargs)
@@ -142,18 +124,18 @@ class CallbackQuery(TelegramObject):
         """
         Shortcut for either::
 
-            bot.editMessageText(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_text(chat_id=update.callback_query.message.chat_id,
                                 message_id=update.callback_query.message.message_id,
                                 *args, **kwargs)
 
         or::
 
-            bot.editMessageText(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_text(inline_message_id=update.callback_query.inline_message_id,
                                 *args, **kwargs)
 
         Returns:
-            :class:`telegram.Message` | bool: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise True is returned.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
         """
 
         if self.inline_message_id:
@@ -167,18 +149,18 @@ class CallbackQuery(TelegramObject):
         """
         Shortcut for either::
 
-            bot.editMessageCaption(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_caption(chat_id=update.callback_query.message.chat_id,
                                    message_id=update.callback_query.message.message_id,
                                    *args, **kwargs)
 
         or::
 
-            bot.editMessageCaption(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_caption(inline_message_id=update.callback_query.inline_message_id,
                                    *args, **kwargs)
 
         Returns:
-            :class:`telegram.Message` | bool: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise True is returned.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
         """
 
         if self.inline_message_id:
@@ -192,18 +174,18 @@ class CallbackQuery(TelegramObject):
         """
         Shortcut for either::
 
-            bot.editMessageReplyMarkup(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_replyMarkup(chat_id=update.callback_query.message.chat_id,
                                        message_id=update.callback_query.message.message_id,
                                        *args, **kwargs)
 
         or::
 
-            bot.editMessageReplyMarkup(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_reply_markup(inline_message_id=update.callback_query.inline_message_id,
                                        *args, **kwargs)
 
         Returns:
-            :class:`telegram.Message` | bool: On success, if edited message is sent by the bot, the
-            edited Message is returned, otherwise True is returned.
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
         """
 
         if self.inline_message_id:

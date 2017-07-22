@@ -23,23 +23,24 @@ from telegram import TelegramObject
 
 
 class User(TelegramObject):
-    """This object represents a Telegram user or bot.
+    """
+    This object represents a Telegram user or bot.
 
     Attributes:
-        id (int): Unique identifier for this user or bot.
-        first_name (str): User's or bot's first name.
-        last_name (str): Optional. User's or bot's last name.
-        username (str): Optional. User's or bot's last name.
-        language_code (str): Optional. IETF language tag of the user's language.
+        id (:obj:`int`): Unique identifier for this user or bot.
+        first_name (:obj:`str`): User's or bot's first name.
+        last_name (:obj:`str`): Optional. User's or bot's last name.
+        username (:obj:`str`): Optional. User's or bot's last name.
+        language_code (:obj:`str`): Optional. IETF language tag of the user's language.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        id (int): Unique identifier for this user or bot.
-        first_name (str): User's or bot's first name.
-        last_name (Optional[str]): User's or bot's last name.
-        username (Optional[str]): User's or bot's username.
-        language_code (Optional[str]): IETF language tag of the user's language.
-        bot (Optional[:class:`telegram.Bot`]): The Bot to use for instance methods.
+        id (:obj:`int`): Unique identifier for this user or bot.
+        first_name (:obj:`str`): User's or bot's first name.
+        last_name (:obj:`str`, optional): User's or bot's last name.
+        username (:obj:`str`, optional): User's or bot's username.
+        language_code (:obj:`str`, optional): IETF language tag of the user's language.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
     """
 
     def __init__(self,
@@ -64,11 +65,9 @@ class User(TelegramObject):
 
     @property
     def name(self):
-        """Returns the users username if available, if not it returns the first name and if present
-        first name and lastname.
-
-        Returns:
-            str
+        """
+        :obj:`str`: The users :attr:`username` if available, if not it returns the first name and
+            if present :attr:`first_name` and :attr:`last_name`.
         """
 
         if self.username:
@@ -79,14 +78,6 @@ class User(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.User`:
-        """
         if not data:
             return None
 
@@ -96,20 +87,16 @@ class User(TelegramObject):
 
     def get_profile_photos(self, *args, **kwargs):
         """
-        Shortcut for ``bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)``
+        Shortcut for::
+
+                bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
+
         """
+
         return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
 
     @staticmethod
     def de_list(data, bot):
-        """
-        Args:
-            data (list):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            list(:class:`telegram.User`):
-        """
         if not data:
             return []
 

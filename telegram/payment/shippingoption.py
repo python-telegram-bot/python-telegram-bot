@@ -26,16 +26,15 @@ class ShippingOption(TelegramObject):
     This object represents one shipping option.
 
     Attributes:
-        id (str): Shipping option identifier.
-        title (str): Option title.
-        prices ([:class:`telegram.LabeledPrice`]): List of price portions.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Shipping option identifier.
+        title (:obj:`str`): Option title.
+        prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
 
     Args:
-        id (str): Shipping option identifier.
-        title (str): Option title.
-        prices (list(:class:`telegram.LabeledPrice`)): List of price portions.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Shipping option identifier.
+        title (:obj:`str`): Option title.
+        prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, id, title, prices, **kwargs):
@@ -47,15 +46,6 @@ class ShippingOption(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.ShippingOption`
-        """
-
         if not data:
             return None
 
@@ -66,11 +56,6 @@ class ShippingOption(TelegramObject):
         return ShippingOption(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict
-        """
-
         data = super(ShippingOption, self).to_dict()
 
         data['prices'] = [p.to_dict() for p in self.prices]

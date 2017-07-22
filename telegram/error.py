@@ -22,8 +22,8 @@
 def _lstrip_str(in_s, lstr):
     """
     Args:
-        in_s (str): in string
-        lstr (str): substr to strip from left side
+        in_s (:obj:`str`): in string
+        lstr (:obj:`str`): substr to strip from left side
 
     Returns:
         str:
@@ -77,26 +77,26 @@ class TimedOut(NetworkError):
 
 
 class ChatMigrated(TelegramError):
+    """
+    Args:
+        new_chat_id (:obj:`int`):
+
+    """
 
     def __init__(self, new_chat_id):
-        """
-        Args:
-            new_chat_id (int):
-
-        """
         super(ChatMigrated,
               self).__init__('Group migrated to supergroup. New chat id: {}'.format(new_chat_id))
         self.new_chat_id = new_chat_id
 
 
 class RetryAfter(TelegramError):
+    """
+    Args:
+        retry_after (:obj:`int`):
+
+    """
 
     def __init__(self, retry_after):
-        """
-        Args:
-            retry_after (int):
-
-        """
         super(RetryAfter,
               self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
         self.retry_after = float(retry_after)

@@ -29,28 +29,28 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
     of the photo.
 
     Attributes:
-        type (str): 'photo'.
-        id (str): Unique identifier for this result, 1-64 bytes.
-        photo_file_id (str): A valid file identifier of the photo.
-        title (str): Optional. Title for the result.
-        description (str): Optional. Short description of the result.
-        caption (str): Optional. Caption, 0-200 characters
+        type (:obj:`str`): 'photo'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        photo_file_id (:obj:`str`): A valid file identifier of the photo.
+        title (:obj:`str`): Optional. Title for the result.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the photo.
+            message to be sent instead of the photo.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 bytes.
-        photo_file_id (str): A valid file identifier of the photo.
-        title (Optional[str]): Title for the result.
-        description (Optional[str]): Short description of the result.
-        caption (Optional[str]): Caption, 0-200 characters
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-                to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-                message to be sent instead of the photo.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        photo_file_id (:obj:`str`): A valid file identifier of the photo.
+        title (:obj:`str`, optional): Title for the result.
+        description (:obj:`str`, optional): Short description of the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the photo.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

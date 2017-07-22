@@ -22,7 +22,8 @@ from future.utils import string_types
 
 
 class BaseFilter(object):
-    """Base class for all Message Filters
+    """
+    Base class for all Message Filters
 
     Subclassing from this class filters to be combined using bitwise operators:
 
@@ -53,7 +54,7 @@ class BaseFilter(object):
     class variable.
 
     Attributes:
-        name (str): Name for this filter. Defaults to ``None``.
+        name (:obj:`str`): Name for this filter. Defaults to the type of filter.
     """
 
     name = None
@@ -84,7 +85,7 @@ class BaseFilter(object):
             message (:class:`telegram.Message`): The message that is tested.
 
         Returns:
-            bool
+            :obj:`bool`
         """
 
         raise NotImplementedError
@@ -140,28 +141,7 @@ class Filters(object):
 
     Note:
         Example use ``MessageHandler(Filters.video, callback_method)`` to filter all video
-        messages. use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
-
-    Attributes:
-        all: All Messages.
-        text: Text Messages.
-        command: Messages starting with ``/``.
-        reply: Messages that are a reply to another message.
-        audio: Messages that contain :class:`telegram.Audio`.
-        document: Messages that contain :class:`telegram.Document`.
-        photo: Messages that contain :class:`telegram.PhotoSize`.
-        sticker: Messages that contain :class:`telegram.Sticker`.
-        video: Messages that contain :class:`telegram.Video`.
-        voice: Messages that contain :class:`telegram.Voice`.
-        contact: Messages that contain :class:`telegram.Contact`.
-        location: Messages that contain :class:`telegram.Location`.
-        venue: Messages that contain :class:`telegram.Venue`.
-        forwarded: Messages that are forwarded.
-        game: Messages that contain :class:`telegram.Game`.
-        private: Messages sent in a private chat.
-        group: Messages sent in a group chat.
-        invoice: Messages that contain :class:`telegram.Invoice`.
-        successful_payment: Messages that confirm a succesfull payment.
+        messages. Use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
     """
 
     class _All(BaseFilter):
@@ -171,6 +151,7 @@ class Filters(object):
             return True
 
     all = _All()
+    """:obj:`Filter`: All Messages."""
 
     class _Text(BaseFilter):
         name = 'Filters.text'
@@ -179,6 +160,7 @@ class Filters(object):
             return bool(message.text and not message.text.startswith('/'))
 
     text = _Text()
+    """:obj:`Filter`: Text Messages."""
 
     class _Command(BaseFilter):
         name = 'Filters.command'
@@ -187,6 +169,7 @@ class Filters(object):
             return bool(message.text and message.text.startswith('/'))
 
     command = _Command()
+    """:obj:`Filter`: Messages starting with ``/``."""
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
@@ -195,6 +178,7 @@ class Filters(object):
             return bool(message.reply_to_message)
 
     reply = _Reply()
+    """:obj:`Filter`: Messages that are a reply to another message."""
 
     class _Audio(BaseFilter):
         name = 'Filters.audio'
@@ -203,6 +187,7 @@ class Filters(object):
             return bool(message.audio)
 
     audio = _Audio()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Audio`."""
 
     class _Document(BaseFilter):
         name = 'Filters.document'
@@ -211,6 +196,7 @@ class Filters(object):
             return bool(message.document)
 
     document = _Document()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
 
     class _Photo(BaseFilter):
         name = 'Filters.photo'
@@ -219,6 +205,7 @@ class Filters(object):
             return bool(message.photo)
 
     photo = _Photo()
+    """:obj:`Filter`: Messages that contain :class:`telegram.PhotoSize`."""
 
     class _Sticker(BaseFilter):
         name = 'Filters.sticker'
@@ -227,6 +214,7 @@ class Filters(object):
             return bool(message.sticker)
 
     sticker = _Sticker()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Sticker`."""
 
     class _Video(BaseFilter):
         name = 'Filters.video'
@@ -235,6 +223,7 @@ class Filters(object):
             return bool(message.video)
 
     video = _Video()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Video`."""
 
     class _Voice(BaseFilter):
         name = 'Filters.voice'
@@ -243,6 +232,7 @@ class Filters(object):
             return bool(message.voice)
 
     voice = _Voice()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Voice`."""
 
     class _Contact(BaseFilter):
         name = 'Filters.contact'
@@ -251,6 +241,7 @@ class Filters(object):
             return bool(message.contact)
 
     contact = _Contact()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Contact`."""
 
     class _Location(BaseFilter):
         name = 'Filters.location'
@@ -259,6 +250,7 @@ class Filters(object):
             return bool(message.location)
 
     location = _Location()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Location`."""
 
     class _Venue(BaseFilter):
         name = 'Filters.venue'
@@ -267,26 +259,15 @@ class Filters(object):
             return bool(message.venue)
 
     venue = _Venue()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Venue`."""
 
     class _StatusUpdate(BaseFilter):
         """
-        subset for messages containing a status update.
+        Subset for messages containing a status update.
 
         Note:
-            Use these filters like: ``Filters.status_update.new_chat_member`` etc.
-
-        Attributes:
-            new_chat_member: Messages that contain :attr:`telegram.Message.new_chat_member`.
-            left_chat_member: Messages that contain :attr:`telegram.Message.left_chat_member`.
-            new_chat_title: Messages that contain :attr:`telegram.Message.new_chat_title`.
-            new_chat_photo: Messages that contain :attr:`telegram.Message.new_chat_photo`.
-            delete_chat_photo: Messages that contain :attr:`telegram.Message.delete_chat_photo`.
-            chat_created: Messages that contain :attr:`telegram.Message.group_chat_created`
-                    :attr:`telegram.Message.supergroup_chat_created` or
-                    :attr:`telegram.Message.channel_chat_created`.
-            migrate: Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
-                    :attr:`telegram.Message.migrate_from_chat_id`.
-            pinned_message: Messages that contain :attr:`telegram.Message.pinned_message`.
+            Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+            ``Filters.status_update`` for all status update messages.
         """
 
         class _NewChatMembers(BaseFilter):
@@ -296,6 +277,7 @@ class Filters(object):
                 return bool(message.new_chat_members)
 
         new_chat_members = _NewChatMembers()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_member`."""
 
         class _LeftChatMember(BaseFilter):
             name = 'Filters.status_update.left_chat_member'
@@ -304,6 +286,7 @@ class Filters(object):
                 return bool(message.left_chat_member)
 
         left_chat_member = _LeftChatMember()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.left_chat_member`."""
 
         class _NewChatTitle(BaseFilter):
             name = 'Filters.status_update.new_chat_title'
@@ -312,6 +295,7 @@ class Filters(object):
                 return bool(message.new_chat_title)
 
         new_chat_title = _NewChatTitle()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_title`."""
 
         class _NewChatPhoto(BaseFilter):
             name = 'Filters.status_update.new_chat_photo'
@@ -320,6 +304,7 @@ class Filters(object):
                 return bool(message.new_chat_photo)
 
         new_chat_photo = _NewChatPhoto()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_photo`."""
 
         class _DeleteChatPhoto(BaseFilter):
             name = 'Filters.status_update.delete_chat_photo'
@@ -328,6 +313,7 @@ class Filters(object):
                 return bool(message.delete_chat_photo)
 
         delete_chat_photo = _DeleteChatPhoto()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
 
         class _ChatCreated(BaseFilter):
             name = 'Filters.status_update.chat_created'
@@ -337,6 +323,9 @@ class Filters(object):
                             message.channel_chat_created)
 
         chat_created = _ChatCreated()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.group_chat_created`,
+            :attr: `telegram.Message.supergroup_chat_created` or
+            :attr: `telegram.Message.channel_chat_created`."""
 
         class _Migrate(BaseFilter):
             name = 'Filters.status_update.migrate'
@@ -345,6 +334,8 @@ class Filters(object):
                 return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
 
         migrate = _Migrate()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
+            :attr: `telegram.Message.migrate_from_chat_id`."""
 
         class _PinnedMessage(BaseFilter):
             name = 'Filters.status_update.pinned_message'
@@ -353,6 +344,7 @@ class Filters(object):
                 return bool(message.pinned_message)
 
         pinned_message = _PinnedMessage()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.pinned_message`."""
 
         name = 'Filters.status_update'
 
@@ -371,6 +363,7 @@ class Filters(object):
             return bool(message.forward_date)
 
     forwarded = _Forwarded()
+    """:obj:`Filter`: Messages that are forwarded."""
 
     class _Game(BaseFilter):
         name = 'Filters.game'
@@ -379,9 +372,11 @@ class Filters(object):
             return bool(message.game)
 
     game = _Game()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Game`."""
 
     class entity(BaseFilter):
-        """Filters messages to only allow those which have a :class:`telegram.MessageEntity`
+        """
+        Filters messages to only allow those which have a :class:`telegram.MessageEntity`
         where their `type` matches `entity_type`.
 
         Note:
@@ -391,7 +386,7 @@ class Filters(object):
             entity_type: Entity type to check for. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
 
-        Returns: function to use as filter
+        Returns: Function to use as filter
         """
 
         def __init__(self, entity_type):
@@ -408,6 +403,7 @@ class Filters(object):
             return message.chat.type == Chat.PRIVATE
 
     private = _Private()
+    """:obj:`Filter`: Messages sent in a private chat."""
 
     class _Group(BaseFilter):
         name = 'Filters.group'
@@ -416,17 +412,19 @@ class Filters(object):
             return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
 
     group = _Group()
+    """:obj:`Filter`: Messages sent in a group chat."""
 
     class user(BaseFilter):
-        """Filters messages to allow only those which are from specified user ID.
+        """
+        Filters messages to allow only those which are from specified user ID.
 
         Note:
             Example: ``MessageHandler(Filters.user(1234), callback_method)``
 
         Args:
-            user_id(Optional[int|list]): which user ID(s) to allow through.
-            username(Optional[str|list]): which username(s) to allow through. If username starts
-                with '@' symbol, it will be ignored.
+            user_id(:obj:`int` | List[:obj:`int`]): Which user ID(s) to allow through.
+            username(:obj:`str` | List[:obj:`str`` ]): Which username(s) to allow through. If
+                username starts with '@' symbol, it will be ignored.
 
         Raises:
             ValueError
@@ -455,15 +453,16 @@ class Filters(object):
                             message.from_user.username in self.usernames)
 
     class chat(BaseFilter):
-        """Filters messages to allow only those which are from specified chat ID.
+        """
+        Filters messages to allow only those which are from specified chat ID.
 
         Note:
             Example: ``MessageHandler(Filters.chat(-1234), callback_method)``
 
         Args:
-            chat_id(Optional[int|list]): which chat ID(s) to allow through.
-            username(Optional[str|list]): which username(s) to allow through. If username starts
-                with '@' symbol, it will be ignored.
+            chat_id(:obj:`int` | List[:obj:`int`]): Which chat ID(s) to allow through.
+            username(:obj:`str` | List[:obj:`str`]): Which username(s) to allow through. If
+                username start swith '@' symbol, it will be ignored.
 
         Raises:
             ValueError
@@ -497,6 +496,7 @@ class Filters(object):
             return bool(message.invoice)
 
     invoice = _Invoice()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Invoice`."""
 
     class _SuccessfulPayment(BaseFilter):
         name = 'Filters.successful_payment'
@@ -505,6 +505,7 @@ class Filters(object):
             return bool(message.successful_payment)
 
     successful_payment = _SuccessfulPayment()
+    """:obj:`Filter`: Messages that confirm a successful payment."""
 
     class language(BaseFilter):
         """
@@ -516,8 +517,9 @@ class Filters(object):
             example ``MessageHandler(Filters.language("en"), callback_method)``
 
         Args:
-            lang (str|list): Which language code(s) to allow through. This will be matched using
-                .startswith meaning that 'en' will match both 'en_US' and 'en_GB'
+            lang (:obj:`str` | List[:obj:`str`]): Which language code(s) to allow through. This
+                will be matched using ``.startswith`` meaning that 'en' will match both 'en_US'
+                and 'en_GB'.
         """
 
         def __init__(self, lang):

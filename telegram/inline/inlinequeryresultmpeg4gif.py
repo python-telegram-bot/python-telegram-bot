@@ -29,34 +29,34 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     animation.
 
     Attributes:
-        type (str): 'mpeg4_gif'.
-        id (str): Unique identifier for this result, 1-64 bytes.
-        mpeg4_url (str): A valid URL for the MP4 file. File size must not exceed 1MB.
-        mpeg4_width (int): Optional. Video width.
-        mpeg4_height (int): Optional. Video height.
-        mpeg4_duration (int): Optional. Video duration.
-        thumb_url (str): URL of the static thumbnail (jpeg or gif) for the result.
-        title (str): Optional. Title for the result.
-        caption (str): Optional. Caption, 0-200 characters
+        type (:obj:`str`): 'mpeg4_gif'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
+        mpeg4_width (:obj:`int`): Optional. Video width.
+        mpeg4_height (:obj:`int`): Optional. Video height.
+        mpeg4_duration (:obj:`int`): Optional. Video duration.
+        thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
+        title (:obj:`str`): Optional. Title for the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the MPEG-4 file.
+            message to be sent instead of the MPEG-4 file.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 bytes.
-        mpeg4_url (str): A valid URL for the MP4 file. File size must not exceed 1MB.
-        mpeg4_width (Optional[int]): Video width.
-        mpeg4_height (Optional[int]): Video height.
-        mpeg4_duration (Optional[int]): Video duration.
-        thumb_url (str): URL of the static thumbnail (jpeg or gif) for the result.
-        title (Optional[str]): Title for the result.
-        caption (Optional[str]): Caption, 0-200 characters
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-                to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-                message to be sent instead of the MPEG-4 file.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
+        mpeg4_width (:obj:`int`, optional): Video width.
+        mpeg4_height (:obj:`int`, optional): Video height.
+        mpeg4_duration (:obj:`int`, optional): Video duration.
+        thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
+        title (:obj:`str`, optional): Title for the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the MPEG-4 file.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

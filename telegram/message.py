@@ -28,181 +28,147 @@ from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, f
 
 
 class Message(TelegramObject):
-    """This object represents a message.
+    """
+    This object represents a message.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        message_id (int): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender, can be empty for messages sent
-                to channels
-        date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
-                :class:`datetime.datetime`.
+        message_id (:obj:`int`): Unique message identifier inside this chat.
+        from_user (:class:`telegram.User`): Optional. Sender.
+        date (:class:`datetime.datetime`): Date the message was sent.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of
-                the original message.
-        forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from a
-                channel, information about the original channel.
-        forward_from_message_id (int): Optional. For forwarded channel posts, identifier of
-                the original message in the channel.
-        forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
-                original message was sent in Unix time. Converted to :class:`datetime.datetime`.
-        reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
-                Note that the Message object in this field will not contain further
-                ``reply_to_message`` fields even if it itself is a reply.
-        edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited
-                in Unix time. Converted to :class:`datetime.datetime`.
-        text (str): Optional. For text messages, the actual UTF-8 text of the message,
-                0-4096 characters.  Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
-        entities ([:class:`telegram.MessageEntity`]): Optional. For text messages, special
-                entities like usernames, URLs, bot commands, etc. that appear in the text. See
-                :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
-                properly.
-        audio (:class:`telegram.Audio`): Optional. Message is an audio file, information
-                about the file.
-        document (:class:`telegram.Document`): Optional. Message is a general file, information
-                about the file.
-        game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-        photo ([:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
-                sizes of the photo.
-        sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information
-                about the sticker.
-        video (:class:`telegram.Video`): Optional. Message is a video, information about the video.
-        voice (:class:`telegram.Voice`): Optional. Message is a voice message, information
-                about the file.
-        video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
-                about the video message.
-        new_chat_members ([:class:`telegram.User`]): Optional. New members that were added to the
-                group or supergroup and information about them
-                (the bot itself may be one of these members).
-        caption (str): 	Optional. Caption for the document, photo or video, 0-200 characters.
-        contact (:class:`telegram.Contact`): Optional. Message is a shared contact, information
-                about the contact.
-        location (:class:`telegram.Location`): Optional. Message is a shared location, information
-                about the location.
-        venue (:class:`telegram.Venue`): Optional. Message is a venue, information about the venue.
-        left_chat_member (:class:`telegram.User`): Optional. A member was removed from the group,
-                information about them (this member may be the bot itself).
-        new_chat_title (str): Optional. A chat title was changed to this value.
-        new_chat_photo ([:class:`telegram.PhotoSize`]): Optional. A chat photo was change to this
-                value.
-        delete_chat_photo (bool): 	Optional. Service message: the chat photo was deleted.
-        group_chat_created (bool): 	Optional. Service message: the group has been created.
-        supergroup_chat_created (bool): Optional. Service message: the supergroup has been created.
-                This field can't be received in a message coming through updates, because bot can't
-                be a member of a supergroup when it is created. It can only be found in
-                ``reply_to_message`` if someone replies to a very first message in a directly
-                created supergroup.
-        channel_chat_created (bool): Optional. Service message: the channel has been created. This
-                field can't be received in a message coming through updates, because bot can't be a
-                member of a channel when it is created. It can only be found in
-                ``reply_to_message`` if someone replies to a very first message in a channel.
-        migrate_to_chat_id (int): Optional. The group has been migrated to a supergroup with the
-                specified identifier. This number may be greater than 32 bits and some programming
-                languages may have difficulty/silent defects in interpreting it. But it is smaller
-                than 52 bits, so a signed 64 bit integer or double-precision float type are safe
-                for storing this identifier.
-        migrate_from_chat_id (int): Optional. The supergroup has been migrated from a group with
-                the specified identifier. This number may be greater than 32 bits and some
-                programming languages may have difficulty/silent defects in interpreting it. But
-                it is smaller than 52 bits, so a signed 64 bit integer or double-precision float
-                type are safe for storing this identifier.
-        pinned_message (:class:`telegram.message`): Optional. Specified message was pinned. Note
-                that the Message object in this field will not contain further ``reply_to_message``
-                fields even if it is itself a reply.
-        invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
-                information about the invoice.
-        successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Message is a service
-                message about a successful payment, information about the payment.
+        forward_from (:class:`telegram.User`): Optional. Sender of the original message.
+        forward_from_chat (:class:`telegram.Chat`): Optional. Information about the original
+            channel.
+        forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
+            channel.
+        forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
+        reply_to_message (:class:`telegram.Message`): Optional. The original message.
+        edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited.
+        text (:obj:`str`): Optional. The actual UTF-8 text of the message.
+        entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+            usernames, URLs, bot commands, etc. that appear in the text. See
+            :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
+            properly.
+        audio (:class:`telegram.Audio`): Optional. Information about the file.
+        document (:class:`telegram.Document`): Optional. Information about the file.
+        game (:class:`telegram.Game`): Optional. Information about the game.
+        photo (List[:class:`telegram.PhotoSize`]): Optional. Available sizes of the photo.
+        sticker (:class:`telegram.Sticker`): Optional. Information about the sticker.
+        video (:class:`telegram.Video`): Optional. Information about the video.
+        voice (:class:`telegram.Voice`): Optional. Information about the file.
+        video_note (:class:`telegram.VideoNote`): Optional. Information about the video message.
+        new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
+            the chat. (the bot itself may be one of these members).
+        caption (:obj:`str`): Optional. Caption for the document, photo or video, 0-200 characters.
+        contact (:class:`telegram.Contact`): Optional. Information about the contact.
+        location (:class:`telegram.Location`): Optional. Information about the location.
+        venue (:class:`telegram.Venue`): Optional. Information about the venue.
+        left_chat_member (:class:`telegram.User`): Optional. Information about the user that left
+            the group. (this member may be the bot itself).
+        new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
+        new_chat_photo (List[:class:`telegram.PhotoSize`]): Optional. A chat photo was change to
+            this value.
+        delete_chat_photo (:obj:`bool`): Optional. The chat photo was deleted.
+        group_chat_created (:obj:`bool`): Optional. The group has been created.
+        supergroup_chat_created (:obj:`bool`): Optional. The supergroup has been created.
+        channel_chat_created (:obj:`bool`): Optional. The channel has been created.
+        migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup with
+            the specified identifier.
+        migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
+            with the specified identifier.
+        pinned_message (:class:`telegram.message`): Optional. Specified message was pinned.
+        invoice (:class:`telegram.Invoice`): Optional. Information about the invoice.
+        successful_payment (:class:`telegram.SuccessfulPayment`): Optional. Information about the
+            payment.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Deprecated: 6.0
-        new_chat_member (:class:`telegram.User`): Replaced with ``new_chat_mebers``
+        new_chat_member (:class:`telegram.User`): Replaced with :attr:`new_chat_members`
 
     Args:
-        message_id (int): Unique message identifier inside this chat.
-        from_user (Optional[:class:`telegram.User`]): Sender, can be empty for messages sent
-                to channels
-        date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
-                :class:`datetime.datetime`.
+        message_id (:obj:`int`): Unique message identifier inside this chat.
+        from_user (:class:`telegram.User`, optional): Sender, can be empty for messages sent
+            to channels.
+        date (:class:`datetime.time`): Date the message was sent in Unix time. Converted to
+            :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (Optional[:class:`telegram.User`]): For forwarded messages, sender of
-                the original message.
-        forward_from_chat (Optional[:class:`telegram.Chat`]): For messages forwarded from a
-                channel, information about the original channel.
-        forward_from_message_id (Optional[int]): For forwarded channel posts, identifier of
-                the original message in the channel.
-        forward_date (Optional[:class:`datetime.datetime`]): For forwarded messages, date the
-                original message was sent in Unix time. Converted to :class:`datetime.datetime`.
-        reply_to_message (Optional[:class:`telegram.Message`]): For replies, the original message.
-                Note that the Message object in this field will not contain further
-                ``reply_to_message`` fields even if it itself is a reply.
-        edit_date (Optional[:class:`datetime.datetime`]): Date the message was last edited
-                in Unix time. Converted to :class:`datetime.datetime`.
-        text (Optional[str]): For text messages, the actual UTF-8 text of the message, 0-4096
-                characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
-        entities (Optional[list(:class:`telegram.MessageEntity`)]): For text messages, special
-                entities like usernames, URLs, bot commands, etc. that appear in the text. See
-                ``parse_entity`` and ``parse_entities`` methods for how to use properly.
-        audio (Optional[:class:`telegram.Audio`]): Message is an audio file, information
-                about the file.
-        document (Optional[:class:`telegram.Document`]): Message is a general file, information
-                about the file.
-        game (Optional[:class:`telegram.Game`]): Message is a game, information about the game.
-        photo (Optional[list(:class:`telegram.PhotoSize`)]): Message is a photo, available
-                sizes of the photo.
-        sticker (Optional[:class:`telegram.Sticker`]): Message is a sticker, information
-                about the sticker.
-        video (Optional[:class:`telegram.Video`]): Message is a video, information about the video.
-        voice (Optional[:class:`telegram.Voice`]): Message is a voice message, information
-                about the file.
-        video_note (Optional[:class:`telegram.VideoNote`]): Message is a video note, information
-                about the video message.
-        new_chat_members (Optional[list(:class:`telegram.User`)]): New members that were added to
-                the group or supergroup and information about them
-                (the bot itself may be one of these members).
-        caption (Optional[str]): Optional. Caption for the document, photo or video, 0-200
-                characters.
-        contact (Optional[:class:`telegram.Contact`]): Message is a shared contact,
-                information about the contact.
-        location (Optional[:class:`telegram.Location`]): Message is a shared location, information
-                about the location.
-        venue (Optional[:class:`telegram.Venue`]): Message is a venue, information about the venue.
-        left_chat_member (Optional[:class:`telegram.User`]): A member was removed from the group,
-                information about them (this member may be the bot itself).
-        new_chat_title (Optional[str]): A chat title was changed to this value.
-        new_chat_photo (Optional[list(:class:`telegram.PhotoSize`)]): A chat photo was change to
-                this value.
-        delete_chat_photo (Optional[bool]): Service message: the chat photo was deleted.
-        group_chat_created (Optional[bool]): Service message: the group has been created.
-        supergroup_chat_created (Optional[bool]): Service message: the supergroup has been created.
-                This field can't be received in a message coming through updates, because bot can't
-                be a member of a supergroup when it is created. It can only be found in
-                ``reply_to_message`` if someone replies to a very first message in a directly
-                created supergroup.
-        channel_chat_created (Optional[bool]): Service message: the channel has been created. This
-                field can't be received in a message coming through updates, because bot can't be a
-                member of a channel when it is created. It can only be found in
-                ``reply_to_message`` if someone replies to a very first message in a channel.
-        migrate_to_chat_id (Optional[int]): The group has been migrated to a supergroup with the
-                specified identifier. This number may be greater than 32 bits and some programming
-                languages may have difficulty/silent defects in interpreting it. But it is smaller
-                than 52 bits, so a signed 64 bit integer or double-precision float type are safe
-                for storing this identifier.
-        migrate_from_chat_id (Optional[int]): The supergroup has been migrated from a group with
-                the specified identifier. This number may be greater than 32 bits and some
-                programming languages may have difficulty/silent defects in interpreting it. But
-                it is smaller than 52 bits, so a signed 64 bit integer or double-precision float
-                type are safe for storing this identifier.
-        pinned_message (Optional[:class:`telegram.message`]): Specified message was pinned. Note
-                that the Message object in this field will not contain further ``reply_to_message``
-                fields even if it is itself a reply.
-        invoice (Optional[:class:`telegram.Invoice`]): Message is an invoice for a payment,
-                information about the invoice.
-        successful_payment (Optional[:class:`telegram.SuccessfulPayment`]): Message is a service
-                message about a successful payment, information about the payment.
-
+        forward_from (:class:`telegram.User`, optional): For forwarded messages, sender of
+            the original message.
+        forward_from_chat (:class:`telegram.Chat`, optional): For messages forwarded from a
+            channel, information about the original channel.
+        forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
+            the original message in the channel.
+        forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
+            original message was sent in Unix time. Converted to :class:`datetime.datetime`.
+        reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
+            Note that the Message object in this field will not contain further
+            ``reply_to_message`` fields even if it itself is a reply.
+        edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
+            time. Converted to :class:`datetime.datetime`.
+        text (str, optional): For text messages, the actual UTF-8 text of the message, 0-4096
+            characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
+        entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
+            entities like usernames, URLs, bot commands, etc. that appear in the text. See
+            attr:`parse_entity` and attr:`parse_entities` methods for how to use properly.
+        audio (:class:`telegram.Audio`, optional): Message is an audio file, information
+            about the file.
+        document (:class:`telegram.Document`, optional): Message is a general file, information
+            about the file.
+        game (:class:`telegram.Game`, optional): Message is a game, information about the game.
+        photo (List[:class:`telegram.PhotoSize`], optional): Message is a photo, available
+            sizes of the photo.
+        sticker (:class:`telegram.Sticker`, optional): Message is a sticker, information
+            about the sticker.
+        video (:class:`telegram.Video`, optional): Message is a video, information about the video.
+        voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
+            the file.
+        video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
+            about the video message.
+        new_chat_members (List[:class:`telegram.User`], optional): New members that were added to
+            the group or supergroup and information about them (the bot itself may be one of these
+            members).
+        caption (:obj:`str`, optional): Caption for the document, photo or video, 0-200 characters.
+        contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
+            about the contact.
+        location (:class:`telegram.Location`, optional): Message is a shared location, information
+            about the location.
+        venue (:class:`telegram.Venue`, optional): Message is a venue, information about the venue.
+        left_chat_member (:class:`telegram.User`, optional): A member was removed from the group,
+            information about them (this member may be the bot itself).
+        new_chat_title (:obj:`str`, optional): A chat title was changed to this value.
+        new_chat_photo (List[:class:`telegram.PhotoSize`], optional): A chat photo was change to
+            this value.
+        delete_chat_photo (:obj:`bool`, optional): Service message: The chat photo was deleted.
+        group_chat_created (:obj:`bool`, optional): Service message: The group has been created.
+        supergroup_chat_created (:obj:`bool`, optional): Service message: The supergroup has been
+            created. This field can't be received in a message coming through updates, because bot
+            can't be a member of a supergroup when it is created. It can only be found in
+            :attr:`reply_to_message` if someone replies to a very first message in a directly
+            created supergroup.
+        channel_chat_created (:obj:`bool`, optional): Service message: The channel has been
+            created. This field can't be received in a message coming through updates, because bot
+            can't be a member of a channel when it is created. It can only be found in
+            attr:`reply_to_message` if someone replies to a very first message in a channel.
+        migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup with
+            the specified identifier. This number may be greater than 32 bits and some programming
+            languages may have difficulty/silent defects in interpreting it. But it is smaller than
+            52 bits, so a signed 64 bit integer or double-precision float type are safe for storing
+            this identifier.
+        migrate_from_chat_id (:obj:`int`, optional): The supergroup has been migrated from a group
+            with the specified identifier. This number may be greater than 32 bits and some
+            programming languages may have difficulty/silent defects in interpreting it. But it is
+            smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
+            safe for storing this identifier.
+        pinned_message (:class:`telegram.message`, optional): Specified message was pinned. Note
+            that the Message object in this field will not contain further attr:`reply_to_message`
+            fields even if it is itself a reply.
+        invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
+            information about the invoice.
+        successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
+            message about a successful payment, information about the payment.
     """
 
     def __init__(self,
@@ -293,22 +259,13 @@ class Message(TelegramObject):
 
     @property
     def chat_id(self):
-        """Short for :attr:`Message.chat.id`
-
-        Returns:
-            int:"""
+        """
+        :attr:`telegram.Chat.id`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`.
+        """
         return self.chat.id
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Message`:
-        """
         if not data:
             return None
 
@@ -351,10 +308,6 @@ class Message(TelegramObject):
             return self.chat.id
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = super(Message, self).to_dict()
 
         # Required
@@ -378,8 +331,6 @@ class Message(TelegramObject):
         return data
 
     def _quote(self, kwargs):
-        """Modify kwargs for replying with or without quoting"""
-
         if 'reply_to_message_id' in kwargs:
             if 'quote' in kwargs:
                 del kwargs['quote']
@@ -401,9 +352,10 @@ class Message(TelegramObject):
             bot.send_message(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
         """
 
         self._quote(kwargs)
@@ -416,8 +368,8 @@ class Message(TelegramObject):
             bot.send_photo(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the photo is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -434,8 +386,8 @@ class Message(TelegramObject):
             bot.send_audio(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the audio is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -452,8 +404,8 @@ class Message(TelegramObject):
             bot.send_document(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the document is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -470,8 +422,8 @@ class Message(TelegramObject):
             bot.send_sticker(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the sticker is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -488,8 +440,8 @@ class Message(TelegramObject):
                 bot.send_video(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -506,8 +458,8 @@ class Message(TelegramObject):
                 bot.send_video_note(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the video is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -524,8 +476,8 @@ class Message(TelegramObject):
             bot.send_voice(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the voice is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -542,8 +494,8 @@ class Message(TelegramObject):
                 bot.send_location(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the location is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -560,8 +512,8 @@ class Message(TelegramObject):
                 bot.send_venue(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the venue is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -578,8 +530,8 @@ class Message(TelegramObject):
                 bot.send_contact(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the contact is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
                 will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
         Returns:
@@ -681,7 +633,7 @@ class Message(TelegramObject):
                                     **kwargs)
 
         Returns:
-            bool: On success, `True` is returned.
+            :obj:`bool`: On success, ``True`` is returned.
 
         """
         return self.bot.delete_message(
@@ -715,24 +667,25 @@ class Message(TelegramObject):
 
     def parse_entities(self, types=None):
         """
-        Returns a ``dict`` that maps :class:`telegram.MessageEntity` to ``str``.
-        It contains entities from this message filtered by their ``type`` attribute as the key, and
-        the text that each entity belongs to as the value of the ``dict``.
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this message filtered by their
+        :attr:`telegram.MessageEntity.type` attribute as the key, and the text that each entity
+        belongs to as the value of the :obj:`dict`.
 
         Note:
-            This method should always be used instead of the ``entities`` attribute, since it
+            This method should always be used instead of the :attr:`entities` attribute, since it
             calculates the correct substring from the message text based on UTF-16 codepoints.
             See :attr:`parse_entity` for more info.
 
         Args:
-            types (Optional[list(str)]): List of :class:`telegram.MessageEntity` types as strings.
-            If the ``type`` attribute of an entity is contained in this list, it will be returned.
-            Defaults to a list of all types. All types can be found as constants in
-            :class:`telegram.MessageEntity`.
+            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+                strings. If the ``type`` attribute of an entity is contained in this list, it will
+                be returned. Defaults to a list of all types. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
 
         Returns:
-            dict(:class:`telegram.MessageEntity`:str): A dictionary of entities mapped to the
-                text that belongs to them, calculated based on UTF-16 codepoints.
+            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
         """
 
         if types is None:
@@ -748,10 +701,10 @@ class Message(TelegramObject):
         """
         Creates an HTML-formatted string from the markup entities found in the message.
 
-        Use this if you want to retreive the message text with the entities formatted as HTML.
+        Use this if you want to retrieve the message text with the entities formatted as HTML.
 
         Returns:
-            str: message text with entities formatted as HTML.
+            :obj:`str`: Message text with entities formatted as HTML.
         """
 
         entities = self.parse_entities()
@@ -799,10 +752,10 @@ class Message(TelegramObject):
         """
         Creates an Markdown-formatted string from the markup entities found in the message.
 
-        Use this if you want to retreive the message text with the entities formatted as Markdown.
+        Use this if you want to retrieve the message text with the entities formatted as Markdown.
 
         Returns:
-            str: message text with entities formatted as Markdown.
+            :obj:`str`: Message text with entities formatted as Markdown.
         """
 
         entities = self.parse_entities()

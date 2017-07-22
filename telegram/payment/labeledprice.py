@@ -26,19 +26,16 @@ class LabeledPrice(TelegramObject):
     This object represents a portion of the price for goods or services.
 
     Attributes:
-        label (str): Portion label
-        amount (int): Price of the product in the smallest units of the currency (integer, not
-                float/double). For example, for a price of US$ 1.45 pass amount = 145. See the
-                exp parameter in currencies.json, it shows the number of digits past the decimal
-                point for each currency (2 for the majority of currencies).
+        label (:obj:`str`): Portion label.
+        amount (:obj:`int`): Price of the product in the smallest units of the currency.
 
     Args:
-        label (str): Portion label
-        amount (int): Price of the product in the smallest units of the currency (integer, not
-                float/double). For example, for a price of US$ 1.45 pass amount = 145. See the
-                exp parameter in currencies.json, it shows the number of digits past the decimal
-                point for each currency (2 for the majority of currencies).
-        **kwargs (dict): Arbitrary keyword arguments.
+        label (:obj:`str`): Portion label
+        amount (:obj:`int`): Price of the product in the smallest units of the currency (integer,
+            not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp
+            parameter in currencies.json, it shows the number of digits past the decimal point for
+            each currency (2 for the majority of currencies).
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, label, amount, **kwargs):
@@ -47,15 +44,6 @@ class LabeledPrice(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.LabeledPrice`
-        """
-
         if not data:
             return None
 
@@ -63,15 +51,6 @@ class LabeledPrice(TelegramObject):
 
     @staticmethod
     def de_list(data, bot):
-        """
-        Args:
-            data (list):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            list(:class:`telegram.LabeledPrice`)
-        """
-
         if not data:
             return []
 

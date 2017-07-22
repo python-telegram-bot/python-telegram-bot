@@ -44,12 +44,10 @@ class InputFile(object):
     This object represents a Telegram InputFile.
 
     Attributes:
-        data (dict): Data containing an inputfile.
-        headers (str): Headers.
-        content-type (str): Content type
+        data (:obj:`dict`): Data containing an inputfile.
 
     Args:
-        data (dict): Data containing an inputfile.
+        data (:obj:`dict`): Data containing an inputfile.
 
     Raises:
         TelegramError
@@ -90,10 +88,18 @@ class InputFile(object):
 
     @property
     def headers(self):
+        """
+        :obj:`str`: Headers.
+        """
+
         return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
 
     @property
     def content_type(self):
+        """
+        :obj:`str`: Content type
+        """
+
         return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
@@ -101,7 +107,7 @@ class InputFile(object):
         Transform the inputfile to multipart/form data.
 
         Returns:
-            str
+            :obj:`str`
         """
 
         form = []
@@ -146,10 +152,10 @@ class InputFile(object):
         Check if the content file is an image by analyzing its headers.
 
         Args:
-            stream (str): A str representing the content of a file.
+            stream (:obj:`str`): A str representing the content of a file.
 
         Returns:
-            str: The str mimetype of an image.
+            :obj:`str`: The str mime-type of an image.
         """
 
         image = imghdr.what(None, stream)
@@ -164,10 +170,10 @@ class InputFile(object):
         Check if the request is a file request.
 
         Args:
-            data (dict): A dict of (str, unicode) key/value pairs.
+            data (:obj:`dict`): A dict of (str, unicode) key/value pairs.
 
         Returns:
-            bool
+            :obj:`bool`
         """
 
         if data:

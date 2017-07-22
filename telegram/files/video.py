@@ -26,23 +26,23 @@ class Video(TelegramObject):
     This object represents a video file.
 
     Attributes:
-        file_id (str): Unique identifier for this file.
-        width (int): Video width as defined by sender.
-        height (int): Video height as defined by sender.
-        duration (int): Duration of the video in seconds as defined by sender.
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
-        mime_type (str): Optional. Mime type of a file as defined by sender.
-        file_size (int): Optional. File size.
+        mime_type (:obj:`str`): Optional. Mime type of a file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str): Unique identifier for this file.
-        width (int): Video width as defined by sender.
-        height (int): Video height as defined by sender.
-        duration (int): Duration of the video in seconds as defined by sender.
-        thumb (Optional[:class:`telegram.PhotoSize`]): Video thumbnail.
-        mime_type (Optional[str]): Mime type of a file as defined by sender.
-        file_size (Optional[int]): File size.
-        **kwargs: Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+        mime_type (:obj:`str`, optional): Mime type of a file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -68,15 +68,6 @@ class Video(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Video`
-        """
-
         if not data:
             return None
 

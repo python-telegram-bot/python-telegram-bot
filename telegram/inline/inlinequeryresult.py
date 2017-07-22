@@ -26,13 +26,13 @@ class InlineQueryResult(TelegramObject):
     Baseclass for the InlineQueryResult* classes.
 
     Attributes:
-        type (str): Type of the result.
-        id (str): Unique identifier for this result, 1-64 Bytes.
+        type (:obj:`str`): Type of the result.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
 
     Args:
-        type (str): Type of the result.
-        id (str): Unique identifier for this result, 1-64 Bytes.
-        **kwargs (dict): Arbitrary keyword arguments.
+        type (:obj:`str`): Type of the result.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, type, id, **kwargs):

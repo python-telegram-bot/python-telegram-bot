@@ -29,38 +29,38 @@ class InlineQueryResultDocument(InlineQueryResult):
     using this method.
 
     Attributes:
-        type (str): 'document'.
-        id (str): Unique identifier for this result, 1-64 bytes.
-        title (str): Title for the result.
-        caption (str): Optional. Caption, 0-200 characters
-        document_url (str): A valid URL for the file.
-        mime_type (str): Mime type of the content of the file, either "application/pdf"
-                or "application/zip".
-        description (str): Optional. Short description of the result.
+        type (:obj:`str`): 'document'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        document_url (:obj:`str`): A valid URL for the file.
+        mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
+            or "application/zip".
+        description (:obj:`str`): Optional. Short description of the result.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the file.
-        thumb_url (str): Optional. URL of the thumbnail (jpeg only) for the file.
-        thumb_width (int): Optional. Thumbnail width.
-        thumb_height (int): Optional. Thumbnail height.
+            message to be sent instead of the file.
+        thumb_url (:obj:`str`): Optional. URL of the thumbnail (jpeg only) for the file.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 bytes.
-        title (str): Title for the result.
-        caption (Optional[str]): Caption, 0-200 characters
-        document_url (str): A valid URL for the file.
-        mime_type (str): Mime type of the content of the file, either "application/pdf"
-                or "application/zip".
-        description (Optional[str]): Short description of the result.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        document_url (:obj:`str`): A valid URL for the file.
+        mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
+            or "application/zip".
+        description (:obj:`str`, optional): Short description of the result.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the file.
-        thumb_url (Optional[str]): URL of the thumbnail (jpeg only) for the file.
-        thumb_width (Optional[int]): Thumbnail width.
-        thumb_height (Optional[int]): Thumbnail height.
-        **kwargs (dict): Arbitrary keyword arguments.
+            message to be sent instead of the file.
+        thumb_url (:obj:`str`, optional): URL of the thumbnail (jpeg only) for the file.
+        thumb_width (:obj:`int`, optional): Thumbnail width.
+        thumb_height (:obj:`int`, optional): Thumbnail height.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

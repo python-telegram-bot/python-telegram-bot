@@ -28,36 +28,36 @@ class InlineQueryResultVenue(InlineQueryResult):
     venue.
 
     Attributes:
-        type (str): 'venue'.
-        id (str): Unique identifier for this result, 1-64 Bytes.
-        latitude (float): Latitude of the venue location in degrees.
-        longitude (float): Longitude of the venue location in degrees.
-        title (str): Title of the venue.
-        address (str): Address of the venue.
-        foursquare_id (str): Optional. Foursquare identifier of the venue if known.
+        type (:obj:`str`): 'venue'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        latitude (:obj:`float`): Latitude of the venue location in degrees.
+        longitude (:obj:`float`): Longitude of the venue location in degrees.
+        title (:obj:`str`): Title of the venue.
+        address (:obj:`str`): Address of the venue.
+        foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-                message to be sent instead of the venue.
-        thumb_url (str): Optional. Url of the thumbnail for the result.
-        thumb_width (int): Optional. Thumbnail width.
-        thumb_height (int): Optional. Thumbnail height.
+            message to be sent instead of the venue.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 Bytes.
-        latitude (float): Latitude of the venue location in degrees.
-        longitude (float): Longitude of the venue location in degrees.
-        title (str): Title of the venue.
-        address (str): Address of the venue.
-        foursquare_id (Optional[str]): Foursquare identifier of the venue if known.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-                to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-                message to be sent instead of the location.
-        thumb_url (Optional[str]): Url of the thumbnail for the result.
-        thumb_width (Optional[int]): Thumbnail width.
-        thumb_height (Optional[int]): Thumbnail height.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        latitude (:obj:`float`): Latitude of the venue location in degrees.
+        longitude (:obj:`float`): Longitude of the venue location in degrees.
+        title (:obj:`str`): Title of the venue.
+        address (:obj:`str`): Address of the venue.
+        foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue if known.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the location.
+        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
+        thumb_width (:obj:`int`, optional): Thumbnail width.
+        thumb_height (:obj:`int`, optional): Thumbnail height.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

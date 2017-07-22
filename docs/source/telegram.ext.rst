@@ -18,7 +18,9 @@ Submodules
     telegram.ext.messagehandler
     telegram.ext.messagequeue
     telegram.ext.filters
+    telegram.ext.precheckoutqueryhandler
     telegram.ext.regexhandler
+    telegram.ext.shippingqueryhandler
     telegram.ext.stringcommandhandler
     telegram.ext.stringregexhandler
     telegram.ext.typehandler

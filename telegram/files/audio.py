@@ -26,21 +26,23 @@ class Audio(TelegramObject):
     This object represents an audio file to be treated as music by the Telegram clients.
 
     Attributes:
-        file_id (str): Unique identifier for this file.
-        duration (int): Duration of the audio in seconds as defined by sender.
-        performer (str): Optional. Performer of the audio as defined by sender or by audio tags.
-        title (str): Optional. Title of the audio as defined by sender or by audio tags.
-        mime_type (str): Optional. MIME type of the file as defined by sender.
-        file_size (int): Optional. File size.
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`): Duration of the audio in seconds.
+        performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str): Unique identifier for this file.
-        duration (int): Duration of the audio in seconds as defined by sender.
-        performer (Optional[str]): Performer of the audio as defined by sender or by audio tags.
-        title (Optional[str]): Title of the audio as defined by sender or by audio tags.
-        mime_type (Optional[str]): MIME type of the file as defined by sender.
-        file_size (Optional[int]): File size.
-        **kwargs: Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -64,15 +66,6 @@ class Audio(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Audio`
-        """
-
         if not data:
             return None
 

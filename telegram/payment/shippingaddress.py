@@ -26,22 +26,21 @@ class ShippingAddress(TelegramObject):
     This object represents a Telegram ShippingAddress.
 
     Attributes:
-        country_code (str): ISO 3166-1 alpha-2 country code.
-        state (str): State, if applicable.
-        city (str): City.
-        street_line1 (str): First line for the address.
-        street_line2 (str): Second line for the address.
-        post_code (str): Address post code.
-        **kwargs (dict): Arbitrary keyword arguments.
+        country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
+        state (:obj:`str`): State, if applicable.
+        city (:obj:`str`): City.
+        street_line1 (:obj:`str`): First line for the address.
+        street_line2 (:obj:`str`): Second line for the address.
+        post_code (:obj:`str`): Address post code.
 
     Args:
-        country_code (str): ISO 3166-1 alpha-2 country code.
-        state (str): State, if applicable.
-        city (str): City.
-        street_line1 (str): First line for the address.
-        street_line2 (str): Second line for the address.
-        post_code (str): Address post code.
-        **kwargs (dict): Arbitrary keyword arguments.
+        country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
+        state (:obj:`str`): State, if applicable.
+        city (:obj:`str`): City.
+        street_line1 (:obj:`str`): First line for the address.
+        street_line2 (:obj:`str`): Second line for the address.
+        post_code (:obj:`str`): Address post code.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, country_code, state, city, street_line1, street_line2, post_code, **kwargs):
@@ -57,15 +56,6 @@ class ShippingAddress(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.ShippingAddress`
-        """
-
         if not data:
             return None
 

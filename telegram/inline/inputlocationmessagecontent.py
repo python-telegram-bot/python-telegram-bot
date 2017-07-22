@@ -27,13 +27,13 @@ class InputLocationMessageContent(InputMessageContent):
     Represents the content of a location message to be sent as the result of an inline query.
 
     Attributes:
-        latitude (float): Latitude of the location in degrees.
-        longitude (float): Longitude of the location in degrees.
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
 
     Args:
-        latitude (float): Latitude of the location in degrees.
-        longitude (float): Longitude of the location in degrees.
-        **kwargs (dict): Arbitrary keyword arguments.
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, latitude, longitude, **kwargs):

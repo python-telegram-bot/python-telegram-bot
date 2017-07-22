@@ -29,20 +29,18 @@ class ForceReply(ReplyMarkup):
     to sacrifice privacy mode.
 
     Attributes:
-        force_reply (True): Shows reply interface to the user, as if they manually selected the
-                bot's message and tapped 'Reply'.
-        selective (bool): Optional. Use this parameter if you want to force reply from specific
-                users only. Targets: 1) users that are @mentioned in the text of the Message
-                object; 2) if the bot's message is a reply (has reply_to_message_id), sender
-                of the original message.
+        force_reply (:obj:`True`): Shows reply interface to the user.
+        selective (:obj:`bool`): Optional. Force reply from specific users only.
 
     Args:
-        selective (Optional[bool]): Use this parameter if you want to force reply from specific
-                users only. Targets: 1) users that are @mentioned in the text of the Message
-                object; 2) if the bot's message is a reply (has reply_to_message_id), sender of
-                the original message.
-        **kwargs (dict): Arbitrary keyword arguments.
+        selective (:obj:`bool`, optional): Use this parameter if you want to force reply from
+            specific users only. Targets:
 
+            1) users that are @mentioned in the text of the Message object;
+            2) if the bot's message is a reply (has reply_to_message_id), sender of the
+            original message.
+
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, force_reply=True, selective=False, **kwargs):
@@ -53,14 +51,6 @@ class ForceReply(ReplyMarkup):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.ForceReply`:
-        """
         if not data:
             return None
 

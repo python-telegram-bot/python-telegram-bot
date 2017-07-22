@@ -28,28 +28,25 @@ class ChosenInlineResult(TelegramObject):
     partner.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        result_id (str): The unique identifier for the result that was chosen.
+        result_id (:obj:`str`): The unique identifier for the result that was chosen.
         from_user (:class:`telegram.User`): The user that chose the result.
-        location (:class:`telegram.Location`): Optional. Sender location, only for bots that
-                require user location.
-        inline_message_id (str): Optional. Identifier of the sent inline message. Available only
-                if there is an inline keyboard attached to the message. Will be also received in
-                callback queries and can be used to edit the message.
-        query (str): The query that was used to obtain the result.
+        location (:class:`telegram.Location`): Optional. Sender location.
+        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message.
+        query (:obj:`str`): The query that was used to obtain the result.
 
     Args:
-        result_id (str): The unique identifier for the result that was chosen.
+        result_id (:obj:`str`): The unique identifier for the result that was chosen.
         from_user (:class:`telegram.User`): The user that chose the result.
-        location (Optional[:class:`telegram.Location`]): Sender location, only for bots that
-                require user location.
-        inline_message_id (Optional[str]): Identifier of the sent inline message. Available only
-                if there is an inline keyboard attached to the message. Will be also received in
-                callback queries and can be used to edit the message.
-        query (str): The query that was used to obtain the result.
-        **kwargs (dict): Arbitrary keyword arguments.
+        location (:class:`telegram.Location`, optional): Sender location, only for bots that
+            require user location.
+        inline_message_id (:obj:`str`, optional): Identifier of the sent inline message. Available
+            only if there is an inline keyboard attached to the message. Will be also received in
+            callback queries and can be used to edit the message.
+        query (:obj:`str`): The query that was used to obtain the result.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -71,14 +68,6 @@ class ChosenInlineResult(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.ChosenInlineResult`:
-        """
         if not data:
             return None
 
@@ -91,10 +80,6 @@ class ChosenInlineResult(TelegramObject):
         return ChosenInlineResult(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict
-        """
         data = super(ChosenInlineResult, self).to_dict()
 
         # Required

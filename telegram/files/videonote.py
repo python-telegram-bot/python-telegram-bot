@@ -26,19 +26,19 @@ class VideoNote(TelegramObject):
     This object represents a video message (available in Telegram apps as of v.4.0).
 
     Attributes:
-        file_id (str): Unique identifier for this file.
-        length (int): Video width and height as defined by sender.
-        duration (int): Duration of the video in seconds as defined by sender.
-        thumb (Optional[:class:`telegram.PhotoSize`]): Optional. Video thumbnail.
-        file_size (Optional[int]): Optional. File size.
+        file_id (:obj:`str`): Unique identifier for this file.
+        length (:obj:`int`): Video width and height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str): Unique identifier for this file.
-        length (int): Video width and height as defined by sender.
-        duration (int): Duration of the video in seconds as defined by sender.
-        thumb (Optional[:class:`telegram.PhotoSize`]): Video thumbnail.
-        file_size (Optional[int]): File size.
-        **kwargs: Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique identifier for this file.
+        length (:obj:`int`): Video width and height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, file_id, length, duration, thumb=None, file_size=None, **kwargs):
@@ -54,15 +54,6 @@ class VideoNote(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.VideoNote`
-        """
-
         if not data:
             return None
 

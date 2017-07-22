@@ -28,20 +28,19 @@ class Animation(TelegramObject):
     message containing a game.
 
     Attributes:
-        file_id (str): Unique file identifier.
+        file_id (:obj:`str`): Unique file identifier.
         thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined
-                by sender.
-        file_name (str): Optional. Original animation filename as defined by sender.
-        mime_type (str): Optional. MIME type of the file as defined by sender.
-        file_size (int): Optional. File size.
+            by sender.
+        file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        Attributes:
-        file_id (str): Unique file identifier.
-        thumb (Optional[:class:`telegram.PhotoSize`]): Animation thumbnail as defined by sender.
-        file_name (Optional[str]): Original animation filename as defined by sender.
-        mime_type (Optional[str]): MIME type of the file as defined by sender.
-        file_size (Optional[int]): File size.
+        file_id (:obj:`str`): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
+        file_name (:obj:`str`, optional): Original animation filename as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
     """
 
     def __init__(self,
@@ -61,14 +60,6 @@ class Animation(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Game`
-        """
         if not data:
             return None
 

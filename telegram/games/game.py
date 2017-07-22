@@ -29,32 +29,32 @@ class Game(TelegramObject):
     act as unique identifiers.
 
     Attributes:
-        title (str): Title of the game.
-        description (str): Description of the game.
-        photo ([:class:`telegram.PhotoSize`]): Photo that will be displayed in the game message
-                in chats.
-        text (str): Optional. Brief description of the game or high scores included in the game
-                message. Can be automatically edited to include current high scores for the game
-                when the bot calls set_game_score, or manually edited using edit_message_text.
-                0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
-        text_entities ([:class:`telegram.MessageEntity`]): Optional. Special entities that appear
-                in text, such as usernames, URLs, bot commands, etc.
+        title (:obj:`str`): Title of the game.
+        description (:obj:`str`): Description of the game.
+        photo (List[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game message
+            in chats.
+        text (:obj:`str`): Optional. Brief description of the game or high scores included in the
+            game message. Can be automatically edited to include current high scores for the game
+            when the bot calls set_game_score, or manually edited using edit_message_text.
+            0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
+        text_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities that
+            appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`): Optional. Animation that will be displayed in the
-                game message in chats. Upload via BotFather.
+            game message in chats. Upload via BotFather.
 
     Args:
-        title (str): Title of the game.
-        description (str): Description of the game.
-        photo (list(:class:`telegram.PhotoSize`)): Photo that will be displayed in the game message
-                in chats.
-        text (Optional[str]): Brief description of the game or high scores included in the game
-                message. Can be automatically edited to include current high scores for the game
-                when the bot calls set_game_score, or manually edited using edit_message_text.
-                0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
-        text_entities (Optional[list(:class:`telegram.MessageEntity`)]): Special entities that
-                appear in text, such as usernames, URLs, bot commands, etc.
-        animation (Optional[:class:`telegram.Animation`]): Animation that will be displayed in the
-                game message in chats. Upload via BotFather.
+        title (:obj:`str`): Title of the game.
+        description (:obj:`str`): Description of the game.
+        photo (List[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game message
+            in chats.
+        text (:obj:`str`, optional): Brief description of the game or high scores included in the
+            game message. Can be automatically edited to include current high scores for the game
+            when the bot calls set_game_score, or manually edited using edit_message_text.
+            0-4096 characters. Also found as ``telegram.constants.MAX_MESSAGE_LENGTH``.
+        text_entities (List[:class:`telegram.MessageEntity`], optional): Special entities that
+            appear in text, such as usernames, URLs, bot commands, etc.
+        animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
+            game message in chats. Upload via BotFather.
     """
 
     def __init__(self,
@@ -74,15 +74,6 @@ class Game(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Game`
-
-        """
         if not data:
             return None
 
@@ -95,10 +86,6 @@ class Game(TelegramObject):
         return Game(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict
-        """
         data = super(Game, self).to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]
@@ -117,10 +104,10 @@ class Game(TelegramObject):
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-                    be an entity that belongs to this message.
+                be an entity that belongs to this message.
 
         Returns:
-            str: The text of the given entity
+            :obj:`str`: The text of the given entity.
         """
 
         # Is it a narrow build, if so we don't need to convert
@@ -134,23 +121,23 @@ class Game(TelegramObject):
 
     def parse_text_entities(self, types=None):
         """
-        Returns a ``dict`` that maps :class:`telegram.MessageEntity` to ``str``.
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
         It contains entities from this message filtered by their ``type`` attribute as the key, and
-        the text that each entity belongs to as the value of the ``dict``.
+        the text that each entity belongs to as the value of the :obj:`dict`.
 
         Note:
-            This method should always be used instead of the ``entities`` attribute, since it
-            calculates the correct substring from the message text based on UTF-16 codepoints.
+            This method should always be used instead of the :attr:`text_entities` attribute, since
+            it calculates the correct substring from the message text based on UTF-16 codepoints.
             See :attr:`parse_text_entity` for more info.
 
         Args:
-            types (Optional[list(str)]): List of ``MessageEntity`` types as strings. If the
+            types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
                     ``type`` attribute of an entity is contained in this list, it will be returned.
                     Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
-            dict(:class:`telegram.MessageEntity`, str]: A dictionary of entities mapped to the
-            text that belongs to them, calculated based on UTF-16 codepoints.
+            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
         """
 
         if types is None:

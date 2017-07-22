@@ -26,21 +26,21 @@ class Sticker(TelegramObject):
     This object represents a sticker.
 
     Attributes:
-        file_id (str): Unique identifier for this file.
-        width (int): Sticker width.
-        height (int): Sticker height.
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Sticker width.
+        height (:obj:`int`): Sticker height.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in .webp or .jpg format.
-        emoji (str): Optional. Emoji associated with the sticker.
-        file_size (int): Optional. File size.
+        emoji (:obj:`str`): Optional. Emoji associated with the sticker.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str): Unique identifier for this file.
-        width (int): Sticker width.
-        height (int): Sticker height.
-        thumb (Optional[:class:`telegram.PhotoSize`]): Sticker thumbnail in .webp or .jpg format.
-        emoji (Optional[str]): Emoji associated with the sticker.
-        file_size (Optional[int]): File size.
-        **kwargs: Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Sticker width.
+        height (:obj:`int`): Sticker height.
+        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in .webp or .jpg format.
+        emoji (:obj:`str`, optional): Emoji associated with the sticker.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, file_id, width, height, thumb=None, emoji=None, file_size=None, **kwargs):
@@ -57,15 +57,6 @@ class Sticker(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`):
-
-        Returns:
-            :class:`telegram.Sticker`
-        """
-
         if not data:
             return None
 

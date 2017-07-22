@@ -27,18 +27,18 @@ class InlineQueryResultGame(InlineQueryResult):
     Represents a Game.
 
     Attributes:
-        type (str): 'game'.
-        id (str): Unique identifier for this result, 1-64 bytes.
-        game_short_name (str): Short name of the game.
+        type (:obj:`str`): 'game'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        game_short_name (:obj:`str`): Short name of the game.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-                to the message.
+            to the message.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 bytes.
-        game_short_name (str): Short name of the game.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-                to the message.
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        game_short_name (:obj:`str`): Short name of the game.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, id, game_short_name, reply_markup=None, **kwargs):

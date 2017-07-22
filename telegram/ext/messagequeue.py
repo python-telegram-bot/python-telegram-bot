@@ -19,7 +19,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
-'''A throughput-limiting message processor for Telegram bots'''
+"""A throughput-limiting message processor for Telegram bots"""
 from telegram.utils import promise
 
 import functools
@@ -44,38 +44,40 @@ else:
 
 
 class DelayQueueError(RuntimeError):
-    """Indicates processing errors."""
+    """
+    Indicates processing errors.
+    """
     pass
 
 
 class DelayQueue(threading.Thread):
     """
-    Processes callbacks from queue with specified throughput limits.
-    Creates a separate thread to process callbacks with delays.
+    Processes callbacks from queue with specified throughput limits. Creates a separate thread to
+    process callbacks with delays.
 
     Attributes:
-        burst_limit (int): Number of maximum callbacks to process per time-window.
-        time_limit (int): Defines width of time-window used when each processing limit is
-                calculated.
-        exc_route (callable): A callable, accepting 1 positional argument; used to route
-                exceptions from processor thread to main thread;
-        name (str): thread's name.
+        burst_limit (:obj:`int`): Number of maximum callbacks to process per time-window.
+        time_limit (:obj:`int`): Defines width of time-window used when each processing limit is
+            calculated.
+        exc_route (:obj:`callable`): A callable, accepting 1 positional argument; used to route
+            exceptions from processor thread to main thread;
+        name (:obj:`str`): thread's name.
 
     Args:
-        queue (Optional[Queue]): Used to pass callbacks to thread. Creates ``Queue`` implicitly
-                if not provided.
-        burst_limit (Optional[int]): Number of maximum callbacks to process per time-window
-                defined by :attr:`time_limit_ms`. Defaults to 30.
-        time_limit_ms (Optional[int]): Defines width of time-window used when each processing
-                limit is calculated. Defaults to 1000.
-        exc_route (Optional[callable]): A callable, accepting 1 positional argument; used to route
-                exceptions from processor thread to main thread; is called on `Exception`
-                subclass exceptions. If not provided, exceptions are routed through dummy handler,
-                which re-raises them.
-        autostart (Optional[bool]): If True, processor is started immediately after object's
-                creation; if False, should be started manually by `start` method. Defaults to True.
-        name (Optional[str]): thread's name. Defaults to ``'DelayQueue-N'``, where N is sequential
-                number of object created.
+        queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
+            implicitly if not provided.
+        burst_limit (:obj:`int`, optional): Number of maximum callbacks to process per time-window
+            defined by :attr:`time_limit_ms`. Defaults to 30.
+        time_limit_ms (:obj:`int`, optional): Defines width of time-window used when each
+            processing limit is calculated. Defaults to 1000.
+        exc_route (:obj:`callable`, optional): A callable, accepting 1 positional argument; used to
+            route exceptions from processor thread to main thread; is called on `Exception`
+            subclass exceptions. If not provided, exceptions are routed through dummy handler,
+            which re-raises them.
+        autostart (:obj:`bool`, optional): If True, processor is started immediately after object's
+            creation; if ``False``, should be started manually by `start` method. Defaults to True.
+        name (:obj:`str`, optional): thread's name. Defaults to ``'DelayQueue-N'``, where N is
+            sequential number of object created.
     """
 
     _instcnt = 0  # instance counter
@@ -136,10 +138,10 @@ class DelayQueue(threading.Thread):
         Used to gently stop processor and shutdown its thread.
 
         Args:
-            timeout (float): indicates maximum time to wait for processor to stop and its thread
-                    to exit. If timeout exceeds and processor has not stopped, method silently
-                    returns. :attr:`is_alive` could be used afterwards to check the actual status.
-                    ``timeout`` set to None, blocks until processor is shut down. Defaults to None.
+            timeout (:obj:`float`): indicates maximum time to wait for processor to stop and its
+                thread to exit. If timeout exceeds and processor has not stopped, method silently
+                returns. :attr:`is_alive` could be used afterwards to check the actual status.
+                ``timeout`` set to None, blocks until processor is shut down. Defaults to None.
         """
 
         self.__exit_req = True  # gently request
@@ -160,10 +162,10 @@ class DelayQueue(threading.Thread):
         Used to process callbacks in throughput-limiting thread through queue.
 
         Args:
-            func (callable): the actual function (or any callable) that is processed through queue.
-
-                    *args: variable-length `func` arguments.
-                    **kwargs: arbitrary keyword-arguments to `func`.
+            func (:obj:`callable`): the actual function (or any callable) that is processed through
+                queue.
+            *args (:obj:`list`): variable-length `func` arguments.
+            **kwargs (:obj:`dict`): arbitrary keyword-arguments to `func`.
         """
 
         if not self.is_alive() or self.__exit_req:
@@ -185,21 +187,21 @@ class MessageQueue(object):
     group-type messages. For non-group messages, only the *all* ``DelayQueue`` is used.
 
     Args:
-        all_burst_limit (Optional[int]): Number of maximum *all-type* callbacks to process per
-                time-window defined by :attr:`all_time_limit_ms`. Defaults to 30.
-        all_time_limit_ms (Optional[int]): Defines width of *all-type* time-window used when each
-                processing limit is calculated. Defaults to 1000 ms.
-        group_burst_limit (Optional[int]): Number of maximum *group-type* callbacks to process per
-                time-window defined by :attr:`group_time_limit_ms`. Defaults to 20.
-        group_time_limit_ms (Optional[int]): Defines width of *group-type* time-window used when
-                each processing limit is calculated. Defaults to 60000 ms.
-        exc_route (Optional[callable]): A callable, accepting one positional argument; used to
-                route exceptions from processor threads to main thread; is called on ``Exception``
-                subclass exceptions. If not provided, exceptions are routed through dummy handler,
-                which re-raises them.
-        autostart (Optional[optional]): If True, processors are started immediately after object's
-                creation; if False, should be started manually by :attr:`start` method. Defaults to
-                True.
+        all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
+            per time-window defined by :attr:`all_time_limit_ms`. Defaults to 30.
+        all_time_limit_ms (:obj:`int`, optional): Defines width of *all-type* time-window used when
+            each processing limit is calculated. Defaults to 1000 ms.
+        group_burst_limit (:obj:`int`, optional): Number of maximum *group-type* callbacks to
+            process per time-window defined by :attr:`group_time_limit_ms`. Defaults to 20.
+        group_time_limit_ms (:obj:`int`, optional): Defines width of *group-type* time-window used
+            when each processing limit is calculated. Defaults to 60000 ms.
+        exc_route (:obj:`callable`, optional): A callable, accepting one positional argument; used
+            to route exceptions from processor threads to main thread; is called on ``Exception``
+            subclass exceptions. If not provided, exceptions are routed through dummy handler,
+            which re-raises them.
+        autostart (:obj:`bool`, optional): If True, processors are started immediately after
+            object's creation; if ``False``, should be started manually by :attr:`start` method.
+            Defaults to ``True``.
     """
 
     def __init__(self,
@@ -240,12 +242,12 @@ class MessageQueue(object):
         :attr:`burst_limit` and :attr:`time_limit`.
 
         Args:
-            promise (callable): mainly the ``telegram.utils.promise.Promise`` (see Notes for other
-                    callables), that is processed in delay queues.
-            is_group_msg (Optional[bool]): defines whether ``promise`` would be processed in
-                    group*+*all* ``DelayQueue``s (if set to ``True``), or only through *all*
-                    ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
-                    hitting specified limits. Defaults to ``True``.
+            promise (:obj:`callable`): mainly the ``telegram.utils.promise.Promise`` (see Notes for
+                other callables), that is processed in delay queues.
+            is_group_msg (:obj:`bool`, optional): defines whether ``promise`` would be processed in
+                group*+*all* ``DelayQueue``s (if set to ``True``), or only through *all*
+                ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
+                hitting specified limits. Defaults to ``True``.
 
         Notes:
             Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``
@@ -277,21 +279,20 @@ def queuedmessage(method):
     The next object attributes are used by decorator:
 
     Attributes:
-        self._is_messages_queued_default (bool): Value to provide class-defaults to ``queued``
-                kwarg if not provided during wrapped method call.
-        self._msg_queue (:class:`telegram.ext.messagequeue.MessageQueue`):
-                The actual ``MessageQueue`` used to delay outbound messages according to specified
-                time-limits.
+        self._is_messages_queued_default (:obj:`bool`): Value to provide class-defaults to
+            ``queued`` kwarg if not provided during wrapped method call.
+        self._msg_queue (:class:`telegram.ext.messagequeue.MessageQueue`): The actual
+            ``MessageQueue`` used to delay outbound messages according to specified time-limits.
 
     Wrapped method starts accepting the next kwargs:
 
     Args:
-        queued (Optional[bool]): if set to ``True``, the ``MessageQueue`` is used to process output
-                messages. Defaults to `self._is_queued_out`.
-        isgroup Optional[bool]): if set to ``True``, the message is meant to be group-type (as
-                there's no obvious way to determine its type in other way at the moment).
-                Group-type messages could have additional processing delay according to limits set
-                in `self._out_queue`. Defaults to ``False``.
+        queued (:obj:`bool`, optional): if set to ``True``, the ``MessageQueue`` is used to process
+            output messages. Defaults to `self._is_queued_out`.
+        isgroup (:obj:`bool`, optional): if set to ``True``, the message is meant to be group-type
+            (as there's no obvious way to determine its type in other way at the moment).
+            Group-type messages could have additional processing delay according to limits set
+            in `self._out_queue`. Defaults to ``False``.
 
     Returns:
         ``telegram.utils.promise.Promise``: in case call is queued or original method's return

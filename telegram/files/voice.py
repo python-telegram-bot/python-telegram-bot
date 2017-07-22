@@ -26,17 +26,17 @@ class Voice(TelegramObject):
     This object represents a voice note.
 
     Attributes:
-        file_id (str): Unique identifier for this file.
-        duration (int): Duration of the audio in seconds as defined by sender.
-        mime_type (str): Optional. MIME type of the file as defined by sender.
-        file_size (int): Optional. File size.
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str): Unique identifier for this file.
-        duration (Optional[int]): Duration of the audio in seconds as defined by sender.
-        mime_type (Optional[str]): MIME type of the file as defined by sender.
-        file_size (Optional[int]): File size.
-        **kwargs: Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):
@@ -51,15 +51,6 @@ class Voice(TelegramObject):
 
     @staticmethod
     def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (:class:`telegram.Bot`)
-
-        Returns:
-            :class:`telegram.Voice`
-        """
-
         if not data:
             return None
 
