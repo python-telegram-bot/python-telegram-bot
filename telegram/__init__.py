@@ -27,7 +27,7 @@ from .files.photosize import PhotoSize
 from .files.audio import Audio
 from .files.voice import Voice
 from .files.document import Document
-from .files.sticker import Sticker
+from .files.sticker import Sticker, StickerSet, MaskPosition
 from .files.video import Video
 from .files.contact import Contact
 from .files.location import Location
@@ -122,5 +122,5 @@ __all__ = [
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
-    'CallbackGame'
+    'StickerSet', 'MaskPosition', 'CallbackGame'
 ]
