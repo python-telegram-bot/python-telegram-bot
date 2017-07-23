@@ -67,7 +67,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         if not data:
             return None
 
-        data = super().de_json(data, bot)
+        data = super(ReplyKeyboardMarkup, cls).de_json(data, bot)
 
         data['keyboard'] = [KeyboardButton.de_list(keyboard, bot) for keyboard in data['keyboard']]
 

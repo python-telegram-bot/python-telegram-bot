@@ -84,7 +84,7 @@ class InlineKeyboardButton(TelegramObject):
         Returns:
             telegram.InlineKeyboardButton:
         """
-        data = super().de_json(data, bot)
+        data = super(InlineKeyboardButton, cls).de_json(data, bot)
 
         if not data:
             return None

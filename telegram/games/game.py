@@ -73,7 +73,7 @@ class Game(TelegramObject):
         if not data:
             return None
 
-        data = super().de_json(data, bot)
+        data = super(Game, cls).de_json(data, bot)
 
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['text_entities'] = MessageEntity.de_list(data.get('text_entities'), bot)

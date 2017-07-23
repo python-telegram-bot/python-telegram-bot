@@ -49,7 +49,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
             telegram.InlineKeyboardMarkup:
 
         """
-        data = super().de_json(data, bot)
+        data = super(InlineKeyboardMarkup, cls).de_json(data, bot)
 
         if not data:
             return None

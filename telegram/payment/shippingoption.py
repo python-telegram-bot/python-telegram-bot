@@ -55,7 +55,7 @@ class ShippingOption(TelegramObject):
         if not data:
             return None
 
-        data = super().de_json(data, bot)
+        data = super(ShippingOption, cls).de_json(data, bot)
 
         data['prices'] = LabeledPrice.de_list(data.get('prices'), bot)
 

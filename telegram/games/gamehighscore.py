@@ -44,12 +44,12 @@ class GameHighScore(TelegramObject):
             bot (telegram.Bot):
 
         Returns:
-            telegram.Game:
+            telegram.GameHighScore:
         """
         if not data:
             return None
 
-        data = super().de_json(data, bot)
+        data = super(GameHighScore, cls).de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
 

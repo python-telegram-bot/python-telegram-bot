@@ -210,7 +210,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data = super().de_json(data, bot)
+        data = super(Message, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])

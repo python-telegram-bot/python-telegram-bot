@@ -2583,7 +2583,7 @@ class Bot(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        data = super().de_json(data, bot)
+        data = super(Bot, cls).de_json(data, bot)
 
         return cls(**data)
 

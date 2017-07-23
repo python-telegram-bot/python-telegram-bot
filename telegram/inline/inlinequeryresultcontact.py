@@ -84,7 +84,7 @@ class InlineQueryResultContact(InlineQueryResult):
 
     @classmethod
     def de_json(cls, data, bot):
-        data = super().de_json(data, bot)
+        data = super(InlineQueryResultContact, cls).de_json(data, bot)
 
         if not data:
             return None

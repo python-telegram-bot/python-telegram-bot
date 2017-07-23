@@ -90,7 +90,7 @@ class User(TelegramObject):
         if not data:
             return None
 
-        data = super().de_json(data, bot)
+        data = super(User, cls).de_json(data, bot)
 
         return cls(bot=bot, **data)
 
