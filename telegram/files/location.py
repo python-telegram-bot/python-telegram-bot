@@ -40,8 +40,8 @@ class Location(TelegramObject):
 
         self._id_attrs = (self.longitude, self.latitude)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -53,4 +53,4 @@ class Location(TelegramObject):
         if not data:
             return None
 
-        return Location(**data)
+        return cls(**data)

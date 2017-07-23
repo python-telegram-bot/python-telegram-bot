@@ -42,8 +42,8 @@ class Invoice(TelegramObject):
         self.currency = currency
         self.total_amount = total_amount
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -55,4 +55,4 @@ class Invoice(TelegramObject):
         if not data:
             return None
 
-        return Invoice(**data)
+        return cls(**data)

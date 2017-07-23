@@ -34,8 +34,8 @@ class LabeledPrice(TelegramObject):
         self.label = label
         self.amount = amount
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -48,10 +48,10 @@ class LabeledPrice(TelegramObject):
         if not data:
             return None
 
-        return LabeledPrice(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         """
         Args:
             data (list):
@@ -65,6 +65,6 @@ class LabeledPrice(TelegramObject):
 
         labeled_prices = list()
         for labeled_price in data:
-            labeled_prices.append(LabeledPrice.de_json(labeled_price, bot))
+            labeled_prices.append(cls.de_json(labeled_price, bot))
 
         return labeled_prices

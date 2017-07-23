@@ -56,8 +56,8 @@ class Sticker(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -69,8 +69,8 @@ class Sticker(TelegramObject):
         if not data:
             return None
 
-        data = super(Sticker, Sticker).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
-        return Sticker(**data)
+        return cls(**data)

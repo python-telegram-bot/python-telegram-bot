@@ -37,8 +37,8 @@ class TelegramObject(object):
     def __getitem__(self, item):
         return self.__dict__[item]
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):

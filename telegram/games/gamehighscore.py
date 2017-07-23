@@ -36,8 +36,8 @@ class GameHighScore(TelegramObject):
         self.user = user
         self.score = score
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -49,8 +49,8 @@ class GameHighScore(TelegramObject):
         if not data:
             return None
 
-        data = super(GameHighScore, GameHighScore).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
 
-        return GameHighScore(**data)
+        return cls(**data)

@@ -32,6 +32,6 @@ class InputTextMessageContent(InputMessageContent):
         self.parse_mode = parse_mode
         self.disable_web_page_preview = disable_web_page_preview
 
-    @staticmethod
-    def de_json(data, bot):
-        return InputTextMessageContent(**data)
+    @classmethod
+    def de_json(cls, data, bot):
+        return cls(**data)

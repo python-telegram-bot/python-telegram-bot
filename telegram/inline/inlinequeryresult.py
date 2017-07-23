@@ -42,7 +42,3 @@ class InlineQueryResult(TelegramObject):
         self.id = str(id)
 
         self._id_attrs = (self.id,)
-
-    @staticmethod
-    def de_json(data, bot):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data, bot)
