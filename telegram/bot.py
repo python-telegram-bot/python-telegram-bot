@@ -2544,8 +2544,8 @@ class Bot(TelegramObject):
 
         return File.de_json(result, self)
 
-    def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis, is_masks=None,
-                               mask_position=None, timeout=None, **kwargs):
+    def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis,
+                               contains_masks=None, mask_position=None, timeout=None, **kwargs):
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
@@ -2569,7 +2569,7 @@ class Bot(TelegramObject):
                 String for Telegram to get a file from the Internet, or upload a new one
                 using multipart/form-data.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
-            is_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
+            contains_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
                 created.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
@@ -2590,8 +2590,8 @@ class Bot(TelegramObject):
         data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
                 'emojis': emojis}
 
-        if is_masks is not None:
-            data['is_masks'] = is_masks
+        if contains_masks is not None:
+            data['contains_masks'] = contains_masks
         if mask_position is not None:
             data['mask_position'] = mask_position
 
