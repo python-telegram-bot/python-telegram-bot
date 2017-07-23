@@ -8,6 +8,10 @@ Changes
 - Internal restructure of files.
 - Improved unitests.
 - Fully support Bot API 3.2.
+- Remove deprecated ``telegram.Emoji``.
+- Remove deprecated ``Botan`` import from ``utils``.
+- Remove deprecated ``ReplyKeyboardHide``.
+- Remove deprecated ``edit_message`` argument of `bot.set_game_score``.
 
 **2017-06-18**
 

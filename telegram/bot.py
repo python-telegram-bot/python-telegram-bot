@@ -1689,7 +1689,6 @@ class Bot(TelegramObject):
                        chat_id=None,
                        message_id=None,
                        inline_message_id=None,
-                       edit_message=None,
                        force=None,
                        disable_edit_message=None,
                        timeout=None,
@@ -1710,8 +1709,6 @@ class Bot(TelegramObject):
                 be useful when fixing mistakes or banning cheaters.
             disable_edit_message (Optional[bool]): Pass True, if the game message should not be
                 automatically edited to include the current scoreboard.
-            edit_message (Optional[bool]): Deprecated. Has the opposite logic for
-                `disable_edit_message`.
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
@@ -1736,12 +1733,6 @@ class Bot(TelegramObject):
             data['force'] = force
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
-        if edit_message is not None:
-            warnings.warn('edit_message is deprecated, use disable_edit_message instead')
-            if disable_edit_message is None:
-                data['edit_message'] = edit_message
-            else:
-                warnings.warn('edit_message is ignored when disable_edit_message is used')
 
         return url, data
 
