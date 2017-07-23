@@ -45,13 +45,13 @@ class OrderInfo(TelegramObject):
         self.email = email
         self.shipping_address = shipping_address
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
-            return OrderInfo()
+            return cls()
 
-        data = super(OrderInfo, OrderInfo).de_json(data, bot)
+        data = super(OrderInfo, cls).de_json(data, bot)
 
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 
-        return OrderInfo(**data)
+        return cls(**data)

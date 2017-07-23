@@ -197,12 +197,12 @@ class Update(TelegramObject):
         self._effective_message = message
         return message
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(Update, Update).de_json(data, bot)
+        data = super(Update, cls).de_json(data, bot)
 
         data['message'] = Message.de_json(data.get('message'), bot)
         data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
@@ -215,4 +215,4 @@ class Update(TelegramObject):
         data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
         data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
 
-        return Update(**data)
+        return cls(**data)

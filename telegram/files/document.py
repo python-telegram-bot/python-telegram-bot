@@ -60,13 +60,13 @@ class Document(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(Document, Document).de_json(data, bot)
+        data = super(Document, cls).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
-        return Document(**data)
+        return cls(**data)

@@ -72,16 +72,16 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(ReplyKeyboardMarkup, ReplyKeyboardMarkup).de_json(data, bot)
+        data = super(ReplyKeyboardMarkup, cls).de_json(data, bot)
 
         data['keyboard'] = [KeyboardButton.de_list(keyboard, bot) for keyboard in data['keyboard']]
 
-        return ReplyKeyboardMarkup(**data)
+        return cls(**data)
 
     def to_dict(self):
         data = super(ReplyKeyboardMarkup, self).to_dict()

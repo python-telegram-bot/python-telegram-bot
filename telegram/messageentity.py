@@ -54,22 +54,25 @@ class MessageEntity(TelegramObject):
         self.url = url
         self.user = user
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(MessageEntity, MessageEntity).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(MessageEntity, cls).de_json(data, bot)
+
+        if not data:
+            return None
 
         data['user'] = User.de_json(data.get('user'), bot)
 
-        return MessageEntity(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         if not data:
             return list()
 
         entities = list()
         for entity in data:
-            entities.append(MessageEntity.de_json(entity, bot))
+            entities.append(cls.de_json(entity, bot))
 
         return entities
 
