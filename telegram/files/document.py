@@ -22,23 +22,23 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Document(TelegramObject):
-    """This object represents a Telegram Document.
+    """
+    This object represents a general file (as opposed to photos, voice messages and audio files).
 
     Attributes:
-        file_id (str):
-        thumb (:class:`telegram.PhotoSize`):
-        file_name (str):
-        mime_type (str):
-        file_size (int):
+        file_id (:obj:`str`): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail.
+        file_name (:obj:`str`): Original filename.
+        mime_type (:obj:`str`): Optional. MIME type of the file.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        thumb (Optional[:class:`telegram.PhotoSize`]):
-        file_name (Optional[str]):
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        file_id (:obj:`str`): Unique file identifier
+        thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
+        file_name (:obj:`str`, optional): Original filename as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     _id_keys = ('file_id',)
@@ -62,14 +62,6 @@ class Document(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Document:
-        """
         if not data:
             return None
 

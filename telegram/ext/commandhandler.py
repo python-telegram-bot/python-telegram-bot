@@ -31,39 +31,59 @@ class CommandHandler(Handler):
     that start with ``/``, optionally followed by an ``@`` and the bot's
     name and/or some additional text.
 
+    Attributes:
+        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
+            should listen for.
+        callback (:obj:`callable`): The callback function for this handler.
+        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+            Filters.
+        allow_edited (:obj:`bool`): Optional. Determines Whether the handler should also accept
+            edited messages.
+        pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
+            ``args``.
+        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+            the callback function.
+        pass_user_data (:obj:`bool`): Optional. Determines whether ``user_data`` will be passed to
+            the callback function.
+        pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
+            the callback function.
+
+    Note:
+        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
+        can use to keep any data in will be sent to the :attr:`callback` function.. Related to
+        either the user or the chat that the update was sent in. For each update from the same user
+        or in the same chat, it will be the same ``dict``.
+
     Args:
-        command (str|list): The name of the command or list of command this handler should
-            listen for.
-        callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``check_update``
-            has determined that an update should be processed by this handler.
-        filters (telegram.ext.BaseFilter): A filter inheriting from
+        command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
+            should listen for.
+        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
+            It will be called when the :attr:`check_update` has determined that an update should be
+            processed by this handler.
+        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
-            operators (& for and, | for or).
-        allow_edited (Optional[bool]): If the handler should also accept edited messages.
-            Default is ``False``
-        pass_args (optional[bool]): If the handler should be passed the
-            arguments passed to the command as a keyword argument called `
-            ``args``. It will contain a list of strings, which is the text
-            following the command split on single or consecutive whitespace characters.
-            Default is ``False``
-        pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
+            operators (& for and, | for or, ~ for not).
+        allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
+            edited messages. Default is ``False``.
+        pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
+            arguments passed to the command as a keyword argument called ``args``. It will contain
+            a list of strings, which is the text following the command split on single or
+            consecutive whitespace characters. Default is ``False``
+        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
-            be used to insert updates. Default is ``False``.
-        pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
-            instance created by the ``Updater`` which can be used to schedule new jobs.
-            Default is ``False``.
-        pass_user_data (optional[bool]): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. It will be a ``dict`` you
-            can use to keep any data related to the user that sent the update. For each update of
-            the same user, it will be the same ``dict``. Default is ``False``.
-        pass_chat_data (optional[bool]): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. It will be a ``dict`` you
-            can use to keep any data related to the chat that the update was sent in.
-            For each update in the same chat, it will be the same ``dict``. Default is ``False``.
+            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
+            that contains new updates which can be used to insert updates. Default is ``False``.
+        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``job_queue`` will be passed to the callback function. It will be a
+            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
+            which can be used to schedule new jobs. Default is ``False``.
+        pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``user_data`` will be passed to the callback function. Default is ``False``.
+        pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``chat_data`` will be passed to the callback function. Default is ``False``.
     """
 
     def __init__(self,
@@ -99,6 +119,16 @@ class CommandHandler(Handler):
                           'instead. More info: https://git.io/vPTbc.')
 
     def check_update(self, update):
+        """
+        Determines whether an update should be passed to this handlers :attr:`callback`.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+
+        Returns:
+            :obj:`bool`
+        """
+
         if (isinstance(update, Update)
                 and (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
@@ -124,6 +154,14 @@ class CommandHandler(Handler):
             return False
 
     def handle_update(self, update, dispatcher):
+        """
+        Send the update to the :attr:`callback`.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+        """
+
         optional_args = self.collect_optional_args(dispatcher, update)
 
         message = update.message or update.edited_message

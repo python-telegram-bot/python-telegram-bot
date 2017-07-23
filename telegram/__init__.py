@@ -47,6 +47,7 @@ from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.animation import Animation
 from .games.game import Game
+from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
 from .payment.successfulpayment import SuccessfulPayment
@@ -120,5 +121,5 @@ __all__ = [
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
-    'StickerSet', 'MaskPosition'
+    'StickerSet', 'MaskPosition', 'CallbackGame'
 ]

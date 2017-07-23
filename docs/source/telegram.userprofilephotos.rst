@@ -1,7 +1,6 @@
-telegram.userprofilephotos module
-=================================
+telegram.UserProfilePhotos
+==========================
 
-.. automodule:: telegram.userprofilephotos
+.. autoclass:: telegram.UserProfilePhotos
     :members:
-    :undoc-members:
     :show-inheritance:

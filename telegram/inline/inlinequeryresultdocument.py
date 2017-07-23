@@ -22,39 +22,45 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultDocument(InlineQueryResult):
-    """Represents a link to a file. By default, this file will be sent by the user with an optional
-    caption. Alternatively, you can use input_message_content to send a message with the specified
-    content instead of the file. Currently, only .PDF and .ZIP files can be sent using this method.
+    """
+    Represents a link to a file. By default, this file will be sent by the user with an optional
+    caption. Alternatively, you can use :attr:`input_message_content` to send a message with the
+    specified content instead of the file. Currently, only .PDF and .ZIP files can be sent
+    using this method.
 
     Attributes:
-        title (str): Title for the result.
-        caption (Optional[str]): Caption of the document to be sent, 0-200 characters.
-        document_url (Optional[str]): A valid URL for the file.
-        mime_type (Optional[str]): Mime type of the content of the file, either "application/pdf"
+        type (:obj:`str`): 'document'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        document_url (:obj:`str`): A valid URL for the file.
+        mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
-        description	(Optional[str]): Short description of the result.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        description (:obj:`str`): Optional. Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the file.
-        thumb_url (Optional[str]): URL of the thumbnail (jpeg only) for the file.
-        thumb_width (Optional[int]): Thumbnail width.
-        thumb_height (Optional[int]): Thumbnail height.
+        thumb_url (:obj:`str`): Optional. URL of the thumbnail (jpeg only) for the file.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (str):
-        document_url (str):
-        title (str):
-        mime_type (str):
-        caption (Optional[str]):
-        description	(Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-        thumb_url (Optional[str]):
-        thumb_width (Optional[int]):
-        thumb_height (Optional[int]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        document_url (:obj:`str`): A valid URL for the file.
+        mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
+            or "application/zip".
+        description (:obj:`str`, optional): Short description of the result.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the file.
+        thumb_url (:obj:`str`, optional): URL of the thumbnail (jpeg only) for the file.
+        thumb_width (:obj:`int`, optional): Thumbnail width.
+        thumb_height (:obj:`int`, optional): Thumbnail height.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

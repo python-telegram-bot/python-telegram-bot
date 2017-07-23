@@ -22,28 +22,27 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Video(TelegramObject):
-    """This object represents a Telegram Video.
+    """
+    This object represents a video file.
 
     Attributes:
-        file_id (str):
-        width (int):
-        height (int):
-        duration (int):
-        thumb (:class:`telegram.PhotoSize`):
-        mime_type (str):
-        file_size (int):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
+        mime_type (:obj:`str`): Optional. Mime type of a file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        width (int):
-        height (int):
-        duration (int):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        thumb (Optional[:class:`telegram.PhotoSize`]):
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
+        thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
+        mime_type (:obj:`str`, optional): Mime type of a file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -69,14 +68,6 @@ class Video(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Video:
-        """
         if not data:
             return None
 

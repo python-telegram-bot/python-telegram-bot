@@ -22,28 +22,32 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultCachedVoice(InlineQueryResult):
-    """Represents a link to a voice message stored on the Telegram servers. By default, this voice
-    message will be sent by the user. Alternatively, you can use input_message_content to send a
-    message with the specified content instead of the voice message.
+    """
+    Represents a link to a voice message stored on the Telegram servers. By default, this voice
+    message will be sent by the user. Alternatively, you can use :attr:`input_message_content` to
+    send a message with the specified content instead of the voice message.
 
     Attributes:
-        voice_file_id (str): A valid file identifier for the voice message.
-        title (str): Voice message title.
-        caption (Optional[str]): Caption, 0-200 characters.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        type (:obj:`str`): 'voice'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_file_id (:obj:`str`): A valid file identifier for the voice message.
+        title (:obj:`str`): Voice message title.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-            message to be sent instead of the voice message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the voice.
 
     Args:
-        id (str):
-        voice_file_id (str):
-        title (str):
-        caption (Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_file_id (:obj:`str`): A valid file identifier for the voice message.
+        title (:obj:`str`): Voice message title.
+        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the voice.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

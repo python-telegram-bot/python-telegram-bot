@@ -17,34 +17,36 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""
-This module contains an object that represents a Telegram ChosenInlineResult
-"""
+"""This module contains an object that represents a Telegram ChosenInlineResult."""
 
 from telegram import TelegramObject, User, Location
 
 
 class ChosenInlineResult(TelegramObject):
-    """This object represents a Telegram ChosenInlineResult.
+    """
+    Represents a result of an inline query that was chosen by the user and sent to their chat
+    partner.
 
     Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
+        In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        result_id (str):
-        from_user (:class:`telegram.User`):
-        query (str):
-        location (:class:`telegram.Location`):
-        inline_message_id (str):
+        result_id (:obj:`str`): The unique identifier for the result that was chosen.
+        from_user (:class:`telegram.User`): The user that chose the result.
+        location (:class:`telegram.Location`): Optional. Sender location.
+        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message.
+        query (:obj:`str`): The query that was used to obtain the result.
 
     Args:
-        result_id (str):
-        from_user (:class:`telegram.User`):
-        query (str):
-        location (Optional[:class:`telegram.Location`]):
-        inline_message_id (Optional[str]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        result_id (:obj:`str`): The unique identifier for the result that was chosen.
+        from_user (:class:`telegram.User`): The user that chose the result.
+        location (:class:`telegram.Location`, optional): Sender location, only for bots that
+            require user location.
+        inline_message_id (:obj:`str`, optional): Identifier of the sent inline message. Available
+            only if there is an inline keyboard attached to the message. Will be also received in
+            callback queries and can be used to edit the message.
+        query (:obj:`str`): The query that was used to obtain the result.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -66,14 +68,6 @@ class ChosenInlineResult(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.ChosenInlineResult:
-        """
         if not data:
             return None
 
@@ -86,10 +80,6 @@ class ChosenInlineResult(TelegramObject):
         return cls(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = super(ChosenInlineResult, self).to_dict()
 
         # Required

@@ -22,30 +22,35 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultCachedVideo(InlineQueryResult):
-    """Represents a link to a video file stored on the Telegram servers. By default, this video
-    file will be sent by the user with an optional caption. Alternatively, you can use
-    input_message_content to send a message with the specified content instead of the video.
+    """
+    Represents a link to a video file stored on the Telegram servers. By default, this video file
+    will be sent by the user with an optional caption. Alternatively, you can use
+    :attr:`input_message_content` to send a message with the specified content instead
+    of the video.
 
     Attributes:
-        video_file_id (str): A valid file identifier for the video file.
-        title (str): Title for the result.
-        description (Optional[str]): Short description of the result.
-        caption (Optional[str]): Caption of the video to be sent, 0-200 characters.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
-            to the message
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-            message to be sent instead of the video
+        type (:obj:`str`): 'video'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        video_file_id (:obj:`str`): A valid file identifier for the video file.
+        title (:obj:`str`): Title for the result.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the video.
 
     Args:
-        id (str):
-        video_file_id (str):
-        title (str):
-        description (Optional[str]):
-        caption (Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        video_file_id (:obj:`str`): A valid file identifier for the video file.
+        title (:obj:`str`): Title for the result.
+        description (:obj:`str`, optional): Short description of the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the video.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

@@ -1,7 +1,6 @@
-telegram.parsemode module
-=========================
+telegram.ParseMode
+==================
 
-.. automodule:: telegram.parsemode
+.. autoclass:: telegram.ParseMode
     :members:
-    :undoc-members:
     :show-inheritance:

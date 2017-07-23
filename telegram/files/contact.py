@@ -22,21 +22,21 @@ from telegram import TelegramObject
 
 
 class Contact(TelegramObject):
-    """This object represents a Telegram Contact.
+    """
+    This object represents a phone contact.
 
     Attributes:
-        phone_number (str):
-        first_name (str):
-        last_name (str):
-        user_id (int):
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`): Optional. Contact's last name.
+        user_id (:obj:`int`): Optional. Contact's user identifier in Telegram.
 
     Args:
-        phone_number (str):
-        first_name (str):
-        last_name (Optional[str]):
-        user_id (Optional[int]):
-        **kwargs: Arbitrary keyword arguments.
-
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`, optional): Contact's last name.
+        user_id (:obj:`int`, optional): Contact's user identifier in Telegram.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):
@@ -51,14 +51,6 @@ class Contact(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Contact:
-        """
         if not data:
             return None
 

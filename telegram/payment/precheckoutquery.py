@@ -22,22 +22,37 @@ from telegram import TelegramObject, User, OrderInfo
 
 
 class PreCheckoutQuery(TelegramObject):
-    """This object contains information about an incoming pre-checkout query.
+    """
+    This object contains information about an incoming pre-checkout query.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
 
     Attributes:
-        id (str): Unique query identifier
-        from_user (:class:`telegram.User`): User who sent the query
-        currency (str): Three-letter ISO 4217 currency code
-        total_amount (int): Total price in the smallest units of the currency (integer)
-        invoice_payload (str): Bot specified invoice payload
-        shipping_option_id (Optional[str]): Identifier of the shipping option chosen by the user
-        order_info (Optional[:class:`telegram.OrderInfo`]): Order info provided by the user
-        bot (Optional[Bot]): The Bot to use for instance methods
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique query identifier.
+        from_user (:class:`telegram.User`): User who sent the query.
+        currency (:obj:`str`): Three-letter ISO 4217 currency code.
+        total_amount (:obj:`int`): Total price in the smallest units of the currency.
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
+            user.
+        order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
+    Args:
+        id (:obj:`str`): Unique query identifier.
+        from_user (:class:`telegram.User`): User who sent the query.
+        currency (:obj:`str`): Three-letter ISO 4217 currency code
+        total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not
+            float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp
+            parameter in currencies.json, it shows the number of digits past the decimal point for
+            each currency (2 for the majority of currencies).
+        invoice_payload (:obj:`str`): Bot specified invoice payload.
+        shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
+            user.
+        order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -64,14 +79,6 @@ class PreCheckoutQuery(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.PreCheckoutQuery:
-        """
         if not data:
             return None
 
@@ -83,10 +90,6 @@ class PreCheckoutQuery(TelegramObject):
         return cls(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = super(PreCheckoutQuery, self).to_dict()
 
         data['from'] = data.pop('from_user', None)
@@ -95,7 +98,19 @@ class PreCheckoutQuery(TelegramObject):
 
     def answer(self, *args, **kwargs):
         """
-        Shortcut for
-        ``bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)``
+        Shortcut for::
+
+                bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
+
+        Args:
+            ok (:obj:`bool`): Specify True if everything is alright (goods are available, etc.) and
+                the bot is ready to proceed with the order. Use False if there are any problems.
+            error_message (:obj:`str`, optional): Required if ok is False. Error message in human
+                readable form that explains the reason for failure to proceed with the checkout
+                (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you
+                were busy filling out your payment details. Please choose a different color or
+                garment!"). Telegram will display this message to the user.
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
         """
+
         return self.bot.answer_pre_checkout_query(self.id, *args, **kwargs)

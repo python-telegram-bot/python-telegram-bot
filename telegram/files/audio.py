@@ -22,25 +22,27 @@ from telegram import TelegramObject
 
 
 class Audio(TelegramObject):
-    """This object represents a Telegram Audio.
+    """
+    This object represents an audio file to be treated as music by the Telegram clients.
 
     Attributes:
-        file_id (str):
-        duration (int):
-        performer (str):
-        title (str):
-        mime_type (str):
-        file_size (int):
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`): Duration of the audio in seconds.
+        performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        duration (int):
-        performer (Optional[str]):
-        title (Optional[str]):
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
-        **kwargs: Arbitrary keyword arguments.
-
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,
@@ -64,14 +66,6 @@ class Audio(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Audio:
-        """
         if not data:
             return None
 

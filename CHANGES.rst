@@ -7,9 +7,10 @@ Changes
 - Improved filters for user_id/username/chat.
 - Internal restructure of files.
 - Improved unitests.
-- Fully support Bot API 3.2.
+- Fully support Bot API 3.2
+- Modified docstrings
 - Remove deprecated ``telegram.Emoji``.
-- Remove deprecated ``Botan`` import from ``utils``.
+- Remove deprecated ``Botan`` import from ``utils`` (``Botan`` is still available through ``contrib``).
 - Remove deprecated ``ReplyKeyboardHide``.
 - Remove deprecated ``edit_message`` argument of `bot.set_game_score``.
 

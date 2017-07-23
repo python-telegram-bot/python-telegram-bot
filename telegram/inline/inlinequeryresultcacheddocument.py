@@ -22,32 +22,35 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultCachedDocument(InlineQueryResult):
-    """Represents a link to a file stored on the Telegram servers. By default, this file will be
-    sent by the user with an optional caption. Alternatively, you can use input_message_content to
-    send a message with the specified content instead of the file. Currently, only pdf-files and
-    zip archives can be sent using this method.
+    """
+    Represents a link to a file stored on the Telegram servers. By default, this file will be sent
+    by the user with an optional caption. Alternatively, you can use :attr:`input_message_content`
+    to send a message with the specified content instead of the file.
 
     Attributes:
-        title (str): Title for the result.
-        document_file_id (str): A valid file identifier for the file.
-        description (Optional[str]): Short description of the result.
-        caption	(Optional[str]): Caption of the document to be sent, 0-200 characters.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        type (:obj:`str`): 'document'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        document_file_id (:obj:`str`): A valid file identifier for the file.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the file.
 
     Args:
-        id (str):
-        title (str):
-        document_file_id (str):
-        description (Optional[str]):
-        caption	(Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
-        """
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        title (:obj:`str`): Title for the result.
+        document_file_id (:obj:`str`): A valid file identifier for the file.
+        description (:obj:`str`, optional): Short description of the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the file.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+    """
 
     def __init__(self,
                  id,

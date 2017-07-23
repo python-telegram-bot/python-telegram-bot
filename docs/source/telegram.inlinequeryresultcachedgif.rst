@@ -1,7 +1,6 @@
-telegram.inlinequeryresultcachedgif module
-==========================================
+telegram.InlineQueryResultCachedGif
+===================================
 
-.. automodule:: telegram.inlinequeryresultcachedgif
+.. autoclass:: telegram.InlineQueryResultCachedGif
     :members:
-    :undoc-members:
     :show-inheritance:

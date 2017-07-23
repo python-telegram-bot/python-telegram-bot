@@ -22,7 +22,8 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Sticker(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """
+    This object represents a sticker.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -76,14 +77,6 @@ class Sticker(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (:obj:`dict`):
-            bot (telegram.Bot):
-
-        Returns:
-            :obj:`telegram.Sticker`
-        """
         if not data:
             return None
 
@@ -109,19 +102,17 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_masks (:obj:`bool`): True, if the sticker set contains masks.
+        contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
 
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_masks (:obj:`bool`): True, if the sticker set contains masks.
+        contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
     """
 
     def __init__(self, name, title, contains_masks, stickers, bot=None, **kwargs):
-        # TODO: telegrams docs claim contains_masks is called is_masks
-        # remove these lines or change once we get answer from support
         self.name = name
         self.title = title
         self.contains_masks = contains_masks

@@ -19,29 +19,38 @@
 """ This module contains the TypeHandler class """
 
 from .handler import Handler
-from telegram.utils.deprecate import deprecate
 
 
 class TypeHandler(Handler):
     """
     Handler class to handle updates of custom types.
 
-    Args:
-        type (class): The ``type`` of updates this handler should process, as
-            determined by ``isinstance``
-        callback (function): A function that takes ``bot, update`` as
-            positional arguments. It will be called when the ``check_update``
-            has determined that an update should be processed by this handler.
-        strict (optional[bool]): Use ``type`` instead of ``isinstance``.
+    Attributes:
+        type (:obj:`type`): The ``type`` of updates this handler should process.
+        callback (:obj:`callable`): The callback function for this handler.
+        strict (:obj:`bool`): Optional. Use ``type`` instead of ``isinstance``.
             Default is ``False``
-        pass_update_queue (optional[bool]): If set to ``True``, a keyword argument called
+        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+            passed to the callback function.
+        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+            the callback function.
+
+    Args:
+        type (:obj:`type`): The ``type`` of updates this handler should process, as
+            determined by ``isinstance``
+        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
+            It will be called when the :attr:`check_update` has determined that an update should be
+            processed by this handler.
+        strict (:obj:`bool`, optional): Use ``type`` instead of ``isinstance``.
+            Default is ``False``
+        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the ``Updater`` and ``Dispatcher`` that contains new updates which can
-            be used to insert updates. Default is ``False``.
-        pass_job_queue (optional[bool]): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a ``JobQueue``
-            instance created by the ``Updater`` which can be used to schedule new jobs.
-            Default is ``False``.
+            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
+            that contains new updates which can be used to insert updates. Default is ``False``.
+        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``job_queue`` will be passed to the callback function. It will be a
+            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
+            which can be used to schedule new jobs. Default is ``False``.
     """
 
     def __init__(self, type, callback, strict=False, pass_update_queue=False,
@@ -52,17 +61,30 @@ class TypeHandler(Handler):
         self.strict = strict
 
     def check_update(self, update):
+        """
+        Determines whether an update should be passed to this handlers :attr:`callback`.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+
+        Returns:
+            :obj:`bool`
+        """
+
         if not self.strict:
             return isinstance(update, self.type)
         else:
             return type(update) is self.type
 
     def handle_update(self, update, dispatcher):
+        """
+        Send the update to the :attr:`callback`.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+        """
+
         optional_args = self.collect_optional_args(dispatcher)
 
         return self.callback(dispatcher.bot, update, **optional_args)
-
-    # old non-PEP8 Handler methods
-    m = "telegram.TypeHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")

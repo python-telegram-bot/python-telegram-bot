@@ -32,55 +32,88 @@ class ConversationHandler(Handler):
     handlers. Note that neither posts in Telegram Channels, nor group interactions with multiple
     users are managed by instances of this class.
 
-    The first collection, a ``list`` named ``entry_points``, is used to initiate the conversation,
-    for example with a ``CommandHandler`` or ``RegexHandler``.
+    The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
+    conversation, for example with a :class:`telegram.ext.CommandHandler` or
+    :class:`telegram.ext.RegexHandler`.
 
-    The second collection, a ``dict`` named ``states``, contains the different conversation steps
-    and one or more associated handlers that should be used if the user sends a message when the
-    conversation with them is currently in that state. You will probably use mostly
-    ``MessageHandler`` and ``RegexHandler`` here.
+    The second collection, a ``dict`` named :attr:`states`, contains the different conversation
+    steps and one or more associated handlers that should be used if the user sends a message when
+    the conversation with them is currently in that state. You will probably use mostly
+    :class:`telegram.ext.MessageHandler` and :class:`telegram.ext.RegexHandler` here.
 
-    The third collection, a ``list`` named ``fallbacks``, is used if the user is currently in a
+    The third collection, a ``list`` named :attr:`fallbacks`, is used if the user is currently in a
     conversation but the state has either no associated handler or the handler that is associated
     to the state is inappropriate for the update, for example if the update contains a command, but
     a regular text message is expected. You could use this for a ``/cancel`` command or to let the
     user know their message was not recognized.
 
-    The fourth, optional collection of handlers, a ``list`` named ``timed_out_behavior`` is used if
-    the wait for ``run_async`` takes longer than defined in ``run_async_timeout``. For example,
-    you can let the user know that they should wait for a bit before they can continue.
+    The fourth, optional collection of handlers, a ``list`` named :attr:`timed_out_behavior` is
+    used if the wait for ``run_async`` takes longer than defined in :attr:`run_async_timeout`.
+    For example, you can let the user know that they should wait for a bit before they can
+    continue.
 
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. To end the conversation, the callback function must
-    return ``CallbackHandler.END`` or ``-1``.
+    return :attr`END` or ``-1``.
+
+    Attributes:
+        entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
+            trigger the start of the conversation.
+        states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
+            defines the different states of conversation a user can be in and one or more
+            associated ``Handler`` objects that should be used in that state.
+        fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
+            the user is in a conversation, but every handler for their current state returned
+            ``False`` on :attr:`check_update`.
+        allow_reentry (:obj:`bool`): Optional. Determines if a user can restart a conversation with
+            an entry point.
+        run_async_timeout (:obj:`float`): Optional. The time-out for ``run_async`` decorated
+            Handlers.
+        timed_out_behavior (List[:class:`telegram.ext.Handler`]): Optional. A list of handlers that
+            might be used if the wait for ``run_async`` timed out.
+        per_chat (:obj:`bool`): Optional. If the conversationkey should contain the Chat's ID.
+        per_user (:obj:`bool`): Optional. If the conversationkey should contain the User's ID.
+        per_message (:obj:`bool`): Optional. If the conversationkey should contain the Message's
+            ID.
 
     Args:
-        entry_points (list): A list of ``Handler`` objects that can trigger the start of the
-            conversation. The first handler which ``check_update`` method returns ``True`` will be
-            used. If all return ``False``, the update is not handled.
-        states (dict): A ``dict[object: list[Handler]]`` that defines the different states of
-            conversation a user can be in and one or more associated ``Handler`` objects that
-            should be used in that state. The first handler which ``check_update`` method returns
-            ``True`` will be used.
-        fallbacks (list): A list of handlers that might be used if the user is in a conversation,
-            but every handler for their current state returned ``False`` on ``check_update``.
-            The first handler which ``check_update`` method returns ``True`` will be used. If all
-            return ``False``, the update is not handled.
-        allow_reentry (Optional[bool]): If set to ``True``, a user that is currently in a
+        entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
+            trigger the start of the conversation. The first handler which :attr:`check_update`
+            method returns ``True`` will be used. If all return ``False``, the update is not
+            handled.
+        states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
+            defines the different states of conversation a user can be in and one or more
+            associated ``Handler`` objects that should be used in that state. The first handler
+            which :attr:`check_update` method returns ``True`` will be used.
+        fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
+            the user is in a conversation, but every handler for their current state returned
+            ``False`` on :attr:`check_update`. The first handler which :attr:`check_update` method
+            returns ``True`` will be used. If all return ``False``, the update is not handled.
+        allow_reentry (:obj:`bool`, optional): If set to ``True``, a user that is currently in a
             conversation can restart the conversation by triggering one of the entry points.
-        run_async_timeout (Optional[float]): If the previous handler for this user was running
-            asynchronously using the ``run_async`` decorator, it might not be finished when the
-            next message arrives. This timeout defines how long the conversation handler should
+        run_async_timeout (:obj:`float`, optional): If the previous handler for this user was
+            running asynchronously using the ``run_async`` decorator, it might not be finished when
+            the next message arrives. This timeout defines how long the conversation handler should
             wait for the next state to be computed. The default is ``None`` which means it will
             wait indefinitely.
-        timed_out_behavior (Optional[list]): A list of handlers that might be used if
-            the wait for ``run_async`` timed out. The first handler which ``check_update`` method
-            returns ``True`` will be used. If all return ``False``, the update is not handled.
+        timed_out_behavior (List[:class:`telegram.ext.Handler`], optional): A list of handlers that
+            might be used if the wait for ``run_async`` timed out. The first handler which
+            :attr:`check_update` method returns ``True`` will be used. If all return ``False``,
+            the update is not handled.
+        per_chat (:obj:`bool`, optional): If the conversationkey should contain the Chat's ID.
+            Default is ``True``.
+        per_user (:obj:`bool`, optional): If the conversationkey should contain the User's ID.
+            Default is ``True``.
+        per_message (:obj:`bool`, optional): If the conversationkey should contain the Message's
+            ID. Default is ``False``.
 
+    Raises:
+        ValueError
     """
 
     END = -1
+    """:obj:`int`: Used as a constant to return when a conversation is ended."""
 
     def __init__(self,
                  entry_points,
@@ -94,26 +127,17 @@ class ConversationHandler(Handler):
                  per_message=False):
 
         self.entry_points = entry_points
-        """:type: list[telegram.ext.Handler]"""
-
         self.states = states
-        """:type: dict[str: telegram.ext.Handler]"""
-
         self.fallbacks = fallbacks
-        """:type: list[telegram.ext.Handler]"""
 
         self.allow_reentry = allow_reentry
         self.run_async_timeout = run_async_timeout
-
         self.timed_out_behavior = timed_out_behavior
-        """:type: list[telegram.ext.Handler]"""
-
-        self.conversations = dict()
         self.per_user = per_user
         self.per_chat = per_chat
         self.per_message = per_message
-        """:type: dict[tuple: object]"""
 
+        self.conversations = dict()
         self.current_conversation = None
         self.current_handler = None
 
@@ -170,6 +194,16 @@ class ConversationHandler(Handler):
         return tuple(key)
 
     def check_update(self, update):
+        """
+        Determines whether an update should be handled by this conversationhandler, and if so in
+        which state the conversation currently is.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+
+        Returns:
+            :obj:`bool`
+        """
 
         # Ignore messages in channels
         if (not isinstance(update, Update) or update.channel_post or self.per_chat
@@ -251,6 +285,13 @@ class ConversationHandler(Handler):
         return True
 
     def handle_update(self, update, dispatcher):
+        """
+        Send the update to the callback for the current state and Handler
+
+        Args:
+            update (:class:`telegram.Update`): Incoming telegram update.
+            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+        """
 
         new_state = self.current_handler.handle_update(update, dispatcher)
 

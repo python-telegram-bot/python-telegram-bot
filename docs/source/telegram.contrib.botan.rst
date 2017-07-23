@@ -1,7 +1,7 @@
-telegram.contrib.botan module
-=============================
+telegram.contrib.Botan
+======================
 
-.. automodule:: telegram.contrib.botan
+.. autoclass:: telegram.contrib.Botan
     :members:
     :undoc-members:
     :show-inheritance:

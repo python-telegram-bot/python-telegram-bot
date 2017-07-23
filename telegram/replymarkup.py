@@ -22,5 +22,9 @@ from telegram import TelegramObject
 
 
 class ReplyMarkup(TelegramObject):
-    """Base class for Telegram ReplyMarkup Objects"""
+    """Base class for Telegram ReplyMarkup Objects.
+
+    See :class:`telegram.ReplyKeyboardMarkup` and :class:`telegram.InlineKeyboardMarkup` for
+    detailed use.
+    """
     pass

@@ -22,22 +22,21 @@ from telegram import TelegramObject
 
 
 class Voice(TelegramObject):
-    """This object represents a Telegram Voice.
+    """
+    This object represents a voice note.
 
     Attributes:
-        file_id (str):
-        duration (int):
-        mime_type (str):
-        file_size (int):
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        duration (Optional[int]):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
+        file_id (:obj:`str`): Unique identifier for this file.
+        duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):
@@ -52,14 +51,6 @@ class Voice(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot)
-
-        Returns:
-            telegram.Voice:
-        """
         if not data:
             return None
 

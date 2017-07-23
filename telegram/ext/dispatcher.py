@@ -35,22 +35,17 @@ from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
-""":type: set[Thread]"""
 DEFAULT_GROUP = 0
 
 
 def run_async(func):
-    """Function decorator that will run the function in a new thread.
-
+    """
+    Function decorator that will run the function in a new thread.
+    will run :attr:`telegram.ext.Dispatcher.run_async`.
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
-    Args:
-        func (function): The function to run in the thread.
-        async_queue (Queue): The queue of the functions to be executed asynchronously.
-
-    Returns:
-        function:
-
+    Note:
+        Use this decorator to run handlers asynchronously.
     """
 
     @wraps(func)
@@ -64,17 +59,23 @@ class Dispatcher(object):
     """
     This class dispatches all kinds of updates to its registered handlers.
 
-    Args:
-        bot (telegram.Bot): The bot object that should be passed to the
-            handlers
-        update_queue (Queue): The synchronized queue that will contain the
-            updates.
-        job_queue (Optional[telegram.ext.JobQueue]): The ``JobQueue`` instance to pass onto handler
-            callbacks
-        workers (Optional[int]): Number of maximum concurrent worker threads for the ``@run_async``
-            decorator
+    Attributes:
+        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
+        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
+        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
+            instance to pass onto handler callbacks.
+        workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
+            decorator.
 
+    Args:
+        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
+        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
+        job_queue (:class:`telegram.ext.JobQueue`, optional): The :class:`telegram.ext.JobQueue`
+                instance to pass onto handler callbacks.
+        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
+            ``@run_async`` decorator. defaults to 4.
     """
+
     __singleton_lock = Lock()
     __singleton_semaphore = BoundedSemaphore()
     __singleton = None
@@ -87,17 +88,18 @@ class Dispatcher(object):
         self.workers = workers
 
         self.user_data = defaultdict(dict)
-        """:type: dict[int, dict]"""
+        """:obj:`dict`: A dictionary handlers can use to store data for the user."""
         self.chat_data = defaultdict(dict)
-        """:type: dict[int, dict]"""
-
+        """:obj:`dict`: A dictionary handlers can use to store data for the chat."""
         self.handlers = {}
-        """:type: dict[int, list[Handler]"""
+        """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
-        """:type: list[int]"""
+        """List[:obj:`int`]: A list with all groups."""
         self.error_handlers = []
+        """List[:obj:`callable`]: A list of errorHandlers."""
 
         self.running = False
+        """:obj:`bool`: Indicates if this dispatcher is running."""
         self.__stop_event = Event()
         self.__exception_event = exception_event or Event()
         self.__async_queue = Queue()
@@ -132,12 +134,16 @@ class Dispatcher(object):
 
     @classmethod
     def get_instance(cls):
-        """Get the singleton instance of this class.
+        """
+        Get the singleton instance of this class.
 
         Returns:
-            Dispatcher
+            :class:`telegram.ext.Dispatcher`
 
+        Raises:
+            RuntimeError
         """
+
         if cls.__singleton is not None:
             return cls.__singleton()
         else:
@@ -145,9 +151,6 @@ class Dispatcher(object):
                 cls.__name__))
 
     def _pooled(self):
-        """
-        A wrapper to run a thread in a thread pool
-        """
         thr_name = current_thread().getName()
         while 1:
             promise = self.__async_queue.get()
@@ -161,12 +164,13 @@ class Dispatcher(object):
             promise.run()
 
     def run_async(self, func, *args, **kwargs):
-        """Queue a function (with given args/kwargs) to be run asynchronously.
+        """
+        Queue a function (with given args/kwargs) to be run asynchronously.
 
         Args:
-            func (function): The function to run in the thread.
-            args (Optional[tuple]): Arguments to `func`.
-            kwargs (Optional[dict]): Keyword arguments to `func`.
+            func (:obj:`callable`): The function to run in the thread.
+            *args (:obj:`tuple`, optional): Arguments to `func`.
+            **kwargs (:obj:`dict`, optional): Keyword arguments to `func`.
 
         Returns:
             Promise
@@ -218,8 +222,9 @@ class Dispatcher(object):
 
     def stop(self):
         """
-        Stops the thread
+        Stops the thread.
         """
+
         if self.running:
             self.__stop_event.set()
             while self.running:
@@ -250,7 +255,7 @@ class Dispatcher(object):
         Processes a single update.
 
         Args:
-            update (object):
+            update (:obj:`str` | :class:`telegram.Update`): The update to process.
         """
 
         # An error happened while polling
@@ -290,22 +295,20 @@ class Dispatcher(object):
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be
         used.
 
-        A handler must be an instance of a subclass of
-        telegram.ext.Handler. All handlers are organized in groups with a
-        numeric value. The default group is 0. All groups will be evaluated for
-        handling an update, but only 0 or 1 handler per group will be used.
+        A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
+        are organized in groups with a numeric value. The default group is 0. All groups will be
+        evaluated for handling an update, but only 0 or 1 handler per group will be used.
 
         The priority/order of handlers is determined as follows:
 
           * Priority of the group (lower group number == higher priority)
-
           * The first handler in a group which should handle an update will be
             used. Other handlers from the group will not be used. The order in
             which handlers were added to the group defines the priority.
 
         Args:
-            handler (telegram.ext.Handler): A Handler instance
-            group (Optional[int]): The group identifier. Default is 0
+            handler (:class:`telegram.ext.Handler`): A Handler instance.
+            group (:obj:`int`, optional): The group identifier. Default is 0.
         """
 
         if not isinstance(handler, Handler):
@@ -325,9 +328,10 @@ class Dispatcher(object):
         Remove a handler from the specified group
 
         Args:
-            handler (telegram.ext.Handler): A Handler instance
-            group (optional[object]): The group identifier. Default is 0
+            handler (:class:`telegram.ext.Handler`): A Handler instance.
+            group (:obj:`object`, optional): The group identifier. Default is 0.
         """
+
         if handler in self.handlers[group]:
             self.handlers[group].remove(handler)
             if not self.handlers[group]:
@@ -339,18 +343,18 @@ class Dispatcher(object):
         Registers an error handler in the Dispatcher.
 
         Args:
-            handler (function): A function that takes ``Bot, Update,
-                TelegramError`` as arguments.
+            handler (:obj:`callable`): A function that takes ``Bot, Update, TelegramError`` as
+                arguments.
         """
 
         self.error_handlers.append(callback)
 
     def remove_error_handler(self, callback):
         """
-        De-registers an error handler.
+        Removes an error handler.
 
         Args:
-            handler (function):
+            handler (:obj:`callable`): The error handler to remove.
         """
 
         if callback in self.error_handlers:
@@ -361,8 +365,8 @@ class Dispatcher(object):
         Dispatches an error.
 
         Args:
-            update (object): The update that caused the error
-            error (telegram.TelegramError): The Telegram error that was raised.
+            update (:obj:`str` | :class:`telegram.Update`): The update that caused the error
+            error (:class:`telegram.TelegramError`): The Telegram error that was raised.
         """
 
         for callback in self.error_handlers:

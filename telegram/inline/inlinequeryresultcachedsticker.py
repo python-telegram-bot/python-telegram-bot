@@ -22,24 +22,28 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultCachedSticker(InlineQueryResult):
-    """Represents a link to a sticker stored on the Telegram servers. By default, this sticker will
-    be sent by the user. Alternatively, you can use input_message_content to send a message with
-    the specified content instead of the sticker.
+    """
+    Represents a link to a sticker stored on the Telegram servers. By default, this sticker will
+    be sent by the user. Alternatively, you can use :attr:`input_message_content` to send a
+    message with the specified content instead of the sticker.
 
     Attributes:
-        sticker_file_id (str): A valid file identifier of the sticker.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        type (:obj:`str`): 'sticker`.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        sticker_file_id (:obj:`str`): A valid file identifier of the sticker.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the sticker.
 
     Args:
-        id (str):
-        sticker_file_id (str):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        id (:obj:`str`):
+        sticker_file_id (:obj:`str`):
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the sticker.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

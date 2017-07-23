@@ -22,15 +22,17 @@ from telegram import TelegramObject
 
 
 class Location(TelegramObject):
-    """This object represents a Telegram Location.
+    """
+    This object represents a point on the map.
 
     Attributes:
-        longitude (float):
-        latitude (float):
+        longitude (:obj:`float`): Longitude as defined by sender.
+        latitude (:obj:`float`): Latitude as defined by sender.
 
     Args:
-        longitude (float):
-        latitude (float):
+        longitude (:obj:`float`): Longitude as defined by sender.
+        latitude (:obj:`float`): Latitude as defined by sender.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, longitude, latitude, **kwargs):
@@ -42,14 +44,6 @@ class Location(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Location:
-        """
         if not data:
             return None
 

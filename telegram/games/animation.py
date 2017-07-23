@@ -22,17 +22,23 @@ from telegram import TelegramObject
 
 
 class Animation(TelegramObject):
-    """This object represents a Telegram Animation.
+    """
+    This object represents an animation file to be displayed in the message containing a game.
 
     Attributes:
-        file_id (str): Unique file identifier.
+        file_id (:obj:`str`): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined
+            by sender.
+        file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
+        file_size (:obj:`int`): Optional. File size.
 
-    Keyword Args:
-        thumb (Optional[:class:`telegram.PhotoSize`]): Animation thumbnail as defined by sender.
-        file_name (Optional[str]): Original animation filename as defined by sender.
-        mime_type (Optional[str]): MIME type of the file as defined by sender.
-        file_size (Optional[int]): File size.
-
+    Args:
+        file_id (:obj:`str`): Unique file identifier.
+        thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
+        file_name (:obj:`str`, optional): Original animation filename as defined by sender.
+        mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
+        file_size (:obj:`int`, optional): File size.
     """
 
     def __init__(self,
@@ -52,14 +58,6 @@ class Animation(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Animation:
-        """
         if not data:
             return None
 

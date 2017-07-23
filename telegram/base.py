@@ -27,7 +27,10 @@ from abc import ABCMeta
 
 
 class TelegramObject(object):
-    """Base class for most telegram objects."""
+    """
+    Base class for most telegram objects.
+    """
+
     __metaclass__ = ABCMeta
     _id_attrs = ()
 
@@ -39,14 +42,6 @@ class TelegramObject(object):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            dict:
-        """
         if not data:
             return None
 
@@ -57,15 +52,12 @@ class TelegramObject(object):
     def to_json(self):
         """
         Returns:
-            str:
+            :obj:`str`
         """
+
         return json.dumps(self.to_dict())
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = dict()
 
         for key in iter(self.__dict__):
@@ -84,9 +76,9 @@ class TelegramObject(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self._id_attrs == other._id_attrs
-        return super(TelegramObject, self).__eq__(other)
+        return super(TelegramObject, self).__eq__(other)  # pylint: disable=no-member
 
     def __hash__(self):
         if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))
+            return hash((self.__class__, self._id_attrs))  # pylint: disable=no-member
         return super(TelegramObject, self).__hash__()

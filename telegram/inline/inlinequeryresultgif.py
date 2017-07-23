@@ -23,36 +23,40 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultGif(InlineQueryResult):
-    """Represents a link to an animated GIF file. By default, this animated GIF file will be sent
-    by the user with optional caption. Alternatively, you can use input_message_content to send a
-    message with the specified content instead of the animation.
+    """
+    Represents a link to an animated GIF file. By default, this animated GIF file will be sent by
+    the user with optional caption. Alternatively, you can use :attr:`input_message_content` to
+    send a message with the specified content instead of the animation.
 
     Attributes:
-        gif_url (str): A valid URL for the GIF file. File size must not exceed 1MB.
-        thumb_url (str): URL of the static thumbnail for the result (jpeg or gif).
-        gif_width (Optional[int]): Width of the GIF.
-        gif_height (Optional[int]): Height of the GIF.
-        gif_duration (Optional[int]): Duration of the GIF.
-        title (Optional[str]): Title for the result.
-        caption	(Optional[str]): Caption of the GIF file to be sent, 0-200 characters.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        type (:obj:`str`): 'gif'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
+        gif_width (:obj:`int`): Optional. Width of the GIF.
+        gif_height (:obj:`int`): Optional. Height of the GIF.
+        gif_duration (:obj:`int`): Optional. Duration of the GIF.
+        thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
+        title (:obj:`str`): Optional. Title for the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
-            message to be sent instead of the GIF animation.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the gif.
 
     Args:
-        id (str):
-        gif_url (str):
-        thumb_url (str):
-        gif_width (Optional[int]):
-        gif_height (Optional[int]):
-        gif_duration (Optional[int]):
-        title (Optional[str]):
-        caption	(Optional[str]):
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]):
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]):
-        **kwargs (dict): Arbitrary keyword arguments.
-
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
+        gif_width (:obj:`int`, optional): Width of the GIF.
+        gif_height (:obj:`int`, optional): Height of the GIF.
+        gif_duration (:obj:`int`, optional): Duration of the GIF
+        thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
+        title (:obj:`str`, optional): Title for the result.caption (:obj:`str`, optional):
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the gif.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self,

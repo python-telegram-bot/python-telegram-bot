@@ -23,7 +23,18 @@ from telegram import InputMessageContent
 
 
 class InputLocationMessageContent(InputMessageContent):
-    """Base class for Telegram InputLocationMessageContent Objects"""
+    """
+    Represents the content of a location message to be sent as the result of an inline query.
+
+    Attributes:
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+
+    Args:
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+    """
 
     def __init__(self, latitude, longitude, **kwargs):
         # Required

@@ -1,7 +1,6 @@
-telegram.inlinequeryresultlocation module
-=========================================
+telegram.InlineQueryResultLocation
+==================================
 
-.. automodule:: telegram.inlinequeryresultlocation
+.. autoclass:: telegram.InlineQueryResultLocation
     :members:
-    :undoc-members:
     :show-inheritance:

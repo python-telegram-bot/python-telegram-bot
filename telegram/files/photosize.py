@@ -22,22 +22,21 @@ from telegram import TelegramObject
 
 
 class PhotoSize(TelegramObject):
-    """This object represents a Telegram PhotoSize.
+    """
+    This object represents one size of a photo or a file/sticker thumbnail.
 
     Attributes:
-        file_id (str):
-        width (int):
-        height (int):
-        file_size (int):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Photo width.
+        height (:obj:`int`): Photo height.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        width (int):
-        height (int):
-        **kwargs: Arbitrary keyword arguments.
-
-    Keyword Args:
-        file_size (Optional[int]):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Photo width.
+        height (:obj:`int`): Photo height.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
     """
 
     def __init__(self, file_id, width, height, file_size=None, **kwargs):
@@ -52,14 +51,6 @@ class PhotoSize(TelegramObject):
 
     @classmethod
     def de_json(cls, data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.PhotoSize:
-        """
         if not data:
             return None
 
@@ -67,14 +58,6 @@ class PhotoSize(TelegramObject):
 
     @classmethod
     def de_list(cls, data, bot):
-        """
-        Args:
-            data (list):
-            bot (telegram.Bot):
-
-        Returns:
-            List<telegram.PhotoSize>:
-        """
         if not data:
             return []
 
