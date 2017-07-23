@@ -16,9 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# TODO: Remove allow_edited
 """ This module contains the RegexHandler class """
 
 import re
+import warnings
 
 from future.utils import string_types
 
@@ -86,6 +88,9 @@ class RegexHandler(Handler):
             is ``False``.
         allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
+
+    Raises:
+        ValueError
     """
 
     def __init__(self,
@@ -97,11 +102,18 @@ class RegexHandler(Handler):
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False,
+                 allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
                  edited_updates=False,
-                 allow_edited=False
                  ):
+        if not message_updates and not channel_post_updates and not edited_updates:
+            raise ValueError(
+                'message_updates, channel_post_updates and edited_updates are all False')
+        if allow_edited:
+            warnings.warn('allow_edited is getting deprecated, please use edited_updates instead')
+            edited_updates = allow_edited
+
         super(RegexHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
