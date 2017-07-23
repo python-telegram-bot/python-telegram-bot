@@ -47,8 +47,8 @@ class ShippingQuery(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -60,12 +60,12 @@ class ShippingQuery(TelegramObject):
         if not data:
             return None
 
-        data = super(ShippingQuery, ShippingQuery).de_json(data, bot)
+        data = super(ShippingQuery, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 
-        return ShippingQuery(**data)
+        return cls(**data)
 
     def to_dict(self):
         """

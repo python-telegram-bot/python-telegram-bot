@@ -16,53 +16,40 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Voice."""
+"""This module contains an object that represents a Telegram ChatPhoto."""
 
 from telegram import TelegramObject
 
 
-class Voice(TelegramObject):
-    """This object represents a Telegram Voice.
+class ChatPhoto(TelegramObject):
+    """ This object represents a Telegram ChatPhoto
 
     Attributes:
-        file_id (str):
-        duration (int):
-        mime_type (str):
-        file_size (int):
+        small_file_id (str): Unique file identifier of small (160x160) chat photo. This file_id
+            can be used only for photo download.
+        big_file_id (str): Unique file identifier of big (640x640) chat photo. This file_id
+            can be used only for photo download.
 
     Args:
-        file_id (str):
-        duration (Optional[int]):
-        **kwargs: Arbitrary keyword arguments.
+        bot (Optional[telegram.Bot]): The Bot to use for instance methods
+        **kwargs (dict): Arbitrary keyword arguments.
 
-    Keyword Args:
-        mime_type (Optional[str]):
-        file_size (Optional[int]):
     """
-
-    def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):
-        # Required
-        self.file_id = str(file_id)
-        self.duration = int(duration)
-        # Optionals
-        self.mime_type = mime_type
-        self.file_size = file_size
-
-        self._id_attrs = (self.file_id,)
+    def __init__(self, small_file_id, big_file_id, bot=None, **kwargs):
+        self.small_file_id = small_file_id
+        self.big_file_id = big_file_id
 
     @classmethod
     def de_json(cls, data, bot):
         """
         Args:
             data (dict):
-            bot (telegram.Bot)
+            bot (telegram.Bot):
 
         Returns:
-            telegram.Voice:
+            telegram.ChatPhoto:
         """
         if not data:
             return None
 
-        data = super(Voice, cls).de_json(data, bot)
-
-        return cls(**data)
+        return cls(bot=bot, **data)

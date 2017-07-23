@@ -19,6 +19,8 @@
 """ This module contains the CommandHandler class """
 import warnings
 
+from future.utils import string_types
+
 from .handler import Handler
 from telegram import Update
 
@@ -80,12 +82,8 @@ class CommandHandler(Handler):
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
-        try:
-            _str = basestring  # Python 2
-        except NameError:
-            _str = str  # Python 3
 
-        if isinstance(command, _str):
+        if isinstance(command, string_types):
             self.command = [command.lower()]
         else:
             self.command = [x.lower() for x in command]

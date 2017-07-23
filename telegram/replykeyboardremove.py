@@ -45,8 +45,8 @@ class ReplyKeyboardRemove(ReplyMarkup):
         # Optionals
         self.selective = bool(selective)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -59,4 +59,4 @@ class ReplyKeyboardRemove(ReplyMarkup):
         if not data:
             return None
 
-        return ReplyKeyboardRemove(**data)
+        return cls(**data)

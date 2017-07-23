@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
@@ -22,10 +23,12 @@
 import functools
 import logging
 import warnings
+from datetime import datetime
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore)
+                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet)
 from telegram.error import InvalidToken, TelegramError
+from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -1039,12 +1042,12 @@ class Bot(TelegramObject):
         return File.de_json(result, self)
 
     @log
-    def kick_chat_member(self, chat_id, user_id, timeout=None, **kwargs):
-        """Use this method to kick a user from a group or a supergroup.
+    def kick_chat_member(self, chat_id, user_id, timeout=None, until_date=None, **kwargs):
+        """Use this method to kick a user from a group, a supergroup or a channel.
 
-        In the case of supergroups, the user will not be able to return to the group on their own
-        using invite links, etc., unless unbanned first. The bot must be an administrator in the
-        group for this to work.
+        In the case of supergroups and channels, the user will not be able to return to the group
+        on their own using invite links, etc., unless unbanned first. The bot must be an
+        administrator in the chat for this to work and must have the appropriate admin rights.
 
         Args:
             chat_id (int|str): Unique identifier for the target group or username of the target
@@ -1053,7 +1056,15 @@ class Bot(TelegramObject):
             timeout (Optional[int|float]): If this value is specified, use it as the read timeout
                 from the server (instead of the one specified during creation of the connection
                 pool).
+            until_date (Optional[int|datetime]): Date when the user will be unbanned,
+                unix time. If user is banned for more than 366 days or less than 30 seconds from
+                the current time they are considered to be banned forever
             **kwargs (dict): Arbitrary keyword arguments.
+
+        Note:
+            In regular groups (non-supergroups), this method will only work if the
+            'All Members Are Admins' setting is off in the target group. Otherwise
+            members may only be removed by the group's creator or by the member that added them.
 
         Returns:
             bool: On success, `True` is returned.
@@ -1065,6 +1076,11 @@ class Bot(TelegramObject):
         url = '{0}/kickChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
+
+        if until_date is not None:
+            if isinstance(until_date, datetime):
+                until_date = to_timestamp(until_date)
+            data['until_date'] = until_date
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -1984,11 +2000,583 @@ class Bot(TelegramObject):
 
         return result
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(Bot, Bot).de_json(data, bot)
+    @log
+    def restrict_chat_member(self, chat_id, user_id, until_date=None, can_send_messages=None,
+                             can_send_media_messages=None, can_send_other_messages=None,
+                             can_add_web_page_previews=None, timeout=None, **kwargs):
+        """Use this method to restrict a user in a supergroup.
 
-        return Bot(**data)
+        The bot must be an administrator in the supergroup for this to work and must have the
+        appropriate admin rights. Pass True for all boolean parameters to lift restrictions
+        from a user.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                supergroup (in the format @supergroupusername)
+            user_id (int): Unique identifier of the target user
+            until_date (Optional[int|datetime]): Date when restrictions will be lifted for the
+                user, unix time. If user is restricted for more than 366 days or less than 30
+                seconds from the current time, they are considered to be restricted forever
+            can_send_messages (Optional[boolean]): Pass True, if the user can send text messages,
+                contacts, locations and venues
+            can_send_media_messages (Optional[boolean]): Pass True, if the user can send audios,
+                documents, photos, videos, video notes and voice notes, implies can_send_messages
+            can_send_other_messages (Optional[boolean]): Pass True, if the user can send
+                animations, games, stickers and use inline bots, implies can_send_media_messages
+            can_add_web_page_previews (Optional[boolean]): Pass True, if the user may add web page
+                previews to their messages, implies can_send_media_messages
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/restrictChatMember'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'user_id': user_id}
+
+        if until_date is not None:
+            if isinstance(until_date, datetime):
+                until_date = to_timestamp(until_date)
+            data['until_date'] = until_date
+        if can_send_messages is not None:
+            data['can_send_messages'] = can_send_messages
+        if can_send_media_messages is not None:
+            data['can_send_media_messages'] = can_send_media_messages
+        if can_send_other_messages is not None:
+            data['can_send_other_messages'] = can_send_other_messages
+        if can_add_web_page_previews is not None:
+            data['can_add_web_page_previews'] = can_add_web_page_previews
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def promote_chat_member(self, chat_id, user_id, can_change_info=None,
+                            can_post_messages=None, can_edit_messages=None,
+                            can_delete_messages=None, can_invite_users=None,
+                            can_restrict_members=None, can_pin_messages=None,
+                            can_promote_members=None, timeout=None, **kwargs):
+        """Use this method to promote or demote a user in a supergroup or a channel.
+
+        The bot must be an administrator in the chat for this to work and must have the
+        appropriate admin rights. Pass False for all boolean parameters to demote a user
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                supergroup (in the format @supergroupusername)
+            user_id (int): Unique identifier of the target user
+            can_change_info (Optional[boolean]): Pass True, if the administrator can change chat
+                title, photo and other settings
+            can_post_messages (Optional[boolean]): Pass True, if the administrator can create
+                channel posts, channels only
+            can_edit_messages (Optional[boolean]): Pass True, if the administrator can edit
+                messages of other users, channels only
+            can_delete_messages (Optional[boolean]): Pass True, if the administrator can delete
+                messages of other users
+            can_invite_users (Optional[boolean]): Pass True, if the administrator can invite new
+                users to the chat
+            can_restrict_members (Optional[boolean]): Pass True, if the administrator can restrict,
+                ban or unban chat members
+            can_pin_messages (Optional[boolean]): Pass True, if the administrator can pin messages,
+                supergroups only
+            can_promote_members (Optional[boolean]): Pass True, if the administrator can add new
+                administrators with a subset of his own privileges or demote administrators that
+                he has promoted, directly or indirectly (promoted by administrators that were
+                appointed by him)
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/promoteChatMember'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'user_id': user_id}
+
+        if can_change_info is not None:
+            data['can_change_info'] = can_change_info
+        if can_post_messages is not None:
+            data['can_post_messages'] = can_post_messages
+        if can_edit_messages is not None:
+            data['can_edit_messages'] = can_edit_messages
+        if can_delete_messages is not None:
+            data['can_delete_messages'] = can_delete_messages
+        if can_invite_users is not None:
+            data['can_invite_users'] = can_invite_users
+        if can_restrict_members is not None:
+            data['can_restrict_members'] = can_restrict_members
+        if can_pin_messages is not None:
+            data['can_pin_messages'] = can_pin_messages
+        if can_promote_members is not None:
+            data['can_promote_members'] = can_promote_members
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def export_chat_invite_link(self, chat_id, timeout=None, **kwargs):
+        """Use this method to export an invite link to a supergroup or a channel.
+
+        The bot must be an administrator in the chat for this to work and must have the
+        appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            str: On success the exported invite link is returned
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/exportChatInviteLink'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_chat_photo(self, chat_id, photo, timeout=None, **kwargs):
+        """Use this method to set a new profile photo for the chat.
+
+        Photos can't be changed for private chats. The bot must be an administrator in the chat
+        for this to work and must have the appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            photo (`telegram.InputFile`): New chat photo
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Note:
+            In regular groups (non-supergroups), this method will only work if the
+            'All Members Are Admins' setting is off in the target group.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatPhoto'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'photo': photo}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def delete_chat_photo(self, chat_id, timeout=None, **kwargs):
+        """Use this method to delete a chat photo.
+
+        Photos can't be changed for private chats. The bot must be an administrator in the chat
+        for this to work and must have the appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Note:
+            In regular groups (non-supergroups), this method will only work if the
+            'All Members Are Admins' setting is off in the target group.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/deleteChatPhoto'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_chat_title(self, chat_id, title, timeout=None, **kwargs):
+        """Use this method to change the title of a chat.
+
+        Titles can't be changed for private chats. The bot must be an administrator in the chat
+        for this to work and must have the appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            title (str): New chat title, 1-255 characters
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Note:
+            In regular groups (non-supergroups), this method will only work if the
+            'All Members Are Admins' setting is off in the target group.
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatTitle'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'title': title}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_chat_description(self, chat_id, description, timeout=None, **kwargs):
+        """Use this method to change the description of a supergroup or a channel.
+
+        The bot must be an administrator in the chat for this to work and must have the
+            appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            description (str): New chat description, 1-255 characters
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatDescription'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'description': description}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def pin_chat_message(self, chat_id, message_id, disable_notification=None, timeout=None,
+                         **kwargs):
+        """Use this method to pin a message in a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must have the
+            appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            message_id (int): Identifier of a message to pin
+            disable_notification (boolean): Pass True, if it is not necessary to send a
+                notification to all group members about the new pinned message
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/pinChatMessage'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'message_id': message_id}
+
+        if disable_notification is not None:
+            data['disable_notification'] = disable_notification
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def unpin_chat_message(self, chat_id, timeout=None, **kwargs):
+        """Use this method to unpin a message in a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must have the
+            appropriate admin rights.
+
+        Args:
+            chat_id (int|str): Unique identifier for the target chat or username of the target
+                channel (in the format @channelusername)
+            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
+                from the server (instead of the one specified during creation of the connection
+                pool).
+            **kwargs (dict): Arbitrary keyword arguments
+
+        Returns:
+            bool: On success, `True` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/unpinChatMessage'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def get_sticker_set(self, name, timeout=None, **kwargs):
+        """
+        Use this method to get a sticker set.
+
+        Args:
+            name (:obj:`str`): Short name of the sticker set that is used in t.me/addstickers/
+                URLs (e.g., animals)
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.StickerSet`
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/getStickerSet'.format(self.base_url)
+
+        data = {'name': name}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return StickerSet.de_json(result, self)
+
+    def upload_sticker_file(self, user_id, png_sticker, timeout=None, **kwargs):
+        """
+        Use this method to upload a .png file with a sticker for later use in
+        :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
+        times).
+
+        Note:
+            The png_sticker argument can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            user_id (:obj:`int`): User identifier of sticker file owner.
+            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker,
+                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
+                and either width or height must be exactly 512px.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`: The uploaded File
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/uploadStickerFile'.format(self.base_url)
+
+        data = {'user_id': user_id, 'png_sticker': png_sticker}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return File.de_json(result, self)
+
+    def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis, is_masks=None,
+                               mask_position=None, timeout=None, **kwargs):
+        """
+        Use this method to create new sticker set owned by a user.
+        The bot will be able to edit the created sticker set.
+
+        Note:
+            The png_sticker argument can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            name (:obj:`str`): Short name of sticker set, to be used in t.me/addstickers/ URLs
+                (e.g., animals). Can contain only english letters, digits and underscores.
+                Must begin with a letter, can't contain consecutive underscores and
+                must end in "_by_<bot username>". <bot_username> is case insensitive.
+                1-64 characters.
+            title (:obj:`str`): Sticker set title, 1-64 characters.
+            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
+                to 512 kilobytes in size, dimensions must not exceed 512px,
+                and either width or height must be exactly 512px. Pass a file_id as a String to
+                send a file that already exists on the Telegram servers, pass an HTTP URL as a
+                String for Telegram to get a file from the Internet, or upload a new one
+                using multipart/form-data.
+            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
+            is_masks (:obj:`bool`, optional): Pass True, if a set of mask stickers should be
+                created.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should be placed on faces.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/createNewStickerSet'.format(self.base_url)
+
+        data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
+                'emojis': emojis}
+
+        if is_masks is not None:
+            data['is_masks'] = is_masks
+        if mask_position is not None:
+            data['mask_position'] = mask_position
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def add_sticker_to_set(self, user_id, name, png_sticker, emojis, mask_position=None,
+                           timeout=None, **kwargs):
+        """
+        Use this method to add a new sticker to a set created by the bot.
+
+        Note:
+            The png_sticker argument can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            user_id (:obj:`int`): User identifier of created sticker set owner.
+            name (:obj:`str`): Sticker set name.
+            png_sticker (:obj:`str` | `filelike object`): Png image with the sticker, must be up
+                to 512 kilobytes in size, dimensions must not exceed 512px,
+                and either width or height must be exactly 512px. Pass a file_id as a String to
+                send a file that already exists on the Telegram servers, pass an HTTP URL as a
+                String for Telegram to get a file from the Internet, or upload a new one
+                using multipart/form-data.
+            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should beplaced on faces.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+
+        url = '{0}/addStickerToSet'.format(self.base_url)
+
+        data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker, 'emojis': emojis}
+
+        if mask_position is not None:
+            data['mask_position'] = mask_position
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def set_sticker_position_in_set(self, sticker, position, timeout=None, **kwargs):
+        """
+        Use this method to move a sticker in a set created by the bot to a specific position.
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            position (:obj:`int`): New sticker position in the set, zero-based.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        url = '{0}/setStickerPositionInSet'.format(self.base_url)
+
+        data = {'sticker': sticker, 'position': position}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    def delete_sticker_from_set(self, sticker, timeout=None, **kwargs):
+        """
+        Use this method to delete a sticker from a set created by the bot.
+
+        Args:
+            sticker (:obj:`str`): File identifier of the sticker.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        url = '{0}/deleteStickerFromSet'.format(self.base_url)
+
+        data = {'sticker': sticker}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(Bot, cls).de_json(data, bot)
+
+        return cls(**data)
 
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.username}
@@ -2042,3 +2630,18 @@ class Bot(TelegramObject):
     sendInvoice = send_invoice
     answerShippingQuery = answer_shipping_query
     answerPreCheckoutQuery = answer_pre_checkout_query
+    restrictChatMember = restrict_chat_member
+    promoteChatMember = promote_chat_member
+    exportChatInviteLink = export_chat_invite_link
+    setChatPhoto = set_chat_photo
+    deleteChatPhoto = delete_chat_photo
+    setChatTitle = set_chat_title
+    setChatDescription = set_chat_description
+    pinChatMessage = pin_chat_message
+    unpinChatMessage = unpin_chat_message
+    getStickerSet = get_sticker_set
+    uploadStickerFile = upload_sticker_file
+    createNewStickerSet = create_new_sticker_set
+    addStickerToSet = add_sticker_to_set
+    setStickerPositionInSet = set_sticker_position_in_set
+    deleteStickerFromSet = delete_sticker_from_set

@@ -59,8 +59,8 @@ class Game(TelegramObject):
         self.text_entities = text_entities
         self.animation = animation
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -73,13 +73,13 @@ class Game(TelegramObject):
         if not data:
             return None
 
-        data = super(Game, Game).de_json(data, bot)
+        data = super(Game, cls).de_json(data, bot)
 
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['text_entities'] = MessageEntity.de_list(data.get('text_entities'), bot)
         data['animation'] = Animation.de_json(data.get('animation'), bot)
 
-        return Game(**data)
+        return cls(**data)
 
     def to_dict(self):
         """

@@ -32,6 +32,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jeffffc <https://github.com/jeffffc>`_
+- `Jelle Besseling <https://github.com/pingiun>`_
 - `jh0ker <https://github.com/jh0ker>`_
 - `John Yong <https://github.com/whipermr5>`_
 - `jossalgon <https://github.com/jossalgon>`_

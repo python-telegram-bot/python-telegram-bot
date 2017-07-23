@@ -58,8 +58,8 @@ class InlineQuery(TelegramObject):
         self.bot = bot
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -68,7 +68,7 @@ class InlineQuery(TelegramObject):
         Returns:
             telegram.InlineQuery:
         """
-        data = super(InlineQuery, InlineQuery).de_json(data, bot)
+        data = super(InlineQuery, cls).de_json(data, bot)
 
         if not data:
             return None
@@ -76,7 +76,7 @@ class InlineQuery(TelegramObject):
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['location'] = Location.de_json(data.get('location'), bot)
 
-        return InlineQuery(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def to_dict(self):
         """

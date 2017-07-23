@@ -42,13 +42,13 @@ class Venue(TelegramObject):
 
         self._id_attrs = (self.location, self.title)
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(Venue, Venue).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(Venue, cls).de_json(data, bot)
 
         if not data:
             return None
 
         data['location'] = Location.de_json(data.get('location'), bot)
 
-        return Venue(**data)
+        return cls(**data)

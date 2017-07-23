@@ -58,8 +58,8 @@ class SuccessfulPayment(TelegramObject):
 
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -71,7 +71,7 @@ class SuccessfulPayment(TelegramObject):
         if not data:
             return None
 
-        data = super(SuccessfulPayment, SuccessfulPayment).de_json(data, bot)
+        data = super(SuccessfulPayment, cls).de_json(data, bot)
         data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
 
-        return SuccessfulPayment(**data)
+        return cls(**data)

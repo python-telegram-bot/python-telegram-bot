@@ -39,8 +39,8 @@ class UserProfilePhotos(TelegramObject):
         self.total_count = int(total_count)
         self.photos = photos
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -52,11 +52,11 @@ class UserProfilePhotos(TelegramObject):
         if not data:
             return None
 
-        data = super(UserProfilePhotos, UserProfilePhotos).de_json(data, bot)
+        data = super(UserProfilePhotos, cls).de_json(data, bot)
 
         data['photos'] = [PhotoSize.de_list(photo, bot) for photo in data['photos']]
 
-        return UserProfilePhotos(**data)
+        return cls(**data)
 
     def to_dict(self):
         """

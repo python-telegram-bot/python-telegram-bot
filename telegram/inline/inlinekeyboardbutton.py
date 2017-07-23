@@ -74,8 +74,8 @@ class InlineKeyboardButton(TelegramObject):
         self.callback_game = callback_game
         self.pay = pay
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -84,20 +84,20 @@ class InlineKeyboardButton(TelegramObject):
         Returns:
             telegram.InlineKeyboardButton:
         """
-        data = super(InlineKeyboardButton, InlineKeyboardButton).de_json(data, bot)
+        data = super(InlineKeyboardButton, cls).de_json(data, bot)
 
         if not data:
             return None
 
-        return InlineKeyboardButton(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         if not data:
             return []
 
         inline_keyboards = list()
         for inline_keyboard in data:
-            inline_keyboards.append(InlineKeyboardButton.de_json(inline_keyboard, bot))
+            inline_keyboards.append(cls.de_json(inline_keyboard, bot))
 
         return inline_keyboards
