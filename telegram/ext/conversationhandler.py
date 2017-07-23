@@ -160,7 +160,7 @@ class ConversationHandler(Handler):
         if self.per_chat:
             key.append(chat.id)
 
-        if self.per_user:
+        if self.per_user and user is not None:
             key.append(user.id)
 
         if self.per_message:
