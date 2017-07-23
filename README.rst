@@ -15,6 +15,10 @@ We have made you a wrapper you can't refuse
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: Supported python versions
 
+.. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
+   :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
+   :alt: PyPi Package Monthly Download
+
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
    :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
