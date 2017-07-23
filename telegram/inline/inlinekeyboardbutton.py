@@ -28,7 +28,7 @@ class InlineKeyboardButton(TelegramObject):
 
     Note:
         You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
-        implemented yet.
+        working as expected. Putting a game short name in it might, but is not guaranteed to work.
 
     Attributes:
         text (:obj:`str`): Label text on the button.
