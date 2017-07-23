@@ -145,7 +145,7 @@ class JobQueue(object):
                   which the job should run.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                tomorrow.
+                  tomorrow.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
