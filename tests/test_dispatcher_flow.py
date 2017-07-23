@@ -52,7 +52,6 @@ class DispatcherFlowTest(BaseTest, unittest.TestCase):
     _update = None
 
     def setUp(self):
-        super().setUp()
         self._bot = Bot('123:XYZ')
         self._bot.bot = User.de_json(
             {'id': 123, 'first_name': 'TestBot', 'username': 'test_bot'},
