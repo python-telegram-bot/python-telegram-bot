@@ -68,11 +68,11 @@ class AnimationTest(BaseTest, unittest.TestCase):
         animation = telegram.Animation.de_json(self.json_dict, self._bot)
 
         self.assertTrue(self.is_dict(animation.to_dict()))
-        self.assertEqual(animation['file_id'], self.animation_file_id)
-        self.assertEqual(animation['thumb'], self.thumb)
-        self.assertEqual(animation['file_name'], self.file_name)
-        self.assertEqual(animation['mime_type'], self.mime_type)
-        self.assertEqual(animation['file_size'], self.file_size)
+        self.assertEqual(animation.file_id, self.animation_file_id)
+        self.assertEqual(animation.thumb, self.thumb)
+        self.assertEqual(animation.file_name, self.file_name)
+        self.assertEqual(animation.mime_type, self.mime_type)
+        self.assertEqual(animation.file_size, self.file_size)
 
     def test_equality(self):
         a = telegram.Animation(self.animation_file_id)

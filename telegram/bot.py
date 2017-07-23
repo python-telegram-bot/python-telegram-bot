@@ -1795,7 +1795,6 @@ class Bot(TelegramObject):
                        chat_id=None,
                        message_id=None,
                        inline_message_id=None,
-                       edit_message=None,
                        force=None,
                        disable_edit_message=None,
                        timeout=None,
@@ -1847,12 +1846,6 @@ class Bot(TelegramObject):
             data['force'] = force
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
-        if edit_message is not None:
-            warnings.warn('edit_message is deprecated, use disable_edit_message instead')
-            if disable_edit_message is None:
-                data['edit_message'] = edit_message
-            else:
-                warnings.warn('edit_message is ignored when disable_edit_message is used')
 
         return url, data
 
@@ -2694,11 +2687,11 @@ class Bot(TelegramObject):
 
         return result
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(Bot, Bot).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(Bot, cls).de_json(data, bot)
 
-        return Bot(**data)
+        return cls(**data)
 
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.username}

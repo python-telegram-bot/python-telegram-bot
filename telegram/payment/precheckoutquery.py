@@ -77,17 +77,17 @@ class PreCheckoutQuery(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(PreCheckoutQuery, PreCheckoutQuery).de_json(data, bot)
+        data = super(PreCheckoutQuery, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
 
-        return PreCheckoutQuery(**data)
+        return cls(**data)
 
     def to_dict(self):
         data = super(PreCheckoutQuery, self).to_dict()

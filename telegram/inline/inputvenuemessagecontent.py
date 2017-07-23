@@ -51,6 +51,6 @@ class InputVenueMessageContent(InputMessageContent):
         # Optionals
         self.foursquare_id = foursquare_id
 
-    @staticmethod
-    def de_json(data, bot):
-        return InputVenueMessageContent(**data)
+    @classmethod
+    def de_json(cls, data, bot):
+        return cls(**data)

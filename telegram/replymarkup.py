@@ -27,12 +27,4 @@ class ReplyMarkup(TelegramObject):
     See :class:`telegram.ReplyKeyboardMarkup` and :class:`telegram.InlineKeyboardMarkup` for
     detailed use.
     """
-
-    @staticmethod
-    def de_json(data, bot):
-        data = super(ReplyMarkup, ReplyMarkup).de_json(data, bot)
-
-        if not data:
-            return None
-
-        return data
+    pass

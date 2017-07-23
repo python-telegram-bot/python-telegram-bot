@@ -44,9 +44,9 @@ class ChatPhoto(TelegramObject):
         self.small_file_id = small_file_id
         self.big_file_id = big_file_id
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        return ChatPhoto(bot=bot, **data)
+        return cls(bot=bot, **data)

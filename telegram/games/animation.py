@@ -56,13 +56,13 @@ class Animation(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(Animation, Animation).de_json(data, bot)
+        data = super(Animation, cls).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
-        return Animation(**data)
+        return cls(**data)

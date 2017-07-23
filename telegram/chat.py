@@ -100,14 +100,14 @@ class Chat(TelegramObject):
         self.bot = bot
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
 
-        return Chat(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def send_action(self, *args, **kwargs):
         """
