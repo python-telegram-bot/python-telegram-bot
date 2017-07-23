@@ -105,7 +105,7 @@ class RegexHandler(Handler):
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
-                 edited_updates=False,
+                 edited_updates=False
                  ):
         if not message_updates and not channel_post_updates and not edited_updates:
             raise ValueError(
