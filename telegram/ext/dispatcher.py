@@ -21,12 +21,11 @@
 import logging
 import weakref
 from functools import wraps
-from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
+from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
 from uuid import uuid4
 from collections import defaultdict
-
-from queue import Queue, Empty
+from queue import Empty, Queue
 
 from future.builtins import range
 
@@ -46,7 +45,6 @@ def run_async(func):
 
     Args:
         func (function): The function to run in the thread.
-        async_queue (Queue): The queue of the functions to be executed asynchronously.
 
     Returns:
         function:
@@ -58,6 +56,28 @@ def run_async(func):
         return Dispatcher.get_instance().run_async(func, *args, **kwargs)
 
     return async_func
+
+
+class Flow(Exception):
+    """
+    Dispatcher update processing manipulation exceptions are base on this class.
+    """
+    pass
+
+
+class Continue(Flow):
+    """
+    If check Handler's check_updated returned true, but execution of handler raised this,
+    then handlers checking will continue.
+    """
+    pass
+
+
+class Stop(Flow):
+    """
+    Raise this in handler to prevent execution any other handlers (even in different group).
+    """
+    pass
 
 
 class Dispatcher(object):
@@ -250,24 +270,28 @@ class Dispatcher(object):
         Processes a single update.
 
         Args:
-            update (object):
+            update (telegram.Update or telegram.TelegramError):
         """
 
         # An error happened while polling
         if isinstance(update, TelegramError):
             self.dispatch_error(None, update)
-
-        else:
-            for group in self.groups:
+            return
+        for group in self.groups:
+            try:
                 for handler in self.handlers[group]:
                     try:
                         if handler.check_update(update):
-                            handler.handle_update(update, self)
+                            try:
+                                handler.handle_update(update, self)
+                            except Continue:
+                                continue
                             break
-                    # Dispatch any errors
+                    except Flow:
+                        raise
                     except TelegramError as te:
-                        self.logger.warn('A TelegramError was raised while processing the '
-                                         'Update.')
+                        self.logger.warning('A TelegramError was raised while processing the '
+                                            'Update.')
 
                         try:
                             self.dispatch_error(update, te)
@@ -282,6 +306,8 @@ class Dispatcher(object):
                         self.logger.exception('An uncaught error was raised while '
                                               'processing the update')
                         break
+            except Stop:
+                break
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """
@@ -339,7 +365,7 @@ class Dispatcher(object):
         Registers an error handler in the Dispatcher.
 
         Args:
-            handler (function): A function that takes ``Bot, Update,
+            callback (function): A function that takes ``Bot, Update,
                 TelegramError`` as arguments.
         """
 
@@ -350,7 +376,7 @@ class Dispatcher(object):
         De-registers an error handler.
 
         Args:
-            handler (function):
+            callback (function):
         """
 
         if callback in self.error_handlers:
@@ -361,7 +387,7 @@ class Dispatcher(object):
         Dispatches an error.
 
         Args:
-            update (object): The update that caused the error
+            update (telegram.Update or None): The update that caused the error
             error (telegram.TelegramError): The Telegram error that was raised.
         """
 
