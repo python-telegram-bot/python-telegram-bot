@@ -27,7 +27,8 @@ class InlineKeyboardButton(TelegramObject):
     This object represents one button of an inline keyboard.
 
     Note:
-        You must use exactly one of the optional fields.
+        You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
+        implemented yet.
 
     Attributes:
         text (:obj:`str`): Label text on the button.

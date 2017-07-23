@@ -28,7 +28,8 @@ class MessageHandler(Handler):
     Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Attributes:
-        filters (:class:`telegram.ext.BaseFilter`): Only allow updates with these Filters.
+        filters (:obj:`Filter`): Only allow updates with these Filters. See
+            :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.

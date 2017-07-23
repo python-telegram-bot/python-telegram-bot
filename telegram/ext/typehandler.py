@@ -26,7 +26,7 @@ class TypeHandler(Handler):
     Handler class to handle updates of custom types.
 
     Attributes:
-        type (:obj:`class`): The ``type`` of updates this handler should process.
+        type (:obj:`type`): The ``type`` of updates this handler should process.
         callback (:obj:`callable`): The callback function for this handler.
         strict (:obj:`bool`): Optional. Use ``type`` instead of ``isinstance``.
             Default is ``False``
@@ -36,7 +36,7 @@ class TypeHandler(Handler):
             the callback function.
 
     Args:
-        type (:obj:`class`): The ``type`` of updates this handler should process, as
+        type (:obj:`type`): The ``type`` of updates this handler should process, as
             determined by ``isinstance``
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be

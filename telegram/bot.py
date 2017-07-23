@@ -223,9 +223,9 @@ class Bot(TelegramObject):
                 of the target channel (in the format @channelusername).
             text (:obj:`str`): Text of the message to be sent. Max 4096 characters. Also found as
                 :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps
-            to show
-                bold, italic, fixed-width text or inline URLs in your bot's message.
+            parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
+                italic, fixed-width text or inline URLs in your bot's message. See the constants in
+                :class:`telegram.ParseMode` for the available modes.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -953,16 +953,8 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format @channelusername).
             action(:class:`telegram.ChatAction` | :obj:`str`): Type of action to broadcast. Choose
-                one, depending on what the user is about to receive:
-
-                * typing for text messages
-                * upload_photo for photos
-                * record_video or upload_video for videos
-                * record_audio or upload_audio for audio files
-                * upload_document for general files
-                * find_location for location data
-                * record_video_note or upload_video_note for video notes
-
+                one, depending on what the user is about to receive. For convenience look at the
+                constants in :class:`telegram.ChatAction`
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1234,8 +1226,7 @@ class Bot(TelegramObject):
                 game button. Otherwise, you may use links like t.me/your_bot?start=XXXX that open
                 your bot with a parameter.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
-                result of the callback query may be cached client-side. Telegram apps will support
-                caching starting in version 3.14. Defaults to 0.
+                result of the callback query may be cached client-side. Defaults to 0.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1289,9 +1280,9 @@ class Bot(TelegramObject):
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             text (:obj:`str`): New text of the message.
-            parse_mode (:class:`telegram.ParseMode` | :obj:`str`): Send Markdown or HTML, if you
-                want Telegram apps to show bold, italic, fixed-width text or inline URLs in your
-                bot's message.
+            parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
+                italic, fixed-width text or inline URLs in your bot's message. See the constants in
+                :class:`telegram.ParseMode` for the available modes.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.

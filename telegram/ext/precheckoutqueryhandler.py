@@ -44,7 +44,7 @@ class PreCheckoutQueryHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
     Args:
-        callback (:obj:`callable): A function that takes ``bot, update`` as positional arguments.
+        callback (:obj:`callable'): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called

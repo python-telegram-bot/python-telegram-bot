@@ -26,7 +26,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
     This object represents a custom keyboard with reply options.
 
     Attributes:
-        keyboard (List[List[:class:`telegram.KeyboardButton`]]): Array of button rows.
+        keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
         one_time_keyboard (:obj:`bool`): Optional. Requests clients to hide the keyboard as soon as
             it's been used.

@@ -23,9 +23,7 @@ from telegram import TelegramObject
 
 class Animation(TelegramObject):
     """
-    You can provide an animation for your game so that it looks stylish in chats (check out
-    Lumberjack for an example). This object represents an animation file to be displayed in the
-    message containing a game.
+    This object represents an animation file to be displayed in the message containing a game.
 
     Attributes:
         file_id (:obj:`str`): Unique file identifier.

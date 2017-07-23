@@ -39,7 +39,6 @@ telegram package
    telegram.videonote
    telegram.voice
    telegram.webhookinfo
-   telegram.stickers
 
 Stickers
 --------
