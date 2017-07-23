@@ -88,7 +88,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **18. June 2017**, all types and methods of the Telegram Bot API 3.0 are supported.
+As of **23. July 2017**, all types and methods of the Telegram Bot API 3.2 are supported.
 
 ==========
 Installing

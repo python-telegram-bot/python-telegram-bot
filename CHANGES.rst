@@ -7,7 +7,7 @@ Changes
 - Improved filters for user_id/username/chat.
 - Internal restructure of files.
 - Improved unitests.
-- Fully support Bot API 3.1.
+- Fully support Bot API 3.2.
 
 **2017-06-18**
 
