@@ -197,8 +197,8 @@ class Message(TelegramObject):
         """int: Short for :attr:`Message.chat.id`"""
         return self.chat.id
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -210,7 +210,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data = super(Message, Message).de_json(data, bot)
+        data = super(Message, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
@@ -240,7 +240,7 @@ class Message(TelegramObject):
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
 
-        return Message(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def __getitem__(self, item):
         if item in self.__dict__.keys():

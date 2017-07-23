@@ -33,10 +33,13 @@ class InlineQueryResultGame(InlineQueryResult):
         if reply_markup:
             self.reply_markup = reply_markup
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultGame, InlineQueryResultGame).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(InlineQueryResultGame, cls).de_json(data, bot)
+
+        if not data:
+            return None
 
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
-        return InlineQueryResultGame(**data)
+        return cls(**data)

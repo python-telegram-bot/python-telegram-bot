@@ -53,8 +53,8 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -66,7 +66,7 @@ class File(TelegramObject):
         if not data:
             return None
 
-        return File(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def download(self, custom_path=None, out=None, timeout=None):
         """

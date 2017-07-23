@@ -62,8 +62,8 @@ class Audio(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -75,4 +75,4 @@ class Audio(TelegramObject):
         if not data:
             return None
 
-        return Audio(**data)
+        return cls(**data)

@@ -49,8 +49,8 @@ class Contact(TelegramObject):
 
         self._id_attrs = (self.phone_number,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -62,4 +62,4 @@ class Contact(TelegramObject):
         if not data:
             return None
 
-        return Contact(**data)
+        return cls(**data)

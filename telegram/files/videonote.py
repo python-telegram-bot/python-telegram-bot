@@ -43,8 +43,8 @@ class VideoNote(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -56,8 +56,8 @@ class VideoNote(TelegramObject):
         if not data:
             return None
 
-        data = super(VideoNote, VideoNote).de_json(data, bot)
+        data = super(VideoNote, cls).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
-        return VideoNote(**data)
+        return cls(**data)

@@ -30,6 +30,6 @@ class InputLocationMessageContent(InputMessageContent):
         self.latitude = latitude
         self.longitude = longitude
 
-    @staticmethod
-    def de_json(data, bot):
-        return InputLocationMessageContent(**data)
+    @classmethod
+    def de_json(cls, data, bot):
+        return cls(**data)

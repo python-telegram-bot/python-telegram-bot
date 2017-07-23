@@ -42,8 +42,8 @@ class ShippingOption(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -55,11 +55,11 @@ class ShippingOption(TelegramObject):
         if not data:
             return None
 
-        data = super(ShippingOption, ShippingOption).de_json(data, bot)
+        data = super(ShippingOption, cls).de_json(data, bot)
 
         data['prices'] = LabeledPrice.de_list(data.get('prices'), bot)
 
-        return ShippingOption(**data)
+        return cls(**data)
 
     def to_dict(self):
         """

@@ -38,8 +38,8 @@ class InlineKeyboardMarkup(ReplyMarkup):
         # Required
         self.inline_keyboard = inline_keyboard
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -49,7 +49,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
             telegram.InlineKeyboardMarkup:
 
         """
-        data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data, bot)
+        data = super(InlineKeyboardMarkup, cls).de_json(data, bot)
 
         if not data:
             return None
@@ -59,7 +59,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
             for inline_keyboard in data['inline_keyboard']
         ]
 
-        return InlineKeyboardMarkup(**data)
+        return cls(**data)
 
     def to_dict(self):
         data = super(InlineKeyboardMarkup, self).to_dict()

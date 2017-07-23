@@ -78,8 +78,8 @@ class Chat(TelegramObject):
         self.bot = bot
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -93,7 +93,7 @@ class Chat(TelegramObject):
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
 
-        return Chat(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def send_action(self, *args, **kwargs):
         """Shortcut for ``bot.send_chat_action(update.message.chat.id, *args, **kwargs)``"""

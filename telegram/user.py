@@ -77,8 +77,8 @@ class User(TelegramObject):
             return '%s %s' % (self.first_name, self.last_name)
         return self.first_name
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (dict):
@@ -90,9 +90,9 @@ class User(TelegramObject):
         if not data:
             return None
 
-        data = super(User, User).de_json(data, bot)
+        data = super(User, cls).de_json(data, bot)
 
-        return User(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def get_profile_photos(self, *args, **kwargs):
         """
@@ -100,8 +100,8 @@ class User(TelegramObject):
         """
         return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         """
         Args:
             data (list):
@@ -115,6 +115,6 @@ class User(TelegramObject):
 
         users = list()
         for user in data:
-            users.append(User.de_json(user, bot))
+            users.append(cls.de_json(user, bot))
 
         return users

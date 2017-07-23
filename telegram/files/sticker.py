@@ -74,8 +74,8 @@ class Sticker(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         """
         Args:
             data (:obj:`dict`):
@@ -87,19 +87,19 @@ class Sticker(TelegramObject):
         if not data:
             return None
 
-        data = super(Sticker, Sticker).de_json(data, bot)
+        data = super(Sticker, cls).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
-        return Sticker(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         if not data:
             return list()
 
-        return [Sticker.de_json(d, bot) for d in data]
+        return [cls.de_json(d, bot) for d in data]
 
 
 class StickerSet(TelegramObject):
@@ -190,9 +190,9 @@ class MaskPosition(TelegramObject):
         self.y_shift = y_shift
         self.zoom = zoom
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if data is None:
             return None
 
-        return MaskPosition(**data)
+        return cls(**data)

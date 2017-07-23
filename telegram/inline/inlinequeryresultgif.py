@@ -89,12 +89,15 @@ class InlineQueryResultGif(InlineQueryResult):
         if input_message_content:
             self.input_message_content = input_message_content
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultGif, InlineQueryResultGif).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(InlineQueryResultGif, cls).de_json(data, bot)
+
+        if not data:
+            return None
 
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
         data['input_message_content'] = InputMessageContent.de_json(
             data.get('input_message_content'), bot)
 
-        return InlineQueryResultGif(**data)
+        return cls(**data)
