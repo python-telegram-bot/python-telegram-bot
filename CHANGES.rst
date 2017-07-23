@@ -8,6 +8,8 @@ Changes
 - Internal restructure of files.
 - Improved unitests.
 - Fully support Bot API 3.1.
+- Fully support Bot API 3.2
+- Modified docstrings
 
 **2017-06-18**
 
