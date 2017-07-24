@@ -1623,7 +1623,7 @@ class Bot(TelegramObject):
 
         url = '{0}/deleteWebhook'.format(self.base_url)
 
-        data = kwargs.copy()
+        data = kwargs
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -1796,7 +1796,7 @@ class Bot(TelegramObject):
 
         url = '{0}/getWebhookInfo'.format(self.base_url)
 
-        data = kwargs.copy()
+        data = kwargs
 
         result = self._request.post(url, data, timeout=timeout)
 
