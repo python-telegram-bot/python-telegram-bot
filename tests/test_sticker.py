@@ -297,13 +297,13 @@ class TestMaskPosition(BaseTest, unittest.TestCase):
         self.point = telegram.MaskPosition.EYES
         self.x_shift = -1
         self.y_shift = 1
-        self.zoom = 2
+        self.scale = 2
 
         self.json_dict = {
             'point': self.point,
             'x_shift': self.x_shift,
             'y_shift': self.y_shift,
-            'zoom': self.zoom
+            'scale': self.scale
         }
 
     def test_mask_position_de_json(self):
@@ -312,7 +312,7 @@ class TestMaskPosition(BaseTest, unittest.TestCase):
         self.assertEqual(mask_position.point, self.point)
         self.assertEqual(mask_position.x_shift, self.x_shift)
         self.assertEqual(mask_position.y_shift, self.y_shift)
-        self.assertEqual(mask_position.zoom, self.zoom)
+        self.assertEqual(mask_position.scale, self.scale)
 
     def test_mask_positiont_to_json(self):
         mask_position = telegram.MaskPosition.de_json(self.json_dict, self._bot)
