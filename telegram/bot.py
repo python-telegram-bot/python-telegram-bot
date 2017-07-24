@@ -26,7 +26,9 @@ import warnings
 from datetime import datetime
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
-                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet)
+                      ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
+                      PhotoSize, Audio, Document, Sticker, Video, Voice, VideoNote, Location,
+                      Venue, Contact)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
@@ -387,7 +389,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendPhoto'.format(self.base_url)
 
-        from telegram import PhotoSize
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
 
@@ -455,7 +456,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendAudio'.format(self.base_url)
 
-        from telegram import Audio
         if isinstance(audio, Audio):
             audio = audio.file_id
 
@@ -522,7 +522,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendDocument'.format(self.base_url)
 
-        from telegram import Document
         if isinstance(document, Document):
             document = document.file_id
 
@@ -579,7 +578,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendSticker'.format(self.base_url)
 
-        from telegram import Sticker
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
 
@@ -641,7 +639,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendVideo'.format(self.base_url)
 
-        from telegram import Video
         if isinstance(video, Video):
             video = video.file_id
 
@@ -708,7 +705,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendVoice'.format(self.base_url)
 
-        from telegram import Voice
         if isinstance(voice, Voice):
             voice = voice.file_id
 
@@ -769,7 +765,6 @@ class Bot(TelegramObject):
 
         url = '{0}/sendVideoNote'.format(self.base_url)
 
-        from telegram import VideoNote
         if isinstance(video_note, VideoNote):
             video_note = video_note.file_id
 
@@ -830,7 +825,6 @@ class Bot(TelegramObject):
         if not (all([latitude, longitude]) or location):
             raise TypeError("Either location or latitude and longitude must be passed as argument")
 
-        from telegram import Location
         if isinstance(location, Location):
             latitude = location.latitude
             longitude = location.longitude
@@ -895,7 +889,6 @@ class Bot(TelegramObject):
             raise TypeError("Either venue or latitude, longitude, address and title must be passed"
                             "as arguments.")
 
-        from telegram import Venue
         if isinstance(venue, Venue):
             latitude = venue.location.latitude
             longitude = venue.location.longitude
@@ -968,7 +961,6 @@ class Bot(TelegramObject):
             raise TypeError("Either contact or phone_number and first_name must be passed as"
                             "arguments.")
 
-        from telegram import Contact
         if isinstance(contact, Contact):
             phone_number = contact.phone_number
             first_name = contact.first_name
