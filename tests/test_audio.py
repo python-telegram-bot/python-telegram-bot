@@ -155,6 +155,14 @@ class AudioTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(audio, self.audio)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_audio_with_audio(self):
+        message = self._bot.send_audio(audio=self.audio, chat_id=self._chat_id)
+        audio = message.audio
+
+        self.assertEqual(audio, self.audio)
+
     def test_audio_de_json(self):
         audio = telegram.Audio.de_json(self.json_dict, self._bot)
 

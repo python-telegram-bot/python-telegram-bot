@@ -63,6 +63,12 @@ def check_method(h4):
         ignored |= {'filename'}  # Undocumented
     elif name == 'setGameScore':
         ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
+    elif name == 'sendContact':
+        ignored |= {'contact'}  # Added for ease of use
+    elif name == 'sendLocation':
+        ignored |= {'location'}  # Added for ease of use
+    elif name == 'sendVenue':
+        ignored |= {'venue'}  # Added for ease of use
 
     logger.debug((sig.parameters.keys(), checked, ignored,
                  sig.parameters.keys() - checked - ignored))

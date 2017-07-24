@@ -33,7 +33,7 @@ class VenueTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Venue."""
 
     def setUp(self):
-        self.location = telegram.Location(longitude=1., latitude=0.)
+        self.location = telegram.Location(longitude=-46.788279, latitude=-23.691288)
         self.title = 'title'
         self._address = '_address'
         self.foursquare_id = 'foursquare id'
@@ -52,6 +52,13 @@ class VenueTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.title, self.title)
         self.assertEqual(sticker.address, self._address)
         self.assertEqual(sticker.foursquare_id, self.foursquare_id)
+
+    def test_send_venue_with_venue(self):
+        ven = telegram.Venue.de_json(self.json_dict, self._bot)
+        message = self._bot.send_venue(chat_id=self._chat_id, venue=ven)
+        venue = message.venue
+
+        self.assertEqual(venue, ven)
 
     def test_venue_to_json(self):
         sticker = telegram.Venue.de_json(self.json_dict, self._bot)

@@ -152,6 +152,15 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.emoji, self.emoji)
         self.assertEqual(sticker.file_size, self.sticker.file_size)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_sticker_with_sticker(self):
+        message = self._bot.send_sticker(sticker=self.sticker, chat_id=self._chat_id)
+        sticker = message.sticker
+
+        self.assertEqual(sticker, self.sticker)
+
+
     def test_sticker_to_json(self):
         self.assertTrue(self.is_json(self.sticker.to_json()))
 

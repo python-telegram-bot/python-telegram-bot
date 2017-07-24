@@ -114,6 +114,14 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
         self.assertEqual(videonote.thumb, self.videonote.thumb)
         self.assertEqual(videonote.file_size, self.videonote.file_size)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_video_note_with_video_note(self):
+        message = self._bot.send_video_note(video_note=self.videonote, chat_id=self._chat_id)
+        video_note = message.video_note
+
+        self.assertEqual(video_note, self.videonote)
+
     def test_videonote_de_json(self):
         videonote = telegram.VideoNote.de_json(self.json_dict, self._bot)
 
