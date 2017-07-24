@@ -251,27 +251,27 @@ class BotTest(BaseTest, unittest.TestCase):
         self.assertEqual(text, fwdmsg.text)
         self.assertEqual(fwdmsg.forward_from_message_id, msg.message_id)
 
-    @flaky(20, 1, _stall_retry)
-    @timeout(10)
-    def test_set_webhook_get_webhook_info(self):
-        url = 'https://python-telegram-bot.org/test/webhook'
-        max_connections = 7
-        allowed_updates = ['message']
-        self._bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
-        info = self._bot.getWebhookInfo()
-        self._bot.delete_webhook()
-        self.assertEqual(url, info.url)
-        self.assertEqual(max_connections, info.max_connections)
-        self.assertListEqual(allowed_updates, info.allowed_updates)
-
-    @flaky(20, 1, _stall_retry)
-    @timeout(10)
-    def test_delete_webhook(self):
-        url = 'https://python-telegram-bot.org/test/webhook'
-        self._bot.set_webhook(url)
-        self._bot.delete_webhook()
-        info = self._bot.getWebhookInfo()
-        self.assertEqual(info.url, '')
+    # @flaky(20, 1, _stall_retry)
+    # @timeout(10)
+    # def test_set_webhook_get_webhook_info(self):
+    #     url = 'https://python-telegram-bot.org/test/webhook'
+    #     max_connections = 7
+    #     allowed_updates = ['message']
+    #     self._bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
+    #     info = self._bot.getWebhookInfo()
+    #     self._bot.delete_webhook()
+    #     self.assertEqual(url, info.url)
+    #     self.assertEqual(max_connections, info.max_connections)
+    #     self.assertListEqual(allowed_updates, info.allowed_updates)
+    #
+    # @flaky(20, 1, _stall_retry)
+    # @timeout(10)
+    # def test_delete_webhook(self):
+    #     url = 'https://python-telegram-bot.org/test/webhook'
+    #     self._bot.set_webhook(url)
+    #     self._bot.delete_webhook()
+    #     info = self._bot.getWebhookInfo()
+    #     self.assertEqual(info.url, '')
 
     @flaky(3, 1)
     @timeout(10)
