@@ -1,5 +1,10 @@
 <!--
 Thanks for reporting issues of python-telegram-bot!
+
+Use this template to notify us if you found a bug, or if you want to request a new feature.
+If you're looking for help with programming your bot using our library, feel free to ask your
+questions in out telegram group at: https://t.me/pythontelegrambotgroup
+
 To make it easier for us to help you please enter detailed information below.
 
 Please note, we only support the latest version of python-telegram-bot and
