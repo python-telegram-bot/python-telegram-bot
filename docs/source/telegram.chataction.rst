@@ -1,7 +1,6 @@
-telegram.chataction module
-==========================
+telegram.ChatAction
+===================
 
-.. automodule:: telegram.chataction
+.. autoclass:: telegram.ChatAction
     :members:
-    :undoc-members:
     :show-inheritance:

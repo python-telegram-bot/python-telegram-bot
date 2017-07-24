@@ -1,7 +1,6 @@
-telegram.choseninlineresult module
-==================================
+telegram.ChosenInlineResult
+===========================
 
-.. automodule:: telegram.choseninlineresult
+.. autoclass:: telegram.ChosenInlineResult
     :members:
-    :undoc-members:
     :show-inheritance:

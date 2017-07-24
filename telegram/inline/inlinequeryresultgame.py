@@ -23,6 +23,23 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup
 
 
 class InlineQueryResultGame(InlineQueryResult):
+    """
+    Represents a Game.
+
+    Attributes:
+        type (:obj:`str`): 'game'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        game_short_name (:obj:`str`): Short name of the game.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+
+    Args:
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        game_short_name (:obj:`str`): Short name of the game.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+    """
 
     def __init__(self, id, game_short_name, reply_markup=None, **kwargs):
         # Required
@@ -33,10 +50,13 @@ class InlineQueryResultGame(InlineQueryResult):
         if reply_markup:
             self.reply_markup = reply_markup
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultGame, InlineQueryResultGame).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(InlineQueryResultGame, cls).de_json(data, bot)
+
+        if not data:
+            return None
 
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
-        return InlineQueryResultGame(**data)
+        return cls(**data)

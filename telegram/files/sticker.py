@@ -22,7 +22,8 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Sticker(TelegramObject):
-    """This object represents a Telegram Sticker.
+    """
+    This object represents a sticker.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -74,32 +75,24 @@ class Sticker(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (:obj:`dict`):
-            bot (telegram.Bot):
-
-        Returns:
-            :obj:`telegram.Sticker`
-        """
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(Sticker, Sticker).de_json(data, bot)
+        data = super(Sticker, cls).de_json(data, bot)
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
-        return Sticker(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         if not data:
             return list()
 
-        return [Sticker.de_json(d, bot) for d in data]
+        return [cls.de_json(d, bot) for d in data]
 
 
 class StickerSet(TelegramObject):
@@ -109,19 +102,17 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_masks (:obj:`bool`): True, if the sticker set contains masks.
+        contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
 
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
-        is_masks (:obj:`bool`): True, if the sticker set contains masks.
+        contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
     """
 
     def __init__(self, name, title, contains_masks, stickers, bot=None, **kwargs):
-        # TODO: telegrams docs claim contains_masks is called is_masks
-        # remove these lines or change once we get answer from support
         self.name = name
         self.title = title
         self.contains_masks = contains_masks
@@ -190,9 +181,9 @@ class MaskPosition(TelegramObject):
         self.y_shift = y_shift
         self.zoom = zoom
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if data is None:
             return None
 
-        return MaskPosition(**data)
+        return cls(**data)

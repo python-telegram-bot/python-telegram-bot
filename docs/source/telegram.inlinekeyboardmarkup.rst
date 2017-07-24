@@ -1,7 +1,6 @@
-telegram.inlinekeyboardmarkup module
-====================================
+telegram.InlineKeyboardMarkup
+=============================
 
-.. automodule:: telegram.inlinekeyboardmarkup
+.. autoclass:: telegram.InlineKeyboardMarkup
     :members:
-    :undoc-members:
     :show-inheritance:

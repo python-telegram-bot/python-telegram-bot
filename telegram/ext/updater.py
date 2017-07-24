@@ -40,38 +40,46 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 class Updater(object):
     """
-    This class, which employs the Dispatcher class, provides a frontend to
-    telegram.Bot to the programmer, so they can focus on coding the bot. Its
-    purpose is to receive the updates from Telegram and to deliver them to said
-    dispatcher. It also runs in a separate thread, so the user can interact
-    with the bot, for example on the command line. The dispatcher supports
-    handlers for different kinds of data: Updates from Telegram, basic text
-    commands and even arbitrary types.
-    The updater can be started as a polling service or, for production, use a
-    webhook to receive updates. This is achieved using the WebhookServer and
+    This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
+    :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
+    receive the updates from Telegram and to deliver them to said dispatcher. It also runs in a
+    separate thread, so the user can interact with the bot, for example on the command line. The
+    dispatcher supports handlers for different kinds of data: Updates from Telegram, basic text
+    commands and even arbitrary types. The updater can be started as a polling service or, for
+    production, use a webhook to receive updates. This is achieved using the WebhookServer and
     WebhookHandler classes.
 
 
     Attributes:
+        bot (:class:`telegram.Bot`): The bot used with this Updater.
+        user_sig_handler (:obj:`signal`): signals the updater will respond to.
+        update_queue (:obj:`Queue`): Queue for the updates.
+        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
+        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
+            dispatches them to the handlers.
+        running (:obj:`bool`): Indicates if the updater is running.
 
     Args:
-        token (Optional[str]): The bot's token given by the @BotFather
-        base_url (Optional[str]):
-        workers (Optional[int]): Amount of threads in the thread pool for
-            functions decorated with @run_async
-        bot (Optional[telegram.Bot]): A pre-initialized bot instance. If a pre-initizlied bot is
-            used, it is the user's responsibility to create it using a `Request` instance with
-            a large enough connection pool.
-        user_sig_handler (Optional[function]): Takes ``signum, frame`` as positional arguments.
-            This will be called when a signal is received, defaults are (SIGINT, SIGTERM, SIGABRT)
-            setable with Updater.idle(stop_signals=(signals))
-        request_kwargs (Optional[dict]): Keyword args to control the creation of a request object
-            (ignored if `bot` argument is used).
+        token (:obj:`str`, optional): The bot's token given by the @BotFather.
+        base_url (:obj:`str`, optional): Base_url for the bot.
+        workers (:obj:`int`, optional): Amount of threads in the thread pool for functions
+            decorated with ``@run_async``.
+        bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance. If a pre-initialized
+            bot is used, it is the user's responsibility to create it using a `Request`
+            instance with a large enough connection pool.
+        user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
+            arguments. This will be called when a signal is received, defaults are (SIGINT,
+            SIGTERM, SIGABRT) setable with :attr:`idle`.
+        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a request
+            object (ignored if `bot` argument is used).
+
+    Note:
+        You must supply either a :attr:`bot` or a :attr:`token` argument.
 
     Raises:
-        ValueError: If both `token` and `bot` are passed or none of them.
-
+        ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
     """
+
     _request = None
 
     def __init__(self,
@@ -119,7 +127,6 @@ class Updater(object):
         self.httpd = None
         self.__lock = Lock()
         self.__threads = []
-        """:type: list[Thread]"""
 
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper, name=name, args=(target,) + args, kwargs=kwargs)
@@ -149,35 +156,30 @@ class Updater(object):
         Starts polling updates from Telegram.
 
         Args:
-            poll_interval (Optional[float]): Time to wait between polling updates from Telegram in
-            seconds. Default is 0.0
+            poll_interval (:obj:`float`, optional): Time to wait between polling updates from
+                Telegram in seconds. Default is 0.0.
+            timeout (:obj:`float`, optional): Passed to :attr:`telegram.Bot.get_updates`.
+            clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
+                before actually starting to poll. Default is False.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
+                `Updater` will retry on failures on the Telegram server.
 
-            timeout (Optional[float]): Passed to Bot.getUpdates
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
+                * > 0 - retry up to X times
 
-            network_delay: Deprecated. Will be honoured as `read_latency` for a while but will be
-                removed in the future.
-
-            clean (Optional[bool]): Whether to clean any pending updates on Telegram servers before
-              actually starting to poll. Default is False.
-
-            bootstrap_retries (Optional[int]): Whether the bootstrapping phase of the `Updater`
-              will retry on failures on the Telegram server.
-
-                |   < 0 - retry indefinitely
-                |     0 - no retries (default)
-                |   > 0 - retry up to X times
-
-            allowed_updates (Optional[list[str]]): Passed to Bot.getUpdates
-
-            read_latency (Optional[float|int]): Grace time in seconds for receiving the reply from
-                server. Will be added to the `timeout` value and used as the read timeout from
-                server (Default: 2).
-
+            allowed_updates (List[:obj:`str`], optional): Passed to
+                :attr:`telegram.Bot.get_updates`.
+            read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
+                the reply from server. Will be added to the `timeout` value and used as the read
+                timeout from server (Default: 2).
+            network_delay: Deprecated. Will be honoured as :attr:`read_latency` for a while but
+                will be removed in the future.
 
         Returns:
-            Queue: The update queue that can be filled from the main thread
-
+            :obj:`Queue`: The update queue that can be filled from the main thread.
         """
+
         if network_delay is not None:
             warnings.warn('network_delay is deprecated, use read_latency instead')
             read_latency = network_delay
@@ -213,29 +215,29 @@ class Updater(object):
         https://listen:port/url_path
 
         Args:
-            listen (Optional[str]): IP-Address to listen on
-            port (Optional[int]): Port the bot should be listening on
-            url_path (Optional[str]): Path inside url
-            cert (Optional[str]): Path to the SSL certificate file
-            key (Optional[str]): Path to the SSL key file
-            clean (Optional[bool]): Whether to clean any pending updates on
-                Telegram servers before actually starting the webhook. Default
-                is False.
-            bootstrap_retries (Optional[int[): Whether the bootstrapping phase
-                of the `Updater` will retry on failures on the Telegram server.
+            listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
+            port (:obj:`int`, optional): Port the bot should be listening on. Default ``80``.
+            url_path (:obj:`str`, optional): Path inside url.
+            cert (:obj:`str`, optional): Path to the SSL certificate file.
+            key (:obj:`str`, optional): Path to the SSL key file.
+            clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
+                before actually starting the webhook. Default is ``False``.
+            bootstrap_retries (Optional[int[): Whether the bootstrapping phase of the `Updater`
+                will retry on failures on the Telegram server.
 
-                |   < 0 - retry indefinitely
-                |   0 - no retries (default)
-                |   > 0 - retry up to X times
-            webhook_url (Optional[str]): Explicitly specify the webhook url.
-                Useful behind NAT, reverse proxy, etc. Default is derived from
-                `listen`, `port` & `url_path`.
-            allowed_updates (Optional[list[str]]): Passed to Bot.setWebhook
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
+                * > 0 - retry up to X times
+
+            webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
+                NAT, reverse proxy, etc. Default is derived from `listen`, `port` & `url_path`.
+            allowed_updates (List[:obj:`str`], optional): Passed to
+                :attr:`telegram.Bot.set_webhook`.
 
         Returns:
-            Queue: The update queue that can be filled from the main thread
-
+            :obj:`Queue`: The update queue that can be filled from the main thread.
         """
+
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -251,12 +253,12 @@ class Updater(object):
 
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
                        allowed_updates):
-        """
-        Thread target of thread 'updater'. Runs in background, pulls
-        updates from Telegram and inserts them in the update queue of the
-        Dispatcher.
+        # """
+        # Thread target of thread 'updater'. Runs in background, pulls
+        # updates from Telegram and inserts them in the update queue of the
+        # Dispatcher.
+        # """
 
-        """
         cur_interval = poll_interval
         self.logger.debug('Updater thread started')
 
@@ -396,7 +398,7 @@ class Updater(object):
 
     def stop(self):
         """
-        Stops the polling/webhook thread, the dispatcher and the job queue
+        Stops the polling/webhook thread, the dispatcher and the job queue.
         """
 
         self.job_queue.stop()
@@ -446,14 +448,14 @@ class Updater(object):
 
     def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
         """
-        Blocks until one of the signals are received and stops the updater
+        Blocks until one of the signals are received and stops the updater.
 
         Args:
-            stop_signals: Iterable containing signals from the signal module
-                that should be subscribed to. Updater.stop() will be called on
-                receiving one of those signals. Defaults to (SIGINT, SIGTERM,
-                SIGABRT)
+            stop_signals (:obj:`iterable`): Iterable containing signals from the signal module that
+                should be subscribed to. Updater.stop() will be called on receiving one of those
+                signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
         """
+
         for sig in stop_signals:
             signal(sig, self.signal_handler)
 

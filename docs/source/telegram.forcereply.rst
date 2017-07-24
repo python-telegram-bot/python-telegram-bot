@@ -1,7 +1,6 @@
-telegram.forcereply module
-==========================
+telegram.ForceReply
+===================
 
-.. automodule:: telegram.forcereply
+.. autoclass:: telegram.ForceReply
     :members:
-    :undoc-members:
     :show-inheritance:

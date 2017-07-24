@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# flake8: noqa E501
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
@@ -34,17 +35,18 @@ class Days(object):
 
 
 class JobQueue(object):
-    """This class allows you to periodically perform tasks with the bot.
+    """
+    This class allows you to periodically perform tasks with the bot.
 
     Attributes:
-        queue (PriorityQueue):
-        bot (telegram.Bot):
+        queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
+        bot (:class:`telegram.Bot`): Bot that's send to the handlers.
 
     Args:
-        bot (telegram.Bot): The bot instance that should be passed to the jobs
+        bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
 
-    Deprecated: 5.2
-        prevent_autostart (Optional[bool]): Thread does not start during initialisation.
+    Deprecated:
+        prevent_autostart (:obj:`bool`, optional): Thread does not start during initialisation.
         Use `start` method instead.
     """
 
@@ -59,28 +61,34 @@ class JobQueue(object):
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick
         self.__tick = Event()
         self.__thread = None
-        """:type: Thread"""
         self._next_peek = None
-        """:type: float"""
         self._running = False
 
     def put(self, job, next_t=None):
-        """Queue a new job.
+        """
+        Queue a new job.
+
+        Note:
+            This method is deprecated. Please use: :attr:`run_once`, :attr:`run_daily`
+            or :attr:`run_repeating` instead.
 
         Args:
-            job (telegram.ext.Job): The ``Job`` instance representing the new job
-            next_t (Optional[int, float, datetime.timedelta, datetime.datetime, datetime.time]):
-                Time in or at which the job should run for the first time. This parameter will be
-                interpreted depending on its type.
-                ``int`` or ``float`` will be interpreted as "seconds from now" in which the job
-                should run.
-                ``datetime.timedelta`` will be interpreted as "time from now" in which the job
-                should run.
-                ``datetime.datetime`` will be interpreted as a specific date and time at which the
-                job should run.
-                ``datetime.time`` will be interpreted as a specific time at which the job should
-                run. This could be either today or, if the time has already passed, tomorrow.
+            job (:class:`telegram.ext.Job`): The ``Job`` instance representing the new job.
+            next_t (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+                Time in or at which the job should run for the first time. This parameter will
+                be interpreted depending on its type.
+
+                * :obj:`int` or :obj:`float` will be interpreted as "seconds from now" in which the
+                  job should run.
+                * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
+                  job should run.
+                * :obj:`datetime.datetime` will be interpreted as a specific date and time at
+                  which the job should run.
+                * :obj:`datetime.time` will be interpreted as a specific time at which the job
+                  should run. This could be either today or, if the time has already passed,
+                  tomorrow.
         """
+
         warnings.warn("'JobQueue.put' is being deprecated, use 'JobQueue.run_once', "
                       "'JobQueue.run_daily' or 'JobQueue.run_repeating' instead")
         if job.job_queue is None:
@@ -88,29 +96,6 @@ class JobQueue(object):
         self._put(job, next_t=next_t)
 
     def _put(self, job, next_t=None, last_t=None):
-        """Queue a new job.
-
-        Args:
-            job (telegram.ext.Job): The ``Job`` instance representing the new job
-            next_t (Optional[int, float, datetime.timedelta, datetime.datetime, datetime.time]):
-                Time in or at which the job should run for the first time. This parameter will be
-                interpreted depending on its type.
-
-                * ``int`` or ``float`` will be interpreted as "seconds from now" in which the job
-                  should run.
-                * ``datetime.timedelta`` will be interpreted as "time from now" in which the job
-                  should run.
-                * ``datetime.datetime`` will be interpreted as a specific date and time at which
-                  the job should run.
-                * ``datetime.time`` will be interpreted as a specific time of day at which the job
-                  should run. This could be either today or, if the time has already passed,
-                  tomorrow.
-            last_t (Optional[float]): Timestamp of the time when ``job`` was scheduled for in the
-                last ``put`` call. If provided, it will be used to calculate the next timestamp
-                more accurately by accounting for the execution time of the job (and possibly
-                others). If None, `now` will be assumed.
-
-        """
         if next_t is None:
             next_t = job.interval
             if next_t is None:
@@ -140,72 +125,79 @@ class JobQueue(object):
         self._set_next_peek(next_t)
 
     def run_once(self, callback, when, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """
+        Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
-            callback (function): The callback function that should be executed by the new job. It
-                should take two parameters ``bot`` and ``job``, where ``job`` is the ``Job``
-                instance. It can be used to access it's ``context`` or change it to a repeating
-                job.
-            when (int, float, datetime.timedelta, datetime.datetime, datetime.time):
+            callback (:obj:`callable`): The callback function that should be executed by the new
+                job. It should take ``bot, job`` as parameters, where ``job`` is the
+                :class:`telegram.ext.Job` instance. It can be used to access it's
+                ``job.context`` or change it to a repeating job.
+            when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
                 depending on its type.
 
-                * ``int`` or ``float`` will be interpreted as "seconds from now" in which the job
-                  should run.
-                * ``datetime.timedelta`` will be interpreted as "time from now" in which the job
-                  should run.
-                * ``datetime.datetime`` will be interpreted as a specific date and time at which
-                  the job should run.
-                * ``datetime.time`` will be interpreted as a specific time of day at which the job
-                  should run. This could be either today or, if the time has already passed,
+                * :obj:`int` or :obj:`float` will be interpreted as "seconds from now" in which the
+                  job should run.
+                * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
+                  job should run.
+                * :obj:`datetime.datetime` will be interpreted as a specific date and time at
+                  which the job should run.
+                * :obj:`datetime.time` will be interpreted as a specific time of day at which the
+                  job should run. This could be either today or, if the time has already passed,
                   tomorrow.
 
-            context (Optional[object]): Additional data needed for the callback function. Can be
-                accessed through ``job.context`` in the callback. Defaults to ``None``
-            name (Optional[str]): The name of the new job. Defaults to ``callback.__name__``
+            context (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+            name (:obj:`str`, optional): The name of the new job. Defaults to
+                ``callback.__name__``.
 
         Returns:
-            telegram.ext.jobqueue.Job: The new ``Job`` instance that has been added to the
-                job queue.
-
+            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            queue.
         """
+
         job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
         self._put(job, next_t=when)
         return job
 
     def run_repeating(self, callback, interval, first=None, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """
+        Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
-            callback (function): The callback function that should be executed by the new job. It
-                should take two parameters ``bot`` and ``job``, where ``job`` is the ``Job``
-                instance. It can be used to access it's ``context``, terminate the job or change
-                its interval.
-            interval (int, float, datetime.timedelta): The interval in which the job will run.
-                If it is an ``int`` or a ``float``, it will be interpreted as seconds.
-            first (int, float, datetime.timedelta, datetime.datetime, datetime.time):
+            callback (:obj:`callable`): The callback function that should be executed by the new
+                job. It should take ``bot, job`` as parameters, where ``job`` is the
+                :class:`telegram.ext.Job` instance. It can be used to access it's
+                ``Job.context`` or change it to a repeating job.
+            interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
+                the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
+                as seconds.
+            first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+                Time in or at which the job should run. This parameter will be interpreted
+                depending on its type.
 
-                * ``int`` or ``float`` will be interpreted as "seconds from now" in which the job
-                  should run.
-                * ``datetime.timedelta`` will be interpreted as "time from now" in which the job
-                  should run.
-                * ``datetime.datetime`` will be interpreted as a specific date and time at which
-                  the job should run.
-                * ``datetime.time`` will be interpreted as a specific time of day at which the job
-                  should run. This could be either today or, if the time has already passed,
+                * :obj:`int` or :obj:`float` will be interpreted as "seconds from now" in which the
+                  job should run.
+                * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
+                  job should run.
+                * :obj:`datetime.datetime` will be interpreted as a specific date and time at
+                  which the job should run.
+                * :obj:`datetime.time` will be interpreted as a specific time of day at which the
+                  job should run. This could be either today or, if the time has already passed,
                   tomorrow.
 
                 Defaults to ``interval``
-            context (Optional[object]): Additional data needed for the callback function. Can be
-                accessed through ``job.context`` in the callback. Defaults to ``None``
-            name (Optional[str]): The name of the new job. Defaults to ``callback.__name__``
+            context (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+            name (:obj:`str`, optional): The name of the new job. Defaults to
+                ``callback.__name__``.
 
         Returns:
-            telegram.ext.jobqueue.Job: The new ``Job`` instance that has been added to the
-                job queue.
-
+            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            queue.
         """
+
         job = Job(callback,
                   interval=interval,
                   repeat=True,
@@ -216,24 +208,27 @@ class JobQueue(object):
         return job
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """
+        Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
-            callback (function): The callback function that should be executed by the new job. It
-                should take two parameters ``bot`` and ``job``, where ``job`` is the ``Job``
-                instance. It can be used to access it's ``context`` or terminate the job.
-            time (datetime.time): Time of day at which the job should run.
-            days (Optional[tuple[int]]): Defines on which days of the week the job should run.
-            Defaults to ``Days.EVERY_DAY``
-            context (Optional[object]): Additional data needed for the callback function. Can be
-                accessed through ``job.context`` in the callback. Defaults to ``None``
-            name (Optional[str]): The name of the new job. Defaults to ``callback.__name__``
+            callback (:obj:`callable`): The callback function that should be executed by the new
+                job. It should take ``bot, job`` as parameters, where ``job`` is the
+                :class:`telegram.ext.Job` instance. It can be used to access it's ``Job.context``
+                or change it to a repeating job.
+            time (:obj:`datetime.time`): Time of day at which the job should run.
+            days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
+                run. Defaults to ``EVERY_DAY``
+            context (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+            name (:obj:`str`, optional): The name of the new job. Defaults to
+                ``callback.__name__``.
 
         Returns:
-            telegram.ext.jobqueue.Job: The new ``Job`` instance that has been added to the
-                job queue.
-
+            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            queue.
         """
+
         job = Job(callback,
                   interval=datetime.timedelta(days=1),
                   repeat=True,
@@ -245,10 +240,10 @@ class JobQueue(object):
         return job
 
     def _set_next_peek(self, t):
-        """
-        Set next peek if not defined or `t` is before next peek.
-        In case the next peek was set, also trigger the `self.__tick` event.
-        """
+        # """
+        # Set next peek if not defined or `t` is before next peek.
+        # In case the next peek was set, also trigger the `self.__tick` event.
+        # """
         with self.__next_peek_lock:
             if not self._next_peek or self._next_peek > t:
                 self._next_peek = t
@@ -257,8 +252,8 @@ class JobQueue(object):
     def tick(self):
         """
         Run all jobs that are due and re-enqueue them with their interval.
-
         """
+
         now = time.time()
 
         self.logger.debug('Ticking jobs with t=%f', now)
@@ -307,8 +302,8 @@ class JobQueue(object):
     def start(self):
         """
         Starts the job_queue thread.
-
         """
+
         self.__start_lock.acquire()
 
         if not self._running:
@@ -324,8 +319,8 @@ class JobQueue(object):
         """
         Thread target of thread ``job_queue``. Runs in background and performs ticks on the job
         queue.
-
         """
+
         while self._running:
             # self._next_peek may be (re)scheduled during self.tick() or self.put()
             with self.__next_peek_lock:
@@ -345,8 +340,9 @@ class JobQueue(object):
 
     def stop(self):
         """
-        Stops the thread
+        Stops the thread.
         """
+
         with self.__start_lock:
             self._running = False
 
@@ -355,41 +351,40 @@ class JobQueue(object):
             self.__thread.join()
 
     def jobs(self):
-        """Returns a tuple of all jobs that are currently in the ``JobQueue``"""
+        """
+        Returns a tuple of all jobs that are currently in the ``JobQueue``
+        """
+
         return tuple(job[1] for job in self.queue.queue if job)
 
 
 class Job(object):
-    """This class encapsulates a Job
+    """
+    This class encapsulates a Job
 
     Attributes:
-        callback (function): The function that the job executes when it's due
-        interval (int, float, datetime.timedelta): The interval in which the job runs
-        days (tuple[int]): A tuple of ``int`` values that determine on which days of the week the
-            job runs
-        repeat (bool): If the job runs periodically or only once
-        name (str): The name of this job
-        job_queue (telegram.ext.JobQueue): The ``JobQueue`` this job belongs to
-        enabled (bool): Boolean property that decides if this job is currently active
+        callback (:obj:`callable`): The callback function that should be executed by the new job.
+        context (:obj:`object`): Optional. Additional data needed for the callback function.
+        name (:obj:`str`): Optional. The name of the new job.
 
     Args:
-        callback (function): The callback function that should be executed by the Job. It should
-            take two parameters ``bot`` and ``job``, where ``job`` is the ``Job`` instance. It
-            can be used to terminate the job or modify its interval.
-        interval (Optional[int, float, datetime.timedelta]): The interval in which the job will
-            execute its callback function. ``int`` and ``float`` will be interpreted as seconds.
-            If you don't set this value, you must set ``repeat=False`` and specify ``next_t`` when
-            you put the job into the job queue.
-        repeat (Optional[bool]): If this job should be periodically execute its callback function
-            (``True``) or only once (``False``). Defaults to ``True``
-        context (Optional[object]): Additional data needed for the callback function. Can be
-            accessed through ``job.context`` in the callback. Defaults to ``None``
-        days (Optional[tuple[int]]): Defines on which days of the week the job should run.
+        callback (:obj:`callable`): The callback function that should be executed by the new job.
+            It should take ``bot, job`` as parameters, where ``job`` is the
+            :class:`telegram.ext.Job` instance. It can be used to access it's :attr:`context`
+            or change it to a repeating job.
+        interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The interval in
+            which the job will run. If it is an :obj:`int` or a :obj:`float`, it will be
+            interpreted as seconds. If you don't set this value, you must set :attr:`repeat` to
+            ``False`` and specify :attr:`next_t` when you put the job into the job queue.
+        repeat (:obj:`bool`, optional): If this job should be periodically execute its callback
+            function (``True``) or only once (``False``). Defaults to ``True``.
+        context (:obj:`object`, optional): Additional data needed for the callback function. Can be
+            accessed through ``job.context`` in the callback. Defaults to ``None``.
+        name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
+        days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should run.
             Defaults to ``Days.EVERY_DAY``
-        name (Optional[str]): The name of this job. Defaults to ``callback.__name__``
-        job_queue (Optional[class:`telegram.ext.JobQueue`]): The ``JobQueue`` this job belongs to.
+        job_queue (class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
-
     """
 
     def __init__(self,
@@ -420,7 +415,10 @@ class Job(object):
         self._enabled.set()
 
     def run(self, bot):
-        """Executes the callback function"""
+        """
+        Executes the callback function.
+        """
+
         self.callback(bot, self)
 
     def schedule_removal(self):
@@ -428,14 +426,23 @@ class Job(object):
         Schedules this job for removal from the ``JobQueue``. It will be removed without executing
         its callback function again.
         """
+
         self._remove.set()
 
     @property
     def removed(self):
+        """
+        :obj:`bool`: Whether this job is due to be removed.
+        """
+
         return self._remove.is_set()
 
     @property
     def enabled(self):
+        """
+        :obj:`bool`: Whether this job is enabled.
+        """
+
         return self._enabled.is_set()
 
     @enabled.setter
@@ -447,6 +454,11 @@ class Job(object):
 
     @property
     def interval(self):
+        """
+        :obj:`int` | :obj:`float` | :obj:`datetime.timedelta`: Optional. The interval in which the
+            job will run.
+        """
+
         return self._interval
 
     @interval.setter
@@ -462,6 +474,10 @@ class Job(object):
 
     @property
     def interval_seconds(self):
+        """
+        :obj:`int`: The interval for this job in seconds.
+        """
+
         if isinstance(self.interval, datetime.timedelta):
             return self.interval.total_seconds()
         else:
@@ -469,6 +485,10 @@ class Job(object):
 
     @property
     def repeat(self):
+        """
+        :obj:`bool`: Optional. If this job should be periodically execute its callback function.
+        """
+
         return self._repeat
 
     @repeat.setter
@@ -479,6 +499,10 @@ class Job(object):
 
     @property
     def days(self):
+        """
+        Tuple[:obj:`int`]: Optional. Defines on which days of the week the job should run.
+        """
+
         return self._days
 
     @days.setter
@@ -497,7 +521,10 @@ class Job(object):
 
     @property
     def job_queue(self):
-        """ :rtype: JobQueue """
+        """
+        :class:`telegram.ext.JobQueue`: Optional. The ``JobQueue`` this job belongs to.
+        """
+
         return self._job_queue
 
     @job_queue.setter

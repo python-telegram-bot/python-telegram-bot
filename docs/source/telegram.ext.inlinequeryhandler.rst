@@ -1,7 +1,6 @@
-telegram.ext.inlinequeryhandler module
-======================================
+telegram.ext.InlineQueryHandler
+===============================
 
-.. automodule:: telegram.ext.inlinequeryhandler
+.. autoclass:: telegram.ext.InlineQueryHandler
     :members:
-    :undoc-members:
     :show-inheritance:

@@ -1,6 +1,6 @@
-telegram.bot module
-===================
+telegram.Bot
+============
 
-.. automodule:: telegram.bot
+.. autoclass:: telegram.Bot
     :members:
     :show-inheritance:

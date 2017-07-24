@@ -23,14 +23,28 @@ from telegram import TelegramObject
 
 class KeyboardButton(TelegramObject):
     """
-    This object represents one button of the reply keyboard. For simple
-    text buttons String can be used instead of this object to specify text
-    of the button.
+    This object represents one button of the reply keyboard. For simple text buttons String can be
+    used instead of this object to specify text of the button.
+
+    Note:
+        Optional fields are mutually exclusive.
+
+    Attributes:
+        text (:obj:`str`): Text of the button.
+        request_location (:obj:`bool`): Optional. If the user's phone number will be sent.
+        request_contact (:obj:`bool`): Optional. If the user's current location will be sent.
 
     Args:
-        text (str):
-        request_location (Optional[bool]):
-        request_contact (Optional[bool]):
+        text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
+            sent to the bot as a message when the button is pressed.
+        request_location (:obj:`bool`, optional): If True, the user's phone number will be sent as
+            a contact when the button is pressed. Available in private chats only.
+        request_contact (:obj:`bool`, optional): If True, the user's current location will be sent
+            when the button is pressed. Available in private chats only.
+
+    Note:
+        :attr:`request_contact` and :attr:`request_location` options will only work in Telegram
+        versions released after 9 April, 2016. Older clients will ignore them.
     """
 
     def __init__(self, text, request_contact=None, request_location=None, **kwargs):
@@ -40,20 +54,20 @@ class KeyboardButton(TelegramObject):
         self.request_contact = request_contact
         self.request_location = request_location
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        return KeyboardButton(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
+    @classmethod
+    def de_list(cls, data, bot):
         if not data:
             return []
 
         keyboards = list()
         for keyboard in data:
-            keyboards.append(KeyboardButton.de_json(keyboard, bot))
+            keyboards.append(cls.de_json(keyboard, bot))
 
         return keyboards

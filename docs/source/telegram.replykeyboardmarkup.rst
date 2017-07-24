@@ -1,7 +1,6 @@
-telegram.replykeyboardmarkup module
-===================================
+telegram.ReplyKeyboardMarkup
+============================
 
-.. automodule:: telegram.replykeyboardmarkup
+.. autoclass:: telegram.ReplyKeyboardMarkup
     :members:
-    :undoc-members:
     :show-inheritance:

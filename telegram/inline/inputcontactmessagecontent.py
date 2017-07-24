@@ -23,7 +23,20 @@ from telegram import InputMessageContent
 
 
 class InputContactMessageContent(InputMessageContent):
-    """Base class for Telegram InputContactMessageContent Objects"""
+    """
+    Represents the content of a contact message to be sent as the result of an inline query.
+
+    Attributes:
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`): Optional. Contact's last name.
+
+    Args:
+        phone_number (:obj:`str`): Contact's phone number.
+        first_name (:obj:`str`): Contact's first name.
+        last_name (:obj:`str`, optional): Contact's last name.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+    """
 
     def __init__(self, phone_number, first_name, last_name=None, **kwargs):
         # Required
@@ -32,6 +45,6 @@ class InputContactMessageContent(InputMessageContent):
         # Optionals
         self.last_name = last_name
 
-    @staticmethod
-    def de_json(data, bot):
-        return InputContactMessageContent(**data)
+    @classmethod
+    def de_json(cls, data, bot):
+        return cls(**data)

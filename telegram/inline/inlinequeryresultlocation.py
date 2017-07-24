@@ -22,34 +22,38 @@ from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageConten
 
 
 class InlineQueryResultLocation(InlineQueryResult):
-    """Represents a location on a map. By default, the location will be sent by the user.
-    Alternatively, you can use input_message_content to send a message with the specified content
-    instead of the location.
+    """
+    Represents a location on a map. By default, the location will be sent by the user.
+    Alternatively, you can use :attr:`input_message_content` to send a message with the specified
+    content instead of the location.
 
     Attributes:
-        latitude (float): Location latitude in degrees.
-        longitude (float): Location longitude in degrees.
-        title (str): Location title.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        type (:obj:`str`): 'location'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        latitude (:obj:`float`): Location latitude in degrees.
+        longitude (:obj:`float`): Location longitude in degrees.
+        title (:obj:`str`): Location title.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the location.
-        thumb_url (Optional[str]): Url of the thumbnail for the result.
-        thumb_width (Optional[int]): Thumbnail width.
-        thumb_height (Optional[int]): Thumbnail height.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        latitude (float): Location latitude in degrees.
-        longitude (float): Location longitude in degrees.
-        title (str): Location title.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        latitude (:obj:`float`): Location latitude in degrees.
+        longitude (:obj:`float`): Location longitude in degrees.
+        title (:obj:`str`): Location title.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the location.
-        thumb_url (Optional[str]): Url of the thumbnail for the result.
-        thumb_width (Optional[int]): Thumbnail width.
-        thumb_height (Optional[int]): Thumbnail height.
-        **kwargs (dict): Arbitrary keyword arguments.
+        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
+        thumb_width (:obj:`int`, optional): Thumbnail width.
+        thumb_height (:obj:`int`, optional): Thumbnail height.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
@@ -82,12 +86,15 @@ class InlineQueryResultLocation(InlineQueryResult):
         if thumb_height:
             self.thumb_height = thumb_height
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultLocation, InlineQueryResultLocation).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(InlineQueryResultLocation, cls).de_json(data, bot)
+
+        if not data:
+            return None
 
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
         data['input_message_content'] = InputMessageContent.de_json(
             data.get('input_message_content'), bot)
 
-        return InlineQueryResultLocation(**data)
+        return cls(**data)

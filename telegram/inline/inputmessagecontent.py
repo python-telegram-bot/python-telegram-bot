@@ -23,11 +23,16 @@ from telegram import TelegramObject
 
 
 class InputMessageContent(TelegramObject):
-    """Base class for Telegram InputMessageContent Objects"""
+    """
+    Base class for Telegram InputMessageContent Objects
+    See: :class:`telegram.InputContactMessageContent`,
+    :class:`telegram.InputLocationMessageContent`, :class:`telegram.InputTextMessageContent` and
+    :class:`telegram.InputVenueMessageContent` for more details.
+    """
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InputMessageContent, InputMessageContent).de_json(data, bot)
+    @classmethod
+    def de_json(cls, data, bot):
+        data = super(InputMessageContent, cls).de_json(data, bot)
 
         if not data:
             return None

@@ -22,7 +22,11 @@ Message Parse Modes."""
 
 
 class ParseMode(object):
-    """This object represents a Telegram Message Parse Modes."""
+    """
+    This object represents a Telegram Message Parse Modes.
+    """
 
     MARKDOWN = 'Markdown'
+    """:obj:`str`: 'Markdown'"""
     HTML = 'HTML'
+    """:obj:`str`: 'HTML'"""

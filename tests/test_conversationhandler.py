@@ -330,6 +330,12 @@ class ConversationHandlerTest(BaseTest, unittest.TestCase):
         update = Update(0, callback_query=cbq)
         handler.check_update(update)
 
+    def test_channelMessageWithoutChat(self):
+        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
+        message = Message(0, None, None, Chat(0, Chat.CHANNEL, "Misses Test"))
+        update = Update(0, message=message)
+        handler.check_update(update)
+
 
 if __name__ == '__main__':
     unittest.main()

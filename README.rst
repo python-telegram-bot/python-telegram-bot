@@ -15,6 +15,10 @@ We have made you a wrapper you can't refuse
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: Supported python versions
 
+.. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
+   :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
+   :alt: PyPi Package Monthly Download
+
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
    :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
@@ -84,7 +88,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **18. June 2017**, all types and methods of the Telegram Bot API 3.0 are supported.
+As of **23. July 2017**, all types and methods of the Telegram Bot API 3.2 are supported.
 
 ==========
 Installing
