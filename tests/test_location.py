@@ -94,9 +94,8 @@ class LocationTest(BaseTest, unittest.TestCase):
         del (json_dict['latitude'])
         del (json_dict['longitude'])
 
-        self.assertRaises(TypeError,
-                          lambda: self._bot.sendLocation(chat_id=self._chat_id,
-                                                         **json_dict))
+        with self.assertRaises(ValueError):
+            self._bot.sendLocation(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     def test_reply_location(self):

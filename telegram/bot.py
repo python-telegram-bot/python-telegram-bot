@@ -823,7 +823,8 @@ class Bot(TelegramObject):
         url = '{0}/sendLocation'.format(self.base_url)
 
         if not (all([latitude, longitude]) or location):
-            raise TypeError("Either location or latitude and longitude must be passed as argument")
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument")
 
         if isinstance(location, Location):
             latitude = location.latitude
@@ -886,8 +887,8 @@ class Bot(TelegramObject):
         url = '{0}/sendVenue'.format(self.base_url)
 
         if not (venue or all([latitude, longitude, address, title])):
-            raise TypeError("Either venue or latitude, longitude, address and title must be passed"
-                            "as arguments.")
+            raise ValueError("Either venue or latitude, longitude, address and title must be"
+                             "passed as arguments.")
 
         if isinstance(venue, Venue):
             latitude = venue.location.latitude
@@ -958,8 +959,8 @@ class Bot(TelegramObject):
         url = '{0}/sendContact'.format(self.base_url)
 
         if (not contact) and (not all([phone_number, first_name])):
-            raise TypeError("Either contact or phone_number and first_name must be passed as"
-                            "arguments.")
+            raise ValueError("Either contact or phone_number and first_name must be passed as"
+                             "arguments.")
 
         if isinstance(contact, Contact):
             phone_number = contact.phone_number
