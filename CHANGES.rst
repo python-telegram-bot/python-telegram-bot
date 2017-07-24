@@ -13,6 +13,7 @@ Changes
 - Remove deprecated ``Botan`` import from ``utils`` (``Botan`` is still available through ``contrib``).
 - Remove deprecated ``ReplyKeyboardHide``.
 - Remove deprecated ``edit_message`` argument of `bot.set_game_score``.
+- Add the possibility to add objects as arguments to send_* methods.
 
 **2017-06-18**
 

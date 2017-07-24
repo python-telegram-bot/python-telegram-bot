@@ -149,7 +149,7 @@ class MaskPosition(TelegramObject):
             size, from left to right.
         y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
             size, from top to bottom.
-        zoom (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
     Notes:
         :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
@@ -163,7 +163,7 @@ class MaskPosition(TelegramObject):
         y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
             size, from top to bottom. For example, 1.0 will place the mask just below the default
             mask position.
-        zoom (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
     """
 
     FOREHEAD = 'forehead'
@@ -175,11 +175,11 @@ class MaskPosition(TelegramObject):
     CHIN = 'chin'
     """:obj:`str`: 'chin'"""
 
-    def __init__(self, point, x_shift, y_shift, zoom, **kwargs):
+    def __init__(self, point, x_shift, y_shift, scale, **kwargs):
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift
-        self.zoom = zoom
+        self.scale = scale
 
     @classmethod
     def de_json(cls, data, bot):

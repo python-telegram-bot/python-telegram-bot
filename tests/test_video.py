@@ -144,6 +144,15 @@ class VideoTest(BaseTest, unittest.TestCase):
         self.assertEqual(video.thumb, self.video.thumb)
         self.assertEqual(video.mime_type, self.video.mime_type)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_video_with_video(self):
+        message = self._bot.send_video(video=self.video, chat_id=self._chat_id)
+        video = message.video
+
+        self.assertEqual(video, self.video)
+
+
     def test_video_de_json(self):
         video = telegram.Video.de_json(self.json_dict, self._bot)
 

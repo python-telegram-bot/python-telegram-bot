@@ -132,6 +132,15 @@ class DocumentTest(BaseTest, unittest.TestCase):
 
         self.assertEqual(document, self.document)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_document_with_document(self):
+        message = self._bot.send_document(document=self.document, chat_id=self._chat_id)
+        document = message.document
+
+        self.assertEqual(document, self.document)
+
+
     def test_document_de_json(self):
         document = telegram.Document.de_json(self.json_dict, self._bot)
 

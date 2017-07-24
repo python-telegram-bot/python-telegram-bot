@@ -152,6 +152,15 @@ class StickerTest(BaseTest, unittest.TestCase):
         self.assertEqual(sticker.emoji, self.emoji)
         self.assertEqual(sticker.file_size, self.sticker.file_size)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_sticker_with_sticker(self):
+        message = self._bot.send_sticker(sticker=self.sticker, chat_id=self._chat_id)
+        sticker = message.sticker
+
+        self.assertEqual(sticker, self.sticker)
+
+
     def test_sticker_to_json(self):
         self.assertTrue(self.is_json(self.sticker.to_json()))
 
@@ -288,13 +297,13 @@ class TestMaskPosition(BaseTest, unittest.TestCase):
         self.point = telegram.MaskPosition.EYES
         self.x_shift = -1
         self.y_shift = 1
-        self.zoom = 2
+        self.scale = 2
 
         self.json_dict = {
             'point': self.point,
             'x_shift': self.x_shift,
             'y_shift': self.y_shift,
-            'zoom': self.zoom
+            'scale': self.scale
         }
 
     def test_mask_position_de_json(self):
@@ -303,7 +312,7 @@ class TestMaskPosition(BaseTest, unittest.TestCase):
         self.assertEqual(mask_position.point, self.point)
         self.assertEqual(mask_position.x_shift, self.x_shift)
         self.assertEqual(mask_position.y_shift, self.y_shift)
-        self.assertEqual(mask_position.zoom, self.zoom)
+        self.assertEqual(mask_position.scale, self.scale)
 
     def test_mask_positiont_to_json(self):
         mask_position = telegram.MaskPosition.de_json(self.json_dict, self._bot)

@@ -149,6 +149,15 @@ class VoiceTest(BaseTest, unittest.TestCase):
         self.assertEqual(voice.duration, self.voice.duration)
         self.assertEqual(voice.mime_type, self.voice.mime_type)
 
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_voice_with_voice(self):
+        message = self._bot.send_voice(voice=self.voice, chat_id=self._chat_id)
+        voice = message.voice
+
+        self.assertEqual(voice, self.voice)
+
+
     def test_voice_de_json(self):
         voice = telegram.Voice.de_json(self.json_dict, self._bot)
 

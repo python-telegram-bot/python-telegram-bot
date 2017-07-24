@@ -55,6 +55,13 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location.latitude, self.latitude)
         self.assertEqual(location.longitude, self.longitude)
 
+    def test_send_location_with_location(self):
+        loc = telegram.Location(longitude=self.longitude, latitude=self.latitude)
+        message = self._bot.send_location(location=loc, chat_id=self._chat_id)
+        location = message.location
+
+        self.assertEqual(location, loc)
+
     def test_location_de_json(self):
         location = telegram.Location.de_json(self.json_dict, self._bot)
 
@@ -78,9 +85,8 @@ class LocationTest(BaseTest, unittest.TestCase):
         json_dict['latitude'] = ''
         json_dict['longitude'] = ''
 
-        self.assertRaises(telegram.TelegramError,
-                          lambda: self._bot.sendLocation(chat_id=self._chat_id,
-                                                         **json_dict))
+        with self.assertRaises(TypeError):
+            self._bot.sendLocation(chat_id=self._chat_id, **json_dict)
 
     def test_error_location_without_required_args(self):
         json_dict = self.json_dict
@@ -88,9 +94,8 @@ class LocationTest(BaseTest, unittest.TestCase):
         del (json_dict['latitude'])
         del (json_dict['longitude'])
 
-        self.assertRaises(TypeError,
-                          lambda: self._bot.sendLocation(chat_id=self._chat_id,
-                                                         **json_dict))
+        with self.assertRaises(ValueError):
+            self._bot.sendLocation(chat_id=self._chat_id, **json_dict)
 
     @flaky(3, 1)
     def test_reply_location(self):

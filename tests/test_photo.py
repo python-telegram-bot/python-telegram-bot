@@ -181,7 +181,8 @@ class PhotoTest(BaseTest, unittest.TestCase):
     @flaky(3, 1)
     @timeout(10)
     def test_silent_send_photo(self):
-        message = self._bot.sendPhoto(photo=self.photo_file, chat_id=self._chat_id, disable_notification=True)
+        message = self._bot.sendPhoto(photo=self.photo_file, chat_id=self._chat_id,
+                                      disable_notification=True)
         thumb, photo = message.photo
 
         self.assertIsInstance(thumb, telegram.PhotoSize)
@@ -191,6 +192,15 @@ class PhotoTest(BaseTest, unittest.TestCase):
         self.assertIsInstance(photo, telegram.PhotoSize)
         self.assertIsInstance(photo.file_id, str)
         self.assertNotEqual(photo.file_id, '')
+
+    @flaky(3, 1)
+    @timeout(10)
+    def test_send_photo_with_photosize(self):
+        message = self._bot.send_photo(photo=self.photo, chat_id=self._chat_id)
+        thumb, photo = message.photo
+
+        self.assertEqual(photo, self.photo)
+        self.assertEqual(thumb, self.thumb)
 
     @flaky(3, 1)
     @timeout(10)
