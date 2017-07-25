@@ -79,15 +79,6 @@ class LocationTest(BaseTest, unittest.TestCase):
         self.assertEqual(location['latitude'], self.latitude)
         self.assertEqual(location['longitude'], self.longitude)
 
-    def test_error_send_location_empty_args(self):
-        json_dict = self.json_dict
-
-        json_dict['latitude'] = ''
-        json_dict['longitude'] = ''
-
-        with self.assertRaises(TypeError):
-            self._bot.sendLocation(chat_id=self._chat_id, **json_dict)
-
     def test_error_location_without_required_args(self):
         json_dict = self.json_dict
 
