@@ -4,6 +4,7 @@ Changes
 
 **2017-07-25**
 *Released 7.0.0*
+
 - Fully support Bot API 3.2.
 - New filters for handling messages from specific chat/user id (PR #677).
 - Add the possibility to add objects as arguments to send_* methods (PR #742).
