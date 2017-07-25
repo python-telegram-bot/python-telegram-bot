@@ -5,16 +5,17 @@ Changes
 **2017-07-25**
 *Released 7.0.0*
 - Fully support Bot API 3.2.
-- Improved filters for user_id/username/chat (PR #677).
+- New filters for handling messages from specific chat/user id (PR #677).
 - Add the possibility to add objects as arguments to send_* methods (PR #742).
 - Fixed download of URLs with UTF-8 chars in path (PR #688).
 - Fixed URL parsing for ``Message`` text properties (PR #689).
 - Fixed args dispatching in ``MessageQueue``'s decorator (PR #705).
--  ConvesationHandler - check if a user exist before using it (PR #699).
+- Fixed regression preventing IPv6 only hosts from connnecting to Telegram servers (Issue #720).
+- ConvesationHandler - check if a user exist before using it (PR #699).
 - Removed deprecated ``telegram.Emoji``.
 - Removed deprecated ``Botan`` import from ``utils`` (``Botan`` is still available through ``contrib``).
 - Removed deprecated ``ReplyKeyboardHide``.
-- Removed deprecated ``edit_message`` argument of `bot.set_game_score``.
+- Removed deprecated ``edit_message`` argument of ``bot.set_game_score``.
 - Internal restructure of files.
 - Improved documentation.
 - Improved unitests.
