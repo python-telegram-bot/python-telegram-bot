@@ -31,15 +31,15 @@ class KeyboardButton(TelegramObject):
 
     Attributes:
         text (:obj:`str`): Text of the button.
-        request_location (:obj:`bool`): Optional. If the user's phone number will be sent.
-        request_contact (:obj:`bool`): Optional. If the user's current location will be sent.
+        request_contact (:obj:`bool`): Optional. If the user's phone number will be sent.
+        request_location (:obj:`bool`): Optional. If the user's current location will be sent.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
             sent to the bot as a message when the button is pressed.
-        request_location (:obj:`bool`, optional): If True, the user's phone number will be sent as
+        request_contact (:obj:`bool`, optional): If True, the user's phone number will be sent as
             a contact when the button is pressed. Available in private chats only.
-        request_contact (:obj:`bool`, optional): If True, the user's current location will be sent
+        request_location (:obj:`bool`, optional): If True, the user's current location will be sent
             when the button is pressed. Available in private chats only.
 
     Note:
