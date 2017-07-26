@@ -146,7 +146,7 @@ class RegexHandler(Handler):
         if any([(self.message_updates and update.message),
                 (self.edited_updates and update.edited_message),
                 (self.channel_post_updates and update.channel_post)]) and (
-                isinstance(update, Update)):
+                isinstance(update, Update)) and update.effective_message.text:
             match = re.match(self.pattern, update.effective_message.text)
             return bool(match)
         return False
