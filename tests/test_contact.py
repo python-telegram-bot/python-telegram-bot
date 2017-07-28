@@ -53,12 +53,14 @@ class ContactTest(BaseTest, unittest.TestCase):
         self.assertEqual(contact.last_name, self.last_name)
         self.assertEqual(contact.user_id, self.user_id)
 
+    '''Commented out because it caused too many "RetryAfter: Flood control exceeded" errors.
     def test_send_contact_with_contact(self):
         con = telegram.Contact.de_json(self.json_dict, self._bot)
         message = self._bot.send_contact(contact=con, chat_id=self._chat_id)
         contact = message.contact
 
         self.assertEqual(contact, con)
+    '''
 
     def test_contact_to_json(self):
         contact = telegram.Contact.de_json(self.json_dict, self._bot)
