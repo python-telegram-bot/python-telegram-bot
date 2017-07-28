@@ -34,8 +34,6 @@ from random import randrange
 
 from future.builtins import bytes
 
-from telegram.utils.request import Request as Requester
-
 try:
     # python2
     from urllib2 import urlopen, Request, HTTPError
@@ -47,12 +45,12 @@ except ImportError:
 sys.path.append('.')
 
 from telegram import (Update, Message, TelegramError, User, Chat, Bot,
-                      InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery)
+                      InlineQuery, CallbackQuery)
 from telegram.ext import *
 from telegram.ext.dispatcher import run_async
 from telegram.error import Unauthorized, InvalidToken
 from tests.base import BaseTest
-from threading import Lock, Thread, current_thread, Semaphore
+from threading import Lock, Thread, current_thread
 
 # Enable logging
 root = logging.getLogger()
@@ -247,6 +245,23 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         self.updater.bot.send_messages = 1
         sleep(.1)
         self.assertTrue(None is self.received_message)
+
+    def test_regex_handler_without_message(self):
+        self._setup_updater('Test3')
+        d = self.updater.dispatcher
+        handler = RegexHandler(r'Te.*', self.telegramHandlerTest)
+        d.add_handler(handler)
+
+        # message, no text
+        m = Message(1, User(1, "testuser"), None, Chat(2, "private"), video="My_vid",
+                    caption="test ")
+        d.process_update(Update(1, message=m))
+        self.assertEqual(self.message_count, 0)
+
+        # no message
+        c = InlineQuery(2, User(1, "testuser"), "my_query", offset=15)
+        d.process_update(Update(2, inline_query=c))
+        self.assertEqual(self.message_count, 0)
 
     def test_addRemoveTelegramCommandHandler(self):
         self._setup_updater('', messages=0)
@@ -926,7 +941,6 @@ class UpdaterTest(BaseTest, unittest.TestCase):
 
 
 class MockBot(object):
-
     def __init__(self,
                  text,
                  messages=1,
@@ -973,12 +987,12 @@ class MockBot(object):
             raise self.bootstrap_err
 
     def get_updates(self,
-                   offset=None,
-                   limit=100,
-                   timeout=0,
-                   network_delay=None,
-                   read_latency=2.,
-                   allowed_updates=None):
+                    offset=None,
+                    limit=100,
+                    timeout=0,
+                    network_delay=None,
+                    read_latency=2.,
+                    allowed_updates=None):
 
         if self.raise_error:
             raise TelegramError('Test Error 2')

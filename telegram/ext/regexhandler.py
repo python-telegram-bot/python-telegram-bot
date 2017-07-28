@@ -142,11 +142,12 @@ class RegexHandler(Handler):
         Returns:
             :obj:`bool`
         """
-
+        if not isinstance(update, Update) and not update.effective_message:
+            return False
         if any([(self.message_updates and update.message),
                 (self.edited_updates and update.edited_message),
-                (self.channel_post_updates and update.channel_post)]) and (
-                isinstance(update, Update)):
+                (self.channel_post_updates and update.channel_post)]) and \
+                update.effective_message.text:
             match = re.match(self.pattern, update.effective_message.text)
             return bool(match)
         return False
