@@ -30,11 +30,12 @@ class CallbackQuery(TelegramObject):
     inline mode), the field :attr:`inline_message_id` will be present.
 
     Note:
+        * In Python `from` is a reserved word, use `from_user` instead.
         Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
-        from (:class:`telegram.User`): Sender.
+        from_user (:class:`telegram.User`): Sender.
         message (:class:`telegram.Message`): Optional. Message with the callback button that
             originated the query.
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
@@ -46,7 +47,7 @@ class CallbackQuery(TelegramObject):
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
-        from (:class:`telegram.User`): Sender.
+        from_user (:class:`telegram.User`): Sender.
         message (:class:`telegram.Message`, optional): Message with the callback button that
             originated the query. Note that message content and message date will not be available
             if the message is too old.
