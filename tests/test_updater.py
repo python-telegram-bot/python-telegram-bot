@@ -22,15 +22,15 @@ This module contains an object that represents Tests for Updater, Dispatcher,
 WebhookServer and WebhookHandler
 """
 import logging
-import os
-import re
 import signal
 import sys
+import os
+import re
 import unittest
 from datetime import datetime
+from time import sleep
 from queue import Queue
 from random import randrange
-from time import sleep
 
 from future.builtins import bytes
 
@@ -871,7 +871,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
                           content_len=-1,
                           content_type='application/json',
                           get_method=None):
-        headers = {'content-type': content_type, }
+        headers = {'content-type': content_type,}
 
         if not payload_str:
             content_len = None
