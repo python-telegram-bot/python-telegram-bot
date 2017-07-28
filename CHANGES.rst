@@ -2,6 +2,12 @@
 Changes
 =======
 
+**2017-07-28**
+*Released 7.0.1*
+
+- Fix TypeError exception in RegexHandler (PR #751).
+- Small documentation fix (PR #749).
+
 **2017-07-25**
 *Released 7.0.0*
 
