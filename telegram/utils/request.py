@@ -82,9 +82,9 @@ class Request(object):
 
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
-            sockopts.extend([(socket.SOL_SOCKET, socket.TCP_KEEPIDLE, 120),
-                             (socket.SOL_SOCKET, socket.TCP_KEEPINTVL, 30),
-                             (socket.SOL_SOCKET, socket.TCP_KEEPCNT, 8)])
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120))
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30))
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8))
 
         kwargs = dict(
             maxsize=con_pool_size,
