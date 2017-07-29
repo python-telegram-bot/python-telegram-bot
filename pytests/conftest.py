@@ -36,18 +36,6 @@ def is_dict():
         return False
     return _is_dict
 
-def pytest_runtest_makereport(item, call):
-    if "incremental" in item.keywords:
-        if call.excinfo is not None:
-            parent = item.parent
-            parent._previousfailed = item
-
-def pytest_runtest_setup(item):
-    if "incremental" in item.keywords:
-        previousfailed = getattr(item.parent, "_previousfailed", None)
-        if previousfailed is not None:
-            pytest.xfail("previous test failed (%s)" % previousfailed.name)
-
 # self._group_id = os.environ.get('GROUP_ID', '-49740850')
 # self._channel_id = os.environ.get('CHANNEL_ID', '@pythontelegrambottests')
 # self._bot = bot

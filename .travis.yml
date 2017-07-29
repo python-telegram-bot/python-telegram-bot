@@ -24,8 +24,8 @@ before_cache:
 install:
   - pip install coveralls
   - pip install -U wheel
-  - pip install -r requirements.txt
-  - pip install -r requirements-dev.txt
+  - pip install -U -r requirements.txt
+  - pip install -U -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
