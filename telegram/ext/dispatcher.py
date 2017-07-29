@@ -55,6 +55,28 @@ def run_async(func):
     return async_func
 
 
+class DispatcherHandlerFlow(Exception):
+    """
+    Dispatcher update processing manipulation exceptions are base on this class.
+    """
+    pass
+
+
+class DispatcherHandlerContinue(DispatcherHandlerFlow):
+    """
+    If check Handler's check_updated returned true, but execution of handler raised this,
+    then handlers checking will continue.
+    """
+    pass
+
+
+class DispatcherHandlerStop(DispatcherHandlerFlow):
+    """
+    Raise this in handler to prevent execution any other handlers (even in different group).
+    """
+    pass
+
+
 class Dispatcher(object):
     """
     This class dispatches all kinds of updates to its registered handlers.
@@ -162,6 +184,9 @@ class Dispatcher(object):
                 break
 
             promise.run()
+            if isinstance(promise.exception, DispatcherHandlerFlow):
+                self.logger.warning('DispatcherHandlerFlow is not supported with async '
+                                    'functions; func: %s', promise.pooled_function.__name__)
 
     def run_async(self, func, *args, **kwargs):
         """
@@ -255,24 +280,29 @@ class Dispatcher(object):
         Processes a single update.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update`): The update to process.
+            update (:obj:`str` | :class:`telegram.Update` | :class:`telegram.TelegramError`):
+                The update to process.
         """
 
         # An error happened while polling
         if isinstance(update, TelegramError):
             self.dispatch_error(None, update)
-
-        else:
-            for group in self.groups:
+            return
+        for group in self.groups:
+            try:
                 for handler in self.handlers[group]:
                     try:
                         if handler.check_update(update):
-                            handler.handle_update(update, self)
+                            try:
+                                handler.handle_update(update, self)
+                            except DispatcherHandlerContinue:
+                                continue
                             break
-                    # Dispatch any errors
+                    except DispatcherHandlerFlow:
+                        raise
                     except TelegramError as te:
-                        self.logger.warn('A TelegramError was raised while processing the '
-                                         'Update.')
+                        self.logger.warning('A TelegramError was raised while processing the '
+                                            'Update.')
 
                         try:
                             self.dispatch_error(update, te)
@@ -287,6 +317,8 @@ class Dispatcher(object):
                         self.logger.exception('An uncaught error was raised while '
                                               'processing the update')
                         break
+            except DispatcherHandlerStop:
+                break
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """
@@ -297,7 +329,9 @@ class Dispatcher(object):
 
         A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
-        evaluated for handling an update, but only 0 or 1 handler per group will be used.
+        evaluated for handling an update, but only 0 or 1 handler per group will be used,
+        except situations when :class:`telegram.DispatcherHandlerContinue` or
+        :class:`telegram.DispatcherHandlerStop` were raised.
 
         The priority/order of handlers is determined as follows:
 
@@ -305,6 +339,10 @@ class Dispatcher(object):
           * The first handler in a group which should handle an update will be
             used. Other handlers from the group will not be used. The order in
             which handlers were added to the group defines the priority.
+          * If :class:`telegram.DispatcherHandlerContinue` was raised, then next handler in the
+            same group will be called.
+          * If :class:`telegram.DispatcherHandlerStop` was raised, then zero handlers (even
+            from other groups) will called.
 
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
@@ -343,7 +381,7 @@ class Dispatcher(object):
         Registers an error handler in the Dispatcher.
 
         Args:
-            handler (:obj:`callable`): A function that takes ``Bot, Update, TelegramError`` as
+            callback (:obj:`callable`): A function that takes ``Bot, Update, TelegramError`` as
                 arguments.
         """
 
@@ -354,7 +392,7 @@ class Dispatcher(object):
         Removes an error handler.
 
         Args:
-            handler (:obj:`callable`): The error handler to remove.
+            callback (:obj:`callable`): The error handler to remove.
         """
 
         if callback in self.error_handlers:
@@ -365,7 +403,7 @@ class Dispatcher(object):
         Dispatches an error.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update`): The update that caused the error
+            update (:obj:`str` | :class:`telegram.Update` | None): The update that caused the error
             error (:class:`telegram.TelegramError`): The Telegram error that was raised.
         """
 
