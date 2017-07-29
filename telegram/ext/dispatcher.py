@@ -326,7 +326,8 @@ class Dispatcher(object):
 
         A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
-        evaluated for handling an update, but only 0 or 1 handler per group will be used.
+        evaluated for handling an update, but only 0 or 1 handler per group will be used,
+        except situations when DispatcherHandlerContinue or DispatcherHandlerStop were raised.
 
         The priority/order of handlers is determined as follows:
 
@@ -334,6 +335,10 @@ class Dispatcher(object):
           * The first handler in a group which should handle an update will be
             used. Other handlers from the group will not be used. The order in
             which handlers were added to the group defines the priority.
+          * If DispatcherHandlerContinue was raised, then next handler in the same group will be
+            called.
+          * If DispatcherHandlerStop was raised, then zero handlers (even from other groups)
+            will called.
 
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
