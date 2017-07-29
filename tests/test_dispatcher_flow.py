@@ -28,8 +28,8 @@ from queue import Queue
 
 sys.path.append('.')
 from telegram import Message, Update, User, Bot
-from telegram.ext import CommandHandler, Dispatcher
-from telegram.ext.dispatcher import Continue, Stop
+from telegram.ext import CommandHandler, Dispatcher, DispatcherHandlerContinue, \
+    DispatcherHandlerStop
 
 from tests.base import BaseTest
 
@@ -57,6 +57,7 @@ class DispatcherFlowTest(BaseTest, unittest.TestCase):
             {'id': 123, 'first_name': 'TestBot', 'username': 'test_bot'},
             self._bot)
         user = User(id=404, first_name='ihoru')
+        # noinspection PyTypeChecker
         message = Message(1, None, None, None, text='/start', bot=self._bot)
         self._update = Update(1, message=message)
 
@@ -65,7 +66,7 @@ class DispatcherFlowTest(BaseTest, unittest.TestCase):
 
         def start1(b, u):
             passed.append('start1')
-            raise Continue
+            raise DispatcherHandlerContinue
 
         def start2(b, u):
             passed.append('start2')
@@ -99,7 +100,7 @@ class DispatcherFlowTest(BaseTest, unittest.TestCase):
 
         def start1(b, u):
             passed.append('start1')
-            raise Stop
+            raise DispatcherHandlerStop
 
         def start2(b, u):
             passed.append('start2')
