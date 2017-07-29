@@ -184,6 +184,9 @@ class Dispatcher(object):
                 break
 
             promise.run()
+            if isinstance(promise.exception, DispatcherHandlerFlow):
+                self.logger.warning('DispatcherHandlerFlow is not supported with async '
+                                    'functions; func: %s', promise.pooled_function.__name__)
 
     def run_async(self, func, *args, **kwargs):
         """
@@ -278,7 +281,7 @@ class Dispatcher(object):
 
         Args:
             update (:obj:`str` | :class:`telegram.Update` | :class:`telegram.TelegramError`):
-            The update to process.
+                The update to process.
         """
 
         # An error happened while polling
@@ -327,7 +330,8 @@ class Dispatcher(object):
         A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
         evaluated for handling an update, but only 0 or 1 handler per group will be used,
-        except situations when DispatcherHandlerContinue or DispatcherHandlerStop were raised.
+        except situations when :class:`telegram.DispatcherHandlerContinue` or
+        :class:`telegram.DispatcherHandlerStop` were raised.
 
         The priority/order of handlers is determined as follows:
 
@@ -335,10 +339,10 @@ class Dispatcher(object):
           * The first handler in a group which should handle an update will be
             used. Other handlers from the group will not be used. The order in
             which handlers were added to the group defines the priority.
-          * If DispatcherHandlerContinue was raised, then next handler in the same group will be
-            called.
-          * If DispatcherHandlerStop was raised, then zero handlers (even from other groups)
-            will called.
+          * If :class:`telegram.DispatcherHandlerContinue` was raised, then next handler in the
+            same group will be called.
+          * If :class:`telegram.DispatcherHandlerStop` was raised, then zero handlers (even
+            from other groups) will called.
 
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
