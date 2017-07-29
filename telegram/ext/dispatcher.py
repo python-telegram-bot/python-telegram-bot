@@ -21,11 +21,12 @@
 import logging
 import weakref
 from functools import wraps
-from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
+from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
 from uuid import uuid4
 from collections import defaultdict
-from queue import Empty, Queue
+
+from queue import Queue, Empty
 
 from future.builtins import range
 
@@ -54,14 +55,14 @@ def run_async(func):
     return async_func
 
 
-class Flow(Exception):
+class DispatcherHandlerFlow(Exception):
     """
     Dispatcher update processing manipulation exceptions are base on this class.
     """
     pass
 
 
-class Continue(Flow):
+class DispatcherHandlerContinue(DispatcherHandlerFlow):
     """
     If check Handler's check_updated returned true, but execution of handler raised this,
     then handlers checking will continue.
@@ -69,7 +70,7 @@ class Continue(Flow):
     pass
 
 
-class Stop(Flow):
+class DispatcherHandlerStop(DispatcherHandlerFlow):
     """
     Raise this in handler to prevent execution any other handlers (even in different group).
     """
@@ -276,7 +277,8 @@ class Dispatcher(object):
         Processes a single update.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update` | :class:`telegram.TelegramError`): The update to process.
+            update (:obj:`str` | :class:`telegram.Update` | :class:`telegram.TelegramError`):
+            The update to process.
         """
 
         # An error happened while polling
@@ -290,10 +292,10 @@ class Dispatcher(object):
                         if handler.check_update(update):
                             try:
                                 handler.handle_update(update, self)
-                            except Continue:
+                            except DispatcherHandlerContinue:
                                 continue
                             break
-                    except Flow:
+                    except DispatcherHandlerFlow:
                         raise
                     except TelegramError as te:
                         self.logger.warning('A TelegramError was raised while processing the '
@@ -312,7 +314,7 @@ class Dispatcher(object):
                         self.logger.exception('An uncaught error was raised while '
                                               'processing the update')
                         break
-            except Stop:
+            except DispatcherHandlerStop:
                 break
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
