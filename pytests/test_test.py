@@ -9,7 +9,7 @@ def test_one():
     assert True
 
 
-@pytest.mark.timeout(2, method="thread")
+@pytest.mark.timeout(2)
 def test_two():
     time.sleep(3)
     assert True
