@@ -30,7 +30,7 @@ install:
 
 script:
 #  - python travis.py
-  - pytest pytests
+  - pytest pytests -v --no-flaky-report
 
 after_success:
   coveralls
