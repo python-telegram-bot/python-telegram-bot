@@ -19,6 +19,7 @@
 """This module contains methods to make POST and GET requests"""
 import os
 import socket
+import sys
 import logging
 import warnings
 
@@ -76,13 +77,20 @@ class Request(object):
 
         self._connect_timeout = connect_timeout
 
+        sockopts = HTTPConnection.default_socket_options + [
+            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
+
+        # TODO: Support other platforms like mac and windows.
+        if 'linux' in sys.platform:
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120))
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30))
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8))
+
         kwargs = dict(
             maxsize=con_pool_size,
             cert_reqs='CERT_REQUIRED',
             ca_certs=certifi.where(),
-            socket_options=HTTPConnection.default_socket_options + [
-                (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-            ],
+            socket_options=sockopts,
             timeout=urllib3.Timeout(
                 connect=self._connect_timeout, read=read_timeout, total=None))
 
