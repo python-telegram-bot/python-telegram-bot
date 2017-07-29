@@ -29,7 +29,8 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - python travis.py
+#  - python travis.py
+  - pytest pytests
 
 after_success:
   coveralls
