@@ -103,6 +103,8 @@ class ChatMember(TelegramObject):
     """:obj:`str`: 'left'"""
     MEMBER = 'member'
     """:obj:`str`: 'member'"""
+    RESTRICTED = 'restricted'
+    """:obj:`str`: 'restricted'"""
 
     def __init__(self, user, status, until_date=None, can_be_edited=None,
                  can_change_info=None, can_post_messages=None, can_edit_messages=None,
