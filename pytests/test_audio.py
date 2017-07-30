@@ -1,21 +1,25 @@
+import json
 import os
+
 import pytest
 from flaky import flaky
 
 from telegram import Audio, TelegramError, Voice
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def audio_file():
     f = open('tests/data/telegram.mp3', 'rb')
     yield f
     f.close()
 
+
 @pytest.fixture(scope="class")
 def audio(bot, chat_id):
     return bot.send_audio(chat_id, audio=open('tests/data/telegram.mp3', 'rb'), timeout=10).audio
 
-@pytest.fixture(scope="function")
+
+@pytest.fixture()
 def json_dict(audio):
     return {
         'file_id': audio.file_id,
@@ -27,6 +31,7 @@ def json_dict(audio):
         'file_size': audio.file_size
     }
 
+
 class TestAudio:
     """This object represents Tests for Telegram Audio."""
 
@@ -37,8 +42,8 @@ class TestAudio:
     # Shortened link, the above one is cached with the wrong duration.
     audio_file_url = "https://goo.gl/3En24v"
 
-    @classmethod
-    def test_creation(self, audio):
+    @staticmethod
+    def test_creation(audio):
         # Make sure file has been uploaded.
         assert isinstance(audio, Audio)
         assert isinstance(audio.file_id, str)
@@ -46,7 +51,7 @@ class TestAudio:
 
     def test_expected_values(self, audio):
         assert audio.duration == 3
-        assert audio.performer == None
+        assert audio.performer is None
         assert audio.title is None
         assert audio.mime_type == 'audio/mpeg'
         assert audio.file_size == 122920
@@ -54,20 +59,20 @@ class TestAudio:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_audio_all_args(self, bot, chat_id, audio_file, audio):
-        message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption, duration=audio.duration, performer=self.performer, title=self.title, disable_notification=False)
+        message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
+                                 duration=audio.duration, performer=self.performer,
+                                 title=self.title, disable_notification=False)
 
         assert message.caption == self.caption
 
-        sentaudio = message.audio
-
-        assert isinstance(sentaudio, Audio)
-        assert isinstance(sentaudio.file_id, str)
-        assert sentaudio.file_id is not None
-        assert sentaudio.duration == audio.duration
-        assert sentaudio.performer == self.performer
-        assert sentaudio.title == self.title
-        assert sentaudio.mime_type == audio.mime_type
-        assert sentaudio.file_size == audio.file_size
+        assert isinstance(message.audio, Audio)
+        assert isinstance(message.audio.file_id, str)
+        assert message.audio.file_id is not None
+        assert message.audio.duration == audio.duration
+        assert message.audio.performer == self.performer
+        assert message.audio.title == self.title
+        assert message.audio.mime_type == audio.mime_type
+        assert message.audio.file_size == audio.file_size
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -86,51 +91,49 @@ class TestAudio:
     @pytest.mark.timeout(10)
     def test_send_audio_mp3_url_file(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=self.audio_file_url, caption=self.caption)
-        assert message.caption == self.caption
-        sentaudio = message.audio
 
-        assert isinstance(sentaudio, Audio)
-        assert isinstance(sentaudio.file_id, str)
-        assert sentaudio.file_id is not None
-        assert sentaudio.duration == audio.duration
-        assert sentaudio.mime_type == audio.mime_type
-        assert sentaudio.file_size == audio.file_size
+        assert message.caption == self.caption
+
+        assert isinstance(message.audio, Audio)
+        assert isinstance(message.audio.file_id, str)
+        assert message.audio.file_id is not None
+        assert message.audio.duration == audio.duration
+        assert message.audio.mime_type == audio.mime_type
+        assert message.audio.file_size == audio.file_size
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_audio_resend(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
-        sentaudio = message.audio
 
-        assert sentaudio == audio
+        assert message.audio == audio
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_audio_with_audio(self, bot, chat_id, audio):
         message = bot.send_audio(audio=audio, chat_id=chat_id)
-        sentaudio = message.audio
 
-        assert sentaudio == audio
+        assert message.audio == audio
 
     def test_audio_de_json(self, json_dict, bot, audio):
         newaudio = Audio.de_json(json_dict, bot)
 
         assert isinstance(newaudio, Audio)
-        assert newaudio.file_id==audio.file_id
-        assert newaudio.duration== audio.duration
-        assert newaudio.performer== self.performer
-        assert newaudio.title== self.title
-        assert newaudio.mime_type== audio.mime_type
-        assert newaudio.file_size== audio.file_size
+        assert newaudio.file_id == audio.file_id
+        assert newaudio.duration == audio.duration
+        assert newaudio.performer == self.performer
+        assert newaudio.title == self.title
+        assert newaudio.mime_type == audio.mime_type
+        assert newaudio.file_size == audio.file_size
 
-    def test_audio_to_json(self, is_json, audio):
-        assert is_json(audio.to_json())
+    def test_audio_to_json(self, audio):
+        json.loads(audio.to_json())
 
-    def test_audio_to_dict(self, is_dict, audio):
+    def test_audio_to_dict(self, audio):
         newaudio = audio.to_dict()
 
-        assert is_dict(newaudio)
-        assert newaudio['file_id']== audio.file_id
+        assert isinstance(newaudio, dict)
+        assert newaudio['file_id'] == audio.file_id
         assert newaudio['duration'] == audio.duration
         assert newaudio['mime_type'] == audio.mime_type
         assert newaudio['file_size'] == audio.file_size
@@ -152,8 +155,8 @@ class TestAudio:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_error_audio_without_required_args(self, bot, chat_id, json_dict):
-        del(json_dict['file_id'])
-        del(json_dict['duration'])
+        del (json_dict['file_id'])
+        del (json_dict['duration'])
 
         with pytest.raises(TypeError):
             bot.send_audio(chat_id=chat_id, **json_dict)

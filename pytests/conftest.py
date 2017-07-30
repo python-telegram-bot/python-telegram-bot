@@ -1,5 +1,4 @@
 import os
-import json
 
 import pytest
 
@@ -22,27 +21,6 @@ def bot(bot_info):
 @pytest.fixture(scope="session")
 def chat_id(bot_info):
     return bot_info['chat_id']
-
-
-@pytest.fixture(scope="session")
-def is_json():
-    def _is_json(string):
-        try:
-            json.loads(string)
-        except ValueError:
-            return False
-
-        return True
-    return _is_json
-
-
-@pytest.fixture(scope="session")
-def is_dict():
-    def _is_dict(dictionary):
-        if isinstance(dictionary, dict):
-            return True
-        return False
-    return _is_dict
 
 
 if TRAVIS:

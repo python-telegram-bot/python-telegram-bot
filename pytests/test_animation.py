@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 import telegram
@@ -10,7 +12,7 @@ def thumb():
                      width=90)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def json_dict(thumb):
     return {
         'file_id': TestAnimation.animation_file_id,
@@ -21,13 +23,13 @@ def json_dict(thumb):
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def animation(json_dict, bot):
     return Animation.de_json(json_dict, bot)
 
 
 class TestAnimation:
-    """This object represents Tests for Telegram Animation."""
+    """Tests for telegram.Animation"""
 
     animation_file_id = 'CgADBAADFQEAAny4rAUgukhiTv2TWwI'
     file_name = "game.gif.mp4"
@@ -42,18 +44,18 @@ class TestAnimation:
         assert animation.mime_type == self.mime_type
         assert animation.file_size == self.file_size
 
-    def test_animation_to_json(self, animation, is_json):
-        assert is_json(animation.to_json())
+    def test_animation_to_json(self, animation):
+        json.loads(animation.to_json())
 
-    def test_animation_to_dict(self, animation, is_dict, thumb):
-        anidict = animation.to_dict()
+    def test_animation_to_dict(self, animation, thumb):
+        animation_dict = animation.to_dict()
 
-        assert is_dict(anidict)
-        assert anidict['file_id'] == self.animation_file_id
-        assert anidict['thumb'] == thumb.to_dict()
-        assert anidict['file_name'] == self.file_name
-        assert anidict['mime_type'] == self.mime_type
-        assert anidict['file_size'] == self.file_size
+        assert isinstance(animation_dict, dict)
+        assert animation_dict['file_id'] == self.animation_file_id
+        assert animation_dict['thumb'] == thumb.to_dict()
+        assert animation_dict['file_name'] == self.file_name
+        assert animation_dict['mime_type'] == self.mime_type
+        assert animation_dict['file_size'] == self.file_size
 
     def test_equality(self):
         a = Animation(self.animation_file_id)
