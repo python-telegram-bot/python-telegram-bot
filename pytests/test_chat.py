@@ -27,7 +27,7 @@ from telegram import User
 @pytest.fixture(scope="class")
 def json_dict():
     return {
-        'id': TestChat._id,
+        'id': TestChat.id,
         'title': TestChat.title,
         'type': TestChat.type,
         'all_members_are_administrators': TestChat.all_members_are_administrators
@@ -41,7 +41,7 @@ def chat(bot, json_dict):
 
 class TestChat:
     """This object represents Tests for Chat."""
-    _id = -28767330
+    id = -28767330
     title = 'ToledosPalaceBot - Group'
     type = 'group'
     all_members_are_administrators = False
@@ -49,7 +49,7 @@ class TestChat:
     def test_group_chat_de_json(self, bot, json_dict):
         chat = Chat.de_json(json_dict, bot)
 
-        assert chat.id == self._id
+        assert chat.id == self.id
         assert chat.title == self.title
         assert chat.type == self.type
         assert chat.all_members_are_administrators == self.all_members_are_administrators
@@ -125,11 +125,11 @@ class TestChat:
         assert chat.unban_member(42)
 
     def test_equality(self):
-        a = Chat(self._id, self.title, self.type)
-        b = Chat(self._id, self.title, self.type)
-        c = Chat(self._id, "", "")
+        a = Chat(self.id, self.title, self.type)
+        b = Chat(self.id, self.title, self.type)
+        c = Chat(self.id, "", "")
         d = Chat(0, self.title, self.type)
-        e = User(self._id, "")
+        e = User(self.id, "")
 
         assert a == b
         assert hash(a) == hash(b)
