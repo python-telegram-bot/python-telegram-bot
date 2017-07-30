@@ -34,7 +34,7 @@ class StickerTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(StickerTest, cls).setUpClass()
 
         cls.emoji = '💪'
         # cls.sticker_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.webp"

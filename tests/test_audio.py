@@ -32,7 +32,7 @@ class AudioTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(AudioTest, cls).setUpClass()
 
         cls.caption = "Test audio"
         cls.performer = 'Leandro Toledo'

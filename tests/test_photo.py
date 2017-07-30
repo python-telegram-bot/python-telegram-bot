@@ -33,7 +33,7 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(PhotoTest, cls).setUpClass()
 
         cls.caption = u'PhotoTest - Caption'
         cls.photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'

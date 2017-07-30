@@ -32,7 +32,7 @@ class DocumentTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(DocumentTest, cls).setUpClass()
 
         cls.caption = u'DocumentTest - Caption'
         cls.document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'

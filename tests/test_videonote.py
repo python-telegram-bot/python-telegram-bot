@@ -31,7 +31,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(VideoNoteTest, cls).setUpClass()
 
         videonote_file = open('tests/data/telegram2.mp4', 'rb')
         video_note = cls._bot.send_video_note(cls._chat_id, video_note=videonote_file, timeout=10).video_note

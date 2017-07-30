@@ -32,7 +32,7 @@ class VideoTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(VideoTest, cls).setUpClass()
 
         cls.caption = u'VideoTest - Caption'
         cls.video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'

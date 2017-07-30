@@ -32,7 +32,7 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(VoiceTest, cls).setUpClass()
 
         cls.voice_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
         cls.caption = u"Test voice"
