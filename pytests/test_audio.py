@@ -16,7 +16,8 @@ def audio_file():
 
 @pytest.fixture(scope="class")
 def audio(bot, chat_id):
-    return bot.send_audio(chat_id, audio=open('tests/data/telegram.mp3', 'rb'), timeout=10).audio
+    with open('tests/data/telegram.mp3', 'rb') as f:
+        return bot.send_audio(chat_id, audio=f, timeout=10).audio
 
 
 @pytest.fixture()
