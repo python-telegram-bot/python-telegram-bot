@@ -30,7 +30,7 @@ install:
 
 script:
 #  - python travis.py
-  - pytest pytests -v --no-flaky-report
+  - pytest pytests --cov=telegram
 
 after_success:
   coveralls

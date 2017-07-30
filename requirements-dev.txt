@@ -10,3 +10,4 @@ beautifulsoup4
 rednose
 pytest
 pytest-timeout
+pytest-cov
