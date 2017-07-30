@@ -66,7 +66,16 @@ def message(func):
     @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         url, data = func(self, *args, **kwargs)
-        return self._message_wrapper(url, data, *args, **kwargs)
+        update_response = kwargs.pop('update_response', False)
+        data = self._message_wrapper(data, *args, **kwargs)
+        if update_response:
+            assert isinstance(update_response, Update)
+            if not update_response.get_webhook_response():
+                method = url.split('/')[-1]
+                data['method'] = method
+                update_response.set_webhook_response(data)
+                return True
+        return self._message_request(url, data, *args, **kwargs)
 
     return decorator
 
@@ -158,7 +167,7 @@ class Bot(TelegramObject):
 
         return '@{0}'.format(self.username)
 
-    def _message_wrapper(self, url, data, *args, **kwargs):
+    def _message_wrapper(self, data, *args, **kwargs):
         if kwargs.get('reply_to_message_id'):
             data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
 
@@ -172,6 +181,9 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
+        return data
+
+    def _message_request(self, url, data, *args, **kwargs):
         result = self._request.post(url, data, timeout=kwargs.get('timeout'))
 
         if result is True:

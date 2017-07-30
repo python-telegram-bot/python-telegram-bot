@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import logging
 
 from telegram import Update
@@ -23,11 +24,10 @@ class _InvalidPost(Exception):
 
 
 class WebhookServer(BaseHTTPServer.HTTPServer, object):
-
-    def __init__(self, server_address, RequestHandlerClass, update_queue, webhook_path, bot):
+    def __init__(self, server_address, RequestHandlerClass, dispatcher, webhook_path, bot):
         super(WebhookServer, self).__init__(server_address, RequestHandlerClass)
         self.logger = logging.getLogger(__name__)
-        self.update_queue = update_queue
+        self.dispatcher = dispatcher
         self.webhook_path = webhook_path
         self.bot = bot
         self.is_running = False
@@ -62,11 +62,11 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         super(WebhookHandler, self).__init__(request, client_address, server)
 
     def do_HEAD(self):
-        self.send_response(200)
+        self.send_response(HTTPStatus.OK)
         self.end_headers()
 
     def do_GET(self):
-        self.send_response(200)
+        self.send_response(HTTPStatus.OK)
         self.end_headers()
 
     def do_POST(self):
@@ -89,7 +89,7 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             update = Update.de_json(json.loads(json_string), self.server.bot)
 
             self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
-            self.server.update_queue.put(update)
+            self.server.dispatcher.update_queue.put(update)
 
     def _validate_post(self):
         if not (self.path == self.server.webhook_path and 'content-type' in self.headers and
@@ -123,3 +123,37 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         """
 
         self.logger.debug("%s - - %s" % (self.address_string(), format % args))
+
+
+class NoQueueWebhookHandler(WebhookHandler):
+    server_version = 'NoQueueWebhookHandler/1.0'
+
+    def do_POST(self):
+        self.logger.debug('Webhook triggered')
+        try:
+            self._validate_post()
+            clen = self._get_content_len()
+        except _InvalidPost as e:
+            self.send_error(e.http_code)
+            self.end_headers()
+        else:
+            buf = self.rfile.read(clen)
+            json_string = bytes_to_native_str(buf)
+
+            self.logger.debug('Webhook received data: ' + json_string)
+
+            update = Update.de_json(json.loads(json_string), self.server.bot)
+
+            self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
+            self.server.dispatcher.process_update(update)
+            response = update.get_webhook_response()
+            self.send_response(HTTPStatus.OK)
+            if not response:
+                self.end_headers()
+                return
+            response = json.dumps(response).encode()
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(response)))
+            self.end_headers()
+            self.wfile.write(response)
+            self.wfile.flush()

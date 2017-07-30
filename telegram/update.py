@@ -98,6 +98,8 @@ class Update(TelegramObject):
 
         self._id_attrs = (self.update_id,)
 
+        self._response = None
+
     @property
     def effective_user(self):
         """
@@ -216,3 +218,9 @@ class Update(TelegramObject):
         data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
 
         return cls(**data)
+
+    def get_webhook_response(self):
+        return self._response
+
+    def set_webhook_response(self, response):
+        self._response = response
