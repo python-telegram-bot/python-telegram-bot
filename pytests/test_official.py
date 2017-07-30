@@ -1,7 +1,7 @@
 import inspect
-from platform import python_implementation
 import sys
 from collections import namedtuple
+from platform import python_implementation
 
 import certifi
 import pytest
@@ -58,7 +58,7 @@ def check_method(h4):
     elif name == 'sendDocument':
         ignored |= {'filename'}  # Undocumented
     elif name == 'setGameScore':
-       ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
+        ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
     elif name == 'sendContact':
         ignored |= {'contact'}  # Added for ease of use
     elif name == 'sendLocation':

@@ -117,27 +117,27 @@ class TestAudio:
         assert message.audio == audio
 
     def test_audio_de_json(self, json_dict, bot, audio):
-        newaudio = Audio.de_json(json_dict, bot)
+        json_audio = Audio.de_json(json_dict, bot)
 
-        assert isinstance(newaudio, Audio)
-        assert newaudio.file_id == audio.file_id
-        assert newaudio.duration == audio.duration
-        assert newaudio.performer == self.performer
-        assert newaudio.title == self.title
-        assert newaudio.mime_type == audio.mime_type
-        assert newaudio.file_size == audio.file_size
+        assert isinstance(json_audio, Audio)
+        assert json_audio.file_id == audio.file_id
+        assert json_audio.duration == audio.duration
+        assert json_audio.performer == self.performer
+        assert json_audio.title == self.title
+        assert json_audio.mime_type == audio.mime_type
+        assert json_audio.file_size == audio.file_size
 
     def test_audio_to_json(self, audio):
         json.loads(audio.to_json())
 
     def test_audio_to_dict(self, audio):
-        newaudio = audio.to_dict()
+        audio_dict = audio.to_dict()
 
-        assert isinstance(newaudio, dict)
-        assert newaudio['file_id'] == audio.file_id
-        assert newaudio['duration'] == audio.duration
-        assert newaudio['mime_type'] == audio.mime_type
-        assert newaudio['file_size'] == audio.file_size
+        assert isinstance(audio_dict, dict)
+        assert audio_dict['file_id'] == audio.file_id
+        assert audio_dict['duration'] == audio.duration
+        assert audio_dict['mime_type'] == audio.mime_type
+        assert audio_dict['file_size'] == audio.file_size
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

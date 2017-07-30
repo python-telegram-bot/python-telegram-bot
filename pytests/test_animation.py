@@ -2,7 +2,6 @@ import json
 
 import pytest
 
-import telegram
 from telegram import PhotoSize, Animation, Voice
 
 
@@ -23,9 +22,11 @@ def json_dict(thumb):
     }
 
 
-@pytest.fixture()
-def animation(json_dict, bot):
-    return Animation.de_json(json_dict, bot)
+@pytest.fixture(scope="class")
+def animation(thumb, bot):
+    return Animation(file_id=TestAnimation.animation_file_id, thumb=thumb.to_dict(),
+                     file_name=TestAnimation.file_name, mime_type=TestAnimation.mime_type,
+                     file_size=TestAnimation.file_size, bot=bot)
 
 
 class TestAnimation:
@@ -60,7 +61,7 @@ class TestAnimation:
     def test_equality(self):
         a = Animation(self.animation_file_id)
         b = Animation(self.animation_file_id)
-        d = telegram.Animation("")
+        d = Animation("")
         e = Voice(self.animation_file_id, 0)
 
         assert a == b

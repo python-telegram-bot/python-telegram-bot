@@ -19,9 +19,6 @@
 """Provide a bot to tests"""
 import os
 
-import sys
-
-
 bot_settings = {
     'APPVEYOR':
         {

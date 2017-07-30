@@ -26,6 +26,7 @@ def chat_id(bot_info):
 if TRAVIS:
     fold_plugins = {'_cov': 'Coverage report', 'flaky': 'Flaky report'}
 
+
     def terminal_summary_wrapper(original, plugin_name):
         text = fold_plugins[plugin_name]
 
