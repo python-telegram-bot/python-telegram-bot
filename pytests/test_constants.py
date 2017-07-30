@@ -16,3 +16,33 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pytest
+from flaky import flaky
+
+from telegram import constants
+from telegram.error import BadRequest
+
+
+class TestConstants:
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_max_message_length(self, bot, chat_id):
+        bot.send_message(chat_id=chat_id, text='a' * constants.MAX_MESSAGE_LENGTH)
+
+        with pytest.raises(BadRequest, message="MAX_MESSAGE_LENGTH is no longer valid",
+                           match="too long"):
+            bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_max_caption_length(self, bot, chat_id):
+        good_caption = 'a' * constants.MAX_CAPTION_LENGTH
+        with open('tests/data/telegram.png', 'rb') as f:
+            good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
+        assert good_msg.caption == good_caption
+
+        bad_caption = good_caption + 'Z'
+        with open('tests/data/telegram.png', 'rb') as f:
+            bad_message = bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
+        assert bad_message.caption != bad_caption
+        assert len(bad_message.caption) == constants.MAX_CAPTION_LENGTH
