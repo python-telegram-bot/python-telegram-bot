@@ -24,14 +24,6 @@ from telegram import ForceReply
 
 
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'force_reply': TestForceReply.force_reply,
-        'selective': TestForceReply.selective,
-    }
-
-
-@pytest.fixture(scope='class')
 def force_reply():
     return ForceReply(TestForceReply.force_reply, TestForceReply.selective)
 
@@ -41,12 +33,14 @@ class TestForceReply:
     selective = True
 
     def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
-        message = bot.sendMessage(chat_id, 'text', reply_markup=force_reply)
+        message = bot.send_message(chat_id, 'text', reply_markup=force_reply)
 
-        json.loads(message.to_json())
         assert message.text == 'text'
 
-    def test_force_reply_de_json(self, json_dict, bot):
+    def test_force_reply_de_json(self, bot):
+        json_dict = {
+            'selective': self.selective,
+        }
         force_reply = ForceReply.de_json(json_dict, bot)
 
         assert force_reply.force_reply == self.force_reply
@@ -56,5 +50,8 @@ class TestForceReply:
         json.loads(force_reply.to_json())
 
     def test_force_reply_to_dict(self, force_reply):
-        assert force_reply['force_reply'] == self.force_reply
-        assert force_reply['selective'] == self.selective
+        force_reply_dict = force_reply.to_dict()
+
+        assert isinstance(force_reply_dict,dict)
+        assert force_reply_dict['force_reply'] == self.force_reply
+        assert force_reply_dict['selective'] == self.selective

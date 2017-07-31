@@ -24,17 +24,6 @@ from telegram import User, Location, InlineQuery, Update
 
 
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'id': TestInlineQuery.id,
-        'from': TestInlineQuery.from_user.to_dict(),
-        'query': TestInlineQuery.query,
-        'offset': TestInlineQuery.offset,
-        'location': TestInlineQuery.location.to_dict()
-    }
-
-
-@pytest.fixture(scope='class')
 def inlinequery():
     return InlineQuery(TestInlineQuery.id, TestInlineQuery.from_user, TestInlineQuery.query,
                        TestInlineQuery.offset, location=TestInlineQuery.location)
@@ -47,21 +36,34 @@ class TestInlineQuery:
     offset = 'offset'
     location = Location(8.8, 53.1)
 
-    def test_inlinequery_de_json(self, json_dict, bot):
-        inlinequery = InlineQuery.de_json(json_dict, bot)
+    def test_inlinequery_de_json(self, bot):
+        json_dict = {
+            'id': self.id,
+            'from': self.from_user.to_dict(),
+            'query': self.query,
+            'offset': self.offset,
+            'location': self.location.to_dict()
+        }
+        inlinequery_json = InlineQuery.de_json(json_dict, bot)
 
-        assert inlinequery.id == self.id
-        assert inlinequery.from_user == self.from_user
-        assert inlinequery.location == self.location
-        assert inlinequery.query == self.query
-        assert inlinequery.offset == self.offset
+        assert inlinequery_json.id == self.id
+        assert inlinequery_json.from_user == self.from_user
+        assert inlinequery_json.location == self.location
+        assert inlinequery_json.query == self.query
+        assert inlinequery_json.offset == self.offset
 
     def test_inlinequery_to_json(self, inlinequery):
         json.loads(inlinequery.to_json())
 
-    def test_inlinequery_to_dict(self, inlinequery, json_dict):
+    def test_inlinequery_to_dict(self, inlinequery):
         inlinequery_dict = inlinequery.to_dict()
-        assert inlinequery_dict == json_dict
+        
+        assert isinstance(inlinequery_dict, dict)
+        assert inlinequery_dict['id'] == inlinequery.id
+        assert inlinequery_dict['from'] == inlinequery.from_user.to_dict()
+        assert inlinequery_dict['location'] == inlinequery.location.to_dict()
+        assert inlinequery_dict['query'] == inlinequery.query
+        assert inlinequery_dict['offset'] == inlinequery.offset
 
     def test_equality(self):
         a = InlineQuery(self.id, User(1, ""), "", "")

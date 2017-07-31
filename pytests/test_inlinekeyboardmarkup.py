@@ -24,16 +24,6 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'inline_keyboard': [[
-            TestInlineKeyboardMarkup.inline_keyboard[0][0].to_dict(),
-            TestInlineKeyboardMarkup.inline_keyboard[0][1].to_dict()
-        ]],
-    }
-
-
-@pytest.fixture(scope='class')
 def inline_keyboard_markup():
     return InlineKeyboardMarkup(TestInlineKeyboardMarkup.inline_keyboard)
 
@@ -44,28 +34,35 @@ class TestInlineKeyboardMarkup:
         InlineKeyboardButton(text='button2', callback_data='data2')
     ]]
 
-    def test_send_message_with_inline_keyboard_markup(self, bot, chat_id):
-        message = bot.sendMessage(
+    def test_send_message_with_inline_keyboard_markup(self, bot, chat_id, inline_keyboard_markup):
+        message = bot.send_message(
             chat_id,
             'Testing InlineKeyboardMarkup',
-            reply_markup=InlineKeyboardMarkup(self.inline_keyboard))
+            reply_markup=inline_keyboard_markup)
 
-        json.loads(message.to_json())
         assert message.text == 'Testing InlineKeyboardMarkup'
 
-    def test_inline_keyboard_markup_de_json_empty(self, bot):
-        inline_keyboard_markup = InlineKeyboardMarkup.de_json(None, bot)
+    def test_inline_keyboard_markup_de_json(self, bot, inline_keyboard_markup):
+        json_dict = {
+            'inline_keyboard': [[
+                self.inline_keyboard[0][0].to_dict(),
+                self.inline_keyboard[0][1].to_dict()
+            ]],
+        }
+        inline_keyboard_markup_json = InlineKeyboardMarkup.de_json(json_dict, bot)
 
-        assert inline_keyboard_markup is None
-
-    def test_inline_keyboard_markup_de_json(self, json_dict, bot):
-        inline_keyboard_markup = InlineKeyboardMarkup.de_json(json_dict, bot)
-
-        assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
+        assert inline_keyboard_markup_json == inline_keyboard_markup
 
     def test_inline_keyboard_markup_to_json(self, inline_keyboard_markup):
         json.loads(inline_keyboard_markup.to_json())
 
-    def test_inline_keyboard_markup_to_dict(self, inline_keyboard_markup, json_dict):
+    def test_inline_keyboard_markup_to_dict(self, inline_keyboard_markup):
         inline_keyboard_markup_dict = inline_keyboard_markup.to_dict()
-        assert inline_keyboard_markup_dict == json_dict
+
+        assert isinstance(inline_keyboard_markup_dict, dict)
+        assert inline_keyboard_markup_dict['inline_keyboard'] == [
+            [
+                self.inline_keyboard[0][0].to_dict(),
+                self.inline_keyboard[0][1].to_dict()
+            ]
+        ]

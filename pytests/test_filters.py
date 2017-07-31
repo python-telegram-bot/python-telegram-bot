@@ -30,10 +30,7 @@ def message():
 
 
 @pytest.fixture(scope="function",
-                params=[MessageEntity.MENTION, MessageEntity.HASHTAG, MessageEntity.BOT_COMMAND,
-                        MessageEntity.URL, MessageEntity.EMAIL, MessageEntity.BOLD,
-                        MessageEntity.ITALIC, MessageEntity.CODE, MessageEntity.PRE,
-                        MessageEntity.TEXT_LINK, MessageEntity.TEXT_MENTION])
+                params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     return MessageEntity(type=request.param, offset=0, length=0, url="", user="")
 

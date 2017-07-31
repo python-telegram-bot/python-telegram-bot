@@ -128,7 +128,6 @@ class TestAudio:
                                     'file_size': audio.file_size},
                                    bot)
 
-        assert isinstance(json_audio, Audio)
         assert json_audio.file_id == audio.file_id
         assert json_audio.duration == audio.duration
         assert json_audio.performer == self.performer

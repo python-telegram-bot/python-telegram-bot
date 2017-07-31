@@ -23,18 +23,6 @@ import pytest
 from telegram import MessageEntity, Game, PhotoSize, Animation
 
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'title': TestGame.title,
-        'description': TestGame.description,
-        'photo': [TestGame.photo[0].to_dict()],
-        'text': TestGame.text,
-        'text_entities': [TestGame.text_entities[0].to_dict()],
-        'animation': TestGame.animation.to_dict()
-    }
-
-
 @pytest.fixture()
 def game():
     return Game(TestGame.title,
@@ -54,7 +42,15 @@ class TestGame:
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     animation = Animation('blah')
 
-    def test_game_de_json(self, json_dict, bot):
+    def test_game_de_json(self, bot):
+        json_dict = {
+            'title': self.title,
+            'description': self.description,
+            'photo': [self.photo[0].to_dict()],
+            'text': self.text,
+            'text_entities': [self.text_entities[0].to_dict()],
+            'animation': self.animation.to_dict()
+        }
         game = Game.de_json(json_dict, bot)
 
         assert game.title == self.title
@@ -66,6 +62,17 @@ class TestGame:
 
     def test_game_to_json(self, game):
         json.loads(game.to_json())
+
+    def test_game_to_dict(self, game):
+        game_dict = game.to_dict()
+
+        assert isinstance(game_dict, dict)
+        assert game_dict['title'] == self.title
+        assert game_dict['description'] == self.description
+        assert game_dict['photo'] == [self.photo[0].to_dict()]
+        assert game_dict['text'] == self.text
+        assert game_dict['text_entities'] == [self.text_entities[0].to_dict()]
+        assert game_dict['animation'] == self.animation.to_dict()
 
     def test_parse_entity(self, game):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
