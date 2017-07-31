@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from telegram import, User, Location, InlineQuery, Update
+from telegram import User, Location, InlineQuery, Update
 
 
 @pytest.fixture(scope='class')
