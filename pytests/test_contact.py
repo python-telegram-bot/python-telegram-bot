@@ -52,11 +52,16 @@ class TestContact:
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
 
-    @pytest.mark.xfail(reason='"Flood control exceeded. Retry in many seconds" errors')
-    def test_send_contact_with_contact(self, bot, chat_id, contact):
-        message = bot.send_contact(contact=contact, chat_id=chat_id)
+    def test_send_contact_with_contact(self, monkeypatch, bot, chat_id, contact):
+        def test(_, url, data, **kwargs):
+            phone = data['phone_number'] == contact.phone_number
+            first = data['first_name'] == contact.first_name
+            last = data['last_name'] == contact.last_name
+            return phone and first and last
 
-        assert message.contact == contact
+        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        message = bot.send_contact(contact=contact, chat_id=chat_id)
+        assert message
 
     def test_contact_to_json(self, contact):
         json.loads(contact.to_json())

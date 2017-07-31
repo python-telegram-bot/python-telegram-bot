@@ -114,12 +114,13 @@ class TestAudio:
 
         assert message.audio == audio
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_audio_with_audio(self, bot, chat_id, audio):
-        message = bot.send_audio(audio=audio, chat_id=chat_id)
+    def test_send_audio_with_audio(self, monkeypatch, bot, chat_id, audio):
+        def test(_, url, data, **kwargs):
+            return data['audio'] == audio.file_id
 
-        assert message.audio == audio
+        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        message = bot.send_audio(audio=audio, chat_id=chat_id)
+        assert message
 
     def test_audio_de_json(self, bot, audio):
         json_audio = Audio.de_json({'file_id': audio.file_id, 'duration': audio.duration,

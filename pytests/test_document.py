@@ -106,12 +106,15 @@ class TestDocument:
 
         assert message.document == document
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_document_with_document(self, bot, chat_id, document):
+    def test_send_document_with_document(self, monkeypatch, bot, chat_id, document):
+        def test(_, url, data, **kwargs):
+            return data['document'] == document.file_id
+
+        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+
         message = bot.send_document(document=document, chat_id=chat_id)
 
-        assert message.document == document
+        assert message
 
     def test_document_de_json(self, bot, document):
         json_dict = {'file_id': document.file_id,
