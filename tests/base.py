@@ -24,6 +24,8 @@ import sys
 
 from nose.tools import make_decorator
 
+from tests.bots import get_bot
+
 sys.path.append('.')
 
 import json
@@ -33,19 +35,20 @@ import telegram
 class BaseTest(object):
     """This object represents a Base test and its sets of functions."""
 
-    def __init__(self, *args, **kwargs):
-        super(BaseTest, self).__init__(*args, **kwargs)
+    _group_id = None
+    _channel_id = None
+    _bot = None
+    _chat_id = None
+    _payment_provider_token = None
 
-        bot = telegram.Bot(
-            os.environ.get('TOKEN', '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'))
-        chat_id = os.environ.get('CHAT_ID', '12173560')
-
-        self._group_id = os.environ.get('GROUP_ID', '-49740850')
-        self._channel_id = os.environ.get('CHANNEL_ID', '@pythontelegrambottests')
-        self._bot = bot
-        self._chat_id = chat_id
-        self._payment_provider_token = os.environ.get('PAYMENT_PROVIDER_TOKEN',
-                                                      '284685063:TEST:ZGJlMmQxZDI3ZTc3')
+    @classmethod
+    def setUpClass(cls):
+        bot_info = get_bot()
+        cls._chat_id = bot_info['chat_id']
+        cls._bot = telegram.Bot(bot_info['token'])
+        cls._group_id = bot_info['group_id']
+        cls._channel_id = bot_info['channel_id']
+        cls._payment_provider_token = bot_info['payment_provider_token']
 
     @staticmethod
     def is_json(string):

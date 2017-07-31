@@ -25,7 +25,6 @@ from flaky import flaky
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
 
 
 class VoiceTest(BaseTest, unittest.TestCase):
@@ -33,13 +32,12 @@ class VoiceTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(VoiceTest, cls).setUpClass()
+
         cls.voice_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
         cls.caption = u"Test voice"
 
         voice_file = open('tests/data/telegram.ogg', 'rb')
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
 
         voice = cls._bot.send_voice(cls._chat_id, voice=voice_file).voice
         cls.voice = voice
