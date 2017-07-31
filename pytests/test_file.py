@@ -16,3 +16,75 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import json
+
+import pytest
+from flaky import flaky
+
+from telegram import File, TelegramError, Voice
+
+
+@pytest.fixture(scope="class")
+def file(bot):
+    return File(file_id="NOTVALIDDONTMATTER",
+                file_path='https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3',
+                file_size=28232, bot=bot)
+
+class TestFile:
+    def test_file_de_json(self, bot):
+        json_dict = {
+            'file_id': "NOTVALIDDONTMATTER",
+            'file_path':
+                'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'
+                '/document/file_3',
+            'file_size': 28232
+        }
+        new_file = File.de_json(json_dict, bot)
+
+        assert new_file.file_id == json_dict['file_id']
+        assert new_file.file_path == json_dict['file_path']
+        assert new_file.file_size == json_dict['file_size']
+
+    def test_file_to_json(self, file):
+        json.loads(file.to_json())
+
+    def test_file_to_dict(self, file):
+        file_dict = file.to_dict()
+
+        assert isinstance(file_dict, dict)
+        assert file_dict['file_id'] == file.file_id
+        assert file_dict['file_path'] == file.file_path
+        assert file_dict['file_size'] == file.file_size
+
+    @flaky(3,1)
+    @pytest.mark.timeout(10)
+    def test_error_get_empty_file_id(self, bot):
+        with pytest.raises(TelegramError):
+            bot.get_file(file_id="")
+
+    def test_download(self,monkeypatch, file):
+        def test(*args, **kwargs):
+            raise TelegramError("test worked")
+        monkeypatch.setattr("telegram.utils.request.Request.download", test)
+        with pytest.raises(TelegramError, match="test worked"):
+            file.download()
+
+    def test_equality(self, bot):
+        a = File("DOESNTMATTER", bot)
+        b = File("DOESNTMATTER", bot)
+        c = File("DOESNTMATTER", None)
+        d = File("DOESNTMATTER2", bot)
+        e = Voice("DOESNTMATTER", 0)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
