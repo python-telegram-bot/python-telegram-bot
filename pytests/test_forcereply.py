@@ -41,13 +41,10 @@ class TestForceReply:
     selective = True
 
     def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
-        message = bot.sendMessage(
-            chat_id,
-            'Моё судно на воздушной подушке полно угрей',
-            reply_markup=force_reply)
+        message = bot.sendMessage(chat_id, 'text', reply_markup=force_reply)
 
         json.loads(message.to_json())
-        assert message.text == 'Моё судно на воздушной подушке полно угрей'
+        assert message.text == 'text'
 
     def test_force_reply_de_json(self, json_dict, bot):
         force_reply = ForceReply.de_json(json_dict, bot)
