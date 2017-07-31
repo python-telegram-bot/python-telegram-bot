@@ -60,18 +60,19 @@ def pytest_runtest_protocol(item, nextitem):
 
     if previous_name is None or previous_name != name:
         previous_name = name
-        terminal.write('\ntravis_fold:start:{}\n{}'.format(name.split('::')[1], name))
-        terminal.write('\ntravis_time:start:{}time\n'.format(name.split('::')[1]))
+        terminal.write('\ntravis_fold:start:{}\r'.format(name.split('::')[1]))
+        terminal.write('travis_time:start:{}time\r'.format(name.split('::')[1]))
+        terminal.write(name)
 
     yield
 
     if nextitem is None or _get_name(nextitem.location) != name:
         global failed
         if name in failed:
-            terminal.write('\n\n')
+            terminal.write('')
         else:
             terminal.write('\n\ntravis_fold:end:{}'.format(name.split('::')[1]))
-        terminal.write('\ntravis_time:end:{}time:'
-                       'duration={}\n'.format(name.split('::')[1],
+        terminal.write('\rtravis_time:end:{}time:'
+                       'duration={}'.format(name.split('::')[1],
                                               int(durations[name]*1E9)))
         time.sleep(0.001)  # Tiny sleep so travis hopefully doesn't mangle the log
