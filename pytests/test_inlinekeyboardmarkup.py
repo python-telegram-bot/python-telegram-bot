@@ -39,8 +39,6 @@ def inline_keyboard_markup():
 
 
 class TestInlineKeyboardMarkup:
-    """This object represents Tests for Telegram KeyboardButton."""
-
     inline_keyboard = [[
         InlineKeyboardButton(text='button1', callback_data='data1'),
         InlineKeyboardButton(text='button2', callback_data='data2')
