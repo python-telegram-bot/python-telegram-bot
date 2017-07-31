@@ -32,7 +32,7 @@ def audio_file():
     f.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def audio(bot, chat_id):
     with open('tests/data/telegram.mp3', 'rb') as f:
         return bot.send_audio(chat_id, audio=f, timeout=10).audio
@@ -41,12 +41,12 @@ def audio(bot, chat_id):
 class TestAudio:
     """This object represents Tests for Telegram Audio."""
 
-    caption = "Test audio"
+    caption = 'Test audio'
     performer = 'Leandro Toledo'
     title = 'Teste'
     # audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
     # Shortened link, the above one is cached with the wrong duration.
-    audio_file_url = "https://goo.gl/3En24v"
+    audio_file_url = 'https://goo.gl/3En24v'
 
     @staticmethod
     def test_creation(audio):
@@ -172,7 +172,7 @@ class TestAudio:
         a = Audio(audio.file_id, audio.duration)
         b = Audio(audio.file_id, audio.duration)
         c = Audio(audio.file_id, 0)
-        d = Audio("", audio.duration)
+        d = Audio('', audio.duration)
         e = Voice(audio.file_id, audio.duration)
 
         assert a == b

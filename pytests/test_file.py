@@ -24,20 +24,25 @@ from flaky import flaky
 from telegram import File, TelegramError, Voice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def file(bot):
-    return File(file_id="NOTVALIDDONTMATTER",
-                file_path='https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3',
-                file_size=28232, bot=bot)
+    return File(file_id=TestFile.file_id,
+                file_path=TestFile.file_path,
+                file_size=TestFile.file_size,
+                bot=bot)
+
 
 class TestFile:
+    file_id = 'NOTVALIDDOESNOTMATTER'
+    file_path = ('https://api.org/file/bot133505823:'
+                 'AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
+    file_size = 28232
+
     def test_file_de_json(self, bot):
         json_dict = {
-            'file_id': "NOTVALIDDONTMATTER",
-            'file_path':
-                'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0'
-                '/document/file_3',
-            'file_size': 28232
+            'file_id': self.file_id,
+            'file_path': self.file_path,
+            'file_size': self.file_size
         }
         new_file = File.de_json(json_dict, bot)
 
@@ -56,25 +61,26 @@ class TestFile:
         assert file_dict['file_path'] == file.file_path
         assert file_dict['file_size'] == file.file_size
 
-    @flaky(3,1)
+    @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
-            bot.get_file(file_id="")
+            bot.get_file(file_id='')
 
-    def test_download(self,monkeypatch, file):
+    def test_download(self, monkeypatch, file):
         def test(*args, **kwargs):
-            raise TelegramError("test worked")
-        monkeypatch.setattr("telegram.utils.request.Request.download", test)
-        with pytest.raises(TelegramError, match="test worked"):
+            raise TelegramError('test worked')
+
+        monkeypatch.setattr('telegram.utils.request.Request.download', test)
+        with pytest.raises(TelegramError, match='test worked'):
             file.download()
 
     def test_equality(self, bot):
-        a = File("DOESNTMATTER", bot)
-        b = File("DOESNTMATTER", bot)
-        c = File("DOESNTMATTER", None)
-        d = File("DOESNTMATTER2", bot)
-        e = Voice("DOESNTMATTER", 0)
+        a = File(self.file_id, bot)
+        b = File(self.file_id, bot)
+        c = File(self.file_id, None)
+        d = File('', bot)
+        e = Voice(self.file_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)

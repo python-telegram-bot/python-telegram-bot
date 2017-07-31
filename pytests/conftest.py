@@ -30,17 +30,17 @@ if TRAVIS:
     pytest_plugins = ['pytests.travis_fold']
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def bot_info():
     return get_bot()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def bot(bot_info):
     return Bot(bot_info['token'])
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def chat_id(bot_info):
     return bot_info['chat_id']
 

@@ -23,7 +23,7 @@ import pytest
 from telegram import PhotoSize, Animation, Voice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def thumb():
     return PhotoSize(height=50, file_size=1613, file_id='AAQEABPQUWQZAAT7gZuQAAH0bd93VwACAg',
                      width=90)
@@ -40,7 +40,7 @@ def json_dict(thumb):
     }
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def animation(thumb, bot):
     return Animation(file_id=TestAnimation.animation_file_id, thumb=thumb.to_dict(),
                      file_name=TestAnimation.file_name, mime_type=TestAnimation.mime_type,

@@ -23,12 +23,12 @@ import pytest
 from telegram import User, ChosenInlineResult, Location, Voice
 
 
-@pytest.fixture(scope="class")
-def user(bot):
+@pytest.fixture(scope='class')
+def user():
     return User(1, 'First name')
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def chosen_inline_result(user):
     return ChosenInlineResult(TestChosenInlineResult.result_id, user, TestChosenInlineResult.query)
 
@@ -66,18 +66,18 @@ class TestChosenInlineResult:
         json.loads(chosen_inline_result.to_json())
 
     def test_choseninlineresult_to_dict(self, chosen_inline_result):
-        result = chosen_inline_result.to_dict()
+        choseninlineresult_dict = chosen_inline_result.to_dict()
 
-        assert isinstance(result, dict)
-        assert result['result_id'] == chosen_inline_result.result_id
-        assert result['from'] == chosen_inline_result.from_user.to_dict()
-        assert result['query'] == chosen_inline_result.query
+        assert isinstance(choseninlineresult_dict, dict)
+        assert choseninlineresult_dict['result_id'] == chosen_inline_result.result_id
+        assert choseninlineresult_dict['from'] == chosen_inline_result.from_user.to_dict()
+        assert choseninlineresult_dict['query'] == chosen_inline_result.query
 
-    def test_equality(self):
-        a = ChosenInlineResult(self.result_id, None, "Query", "")
-        b = ChosenInlineResult(self.result_id, None, "Query", "")
-        c = ChosenInlineResult(self.result_id, None, "", "")
-        d = ChosenInlineResult("", None, "Query", "")
+    def test_equality(self, user):
+        a = ChosenInlineResult(self.result_id, user, 'Query', '')
+        b = ChosenInlineResult(self.result_id, user, 'Query', '')
+        c = ChosenInlineResult(self.result_id, user, '', '')
+        d = ChosenInlineResult('', user, 'Query', '')
         e = Voice(self.result_id, 0)
 
         assert a == b

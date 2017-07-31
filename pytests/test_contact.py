@@ -23,9 +23,10 @@ import pytest
 from telegram import Contact, Voice
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def contact():
-    return Contact('+11234567890', 'Leandro', 'Toledo', 23)
+    return Contact(TestContact.phone_number, TestContact.first_name, TestContact.last_name,
+                   TestContact.user_id)
 
 
 class TestContact:
@@ -35,8 +36,8 @@ class TestContact:
     user_id = 23
 
     def test_contact_de_json_required(self, bot):
-        contact = Contact.de_json(
-            {'phone_number': self.phone_number, 'first_name': self.first_name}, bot)
+        contact = Contact.de_json({'phone_number': self.phone_number,
+                                   'first_name': self.first_name}, bot)
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
@@ -71,9 +72,9 @@ class TestContact:
     def test_equality(self):
         a = Contact(self.phone_number, self.first_name)
         b = Contact(self.phone_number, self.first_name)
-        c = Contact(self.phone_number, "")
-        d = Contact("", self.first_name)
-        e = Voice("", 0)
+        c = Contact(self.phone_number, '')
+        d = Contact('', self.first_name)
+        e = Voice('', 0)
 
         assert a == b
         assert hash(a) == hash(b)

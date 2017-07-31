@@ -24,12 +24,12 @@ import pytest
 from telegram import User, ChatMember
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def user():
-    return User(1, "User")
+    return User(1, 'First name')
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def chatmember(user):
     return ChatMember(user, TestChatMember.status)
 
@@ -47,7 +47,8 @@ class TestChatMember:
 
     def test_chatmember_de_json_all_args(self, bot, user):
         time = datetime.datetime.now()
-        json_dict = {'user': user.to_dict(), 'status': self.status,
+        json_dict = {'user': user.to_dict(),
+                     'status': self.status,
                      'until_date': time.timestamp(),
                      'can_be_edited': False,
                      'can_change_info': True,
@@ -91,10 +92,10 @@ class TestChatMember:
         assert chatmember['status'] == chatmember.status
 
     def test_equality(self):
-        a = ChatMember(User(1, ""), ChatMember.ADMINISTRATOR)
-        b = ChatMember(User(1, ""), ChatMember.ADMINISTRATOR)
-        d = ChatMember(User(2, ""), ChatMember.ADMINISTRATOR)
-        d2 = ChatMember(User(1, ""), ChatMember.CREATOR)
+        a = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
+        b = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
+        d = ChatMember(User(2, ''), ChatMember.ADMINISTRATOR)
+        d2 = ChatMember(User(1, ''), ChatMember.CREATOR)
 
         assert a == b
         assert hash(a) == hash(b)

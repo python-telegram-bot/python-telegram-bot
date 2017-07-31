@@ -32,14 +32,14 @@ def document_file():
     f.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def document(bot, chat_id):
     with open('tests/data/telegram.png', 'rb') as f:
         return bot.send_document(chat_id, document=f).document
 
 
 class TestDocument:
-    caption = u'DocumentTest - Caption'
+    caption = 'DocumentTest - Caption'
     document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
 
     def test_creation(self, document):
@@ -82,7 +82,7 @@ class TestDocument:
 
         new_file.download('telegram.png')
 
-        assert os.path.isfile('png')
+        assert os.path.isfile('telegram.png')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -103,8 +103,6 @@ class TestDocument:
     @pytest.mark.timeout(10)
     def test_send_document_resend(self, bot, chat_id, document):
         message = bot.send_document(chat_id=chat_id, document=document.file_id)
-
-        message.document
 
         assert message.document == document
 
@@ -149,7 +147,7 @@ class TestDocument:
     @pytest.mark.timeout(10)
     def test_error_send_document_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_document(chat_id=chat_id, document="")
+            bot.send_document(chat_id=chat_id, document='')
 
     def test_error_document_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
@@ -158,7 +156,7 @@ class TestDocument:
     def test_equality(self, document):
         a = Document(document.file_id)
         b = Document(document.file_id)
-        d = Document("")
+        d = Document('')
         e = Voice(document.file_id, 0)
 
         assert a == b
