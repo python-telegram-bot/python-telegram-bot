@@ -34,8 +34,8 @@ def file(bot):
 
 class TestFile:
     file_id = 'NOTVALIDDOESNOTMATTER'
-    file_path = ('https://api.org/file/bot133505823:'
-                 'AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
+    file_path = (
+    u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
     file_size = 28232
 
     def test_file_de_json(self, bot):
