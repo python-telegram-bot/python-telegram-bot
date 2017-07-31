@@ -37,7 +37,7 @@ class TestChosenInlineResult:
     result_id = 'result id'
     query = 'query text'
 
-    def test_choseninlineresult_de_json_required(self, bot, user):
+    def test_chosen_inline_result_de_json_required(self, bot, user):
         json_dict = {'result_id': self.result_id,
                      'from': user.to_dict(),
                      'query': self.query}
@@ -47,7 +47,7 @@ class TestChosenInlineResult:
         assert result.from_user == user
         assert result.query == self.query
 
-    def test_choseninlineresult_de_json_all(self, bot, user):
+    def test_chosen_inline_result_de_json_all(self, bot, user):
         loc = Location(-42.003, 34.004)
         json_dict = {'result_id': self.result_id,
                      'from': user.to_dict(),
@@ -62,16 +62,16 @@ class TestChosenInlineResult:
         assert result.location == loc
         assert result.inline_message_id == "a random id"
 
-    def test_choseninlineresult_to_json(self, chosen_inline_result):
+    def test_chosen_inline_result_to_json(self, chosen_inline_result):
         json.loads(chosen_inline_result.to_json())
 
-    def test_choseninlineresult_to_dict(self, chosen_inline_result):
-        choseninlineresult_dict = chosen_inline_result.to_dict()
+    def test_chosen_inline_result_to_dict(self, chosen_inline_result):
+        chosen_inline_result_dict = chosen_inline_result.to_dict()
 
-        assert isinstance(choseninlineresult_dict, dict)
-        assert choseninlineresult_dict['result_id'] == chosen_inline_result.result_id
-        assert choseninlineresult_dict['from'] == chosen_inline_result.from_user.to_dict()
-        assert choseninlineresult_dict['query'] == chosen_inline_result.query
+        assert isinstance(chosen_inline_result_dict, dict)
+        assert chosen_inline_result_dict['result_id'] == chosen_inline_result.result_id
+        assert chosen_inline_result_dict['from'] == chosen_inline_result.from_user.to_dict()
+        assert chosen_inline_result_dict['query'] == chosen_inline_result.query
 
     def test_equality(self, user):
         a = ChosenInlineResult(self.result_id, user, 'Query', '')

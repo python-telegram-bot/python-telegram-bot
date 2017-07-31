@@ -35,12 +35,16 @@ CLASS_VARS = r'    def setUp\(self\):\n([\s\S]*?def)'
 if __name__ == '__main__':
     original = Path('tests/' + sys.argv[1]).open('r', encoding='UTF-8').read()
     new_text = header
-    new_text += '\nimport json\n\nimport pytest\n\nfrom telegram import\n\n'
+    new_text += '\nimport json\n\nimport pytest\n\nfrom telegram import '
 
     match = re.search(CLASS, original)
     if not match:
         match = re.search(CLASS[:-11], original)
-    name = 'Test' + match.group(1)
+
+    name = match.group(1)
+    new_text += name + "\n\n"
+    test_name = 'Test' + name
+
     new_class = 'class {}:\n{}'.format(name, match.group(2))
     new_class = re.sub(r'self\._id', 'self.id', new_class)
     new_class = re.sub(r'telegram\.', '', new_class)
@@ -56,14 +60,21 @@ if __name__ == '__main__':
     new_class = re.sub(r'self\.assert(?:Dict)?Equals?\((.*), (.*)\)',
                        r'assert \1 == \2', new_class)
     new_class = re.sub(r'self\.assertNotEquals?\((.*), (.*)\)', r'assert \1 != \2', new_class)
+    new_class = re.sub(r'self\.assertIs\((.*), (.*)\)', r'assert \1 is \2', new_class)
+    new_class = re.sub(r'self\.assertIsNot\((.*), (.*)\)', r'assert \1 is not \2', new_class)
     new_class = re.sub(r'self\._bot', r'bot', new_class)
     new_class = re.sub(r'self\._chat_id,', r'chat_id', new_class)
+
+    name_lower = name.lower()
+    proper_name_lower = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    proper_name_lower = re.sub('([a-z0-9])([A-Z])', r'\1_\2', proper_name_lower).lower()
+    new_class.replace(name_lower, proper_name_lower)
 
     json_dict = re.search(JSON_DICT, new_class)
     if json_dict:
         new_class = re.sub(JSON_DICT, r'\2', new_class)
         new_text += '@pytest.fixture(scope=\'class\')\ndef json_dict():\n    return '
-        new_text += json_dict.group(1).replace('self.', name + '.')
+        new_text += json_dict.group(1).replace('self.', test_name + '.')
         new_text += '\n\n'
 
     class_vars = re.search(CLASS_VARS, new_class)

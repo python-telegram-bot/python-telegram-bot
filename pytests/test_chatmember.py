@@ -30,22 +30,22 @@ def user():
 
 
 @pytest.fixture(scope='class')
-def chatmember(user):
+def chat_member(user):
     return ChatMember(user, TestChatMember.status)
 
 
 class TestChatMember:
     status = ChatMember.CREATOR
 
-    def test_chatmember_de_json_required_args(self, bot, user):
+    def test_chat_member_de_json_required_args(self, bot, user):
         json_dict = {'user': user.to_dict(), 'status': self.status}
 
-        chatmember = ChatMember.de_json(json_dict, bot)
+        chat_member = ChatMember.de_json(json_dict, bot)
 
-        assert chatmember.user == user
-        assert chatmember.status == self.status
+        assert chat_member.user == user
+        assert chat_member.status == self.status
 
-    def test_chatmember_de_json_all_args(self, bot, user):
+    def test_chat_member_de_json_all_args(self, bot, user):
         time = datetime.datetime.now()
         json_dict = {'user': user.to_dict(),
                      'status': self.status,
@@ -64,32 +64,32 @@ class TestChatMember:
                      'can_send_other_messages': False,
                      'can_add_web_page_previews': True}
 
-        chatmember = ChatMember.de_json(json_dict, bot)
+        chat_member = ChatMember.de_json(json_dict, bot)
 
-        assert chatmember.user == user
-        assert chatmember.status == self.status
-        assert chatmember.can_be_edited is False
-        assert chatmember.can_change_info is True
-        assert chatmember.can_post_messages is False
-        assert chatmember.can_edit_messages is True
-        assert chatmember.can_delete_messages is True
-        assert chatmember.can_invite_users is False
-        assert chatmember.can_restrict_members is True
-        assert chatmember.can_pin_messages is False
-        assert chatmember.can_promote_members is True
-        assert chatmember.can_send_messages is False
-        assert chatmember.can_send_media_messages is True
-        assert chatmember.can_send_other_messages is False
-        assert chatmember.can_add_web_page_previews is True
+        assert chat_member.user == user
+        assert chat_member.status == self.status
+        assert chat_member.can_be_edited is False
+        assert chat_member.can_change_info is True
+        assert chat_member.can_post_messages is False
+        assert chat_member.can_edit_messages is True
+        assert chat_member.can_delete_messages is True
+        assert chat_member.can_invite_users is False
+        assert chat_member.can_restrict_members is True
+        assert chat_member.can_pin_messages is False
+        assert chat_member.can_promote_members is True
+        assert chat_member.can_send_messages is False
+        assert chat_member.can_send_media_messages is True
+        assert chat_member.can_send_other_messages is False
+        assert chat_member.can_add_web_page_previews is True
 
-    def test_chatmember_to_json(self, chatmember):
-        json.loads(chatmember.to_json())
+    def test_chat_member_to_json(self, chat_member):
+        json.loads(chat_member.to_json())
 
-    def test_chatmember_to_dict(self, chatmember):
-        chatmember_dict = chatmember.to_dict()
-        assert isinstance(chatmember_dict, dict)
-        assert chatmember_dict['user'] == chatmember.user.to_dict()
-        assert chatmember['status'] == chatmember.status
+    def test_chat_member_to_dict(self, chat_member):
+        chat_member_dict = chat_member.to_dict()
+        assert isinstance(chat_member_dict, dict)
+        assert chat_member_dict['user'] == chat_member.user.to_dict()
+        assert chat_member['status'] == chat_member.status
 
     def test_equality(self):
         a = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
