@@ -52,6 +52,7 @@ class TestContact:
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
 
+    @pytest.mark.xfail(reason='"Flood control exceeded. Retry in many seconds" errors')
     def test_send_contact_with_contact(self, bot, chat_id, contact):
         message = bot.send_contact(contact=contact, chat_id=chat_id)
 
