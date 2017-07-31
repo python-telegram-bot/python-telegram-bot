@@ -22,6 +22,7 @@ import json
 import pytest
 
 from telegram import User, ChatMember
+from telegram.utils.helpers import to_timestamp
 
 
 @pytest.fixture(scope='class')
@@ -49,7 +50,7 @@ class TestChatMember:
         time = datetime.datetime.now()
         json_dict = {'user': user.to_dict(),
                      'status': self.status,
-                     'until_date': time.timestamp(),
+                     'until_date': to_timestamp(time),
                      'can_be_edited': False,
                      'can_change_info': True,
                      'can_post_messages': False,
