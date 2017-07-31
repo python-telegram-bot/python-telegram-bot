@@ -18,10 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
 import subprocess
+import sys
 from platform import python_implementation
 
 import pytest
-import sys
 
 
 def call_pre_commit_hook(hook_id):
@@ -36,3 +36,7 @@ def call_pre_commit_hook(hook_id):
                            'as they are slow and consistent across platforms.')
 def test_pre_commit_hook(hook_id):
     assert call_pre_commit_hook(hook_id) == 0
+
+
+def test_build():
+    assert subprocess.call(['python', 'setup.py', 'bdist_dumb']) == 0
