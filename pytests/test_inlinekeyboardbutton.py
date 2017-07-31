@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from telegram import
+from telegram import InlineKeyboardButton
 
 
 @pytest.fixture(scope='class')
@@ -29,44 +29,60 @@ def json_dict():
         'text': TestInlineKeyboardButton.text,
         'url': TestInlineKeyboardButton.url,
         'callback_data': TestInlineKeyboardButton.callback_data,
-        'switch_inline_query': TestInlineKeyboardButton.switch_inline_query
+        'switch_inline_query': TestInlineKeyboardButton.switch_inline_query,
+        'switch_inline_query_current_chat':
+            TestInlineKeyboardButton.switch_inline_query_current_chat,
+        'callback_game': TestInlineKeyboardButton.callback_game,
+        'pay': TestInlineKeyboardButton.pay
     }
 
 
-class TestInlineKeyboardButton:
-    """This object represents Tests for Telegram KeyboardButton."""
+@pytest.fixture(scope='class')
+def inline_keyboard_button():
+    return InlineKeyboardButton(TestInlineKeyboardButton.text,
+                                url=TestInlineKeyboardButton.url,
+                                callback_data=TestInlineKeyboardButton.callback_data,
+                                switch_inline_query=TestInlineKeyboardButton.switch_inline_query,
+                                switch_inline_query_current_chat=TestInlineKeyboardButton
+                                .switch_inline_query_current_chat,
+                                callback_game=TestInlineKeyboardButton.callback_game,
+                                pay=TestInlineKeyboardButton.pay)
 
+
+class TestInlineKeyboardButton:
     text = 'text'
     url = 'url'
     callback_data = 'callback data'
-    switch_inline_query = ''
+    switch_inline_query = 'switch_inline_query'
+    switch_inline_query_current_chat = 'switch_inline_query_current_chat'
+    callback_game = 'callback_game'
+    pay = 'pay'
 
-    def test_inline_keyboard_button_de_json(self):
+    def test_inline_keyboard_button_de_json(self, json_dict, bot):
         inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, bot)
 
         assert inline_keyboard_button.text == self.text
         assert inline_keyboard_button.url == self.url
         assert inline_keyboard_button.callback_data == self.callback_data
         assert inline_keyboard_button.switch_inline_query == self.switch_inline_query
+        assert inline_keyboard_button.switch_inline_query_current_chat == \
+            self.switch_inline_query_current_chat
+        assert inline_keyboard_button.callback_game == self.callback_game
+        assert inline_keyboard_button.pay == self.pay
 
-    def test_inline_keyboard_button_de_json_empty(self):
+    def test_inline_keyboard_button_de_json_empty(self, bot):
         inline_keyboard_button = InlineKeyboardButton.de_json(None, bot)
 
-        assert inline_keyboard_button is False
+        assert inline_keyboard_button is None
 
-    def test_inline_keyboard_button_de_list_empty(self):
+    def test_inline_keyboard_button_de_list_empty(self, bot):
         inline_keyboard_button = InlineKeyboardButton.de_list(None, bot)
 
-        assert inline_keyboard_button is False
+        assert inline_keyboard_button == []
 
-    def test_inline_keyboard_button_to_json(self):
-        inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, bot)
-
+    def test_inline_keyboard_button_to_json(self, inline_keyboard_button):
         json.loads(inline_keyboard_button.to_json())
 
-    def test_inline_keyboard_button_to_dict(self):
-        inline_keyboard_button = InlineKeyboardButton.de_json(json_dict,
-                                                              bot).to_dict()
-
-        assert isinstance(inline_keyboard_button, dict)
-        assert json_dict == inline_keyboard_button
+    def test_inline_keyboard_button_to_dict(self, json_dict, inline_keyboard_button):
+        inline_keyboard_button_dict = inline_keyboard_button.to_dict()
+        assert inline_keyboard_button_dict == json_dict
