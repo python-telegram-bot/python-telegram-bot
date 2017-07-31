@@ -38,19 +38,6 @@ def audio(bot, chat_id):
         return bot.send_audio(chat_id, audio=f, timeout=10).audio
 
 
-@pytest.fixture()
-def json_dict(audio):
-    return {
-        'file_id': audio.file_id,
-        'duration': audio.duration,
-        'performer': TestAudio.performer,
-        'title': TestAudio.title,
-        'caption': TestAudio.caption,
-        'mime_type': audio.mime_type,
-        'file_size': audio.file_size
-    }
-
-
 class TestAudio:
     """This object represents Tests for Telegram Audio."""
 
@@ -134,8 +121,12 @@ class TestAudio:
 
         assert message.audio == audio
 
-    def test_audio_de_json(self, json_dict, bot, audio):
-        json_audio = Audio.de_json(json_dict, bot)
+    def test_audio_de_json(self, bot, audio):
+        json_audio = Audio.de_json({'file_id': audio.file_id, 'duration': audio.duration,
+                                    'performer': TestAudio.performer, 'title': TestAudio.title,
+                                    'caption': TestAudio.caption, 'mime_type': audio.mime_type,
+                                    'file_size': audio.file_size},
+                                   bot)
 
         assert isinstance(json_audio, Audio)
         assert json_audio.file_id == audio.file_id
@@ -173,22 +164,9 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_audio_without_required_args(self, bot, chat_id, json_dict):
-        del (json_dict['file_id'])
-        del (json_dict['duration'])
-
+    def test_error_audio_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_audio(chat_id=chat_id, **json_dict)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_reply_audio(self, bot, chat_id, audio_file):
-        message = bot.send_message(chat_id, '.')
-        audio = message.reply_audio(audio_file).audio
-
-        assert isinstance(audio, Audio)
-        assert isinstance(audio.file_id, str)
-        assert audio.file_id is not None
+            bot.send_audio(chat_id=chat_id)
 
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.duration)
