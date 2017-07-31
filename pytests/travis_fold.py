@@ -1,8 +1,8 @@
+import time
 from collections import defaultdict
 
 import _pytest.config
 import pytest
-import time
 
 fold_plugins = {'_cov': 'Coverage report', 'flaky': 'Flaky report'}
 
@@ -74,5 +74,5 @@ def pytest_runtest_protocol(item, nextitem):
             terminal.write('\n\ntravis_fold:end:{}'.format(name.split('::')[1]))
         terminal.write('\rtravis_time:end:{}time:'
                        'duration={}'.format(name.split('::')[1],
-                                              int(durations[name]*1E9)))
+                                            int(durations[name] * 1E9)))
         time.sleep(0.001)  # Tiny sleep so travis hopefully doesn't mangle the log
