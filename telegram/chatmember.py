@@ -59,7 +59,7 @@ class ChatMember(TelegramObject):
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be 'creator', 'administrator',
-            'member', 'left' or 'kicked'.
+            'member', 'restricted', 'left' or 'kicked'.
         until_date (:class:`datetime.datetime`, optional): Restricted and kicked only. Date when
             restrictions will be lifted for this user.
         can_be_edited (:obj:`bool`, optional): Administrators only. True, if the bot is allowed to
@@ -103,6 +103,8 @@ class ChatMember(TelegramObject):
     """:obj:`str`: 'left'"""
     MEMBER = 'member'
     """:obj:`str`: 'member'"""
+    RESTRICTED = 'restricted'
+    """:obj:`str`: 'restricted'"""
 
     def __init__(self, user, status, until_date=None, can_be_edited=None,
                  can_change_info=None, can_post_messages=None, can_edit_messages=None,
