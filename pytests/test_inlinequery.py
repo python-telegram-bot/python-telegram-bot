@@ -57,7 +57,7 @@ class TestInlineQuery:
 
     def test_inlinequery_to_dict(self, inlinequery):
         inlinequery_dict = inlinequery.to_dict()
-        
+
         assert isinstance(inlinequery_dict, dict)
         assert inlinequery_dict['id'] == inlinequery.id
         assert inlinequery_dict['from'] == inlinequery.from_user.to_dict()
