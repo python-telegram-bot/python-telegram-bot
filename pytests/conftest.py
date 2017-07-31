@@ -24,7 +24,7 @@ import pytest
 from pytests.bots import get_bot
 from telegram import Bot
 
-TRAVIS = os.getenv('TRAVIS', True)
+TRAVIS = os.getenv('TRAVIS', False)
 
 if TRAVIS:
     pytest_plugins = ['pytests.travis_fold']

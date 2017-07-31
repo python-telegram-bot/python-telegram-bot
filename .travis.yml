@@ -30,7 +30,7 @@ install:
 
 script:
 #  - python travis.py
-  - pytest pytests --cov=telegram
+  - pytest -v --cov=telegram pytests
 
 after_success:
   coveralls
