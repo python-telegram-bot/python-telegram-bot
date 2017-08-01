@@ -25,27 +25,9 @@ from telegram import (InlineKeyboardMarkup, InlineQueryResultAudio, InlineQueryR
 
 
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'type': TestInlineQueryResultArticle.type,
-        'id': TestInlineQueryResultArticle.id,
-        'title': TestInlineQueryResultArticle.title,
-        'input_message_content': TestInlineQueryResultArticle.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultArticle.reply_markup.to_dict(),
-        'url': TestInlineQueryResultArticle.url,
-        'hide_url': TestInlineQueryResultArticle.hide_url,
-        'description': TestInlineQueryResultArticle.description,
-        'thumb_url': TestInlineQueryResultArticle.thumb_url,
-        'thumb_height': TestInlineQueryResultArticle.thumb_height,
-        'thumb_width': TestInlineQueryResultArticle.thumb_width
-    }
-
-
-@pytest.fixture(scope='class')
 def inline_query_result_article():
-    return InlineQueryResultArticle(type=TestInlineQueryResultArticle.type,
-                                    id=TestInlineQueryResultArticle.id,
-                                    title=TestInlineQueryResultArticle.title,
+    return InlineQueryResultArticle(TestInlineQueryResultArticle.id,
+                                    TestInlineQueryResultArticle.title,
                                     input_message_content=TestInlineQueryResultArticle.input_message_content,
                                     reply_markup=TestInlineQueryResultArticle.reply_markup,
                                     url=TestInlineQueryResultArticle.url,
@@ -72,32 +54,39 @@ class TestInlineQueryResultArticle:
     thumb_height = 10
     thumb_width = 15
 
-    def test_article_de_json(self):
-        article = InlineQueryResultArticle.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_article, bot):
+        assert inline_query_result_article.type == self.type
+        assert inline_query_result_article.id == self.id
+        assert inline_query_result_article.title == self.title
+        assert inline_query_result_article.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_article.reply_markup.to_dict() == self.reply_markup.to_dict()
+        assert inline_query_result_article.url == self.url
+        assert inline_query_result_article.hide_url == self.hide_url
+        assert inline_query_result_article.description == self.description
+        assert inline_query_result_article.thumb_url == self.thumb_url
+        assert inline_query_result_article.thumb_height == self.thumb_height
+        assert inline_query_result_article.thumb_width == self.thumb_width
 
-        assert article.type == self.type
-        assert article.id == self.id
-        assert article.title == self.title
-        self.assertDictEqual(article.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert article.reply_markup.to_dict() == self.reply_markup.to_dict()
-        assert article.url == self.url
-        assert article.hide_url == self.hide_url
-        assert article.description == self.description
-        assert article.thumb_url == self.thumb_url
-        assert article.thumb_height == self.thumb_height
-        assert article.thumb_width == self.thumb_width
+    def test_to_json(self, inline_query_result_article):
+        json.loads(inline_query_result_article.to_json())
 
-    def test_article_to_json(self):
-        article = InlineQueryResultArticle.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_article):
+        inline_query_result_article_dict = inline_query_result_article.to_dict()
 
-        json.loads(article.to_json())
-
-    def test_article_to_dict(self):
-        article = InlineQueryResultArticle.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(article, dict)
-        assert json_dict == article
+        assert isinstance(inline_query_result_article_dict, dict)
+        assert inline_query_result_article_dict['type'] == self.type
+        assert inline_query_result_article_dict['id'] == self.id
+        assert inline_query_result_article_dict['title'] == self.title
+        assert inline_query_result_article_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_article_dict['reply_markup'] == self.reply_markup.to_dict()
+        assert inline_query_result_article_dict['url'] == self.url
+        assert inline_query_result_article_dict['hide_url'] == self.hide_url
+        assert inline_query_result_article_dict['description'] == self.description
+        assert inline_query_result_article_dict['thumb_url'] == self.thumb_url
+        assert inline_query_result_article_dict['thumb_height'] == self.thumb_height
+        assert inline_query_result_article_dict['thumb_width'] == self.thumb_width
 
     def test_equality(self):
         a = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
