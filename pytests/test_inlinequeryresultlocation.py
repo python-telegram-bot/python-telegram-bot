@@ -69,18 +69,23 @@ class TestInlineQueryResultLocation:
         inline_query_result_location_dict = inline_query_result_location.to_dict()
 
         assert isinstance(inline_query_result_location_dict, dict)
-        assert inline_query_result_location_dict['id'] == self.id
-        assert inline_query_result_location_dict['type'] == self.type
-        assert inline_query_result_location_dict['latitude'] == self.latitude
-        assert inline_query_result_location_dict['longitude'] == self.longitude
-        assert inline_query_result_location_dict['title'] == self.title
-        assert inline_query_result_location_dict['thumb_url'] == self.thumb_url
-        assert inline_query_result_location_dict['thumb_width'] == self.thumb_width
-        assert inline_query_result_location_dict['thumb_height'] == self.thumb_height
+        assert inline_query_result_location_dict['id'] == inline_query_result_location.id
+        assert inline_query_result_location_dict['type'] == inline_query_result_location.type
+        assert inline_query_result_location_dict[
+                   'latitude'] == inline_query_result_location.latitude
+        assert inline_query_result_location_dict[
+                   'longitude'] == inline_query_result_location.longitude
+        assert inline_query_result_location_dict['title'] == inline_query_result_location.title
+        assert inline_query_result_location_dict[
+                   'thumb_url'] == inline_query_result_location.thumb_url
+        assert inline_query_result_location_dict[
+                   'thumb_width'] == inline_query_result_location.thumb_width
+        assert inline_query_result_location_dict[
+                   'thumb_height'] == inline_query_result_location.thumb_height
         assert inline_query_result_location_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
+               inline_query_result_location.input_message_content.to_dict()
         assert inline_query_result_location_dict['reply_markup'] == \
-               self.reply_markup.to_dict()
+               inline_query_result_location.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)

@@ -44,9 +44,12 @@ class TestAudio:
     caption = 'Test audio'
     performer = 'Leandro Toledo'
     title = 'Teste'
+    duration = 3
     # audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
     # Shortened link, the above one is cached with the wrong duration.
     audio_file_url = 'https://goo.gl/3En24v'
+    mime_type = 'audio/mpeg'
+    file_size = 122920
 
     @staticmethod
     def test_creation(audio):
@@ -56,17 +59,17 @@ class TestAudio:
         assert audio.file_id is not ''
 
     def test_expected_values(self, audio):
-        assert audio.duration == 3
+        assert audio.duration == self.duration
         assert audio.performer is None
         assert audio.title is None
-        assert audio.mime_type == 'audio/mpeg'
-        assert audio.file_size == 122920
+        assert audio.mime_type == self.mime_type
+        assert audio.file_size == self.file_size
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, audio_file, audio):
         message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
-                                 duration=audio.duration, performer=self.performer,
+                                 duration=self.duration, performer=self.performer,
                                  title=self.title, disable_notification=False)
 
         assert message.caption == self.caption
@@ -74,18 +77,18 @@ class TestAudio:
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)
         assert message.audio.file_id is not None
-        assert message.audio.duration == audio.duration
+        assert message.audio.duration == self.duration
         assert message.audio.performer == self.performer
         assert message.audio.title == self.title
-        assert message.audio.mime_type == audio.mime_type
-        assert message.audio.file_size == audio.file_size
+        assert message.audio.mime_type == self.mime_type
+        assert message.audio.file_size == self.file_size
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, audio):
         new_file = bot.get_file(audio.file_id)
 
-        assert new_file.file_size == audio.file_size
+        assert new_file.file_size == self.file_size
         assert new_file.file_id == audio.file_id
         assert new_file.file_path.startswith('https://')
 
@@ -123,18 +126,21 @@ class TestAudio:
         assert message
 
     def test_de_json(self, bot, audio):
-        json_audio = Audio.de_json({'file_id': audio.file_id, 'duration': audio.duration,
-                                    'performer': TestAudio.performer, 'title': TestAudio.title,
-                                    'caption': TestAudio.caption, 'mime_type': audio.mime_type,
-                                    'file_size': audio.file_size},
-                                   bot)
+        json_dict = {'file_id': audio.file_id,
+                     'duration': self.duration,
+                     'performer': self.performer,
+                     'title': self.title,
+                     'caption': self.caption,
+                     'mime_type': self.mime_type,
+                     'file_size': self.file_size}
+        json_audio = Audio.de_json(json_dict, bot)
 
         assert json_audio.file_id == audio.file_id
-        assert json_audio.duration == audio.duration
+        assert json_audio.duration == self.duration
         assert json_audio.performer == self.performer
         assert json_audio.title == self.title
-        assert json_audio.mime_type == audio.mime_type
-        assert json_audio.file_size == audio.file_size
+        assert json_audio.mime_type == self.mime_type
+        assert json_audio.file_size == self.file_size
 
     def test_to_json(self, audio):
         json.loads(audio.to_json())
@@ -162,8 +168,6 @@ class TestAudio:
         with pytest.raises(TelegramError):
             bot.send_audio(chat_id=chat_id, audio="")
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_audio_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_audio(chat_id=chat_id)

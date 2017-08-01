@@ -72,18 +72,19 @@ class TestInlineQueryResultGif:
         inline_query_result_gif_dict = inline_query_result_gif.to_dict()
 
         assert isinstance(inline_query_result_gif_dict, dict)
-        assert inline_query_result_gif_dict['type'] == self.type
-        assert inline_query_result_gif_dict['id'] == self.id
-        assert inline_query_result_gif_dict['gif_url'] == self.gif_url
-        assert inline_query_result_gif_dict['gif_width'] == self.gif_width
-        assert inline_query_result_gif_dict['gif_height'] == self.gif_height
-        assert inline_query_result_gif_dict['gif_duration'] == self.gif_duration
-        assert inline_query_result_gif_dict['thumb_url'] == self.thumb_url
-        assert inline_query_result_gif_dict['title'] == self.title
-        assert inline_query_result_gif_dict['caption'] == self.caption
+        assert inline_query_result_gif_dict['type'] == inline_query_result_gif.type
+        assert inline_query_result_gif_dict['id'] == inline_query_result_gif.id
+        assert inline_query_result_gif_dict['gif_url'] == inline_query_result_gif.gif_url
+        assert inline_query_result_gif_dict['gif_width'] == inline_query_result_gif.gif_width
+        assert inline_query_result_gif_dict['gif_height'] == inline_query_result_gif.gif_height
+        assert inline_query_result_gif_dict['gif_duration'] == inline_query_result_gif.gif_duration
+        assert inline_query_result_gif_dict['thumb_url'] == inline_query_result_gif.thumb_url
+        assert inline_query_result_gif_dict['title'] == inline_query_result_gif.title
+        assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
         assert inline_query_result_gif_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
-        assert inline_query_result_gif_dict['reply_markup'] == self.reply_markup.to_dict()
+               inline_query_result_gif.input_message_content.to_dict()
+        assert inline_query_result_gif_dict[
+                   'reply_markup'] == inline_query_result_gif.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)

@@ -64,16 +64,21 @@ class TestInlineQueryResultCachedVideo:
         inline_query_result_cached_video_dict = inline_query_result_cached_video.to_dict()
 
         assert isinstance(inline_query_result_cached_video_dict, dict)
-        assert inline_query_result_cached_video_dict['type'] == self.type
-        assert inline_query_result_cached_video_dict['id'] == self.id
-        assert inline_query_result_cached_video_dict['video_file_id'] == self.video_file_id
-        assert inline_query_result_cached_video_dict['title'] == self.title
-        assert inline_query_result_cached_video_dict['description'] == self.description
-        assert inline_query_result_cached_video_dict['caption'] == self.caption
+        assert inline_query_result_cached_video_dict[
+                   'type'] == inline_query_result_cached_video.type
+        assert inline_query_result_cached_video_dict['id'] == inline_query_result_cached_video.id
+        assert inline_query_result_cached_video_dict[
+                   'video_file_id'] == inline_query_result_cached_video.video_file_id
+        assert inline_query_result_cached_video_dict[
+                   'title'] == inline_query_result_cached_video.title
+        assert inline_query_result_cached_video_dict[
+                   'description'] == inline_query_result_cached_video.description
+        assert inline_query_result_cached_video_dict[
+                   'caption'] == inline_query_result_cached_video.caption
         assert inline_query_result_cached_video_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
+               inline_query_result_cached_video.input_message_content.to_dict()
         assert inline_query_result_cached_video_dict['reply_markup'] == \
-               self.reply_markup.to_dict()
+               inline_query_result_cached_video.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)

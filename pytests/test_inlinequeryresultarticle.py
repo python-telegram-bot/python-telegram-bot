@@ -51,7 +51,7 @@ class TestInlineQueryResultArticle:
     thumb_height = 10
     thumb_width = 15
 
-    def test_expected_values(self, inline_query_result_article, bot):
+    def test_expected_values(self, inline_query_result_article):
         assert inline_query_result_article.type == self.type
         assert inline_query_result_article.id == self.id
         assert inline_query_result_article.title == self.title
@@ -72,18 +72,23 @@ class TestInlineQueryResultArticle:
         inline_query_result_article_dict = inline_query_result_article.to_dict()
 
         assert isinstance(inline_query_result_article_dict, dict)
-        assert inline_query_result_article_dict['type'] == self.type
-        assert inline_query_result_article_dict['id'] == self.id
-        assert inline_query_result_article_dict['title'] == self.title
+        assert inline_query_result_article_dict['type'] == inline_query_result_article.type
+        assert inline_query_result_article_dict['id'] == inline_query_result_article.id
+        assert inline_query_result_article_dict['title'] == inline_query_result_article.title
         assert inline_query_result_article_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
-        assert inline_query_result_article_dict['reply_markup'] == self.reply_markup.to_dict()
-        assert inline_query_result_article_dict['url'] == self.url
-        assert inline_query_result_article_dict['hide_url'] == self.hide_url
-        assert inline_query_result_article_dict['description'] == self.description
-        assert inline_query_result_article_dict['thumb_url'] == self.thumb_url
-        assert inline_query_result_article_dict['thumb_height'] == self.thumb_height
-        assert inline_query_result_article_dict['thumb_width'] == self.thumb_width
+               inline_query_result_article.input_message_content.to_dict()
+        assert inline_query_result_article_dict[
+                   'reply_markup'] == inline_query_result_article.reply_markup.to_dict()
+        assert inline_query_result_article_dict['url'] == inline_query_result_article.url
+        assert inline_query_result_article_dict['hide_url'] == inline_query_result_article.hide_url
+        assert inline_query_result_article_dict[
+                   'description'] == inline_query_result_article.description
+        assert inline_query_result_article_dict[
+                   'thumb_url'] == inline_query_result_article.thumb_url
+        assert inline_query_result_article_dict[
+                   'thumb_height'] == inline_query_result_article.thumb_height
+        assert inline_query_result_article_dict[
+                   'thumb_width'] == inline_query_result_article.thumb_width
 
     def test_equality(self):
         a = InlineQueryResultArticle(self.id, self.title, self.input_message_content)

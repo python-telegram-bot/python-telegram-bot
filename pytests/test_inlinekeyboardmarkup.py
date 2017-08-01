@@ -51,7 +51,7 @@ class TestInlineKeyboardMarkup:
         }
         inline_keyboard_markup_json = InlineKeyboardMarkup.de_json(json_dict, bot)
 
-        assert inline_keyboard_markup_json == inline_keyboard_markup
+        assert inline_keyboard_markup_json.to_dict() == inline_keyboard_markup.to_dict()
 
     def test_to_json(self, inline_keyboard_markup):
         json.loads(inline_keyboard_markup.to_json())

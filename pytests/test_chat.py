@@ -26,12 +26,7 @@ from telegram import User
 
 @pytest.fixture(scope='class')
 def json_dict():
-    return {
-        'id': TestChat.id,
-        'title': TestChat.title,
-        'type': TestChat.type,
-        'all_members_are_administrators': TestChat.all_members_are_administrators
-    }
+    return
 
 
 @pytest.fixture(scope='class')
@@ -42,13 +37,18 @@ def chat(bot, json_dict):
 
 
 class TestChat:
-    """This object represents Tests for Chat."""
     id = -28767330
     title = 'ToledosPalaceBot - Group'
     type = 'group'
     all_members_are_administrators = False
 
-    def test_de_json(self, bot, json_dict):
+    def test_de_json(self, bot):
+        json_dict = {
+            'id': TestChat.id,
+            'title': TestChat.title,
+            'type': TestChat.type,
+            'all_members_are_administrators': TestChat.all_members_are_administrators
+        }
         chat = Chat.de_json(json_dict, bot)
 
         assert chat.id == self.id

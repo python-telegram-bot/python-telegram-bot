@@ -37,12 +37,7 @@ class TestForceReply:
 
         assert message.text == 'text'
 
-    def test_de_json(self, bot):
-        json_dict = {
-            'selective': self.selective,
-        }
-        force_reply = ForceReply.de_json(json_dict, bot)
-
+    def test_expected(self, force_reply):
         assert force_reply.force_reply == self.force_reply
         assert force_reply.selective == self.selective
 
@@ -52,6 +47,6 @@ class TestForceReply:
     def test_to_dict(self, force_reply):
         force_reply_dict = force_reply.to_dict()
 
-        assert isinstance(force_reply_dict,dict)
-        assert force_reply_dict['force_reply'] == self.force_reply
-        assert force_reply_dict['selective'] == self.selective
+        assert isinstance(force_reply_dict, dict)
+        assert force_reply_dict['force_reply'] == force_reply.force_reply
+        assert force_reply_dict['selective'] == force_reply.selective

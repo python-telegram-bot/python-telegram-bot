@@ -36,16 +36,16 @@ class TestContact:
     user_id = 23
 
     def test_de_json_required(self, bot):
-        contact = Contact.de_json({'phone_number': self.phone_number,
-                                   'first_name': self.first_name}, bot)
+        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name}
+        contact = Contact.de_json(json_dict, bot)
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
 
     def test_de_json_all(self, bot):
-        contact = Contact.de_json(
-            {'phone_number': self.phone_number, 'first_name': self.first_name,
-             'last_name': self.last_name, 'user_id': self.user_id}, bot)
+        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name,
+                     'last_name': self.last_name, 'user_id': self.user_id}
+        contact = Contact.de_json(json_dict, bot)
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name

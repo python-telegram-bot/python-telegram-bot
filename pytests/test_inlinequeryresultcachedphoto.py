@@ -44,7 +44,7 @@ class TestInlineQueryResultCachedPhoto:
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
-    
+
     def test_expected_values(self, inline_query_result_cached_photo):
         assert inline_query_result_cached_photo.type == self.type
         assert inline_query_result_cached_photo.id == self.id
@@ -64,16 +64,21 @@ class TestInlineQueryResultCachedPhoto:
         inline_query_result_cached_photo_dict = inline_query_result_cached_photo.to_dict()
 
         assert isinstance(inline_query_result_cached_photo_dict, dict)
-        assert inline_query_result_cached_photo_dict['type'] == self.type
-        assert inline_query_result_cached_photo_dict['id'] == self.id
-        assert inline_query_result_cached_photo_dict['photo_file_id'] == self.photo_file_id
-        assert inline_query_result_cached_photo_dict['title'] == self.title
-        assert inline_query_result_cached_photo_dict['description'] == self.description
-        assert inline_query_result_cached_photo_dict['caption'] == self.caption
+        assert inline_query_result_cached_photo_dict[
+                   'type'] == inline_query_result_cached_photo.type
+        assert inline_query_result_cached_photo_dict['id'] == inline_query_result_cached_photo.id
+        assert inline_query_result_cached_photo_dict[
+                   'photo_file_id'] == inline_query_result_cached_photo.photo_file_id
+        assert inline_query_result_cached_photo_dict[
+                   'title'] == inline_query_result_cached_photo.title
+        assert inline_query_result_cached_photo_dict[
+                   'description'] == inline_query_result_cached_photo.description
+        assert inline_query_result_cached_photo_dict[
+                   'caption'] == inline_query_result_cached_photo.caption
         assert inline_query_result_cached_photo_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
+               inline_query_result_cached_photo.input_message_content.to_dict()
         assert inline_query_result_cached_photo_dict['reply_markup'] == \
-               self.reply_markup.to_dict()
+               inline_query_result_cached_photo.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedPhoto(self.id, self.photo_file_id)

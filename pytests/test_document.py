@@ -41,6 +41,12 @@ def document(bot, chat_id):
 class TestDocument:
     caption = 'DocumentTest - Caption'
     document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
+    file_size = 12948
+    mime_type = 'image/png'
+    file_name = 'telegram.png'
+    thumb_file_size = 2364
+    thumb_width = 90
+    thumb_heigth = 90
 
     def test_creation(self, document):
         assert isinstance(document, Document)
@@ -48,12 +54,12 @@ class TestDocument:
         assert document.file_id is not ''
 
     def test_expected_values(self, document):
-        assert document.file_size == 12948
-        assert document.mime_type == 'image/png'
-        assert document.file_name == 'telegram.png'
-        assert document.thumb.file_size == 2364
-        assert document.thumb.width == 90
-        assert document.thumb.height == 90
+        assert document.file_size == self.file_size
+        assert document.mime_type == self.mime_type
+        assert document.file_name == self.file_name
+        assert document.thumb.file_size == self.thumb_file_size
+        assert document.thumb.width == self.thumb_width
+        assert document.thumb.height == self.thumb_heigth
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

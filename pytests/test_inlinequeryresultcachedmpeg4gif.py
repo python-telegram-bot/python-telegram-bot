@@ -61,15 +61,20 @@ class TestInlineQueryResultCachedMpeg4Gif:
         inline_query_result_cached_mpeg4_gif_dict = inline_query_result_cached_mpeg4_gif.to_dict()
 
         assert isinstance(inline_query_result_cached_mpeg4_gif_dict, dict)
-        assert inline_query_result_cached_mpeg4_gif_dict['type'] == self.type
-        assert inline_query_result_cached_mpeg4_gif_dict['id'] == self.id
-        assert inline_query_result_cached_mpeg4_gif_dict['mpeg4_file_id'] == self.mpeg4_file_id
-        assert inline_query_result_cached_mpeg4_gif_dict['title'] == self.title
-        assert inline_query_result_cached_mpeg4_gif_dict['caption'] == self.caption
+        assert inline_query_result_cached_mpeg4_gif_dict[
+                   'type'] == inline_query_result_cached_mpeg4_gif.type
+        assert inline_query_result_cached_mpeg4_gif_dict[
+                   'id'] == inline_query_result_cached_mpeg4_gif.id
+        assert inline_query_result_cached_mpeg4_gif_dict[
+                   'mpeg4_file_id'] == inline_query_result_cached_mpeg4_gif.mpeg4_file_id
+        assert inline_query_result_cached_mpeg4_gif_dict[
+                   'title'] == inline_query_result_cached_mpeg4_gif.title
+        assert inline_query_result_cached_mpeg4_gif_dict[
+                   'caption'] == inline_query_result_cached_mpeg4_gif.caption
         assert inline_query_result_cached_mpeg4_gif_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
+               inline_query_result_cached_mpeg4_gif.input_message_content.to_dict()
         assert inline_query_result_cached_mpeg4_gif_dict['reply_markup'] == \
-               self.reply_markup.to_dict()
+               inline_query_result_cached_mpeg4_gif.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedMpeg4Gif(self.id, self.mpeg4_file_id)

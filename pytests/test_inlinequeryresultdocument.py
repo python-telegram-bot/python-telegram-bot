@@ -75,20 +75,26 @@ class TestInlineQueryResultDocument:
         inline_query_result_document_dict = inline_query_result_document.to_dict()
 
         assert isinstance(inline_query_result_document_dict, dict)
-        assert inline_query_result_document_dict['id'] == self.id
-        assert inline_query_result_document_dict['type'] == self.type
-        assert inline_query_result_document_dict['document_url'] == self.document_url
-        assert inline_query_result_document_dict['title'] == self.title
-        assert inline_query_result_document_dict['caption'] == self.caption
-        assert inline_query_result_document_dict['mime_type'] == self.mime_type
-        assert inline_query_result_document_dict['description'] == self.description
-        assert inline_query_result_document_dict['thumb_url'] == self.thumb_url
-        assert inline_query_result_document_dict['thumb_width'] == self.thumb_width
-        assert inline_query_result_document_dict['thumb_height'] == self.thumb_height
+        assert inline_query_result_document_dict['id'] == inline_query_result_document.id
+        assert inline_query_result_document_dict['type'] == inline_query_result_document.type
+        assert inline_query_result_document_dict[
+                   'document_url'] == inline_query_result_document.document_url
+        assert inline_query_result_document_dict['title'] == inline_query_result_document.title
+        assert inline_query_result_document_dict['caption'] == inline_query_result_document.caption
+        assert inline_query_result_document_dict[
+                   'mime_type'] == inline_query_result_document.mime_type
+        assert inline_query_result_document_dict[
+                   'description'] == inline_query_result_document.description
+        assert inline_query_result_document_dict[
+                   'thumb_url'] == inline_query_result_document.thumb_url
+        assert inline_query_result_document_dict[
+                   'thumb_width'] == inline_query_result_document.thumb_width
+        assert inline_query_result_document_dict[
+                   'thumb_height'] == inline_query_result_document.thumb_height
         assert inline_query_result_document_dict['input_message_content'] == \
-               self.input_message_content.to_dict()
+               inline_query_result_document.input_message_content.to_dict()
         assert inline_query_result_document_dict['reply_markup'] == \
-               self.reply_markup.to_dict()
+               inline_query_result_document.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultDocument(self.id, self.document_url, self.title,

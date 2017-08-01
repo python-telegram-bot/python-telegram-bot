@@ -35,7 +35,7 @@ def file(bot):
 class TestFile:
     file_id = 'NOTVALIDDOESNOTMATTER'
     file_path = (
-    u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
+        u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
     file_size = 28232
 
     def test_de_json(self, bot):
@@ -46,9 +46,9 @@ class TestFile:
         }
         new_file = File.de_json(json_dict, bot)
 
-        assert new_file.file_id == json_dict['file_id']
-        assert new_file.file_path == json_dict['file_path']
-        assert new_file.file_size == json_dict['file_size']
+        assert new_file.file_id == self.file_id
+        assert new_file.file_path == self.file_path
+        assert new_file.file_size == self.file_size
 
     def test_to_json(self, file):
         json.loads(file.to_json())

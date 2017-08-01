@@ -29,17 +29,6 @@ def thumb():
                      width=90)
 
 
-@pytest.fixture()
-def json_dict(thumb):
-    return {
-        'file_id': TestAnimation.animation_file_id,
-        'thumb': thumb.to_dict(),
-        'file_name': TestAnimation.file_name,
-        'mime_type': TestAnimation.mime_type,
-        'file_size': TestAnimation.file_size
-    }
-
-
 @pytest.fixture(scope='class')
 def animation(thumb, bot):
     return Animation(file_id=TestAnimation.animation_file_id, thumb=thumb.to_dict(),
@@ -55,7 +44,14 @@ class TestAnimation:
     mime_type = "video/mp4"
     file_size = 4008
 
-    def test_de_json(self, json_dict, bot, thumb):
+    def test_de_json(self, bot, thumb):
+        json_dict = {
+            'file_id': self.animation_file_id,
+            'thumb': thumb.to_dict(),
+            'file_name': self.file_name,
+            'mime_type': self.mime_type,
+            'file_size': self.file_size
+        }
         animation = Animation.de_json(json_dict, bot)
         assert animation.file_id == self.animation_file_id
         assert animation.thumb == thumb
@@ -70,11 +66,11 @@ class TestAnimation:
         animation_dict = animation.to_dict()
 
         assert isinstance(animation_dict, dict)
-        assert animation_dict['file_id'] == self.animation_file_id
+        assert animation_dict['file_id'] == animation.file_id
         assert animation_dict['thumb'] == thumb.to_dict()
-        assert animation_dict['file_name'] == self.file_name
-        assert animation_dict['mime_type'] == self.mime_type
-        assert animation_dict['file_size'] == self.file_size
+        assert animation_dict['file_name'] == animation.file_name
+        assert animation_dict['mime_type'] == animation.mime_type
+        assert animation_dict['file_size'] == animation.file_size
 
     def test_equality(self):
         a = Animation(self.animation_file_id)
