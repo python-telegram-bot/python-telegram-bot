@@ -62,11 +62,11 @@ class TestInlineQueryResultCachedGif:
         assert isinstance(inline_query_result_cached_gif_dict, dict)
         assert inline_query_result_cached_gif_dict['type'] == inline_query_result_cached_gif.type
         assert inline_query_result_cached_gif_dict['id'] == inline_query_result_cached_gif.id
-        assert inline_query_result_cached_gif_dict[
-                   'gif_file_id'] == inline_query_result_cached_gif.gif_file_id
+        assert inline_query_result_cached_gif_dict['gif_file_id'] == \
+               inline_query_result_cached_gif.gif_file_id
         assert inline_query_result_cached_gif_dict['title'] == inline_query_result_cached_gif.title
-        assert inline_query_result_cached_gif_dict[
-                   'caption'] == inline_query_result_cached_gif.caption
+        assert inline_query_result_cached_gif_dict['caption'] == \
+               inline_query_result_cached_gif.caption
         assert inline_query_result_cached_gif_dict['input_message_content'] == \
                inline_query_result_cached_gif.input_message_content.to_dict()
         assert inline_query_result_cached_gif_dict['reply_markup'] == \

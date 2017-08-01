@@ -71,17 +71,17 @@ class TestInlineQueryResultLocation:
         assert isinstance(inline_query_result_location_dict, dict)
         assert inline_query_result_location_dict['id'] == inline_query_result_location.id
         assert inline_query_result_location_dict['type'] == inline_query_result_location.type
-        assert inline_query_result_location_dict[
-                   'latitude'] == inline_query_result_location.latitude
-        assert inline_query_result_location_dict[
-                   'longitude'] == inline_query_result_location.longitude
+        assert inline_query_result_location_dict['latitude'] == \
+               inline_query_result_location.latitude
+        assert inline_query_result_location_dict['longitude'] == \
+               inline_query_result_location.longitude
         assert inline_query_result_location_dict['title'] == inline_query_result_location.title
-        assert inline_query_result_location_dict[
-                   'thumb_url'] == inline_query_result_location.thumb_url
-        assert inline_query_result_location_dict[
-                   'thumb_width'] == inline_query_result_location.thumb_width
-        assert inline_query_result_location_dict[
-                   'thumb_height'] == inline_query_result_location.thumb_height
+        assert inline_query_result_location_dict['thumb_url'] == \
+               inline_query_result_location.thumb_url
+        assert inline_query_result_location_dict['thumb_width'] == \
+               inline_query_result_location.thumb_width
+        assert inline_query_result_location_dict['thumb_height'] == \
+               inline_query_result_location.thumb_height
         assert inline_query_result_location_dict['input_message_content'] == \
                inline_query_result_location.input_message_content.to_dict()
         assert inline_query_result_location_dict['reply_markup'] == \

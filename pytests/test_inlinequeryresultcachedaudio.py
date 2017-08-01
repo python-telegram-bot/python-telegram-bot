@@ -58,13 +58,13 @@ class TestInlineQueryResultCachedAudio:
         inline_query_result_cached_audio_dict = inline_query_result_cached_audio.to_dict()
 
         assert isinstance(inline_query_result_cached_audio_dict, dict)
-        assert inline_query_result_cached_audio_dict[
-                   'type'] == inline_query_result_cached_audio.type
+        assert inline_query_result_cached_audio_dict['type'] == \
+               inline_query_result_cached_audio.type
         assert inline_query_result_cached_audio_dict['id'] == inline_query_result_cached_audio.id
-        assert inline_query_result_cached_audio_dict[
-                   'audio_file_id'] == inline_query_result_cached_audio.audio_file_id
-        assert inline_query_result_cached_audio_dict[
-                   'caption'] == inline_query_result_cached_audio.caption
+        assert inline_query_result_cached_audio_dict['audio_file_id'] == \
+               inline_query_result_cached_audio.audio_file_id
+        assert inline_query_result_cached_audio_dict['caption'] == \
+               inline_query_result_cached_audio.caption
         assert inline_query_result_cached_audio_dict['input_message_content'] == \
                inline_query_result_cached_audio.input_message_content.to_dict()
         assert inline_query_result_cached_audio_dict['reply_markup'] == \

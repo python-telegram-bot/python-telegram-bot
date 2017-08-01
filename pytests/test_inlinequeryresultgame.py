@@ -53,8 +53,8 @@ class TestInlineQueryResultGame:
         assert isinstance(inline_query_result_game_dict, dict)
         assert inline_query_result_game_dict['type'] == inline_query_result_game.type
         assert inline_query_result_game_dict['id'] == inline_query_result_game.id
-        assert inline_query_result_game_dict[
-                   'game_short_name'] == inline_query_result_game.game_short_name
+        assert inline_query_result_game_dict['game_short_name'] == \
+               inline_query_result_game.game_short_name
         assert inline_query_result_game_dict['reply_markup'] == \
                inline_query_result_game.reply_markup.to_dict()
 

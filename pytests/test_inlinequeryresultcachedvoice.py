@@ -61,15 +61,15 @@ class TestInlineQueryResultCachedVoice:
         inline_query_result_cached_voice_dict = inline_query_result_cached_voice.to_dict()
 
         assert isinstance(inline_query_result_cached_voice_dict, dict)
-        assert inline_query_result_cached_voice_dict[
-                   'type'] == inline_query_result_cached_voice.type
+        assert inline_query_result_cached_voice_dict['type'] == \
+               inline_query_result_cached_voice.type
         assert inline_query_result_cached_voice_dict['id'] == inline_query_result_cached_voice.id
-        assert inline_query_result_cached_voice_dict[
-                   'voice_file_id'] == inline_query_result_cached_voice.voice_file_id
-        assert inline_query_result_cached_voice_dict[
-                   'title'] == inline_query_result_cached_voice.title
-        assert inline_query_result_cached_voice_dict[
-                   'caption'] == inline_query_result_cached_voice.caption
+        assert inline_query_result_cached_voice_dict['voice_file_id'] == \
+               inline_query_result_cached_voice.voice_file_id
+        assert inline_query_result_cached_voice_dict['title'] == \
+               inline_query_result_cached_voice.title
+        assert inline_query_result_cached_voice_dict['caption'] == \
+               inline_query_result_cached_voice.caption
         assert inline_query_result_cached_voice_dict['input_message_content'] == \
                inline_query_result_cached_voice.input_message_content.to_dict()
         assert inline_query_result_cached_voice_dict['reply_markup'] == \

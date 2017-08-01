@@ -74,19 +74,19 @@ class TestInlineQueryResultMpeg4Gif:
         assert isinstance(inline_query_result_mpeg4_gif_dict, dict)
         assert inline_query_result_mpeg4_gif_dict['type'] == inline_query_result_mpeg4_gif.type
         assert inline_query_result_mpeg4_gif_dict['id'] == inline_query_result_mpeg4_gif.id
-        assert inline_query_result_mpeg4_gif_dict[
-                   'mpeg4_url'] == inline_query_result_mpeg4_gif.mpeg4_url
-        assert inline_query_result_mpeg4_gif_dict[
-                   'mpeg4_width'] == inline_query_result_mpeg4_gif.mpeg4_width
-        assert inline_query_result_mpeg4_gif_dict[
-                   'mpeg4_height'] == inline_query_result_mpeg4_gif.mpeg4_height
-        assert inline_query_result_mpeg4_gif_dict[
-                   'mpeg4_duration'] == inline_query_result_mpeg4_gif.mpeg4_duration
-        assert inline_query_result_mpeg4_gif_dict[
-                   'thumb_url'] == inline_query_result_mpeg4_gif.thumb_url
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_url'] == \
+               inline_query_result_mpeg4_gif.mpeg4_url
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_width'] == \
+               inline_query_result_mpeg4_gif.mpeg4_width
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_height'] == \
+               inline_query_result_mpeg4_gif.mpeg4_height
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_duration'] == \
+               inline_query_result_mpeg4_gif.mpeg4_duration
+        assert inline_query_result_mpeg4_gif_dict['thumb_url'] == \
+               inline_query_result_mpeg4_gif.thumb_url
         assert inline_query_result_mpeg4_gif_dict['title'] == inline_query_result_mpeg4_gif.title
-        assert inline_query_result_mpeg4_gif_dict[
-                   'caption'] == inline_query_result_mpeg4_gif.caption
+        assert inline_query_result_mpeg4_gif_dict['caption'] == \
+               inline_query_result_mpeg4_gif.caption
         assert inline_query_result_mpeg4_gif_dict['input_message_content'] == \
                inline_query_result_mpeg4_gif.input_message_content.to_dict()
         assert inline_query_result_mpeg4_gif_dict['reply_markup'] == \

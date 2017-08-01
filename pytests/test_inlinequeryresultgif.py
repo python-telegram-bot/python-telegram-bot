@@ -83,8 +83,8 @@ class TestInlineQueryResultGif:
         assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
         assert inline_query_result_gif_dict['input_message_content'] == \
                inline_query_result_gif.input_message_content.to_dict()
-        assert inline_query_result_gif_dict[
-                   'reply_markup'] == inline_query_result_gif.reply_markup.to_dict()
+        assert inline_query_result_gif_dict['reply_markup'] == \
+               inline_query_result_gif.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)

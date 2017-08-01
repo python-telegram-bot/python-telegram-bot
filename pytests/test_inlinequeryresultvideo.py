@@ -82,21 +82,21 @@ class TestInlineQueryResultVideo:
         assert inline_query_result_video_dict['id'] == inline_query_result_video.id
         assert inline_query_result_video_dict['video_url'] == inline_query_result_video.video_url
         assert inline_query_result_video_dict['mime_type'] == inline_query_result_video.mime_type
-        assert inline_query_result_video_dict[
-                   'video_width'] == inline_query_result_video.video_width
-        assert inline_query_result_video_dict[
-                   'video_height'] == inline_query_result_video.video_height
-        assert inline_query_result_video_dict[
-                   'video_duration'] == inline_query_result_video.video_duration
+        assert inline_query_result_video_dict['video_width'] == \
+               inline_query_result_video.video_width
+        assert inline_query_result_video_dict['video_height'] == \
+               inline_query_result_video.video_height
+        assert inline_query_result_video_dict['video_duration'] == \
+               inline_query_result_video.video_duration
         assert inline_query_result_video_dict['thumb_url'] == inline_query_result_video.thumb_url
         assert inline_query_result_video_dict['title'] == inline_query_result_video.title
-        assert inline_query_result_video_dict[
-                   'description'] == inline_query_result_video.description
+        assert inline_query_result_video_dict['description'] == \
+               inline_query_result_video.description
         assert inline_query_result_video_dict['caption'] == inline_query_result_video.caption
         assert inline_query_result_video_dict['input_message_content'] == \
                inline_query_result_video.input_message_content.to_dict()
-        assert inline_query_result_video_dict[
-                   'reply_markup'] == inline_query_result_video.reply_markup.to_dict()
+        assert inline_query_result_video_dict['reply_markup'] == \
+               inline_query_result_video.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultVideo(self.id, self.video_url, self.mime_type,

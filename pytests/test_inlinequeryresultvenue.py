@@ -81,17 +81,17 @@ class TestInlineQueryResultVenue:
         assert inline_query_result_venue_dict['longitude'] == inline_query_result_venue.longitude
         assert inline_query_result_venue_dict['title'] == inline_query_result_venue.title
         assert inline_query_result_venue_dict['address'] == inline_query_result_venue.address
-        assert inline_query_result_venue_dict[
-                   'foursquare_id'] == inline_query_result_venue.foursquare_id
+        assert inline_query_result_venue_dict['foursquare_id'] == \
+               inline_query_result_venue.foursquare_id
         assert inline_query_result_venue_dict['thumb_url'] == inline_query_result_venue.thumb_url
-        assert inline_query_result_venue_dict[
-                   'thumb_width'] == inline_query_result_venue.thumb_width
-        assert inline_query_result_venue_dict[
-                   'thumb_height'] == inline_query_result_venue.thumb_height
+        assert inline_query_result_venue_dict['thumb_width'] == \
+               inline_query_result_venue.thumb_width
+        assert inline_query_result_venue_dict['thumb_height'] == \
+               inline_query_result_venue.thumb_height
         assert inline_query_result_venue_dict['input_message_content'] == \
                inline_query_result_venue.input_message_content.to_dict()
-        assert inline_query_result_venue_dict[
-                   'reply_markup'] == inline_query_result_venue.reply_markup.to_dict()
+        assert inline_query_result_venue_dict['reply_markup'] == \
+               inline_query_result_venue.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultVenue(self.id, self.longitude, self.latitude, self.title,

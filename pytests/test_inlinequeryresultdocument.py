@@ -77,20 +77,20 @@ class TestInlineQueryResultDocument:
         assert isinstance(inline_query_result_document_dict, dict)
         assert inline_query_result_document_dict['id'] == inline_query_result_document.id
         assert inline_query_result_document_dict['type'] == inline_query_result_document.type
-        assert inline_query_result_document_dict[
-                   'document_url'] == inline_query_result_document.document_url
+        assert inline_query_result_document_dict['document_url'] == \
+               inline_query_result_document.document_url
         assert inline_query_result_document_dict['title'] == inline_query_result_document.title
         assert inline_query_result_document_dict['caption'] == inline_query_result_document.caption
-        assert inline_query_result_document_dict[
-                   'mime_type'] == inline_query_result_document.mime_type
-        assert inline_query_result_document_dict[
-                   'description'] == inline_query_result_document.description
-        assert inline_query_result_document_dict[
-                   'thumb_url'] == inline_query_result_document.thumb_url
-        assert inline_query_result_document_dict[
-                   'thumb_width'] == inline_query_result_document.thumb_width
-        assert inline_query_result_document_dict[
-                   'thumb_height'] == inline_query_result_document.thumb_height
+        assert inline_query_result_document_dict['mime_type'] == \
+               inline_query_result_document.mime_type
+        assert inline_query_result_document_dict['description'] == \
+               inline_query_result_document.description
+        assert inline_query_result_document_dict['thumb_url'] == \
+               inline_query_result_document.thumb_url
+        assert inline_query_result_document_dict['thumb_width'] == \
+               inline_query_result_document.thumb_width
+        assert inline_query_result_document_dict['thumb_height'] == \
+               inline_query_result_document.thumb_height
         assert inline_query_result_document_dict['input_message_content'] == \
                inline_query_result_document.input_message_content.to_dict()
         assert inline_query_result_document_dict['reply_markup'] == \
