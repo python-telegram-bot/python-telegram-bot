@@ -20,31 +20,15 @@ import json
 
 import pytest
 
-from telegram import (InlineQueryResultArticle, InlineKeyboardMarkup, InlineKeyboardButton,
-                      InlineQueryResultAudio, InputTextMessageContent)
-
-
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'type': TestInlineQueryResultAudio.type,
-        'id': TestInlineQueryResultAudio.id,
-        'audio_url': TestInlineQueryResultAudio.audio_url,
-        'title': TestInlineQueryResultAudio.title,
-        'performer': TestInlineQueryResultAudio.performer,
-        'audio_duration': TestInlineQueryResultAudio.audio_duration,
-        'caption': TestInlineQueryResultAudio.caption,
-        'input_message_content': TestInlineQueryResultAudio.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultAudio.reply_markup.to_dict(),
-    }
+from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultAudio,
+                      InputTextMessageContent, InlineQueryResultVoice)
 
 
 @pytest.fixture(scope='class')
 def inline_query_result_audio():
-    return InlineQueryResultAudio(type=TestInlineQueryResultAudio.type,
-                                  id=TestInlineQueryResultAudio.id,
-                                  audio_url=TestInlineQueryResultAudio.audio_url,
-                                  title=TestInlineQueryResultAudio.title,
+    return InlineQueryResultAudio(TestInlineQueryResultAudio.id,
+                                  TestInlineQueryResultAudio.audio_url,
+                                  TestInlineQueryResultAudio.title,
                                   performer=TestInlineQueryResultAudio.performer,
                                   audio_duration=TestInlineQueryResultAudio.audio_duration,
                                   caption=TestInlineQueryResultAudio.caption,
@@ -53,8 +37,6 @@ def inline_query_result_audio():
 
 
 class TestInlineQueryResultAudio:
-    """This object represents Tests for Telegram InlineQueryResultAudio."""
-
     id = 'id'
     type = 'audio'
     audio_url = 'audio url'
@@ -63,40 +45,44 @@ class TestInlineQueryResultAudio:
     audio_duration = 'audio_duration'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_audio_de_json(self):
-        audio = InlineQueryResultAudio.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_audio):
+        assert inline_query_result_audio.type == self.type
+        assert inline_query_result_audio.id == self.id
+        assert inline_query_result_audio.audio_url == self.audio_url
+        assert inline_query_result_audio.title == self.title
+        assert inline_query_result_audio.performer == self.performer
+        assert inline_query_result_audio.audio_duration == self.audio_duration
+        assert inline_query_result_audio.caption == self.caption
+        assert inline_query_result_audio.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_audio.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert audio.type == self.type
-        assert audio.id == self.id
-        assert audio.audio_url == self.audio_url
-        assert audio.title == self.title
-        assert audio.performer == self.performer
-        assert audio.audio_duration == self.audio_duration
-        assert audio.caption == self.caption
-        self.assertDictEqual(audio.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert audio.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_audio):
+        json.loads(inline_query_result_audio.to_json())
 
-    def test_audio_to_json(self):
-        audio = InlineQueryResultAudio.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_audio):
+        inline_query_result_audio_dict = inline_query_result_audio.to_dict()
 
-        json.loads(audio.to_json())
-
-    def test_audio_to_dict(self):
-        audio = InlineQueryResultAudio.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(audio, dict)
-        assert json_dict == audio
+        assert isinstance(inline_query_result_audio_dict, dict)
+        assert inline_query_result_audio_dict['type'] == self.type
+        assert inline_query_result_audio_dict['id'] == self.id
+        assert inline_query_result_audio_dict['audio_url'] == self.audio_url
+        assert inline_query_result_audio_dict['title'] == self.title
+        assert inline_query_result_audio_dict['performer'] == self.performer
+        assert inline_query_result_audio_dict['audio_duration'] == self.audio_duration
+        assert inline_query_result_audio_dict['caption'] == self.caption
+        assert inline_query_result_audio_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_audio_dict['reply_markup'] == self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultAudio(self.id, self.audio_url, self.title)
         b = InlineQueryResultAudio(self.id, self.title, self.title)
         c = InlineQueryResultAudio(self.id, "", self.title)
         d = InlineQueryResultAudio("", self.audio_url, self.title)
-        e = InlineQueryResultArticle(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

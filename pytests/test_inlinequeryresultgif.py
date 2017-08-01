@@ -21,34 +21,17 @@ import json
 import pytest
 
 from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultGif,
-                      InlineQueryResultArticle, InlineKeyboardMarkup)
-
-
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'type': TestInlineQueryResultGif.type,
-        'id': TestInlineQueryResultGif.id,
-        'gif_url': TestInlineQueryResultGif.gif_url,
-        'gif_width': TestInlineQueryResultGif.gif_width,
-        'gif_height': TestInlineQueryResultGif.gif_height,
-        'gif_duration': TestInlineQueryResultGif.gif_duration,
-        'thumb_url': TestInlineQueryResultGif.thumb_url,
-        'title': TestInlineQueryResultGif.title,
-        'caption': TestInlineQueryResultGif.caption,
-        'input_message_content': TestInlineQueryResultGif.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultGif.reply_markup.to_dict(),
-    }
+                      InlineQueryResultVoice, InlineKeyboardMarkup)
 
 
 @pytest.fixture(scope='class')
 def inline_query_result_gif():
-    return InlineQueryResultGif(type=TestInlineQueryResultGif.type, id=TestInlineQueryResultGif.id,
-                                gif_url=TestInlineQueryResultGif.gif_url,
+    return InlineQueryResultGif(TestInlineQueryResultGif.id,
+                                TestInlineQueryResultGif.gif_url,
+                                TestInlineQueryResultGif.thumb_url,
                                 gif_width=TestInlineQueryResultGif.gif_width,
                                 gif_height=TestInlineQueryResultGif.gif_height,
                                 gif_duration=TestInlineQueryResultGif.gif_duration,
-                                thumb_url=TestInlineQueryResultGif.thumb_url,
                                 title=TestInlineQueryResultGif.title,
                                 caption=TestInlineQueryResultGif.caption,
                                 input_message_content=TestInlineQueryResultGif.input_message_content,
@@ -56,8 +39,6 @@ def inline_query_result_gif():
 
 
 class TestInlineQueryResultGif:
-    """This object represents Tests for Telegram InlineQueryResultGif."""
-
     id = 'id'
     type = 'gif'
     gif_url = 'gif url'
@@ -68,42 +49,48 @@ class TestInlineQueryResultGif:
     title = 'title'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_gif_de_json(self):
-        gif = InlineQueryResultGif.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_gif):
+        assert inline_query_result_gif.type == self.type
+        assert inline_query_result_gif.id == self.id
+        assert inline_query_result_gif.gif_url == self.gif_url
+        assert inline_query_result_gif.gif_width == self.gif_width
+        assert inline_query_result_gif.gif_height == self.gif_height
+        assert inline_query_result_gif.gif_duration == self.gif_duration
+        assert inline_query_result_gif.thumb_url == self.thumb_url
+        assert inline_query_result_gif.title == self.title
+        assert inline_query_result_gif.caption == self.caption
+        assert inline_query_result_gif.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert gif.type == self.type
-        assert gif.id == self.id
-        assert gif.gif_url == self.gif_url
-        assert gif.gif_width == self.gif_width
-        assert gif.gif_height == self.gif_height
-        assert gif.gif_duration == self.gif_duration
-        assert gif.thumb_url == self.thumb_url
-        assert gif.title == self.title
-        assert gif.caption == self.caption
-        self.assertDictEqual(gif.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_gif):
+        json.loads(inline_query_result_gif.to_json())
 
-    def test_gif_to_json(self):
-        gif = InlineQueryResultGif.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_gif):
+        inline_query_result_gif_dict = inline_query_result_gif.to_dict()
 
-        json.loads(gif.to_json())
-
-    def test_gif_to_dict(self):
-        gif = InlineQueryResultGif.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(gif, dict)
-        assert json_dict == gif
+        assert isinstance(inline_query_result_gif_dict, dict)
+        assert inline_query_result_gif_dict['type'] == self.type
+        assert inline_query_result_gif_dict['id'] == self.id
+        assert inline_query_result_gif_dict['gif_url'] == self.gif_url
+        assert inline_query_result_gif_dict['gif_width'] == self.gif_width
+        assert inline_query_result_gif_dict['gif_height'] == self.gif_height
+        assert inline_query_result_gif_dict['gif_duration'] == self.gif_duration
+        assert inline_query_result_gif_dict['thumb_url'] == self.thumb_url
+        assert inline_query_result_gif_dict['title'] == self.title
+        assert inline_query_result_gif_dict['caption'] == self.caption
+        assert inline_query_result_gif_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_gif_dict['reply_markup'] == self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)
         b = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)
         c = InlineQueryResultGif(self.id, "", self.thumb_url)
         d = InlineQueryResultGif("", self.gif_url, self.thumb_url)
-        e = InlineQueryResultArticle(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

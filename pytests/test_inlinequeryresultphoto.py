@@ -21,34 +21,16 @@ import json
 import pytest
 
 from telegram import (InputTextMessageContent, InlineKeyboardButton, InlineKeyboardMarkup,
-                      InlineQueryResultPhoto, InlineQueryResultArticle)
-
-
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'type': TestInlineQueryResultPhoto.type,
-        'id': TestInlineQueryResultPhoto.id,
-        'photo_url': TestInlineQueryResultPhoto.photo_url,
-        'photo_width': TestInlineQueryResultPhoto.photo_width,
-        'photo_height': TestInlineQueryResultPhoto.photo_height,
-        'thumb_url': TestInlineQueryResultPhoto.thumb_url,
-        'title': TestInlineQueryResultPhoto.title,
-        'description': TestInlineQueryResultPhoto.description,
-        'caption': TestInlineQueryResultPhoto.caption,
-        'input_message_content': TestInlineQueryResultPhoto.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultPhoto.reply_markup.to_dict(),
-    }
+                      InlineQueryResultPhoto, InlineQueryResultVoice)
 
 
 @pytest.fixture(scope='class')
 def inline_query_result_photo():
-    return InlineQueryResultPhoto(type=TestInlineQueryResultPhoto.type,
-                                  id=TestInlineQueryResultPhoto.id,
-                                  photo_url=TestInlineQueryResultPhoto.photo_url,
+    return InlineQueryResultPhoto(TestInlineQueryResultPhoto.id,
+                                  TestInlineQueryResultPhoto.photo_url,
+                                  TestInlineQueryResultPhoto.thumb_url,
                                   photo_width=TestInlineQueryResultPhoto.photo_width,
                                   photo_height=TestInlineQueryResultPhoto.photo_height,
-                                  thumb_url=TestInlineQueryResultPhoto.thumb_url,
                                   title=TestInlineQueryResultPhoto.title,
                                   description=TestInlineQueryResultPhoto.description,
                                   caption=TestInlineQueryResultPhoto.caption,
@@ -57,8 +39,6 @@ def inline_query_result_photo():
 
 
 class TestInlineQueryResultPhoto:
-    """This object represents Tests for Telegram InlineQueryResultPhoto."""
-
     id = 'id'
     type = 'photo'
     photo_url = 'photo url'
@@ -69,42 +49,48 @@ class TestInlineQueryResultPhoto:
     description = 'description'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_photo_de_json(self):
-        photo = InlineQueryResultPhoto.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_photo):
+        assert inline_query_result_photo.type == self.type
+        assert inline_query_result_photo.id == self.id
+        assert inline_query_result_photo.photo_url == self.photo_url
+        assert inline_query_result_photo.photo_width == self.photo_width
+        assert inline_query_result_photo.photo_height == self.photo_height
+        assert inline_query_result_photo.thumb_url == self.thumb_url
+        assert inline_query_result_photo.title == self.title
+        assert inline_query_result_photo.description == self.description
+        assert inline_query_result_photo.caption == self.caption
+        assert inline_query_result_photo.input_message_content.to_dict() == \
+                             self.input_message_content.to_dict()
+        assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert photo.type == self.type
-        assert photo.id == self.id
-        assert photo.photo_url == self.photo_url
-        assert photo.photo_width == self.photo_width
-        assert photo.photo_height == self.photo_height
-        assert photo.thumb_url == self.thumb_url
-        assert photo.title == self.title
-        assert photo.description == self.description
-        assert photo.caption == self.caption
-        self.assertDictEqual(photo.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_photo):
+        json.loads(inline_query_result_photo.to_json())
 
-    def test_photo_to_json(self):
-        photo = InlineQueryResultPhoto.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_photo):
+        inline_query_result_photo_dict = inline_query_result_photo.to_dict()
 
-        json.loads(photo.to_json())
-
-    def test_photo_to_dict(self):
-        photo = InlineQueryResultPhoto.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(photo, dict)
-        assert json_dict == photo
+        assert isinstance(inline_query_result_photo_dict, dict)
+        assert inline_query_result_photo_dict['type'] == self.type
+        assert inline_query_result_photo_dict['id'] == self.id
+        assert inline_query_result_photo_dict['photo_url'] == self.photo_url
+        assert inline_query_result_photo_dict['photo_width'] == self.photo_width
+        assert inline_query_result_photo_dict['photo_height'] == self.photo_height
+        assert inline_query_result_photo_dict['thumb_url'] == self.thumb_url
+        assert inline_query_result_photo_dict['title'] == self.title
+        assert inline_query_result_photo_dict['description'] == self.description
+        assert inline_query_result_photo_dict['caption'] == self.caption
+        assert inline_query_result_photo_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_photo_dict['reply_markup'] == self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)
         b = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)
         c = InlineQueryResultPhoto(self.id, "", self.thumb_url)
         d = InlineQueryResultPhoto("", self.photo_url, self.thumb_url)
-        e = InlineQueryResultArticle(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

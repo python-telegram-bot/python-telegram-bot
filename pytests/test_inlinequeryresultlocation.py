@@ -21,32 +21,15 @@ import json
 import pytest
 
 from telegram import (InputTextMessageContent, InlineQueryResultLocation, InlineKeyboardButton,
-                      InlineQueryResultArticle, InlineKeyboardMarkup)
-
-
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'id': TestInlineQueryResultLocation.id,
-        'type': TestInlineQueryResultLocation.type,
-        'latitude': TestInlineQueryResultLocation.latitude,
-        'longitude': TestInlineQueryResultLocation.longitude,
-        'title': TestInlineQueryResultLocation.title,
-        'thumb_url': TestInlineQueryResultLocation.thumb_url,
-        'thumb_width': TestInlineQueryResultLocation.thumb_width,
-        'thumb_height': TestInlineQueryResultLocation.thumb_height,
-        'input_message_content': TestInlineQueryResultLocation.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultLocation.reply_markup.to_dict(),
-    }
+                      InlineQueryResultVoice, InlineKeyboardMarkup)
 
 
 @pytest.fixture(scope='class')
 def inline_query_result_location():
-    return InlineQueryResultLocation(id=TestInlineQueryResultLocation.id,
-                                     type=TestInlineQueryResultLocation.type,
-                                     latitude=TestInlineQueryResultLocation.latitude,
-                                     longitude=TestInlineQueryResultLocation.longitude,
-                                     title=TestInlineQueryResultLocation.title,
+    return InlineQueryResultLocation(TestInlineQueryResultLocation.id,
+                                     TestInlineQueryResultLocation.latitude,
+                                     TestInlineQueryResultLocation.longitude,
+                                     TestInlineQueryResultLocation.title,
                                      thumb_url=TestInlineQueryResultLocation.thumb_url,
                                      thumb_width=TestInlineQueryResultLocation.thumb_width,
                                      thumb_height=TestInlineQueryResultLocation.thumb_height,
@@ -55,52 +38,56 @@ def inline_query_result_location():
 
 
 class TestInlineQueryResultLocation:
-    """This object represents Tests for Telegram InlineQueryResultLocation."""
-
     id = 'id'
     type = 'location'
     latitude = 0.0
-    longitude = 0.0
+    longitude = 1.0
     title = 'title'
     thumb_url = 'thumb url'
     thumb_width = 10
     thumb_height = 15
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_location_de_json(self):
-        location = InlineQueryResultLocation.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_location):
+        assert inline_query_result_location.id == self.id
+        assert inline_query_result_location.type == self.type
+        assert inline_query_result_location.latitude == self.latitude
+        assert inline_query_result_location.longitude == self.longitude
+        assert inline_query_result_location.title == self.title
+        assert inline_query_result_location.thumb_url == self.thumb_url
+        assert inline_query_result_location.thumb_width == self.thumb_width
+        assert inline_query_result_location.thumb_height == self.thumb_height
+        assert inline_query_result_location.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert location.id == self.id
-        assert location.type == self.type
-        assert location.latitude == self.latitude
-        assert location.longitude == self.longitude
-        assert location.title == self.title
-        assert location.thumb_url == self.thumb_url
-        assert location.thumb_width == self.thumb_width
-        assert location.thumb_height == self.thumb_height
-        self.assertDictEqual(location.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert location.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_location):
+        json.loads(inline_query_result_location.to_json())
 
-    def test_location_to_json(self):
-        location = InlineQueryResultLocation.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_location):
+        inline_query_result_location_dict = inline_query_result_location.to_dict()
 
-        json.loads(location.to_json())
-
-    def test_location_to_dict(self):
-        location = InlineQueryResultLocation.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(location, dict)
-        assert json_dict == location
+        assert isinstance(inline_query_result_location_dict, dict)
+        assert inline_query_result_location_dict['id'] == self.id
+        assert inline_query_result_location_dict['type'] == self.type
+        assert inline_query_result_location_dict['latitude'] == self.latitude
+        assert inline_query_result_location_dict['longitude'] == self.longitude
+        assert inline_query_result_location_dict['title'] == self.title
+        assert inline_query_result_location_dict['thumb_url'] == self.thumb_url
+        assert inline_query_result_location_dict['thumb_width'] == self.thumb_width
+        assert inline_query_result_location_dict['thumb_height'] == self.thumb_height
+        assert inline_query_result_location_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_location_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
         b = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
         c = InlineQueryResultLocation(self.id, 0, self.latitude, self.title)
         d = InlineQueryResultLocation("", self.longitude, self.latitude, self.title)
-        e = InlineQueryResultArticle(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

@@ -20,22 +20,8 @@ import json
 
 import pytest
 
-from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultArticle,
+from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultAudio,
                       InlineQueryResultVoice, InlineKeyboardMarkup)
-
-
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'type': TestInlineQueryResultVoice.type,
-        'id': TestInlineQueryResultVoice.id,
-        'voice_url': TestInlineQueryResultVoice.voice_url,
-        'title': TestInlineQueryResultVoice.title,
-        'voice_duration': TestInlineQueryResultVoice.voice_duration,
-        'caption': TestInlineQueryResultVoice.caption,
-        'input_message_content': TestInlineQueryResultVoice.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultVoice.reply_markup.to_dict(),
-    }
 
 
 @pytest.fixture(scope='class')
@@ -51,8 +37,6 @@ def inline_query_result_voice():
 
 
 class TestInlineQueryResultVoice:
-    """This object represents Tests for Telegram InlineQueryResultVoice."""
-
     id = 'id'
     type = 'voice'
     voice_url = 'voice url'
@@ -60,39 +44,42 @@ class TestInlineQueryResultVoice:
     voice_duration = 'voice_duration'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_voice_de_json(self):
-        voice = InlineQueryResultVoice.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_voice):
+        assert inline_query_result_voice.type == self.type
+        assert inline_query_result_voice.id == self.id
+        assert inline_query_result_voice.voice_url == self.voice_url
+        assert inline_query_result_voice.title == self.title
+        assert inline_query_result_voice.voice_duration == self.voice_duration
+        assert inline_query_result_voice.caption == self.caption
+        assert inline_query_result_voice.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_voice.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert voice.type == self.type
-        assert voice.id == self.id
-        assert voice.voice_url == self.voice_url
-        assert voice.title == self.title
-        assert voice.voice_duration == self.voice_duration
-        assert voice.caption == self.caption
-        self.assertDictEqual(voice.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert voice.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_voice):
+        json.loads(inline_query_result_voice.to_json())
 
-    def test_voice_to_json(self):
-        voice = InlineQueryResultVoice.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_voice):
+        inline_query_result_voice_dict = inline_query_result_voice.to_dict()
 
-        json.loads(voice.to_json())
-
-    def test_voice_to_dict(self):
-        voice = InlineQueryResultVoice.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(voice, dict)
-        assert json_dict == voice
+        assert isinstance(inline_query_result_voice_dict, dict)
+        assert inline_query_result_voice_dict['type'] == self.type
+        assert inline_query_result_voice_dict['id'] == self.id
+        assert inline_query_result_voice_dict['voice_url'] == self.voice_url
+        assert inline_query_result_voice_dict['title'] == self.title
+        assert inline_query_result_voice_dict['voice_duration'] == self.voice_duration
+        assert inline_query_result_voice_dict['caption'] == self.caption
+        assert inline_query_result_voice_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_voice_dict['reply_markup'] == self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultVoice(self.id, self.voice_url, self.title)
         b = InlineQueryResultVoice(self.id, self.voice_url, self.title)
         c = InlineQueryResultVoice(self.id, "", self.title)
         d = InlineQueryResultVoice("", self.voice_url, self.title)
-        e = InlineQueryResultArticle(self.id, "", "")
+        e = InlineQueryResultAudio(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

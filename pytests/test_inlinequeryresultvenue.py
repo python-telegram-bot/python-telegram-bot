@@ -20,36 +20,17 @@ import json
 
 import pytest
 
-from telegram import (InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardButton,
+from telegram import (InlineQueryResultVoice, InputTextMessageContent, InlineKeyboardButton,
                       InlineQueryResultVenue, InlineKeyboardMarkup)
 
 
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'id': TestInlineQueryResultVenue.id,
-        'type': TestInlineQueryResultVenue.type,
-        'latitude': TestInlineQueryResultVenue.latitude,
-        'longitude': TestInlineQueryResultVenue.longitude,
-        'title': TestInlineQueryResultVenue.title,
-        'address': TestInlineQueryResultVenue._address,
-        'foursquare_id': TestInlineQueryResultVenue.foursquare_id,
-        'thumb_url': TestInlineQueryResultVenue.thumb_url,
-        'thumb_width': TestInlineQueryResultVenue.thumb_width,
-        'thumb_height': TestInlineQueryResultVenue.thumb_height,
-        'input_message_content': TestInlineQueryResultVenue.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultVenue.reply_markup.to_dict(),
-    }
-
-
-@pytest.fixture(scope='class')
 def inline_query_result_venue():
-    return InlineQueryResultVenue(id=TestInlineQueryResultVenue.id,
-                                  type=TestInlineQueryResultVenue.type,
-                                  latitude=TestInlineQueryResultVenue.latitude,
-                                  longitude=TestInlineQueryResultVenue.longitude,
-                                  title=TestInlineQueryResultVenue.title,
-                                  address=TestInlineQueryResultVenue._address,
+    return InlineQueryResultVenue(TestInlineQueryResultVenue.id,
+                                  TestInlineQueryResultVenue.latitude,
+                                  TestInlineQueryResultVenue.longitude,
+                                  TestInlineQueryResultVenue.title,
+                                  TestInlineQueryResultVenue.address,
                                   foursquare_id=TestInlineQueryResultVenue.foursquare_id,
                                   thumb_url=TestInlineQueryResultVenue.thumb_url,
                                   thumb_width=TestInlineQueryResultVenue.thumb_width,
@@ -59,59 +40,64 @@ def inline_query_result_venue():
 
 
 class TestInlineQueryResultVenue:
-    """This object represents Tests for Telegram InlineQueryResultVenue."""
-
     id = 'id'
     type = 'venue'
     latitude = 'latitude'
     longitude = 'longitude'
     title = 'title'
-    _address = 'address'  # nose binds address for testing
+    address = 'address'
     foursquare_id = 'foursquare id'
     thumb_url = 'thumb url'
     thumb_width = 10
     thumb_height = 15
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_venue_de_json(self):
-        venue = InlineQueryResultVenue.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_venue):
+        assert inline_query_result_venue.id == self.id
+        assert inline_query_result_venue.type == self.type
+        assert inline_query_result_venue.latitude == self.latitude
+        assert inline_query_result_venue.longitude == self.longitude
+        assert inline_query_result_venue.title == self.title
+        assert inline_query_result_venue.address == self.address
+        assert inline_query_result_venue.foursquare_id == self.foursquare_id
+        assert inline_query_result_venue.thumb_url == self.thumb_url
+        assert inline_query_result_venue.thumb_width == self.thumb_width
+        assert inline_query_result_venue.thumb_height == self.thumb_height
+        assert inline_query_result_venue.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_venue.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert venue.id == self.id
-        assert venue.type == self.type
-        assert venue.latitude == self.latitude
-        assert venue.longitude == self.longitude
-        assert venue.title == self.title
-        assert venue.address == self._address
-        assert venue.foursquare_id == self.foursquare_id
-        assert venue.thumb_url == self.thumb_url
-        assert venue.thumb_width == self.thumb_width
-        assert venue.thumb_height == self.thumb_height
-        self.assertDictEqual(venue.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert venue.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_venue):
+        json.loads(inline_query_result_venue.to_json())
 
-    def test_venue_to_json(self):
-        venue = InlineQueryResultVenue.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_venue):
+        inline_query_result_venue_dict = inline_query_result_venue.to_dict()
 
-        json.loads(venue.to_json())
-
-    def test_venue_to_dict(self):
-        venue = InlineQueryResultVenue.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(venue, dict)
-        assert json_dict == venue
+        assert isinstance(inline_query_result_venue_dict, dict)
+        assert inline_query_result_venue_dict['id'] == self.id
+        assert inline_query_result_venue_dict['type'] == self.type
+        assert inline_query_result_venue_dict['latitude'] == self.latitude
+        assert inline_query_result_venue_dict['longitude'] == self.longitude
+        assert inline_query_result_venue_dict['title'] == self.title
+        assert inline_query_result_venue_dict['address'] == self.address
+        assert inline_query_result_venue_dict['foursquare_id'] == self.foursquare_id
+        assert inline_query_result_venue_dict['thumb_url'] == self.thumb_url
+        assert inline_query_result_venue_dict['thumb_width'] == self.thumb_width
+        assert inline_query_result_venue_dict['thumb_height'] == self.thumb_height
+        assert inline_query_result_venue_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_venue_dict['reply_markup'] == self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultVenue(self.id, self.longitude, self.latitude, self.title,
-                                   self._address)
+                                   self.address)
         b = InlineQueryResultVenue(self.id, self.longitude, self.latitude, self.title,
-                                   self._address)
-        c = InlineQueryResultVenue(self.id, "", self.latitude, self.title, self._address)
+                                   self.address)
+        c = InlineQueryResultVenue(self.id, "", self.latitude, self.title, self.address)
         d = InlineQueryResultVenue("", self.longitude, self.latitude, self.title,
-                                   self._address)
-        e = InlineQueryResultArticle(self.id, "", "")
+                                   self.address)
+        e = InlineQueryResultVoice(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

@@ -20,36 +20,18 @@ import json
 
 import pytest
 
-from telegram import (InlineQueryResultMpeg4Gif, InlineKeyboardButton, InlineQueryResultArticle,
+from telegram import (InlineQueryResultMpeg4Gif, InlineKeyboardButton, InlineQueryResultVoice,
                       InlineKeyboardMarkup, InputTextMessageContent)
 
 
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-        'type': TestInlineQueryResultMpeg4Gif.type,
-        'id': TestInlineQueryResultMpeg4Gif.id,
-        'mpeg4_url': TestInlineQueryResultMpeg4Gif.mpeg4_url,
-        'mpeg4_width': TestInlineQueryResultMpeg4Gif.mpeg4_width,
-        'mpeg4_height': TestInlineQueryResultMpeg4Gif.mpeg4_height,
-        'mpeg4_duration': TestInlineQueryResultMpeg4Gif.mpeg4_duration,
-        'thumb_url': TestInlineQueryResultMpeg4Gif.thumb_url,
-        'title': TestInlineQueryResultMpeg4Gif.title,
-        'caption': TestInlineQueryResultMpeg4Gif.caption,
-        'input_message_content': TestInlineQueryResultMpeg4Gif.input_message_content.to_dict(),
-        'reply_markup': TestInlineQueryResultMpeg4Gif.reply_markup.to_dict(),
-    }
-
-
-@pytest.fixture(scope='class')
 def inline_query_result_mpeg4_gif():
-    return InlineQueryResultMpeg4Gif(type=TestInlineQueryResultMpeg4Gif.type,
-                                     id=TestInlineQueryResultMpeg4Gif.id,
-                                     mpeg4_url=TestInlineQueryResultMpeg4Gif.mpeg4_url,
+    return InlineQueryResultMpeg4Gif(TestInlineQueryResultMpeg4Gif.id,
+                                     TestInlineQueryResultMpeg4Gif.mpeg4_url,
+                                     TestInlineQueryResultMpeg4Gif.thumb_url,
                                      mpeg4_width=TestInlineQueryResultMpeg4Gif.mpeg4_width,
                                      mpeg4_height=TestInlineQueryResultMpeg4Gif.mpeg4_height,
                                      mpeg4_duration=TestInlineQueryResultMpeg4Gif.mpeg4_duration,
-                                     thumb_url=TestInlineQueryResultMpeg4Gif.thumb_url,
                                      title=TestInlineQueryResultMpeg4Gif.title,
                                      caption=TestInlineQueryResultMpeg4Gif.caption,
                                      input_message_content=TestInlineQueryResultMpeg4Gif.input_message_content,
@@ -57,8 +39,6 @@ def inline_query_result_mpeg4_gif():
 
 
 class TestInlineQueryResultMpeg4Gif:
-    """This object represents Tests for Telegram InlineQueryResultMpeg4Gif."""
-
     id = 'id'
     type = 'mpeg4_gif'
     mpeg4_url = 'mpeg4 url'
@@ -69,42 +49,49 @@ class TestInlineQueryResultMpeg4Gif:
     title = 'title'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_mpeg4_de_json(self):
-        mpeg4 = InlineQueryResultMpeg4Gif.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_mpeg4_gif):
+        assert inline_query_result_mpeg4_gif.type == self.type
+        assert inline_query_result_mpeg4_gif.id == self.id
+        assert inline_query_result_mpeg4_gif.mpeg4_url == self.mpeg4_url
+        assert inline_query_result_mpeg4_gif.mpeg4_width == self.mpeg4_width
+        assert inline_query_result_mpeg4_gif.mpeg4_height == self.mpeg4_height
+        assert inline_query_result_mpeg4_gif.mpeg4_duration == self.mpeg4_duration
+        assert inline_query_result_mpeg4_gif.thumb_url == self.thumb_url
+        assert inline_query_result_mpeg4_gif.title == self.title
+        assert inline_query_result_mpeg4_gif.caption == self.caption
+        assert inline_query_result_mpeg4_gif.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_mpeg4_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        assert mpeg4.type == self.type
-        assert mpeg4.id == self.id
-        assert mpeg4.mpeg4_url == self.mpeg4_url
-        assert mpeg4.mpeg4_width == self.mpeg4_width
-        assert mpeg4.mpeg4_height == self.mpeg4_height
-        assert mpeg4.mpeg4_duration == self.mpeg4_duration
-        assert mpeg4.thumb_url == self.thumb_url
-        assert mpeg4.title == self.title
-        assert mpeg4.caption == self.caption
-        self.assertDictEqual(mpeg4.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert mpeg4.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_mpeg4_gif):
+        json.loads(inline_query_result_mpeg4_gif.to_json())
 
-    def test_mpeg4_to_json(self):
-        mpeg4 = InlineQueryResultMpeg4Gif.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_mpeg4_gif):
+        inline_query_result_mpeg4_gif_dict = inline_query_result_mpeg4_gif.to_dict()
 
-        json.loads(mpeg4.to_json())
-
-    def test_mpeg4_to_dict(self):
-        mpeg4 = InlineQueryResultMpeg4Gif.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(mpeg4, dict)
-        assert json_dict == mpeg4
+        assert isinstance(inline_query_result_mpeg4_gif_dict, dict)
+        assert inline_query_result_mpeg4_gif_dict['type'] == self.type
+        assert inline_query_result_mpeg4_gif_dict['id'] == self.id
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_url'] == self.mpeg4_url
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_width'] == self.mpeg4_width
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_height'] == self.mpeg4_height
+        assert inline_query_result_mpeg4_gif_dict['mpeg4_duration'] == self.mpeg4_duration
+        assert inline_query_result_mpeg4_gif_dict['thumb_url'] == self.thumb_url
+        assert inline_query_result_mpeg4_gif_dict['title'] == self.title
+        assert inline_query_result_mpeg4_gif_dict['caption'] == self.caption
+        assert inline_query_result_mpeg4_gif_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_mpeg4_gif_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultMpeg4Gif(self.id, self.mpeg4_url, self.thumb_url)
         b = InlineQueryResultMpeg4Gif(self.id, self.mpeg4_url, self.thumb_url)
         c = InlineQueryResultMpeg4Gif(self.id, "", self.thumb_url)
         d = InlineQueryResultMpeg4Gif("", self.mpeg4_url, self.thumb_url)
-        e = InlineQueryResultArticle(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

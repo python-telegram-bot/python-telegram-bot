@@ -39,14 +39,11 @@ def inline_query_result_article():
 
 
 class TestInlineQueryResultArticle:
-    """This object represents Tests for Telegram InlineQueryResultArticle."""
-
     id = 'id'
     type = 'article'
     title = 'title'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
     url = 'url'
     hide_url = True
     description = 'description'
