@@ -616,7 +616,7 @@ class Bot(TelegramObject):
                 the Internet, or upload a new one using multipart/form-data. Lastly you can pass
                 an existing :class:`telegram.Video` object to send.
             duration (:obj:`int`, optional): Duration of sent video in seconds.
-            width (Optional[int)): Video width.
+            width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
                 by file_id), 0-200 characters.
