@@ -137,6 +137,12 @@ Here's how to make a one-off code change.
       	$ git commit -a
       	$ git push origin your-branch-name
 
+   - If after merging you see local modified files in ``telegram/vendor/`` directory, that you didn't actually touch, that means you need to update submodules with this command:
+
+     .. code-block:: bash
+
+      	$ git submodule update --init --recursive
+
    - At the end, the reviewer will merge the pull request.
 
 6. **Tidy up!** Delete the feature branch from both your local clone and the GitHub repository:
