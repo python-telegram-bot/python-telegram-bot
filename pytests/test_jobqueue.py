@@ -16,16 +16,30 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-def TestJobQueue:
-    def setUp(self):
-        self.jq = JobQueue(MockBot('jobqueue_test'))
-        self.jq.start()
+import time
+from time import sleep
+
+import datetime
+import pytest
+from flaky import flaky
+
+from telegram.ext import JobQueue, Updater
+
+
+@pytest.fixture()
+def job_queue(bot):
+    jq = JobQueue(bot)
+    jq.start()
+    yield jq
+    jq.stop()
+
+
+@flaky(3, 1)  # Timings aren't quite perfect
+class TestJobQueue:
+    @pytest.fixture(autouse=True)
+    def reset(self):
         self.result = 0
         self.job_time = 0
-
-    def tearDown(self):
-        if self.jq is not None:
-            self.jq.stop()
 
     def job1(self, bot, job):
         self.result += 1
@@ -43,175 +57,155 @@ def TestJobQueue:
     def job5(self, bot, job):
         self.job_time = time.time()
 
-    def test_basic(self):
-        self.jq.put(Job(self.job1, 0.1))
-        sleep(1.5)
-        self.assertGreaterEqual(self.result, 10)
+    def test_run_once(self, job_queue):
+        job_queue.run_once(self.job1, 0.1)
+        sleep(0.2)
+        assert self.result == 1
 
-    def test_job_with_context(self):
-        self.jq.put(Job(self.job4, 0.1, context=5))
-        sleep(1.5)
-        self.assertGreaterEqual(self.result, 50)
+    def test_job_with_context(self, job_queue):
+        job_queue.run_once(self.job4, 0.1, context=5)
+        sleep(0.2)
+        assert self.result == 5
 
-    def test_noRepeat(self):
-        self.jq.put(Job(self.job1, 0.1, repeat=False))
+    def test_run_repeating(self, job_queue):
+        job_queue.run_repeating(self.job1, 0.2)
         sleep(0.5)
-        self.assertEqual(1, self.result)
+        assert self.result == 2
 
-    def test_nextT(self):
-        self.jq.put(Job(self.job1, 0.1), next_t=0.5)
+    def test_run_repeating_first(self, job_queue):
+        job_queue.run_repeating(self.job1, 0.1, first=0.5)
         sleep(0.45)
-        self.assertEqual(0, self.result)
+        assert self.result == 0
         sleep(0.1)
-        self.assertEqual(1, self.result)
+        assert self.result == 1
 
-    def test_multiple(self):
-        self.jq.put(Job(self.job1, 0.1, repeat=False))
-        self.jq.put(Job(self.job1, 0.2, repeat=False))
-        self.jq.put(Job(self.job1, 0.4))
-        sleep(1)
-        self.assertEqual(4, self.result)
-
-    def test_disabled(self):
-        j0 = Job(self.job1, 0.1)
-        j1 = Job(self.job1, 0.2)
-
-        self.jq.put(j0)
-        self.jq.put(Job(self.job1, 0.4))
-        self.jq.put(j1)
-
-        j0.enabled = False
-        j1.enabled = False
-
-        sleep(1)
-        self.assertEqual(2, self.result)
-
-    def test_schedule_removal(self):
-        j0 = Job(self.job1, 0.1)
-        j1 = Job(self.job1, 0.2)
-
-        self.jq.put(j0)
-        self.jq.put(Job(self.job1, 0.4))
-        self.jq.put(j1)
-
-        j0.schedule_removal()
-        j1.schedule_removal()
-
-        sleep(1)
-        self.assertEqual(2, self.result)
-
-    def test_schedule_removal_from_within(self):
-        self.jq.put(Job(self.job1, 0.4))
-        self.jq.put(Job(self.job3, 0.2))
-
-        sleep(1)
-        self.assertEqual(3, self.result)
-
-    def test_longer_first(self):
-        self.jq.put(Job(self.job1, 0.2, repeat=False))
-        self.jq.put(Job(self.job1, 0.1, repeat=False))
-        sleep(0.15)
-        self.assertEqual(1, self.result)
-
-    def test_error(self):
-        self.jq.put(Job(self.job2, 0.1))
-        self.jq.put(Job(self.job1, 0.2))
+    def test_multiple(self, job_queue):
+        job_queue.run_once(self.job1, 0.1)
+        job_queue.run_once(self.job1, 0.2)
+        job_queue.run_repeating(self.job1, 0.2)
         sleep(0.5)
-        self.assertEqual(2, self.result)
+        assert self.result == 4
 
-    def test_jobs_tuple(self):
-        self.jq.stop()
-        jobs = tuple(Job(self.job1, t) for t in range(5, 25))
+    def test_disabled(self, job_queue):
+        j1 = job_queue.run_once(self.job1, 0.1)
+        j2 = job_queue.run_repeating(self.job1, 0.2)
 
-        for job in jobs:
-            self.jq.put(job)
+        j1.enabled = False
+        j2.enabled = False
 
-        self.assertTupleEqual(jobs, self.jq.jobs())
+        sleep(0.3)
 
-    def test_inUpdater(self):
-        u = Updater(bot="MockBot")
+        assert self.result == 0
+
+        j2.enabled = True
+
+        sleep(0.2)
+
+        assert self.result == 1
+
+    def test_schedule_removal(self, job_queue):
+        j1 = job_queue.run_once(self.job1, 0.3)
+        j2 = job_queue.run_repeating(self.job1, 0.2)
+
+        sleep(0.25)
+
+        j1.schedule_removal()
+        j2.schedule_removal()
+
+        sleep(0.4)
+
+        assert self.result == 1
+
+    def test_schedule_removal_from_within(self, job_queue):
+        job_queue.run_repeating(self.job1, 0.2)
+        job_queue.run_repeating(self.job3, 0.2)
+
+        sleep(0.5)
+
+        assert self.result == 3
+
+    def test_longer_first(self, job_queue):
+        job_queue.run_once(self.job1, 0.2)
+        job_queue.run_once(self.job1, 0.1)
+
+        sleep(0.15)
+
+        assert self.result == 1
+
+    def test_error(self, job_queue):
+        job_queue.run_repeating(self.job2, 0.1)
+        job_queue.run_repeating(self.job1, 0.2)
+        sleep(0.3)
+        assert self.result == 1
+
+    def test_in_updater(self, bot):
+        u = Updater(bot=bot)
         u.job_queue.start()
         try:
-            u.job_queue.put(Job(self.job1, 0.5))
-            sleep(0.75)
-            self.assertEqual(1, self.result)
+            u.job_queue.run_repeating(self.job1, 0.2)
+            sleep(0.3)
+            assert self.result == 1
             u.stop()
-            sleep(2)
-            self.assertEqual(1, self.result)
+            sleep(1)
+            assert self.result == 1
         finally:
             u.stop()
 
-    def test_time_unit_int(self):
+    def test_time_unit_int(self, job_queue):
         # Testing seconds in int
-        delta = 2
+        delta = 0.5
         expected_time = time.time() + delta
 
-        self.jq.put(Job(self.job5, delta, repeat=False))
-        sleep(2.5)
-        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+        job_queue.run_once(self.job5, delta)
+        sleep(1)
+        assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_timedelta(self):
+    def test_time_unit_dt_timedelta(self, job_queue):
         # Testing seconds, minutes and hours as datetime.timedelta object
         # This is sufficient to test that it actually works.
-        interval = datetime.timedelta(seconds=2)
+        interval = datetime.timedelta(seconds=0.5)
         expected_time = time.time() + interval.total_seconds()
 
-        self.jq.put(Job(self.job5, interval, repeat=False))
-        sleep(2.5)
-        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+        job_queue.run_once(self.job5, interval)
+        sleep(1)
+        assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_datetime(self):
+    def test_time_unit_dt_datetime(self, job_queue):
         # Testing running at a specific datetime
-        delta = datetime.timedelta(seconds=2)
-        next_t = datetime.datetime.now() + delta
+        delta = datetime.timedelta(seconds=0.5)
+        when = datetime.datetime.now() + delta
         expected_time = time.time() + delta.total_seconds()
 
-        self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
-        sleep(2.5)
-        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+        job_queue.run_once(self.job5, when)
+        sleep(1)
+        assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_time_today(self):
+    def test_time_unit_dt_time_today(self, job_queue):
         # Testing running at a specific time today
-        delta = 2
-        next_t = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
+        delta = 0.5
+        when = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + delta
 
-        self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
-        sleep(2.5)
-        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
+        job_queue.run_once(self.job5, when)
+        sleep(1)
+        assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_time_tomorrow(self):
+    def test_time_unit_dt_time_tomorrow(self, job_queue):
         # Testing running at a specific time that has passed today. Since we can't wait a day, we
         # test if the jobs next_t has been calculated correctly
         delta = -2
-        next_t = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
+        when = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + delta + 60 * 60 * 24
 
-        self.jq.put(Job(self.job5, repeat=False), next_t=next_t)
-        self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
+        job_queue.run_once(self.job5, when)
+        assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
 
-    def test_run_once(self):
-        delta = 2
-        expected_time = time.time() + delta
-
-        self.jq.run_once(self.job5, delta)
-        sleep(2.5)
-        self.assertAlmostEqual(self.job_time, expected_time, delta=0.1)
-
-    def test_run_repeating(self):
-        interval = 0.1
-        first = 1.5
-
-        self.jq.run_repeating(self.job1, interval, first=first)
-        sleep(2.505)
-        self.assertAlmostEqual(self.result, 10, delta=1)
-
-    def test_run_daily(self):
+    def test_run_daily(self, job_queue):
         delta = 1
         time_of_day = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + 60 * 60 * 24 + delta
 
-        self.jq.run_daily(self.job1, time_of_day)
+        job_queue.run_daily(self.job1, time_of_day)
         sleep(2 * delta)
-        self.assertEqual(self.result, 1)
-        self.assertAlmostEqual(self.jq.queue.get(False)[0], expected_time, delta=0.1)
+        assert self.result == 1
+        assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
