@@ -37,7 +37,7 @@ class TestForceReply:
 
         assert message.text == 'text'
 
-    def test_force_reply_de_json(self, bot):
+    def test_de_json(self, bot):
         json_dict = {
             'selective': self.selective,
         }
@@ -46,10 +46,10 @@ class TestForceReply:
         assert force_reply.force_reply == self.force_reply
         assert force_reply.selective == self.selective
 
-    def test_force_reply_to_json(self, force_reply):
+    def test_to_json(self, force_reply):
         json.loads(force_reply.to_json())
 
-    def test_force_reply_to_dict(self, force_reply):
+    def test_to_dict(self, force_reply):
         force_reply_dict = force_reply.to_dict()
 
         assert isinstance(force_reply_dict,dict)

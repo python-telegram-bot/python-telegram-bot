@@ -38,7 +38,7 @@ class TestFile:
     u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
     file_size = 28232
 
-    def test_file_de_json(self, bot):
+    def test_de_json(self, bot):
         json_dict = {
             'file_id': self.file_id,
             'file_path': self.file_path,
@@ -50,10 +50,10 @@ class TestFile:
         assert new_file.file_path == json_dict['file_path']
         assert new_file.file_size == json_dict['file_size']
 
-    def test_file_to_json(self, file):
+    def test_to_json(self, file):
         json.loads(file.to_json())
 
-    def test_file_to_dict(self, file):
+    def test_to_dict(self, file):
         file_dict = file.to_dict()
 
         assert isinstance(file_dict, dict)

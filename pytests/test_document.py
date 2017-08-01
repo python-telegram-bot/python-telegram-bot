@@ -57,7 +57,7 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_document_all_args(self, bot, chat_id, document_file, document):
+    def test_send_all_args(self, bot, chat_id, document_file, document):
         message = bot.send_document(chat_id, document=document_file, caption=self.caption,
                                     disable_notification=False, filename='telegram_custom.png')
 
@@ -73,7 +73,7 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download_document(self, bot, document):
+    def test_get_and_download(self, bot, document):
         new_file = bot.get_file(document.file_id)
 
         assert new_file.file_size == document.file_size
@@ -86,7 +86,7 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_document_url_gif_file(self, bot, chat_id):
+    def test_send_url_gif_file(self, bot, chat_id):
         message = bot.send_document(chat_id, self.document_file_url)
 
         document = message.document
@@ -101,12 +101,12 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_document_resend(self, bot, chat_id, document):
+    def test_send_resend(self, bot, chat_id, document):
         message = bot.send_document(chat_id=chat_id, document=document.file_id)
 
         assert message.document == document
 
-    def test_send_document_with_document(self, monkeypatch, bot, chat_id, document):
+    def test_send_with_document(self, monkeypatch, bot, chat_id, document):
         def test(_, url, data, **kwargs):
             return data['document'] == document.file_id
 
@@ -116,7 +116,7 @@ class TestDocument:
 
         assert message
 
-    def test_document_de_json(self, bot, document):
+    def test_de_json(self, bot, document):
         json_dict = {'file_id': document.file_id,
                      'thumb': document.thumb.to_dict(),
                      'file_name': document.file_name,
@@ -127,10 +127,10 @@ class TestDocument:
 
         assert test_document == document
 
-    def test_document_to_json(self, document):
+    def test_to_json(self, document):
         json.loads(document.to_json())
 
-    def test_document_to_dict(self, document):
+    def test_to_dict(self, document):
         document_dict = document.to_dict()
 
         assert isinstance(document_dict, dict)
@@ -141,18 +141,18 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_document_empty_file(self, bot, chat_id):
+    def test_error_send_empty_file(self, bot, chat_id):
         with open(os.devnull, 'rb') as f:
             with pytest.raises(TelegramError):
                 bot.send_document(chat_id=chat_id, document=f)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_document_empty_file_id(self, bot, chat_id):
+    def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_document(chat_id=chat_id, document='')
 
-    def test_error_document_without_required_args(self, bot, chat_id):
+    def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_document(chat_id=chat_id)
 

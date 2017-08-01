@@ -35,14 +35,14 @@ class TestContact:
     last_name = 'Toledo'
     user_id = 23
 
-    def test_contact_de_json_required(self, bot):
+    def test_de_json_required(self, bot):
         contact = Contact.de_json({'phone_number': self.phone_number,
                                    'first_name': self.first_name}, bot)
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
 
-    def test_contact_de_json_all(self, bot):
+    def test_de_json_all(self, bot):
         contact = Contact.de_json(
             {'phone_number': self.phone_number, 'first_name': self.first_name,
              'last_name': self.last_name, 'user_id': self.user_id}, bot)
@@ -52,7 +52,7 @@ class TestContact:
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
 
-    def test_send_contact_with_contact(self, monkeypatch, bot, chat_id, contact):
+    def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
         def test(_, url, data, **kwargs):
             phone = data['phone_number'] == contact.phone_number
             first = data['first_name'] == contact.first_name
@@ -63,10 +63,10 @@ class TestContact:
         message = bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
 
-    def test_contact_to_json(self, contact):
+    def test_to_json(self, contact):
         json.loads(contact.to_json())
 
-    def test_contact_to_dict(self, contact):
+    def test_to_dict(self, contact):
         contact_dict = contact.to_dict()
 
         assert isinstance(contact_dict, dict)

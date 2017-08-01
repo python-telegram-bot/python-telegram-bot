@@ -64,7 +64,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_audio_all_args(self, bot, chat_id, audio_file, audio):
+    def test_send_all_args(self, bot, chat_id, audio_file, audio):
         message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
                                  duration=audio.duration, performer=self.performer,
                                  title=self.title, disable_notification=False)
@@ -82,7 +82,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download_audio(self, bot, audio):
+    def test_get_and_download(self, bot, audio):
         new_file = bot.get_file(audio.file_id)
 
         assert new_file.file_size == audio.file_size
@@ -95,7 +95,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_audio_mp3_url_file(self, bot, chat_id, audio):
+    def test_send_mp3_url_file(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=self.audio_file_url, caption=self.caption)
 
         assert message.caption == self.caption
@@ -109,12 +109,12 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_audio_resend(self, bot, chat_id, audio):
+    def test_send_resend(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
 
         assert message.audio == audio
 
-    def test_send_audio_with_audio(self, monkeypatch, bot, chat_id, audio):
+    def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
         def test(_, url, data, **kwargs):
             return data['audio'] == audio.file_id
 
@@ -122,7 +122,7 @@ class TestAudio:
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
-    def test_audio_de_json(self, bot, audio):
+    def test_de_json(self, bot, audio):
         json_audio = Audio.de_json({'file_id': audio.file_id, 'duration': audio.duration,
                                     'performer': TestAudio.performer, 'title': TestAudio.title,
                                     'caption': TestAudio.caption, 'mime_type': audio.mime_type,
@@ -136,10 +136,10 @@ class TestAudio:
         assert json_audio.mime_type == audio.mime_type
         assert json_audio.file_size == audio.file_size
 
-    def test_audio_to_json(self, audio):
+    def test_to_json(self, audio):
         json.loads(audio.to_json())
 
-    def test_audio_to_dict(self, audio):
+    def test_to_dict(self, audio):
         audio_dict = audio.to_dict()
 
         assert isinstance(audio_dict, dict)

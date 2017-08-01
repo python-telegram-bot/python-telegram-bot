@@ -36,7 +36,7 @@ class TestInlineQuery:
     offset = 'offset'
     location = Location(8.8, 53.1)
 
-    def test_inlinequery_de_json(self, bot):
+    def test_de_json(self, bot):
         json_dict = {
             'id': self.id,
             'from': self.from_user.to_dict(),
@@ -52,10 +52,10 @@ class TestInlineQuery:
         assert inlinequery_json.query == self.query
         assert inlinequery_json.offset == self.offset
 
-    def test_inlinequery_to_json(self, inlinequery):
+    def test_to_json(self, inlinequery):
         json.loads(inlinequery.to_json())
 
-    def test_inlinequery_to_dict(self, inlinequery):
+    def test_to_dict(self, inlinequery):
         inlinequery_dict = inlinequery.to_dict()
 
         assert isinstance(inlinequery_dict, dict)

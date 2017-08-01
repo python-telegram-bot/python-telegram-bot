@@ -44,7 +44,7 @@ class TestInlineKeyboardButton:
     callback_game = 'callback_game'
     pay = 'pay'
 
-    def test_inline_keyboard_button_de_json(self, bot):
+    def test_de_json(self, bot):
         json_dict = {
             'text': self.text,
             'url': self.url,
@@ -66,16 +66,16 @@ class TestInlineKeyboardButton:
         assert inline_keyboard_button.callback_game == self.callback_game
         assert inline_keyboard_button.pay == self.pay
 
-    def test_inline_keyboard_button_de_list(self, bot, inline_keyboard_button):
+    def test_de_list(self, bot, inline_keyboard_button):
         keyboard_json = [inline_keyboard_button.to_dict(), inline_keyboard_button.to_dict()]
         inline_keyboard_buttons = InlineKeyboardButton.de_list(keyboard_json, bot)
 
         assert inline_keyboard_buttons == [inline_keyboard_button, inline_keyboard_button]
 
-    def test_inline_keyboard_button_to_json(self, inline_keyboard_button):
+    def test_to_json(self, inline_keyboard_button):
         json.loads(inline_keyboard_button.to_json())
 
-    def test_inline_keyboard_button_to_dict(self, inline_keyboard_button):
+    def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()
 
         assert isinstance(inline_keyboard_button_dict, dict)

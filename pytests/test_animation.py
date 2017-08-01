@@ -55,7 +55,7 @@ class TestAnimation:
     mime_type = "video/mp4"
     file_size = 4008
 
-    def test_animation_de_json(self, json_dict, bot, thumb):
+    def test_de_json(self, json_dict, bot, thumb):
         animation = Animation.de_json(json_dict, bot)
         assert animation.file_id == self.animation_file_id
         assert animation.thumb == thumb
@@ -63,10 +63,10 @@ class TestAnimation:
         assert animation.mime_type == self.mime_type
         assert animation.file_size == self.file_size
 
-    def test_animation_to_json(self, animation):
+    def test_to_json(self, animation):
         json.loads(animation.to_json())
 
-    def test_animation_to_dict(self, animation, thumb):
+    def test_to_dict(self, animation, thumb):
         animation_dict = animation.to_dict()
 
         assert isinstance(animation_dict, dict)

@@ -42,7 +42,7 @@ class TestGame:
     text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     animation = Animation('blah')
 
-    def test_game_de_json(self, bot):
+    def test_de_json(self, bot):
         json_dict = {
             'title': self.title,
             'description': self.description,
@@ -60,10 +60,10 @@ class TestGame:
         assert game.text_entities == self.text_entities
         assert game.animation == self.animation
 
-    def test_game_to_json(self, game):
+    def test_to_json(self, game):
         json.loads(game.to_json())
 
-    def test_game_to_dict(self, game):
+    def test_to_dict(self, game):
         game_dict = game.to_dict()
 
         assert isinstance(game_dict, dict)

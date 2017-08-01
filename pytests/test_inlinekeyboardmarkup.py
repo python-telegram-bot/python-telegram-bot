@@ -42,7 +42,7 @@ class TestInlineKeyboardMarkup:
 
         assert message.text == 'Testing InlineKeyboardMarkup'
 
-    def test_inline_keyboard_markup_de_json(self, bot, inline_keyboard_markup):
+    def test_de_json(self, bot, inline_keyboard_markup):
         json_dict = {
             'inline_keyboard': [[
                 self.inline_keyboard[0][0].to_dict(),
@@ -53,10 +53,10 @@ class TestInlineKeyboardMarkup:
 
         assert inline_keyboard_markup_json == inline_keyboard_markup
 
-    def test_inline_keyboard_markup_to_json(self, inline_keyboard_markup):
+    def test_to_json(self, inline_keyboard_markup):
         json.loads(inline_keyboard_markup.to_json())
 
-    def test_inline_keyboard_markup_to_dict(self, inline_keyboard_markup):
+    def test_to_dict(self, inline_keyboard_markup):
         inline_keyboard_markup_dict = inline_keyboard_markup.to_dict()
 
         assert isinstance(inline_keyboard_markup_dict, dict)

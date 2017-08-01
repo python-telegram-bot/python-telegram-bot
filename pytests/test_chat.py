@@ -48,7 +48,7 @@ class TestChat:
     type = 'group'
     all_members_are_administrators = False
 
-    def test_group_chat_de_json(self, bot, json_dict):
+    def test_de_json(self, bot, json_dict):
         chat = Chat.de_json(json_dict, bot)
 
         assert chat.id == self.id
@@ -56,10 +56,10 @@ class TestChat:
         assert chat.type == self.type
         assert chat.all_members_are_administrators == self.all_members_are_administrators
 
-    def test_group_chat_to_json(self, chat):
+    def test_to_json(self, chat):
         json.loads(chat.to_json())
 
-    def test_group_chat_to_dict(self, chat):
+    def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
 
         assert isinstance(chat_dict, dict)

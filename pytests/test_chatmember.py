@@ -38,7 +38,7 @@ def chat_member(user):
 class TestChatMember:
     status = ChatMember.CREATOR
 
-    def test_chat_member_de_json_required_args(self, bot, user):
+    def test_de_json_required_args(self, bot, user):
         json_dict = {'user': user.to_dict(), 'status': self.status}
 
         chat_member = ChatMember.de_json(json_dict, bot)
@@ -46,7 +46,7 @@ class TestChatMember:
         assert chat_member.user == user
         assert chat_member.status == self.status
 
-    def test_chat_member_de_json_all_args(self, bot, user):
+    def test_de_json_all_args(self, bot, user):
         time = datetime.datetime.now()
         json_dict = {'user': user.to_dict(),
                      'status': self.status,
@@ -83,10 +83,10 @@ class TestChatMember:
         assert chat_member.can_send_other_messages is False
         assert chat_member.can_add_web_page_previews is True
 
-    def test_chat_member_to_json(self, chat_member):
+    def test_to_json(self, chat_member):
         json.loads(chat_member.to_json())
 
-    def test_chat_member_to_dict(self, chat_member):
+    def test_to_dict(self, chat_member):
         chat_member_dict = chat_member.to_dict()
         assert isinstance(chat_member_dict, dict)
         assert chat_member_dict['user'] == chat_member.user.to_dict()
