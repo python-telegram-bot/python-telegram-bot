@@ -90,6 +90,8 @@ class CallbackQuery(TelegramObject):
 
         self.bot = bot
 
+        self._id_attrs = ('id',)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
