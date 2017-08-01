@@ -20,29 +20,22 @@ import json
 
 import pytest
 
-from telegram import (InlineKeyboardMarkup, InputTextMessageContent, InlineQueryResultCachedVideo, InlineKeyboardButton, InlineQueryResultCachedVoice)
+from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InputTextMessageContent,
+                      InlineQueryResultCachedVideo, InlineQueryResultCachedVoice)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'type': TestInlineQueryResultCachedVideo.type,
-            'id': TestInlineQueryResultCachedVideo.id,
-            'video_file_id': TestInlineQueryResultCachedVideo.video_file_id,
-            'title': TestInlineQueryResultCachedVideo.title,
-            'caption': TestInlineQueryResultCachedVideo.caption,
-            'description': TestInlineQueryResultCachedVideo.description,
-            'input_message_content': TestInlineQueryResultCachedVideo.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedVideo.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_video():
-   return InlineQueryResultCachedVideo(type=TestInlineQueryResultCachedVideo.type, id=TestInlineQueryResultCachedVideo.id, video_file_id=TestInlineQueryResultCachedVideo.video_file_id, title=TestInlineQueryResultCachedVideo.title, caption=TestInlineQueryResultCachedVideo.caption, description=TestInlineQueryResultCachedVideo.description, input_message_content=TestInlineQueryResultCachedVideo.input_message_content, reply_markup=TestInlineQueryResultCachedVideo.reply_markup)
+    return InlineQueryResultCachedVideo(TestInlineQueryResultCachedVideo.id,
+                                        TestInlineQueryResultCachedVideo.video_file_id,
+                                        TestInlineQueryResultCachedVideo.title,
+                                        caption=TestInlineQueryResultCachedVideo.caption,
+                                        description=TestInlineQueryResultCachedVideo.description,
+                                        input_message_content=TestInlineQueryResultCachedVideo.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedVideo.reply_markup)
+
 
 class TestInlineQueryResultCachedVideo:
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedVideo."""
-
     id = 'id'
     type = 'video'
     video_file_id = 'video file id'
@@ -50,34 +43,37 @@ class TestInlineQueryResultCachedVideo:
     caption = 'caption'
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
-    
-    
-    
-    def test_video_de_json(self):
-        video = InlineQueryResultCachedVideo.de_json(json_dict, bot)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        assert video.type == self.type
-        assert video.id == self.id
-        assert video.video_file_id == self.video_file_id
-        assert video.title == self.title
-        assert video.description == self.description
-        assert video.caption == self.caption
-        self.assertDictEqual(video.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert video.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_expected_values(self, inline_query_result_cached_video):
+        assert inline_query_result_cached_video.type == self.type
+        assert inline_query_result_cached_video.id == self.id
+        assert inline_query_result_cached_video.video_file_id == self.video_file_id
+        assert inline_query_result_cached_video.title == self.title
+        assert inline_query_result_cached_video.description == self.description
+        assert inline_query_result_cached_video.caption == self.caption
+        assert inline_query_result_cached_video.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_video.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-    def test_video_to_json(self):
-        video = InlineQueryResultCachedVideo.de_json(json_dict, bot)
+    def test_to_json(self, inline_query_result_cached_video):
+        json.loads(inline_query_result_cached_video.to_json())
 
-        json.loads(video.to_json())
+    def test_to_dict(self, inline_query_result_cached_video):
+        inline_query_result_cached_video_dict = inline_query_result_cached_video.to_dict()
 
-    def test_video_to_dict(self):
-        video = InlineQueryResultCachedVideo.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(video, dict)
-        assert json_dict == video
+        assert isinstance(inline_query_result_cached_video_dict, dict)
+        assert inline_query_result_cached_video_dict['type'] == self.type
+        assert inline_query_result_cached_video_dict['id'] == self.id
+        assert inline_query_result_cached_video_dict['video_file_id'] == self.video_file_id
+        assert inline_query_result_cached_video_dict['title'] == self.title
+        assert inline_query_result_cached_video_dict['description'] == self.description
+        assert inline_query_result_cached_video_dict['caption'] == self.caption
+        assert inline_query_result_cached_video_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_video_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
@@ -98,5 +94,3 @@ class TestInlineQueryResultCachedVideo:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

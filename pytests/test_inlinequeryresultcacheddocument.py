@@ -20,29 +20,22 @@ import json
 
 import pytest
 
-from telegram import (InlineKeyboardButton, InlineQueryResultCachedDocument, InlineKeyboardMarkup, InputTextMessageContent, InlineQueryResultCachedVoice)
+from telegram import (InlineQueryResultCachedDocument, InlineKeyboardButton, InlineKeyboardMarkup,
+                      InputTextMessageContent, InlineQueryResultCachedVoice)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'id': TestInlineQueryResultCachedDocument.id,
-            'type': TestInlineQueryResultCachedDocument.type,
-            'document_file_id': TestInlineQueryResultCachedDocument.document_file_id,
-            'title': TestInlineQueryResultCachedDocument.title,
-            'caption': TestInlineQueryResultCachedDocument.caption,
-            'description': TestInlineQueryResultCachedDocument.description,
-            'input_message_content': TestInlineQueryResultCachedDocument.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedDocument.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_document():
-   return InlineQueryResultCachedDocument(id=TestInlineQueryResultCachedDocument.id, type=TestInlineQueryResultCachedDocument.type, document_file_id=TestInlineQueryResultCachedDocument.document_file_id, title=TestInlineQueryResultCachedDocument.title, caption=TestInlineQueryResultCachedDocument.caption, description=TestInlineQueryResultCachedDocument.description, input_message_content=TestInlineQueryResultCachedDocument.input_message_content, reply_markup=TestInlineQueryResultCachedDocument.reply_markup)
+    return InlineQueryResultCachedDocument(TestInlineQueryResultCachedDocument.id,
+                                           TestInlineQueryResultCachedDocument.title,
+                                           TestInlineQueryResultCachedDocument.document_file_id,
+                                           caption=TestInlineQueryResultCachedDocument.caption,
+                                           description=TestInlineQueryResultCachedDocument.description,
+                                           input_message_content=TestInlineQueryResultCachedDocument.input_message_content,
+                                           reply_markup=TestInlineQueryResultCachedDocument.reply_markup)
+
 
 class TestInlineQueryResultCachedDocument:
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedDocument."""
-
     id = 'id'
     type = 'document'
     document_file_id = 'document file id'
@@ -50,34 +43,38 @@ class TestInlineQueryResultCachedDocument:
     caption = 'caption'
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
-    
-    
-    def test_document_de_json(self):
-        document = InlineQueryResultCachedDocument.de_json(json_dict, bot)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        assert document.id == self.id
-        assert document.type == self.type
-        assert document.document_file_id == self.document_file_id
-        assert document.title == self.title
-        assert document.caption == self.caption
-        assert document.description == self.description
-        self.assertDictEqual(document.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert document.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_expected_values(self, inline_query_result_cached_document):
+        assert inline_query_result_cached_document.id == self.id
+        assert inline_query_result_cached_document.type == self.type
+        assert inline_query_result_cached_document.document_file_id == self.document_file_id
+        assert inline_query_result_cached_document.title == self.title
+        assert inline_query_result_cached_document.caption == self.caption
+        assert inline_query_result_cached_document.description == self.description
+        assert inline_query_result_cached_document.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_document.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-    def test_document_to_json(self):
-        document = InlineQueryResultCachedDocument.de_json(json_dict, bot)
+    def test_to_json(self, inline_query_result_cached_document):
+        json.loads(inline_query_result_cached_document.to_json())
 
-        json.loads(document.to_json())
+    def test_to_dict(self, inline_query_result_cached_document):
+        inline_query_result_cached_document_dict = inline_query_result_cached_document.to_dict()
 
-    def test_document_to_dict(self):
-        document = InlineQueryResultCachedDocument.de_json(json_dict,
-                                                                    bot).to_dict()
-
-        assert isinstance(document, dict)
-        assert json_dict == document
+        assert isinstance(inline_query_result_cached_document_dict, dict)
+        assert inline_query_result_cached_document_dict['id'] == self.id
+        assert inline_query_result_cached_document_dict['type'] == self.type
+        assert inline_query_result_cached_document_dict['document_file_id'] == \
+               self.document_file_id
+        assert inline_query_result_cached_document_dict['title'] == self.title
+        assert inline_query_result_cached_document_dict['caption'] == self.caption
+        assert inline_query_result_cached_document_dict['description'] == self.description
+        assert inline_query_result_cached_document_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_document_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedDocument(self.id, self.title, self.document_file_id)
@@ -98,5 +95,3 @@ class TestInlineQueryResultCachedDocument:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

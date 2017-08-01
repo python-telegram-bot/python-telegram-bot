@@ -20,61 +20,56 @@ import json
 
 import pytest
 
-from telegram import (InputTextMessageContent, InlineQueryResultCachedVoice, InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryResultCachedAudio)
+from telegram import (InlineQueryResultCachedVoice, InlineKeyboardButton, InlineKeyboardMarkup,
+                      InlineQueryResultCachedAudio, InputTextMessageContent)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'type': TestInlineQueryResultCachedVoice.type,
-            'id': TestInlineQueryResultCachedVoice.id,
-            'voice_file_id': TestInlineQueryResultCachedVoice.voice_file_id,
-            'title': TestInlineQueryResultCachedVoice.title,
-            'caption': TestInlineQueryResultCachedVoice.caption,
-            'input_message_content': TestInlineQueryResultCachedVoice.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedVoice.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_voice():
-   return InlineQueryResultCachedVoice(type=TestInlineQueryResultCachedVoice.type, id=TestInlineQueryResultCachedVoice.id, voice_file_id=TestInlineQueryResultCachedVoice.voice_file_id, title=TestInlineQueryResultCachedVoice.title, caption=TestInlineQueryResultCachedVoice.caption, input_message_content=TestInlineQueryResultCachedVoice.input_message_content, reply_markup=TestInlineQueryResultCachedVoice.reply_markup)
+    return InlineQueryResultCachedVoice(TestInlineQueryResultCachedVoice.id,
+                                        TestInlineQueryResultCachedVoice.voice_file_id,
+                                        TestInlineQueryResultCachedVoice.title,
+                                        caption=TestInlineQueryResultCachedVoice.caption,
+                                        input_message_content=TestInlineQueryResultCachedVoice.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedVoice.reply_markup)
+
 
 class TestInlineQueryResultCachedVoice:
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedVoice."""
-
     id = 'id'
     type = 'voice'
     voice_file_id = 'voice file id'
     title = 'title'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
-    
-    
-    
-    def test_voice_de_json(self):
-        voice = InlineQueryResultCachedVoice.de_json(json_dict, bot)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        assert voice.type == self.type
-        assert voice.id == self.id
-        assert voice.voice_file_id == self.voice_file_id
-        assert voice.title == self.title
-        assert voice.caption == self.caption
-        self.assertDictEqual(voice.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert voice.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_expected_values(self, inline_query_result_cached_voice):
+        assert inline_query_result_cached_voice.type == self.type
+        assert inline_query_result_cached_voice.id == self.id
+        assert inline_query_result_cached_voice.voice_file_id == self.voice_file_id
+        assert inline_query_result_cached_voice.title == self.title
+        assert inline_query_result_cached_voice.caption == self.caption
+        assert inline_query_result_cached_voice.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_voice.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-    def test_voice_to_json(self):
-        voice = InlineQueryResultCachedVoice.de_json(json_dict, bot)
+    def test_to_json(self, inline_query_result_cached_voice):
+        json.loads(inline_query_result_cached_voice.to_json())
 
-        json.loads(voice.to_json())
+    def test_to_dict(self, inline_query_result_cached_voice):
+        inline_query_result_cached_voice_dict = inline_query_result_cached_voice.to_dict()
 
-    def test_voice_to_dict(self):
-        voice = InlineQueryResultCachedVoice.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(voice, dict)
-        assert json_dict == voice
+        assert isinstance(inline_query_result_cached_voice_dict, dict)
+        assert inline_query_result_cached_voice_dict['type'] == self.type
+        assert inline_query_result_cached_voice_dict['id'] == self.id
+        assert inline_query_result_cached_voice_dict['voice_file_id'] == self.voice_file_id
+        assert inline_query_result_cached_voice_dict['title'] == self.title
+        assert inline_query_result_cached_voice_dict['caption'] == self.caption
+        assert inline_query_result_cached_voice_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_voice_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedVoice(self.id, self.voice_file_id, self.title)
@@ -95,5 +90,3 @@ class TestInlineQueryResultCachedVoice:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

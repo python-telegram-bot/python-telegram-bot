@@ -20,29 +20,22 @@ import json
 
 import pytest
 
-from telegram import (InlineQueryResultCachedVoice, InlineKeyboardButton, InputTextMessageContent, InlineKeyboardMarkup, InlineQueryResultCachedPhoto)
+from telegram import (InputTextMessageContent, InlineQueryResultCachedPhoto, InlineKeyboardButton,
+                      InlineQueryResultCachedVoice, InlineKeyboardMarkup)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'type': TestInlineQueryResultCachedPhoto.type,
-            'id': TestInlineQueryResultCachedPhoto.id,
-            'photo_file_id': TestInlineQueryResultCachedPhoto.photo_file_id,
-            'title': TestInlineQueryResultCachedPhoto.title,
-            'description': TestInlineQueryResultCachedPhoto.description,
-            'caption': TestInlineQueryResultCachedPhoto.caption,
-            'input_message_content': TestInlineQueryResultCachedPhoto.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedPhoto.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_photo():
-   return InlineQueryResultCachedPhoto(type=TestInlineQueryResultCachedPhoto.type, id=TestInlineQueryResultCachedPhoto.id, photo_file_id=TestInlineQueryResultCachedPhoto.photo_file_id, title=TestInlineQueryResultCachedPhoto.title, description=TestInlineQueryResultCachedPhoto.description, caption=TestInlineQueryResultCachedPhoto.caption, input_message_content=TestInlineQueryResultCachedPhoto.input_message_content, reply_markup=TestInlineQueryResultCachedPhoto.reply_markup)
+    return InlineQueryResultCachedPhoto(TestInlineQueryResultCachedPhoto.id,
+                                        TestInlineQueryResultCachedPhoto.photo_file_id,
+                                        title=TestInlineQueryResultCachedPhoto.title,
+                                        description=TestInlineQueryResultCachedPhoto.description,
+                                        caption=TestInlineQueryResultCachedPhoto.caption,
+                                        input_message_content=TestInlineQueryResultCachedPhoto.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedPhoto.reply_markup)
+
 
 class TestInlineQueryResultCachedPhoto:
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedPhoto."""
-
     id = 'id'
     type = 'photo'
     photo_file_id = 'photo file id'
@@ -50,34 +43,37 @@ class TestInlineQueryResultCachedPhoto:
     description = 'description'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
     
-    
-    
-    def test_photo_de_json(self):
-        photo = InlineQueryResultCachedPhoto.de_json(json_dict, bot)
+    def test_expected_values(self, inline_query_result_cached_photo):
+        assert inline_query_result_cached_photo.type == self.type
+        assert inline_query_result_cached_photo.id == self.id
+        assert inline_query_result_cached_photo.photo_file_id == self.photo_file_id
+        assert inline_query_result_cached_photo.title == self.title
+        assert inline_query_result_cached_photo.description == self.description
+        assert inline_query_result_cached_photo.caption == self.caption
+        assert inline_query_result_cached_photo.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_photo.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-        assert photo.type == self.type
-        assert photo.id == self.id
-        assert photo.photo_file_id == self.photo_file_id
-        assert photo.title == self.title
-        assert photo.description == self.description
-        assert photo.caption == self.caption
-        self.assertDictEqual(photo.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert photo.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_to_json(self, inline_query_result_cached_photo):
+        json.loads(inline_query_result_cached_photo.to_json())
 
-    def test_photo_to_json(self):
-        photo = InlineQueryResultCachedPhoto.de_json(json_dict, bot)
+    def test_to_dict(self, inline_query_result_cached_photo):
+        inline_query_result_cached_photo_dict = inline_query_result_cached_photo.to_dict()
 
-        json.loads(photo.to_json())
-
-    def test_photo_to_dict(self):
-        photo = InlineQueryResultCachedPhoto.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(photo, dict)
-        assert json_dict == photo
+        assert isinstance(inline_query_result_cached_photo_dict, dict)
+        assert inline_query_result_cached_photo_dict['type'] == self.type
+        assert inline_query_result_cached_photo_dict['id'] == self.id
+        assert inline_query_result_cached_photo_dict['photo_file_id'] == self.photo_file_id
+        assert inline_query_result_cached_photo_dict['title'] == self.title
+        assert inline_query_result_cached_photo_dict['description'] == self.description
+        assert inline_query_result_cached_photo_dict['caption'] == self.caption
+        assert inline_query_result_cached_photo_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_photo_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedPhoto(self.id, self.photo_file_id)
@@ -98,5 +94,3 @@ class TestInlineQueryResultCachedPhoto:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

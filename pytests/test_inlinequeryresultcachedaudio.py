@@ -20,58 +20,52 @@ import json
 
 import pytest
 
-from telegram import (InlineQueryResultCachedAudio, InlineQueryResultCachedVoice, InlineKeyboardMarkup, InputTextMessageContent, InlineKeyboardButton)
+from telegram import (InputTextMessageContent, InlineQueryResultCachedAudio, InlineKeyboardMarkup,
+                      InlineKeyboardButton, InlineQueryResultCachedVoice)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'type': TestInlineQueryResultCachedAudio.type,
-            'id': TestInlineQueryResultCachedAudio.id,
-            'audio_file_id': TestInlineQueryResultCachedAudio.audio_file_id,
-            'caption': TestInlineQueryResultCachedAudio.caption,
-            'input_message_content': TestInlineQueryResultCachedAudio.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedAudio.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_audio():
-   return InlineQueryResultCachedAudio(type=TestInlineQueryResultCachedAudio.type, id=TestInlineQueryResultCachedAudio.id, audio_file_id=TestInlineQueryResultCachedAudio.audio_file_id, caption=TestInlineQueryResultCachedAudio.caption, input_message_content=TestInlineQueryResultCachedAudio.input_message_content, reply_markup=TestInlineQueryResultCachedAudio.reply_markup)
+    return InlineQueryResultCachedAudio(TestInlineQueryResultCachedAudio.id,
+                                        TestInlineQueryResultCachedAudio.audio_file_id,
+                                        caption=TestInlineQueryResultCachedAudio.caption,
+                                        input_message_content=TestInlineQueryResultCachedAudio.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedAudio.reply_markup)
+
 
 class TestInlineQueryResultCachedAudio:
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedAudio."""
-
     id = 'id'
     type = 'audio'
     audio_file_id = 'audio file id'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
-    
-    
-    
-    def test_audio_de_json(self):
-        audio = InlineQueryResultCachedAudio.de_json(json_dict, bot)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        assert audio.type == self.type
-        assert audio.id == self.id
-        assert audio.audio_file_id == self.audio_file_id
-        assert audio.caption == self.caption
-        self.assertDictEqual(audio.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert audio.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_expected_values(self, inline_query_result_cached_audio):
+        assert inline_query_result_cached_audio.type == self.type
+        assert inline_query_result_cached_audio.id == self.id
+        assert inline_query_result_cached_audio.audio_file_id == self.audio_file_id
+        assert inline_query_result_cached_audio.caption == self.caption
+        assert inline_query_result_cached_audio.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_audio.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-    def test_audio_to_json(self):
-        audio = InlineQueryResultCachedAudio.de_json(json_dict, bot)
+    def test_to_json(self, inline_query_result_cached_audio):
+        json.loads(inline_query_result_cached_audio.to_json())
 
-        json.loads(audio.to_json())
+    def test_to_dict(self, inline_query_result_cached_audio):
+        inline_query_result_cached_audio_dict = inline_query_result_cached_audio.to_dict()
 
-    def test_audio_to_dict(self):
-        audio = InlineQueryResultCachedAudio.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(audio, dict)
-        assert json_dict == audio
+        assert isinstance(inline_query_result_cached_audio_dict, dict)
+        assert inline_query_result_cached_audio_dict['type'] == self.type
+        assert inline_query_result_cached_audio_dict['id'] == self.id
+        assert inline_query_result_cached_audio_dict['audio_file_id'] == self.audio_file_id
+        assert inline_query_result_cached_audio_dict['caption'] == self.caption
+        assert inline_query_result_cached_audio_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_audio_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedAudio(self.id, self.audio_file_id)
@@ -92,5 +86,3 @@ class TestInlineQueryResultCachedAudio:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

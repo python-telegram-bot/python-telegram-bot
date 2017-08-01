@@ -20,56 +20,49 @@ import json
 
 import pytest
 
-from telegram import (InlineQueryResultCachedSticker, InputTextMessageContent, InlineQueryResultCachedVoice, InlineKeyboardMarkup, InlineKeyboardButton)
+from telegram import (InputTextMessageContent, InlineKeyboardButton,
+                      InlineQueryResultCachedSticker, InlineQueryResultCachedVoice,
+                      InlineKeyboardMarkup)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'type': TestInlineQueryResultCachedSticker.type,
-            'id': TestInlineQueryResultCachedSticker.id,
-            'sticker_file_id': TestInlineQueryResultCachedSticker.sticker_file_id,
-            'input_message_content': TestInlineQueryResultCachedSticker.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedSticker.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_sticker():
-   return InlineQueryResultCachedSticker(type=TestInlineQueryResultCachedSticker.type, id=TestInlineQueryResultCachedSticker.id, sticker_file_id=TestInlineQueryResultCachedSticker.sticker_file_id, input_message_content=TestInlineQueryResultCachedSticker.input_message_content, reply_markup=TestInlineQueryResultCachedSticker.reply_markup)
+    return InlineQueryResultCachedSticker(TestInlineQueryResultCachedSticker.id,
+                                          TestInlineQueryResultCachedSticker.sticker_file_id,
+                                          input_message_content=TestInlineQueryResultCachedSticker.input_message_content,
+                                          reply_markup=TestInlineQueryResultCachedSticker.reply_markup)
+
 
 class TestInlineQueryResultCachedSticker:
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedSticker."""
-
     id = 'id'
     type = 'sticker'
     sticker_file_id = 'sticker file id'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
-    
-    
-    
-    def test_sticker_de_json(self):
-        sticker = InlineQueryResultCachedSticker.de_json(json_dict, bot)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        assert sticker.type == self.type
-        assert sticker.id == self.id
-        assert sticker.sticker_file_id == self.sticker_file_id
-        self.assertDictEqual(sticker.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert sticker.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_expected_values(self, inline_query_result_cached_sticker):
+        assert inline_query_result_cached_sticker.type == self.type
+        assert inline_query_result_cached_sticker.id == self.id
+        assert inline_query_result_cached_sticker.sticker_file_id == self.sticker_file_id
+        assert inline_query_result_cached_sticker.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_sticker.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-    def test_sticker_to_json(self):
-        sticker = InlineQueryResultCachedSticker.de_json(json_dict, bot)
+    def test_to_json(self, inline_query_result_cached_sticker):
+        json.loads(inline_query_result_cached_sticker.to_json())
 
-        json.loads(sticker.to_json())
+    def test_to_dict(self, inline_query_result_cached_sticker):
+        inline_query_result_cached_sticker_dict = inline_query_result_cached_sticker.to_dict()
 
-    def test_sticker_to_dict(self):
-        sticker = InlineQueryResultCachedSticker.de_json(json_dict,
-                                                                  bot).to_dict()
-
-        assert isinstance(sticker, dict)
-        assert json_dict == sticker
+        assert isinstance(inline_query_result_cached_sticker_dict, dict)
+        assert inline_query_result_cached_sticker_dict['type'] == self.type
+        assert inline_query_result_cached_sticker_dict['id'] == self.id
+        assert inline_query_result_cached_sticker_dict['sticker_file_id'] == self.sticker_file_id
+        assert inline_query_result_cached_sticker_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_sticker_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
@@ -90,5 +83,3 @@ class TestInlineQueryResultCachedSticker:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

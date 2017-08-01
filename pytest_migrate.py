@@ -73,7 +73,7 @@ if __name__ == '__main__':
     new_class = re.sub(r'self\._chat_id,', r'chat_id', new_class)
     new_class = re.sub(r'self\._id', 'self.id', new_class)
 
-    new_class = re.sub(r'def test_.*_(de|to)_(json|dict):\(self\):',
+    new_class = re.sub(r'def test_.*_(de|to)_(json|dict)\(self\):',
                        r'def test_\1_\2(self):', new_class)
 
     name_lower = name.lower()

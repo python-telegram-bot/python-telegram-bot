@@ -20,60 +20,55 @@ import json
 
 import pytest
 
-from telegram import (InlineKeyboardMarkup, InlineQueryResultCachedVoice, InlineKeyboardButton, InputTextMessageContent, InlineQueryResultCachedGif)
+from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultCachedVoice,
+                      InlineKeyboardMarkup, InlineQueryResultCachedGif)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'type': TestInlineQueryResultCachedGif.type,
-            'id': TestInlineQueryResultCachedGif.id,
-            'gif_file_id': TestInlineQueryResultCachedGif.gif_file_id,
-            'title': TestInlineQueryResultCachedGif.title,
-            'caption': TestInlineQueryResultCachedGif.caption,
-            'input_message_content': TestInlineQueryResultCachedGif.input_message_content.to_dict(),
-            'reply_markup': TestInlineQueryResultCachedGif.reply_markup.to_dict(),
-        }
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_gif():
-   return InlineQueryResultCachedGif(type=TestInlineQueryResultCachedGif.type, id=TestInlineQueryResultCachedGif.id, gif_file_id=TestInlineQueryResultCachedGif.gif_file_id, title=TestInlineQueryResultCachedGif.title, caption=TestInlineQueryResultCachedGif.caption, input_message_content=TestInlineQueryResultCachedGif.input_message_content, reply_markup=TestInlineQueryResultCachedGif.reply_markup)
+    return InlineQueryResultCachedGif(TestInlineQueryResultCachedGif.id,
+                                      TestInlineQueryResultCachedGif.gif_file_id,
+                                      title=TestInlineQueryResultCachedGif.title,
+                                      caption=TestInlineQueryResultCachedGif.caption,
+                                      input_message_content=TestInlineQueryResultCachedGif.input_message_content,
+                                      reply_markup=TestInlineQueryResultCachedGif.reply_markup)
+
 
 class TestInlineQueryResultCachedGif:
-    """This object represents Tests for Telegram InlineQueryResultCachedGif."""
-
     id = 'id'
     type = 'gif'
     gif_file_id = 'gif file id'
     title = 'title'
     caption = 'caption'
     input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup(
-    [[InlineKeyboardButton('reply_markup')]])
-    
-    
-    
-    def test_gif_de_json(self):
-        gif = InlineQueryResultCachedGif.de_json(json_dict, bot)
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        assert gif.type == self.type
-        assert gif.id == self.id
-        assert gif.gif_file_id == self.gif_file_id
-        assert gif.title == self.title
-        assert gif.caption == self.caption
-        self.assertDictEqual(gif.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        assert gif.reply_markup.to_dict() == self.reply_markup.to_dict()
+    def test_expected_values(self, inline_query_result_cached_gif):
+        assert inline_query_result_cached_gif.type == self.type
+        assert inline_query_result_cached_gif.id == self.id
+        assert inline_query_result_cached_gif.gif_file_id == self.gif_file_id
+        assert inline_query_result_cached_gif.title == self.title
+        assert inline_query_result_cached_gif.caption == self.caption
+        assert inline_query_result_cached_gif.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-    def test_gif_to_json(self):
-        gif = InlineQueryResultCachedGif.de_json(json_dict, bot)
+    def test_to_json(self, inline_query_result_cached_gif):
+        json.loads(inline_query_result_cached_gif.to_json())
 
-        json.loads(gif.to_json())
+    def test_to_dict(self, inline_query_result_cached_gif):
+        inline_query_result_cached_gif_dict = inline_query_result_cached_gif.to_dict()
 
-    def test_gif_to_dict(self):
-        gif = InlineQueryResultCachedGif.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(gif, dict)
-        assert json_dict == gif
+        assert isinstance(inline_query_result_cached_gif_dict, dict)
+        assert inline_query_result_cached_gif_dict['type'] == self.type
+        assert inline_query_result_cached_gif_dict['id'] == self.id
+        assert inline_query_result_cached_gif_dict['gif_file_id'] == self.gif_file_id
+        assert inline_query_result_cached_gif_dict['title'] == self.title
+        assert inline_query_result_cached_gif_dict['caption'] == self.caption
+        assert inline_query_result_cached_gif_dict['input_message_content'] == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_gif_dict['reply_markup'] == \
+               self.reply_markup.to_dict()
 
     def test_equality(self):
         a = InlineQueryResultCachedGif(self.id, self.gif_file_id)
@@ -94,5 +89,3 @@ class TestInlineQueryResultCachedGif:
 
         assert a != e
         assert hash(a) != hash(e)
-
-
