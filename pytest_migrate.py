@@ -35,18 +35,25 @@ CLASS_VARS = r'    def setUp\(self\):\n([\s\S]*?def)'
 if __name__ == '__main__':
     original = Path('tests/' + sys.argv[1]).open('r', encoding='UTF-8').read()
     new_text = header
-    new_text += '\nimport json\n\nimport pytest\n\nfrom telegram import '
+    new_text += '\nimport json\n\nimport pytest\n\n'
 
     match = re.search(CLASS, original)
     if not match:
         match = re.search(CLASS[:-11], original)
 
     name = match.group(1)
-    new_text += name + "\n\n"
     test_name = 'Test' + name
 
-    new_class = 'class {}:\n{}'.format(name, match.group(2))
-    new_class = re.sub(r'self\._id', 'self.id', new_class)
+    new_class = 'class {}:\n{}'.format(test_name, match.group(2))
+
+    imports = {name}
+    for find in re.finditer('telegram\.([^().]*)', new_class):
+        imports.add(find.group(1))
+    tg_imports = ', '.join(imports)
+    new_text += 'from telegram import {}{}{}\n\n'.format('(' if len(tg_imports) > 77 else '',
+                                                         tg_imports,
+                                                         ')' if len(tg_imports) > 77 else '')
+
     new_class = re.sub(r'telegram\.', '', new_class)
     new_class = re.sub(r'self\.assertTrue\(isinstance\((.*), (.*)\)\)',
                        r'assert isinstance(\1, \2)', new_class)
@@ -64,6 +71,7 @@ if __name__ == '__main__':
     new_class = re.sub(r'self\.assertIsNot\((.*), (.*)\)', r'assert \1 is not \2', new_class)
     new_class = re.sub(r'self\._bot', r'bot', new_class)
     new_class = re.sub(r'self\._chat_id,', r'chat_id', new_class)
+    new_class = re.sub(r'self\._id', 'self.id', new_class)
 
     name_lower = name.lower()
     proper_name_lower = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
@@ -76,6 +84,13 @@ if __name__ == '__main__':
         new_text += '@pytest.fixture(scope=\'class\')\ndef json_dict():\n    return '
         new_text += json_dict.group(1).replace('self.', test_name + '.')
         new_text += '\n\n'
+        new_text += '@pytest.fixture(scope=\'class\')\ndef {}():\n'.format(proper_name_lower)
+        args = []
+        for line in json_dict.group(1).replace('self.', test_name + '.').split(','):
+            match = re.search(r'\'(.*)\': (.*?\.[^,\s.]*)', line)
+            if match:
+                args.append('{}={}'.format(match.group(1), match.group(2)))
+        new_text += '   return {}({})\n\n'.format(name, ', '.join(args))
 
     class_vars = re.search(CLASS_VARS, new_class)
     if class_vars:
