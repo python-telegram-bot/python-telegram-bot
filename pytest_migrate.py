@@ -70,7 +70,7 @@ if __name__ == '__main__':
     new_class = re.sub(r'self\.assertIs\((.*), (.*)\)', r'assert \1 is \2', new_class)
     new_class = re.sub(r'self\.assertIsNot\((.*), (.*)\)', r'assert \1 is not \2', new_class)
     new_class = re.sub(r'self\._bot', r'bot', new_class)
-    new_class = re.sub(r'self\._chat_id,', r'chat_id', new_class)
+    new_class = re.sub(r'self\._chat_id,', r'chat_id,', new_class)
     new_class = re.sub(r'self\._id', 'self.id', new_class)
 
     new_class = re.sub(r'def test_.*_(de|to)_(json|dict)\(self\):',
