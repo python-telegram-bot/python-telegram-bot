@@ -19,87 +19,86 @@
 import json
 
 import pytest
+from flaky import flaky
 
 from telegram import LabeledPrice, Invoice
 
+
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'title': TestInvoice.title,
-            'description': TestInvoice.description,
-            'start_parameter': TestInvoice.start_parameter,
-            'currency': TestInvoice.currency,
-            'total_amount': TestInvoice.total_amount
-        }
+def provider_token(bot_info):
+    return bot_info['payment_provider_token']
+
 
 @pytest.fixture(scope='class')
 def invoice():
-   return Invoice(title=TestInvoice.title, description=TestInvoice.description, start_parameter=TestInvoice.start_parameter, currency=TestInvoice.currency, total_amount=TestInvoice.total_amount)
+    return Invoice(TestInvoice.title, TestInvoice.description, TestInvoice.start_parameter,
+                   TestInvoice.currency, TestInvoice.total_amount)
+
 
 class TestInvoice:
-    """This object represents Tests for Telegram Invoice."""
-
     payload = 'payload'
-    provider_token = _payment_provider_token
     prices = [LabeledPrice('Fish', 100), LabeledPrice('Fish Tax', 1000)]
-    
     title = 'title'
     description = 'description'
     start_parameter = 'start_parameter'
     currency = 'EUR'
     total_amount = sum([p.amount for p in prices])
-    
-    
-    
-    def test_de_json(self):
-        invoice = Invoice.de_json(json_dict, bot)
 
-        assert invoice.title == self.title
-        assert invoice.description == self.description
-        assert invoice.start_parameter == self.start_parameter
-        assert invoice.currency == self.currency
-        assert invoice.total_amount == self.total_amount
+    def test_de_json(self, bot):
+        invoice_json = Invoice.de_json({
+            'title': TestInvoice.title,
+            'description': TestInvoice.description,
+            'start_parameter': TestInvoice.start_parameter,
+            'currency': TestInvoice.currency,
+            'total_amount': TestInvoice.total_amount
+        }, bot)
 
-    def test_to_json(self):
-        invoice = Invoice.de_json(json_dict, bot)
+        assert invoice_json.title == self.title
+        assert invoice_json.description == self.description
+        assert invoice_json.start_parameter == self.start_parameter
+        assert invoice_json.currency == self.currency
+        assert invoice_json.total_amount == self.total_amount
 
+    def test_to_json(self, invoice):
         json.loads(invoice.to_json())
 
-    def test_to_dict(self):
-        invoice = Invoice.de_json(json_dict, bot).to_dict()
+    def test_to_dict(self, invoice):
+        invoice_dict = invoice.to_dict()
 
-        assert isinstance(invoice, dict)
-        assert json_dict == invoice
+        assert isinstance(invoice_dict, dict)
+        assert invoice_dict['title'] == invoice.title
+        assert invoice_dict['description'] == invoice.description
+        assert invoice_dict['start_parameter'] == invoice.start_parameter
+        assert invoice_dict['currency'] == invoice.currency
+        assert invoice_dict['total_amount'] == invoice.total_amount
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_invoice_required_args_only(self):
+    @pytest.mark.timeout(10)
+    def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = bot.send_invoice(chat_id, self.title, self.description, self.payload,
-                                         self.provider_token, self.start_parameter, self.currency,
-                                         self.prices)
-        invoice = message.invoice
+                                   provider_token, self.start_parameter, self.currency,
+                                   self.prices)
 
-        assert invoice.currency == self.currency
-        assert invoice.start_parameter == self.start_parameter
-        assert invoice.description == self.description
-        assert invoice.title == self.title
-        assert invoice.total_amount == self.total_amount
+        assert message.invoice.currency == self.currency
+        assert message.invoice.start_parameter == self.start_parameter
+        assert message.invoice.description == self.description
+        assert message.invoice.title == self.title
+        assert message.invoice.total_amount == self.total_amount
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_invoice_all_args(self):
+    @pytest.mark.timeout(10)
+    def test_send_invoice_all_args(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
             chat_id,
             self.title,
             self.description,
             self.payload,
-            self.provider_token,
+            provider_token,
             self.start_parameter,
             self.currency,
             self.prices,
             photo_url='https://raw.githubusercontent.com/'
-            'python-telegram-bot/logos/master/'
-            'logo/png/ptb-logo_240.png',
+                      'python-telegram-bot/logos/master/'
+                      'logo/png/ptb-logo_240.png',
             photo_size=240,
             photo_width=240,
             photo_height=240,
@@ -107,12 +106,9 @@ class TestInvoice:
             need_phone_number=True,
             need_shipping_address=True,
             is_flexible=True)
-        invoice = message.invoice
 
-        assert invoice.currency == self.currency
-        assert invoice.start_parameter == self.start_parameter
-        assert invoice.description == self.description
-        assert invoice.title == self.title
-        assert invoice.total_amount == self.total_amount
-
-
+        assert message.invoice.currency == self.currency
+        assert message.invoice.start_parameter == self.start_parameter
+        assert message.invoice.description == self.description
+        assert message.invoice.title == self.title
+        assert message.invoice.total_amount == self.total_amount
