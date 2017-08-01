@@ -834,7 +834,7 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         port = randrange(1024, 49152)  # select random port for travis
         thr = Thread(
             target=self.updater._start_webhook,
-            args=(ip, port, '', None, None, 0, False, None, None))
+            args=(ip, port, '', None, None, 0, False, None, None, True))
         thr.start()
 
         sleep(0.5)
