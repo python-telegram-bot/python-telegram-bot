@@ -16,71 +16,78 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from time import sleep
 
-from telegram import ConversationHandler
+import pytest
+
+from telegram import Update, Message, User, Chat, CallbackQuery
+from telegram.ext import (Updater, ConversationHandler, CommandHandler, CallbackQueryHandler)
+
+
+@pytest.fixture()
+def updater(request, bot, monkeypatch):
+    def test(*args, **kwargs):
+        sleep(0.01)
+        return []
+
+    monkeypatch.setattr('telegram.Bot.get_updates', test)
+    updater = Updater(workers=2, bot=bot)
+    yield updater
+    updater.stop()
+
+
+@pytest.fixture()
+def dp(updater):
+    return updater.dispatcher
+
+
+@pytest.fixture()
+def queue(updater):
+    return updater.start_polling()
+
+
+@pytest.fixture()
+def user1():
+    return User(first_name="Misses Test", id=123)
+
+
+@pytest.fixture()
+def user2():
+    return User(first_name="Mister Test", id=124)
 
 
 class TestConversationHandler:
-    """
-    This object represents the tests for the conversation handler.
-    """
-
     # State definitions
     # At first we're thirsty.  Then we brew coffee, we drink it
     # and then we can start coding!
     END, THIRSTY, BREWING, DRINKING, CODING = range(-1, 4)
-    _updater = None
 
     # Test related
-    current_state = dict()
-    entry_points = [CommandHandler('start', start)]
-    states = {
-        THIRSTY: [CommandHandler('brew', brew), CommandHandler('wait', start)],
-        BREWING: [CommandHandler('pourCoffee', drink)],
-        DRINKING:
-            [CommandHandler('startCoding', code), CommandHandler('drinkMore', drink)],
-        CODING: [
-            CommandHandler('keepCoding', code),
-            CommandHandler('gettingThirsty', start),
-            CommandHandler('drinkMore', drink)
-        ],
-    }
-    fallbacks = [CommandHandler('eat', start)]
-
-    group = Chat(0, Chat.GROUP)
-    second_group = Chat(1, Chat.GROUP)
-
-    def _chat(self, user):
-        return Chat(user.id, Chat.GROUP)
-
-    def _setup_updater(self, *args, **kwargs):
-        self.bot = MockBot(*args, **kwargs)
-        self.updater = Updater(workers=2, bot=self.bot)
-
-    def tearDown(self):
-        if self.updater is not None:
-            self.updater.stop()
-
-    @property
-    def updater(self):
-        return self._updater
-
-    @updater.setter
-    def updater(self, val):
-        if self._updater:
-            self._updater.stop()
-        self._updater = val
-
+    @pytest.fixture(autouse=True)
     def reset(self):
         self.current_state = dict()
+        self.entry_points = [CommandHandler('start', self.start)]
+        self.states = {
+            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
+            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+            self.DRINKING:
+                [CommandHandler('startCoding', self.code),
+                 CommandHandler('drinkMore', self.drink)],
+            self.CODING: [
+                CommandHandler('keepCoding', self.code),
+                CommandHandler('gettingThirsty', self.start),
+                CommandHandler('drinkMore', self.drink)
+            ],
+        }
+        self.fallbacks = [CommandHandler('eat', self.start)]
+
+        self.group = Chat(0, Chat.GROUP)
+        self.second_group = Chat(1, Chat.GROUP)
 
     # State handlers
     def _set_state(self, update, state):
         self.current_state[update.message.from_user.id] = state
         return state
-
-    def _get_state(self, user_id):
-        return self.current_state[user_id]
 
     # Actions
     def start(self, bot, update):
@@ -99,116 +106,95 @@ class TestConversationHandler:
         return self._set_state(update, self.CODING)
 
     # Tests
-    def test_addConversationHandler(self):
-        self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
-        user = User(first_name="Misses Test", id=123)
-        second_user = User(first_name="Mister Test", id=124)
-
-        handler = ConversationHandler(
-            entry_points=self.entry_points, states=self.states, fallbacks=self.fallbacks)
-        d.add_handler(handler)
-        queue = self.updater.start_polling(0.01)
+    def test_add_conversation_handler(self, queue, dp, bot, user1, user2):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks)
+        dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user, None, self.group, text="/start", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/start", bot=bot)
         queue.put(Update(update_id=0, message=message))
-        sleep(.1)
-        assert self.current_state[user.id] == self.THIRSTY is True
+        sleep(.7)
+        assert self.current_state[user1.id] == self.THIRSTY
 
         # The user is thirsty and wants to brew coffee.
-        message = Message(0, user, None, self.group, text="/brew", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/brew", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
-        assert self.current_state[user.id] == self.BREWING is True
+        assert self.current_state[user1.id] == self.BREWING
 
         # Lets see if an invalid command makes sure, no state is changed.
-        message = Message(0, user, None, self.group, text="/nothing", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/nothing", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
-        assert self.current_state[user.id] == self.BREWING is True
+        assert self.current_state[user1.id] == self.BREWING
 
         # Lets see if the state machine still works by pouring coffee.
-        message = Message(0, user, None, self.group, text="/pourCoffee", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/pourCoffee", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
-        assert self.current_state[user.id] == self.DRINKING is True
+        assert self.current_state[user1.id] == self.DRINKING
 
         # Let's now verify that for another user, who did not start yet,
         # the state has not been changed.
-        message = Message(0, second_user, None, self.group, text="/brew", bot=self.bot)
+        message = Message(0, user2, None, self.group, text="/brew", bot=bot)
         queue.put(Update(update_id=0, message=message))
-        sleep(.1)
-        self.assertRaises(KeyError, self._get_state, user_id=second_user.id)
+        sleep(.7)
+        with pytest.raises(KeyError):
+            self.current_state[user2.id]
 
-    def test_addConversationHandlerPerChat(self):
-        self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
-        user = User(first_name="Misses Test", id=123)
-        second_user = User(first_name="Mister Test", id=124)
-
+    def test_add_conversation_handler_per_chat(self, queue, dp, bot, user1, user2):
         handler = ConversationHandler(
             entry_points=self.entry_points,
             states=self.states,
             fallbacks=self.fallbacks,
             per_user=False)
-        d.add_handler(handler)
-        queue = self.updater.start_polling(0.01)
+        dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user, None, self.group, text="/start", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/start", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
 
         # The user is thirsty and wants to brew coffee.
-        message = Message(0, user, None, self.group, text="/brew", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/brew", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
 
         # Let's now verify that for another user, who did not start yet,
         # the state will be changed because they are in the same group.
-        message = Message(0, second_user, None, self.group, text="/pourCoffee", bot=self.bot)
+        message = Message(0, user2, None, self.group, text="/pourCoffee", bot=bot)
         queue.put(Update(update_id=0, message=message))
-        sleep(.1)
+        sleep(.7)
         assert handler.conversations[(self.group.id,)] == self.DRINKING
 
-    def test_addConversationHandlerPerUser(self):
-        self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
-        user = User(first_name="Misses Test", id=123)
-
+    def test_add_conversation_handler_per_user(self, queue, dp, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
             states=self.states,
             fallbacks=self.fallbacks,
             per_chat=False)
-        d.add_handler(handler)
-        queue = self.updater.start_polling(0.01)
+        dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user, None, self.group, text="/start", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/start", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
 
         # The user is thirsty and wants to brew coffee.
-        message = Message(0, user, None, self.group, text="/brew", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/brew", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
 
         # Let's now verify that for the same user in a different group, the state will still be
         # updated
-        message = Message(0, user, None, self.second_group, text="/pourCoffee", bot=self.bot)
+        message = Message(0, user1, None, self.second_group, text="/pourCoffee", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
 
-        assert handler.conversations[(user.id,)] == self.DRINKING
+        assert handler.conversations[(user1.id,)] == self.DRINKING
 
-    def test_addConversationHandlerPerMessage(self):
-        self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
-        user = User(first_name="Misses Test", id=123)
-        second_user = User(first_name="Mister Test", id=124)
-
+    def test_add_conversation_handler_per_message(self, queue, dp, bot, user1, user2):
         def entry(bot, update):
             return 1
 
@@ -224,82 +210,70 @@ class TestConversationHandler:
                     2: [CallbackQueryHandler(two)]},
             fallbacks=[],
             per_message=True)
-        d.add_handler(handler)
-        queue = self.updater.start_polling(0.01)
+        dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user, None, self.group, text="msg w/ inlinekeyboard", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="msg w/ inlinekeyboard", bot=bot)
 
-        cbq = CallbackQuery(0, user, None, message=message, data='data', bot=self.bot)
+        cbq = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
         queue.put(Update(update_id=0, callback_query=cbq))
         sleep(.1)
-        assert handler.conversations[(self.group.id, user.id, message.message_id)] == 1
+        assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 1
 
-        cbq = CallbackQuery(0, user, None, message=message, data='data', bot=self.bot)
+        cbq = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
         queue.put(Update(update_id=0, callback_query=cbq))
         sleep(.1)
-        assert handler.conversations[(self.group.id, user.id, message.message_id)] == 2
+        assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 2
 
         # Let's now verify that for a different user in the same group, the state will not be
         # updated
-        cbq = CallbackQuery(0, second_user, None, message=message, data='data', bot=self.bot)
+        cbq = CallbackQuery(0, user2, None, message=message, data='data', bot=bot)
         queue.put(Update(update_id=0, callback_query=cbq))
         sleep(.1)
-        assert handler.conversations[(self.group.id, user.id, message.message_id)] == 2
+        assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 2
 
-    def test_endOnFirstMessage(self):
-        self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
-        user = User(first_name="Misses Test", id=123)
-
+    def test_end_on_first_message(self, queue, dp, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
-        d.add_handler(handler)
-        queue = self.updater.start_polling(0.01)
+        dp.add_handler(handler)
 
         # User starts the state machine and immediately ends it.
-        message = Message(0, user, None, self.group, text="/start", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/start", bot=bot)
         queue.put(Update(update_id=0, message=message))
-        sleep(.1)
+        sleep(.7)
         assert len(handler.conversations) == 0
 
-    def test_endOnFirstMessageAsync(self):
-        self._setup_updater('', messages=0)
-        d = self.updater.dispatcher
-        user = User(first_name="Misses Test", id=123)
-
-        start_end_async = (lambda bot, update: d.run_async(self.start_end, bot, update))
+    def test_end_on_first_message_async(self, queue, dp, bot, user1, user2):
+        start_end_async = (lambda bot, update: dp.run_async(self.start_end, bot, update))
 
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', start_end_async)], states={}, fallbacks=[])
-        d.add_handler(handler)
-        queue = self.updater.start_polling(0.01)
+        dp.add_handler(handler)
 
         # User starts the state machine with an async function that immediately ends the
         # conversation. Async results are resolved when the users state is queried next time.
-        message = Message(0, user, None, self.group, text="/start", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="/start", bot=bot)
         queue.put(Update(update_id=0, message=message))
-        sleep(.1)
+        sleep(.7)
         # Assert that the Promise has been accepted as the new state
         assert len(handler.conversations) == 1
 
-        message = Message(0, user, None, self.group, text="resolve promise pls", bot=self.bot)
+        message = Message(0, user1, None, self.group, text="resolve promise pls", bot=bot)
         queue.put(Update(update_id=0, message=message))
         sleep(.1)
         # Assert that the Promise has been resolved and the conversation ended.
         assert len(handler.conversations) == 0
 
-    def test_perChatMessageWithoutChat(self):
+    def test_per_chat_message_without_chat(self, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
-        user = User(first_name="Misses Test", id=123)
-        cbq = CallbackQuery(0, user, None, None)
+        cbq = CallbackQuery(0, user1, None, None, bot=bot)
         update = Update(0, callback_query=cbq)
         handler.check_update(update)
 
-    def test_channelMessageWithoutChat(self):
+    def test_channel_message_without_chat(self, bot):
         handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)],
                                       states={}, fallbacks=[])
-        message = Message(0, None, None, Chat(0, Chat.CHANNEL, "Misses Test"))
+        message = Message(0, None, None, Chat(0, Chat.CHANNEL, "Misses Test"), bot=bot)
         update = Update(0, message=message)
         handler.check_update(update)
