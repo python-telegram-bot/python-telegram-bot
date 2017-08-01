@@ -16,18 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
-
-import pytest
 
 from telegram import InputMessageContent
 
+
 class TestInputMessageContent:
-    """This object represents Tests for Telegram InputMessageContent."""
+    def test_de_json(self, bot):
+        input_message_content = InputMessageContent.de_json(None, bot)
 
-    def test_de_json(self):
-        imc = InputMessageContent.de_json(None, bot)
-
-        assert imc is False
-
-
+        assert input_message_content is None

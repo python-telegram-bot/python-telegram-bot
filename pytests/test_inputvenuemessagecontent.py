@@ -22,46 +22,49 @@ import pytest
 
 from telegram import InputVenueMessageContent, InputMessageContent
 
-@pytest.fixture(scope='class')
+
+@pytest.fixture()
 def json_dict():
     return {
-            'longitude': TestInputVenueMessageContent.longitude,
-            'latitude': TestInputVenueMessageContent.latitude,
-            'title': TestInputVenueMessageContent.title,
-            'address': TestInputVenueMessageContent._address,
-            'foursquare_id': TestInputVenueMessageContent.foursquare_id,
-        }
+        'longitude': TestInputVenueMessageContent.longitude,
+        'latitude': TestInputVenueMessageContent.latitude,
+        'title': TestInputVenueMessageContent.title,
+        'address': TestInputVenueMessageContent.address,
+        'foursquare_id': TestInputVenueMessageContent.foursquare_id,
+    }
+
 
 @pytest.fixture(scope='class')
 def input_venue_message_content():
-   return InputVenueMessageContent(longitude=TestInputVenueMessageContent.longitude, latitude=TestInputVenueMessageContent.latitude, title=TestInputVenueMessageContent.title, address=TestInputVenueMessageContent._address, foursquare_id=TestInputVenueMessageContent.foursquare_id)
+    return InputVenueMessageContent(TestInputVenueMessageContent.latitude,
+                                    TestInputVenueMessageContent.longitude,
+                                    TestInputVenueMessageContent.title,
+                                    TestInputVenueMessageContent.address,
+                                    foursquare_id=TestInputVenueMessageContent.foursquare_id)
+
 
 class TestInputVenueMessageContent:
-    """This object represents Tests for Telegram InputVenueMessageContent."""
-
     latitude = 1.
     longitude = 2.
     title = 'title'
-    _address = 'address'  # nose binds address for testing
+    address = 'address'
     foursquare_id = 'foursquare id'
-    
-    
-    
-    def test_de_json(self):
-        ivmc = InputVenueMessageContent.de_json(json_dict, bot)
 
-        assert ivmc.longitude == self.longitude
-        assert ivmc.latitude == self.latitude
-        assert ivmc.title == self.title
-        assert ivmc.address == self._address
-        assert ivmc.foursquare_id == self.foursquare_id
+    def test_de_json(self, json_dict, bot):
+        input_venue_message_content_json = InputVenueMessageContent.de_json(json_dict, bot)
 
-    def test_ivmc_de_json_factory(self):
-        ivmc = InputMessageContent.de_json(json_dict, bot)
+        assert input_venue_message_content_json.longitude == self.longitude
+        assert input_venue_message_content_json.latitude == self.latitude
+        assert input_venue_message_content_json.title == self.title
+        assert input_venue_message_content_json.address == self.address
+        assert input_venue_message_content_json.foursquare_id == self.foursquare_id
 
-        assert isinstance(ivmc, InputVenueMessageContent)
+    def test_de_json_factory(self, json_dict, bot):
+        input_venue_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
-    def test_ivmc_de_json_factory_without_required_args(self):
+        assert isinstance(input_venue_message_content_json, InputVenueMessageContent)
+
+    def test_de_json_factory_without_required_args(self, json_dict, bot):
         json_dict = json_dict
 
         del (json_dict['longitude'])
@@ -69,19 +72,22 @@ class TestInputVenueMessageContent:
         del (json_dict['title'])
         del (json_dict['address'])
 
-        ivmc = InputMessageContent.de_json(json_dict, bot)
+        input_venue_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
-        assert ivmc is False
+        assert input_venue_message_content_json is None
 
-    def test_to_json(self):
-        ivmc = InputVenueMessageContent.de_json(json_dict, bot)
+    def test_to_json(self, input_venue_message_content):
+        json.loads(input_venue_message_content.to_json())
 
-        json.loads(ivmc.to_json())
+    def test_to_dict(self, input_venue_message_content):
+        input_venue_message_content_dict = input_venue_message_content.to_dict()
 
-    def test_to_dict(self):
-        ivmc = InputVenueMessageContent.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(ivmc, dict)
-        assert json_dict == ivmc
-
-
+        assert isinstance(input_venue_message_content_dict, dict)
+        assert input_venue_message_content_dict['latitude'] == \
+               input_venue_message_content.latitude
+        assert input_venue_message_content_dict['longitude'] == \
+               input_venue_message_content.longitude
+        assert input_venue_message_content_dict['title'] == input_venue_message_content.title
+        assert input_venue_message_content_dict['address'] == input_venue_message_content.address
+        assert input_venue_message_content_dict['foursquare_id'] == \
+               input_venue_message_content.foursquare_id

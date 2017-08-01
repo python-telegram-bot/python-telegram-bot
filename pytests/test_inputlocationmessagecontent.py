@@ -22,56 +22,54 @@ import pytest
 
 from telegram import InputMessageContent, InputLocationMessageContent
 
-@pytest.fixture(scope='class')
+
+@pytest.fixture()
 def json_dict():
     return {
-            'longitude': TestInputLocationMessageContent.longitude,
-            'latitude': TestInputLocationMessageContent.latitude,
-        }
+        'longitude': TestInputLocationMessageContent.longitude,
+        'latitude': TestInputLocationMessageContent.latitude,
+    }
+
 
 @pytest.fixture(scope='class')
 def input_location_message_content():
-   return InputLocationMessageContent(longitude=TestInputLocationMessageContent.longitude, latitude=TestInputLocationMessageContent.latitude)
+    return InputLocationMessageContent(TestInputLocationMessageContent.longitude,
+                                       TestInputLocationMessageContent.latitude)
+
 
 class TestInputLocationMessageContent:
-    """This object represents Tests for Telegram InputLocationMessageContent."""
-
     latitude = 1.
     longitude = 2.
-    
-    
-    
-    def test_de_json(self):
-        ilmc = InputLocationMessageContent.de_json(json_dict, bot)
 
-        assert ilmc.longitude == self.longitude
-        assert ilmc.latitude == self.latitude
+    def test_de_json(self, json_dict, bot):
+        input_location_message_content_json = InputLocationMessageContent.de_json(json_dict, bot)
 
-    def test_ilmc_de_json_factory(self):
-        ilmc = InputMessageContent.de_json(json_dict, bot)
+        assert input_location_message_content_json.longitude == self.longitude
+        assert input_location_message_content_json.latitude == self.latitude
 
-        assert isinstance(ilmc, InputLocationMessageContent)
+    def test_input_location_message_content_json_de_json_factory(self, json_dict, bot):
+        input_location_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
-    def test_ilmc_de_json_factory_without_required_args(self):
-        json_dict = json_dict
+        assert isinstance(input_location_message_content_json, InputLocationMessageContent)
 
+    def test_de_json_factory_without_required_args(self, json_dict, bot):
         del (json_dict['longitude'])
-        # If none args are sent it will fall in a different condition
+        # If no args are passed it will fall in a different condition
         # del (json_dict['latitude'])
 
-        ilmc = InputMessageContent.de_json(json_dict, bot)
+        input_location_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
-        assert ilmc is False
+        assert input_location_message_content_json is None
 
-    def test_to_json(self):
-        ilmc = InputLocationMessageContent.de_json(json_dict, bot)
+    def test_to_json(self, input_location_message_content):
+        json.loads(input_location_message_content.to_json())
 
-        json.loads(ilmc.to_json())
+    def test_to_dict(self, input_location_message_content):
+        input_location_message_content_dict = input_location_message_content.to_dict()
 
-    def test_to_dict(self):
-        ilmc = InputLocationMessageContent.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(ilmc, dict)
-        assert json_dict == ilmc
-
+        assert isinstance(input_location_message_content_dict, dict)
+        assert input_location_message_content_dict['latitude'] == \
+               input_location_message_content.latitude
+        assert input_location_message_content_dict['longitude'] == \
+               input_location_message_content.longitude
 
