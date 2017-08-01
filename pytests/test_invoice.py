@@ -25,11 +25,6 @@ from telegram import LabeledPrice, Invoice
 
 
 @pytest.fixture(scope='class')
-def provider_token(bot_info):
-    return bot_info['payment_provider_token']
-
-
-@pytest.fixture(scope='class')
 def invoice():
     return Invoice(TestInvoice.title, TestInvoice.description, TestInvoice.start_parameter,
                    TestInvoice.currency, TestInvoice.total_amount)

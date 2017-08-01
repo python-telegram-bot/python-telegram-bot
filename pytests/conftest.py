@@ -45,6 +45,11 @@ def chat_id(bot_info):
     return bot_info['chat_id']
 
 
+@pytest.fixture(scope='session')
+def provider_token(bot_info):
+    return bot_info['payment_provider_token']
+
+
 def pytest_configure(config):
     if sys.version_info >= (3,):
         config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
