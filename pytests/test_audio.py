@@ -51,8 +51,7 @@ class TestAudio:
     mime_type = 'audio/mpeg'
     file_size = 122920
 
-    @staticmethod
-    def test_creation(audio):
+    def test_creation(self, audio):
         # Make sure file has been uploaded.
         assert isinstance(audio, Audio)
         assert isinstance(audio.file_id, str)
