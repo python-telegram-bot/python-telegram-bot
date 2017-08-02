@@ -18,11 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
 import sys
+from queue import Queue
+from threading import Thread
 
 import pytest
 
 from pytests.bots import get_bot
 from telegram import Bot
+from telegram.ext import Dispatcher
 
 TRAVIS = os.getenv('TRAVIS', False)
 
@@ -48,6 +51,16 @@ def chat_id(bot_info):
 @pytest.fixture(scope='session')
 def provider_token(bot_info):
     return bot_info['payment_provider_token']
+
+
+@pytest.fixture(scope='function')
+def dp(bot):
+    dispatcher = Dispatcher(bot, Queue(), workers=2)
+    thr = Thread(target=dispatcher.start)
+    thr.start()
+    yield dispatcher
+    dispatcher.stop()
+    thr.join()
 
 
 def pytest_configure(config):
