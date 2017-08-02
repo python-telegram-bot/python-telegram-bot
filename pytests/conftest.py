@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
 import sys
+from collections import defaultdict
 from queue import Queue
-from threading import Thread
+from threading import Thread, Event
 
 import pytest
 
@@ -38,7 +39,7 @@ def bot_info():
     return get_bot()
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='session')
 def bot(bot_info):
     return Bot(bot_info['token'])
 
@@ -53,14 +54,33 @@ def provider_token(bot_info):
     return bot_info['payment_provider_token']
 
 
-@pytest.fixture(scope='function')
-def dp(bot):
+@pytest.fixture(scope='session')
+def _dp(bot):
+    # Dispatcher is heavy to init (due to many threads and such) so we have a single session
+    # scoped one here, but before each test, reset it (dp fixture below)
     dispatcher = Dispatcher(bot, Queue(), workers=2)
     thr = Thread(target=dispatcher.start)
     thr.start()
     yield dispatcher
     dispatcher.stop()
     thr.join()
+
+
+@pytest.fixture(scope='function')
+def dp(_dp):
+    # Reset the dispatcher first
+    while not _dp.update_queue.empty():
+        _dp.update_queue.get(False)
+    _dp.chat_data = defaultdict(dict)
+    _dp.user_data = defaultdict(dict)
+    _dp.handlers = {}
+    _dp.groups = []
+    _dp.error_handlers = []
+    _dp.__stop_event = Event()
+    _dp.__exception_event = Event()
+    _dp.__async_queue = Queue()
+    _dp.__async_threads = set()
+    return _dp
 
 
 def pytest_configure(config):
