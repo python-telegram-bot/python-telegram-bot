@@ -76,7 +76,7 @@ class TestJobQueue:
         job_queue.run_repeating(self.job1, 0.01, first=0.05)
         sleep(0.045)
         assert self.result == 0
-        sleep(0.02)
+        sleep(0.01)
         assert self.result == 1
 
     def test_multiple(self, job_queue):
