@@ -25,7 +25,7 @@ from telegram import User
 
 
 @pytest.fixture(scope='class')
-def chat(bot, json_dict):
+def chat(bot):
     return Chat(TestChat.id, TestChat.title, TestChat.type,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot)
