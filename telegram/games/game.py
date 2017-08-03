@@ -68,7 +68,7 @@ class Game(TelegramObject):
         self.description = description
         self.photo = photo
         self.text = text
-        self.text_entities = text_entities
+        self.text_entities = text_entities or list()
         self.animation = animation
 
     @classmethod
@@ -88,7 +88,8 @@ class Game(TelegramObject):
         data = super(Game, self).to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]
-        data['text_entities'] = [x.to_dict() for x in self.text_entities]
+        if self.text_entities:
+            data['text_entities'] = [x.to_dict() for x in self.text_entities]
 
         return data
 

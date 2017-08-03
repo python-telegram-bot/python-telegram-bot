@@ -75,7 +75,7 @@ def message(bot):
                     {'pinned_message': Message(7, None, None, None)},
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
                     {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
-                                                             'charge_id', 'provider_id')}
+                                                             'charge_id', 'provider_id',order_info={})}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
                      'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
@@ -110,6 +110,7 @@ class TestMessage:
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
+
         assert new.to_dict() == message_params.to_dict()
 
     def test_parse_entity(self):

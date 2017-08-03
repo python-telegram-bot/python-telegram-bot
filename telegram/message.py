@@ -228,7 +228,7 @@ class Message(TelegramObject):
         self.audio = audio
         self.game = game
         self.document = document
-        self.photo = photo
+        self.photo = photo or list()
         self.sticker = sticker
         self.video = video
         self.voice = voice
@@ -238,10 +238,10 @@ class Message(TelegramObject):
         self.location = location
         self.venue = venue
         self._new_chat_member = new_chat_member
-        self.new_chat_members = new_chat_members
+        self.new_chat_members = new_chat_members or list()
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
-        self.new_chat_photo = new_chat_photo
+        self.new_chat_photo = new_chat_photo or list()
         self.delete_chat_photo = bool(delete_chat_photo)
         self.group_chat_created = bool(group_chat_created)
         self.supergroup_chat_created = bool(supergroup_chat_created)
