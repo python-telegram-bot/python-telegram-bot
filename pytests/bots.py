@@ -18,46 +18,38 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provide a bot to tests"""
 import os
+import sys
 
-bot_settings = {
-    'APPVEYOR':
-        {
-            'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
-            'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3'
-        },
-    'TRAVIS':
-        {
-            'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
-            'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3'
-        },
-    'FALLBACK':
-        {
-            'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
-            'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3'
-        }
+from platform import python_implementation
+
+# Provide some public fallbacks so it's easy for contributors to run tests on their local machine
+FALLBACKS = {
+    'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
+    'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3',
+    'chat_id': '12173560',
+    'group_id': '-49740850',
+    'channel_id': '@pythontelegrambottests'
 }
 
 
-def get_bot():
-    # TODO: Add version info with different bots
-    # ver = sys.version_info
-    # pyver = "{}{}".format(ver[0], ver[1])
-    #
-    bot = None
-    if os.environ.get('TRAVIS', False):
-        bot = bot_settings.get('TRAVIS', None)
-        # TODO:
-        # bot = bot_setting.get('TRAVIS'+pyver, None)
-    elif os.environ.get('APPVEYOR', False):
-        bot = bot_settings.get('APPVEYOR', None)
-        # TODO:
-        # bot = bot_setting.get('TRAVIS'+pyver, None)
-    if not bot:
-        bot = bot_settings['FALLBACK']
+def get(name, fallback):
+    full_name = '{0}-{1}-{2[0]}{2[1]}'.format(name, python_implementation(),
+                                              sys.version_info).upper()
+    # First try fullnames such as
+    # TOKEN-CPYTHON-33
+    # CHAT_ID-PYPY-27
+    val = os.getenv(full_name)
+    if val:
+        return val
+    # Then try short names
+    # TOKEN
+    # CHAT_ID
+    val = os.getenv(name.upper())
+    if val:
+        return val
+    # Otherwise go with the fallback
+    return fallback
 
-    bot.update({
-        'chat_id': '12173560',
-        'group_id': '-49740850',
-        'channel_id': '@pythontelegrambottests'
-    })
-    return bot
+
+def get_bot():
+    return {k: get(k, v) for k, v in FALLBACKS.items()}
