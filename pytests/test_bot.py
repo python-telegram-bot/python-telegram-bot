@@ -335,6 +335,7 @@ class TestBot:
     def test_timeout_propagation(self, monkeypatch, bot, chat_id):
         class OkException(Exception):
             pass
+
         timeout = 500
 
         def post(*args, **kwargs):
