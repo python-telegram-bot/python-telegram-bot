@@ -51,7 +51,8 @@ class TestShippingOption:
         assert isinstance(shipping_option_dict, dict)
         assert shipping_option_dict['id'] == shipping_option.id
         assert shipping_option_dict['title'] == shipping_option.title
-        assert shipping_option_dict['prices'] == shipping_option.prices
+        assert shipping_option_dict['prices'][0] == shipping_option.prices[0].to_dict()
+        assert shipping_option_dict['prices'][1] == shipping_option.prices[1].to_dict()
 
     def test_equality(self):
         a = ShippingOption(self.id, self.title, self.prices)
