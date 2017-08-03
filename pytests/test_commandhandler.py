@@ -174,7 +174,6 @@ class TestCommandHandler:
         dp.add_handler(handler)
 
         message.text = '/test'
-        assert handler.check_update(Update(0, message=message))
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
