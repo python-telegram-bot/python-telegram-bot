@@ -89,9 +89,12 @@ class TestCommandHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_edited(self, message):
-        handler = CommandHandler('test', self.ch_test1, allow_edited=True)
+        handler = CommandHandler('test', self.ch_test1, allow_edited=False)
 
         message.text = '/test'
+        assert handler.check_update(Update(0, message))
+        assert not handler.check_update(Update(0, edited_message=message))
+        handler.allow_edited = True
         assert handler.check_update(Update(0, message))
         assert handler.check_update(Update(0, edited_message=message))
 
