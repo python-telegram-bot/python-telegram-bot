@@ -31,7 +31,7 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - pytest -v --cov=telegram pytests
+  - pytest -vv --cov=telegram
 
 after_success:
   coveralls
