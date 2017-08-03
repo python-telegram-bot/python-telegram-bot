@@ -22,47 +22,41 @@ import pytest
 
 from telegram import ShippingAddress, OrderInfo
 
+
 @pytest.fixture(scope='class')
-def json_dict():
-    return {
+def order_info():
+    return OrderInfo(TestOrderInfo.name, TestOrderInfo.phone_number,
+                     TestOrderInfo.email, TestOrderInfo.shipping_address)
+
+
+class TestOrderInfo:
+    name = 'name'
+    phone_number = 'phone_number'
+    email = 'email'
+    shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
+
+    def test_de_json(self, bot):
+        json_dict = {
             'name': TestOrderInfo.name,
             'phone_number': TestOrderInfo.phone_number,
             'email': TestOrderInfo.email,
             'shipping_address': TestOrderInfo.shipping_address.to_dict()
         }
+        order_info = OrderInfo.de_json(json_dict, bot)
 
-@pytest.fixture(scope='class')
-def order_info():
-   return OrderInfo(name=TestOrderInfo.name, phone_number=TestOrderInfo.phone_number, email=TestOrderInfo.email, shipping_address=TestOrderInfo.shipping_address)
+        assert order_info.name == self.name
+        assert order_info.phone_number == self.phone_number
+        assert order_info.email == self.email
+        assert order_info.shipping_address == self.shipping_address
 
-class TestOrderInfo:
-    """This object represents Tests for Telegram OrderInfo."""
+    def test_to_json(self, bot, order_info):
+        json.loads(order_info.to_json())
 
-    name = 'name'
-    phone_number = 'phone_number'
-    email = 'email'
-    shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place',
-     '', 'WC1')
-    
-    
-    
-    def test_de_json(self):
-        orderinfo = OrderInfo.de_json(json_dict, bot)
+    def test_to_dict(self, order_info):
+        order_info_dict = order_info.to_dict()
 
-        assert orderinfo.name == self.name
-        assert orderinfo.phone_number == self.phone_number
-        assert orderinfo.email == self.email
-        assert orderinfo.shipping_address == self.shipping_address
-
-    def test_to_json(self):
-        orderinfo = OrderInfo.de_json(json_dict, bot)
-
-        json.loads(orderinfo.to_json())
-
-    def test_to_dict(self):
-        orderinfo = OrderInfo.de_json(json_dict, bot).to_dict()
-
-        assert isinstance(orderinfo, dict)
-        assert json_dict == orderinfo
-
-
+        assert isinstance(order_info_dict, dict)
+        assert order_info_dict['name'] == order_info.name
+        assert order_info_dict['phone_number'] == order_info.phone_number
+        assert order_info_dict['email'] == order_info.email
+        assert order_info_dict['shipping_address'] == order_info.shipping_address.to_dict()
