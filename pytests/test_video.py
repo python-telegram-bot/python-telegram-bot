@@ -90,20 +90,20 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download_video(self, bot, video):
+    def test_get_and_download(self, bot, video):
         new_file = bot.get_file(video.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video.file_id
-        assert new_file.file_path.startswith('https://') is True
+        assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.mp4')
 
-        assert os.path.isfile('telegram.mp4') is True
+        assert os.path.isfile('telegram.mp4')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_video_mp4_file_url(self, bot, chat_id, video):
+    def test_send_mp4_file_url(self, bot, chat_id, video):
         message = bot.send_video(chat_id, self.video_file_url, caption=self.caption)
 
         assert isinstance(message.video, Video)
@@ -125,18 +125,18 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_video_resend(self, bot, chat_id, video):
+    def test_resend(self, bot, chat_id, video):
         message = bot.send_video(chat_id, video.file_id)
 
         assert message.video == video
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_video_with_video(self, monkeypatch, bot, chat_id, video):
+    def test_send_with_video(self, monkeypatch, bot, chat_id, video):
         def test(_, url, data, **kwargs):
             return data['video'] == video.file_id
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_video(chat_id, video=video)
         assert message
 
@@ -149,14 +149,14 @@ class TestVideo:
             'mime_type': TestVideo.mime_type,
             'file_size': TestVideo.file_size
         }
-        video = Video.de_json(json_dict, bot)
+        json_video = Video.de_json(json_dict, bot)
 
-        assert video.file_id == video.file_id
-        assert video.width == self.width
-        assert video.height == self.height
-        assert video.duration == self.duration
-        assert video.mime_type == self.mime_type
-        assert video.file_size == self.file_size
+        assert json_video.file_id == video.file_id
+        assert json_video.width == self.width
+        assert json_video.height == self.height
+        assert json_video.duration == self.duration
+        assert json_video.mime_type == self.mime_type
+        assert json_video.file_size == self.file_size
 
     def test_to_json(self, video):
         json.loads(video.to_json())
@@ -174,13 +174,13 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_video_empty_file(self, bot, chat_id):
+    def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_video_empty_file_id(self, bot, chat_id):
+    def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video(chat_id, '')
 

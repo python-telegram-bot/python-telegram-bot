@@ -59,7 +59,7 @@ class TestContact:
             last = data['last_name'] == contact.last_name
             return phone and first and last
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
 

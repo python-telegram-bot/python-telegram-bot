@@ -82,31 +82,31 @@ class TestVideoNote:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download_video_note(self, bot, video_note):
+    def test_get_and_download(self, bot, video_note):
         new_file = bot.get_file(video_note.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == video_note.file_id
-        assert new_file.file_path.startswith('https://') is True
+        assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram2.mp4')
 
-        assert os.path.isfile('telegram2.mp4') is True
+        assert os.path.isfile('telegram2.mp4')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_video_note_resend(self, bot, chat_id, video_note):
+    def test_resend(self, bot, chat_id, video_note):
         message = bot.send_video_note(chat_id, video_note.file_id)
 
         assert message.video_note == video_note
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_video_note_with_video_note(self, monkeypatch, bot, chat_id, video_note):
+    def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
         def test(_, url, data, **kwargs):
             return data['video_note'] == video_note.file_id
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_video_note(chat_id, video_note=video_note)
         assert message
 
@@ -117,12 +117,12 @@ class TestVideoNote:
             'duration': TestVideoNote.duration,
             'file_size': TestVideoNote.file_size
         }
-        video_note = VideoNote.de_json(json_dict, bot)
+        json_video_note = VideoNote.de_json(json_dict, bot)
 
-        assert video_note.file_id == video_note.file_id
-        assert video_note.length == self.length
-        assert video_note.duration == self.duration
-        assert video_note.file_size == self.file_size
+        assert json_video_note.file_id == video_note.file_id
+        assert json_video_note.length == self.length
+        assert json_video_note.duration == self.duration
+        assert json_video_note.file_size == self.file_size
 
     def test_to_json(self, video_note):
         json.loads(video_note.to_json())
@@ -138,13 +138,13 @@ class TestVideoNote:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_video_note_empty_file(self, bot, chat_id):
+    def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video_note(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_video_note_empty_file_id(self, bot, chat_id):
+    def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video_note(chat_id, '')
 

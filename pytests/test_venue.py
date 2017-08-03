@@ -59,7 +59,7 @@ class TestVenue:
                     and data['address'] == self.address
                     and data['foursquare_id'] == self.foursquare_id)
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_venue(chat_id, venue=venue)
         assert message
 

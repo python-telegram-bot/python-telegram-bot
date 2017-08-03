@@ -43,7 +43,7 @@ class TestVoice:
     mime_type = 'audio/ogg'
     file_size = 9199
 
-    caption = u"Test voice"
+    caption = u'Test voice'
     voice_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
 
     def test_creation(self, voice):
@@ -59,7 +59,7 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_voice_all_args(self, bot, chat_id, voice_file, voice):
+    def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = bot.send_voice(chat_id, voice_file, duration=self.duration,
                                  caption=self.caption, disable_notification=False)
 
@@ -74,7 +74,7 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download_voice(self, bot, voice):
+    def test_get_and_download(self, bot, voice):
         new_file = bot.get_file(voice.file_id)
 
         assert new_file.file_size == voice.file_size
@@ -87,7 +87,7 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_voice_ogg_url_file(self, bot, chat_id, voice):
+    def test_send_ogg_url_file(self, bot, chat_id, voice):
         message = bot.sendVoice(chat_id, self.voice_file_url, duration=self.duration)
 
         assert isinstance(message.voice, Voice)
@@ -99,7 +99,7 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_voice_resend(self, bot, chat_id, voice):
+    def test_resend(self, bot, chat_id, voice):
         message = bot.sendVoice(chat_id, voice.file_id)
 
         assert isinstance(message.voice, Voice)
@@ -111,11 +111,11 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_voice_with_voice(self, monkeypatch, bot, chat_id, voice):
+    def test_send_with_voice(self, monkeypatch, bot, chat_id, voice):
         def test(_, url, data, **kwargs):
             return data['voice'] == voice.file_id
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_voice(chat_id, voice=voice)
         assert message
 
@@ -148,19 +148,19 @@ class TestVoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_voice_empty_file(self, bot, chat_id):
+    def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.sendVoice(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_voice_empty_file_id(self, bot, chat_id):
+    def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.sendVoice(chat_id, '')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_voice_without_required_args(self, bot, chat_id):
+    def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.sendVoice(chat_id)
 

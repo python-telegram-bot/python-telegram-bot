@@ -380,12 +380,12 @@ class TestMessage:
         assert message.delete()
 
     def test_equality(self):
-        _id = 1
-        a = Message(_id, self.from_user, self.date, self.chat)
-        b = Message(_id, self.from_user, self.date, self.chat)
-        c = Message(_id, User(0, ""), self.date, self.chat)
+        id = 1
+        a = Message(id, self.from_user, self.date, self.chat)
+        b = Message(id, self.from_user, self.date, self.chat)
+        c = Message(id, User(0, ""), self.date, self.chat)
         d = Message(0, self.from_user, self.date, self.chat)
-        e = Update(_id)
+        e = Update(id)
 
         assert a == b
         assert hash(a) == hash(b)

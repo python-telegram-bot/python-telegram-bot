@@ -111,7 +111,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_resend(self, bot, chat_id, audio):
+    def test_resend(self, bot, chat_id, audio):
         message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
 
         assert message.audio == audio
@@ -120,7 +120,7 @@ class TestAudio:
         def test(_, url, data, **kwargs):
             return data['audio'] == audio.file_id
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
@@ -155,7 +155,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_audio_empty_file(self, bot, chat_id):
+    def test_error_send_empty_file(self, bot, chat_id):
         audio_file = open(os.devnull, 'rb')
 
         with pytest.raises(TelegramError):
@@ -163,11 +163,11 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_audio_empty_file_id(self, bot, chat_id):
+    def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_audio(chat_id=chat_id, audio="")
 
-    def test_error_audio_without_required_args(self, bot, chat_id):
+    def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_audio(chat_id=chat_id)
 

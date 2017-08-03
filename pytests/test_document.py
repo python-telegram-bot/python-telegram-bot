@@ -116,7 +116,7 @@ class TestDocument:
         def test(_, url, data, **kwargs):
             return data['document'] == document.file_id
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
 
         message = bot.send_document(document=document, chat_id=chat_id)
 

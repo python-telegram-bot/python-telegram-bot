@@ -81,7 +81,7 @@ class TestInvoice:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_invoice_all_args(self, bot, chat_id, provider_token):
+    def test_send_all_args(self, bot, chat_id, provider_token):
         message = bot.send_invoice(
             chat_id,
             self.title,

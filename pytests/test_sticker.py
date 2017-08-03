@@ -43,8 +43,8 @@ def sticker(bot, chat_id):
 class TestSticker:
     # sticker_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.webp"
     # Serving sticker from gh since our server sends wrong content_type
-    sticker_file_url = ("https://github.com/python-telegram-bot/python-telegram-bot/blob/master"
-                        "/tests/data/telegram.webp?raw=true")
+    sticker_file_url = ('https://github.com/python-telegram-bot/python-telegram-bot/blob/master'
+                        '/tests/data/telegram.webp?raw=true')
 
     emoji = '💪'
     width = 510
@@ -70,7 +70,7 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_sticker_all_args(self, bot, chat_id, sticker_file, sticker):
+    def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = bot.send_sticker(chat_id, sticker=sticker_file, disable_notification=False)
 
         assert isinstance(message.sticker, Sticker)
@@ -89,20 +89,20 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_and_download_sticker(self, bot, sticker):
+    def test_get_and_download(self, bot, sticker):
         new_file = bot.get_file(sticker.file_id)
 
         assert new_file.file_size == sticker.file_size
         assert new_file.file_id == sticker.file_id
-        assert new_file.file_path.startswith('https://') is True
+        assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.webp')
 
-        assert os.path.isfile('telegram.webp') is True
+        assert os.path.isfile('telegram.webp')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_sticker_resend(self, bot, chat_id, sticker):
+    def test_resend(self, bot, chat_id, sticker):
         message = bot.sendSticker(chat_id=chat_id, sticker=sticker.file_id)
 
         assert isinstance(message.sticker, Sticker)
@@ -121,8 +121,8 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_sticker_on_server_emoji(self, bot, chat_id):
-        server_file_id = "CAADAQADHAADyIsGAAFZfq1bphjqlgI"
+    def test_send_on_server_emoji(self, bot, chat_id):
+        server_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
         message = bot.sendSticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
         if PY2:
@@ -132,7 +132,7 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_sticker_from_url(self, bot, chat_id):
+    def test_send_from_url(self, bot, chat_id):
         message = bot.sendSticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
 
@@ -169,7 +169,7 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_sticker_with_sticker(self, bot, chat_id, sticker):
+    def test_send_with_sticker(self, bot, chat_id, sticker):
         message = bot.send_sticker(chat_id, sticker=sticker)
 
         assert isinstance(message.sticker, Sticker)
@@ -201,19 +201,19 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_sticker_empty_file(self, bot, chat_id):
+    def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.sendSticker(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_send_sticker_empty_file_id(self, bot, chat_id):
+    def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.sendSticker(chat_id, '')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_error_sticker_without_required_args(self, bot, chat_id):
+    def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.sendSticker(chat_id)
 

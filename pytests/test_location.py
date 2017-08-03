@@ -40,13 +40,13 @@ class TestLocation:
         assert location.latitude == self.latitude
         assert location.longitude == self.longitude
 
-    def test_send_location_with_location(self, monkeypatch, bot, chat_id, location):
+    def test_send_with_location(self, monkeypatch, bot, chat_id, location):
         def test(_, url, data, **kwargs):
             lat = data['latitude'] == location.latitude
             lon = data['longitude'] == location.longitude
             return lat and lon
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         assert bot.send_location(location=location, chat_id=chat_id)
 
     def test_to_json(self, location):
