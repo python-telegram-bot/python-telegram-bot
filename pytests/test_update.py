@@ -20,85 +20,113 @@ import json
 
 import pytest
 
-from telegram import Message, User, Update
+from telegram import (Message, User, Update, Chat, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {'update_id': TestUpdate.update_id, 'message': TestUpdate.message}
+message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
 
-@pytest.fixture(scope='class')
-def update():
-   return Update(update_id=TestUpdate.update_id, message=TestUpdate.message})
+params = [
+    {'message': message},
+    {'edited_message': message},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
+    {'channel_post': message},
+    {'edited_channel_post': message},
+    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
+    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+]
+
+all_types = ('message', 'edited_message', 'callback_query', 'channel_post',
+             'edited_channel_post', 'inline_query', 'chosen_inline_result',
+             'shipping_query', 'pre_checkout_query')
+
+ids = all_types + ('callback_query_without_message',)
+
+
+@pytest.fixture(params=params, ids=ids)
+def update(request):
+    return Update(update_id=TestUpdate.update_id, **request.param)
+
 
 class TestUpdate:
-    """This object represents Tests for Telegram Update."""
-
     update_id = 868573637
-    message = {
-    'message_id': 319,
-    'from': {
-    'id': 12173560,
-    'first_name': "Leandro",
-    'last_name': "S.",
-    'username': "leandrotoledo"
-    },
-    'chat': {
-    'id': 12173560,
-    'type': 'private',
-    'first_name': "Leandro",
-    'last_name': "S.",
-    'username': "leandrotoledo"
-    },
-    'date': 1441644592,
-    'text': "Update Test"
-    }
-    
-    
-    
-    def test_de_json(self):
+
+    @pytest.mark.parametrize('dict', argvalues=params, ids=ids)
+    def test_de_json(self, bot, dict):
+        json_dict = {'update_id': TestUpdate.update_id}
+        # Convert the single update "item" to a dict of that item and apply it to the json_dict
+        json_dict.update({k: v.to_dict() for k, v in dict.items()})
         update = Update.de_json(json_dict, bot)
 
         assert update.update_id == self.update_id
-        assert isinstance(update.message, Message)
 
-    def test_update_de_json_empty(self):
+        # Make sure only one thing in the update (other than update_id) is not None
+        i = 0
+        for type in all_types:
+            if getattr(update, type) is not None:
+                i += 1
+                assert getattr(update, type) == dict[type]
+        assert i == 1
+
+    def test_update_de_json_empty(self, bot):
         update = Update.de_json(None, bot)
 
-        assert update is False
+        assert update is None
 
-    def test_to_json(self):
-        update = Update.de_json(json_dict, bot)
-
+    def test_to_json(self, update):
         json.loads(update.to_json())
 
-    def test_to_dict(self):
-        update = Update.de_json(json_dict, bot)
+    def test_to_dict(self, update):
+        update_dict = update.to_dict()
 
-        assert isinstance(update.to_dict(), dict)
-        assert update['update_id'] == self.update_id
-        assert isinstance(update['message'], Message)
+        assert isinstance(update_dict, dict)
+        assert update_dict['update_id'] == update.update_id
+        for type in all_types:
+            if getattr(update, type) is not None:
+                assert update_dict[type] == getattr(update, type).to_dict()
 
-    def test_effective_chat(self):
-        update = Update.de_json(json_dict, bot)
+    def test_effective_chat(self, update):
+        # Test that it's sometimes None per docstring
         chat = update.effective_chat
-        assert update.message.chat == chat
+        if not (update.inline_query is not None
+                or update.chosen_inline_result is not None
+                or (update.callback_query is not None
+                    and update.callback_query.message is None)
+                or update.shipping_query is not None
+                or update.pre_checkout_query is not None):
+            assert chat.id == 1
+        else:
+            assert chat is None
 
-    def test_effective_user(self):
-        update = Update.de_json(json_dict, bot)
+    def test_effective_user(self, update):
+        # Test that it's sometimes None per docstring
         user = update.effective_user
-        assert update.message.from_user == user
+        if not (update.channel_post is not None or update.edited_channel_post is not None):
+            assert user.id == 1
+        else:
+            assert user is None
 
-    def test_effective_message(self):
-        update = Update.de_json(json_dict, bot)
+    def test_effective_message(self, update):
+        # Test that it's sometimes None per docstring
         message = update.effective_message
-        assert update.message.text == message.text
+        if not (update.inline_query is not None
+                or update.chosen_inline_result is not None
+                or (update.callback_query is not None
+                    and update.callback_query.message is None)
+                or update.shipping_query is not None
+                or update.pre_checkout_query is not None):
+            assert message.message_id == 1
+        else:
+            assert message is None
 
     def test_equality(self):
-        a = Update(self.update_id, message=self.message)
-        b = Update(self.update_id, message=self.message)
+        a = Update(self.update_id, message=message)
+        b = Update(self.update_id, message=message)
         c = Update(self.update_id)
-        d = Update(0, message=self.message)
-        e = User(self.update_id, "")
+        d = Update(0, message=message)
+        e = User(self.update_id, '')
 
         assert a == b
         assert hash(a) == hash(b)
@@ -112,5 +140,3 @@ class TestUpdate:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

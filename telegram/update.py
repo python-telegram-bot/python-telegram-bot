@@ -139,7 +139,8 @@ class Update(TelegramObject):
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
-            :attr:`chosen_inline_result`, :attr:`shipping_query` and :attr:`pre_checkout_query`.
+            :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
+            :attr:`shipping_query` and :attr:`pre_checkout_query`.
         """
 
         if self._effective_chat:
