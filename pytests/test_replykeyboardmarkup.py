@@ -22,64 +22,48 @@ import pytest
 
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'keyboard': [[TestReplyKeyboardMarkup.keyboard[0][0].to_dict(), TestReplyKeyboardMarkup.keyboard[0][1].to_dict()]],
-            'resize_keyboard': TestReplyKeyboardMarkup.resize_keyboard,
-            'one_time_keyboard': TestReplyKeyboardMarkup.one_time_keyboard,
-            'selective': TestReplyKeyboardMarkup.selective,
-        }
 
 @pytest.fixture(scope='class')
 def reply_keyboard_markup():
-   return ReplyKeyboardMarkup(keyboard=[[TestReplyKeyboardMarkup.keyboard[0][0], resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard, one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard, selective=TestReplyKeyboardMarkup.selective)
+    return ReplyKeyboardMarkup(TestReplyKeyboardMarkup.keyboard,
+                               resize_keyboard=TestReplyKeyboardMarkup.resize_keyboard,
+                               one_time_keyboard=TestReplyKeyboardMarkup.one_time_keyboard,
+                               selective=TestReplyKeyboardMarkup.selective)
+
 
 class TestReplyKeyboardMarkup:
-    """This object represents Tests for Telegram ReplyKeyboardMarkup."""
-
     keyboard = [[KeyboardButton('button1'), KeyboardButton('button2')]]
     resize_keyboard = True
     one_time_keyboard = True
     selective = True
-    
-    
-    
-    def test_send_message_with_reply_keyboard_markup(self):
-        message = bot.sendMessage(
-            chat_id,
-            'Моё судно на воздушной подушке полно угрей',
-            reply_markup=ReplyKeyboardMarkup.de_json(json_dict, bot))
+
+    def test_send_message_with_reply_keyboard_markup(self, bot, chat_id, reply_keyboard_markup):
+        message = bot.sendMessage(chat_id, 'Text', reply_markup=reply_keyboard_markup)
 
         json.loads(message.to_json())
-        assert message.text == u'Моё судно на воздушной подушке полно угрей'
+        assert message.text == u'Text'
 
-    def test_reply_markup_empty_de_json_empty(self):
-        reply_markup_empty = ReplyKeyboardMarkup.de_json(None, bot)
-
-        assert reply_markup_empty is False
-
-    def test_de_json(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.de_json(json_dict, bot)
-
+    def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, list)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
+        assert isinstance(reply_keyboard_markup.keyboard[0][1], KeyboardButton)
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
 
-    def test_to_json(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.de_json(json_dict, bot)
-
+    def test_to_json(self, reply_keyboard_markup):
         json.loads(reply_keyboard_markup.to_json())
 
-    def test_to_dict(self):
-        reply_keyboard_markup = ReplyKeyboardMarkup.de_json(json_dict, bot)
+    def test_to_dict(self, reply_keyboard_markup):
+        reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
 
-        assert isinstance(reply_keyboard_markup.keyboard, list)
-        assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
-        assert reply_keyboard_markup['resize_keyboard'] == self.resize_keyboard
-        assert reply_keyboard_markup['one_time_keyboard'] == self.one_time_keyboard
-        assert reply_keyboard_markup['selective'] == self.selective
-
-
+        assert isinstance(reply_keyboard_markup_dict, dict)
+        assert reply_keyboard_markup_dict['keyboard'][0][0] == \
+               reply_keyboard_markup.keyboard[0][0].to_dict()
+        assert reply_keyboard_markup_dict['keyboard'][0][1] == \
+               reply_keyboard_markup.keyboard[0][1].to_dict()
+        assert reply_keyboard_markup_dict['resize_keyboard'] == \
+               reply_keyboard_markup.resize_keyboard
+        assert reply_keyboard_markup_dict['one_time_keyboard'] == \
+               reply_keyboard_markup.one_time_keyboard
+        assert reply_keyboard_markup_dict['selective'] == reply_keyboard_markup.selective
