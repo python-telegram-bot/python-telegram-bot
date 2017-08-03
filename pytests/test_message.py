@@ -43,8 +43,8 @@ def message(bot):
                     {'reply_to_message': Message(50, None, None, None)},
                     {'edit_date': datetime.now()},
                     {'test': 'a text message',
-                     'enitites': [{'length': 4, 'offset': 10, 'type': 'bold'},
-                                  {'length': 7, 'offset': 16, 'type': 'italic'}]},
+                     'enitites': [MessageEntity('bold', 10, 4),
+                                  MessageEntity('italic', 16, 7)]},
                     {'audio': Audio("audio_id", 12),
                      'caption': 'audio_file'},
                     {'document': Document('document_id'),
@@ -91,7 +91,6 @@ def message_params(bot, request):
 
 
 class TestMessage:
-    """This object represents Tests for Telegram MessageTest."""
     id = 1
     from_user = User(2, 'testuser')
     date = datetime.now()
@@ -111,14 +110,13 @@ class TestMessage:
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
-        new.to_dict() == message_params.to_dict()
+        assert new.to_dict() == message_params.to_dict()
 
     def test_parse_entity(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
-        message = Message(
-            message_id=1, from_user=None, date=None, chat=None, text=text, entities=[entity])
+        message = Message(1, self.from_user, self.date, self.chat, text=text, entities=[entity])
         assert message.parse_entity(entity) == 'http://google.com'
 
     def test_parse_entities(self):
@@ -126,55 +124,45 @@ class TestMessage:
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
-        message = Message(
-            message_id=1,
-            from_user=None,
-            date=None,
-            chat=None,
-            text=text,
-            entities=[entity_2, entity])
+        message = Message(1, self.from_user, self.date, self.chat,
+                          text=text, entities=[entity_2, entity])
         assert message.parse_entities(MessageEntity.URL) == {entity: 'http://google.com'}
         assert message.parse_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_text_html_simple(self):
-        test_html_string = 'Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, ' \
-                           '<a href="http://github.com/">links</a> and <pre>pre</pre>.'
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>.')
         text_html = self.test_message.text_html
         assert test_html_string == text_html
 
     def test_text_markdown_simple(self):
-        test_md_string = 'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and ' \
-                         '```pre```.'
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```.')
         text_markdown = self.test_message.text_markdown
         assert test_md_string == text_markdown
 
     def test_text_html_emoji(self):
-        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d ABC').decode('unicode-escape')
-        expected = (b'\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>').decode('unicode-escape')
+        text = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
+        expected = b'\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>'.decode('unicode-escape')
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
-        message = Message(
-            message_id=1, from_user=None, date=None, chat=None, text=text, entities=[bold_entity])
+        message = Message(1, self.from_user, self.date, self.chat,
+                          text=text, entities=[bold_entity])
         assert expected == message.text_html
 
     def test_text_markdown_emoji(self):
-        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d ABC').decode('unicode-escape')
-        expected = (b'\\U0001f469\\u200d\\U0001f469\\u200d *ABC*').decode('unicode-escape')
+        text = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
+        expected = b'\\U0001f469\\u200d\\U0001f469\\u200d *ABC*'.decode('unicode-escape')
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
-        message = Message(
-            message_id=1, from_user=None, date=None, chat=None, text=text, entities=[bold_entity])
+        message = Message(1, self.from_user, self.date, self.chat,
+                          text=text, entities=[bold_entity])
         assert expected == message.text_markdown
 
     def test_parse_entities_url_emoji(self):
         url = b'http://github.com/?unicode=\\u2713\\U0001f469'.decode('unicode-escape')
         text = 'some url'
         link_entity = MessageEntity(type=MessageEntity.URL, offset=0, length=8, url=url)
-        message = Message(
-            message_id=1,
-            from_user=None,
-            date=None,
-            chat=None,
-            text=text,
-            entities=[link_entity])
+        message = Message(1, self.from_user, self.date, self.chat,
+                          text=text, entities=[link_entity])
         assert message.parse_entities() == {link_entity: text}
         assert next(iter(message.parse_entities())).url == url
 
@@ -390,14 +378,12 @@ class TestMessage:
         monkeypatch.setattr('telegram.Bot.delete_message', test)
         assert message.delete()
 
-    # todo: add the shortcut method tests monkeypatched
-
     def test_equality(self):
         _id = 1
-        a = Message(_id, User(1, ""), None, None)
-        b = Message(_id, User(1, ""), None, None)
-        c = Message(_id, User(0, ""), None, None)
-        d = Message(0, User(1, ""), None, None)
+        a = Message(_id, self.from_user, self.date, self.chat)
+        b = Message(_id, self.from_user, self.date, self.chat)
+        c = Message(_id, User(0, ""), self.date, self.chat)
+        d = Message(0, self.from_user, self.date, self.chat)
         e = Update(_id)
 
         assert a == b

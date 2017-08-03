@@ -41,16 +41,13 @@ class TestMessageEntity:
     offset = 1
     length = 2
     url = 'url'
-    
-    
-    
+
     def test_de_json(self, bot):
         json_dict = {
             'type': self.type,
             'offset': self.offset,
             'length': self.length
         }
-        
         entity = MessageEntity.de_json(json_dict, bot)
 
         assert entity.type == self.type
@@ -71,5 +68,3 @@ class TestMessageEntity:
             assert entity_dict['url'] == message_entity.url
         if message_entity.user:
             assert entity_dict['user'] == message_entity.user.to_dict()
-
-
