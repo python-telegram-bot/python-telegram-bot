@@ -32,8 +32,8 @@ class TestReplyKeyboardRemove:
     remove_keyboard = True
     selective = True
 
-    def test_send_message_with_reply_keyboard_remove(self, bot, chat_id):
-        message = bot.sendMessage(chat_id, 'Text', reply_markup=reply_keyboard_remove)
+    def test_send_message_with_reply_keyboard_remove(self, bot, chat_id, reply_keyboard_remove):
+        message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
 
         json.loads(message.to_json())
         assert message.text == u'Text'
