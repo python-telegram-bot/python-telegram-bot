@@ -64,7 +64,7 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_updates(self, bot, update):
+    def test_get_updates(self, bot):
         bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = bot.getUpdates(timeout=1)
 

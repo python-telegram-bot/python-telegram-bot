@@ -50,6 +50,16 @@ def chat_id(bot_info):
 
 
 @pytest.fixture(scope='session')
+def group_id(bot_info):
+    return bot_info['group_id']
+
+
+@pytest.fixture(scope='session')
+def channel_id(bot_info):
+    return bot_info['channel_id']
+
+
+@pytest.fixture(scope='session')
 def provider_token(bot_info):
     return bot_info['payment_provider_token']
 
