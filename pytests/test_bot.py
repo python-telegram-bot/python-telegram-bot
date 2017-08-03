@@ -157,7 +157,7 @@ class TestBot:
 
         json.loads(chat.to_json())
         assert chat.type == "group"
-        assert chat.title == ">>> Bot() - Developers"
+        assert chat.title == ">>> telegram.Bot() - Developers"
         assert chat.id == int(group_id)
 
     @flaky(3, 1)
@@ -168,7 +168,7 @@ class TestBot:
         json.loads(admins[0].to_json())
 
         for a in admins:
-            assert a.status in ("administrator", "creator") is True
+            assert a.status in ("administrator", "creator")
 
         bot = [a.user for a in admins if a.user.id == 133505823][0]
         self._test_user_equals_bot(bot)
@@ -178,7 +178,7 @@ class TestBot:
     def test_get_chat_members_count(self, bot, channel_id):
         count = bot.get_chat_members_count(channel_id)
         assert isinstance(count, int)
-        assert count > 3 is True
+        assert count > 3
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -188,7 +188,7 @@ class TestBot:
 
         json.loads(chat_member.to_json())
         assert chat_member.status == "administrator"
-        self._test_user_equals_bot(chat_member)
+        self._test_user_equals_bot(chat_member.user)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -198,8 +198,11 @@ class TestBot:
         max_connections = 7
         allowed_updates = ['message']
         bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
+        time.sleep(1)
         info = bot.get_webhook_info()
+        time.sleep(1)
         bot.delete_webhook()
+        time.sleep(1)
         assert url == info.url
         assert max_connections == info.max_connections
         assert allowed_updates == info.allowed_updates
@@ -209,8 +212,11 @@ class TestBot:
     @pytest.mark.xfail
     def test_delete_webhook(self, bot):
         url = 'https://python-telegram-bot.org/test/webhook'
+        time.sleep(2)
         bot.set_webhook(url)
+        time.sleep(1)
         bot.delete_webhook()
+        time.sleep(2)
         info = bot.get_webhook_info()
         assert info.url == ''
 
