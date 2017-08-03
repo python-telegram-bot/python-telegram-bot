@@ -26,7 +26,7 @@ import pytest
 
 from pytests.bots import get_bot
 from telegram import Bot
-from telegram.ext import Dispatcher
+from telegram.ext import Dispatcher, JobQueue
 
 TRAVIS = os.getenv('TRAVIS', False)
 
@@ -58,7 +58,7 @@ def provider_token(bot_info):
 def _dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
-    dispatcher = Dispatcher(bot, Queue(), workers=2)
+    dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(bot), workers=2)
     thr = Thread(target=dispatcher.start)
     thr.start()
     yield dispatcher
