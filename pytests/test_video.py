@@ -17,207 +17,179 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
+import os
 
 import pytest
+from flaky import flaky
 
-from telegram import (Bot, Video, TelegramError, mp4'
+from telegram import Video, TelegramError, Voice, PhotoSize
 
-        bot_info = get_bot, mp4', Voice, mp4', 'rb')
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'file_id': TestVideo.video.file_id,
-            'width': TestVideo.video.width,
-            'height': TestVideo.video.height,
-            'duration': TestVideo.video.duration,
-            'thumb': TestVideo.video.thumb.to_dict(),
-            'mime_type': TestVideo.video.mime_type,
-            'file_size': TestVideo.video.file_size
-        }
+@pytest.fixture()
+def video_file():
+    f = open('tests/data/telegram.mp4', 'rb')
+    yield f
+    f.close()
+
 
 @pytest.fixture(scope='class')
-def video():
-   return Video(file_id=TestVideo.video, width=TestVideo.video, height=TestVideo.video, duration=TestVideo.video, thumb=TestVideo.video, mime_type=TestVideo.video, file_size=TestVideo.video)
+def video(bot, chat_id):
+    with open('tests/data/telegram.mp4', 'rb') as f:
+        return bot.send_video(chat_id, video=f, timeout=10).video
+
 
 class TestVideo:
-    """This object represents Tests for Telegram Video."""
+    width = 360
+    height = 640
+    duration = 5
+    file_size = 326534
+    mime_type = 'video/mp4'
 
-    @classmethod
-    def setUpClass(cls):
-        cls.caption = u'VideoTest - Caption'
-        cls.video_file_url = 'https://python-telegram-bot.org/static/testfiles/mp4'
+    caption = u'VideoTest - Caption'
+    video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
 
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = Bot(bot_info['token'])
-
-        video_file = open('tests/data/mp4', 'rb')
-        video = cls._bot.send_video(cls._chat_id, video=video_file, timeout=10).video
-        cls.video = video
-
+    def test_creation(self, video):
         # Make sure file has been uploaded.
-        # Simple assertions PY2 Only
-        assert isinstance(cls.video, Video)
-        assert isinstance(cls.video.file_id, str)
-        assert cls.video.file_id is not ''
+        assert isinstance(video, Video)
+        assert isinstance(video.file_id, str)
+        assert video.file_id is not ''
 
-    video_file = open('tests/data/mp4', 'rb')
-    
-    
-    def test_expected_values(self):
-        assert self.video.width == 360
-        assert self.video.height == 640
-        assert self.video.duration == 5
-        assert self.video.file_size == 326534
-        assert self.video.mime_type == 'video/mp4'
+        assert isinstance(video.thumb, PhotoSize)
+        assert isinstance(video.thumb.file_id, str)
+        assert video.thumb.file_id is not ''
+
+    def test_expected_values(self, video):
+        assert video.width == self.width
+        assert video.height == self.height
+        assert video.duration == self.duration
+        assert video.file_size == self.file_size
+        assert video.mime_type == self.mime_type
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_video_all_args(self):
-        message = bot.sendVideo(
-            chat_id,
-            self.video_file,
-            timeout=10,
-            duration=self.video.duration,
-            caption=self.caption,
-            disable_notification=False)
+    @pytest.mark.timeout(10)
+    def test_send_all_args(self, bot, chat_id, video_file, video):
+        message = bot.send_video(chat_id, video_file, duration=self.duration,
+                                 caption=self.caption, disable_notification=False)
 
-        video = message.video
+        assert isinstance(message.video, Video)
+        assert isinstance(message.video.file_id, str)
+        assert message.video.file_id != ''
+        assert message.video.width == video.width
+        assert message.video.height == video.height
+        assert message.video.duration == video.duration
+        assert message.video.file_size == video.file_size
 
-        assert isinstance(video.file_id, str)
-        assert video.file_id != None
-        assert video.width == self.video.width
-        assert video.height == self.video.height
-        assert video.duration == self.video.duration
-        assert video.thumb == self.video.thumb
-        assert video.mime_type == self.video.mime_type
-        assert video.file_size == self.video.file_size
+        assert isinstance(message.video.thumb, PhotoSize)
+        assert isinstance(message.video.thumb.file_id, str)
+        assert message.video.thumb.file_id != ''
+        assert message.video.thumb.width == video.thumb.width
+        assert message.video.thumb.height == video.thumb.height
+        assert message.video.thumb.file_size == video.thumb.file_size
 
         assert message.caption == self.caption
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_get_and_download_video(self):
-        new_file = bot.getFile(self.video.file_id)
+    @pytest.mark.timeout(10)
+    def test_get_and_download_video(self, bot, video):
+        new_file = bot.get_file(video.file_id)
 
-        assert new_file.file_size == self.video.file_size
-        assert new_file.file_id == self.video.file_id
+        assert new_file.file_size == self.file_size
+        assert new_file.file_id == video.file_id
         assert new_file.file_path.startswith('https://') is True
 
-        new_file.download('mp4')
+        new_file.download('telegram.mp4')
 
-        assert os.path.isfile('mp4') is True
+        assert os.path.isfile('telegram.mp4') is True
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_video_mp4_file_url(self):
-        message = bot.sendVideo(
-            chat_id=chat_id,
-            video=self.video_file_url,
-            timeout=10,
-            caption=self.caption)
+    @pytest.mark.timeout(10)
+    def test_send_video_mp4_file_url(self, bot, chat_id, video):
+        message = bot.send_video(chat_id, self.video_file_url, caption=self.caption)
 
-        video = message.video
+        assert isinstance(message.video, Video)
+        assert isinstance(message.video.file_id, str)
+        assert message.video.file_id != ''
+        assert message.video.width == video.width
+        assert message.video.height == video.height
+        assert message.video.duration == video.duration
+        assert message.video.file_size == video.file_size
 
-        assert isinstance(video.file_id, str)
-        assert video.file_id != None
-        assert video.height == self.video.height
-        assert video.duration == self.video.duration
-        assert video.mime_type == self.video.mime_type
-        assert video.file_size == self.video.file_size
+        assert isinstance(message.video.thumb, PhotoSize)
+        assert isinstance(message.video.thumb.file_id, str)
+        assert message.video.thumb.file_id != ''
+        assert message.video.thumb.width == video.thumb.width
+        assert message.video.thumb.height == video.thumb.height
+        assert message.video.thumb.file_size == video.thumb.file_size
+
         assert message.caption == self.caption
-        thumb = video.thumb
-        assert thumb.height == self.video.thumb.height
-        assert thumb.width == self.video.thumb.width
-        assert thumb.file_size == self.video.thumb.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_video_resend(self):
-        message = bot.sendVideo(
-            chat_id=chat_id,
-            video=self.video.file_id,
-            timeout=10)
+    @pytest.mark.timeout(10)
+    def test_send_video_resend(self, bot, chat_id, video):
+        message = bot.send_video(chat_id, video.file_id)
 
-        video = message.video
-
-        assert video.file_id == self.video.file_id
-        assert video.duration == self.video.duration
-        assert video.thumb == self.video.thumb
-        assert video.mime_type == self.video.mime_type
+        assert message.video == video
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_video_with_video(self):
-        message = bot.send_video(video=self.video, chat_id=self._chat_id)
-        video = message.video
+    @pytest.mark.timeout(10)
+    def test_send_video_with_video(self, monkeypatch, bot, chat_id, video):
+        def test(_, url, data, **kwargs):
+            return data['video'] == video.file_id
 
-        assert video == self.video
+        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        message = bot.send_video(chat_id, video=video)
+        assert message
 
-
-    def test_de_json(self):
+    def test_de_json(self, video, bot):
+        json_dict = {
+            'file_id': video.file_id,
+            'width': TestVideo.width,
+            'height': TestVideo.height,
+            'duration': TestVideo.duration,
+            'mime_type': TestVideo.mime_type,
+            'file_size': TestVideo.file_size
+        }
         video = Video.de_json(json_dict, bot)
 
-        assert video == self.video
+        assert video.file_id == video.file_id
+        assert video.width == self.width
+        assert video.height == self.height
+        assert video.duration == self.duration
+        assert video.mime_type == self.mime_type
+        assert video.file_size == self.file_size
 
-    def test_to_json(self):
-        json.loads(self.video.to_json())
+    def test_to_json(self, video):
+        json.loads(video.to_json())
 
-    def test_to_dict(self):
-        video = self.video.to_dict()
+    def test_to_dict(self, video):
+        video_dict = video.to_dict()
 
-        assert isinstance(video, dict)
-        assert video['file_id'] == self.video.file_id
-        assert video['width'] == self.video.width
-        assert video['height'] == self.video.height
-        assert video['duration'] == self.video.duration
-        assert video['mime_type'] == self.video.mime_type
-        assert video['file_size'] == self.video.file_size
-
-    @flaky(3, 1)
-    @timeout(10)
-    def test_error_send_video_empty_file(self):
-        json_dict = json_dict
-
-        del (json_dict['file_id'])
-        json_dict['video'] = open(os.devnull, 'rb')
-
-        with self.assertRaises(TelegramError):
-            bot.sendVideo(chat_id=chat_id, timeout=10, **json_dict)
+        assert isinstance(video_dict, dict)
+        assert video_dict['file_id'] == video.file_id
+        assert video_dict['width'] == video.width
+        assert video_dict['height'] == video.height
+        assert video_dict['duration'] == video.duration
+        assert video_dict['mime_type'] == video.mime_type
+        assert video_dict['file_size'] == video.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_error_send_video_empty_file_id(self):
-        json_dict = json_dict
-
-        del (json_dict['file_id'])
-        json_dict['video'] = ''
-
-        with self.assertRaises(TelegramError):
-            bot.sendVideo(chat_id=chat_id, timeout=10, **json_dict)
+    @pytest.mark.timeout(10)
+    def test_error_send_video_empty_file(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            bot.send_video(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_error_video_without_required_args(self):
-        # Obsolete: only required args are chat_id and video. Both tested above
-        assert True == True
+    @pytest.mark.timeout(10)
+    def test_error_send_video_empty_file_id(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            bot.send_video(chat_id, '')
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_reply_video(self):
-        """Test for Message.reply_video"""
-        message = bot.sendMessage(chat_id, '.')
-        message = message.reply_video(self.video_file)
-
-        assert message.video.file_id != None
-
-    def test_equality(self):
-        a = Video(self.video.file_id, self.video.width, self.video.height, self.video.duration)
-        b = Video(self.video.file_id, self.video.width, self.video.height, self.video.duration)
-        c = Video(self.video.file_id, 0, 0, 0)
-        d = Video("", self.video.width, self.video.height, self.video.duration)
-        e = Voice(self.video.file_id, self.video.duration)
+    def test_equality(self, video):
+        a = Video(video.file_id, self.width, self.height, self.duration)
+        b = Video(video.file_id, self.width, self.height, self.duration)
+        c = Video(video.file_id, 0, 0, 0)
+        d = Video("", self.width, self.height, self.duration)
+        e = Voice(video.file_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -231,5 +203,3 @@ class TestVideo:
 
         assert a != e
         assert hash(a) != hash(e)
-
-

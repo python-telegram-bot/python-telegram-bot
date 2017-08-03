@@ -22,71 +22,65 @@ import pytest
 
 from telegram import Location, Venue
 
-@pytest.fixture(scope='class')
-def json_dict():
-    return {
-            'location': TestVenue.location.to_dict(),
-            'title': TestVenue.title,
-            'address': TestVenue._address,
-            'foursquare_id': TestVenue.foursquare_id
-        }
 
 @pytest.fixture(scope='class')
 def venue():
-   return Venue(location=TestVenue.location, title=TestVenue.title, address=TestVenue._address, foursquare_id=TestVenue.foursquare_id)
+    return Venue(TestVenue.location,
+                 TestVenue.title,
+                 TestVenue.address,
+                 foursquare_id=TestVenue.foursquare_id)
+
 
 class TestVenue:
-    """This object represents Tests for Telegram Venue."""
-
     location = Location(longitude=-46.788279, latitude=-23.691288)
     title = 'title'
-    _address = '_address'
+    address = 'address'
     foursquare_id = 'foursquare id'
-    
-    
-    
-    def test_de_json(self):
-        sticker = Venue.de_json(json_dict, bot)
 
-        assert isinstance(sticker.location, Location)
-        assert sticker.title == self.title
-        assert sticker.address == self._address
-        assert sticker.foursquare_id == self.foursquare_id
+    def test_de_json(self, bot):
+        json_dict = {
+            'location': TestVenue.location.to_dict(),
+            'title': TestVenue.title,
+            'address': TestVenue.address,
+            'foursquare_id': TestVenue.foursquare_id
+        }
+        venue = Venue.de_json(json_dict, bot)
 
-    def test_send_venue_with_venue(self):
-        ven = Venue.de_json(json_dict, bot)
-        message = bot.send_venue(chat_id=chat_id, venue=ven)
-        venue = message.venue
+        assert venue.location == self.location
+        assert venue.title == self.title
+        assert venue.address == self.address
+        assert venue.foursquare_id == self.foursquare_id
 
-        assert venue == ven
+    def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
+        def test(_, url, data, **kwargs):
+            return (data['longitude'] == self.location.longitude
+                    and data['latitude'] == self.location.latitude
+                    and data['title'] == self.title
+                    and data['address'] == self.address
+                    and data['foursquare_id'] == self.foursquare_id)
 
-    def test_to_json(self):
-        sticker = Venue.de_json(json_dict, bot)
+        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        message = bot.send_venue(chat_id, venue=venue)
+        assert message
 
-        json.loads(sticker.to_json())
+    def test_to_json(self, venue):
+        json.loads(venue.to_json())
 
-    def test_to_dict(self):
-        sticker = Venue.de_json(json_dict, bot).to_dict()
+    def test_to_dict(self, venue):
+        venue_dict = venue.to_dict()
 
-        assert isinstance(sticker, dict)
-        assert json_dict == sticker
-
-    @flaky(3, 1)
-    def test_reply_venue(self):
-        """Test for Message.reply_venue"""
-        message = bot.sendMessage(chat_id, '.')
-        message = message.reply_venue(self.location.latitude, self.location.longitude, self.title,
-                                      self._address)
-
-        self.assertAlmostEqual(message.venue.location.latitude, self.location.latitude, 2)
-        self.assertAlmostEqual(message.venue.location.longitude, self.location.longitude, 2)
+        assert isinstance(venue_dict, dict)
+        assert venue_dict['location'] == venue.location.to_dict()
+        assert venue_dict['title'] == venue.title
+        assert venue_dict['address'] == venue.address
+        assert venue_dict['foursquare_id'] == venue.foursquare_id
 
     def test_equality(self):
-        a = Venue(Location(0, 0), "Title", "Address")
-        b = Venue(Location(0, 0), "Title", "Address")
-        c = Venue(Location(0, 0), "Title", "Not Address")
-        d = Venue(Location(0, 1), "Title", "Address")
-        d2 = Venue(Location(0, 0), "Not Title", "Address")
+        a = Venue(Location(0, 0), self.title, self.address)
+        b = Venue(Location(0, 0), self.title, self.address)
+        c = Venue(Location(0, 0), self.title, '')
+        d = Venue(Location(0, 1), self.title, self.address)
+        d2 = Venue(Location(0, 0), '', self.address)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -100,5 +94,3 @@ class TestVenue:
 
         assert a != d2
         assert hash(a) != hash(d2)
-
-
