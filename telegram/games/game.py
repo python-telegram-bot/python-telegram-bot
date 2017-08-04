@@ -88,7 +88,8 @@ class Game(TelegramObject):
         data = super(Game, self).to_dict()
 
         data['photo'] = [p.to_dict() for p in self.photo]
-        data['text_entities'] = [x.to_dict() for x in self.text_entities]
+        if self.text_entities:
+            data['text_entities'] = [x.to_dict() for x in self.text_entities]
 
         return data
 
