@@ -30,8 +30,12 @@ from telegram.ext.dispatcher import run_async, Dispatcher
 
 @pytest.fixture()
 def dp2(bot):
+    print('dp2 before')
     for dp in create_dp(bot):
+        print('dp2 in before')
         yield dp
+        print('dp2 in after')
+    print('dp2 after')
 
 
 class TestDispatcher:
