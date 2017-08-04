@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import os
 import sys
 from collections import defaultdict
@@ -32,6 +33,8 @@ TRAVIS = os.getenv('TRAVIS', False)
 
 if TRAVIS:
     pytest_plugins = ['pytests.travis_fold']
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 @pytest.fixture(scope='session')
@@ -64,8 +67,7 @@ def provider_token(bot_info):
     return bot_info['payment_provider_token']
 
 
-@pytest.fixture(scope='session')
-def _dp(bot):
+def create_dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
     dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(bot), workers=2)
@@ -75,6 +77,12 @@ def _dp(bot):
     if dispatcher.running:
         dispatcher.stop()
     thr.join()
+
+
+@pytest.fixture(scope='session')
+def _dp(bot):
+    for dp in create_dp(bot):
+        yield dp
 
 
 @pytest.fixture(scope='function')

@@ -16,25 +16,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import logging
 from queue import Queue
 from threading import current_thread
 from time import sleep
 
 import pytest
 
-from pytests.conftest import _dp
+from pytests.conftest import create_dp
 from telegram import TelegramError, Message, User, Chat, Update
 from telegram.ext import MessageHandler, Filters
 from telegram.ext.dispatcher import run_async, Dispatcher
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 @pytest.fixture()
 def dp2(bot):
-    for dispatcher2 in _dp(bot):
-        yield dispatcher2
+    for dp in create_dp(bot):
+        yield dp
 
 
 class TestDispatcher:
