@@ -261,7 +261,7 @@ class TestUpdater:
         # If we get this far, idle() ran through
         sleep(.5)
         assert updater.running is False
-        assert temp_var['a'] != 0 is True
+        assert temp_var['a'] != 0
 
     def test_create_bot(self):
         updater = Updater('123:abcd')
