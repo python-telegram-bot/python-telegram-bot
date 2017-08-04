@@ -90,7 +90,10 @@ def dp(_dp):
     _dp.__exception_event = Event()
     _dp.__async_queue = Queue()
     _dp.__async_threads = set()
-    return _dp
+    if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
+        Dispatcher._set_singleton(_dp)
+    yield _dp
+    Dispatcher._Dispatcher__singleton_semaphore.release()
 
 
 def pytest_configure(config):
