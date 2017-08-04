@@ -72,7 +72,8 @@ def _dp(bot):
     thr = Thread(target=dispatcher.start)
     thr.start()
     yield dispatcher
-    dispatcher.stop()
+    if dispatcher.running:
+        dispatcher.stop()
     thr.join()
 
 

@@ -33,6 +33,7 @@ except ImportError:
     from urllib.error import HTTPError
 
 import pytest
+from future.builtins import bytes
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken
@@ -247,7 +248,7 @@ class TestUpdater:
         assert updater.running is False
 
     @signalskip
-    def test_user_signal(self):
+    def test_user_signal(self, updater):
         temp_var = {'a': 0}
 
         def user_signal_inc(signum, frame):
