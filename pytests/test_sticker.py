@@ -24,7 +24,7 @@ import pytest
 from flaky import flaky
 from future.utils import PY2
 
-from telegram import Sticker, PhotoSize, TelegramError
+from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition
 
 
 @pytest.fixture()
@@ -236,3 +236,116 @@ class TestSticker:
 
         assert a != e
         assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope='class')
+def sticker_set(bot):
+    return bot.get_sticker_set('test_by_{0}'.format(bot.username))
+
+
+class TestStickerSet:
+    title = 'Test stickers'
+    contains_masks = False
+    stickers = [Sticker('file_id', 512, 512)]
+    name = 'NOTAREALNAME'
+
+    def test_de_json(self, bot):
+        name = 'test_by_{0}'.format(bot.username)
+        json_dict = {
+            'name': name,
+            'title': self.title,
+            'contains_masks': self.contains_masks,
+            'stickers': [x.to_dict() for x in self.stickers]
+        }
+        sticker_set = StickerSet.de_json(json_dict, bot)
+
+        assert sticker_set.name == name
+        assert sticker_set.title == self.title
+        assert sticker_set.contains_masks == self.contains_masks
+        assert sticker_set.stickers == self.stickers
+
+    def test_sticker_set_to_json(self, sticker_set):
+        json.loads(sticker_set.to_json())
+
+    def test_sticker_set_to_dict(self, sticker_set):
+        sticker_set_dict = sticker_set.to_dict()
+
+        assert isinstance(sticker_set_dict, dict)
+        assert sticker_set_dict['name'] == sticker_set.name
+        assert sticker_set_dict['title'] == sticker_set.title
+        assert sticker_set_dict['contains_masks'] == sticker_set.contains_masks
+        assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
+
+    def test_bot_methods_1(self, bot, sticker_set):
+        with open('tests/data/telegram_sticker.png', 'rb') as f:
+            file = bot.upload_sticker_file(95205500, f)
+        assert file
+        assert bot.add_sticker_to_set(95205500, sticker_set.name, file.file_id, '😄')
+
+    def test_bot_methods_2(self, bot, sticker_set):
+        updated_sticker_set = bot.get_sticker_set(sticker_set.name)
+        assert len(updated_sticker_set.stickers) > 1  # Otherwise test_bot_methods_1 failed
+        file_id = updated_sticker_set.stickers[-1].file_id
+        assert bot.set_sticker_position_in_set(file_id, 1)
+        assert bot.delete_sticker_from_set(file_id)
+
+    def test_equality(self):
+        a = StickerSet(self.name, self.title, self.contains_masks, self.stickers)
+        b = StickerSet(self.name, self.title, self.contains_masks, self.stickers)
+        c = StickerSet(self.name, None, None, None)
+        d = StickerSet('blah', self.title, self.contains_masks, self.stickers)
+        e = Audio(self.name, 0, None, None)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
+
+@pytest.fixture(scope='class')
+def mask_position():
+    return MaskPosition(TestMaskPosition.point,
+                        TestMaskPosition.x_shift,
+                        TestMaskPosition.y_shift,
+                        TestMaskPosition.scale)
+
+
+class TestMaskPosition:
+    point = MaskPosition.EYES
+    x_shift = -1
+    y_shift = 1
+    scale = 2
+
+    def test_mask_position_de_json(self, bot):
+        json_dict = {
+            'point': self.point,
+            'x_shift': self.x_shift,
+            'y_shift': self.y_shift,
+            'scale': self.scale
+        }
+        mask_position = MaskPosition.de_json(json_dict, bot)
+
+        assert mask_position.point == self.point
+        assert mask_position.x_shift == self.x_shift
+        assert mask_position.y_shift == self.y_shift
+        assert mask_position.scale == self.scale
+
+    def test_mask_positiont_to_json(self, mask_position):
+        json.loads(mask_position.to_json())
+
+    def test_mask_position_to_dict(self, mask_position):
+        mask_position_dict = mask_position.to_dict()
+
+        assert isinstance(mask_position_dict, dict)
+        assert mask_position_dict['point'] == mask_position.point
+        assert mask_position_dict['x_shift'] == mask_position.x_shift
+        assert mask_position_dict['y_shift'] == mask_position.y_shift
+        assert mask_position_dict['scale'] == mask_position.scale
