@@ -22,6 +22,7 @@ import sys
 from collections import defaultdict
 from queue import Queue
 from threading import Thread, Event
+from time import sleep
 
 import pytest
 
@@ -74,11 +75,16 @@ def create_dp(bot):
     dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(bot), workers=2)
     thr = Thread(target=dispatcher.start)
     thr.start()
+    sleep(2)
     print('create before after')
     yield dispatcher
     print('create after before')
+    sleep(1)
+    print(dispatcher.__dict__)
+    print(dispatcher._Dispatcher__stop_event.is_set())
     if dispatcher.running:
         dispatcher.stop()
+    print(dispatcher._Dispatcher__stop_event.is_set())
     thr.join()
     print('create after after')
 
