@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from flaky import flaky
 
 from telegram import (Bot, Update, ChatAction, TelegramError, error)
+from telegram.error import BadRequest
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -313,6 +314,76 @@ class TestBot:
         with pytest.raises(error.BadRequest):
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_error_pin_unpin_message(self, bot, chat_id):
+        msg = bot.send_message(chat_id, 'Pinned then unpinned')
+        # TODO: Add bot to supergroup so this can be tested properly
+        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
+            bot.pin_chat_message(chat_id, msg.message_id, disable_notification=True)
+
+        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
+            bot.unpin_chat_message(chat_id)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_set_chat_description(self, bot, channel_id):
+        assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_set_chat_title(self, bot, channel_id):
+        assert bot.set_chat_title(channel_id, '>>> telegram.Bot() - Tests')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_restrict_chat_member(self, bot, channel_id):
+        # TODO: Add bot to supergroup so this can be tested properly
+        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
+            until = datetime.now() + timedelta(seconds=30)
+            assert bot.restrict_chat_member(channel_id,
+                                            95205500,
+                                            until_date=datetime.now(),
+                                            can_send_messages=False,
+                                            can_send_media_messages=False,
+                                            can_send_other_messages=False,
+                                            can_add_web_page_previews=False)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_promote_chat_member(self, bot, channel_id):
+        # TODO: Add bot to supergroup so this can be tested properly / give bot perms
+        with pytest.raises(BadRequest, match='Chat_admin_required'):
+            assert bot.promote_chat_member(channel_id,
+                                           95205500,
+                                           can_change_info=True,
+                                           can_post_messages=True,
+                                           can_edit_messages=True,
+                                           can_delete_messages=True,
+                                           can_invite_users=True,
+                                           can_restrict_members=True,
+                                           can_pin_messages=True,
+                                           can_promote_members=True)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_export_chat_invite_link(self, bot, channel_id):
+        # Each link is unique apparently
+        invite_link = bot.export_chat_invite_link(channel_id)
+        assert isinstance(invite_link, str)
+        assert invite_link != ''
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_delete_chat_photo(self, bot, channel_id):
+        assert bot.delete_chat_photo(channel_id)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_set_chat_photo(self, bot, channel_id):
+        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
+            bot.set_chat_photo(channel_id, f)
 
     def _test_user_equals_bot(self, user):
         """Tests if user is our trusty @PythonTelegramBot."""

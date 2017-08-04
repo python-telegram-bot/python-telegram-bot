@@ -99,6 +99,7 @@ class TestInvoice:
             photo_height=240,
             need_name=True,
             need_phone_number=True,
+            need_email=True,
             need_shipping_address=True,
             is_flexible=True)
 
