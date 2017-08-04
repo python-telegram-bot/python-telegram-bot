@@ -1971,7 +1971,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
         """
 
-        url = '{0}/setGameScore'.format(self.base_url)
+        url = '{0}/getGameHighScores'.format(self.base_url)
 
         data = {'user_id': user_id}
 
