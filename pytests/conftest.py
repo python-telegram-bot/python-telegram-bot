@@ -35,8 +35,6 @@ TRAVIS = os.getenv('TRAVIS', False)
 if TRAVIS:
     pytest_plugins = ['pytests.travis_fold']
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 @pytest.fixture(scope='session')
 def bot_info():
@@ -69,34 +67,23 @@ def provider_token(bot_info):
 
 
 def create_dp(bot):
-    print('create before before')
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
     dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(bot), workers=2)
     thr = Thread(target=dispatcher.start)
     thr.start()
     sleep(2)
-    print('create before after')
     yield dispatcher
-    print('create after before')
     sleep(1)
-    print(dispatcher.__dict__)
-    print(dispatcher._Dispatcher__stop_event.is_set())
     if dispatcher.running:
         dispatcher.stop()
-    print(dispatcher._Dispatcher__stop_event.is_set())
     thr.join()
-    print('create after after')
 
 
 @pytest.fixture(scope='session')
 def _dp(bot):
-    print('_dp before')
     for dp in create_dp(bot):
-        print('_dp in before')
         yield dp
-        print('_dp in after')
-    print('_dp after')
 
 
 @pytest.fixture(scope='function')
