@@ -23,9 +23,9 @@ import pytest
 from flaky import flaky
 from future.utils import string_types
 
-from telegram import (Bot, Update, ChatAction, TelegramError, error, User, InlineKeyboardMarkup,
+from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton)
-from telegram.error import BadRequest, InvalidToken
+from telegram.error import BadRequest, InvalidToken, NetworkError
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -282,10 +282,10 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_leave_chat(self, bot):
-        with pytest.raises(error.BadRequest, match='Chat not found'):
+        with pytest.raises(BadRequest, match='Chat not found'):
             bot.leave_chat(-123456)
 
-        with pytest.raises(error.NetworkError, match='Chat not found'):
+        with pytest.raises(NetworkError, match='Chat not found'):
             bot.leave_chat(-123456)
 
     @flaky(3, 1)
@@ -369,7 +369,7 @@ class TestBot:
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
 
-        with pytest.raises(error.BadRequest, match='Bot_score_not_modified'):
+        with pytest.raises(BadRequest, match='Bot_score_not_modified'):
             bot.set_game_score(
                 user_id=chat_id,
                 score=score,
@@ -408,7 +408,7 @@ class TestBot:
         game_short_name = 'python_telegram_bot_test_game'
         game = bot.send_game(chat_id, game_short_name)
 
-        with pytest.raises(error.BadRequest):
+        with pytest.raises(BadRequest):
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 

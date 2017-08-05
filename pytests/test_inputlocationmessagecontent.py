@@ -72,4 +72,3 @@ class TestInputLocationMessageContent:
                input_location_message_content.latitude
         assert input_location_message_content_dict['longitude'] == \
                input_location_message_content.longitude
-

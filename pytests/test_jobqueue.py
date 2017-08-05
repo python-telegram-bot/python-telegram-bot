@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime
 import time
 from time import sleep
 
-import datetime
 import pytest
 from flaky import flaky
 

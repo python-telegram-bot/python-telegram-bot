@@ -108,7 +108,7 @@ class TestUpdate:
         else:
             assert user is None
 
-    def test_effective_message(self, update, message):
+    def test_effective_message(self, update):
         # Test that it's sometimes None per docstring
         eff_message = update.effective_message
         if not (update.inline_query is not None
@@ -117,7 +117,7 @@ class TestUpdate:
                     and update.callback_query.message is None)
                 or update.shipping_query is not None
                 or update.pre_checkout_query is not None):
-            assert eff_message.message_id == message
+            assert eff_message.message_id == message.message_id
         else:
             assert eff_message is None
 

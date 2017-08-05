@@ -75,7 +75,8 @@ def message(bot):
                     {'pinned_message': Message(7, None, None, None)},
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
                     {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
-                                                             'charge_id', 'provider_id',order_info={})}
+                                                             'charge_id', 'provider_id',
+                                                             order_info={})}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
                      'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
