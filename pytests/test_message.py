@@ -114,6 +114,11 @@ class TestMessage:
 
         assert new.to_dict() == message_params.to_dict()
 
+    def test_dict_approach(self, message):
+        assert message['date'] == message.date
+        assert message['chat_id'] == message.chat_id
+        assert message['no_key'] is None
+
     def test_parse_entity(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
@@ -184,6 +189,7 @@ class TestMessage:
         monkeypatch.setattr('telegram.Bot.send_message', test)
         assert message.reply_text('test')
         assert message.reply_text('test', quote=True)
+        assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):

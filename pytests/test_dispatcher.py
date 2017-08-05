@@ -160,3 +160,12 @@ class TestDispatcher:
         dp.update_queue.put(self.message_update)
         sleep(.1)
         assert self.count == 3
+
+    def test_add_handler_errors(self, dp):
+        handler = 'not a handler'
+        with pytest.raises(TypeError, match='handler is not an instance of'):
+            dp.add_handler(handler)
+
+        handler = MessageHandler(Filters.photo, self.callback_set_count(1))
+        with pytest.raises(TypeError, match='group is not int'):
+            dp.add_handler(handler, 'one')

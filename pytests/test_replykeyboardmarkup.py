@@ -19,6 +19,7 @@
 import json
 
 import pytest
+from flaky import flaky
 
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 
@@ -37,10 +38,19 @@ class TestReplyKeyboardMarkup:
     one_time_keyboard = True
     selective = True
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_message_with_reply_keyboard_markup(self, bot, chat_id, reply_keyboard_markup):
         message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_markup)
 
         assert message.text == 'Text'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_message_with_string_markup(self, bot, chat_id):
+        message = bot.send_message(chat_id, 'text 2', reply_markup=[['1', '2']])
+
+        assert message.text == 'text 2'
 
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, list)

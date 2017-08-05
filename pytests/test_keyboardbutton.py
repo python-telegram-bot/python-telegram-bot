@@ -40,6 +40,12 @@ class TestKeyboardButton:
         assert keyboard_button.request_location == self.request_location
         assert keyboard_button.request_contact == self.request_contact
 
+    def test_de_list(self, bot, keyboard_button):
+        keyboard_json = [keyboard_button.to_dict(), keyboard_button.to_dict()]
+        inline_keyboard_buttons = KeyboardButton.de_list(keyboard_json, bot)
+
+        assert inline_keyboard_buttons == [keyboard_button, keyboard_button]
+
     def test_to_json(self, keyboard_button):
         json.loads(keyboard_button.to_json())
 

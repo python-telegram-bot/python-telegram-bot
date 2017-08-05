@@ -69,7 +69,8 @@ class TestVideo:
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, video_file, video):
         message = bot.send_video(chat_id, video_file, duration=self.duration,
-                                 caption=self.caption, disable_notification=False)
+                                 caption=self.caption, disable_notification=False,
+                                 width=video.width, height=video.height)
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)

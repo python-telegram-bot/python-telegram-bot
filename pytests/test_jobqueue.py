@@ -23,7 +23,7 @@ from time import sleep
 import pytest
 from flaky import flaky
 
-from telegram.ext import JobQueue, Updater
+from telegram.ext import JobQueue, Updater, Job
 
 
 @pytest.fixture()
@@ -208,3 +208,28 @@ class TestJobQueue:
         sleep(0.6)
         assert self.result == 1
         assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
+
+    def test_warnings(self, job_queue):
+        j = Job(self.job_run_once, repeat=False)
+        with pytest.warns(UserWarning):
+            job_queue.put(j, next_t=0)
+        j.schedule_removal()
+        with pytest.raises(ValueError, match='can not be set to'):
+            j.repeat = True
+        j.interval = 15
+        assert j.interval_seconds == 15
+        j.repeat = True
+        with pytest.raises(ValueError, match='can not be'):
+            j.interval = None
+        j.repeat = False
+        with pytest.raises(ValueError, match='must be of type'):
+            j.interval = 'every 3 minutes'
+        j.interval = 15
+        assert j.interval_seconds == 15
+
+        with pytest.raises(ValueError, match='argument should be of type'):
+            j.days = 'every day'
+        with pytest.raises(ValueError, match='The elements of the'):
+            j.days = ('mon', 'wed')
+        with pytest.raises(ValueError, match='from 0 up to and'):
+            j.days = (0, 6, 12, 14)

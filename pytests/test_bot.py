@@ -73,6 +73,9 @@ class TestBot:
         assert isinstance(get_me_bot, User)
         assert get_me_bot.id == bot.id
         assert get_me_bot.username == bot.username
+        assert get_me_bot.first_name == bot.first_name
+        assert get_me_bot.last_name == bot.last_name
+        assert get_me_bot.name == bot.name
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -217,7 +220,8 @@ class TestBot:
     @pytest.mark.timeout(10)
     def test_edit_message_text(self, bot, message):
         message = bot.edit_message_text(text='new_text', chat_id=message.chat_id,
-                                        message_id=message.message_id)
+                                        message_id=message.message_id, parse_mode='HTML',
+                                        disable_web_page_preview=True)
 
         assert message.text == 'new_text'
 
@@ -233,6 +237,10 @@ class TestBot:
 
         assert message.caption == 'new_caption'
 
+    def test_edit_message_caption_without_required(self, bot):
+        with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
+            bot.edit_message_caption(caption='new_caption')
+
     @pytest.mark.skip(reason='need reference to an inline message')
     def test_edit_message_caption_inline(self):
         pass
@@ -246,6 +254,11 @@ class TestBot:
                                                 reply_markup=new_markup)
 
         assert message is not True
+
+    def test_edit_message_reply_markup_without_required(self, bot):
+        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
+        with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
+            bot.edit_message_reply_markup(reply_markup=new_markup)
 
     @pytest.mark.skip(reason='need reference to an inline message')
     def test_edit_reply_markup_inline(self):
