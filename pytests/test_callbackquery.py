@@ -87,6 +87,7 @@ class TestCallbackQuery:
             return args[1] == callback_query.id
 
         monkeypatch.setattr('telegram.Bot.answerCallbackQuery', test)
+        # TODO: PEP8
         assert callback_query.answer()
 
     def test_edit_message_text(self, monkeypatch, callback_query):
@@ -95,7 +96,7 @@ class TestCallbackQuery:
                 id = kwargs['inline_message_id'] == callback_query.inline_message_id
                 text = kwargs['text'] == 'test'
                 return id and text
-            except:
+            except KeyError:
                 chat_id = kwargs['chat_id'] == callback_query.message.chat_id
                 message_id = kwargs['message_id'] == callback_query.message.message_id
                 text = kwargs['text'] == 'test'

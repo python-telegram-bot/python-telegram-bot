@@ -24,11 +24,12 @@ from telegram import Update, User, ShippingAddress, ShippingQuery
 
 
 @pytest.fixture(scope='class')
-def shipping_query():
+def shipping_query(bot):
     return ShippingQuery(TestShippingQuery.id,
                          TestShippingQuery.from_user,
                          TestShippingQuery.invoice_payload,
-                         TestShippingQuery.shipping_address)
+                         TestShippingQuery.shipping_address,
+                         bot=bot)
 
 
 class TestShippingQuery:
@@ -62,6 +63,13 @@ class TestShippingQuery:
         assert shipping_query_dict['invoice_payload'] == shipping_query.invoice_payload
         assert shipping_query_dict['from'] == shipping_query.from_user.to_dict()
         assert shipping_query_dict['shipping_address'] == shipping_query.shipping_address.to_dict()
+
+    def test_answer(self, monkeypatch, shipping_query):
+        def test(*args, **kwargs):
+            return args[1] == shipping_query.id
+
+        monkeypatch.setattr('telegram.Bot.answer_shipping_query', test)
+        assert shipping_query.answer()
 
     def test_equality(self):
         a = ShippingQuery(self.id, self.from_user, self.invoice_payload, self.shipping_address)

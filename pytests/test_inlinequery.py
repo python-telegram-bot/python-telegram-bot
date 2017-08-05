@@ -24,9 +24,9 @@ from telegram import User, Location, InlineQuery, Update
 
 
 @pytest.fixture(scope='class')
-def inlinequery():
+def inline_query(bot):
     return InlineQuery(TestInlineQuery.id, TestInlineQuery.from_user, TestInlineQuery.query,
-                       TestInlineQuery.offset, location=TestInlineQuery.location)
+                       TestInlineQuery.offset, location=TestInlineQuery.location, bot=bot)
 
 
 class TestInlineQuery:
@@ -44,26 +44,33 @@ class TestInlineQuery:
             'offset': self.offset,
             'location': self.location.to_dict()
         }
-        inlinequery_json = InlineQuery.de_json(json_dict, bot)
+        inline_query_json = InlineQuery.de_json(json_dict, bot)
 
-        assert inlinequery_json.id == self.id
-        assert inlinequery_json.from_user == self.from_user
-        assert inlinequery_json.location == self.location
-        assert inlinequery_json.query == self.query
-        assert inlinequery_json.offset == self.offset
+        assert inline_query_json.id == self.id
+        assert inline_query_json.from_user == self.from_user
+        assert inline_query_json.location == self.location
+        assert inline_query_json.query == self.query
+        assert inline_query_json.offset == self.offset
 
-    def test_to_json(self, inlinequery):
-        json.loads(inlinequery.to_json())
+    def test_to_json(self, inline_query):
+        json.loads(inline_query.to_json())
 
-    def test_to_dict(self, inlinequery):
-        inlinequery_dict = inlinequery.to_dict()
+    def test_to_dict(self, inline_query):
+        inline_query_dict = inline_query.to_dict()
 
-        assert isinstance(inlinequery_dict, dict)
-        assert inlinequery_dict['id'] == inlinequery.id
-        assert inlinequery_dict['from'] == inlinequery.from_user.to_dict()
-        assert inlinequery_dict['location'] == inlinequery.location.to_dict()
-        assert inlinequery_dict['query'] == inlinequery.query
-        assert inlinequery_dict['offset'] == inlinequery.offset
+        assert isinstance(inline_query_dict, dict)
+        assert inline_query_dict['id'] == inline_query.id
+        assert inline_query_dict['from'] == inline_query.from_user.to_dict()
+        assert inline_query_dict['location'] == inline_query.location.to_dict()
+        assert inline_query_dict['query'] == inline_query.query
+        assert inline_query_dict['offset'] == inline_query.offset
+
+    def test_answer(self, monkeypatch, inline_query):
+        def test(*args, **kwargs):
+            return args[1] == inline_query.id
+
+        monkeypatch.setattr('telegram.Bot.answer_inline_query', test)
+        assert inline_query.answer()
 
     def test_equality(self):
         a = InlineQuery(self.id, User(1, ""), "", "")

@@ -24,14 +24,15 @@ from telegram import Update, User, PreCheckoutQuery, OrderInfo
 
 
 @pytest.fixture(scope='class')
-def pre_checkout_query():
+def pre_checkout_query(bot):
     return PreCheckoutQuery(TestPreCheckoutQuery.id,
                             TestPreCheckoutQuery.from_user,
                             TestPreCheckoutQuery.currency,
                             TestPreCheckoutQuery.total_amount,
                             TestPreCheckoutQuery.invoice_payload,
                             shipping_option_id=TestPreCheckoutQuery.shipping_option_id,
-                            order_info=TestPreCheckoutQuery.order_info)
+                            order_info=TestPreCheckoutQuery.order_info,
+                            bot=bot)
 
 
 class TestPreCheckoutQuery:
@@ -76,6 +77,13 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query_dict['currency'] == pre_checkout_query.currency
         assert pre_checkout_query_dict['from'] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict['order_info'] == pre_checkout_query.order_info.to_dict()
+
+    def test_answer(self, monkeypatch, pre_checkout_query):
+        def test(*args, **kwargs):
+            return args[1] == pre_checkout_query.id
+
+        monkeypatch.setattr('telegram.Bot.answer_pre_checkout_query', test)
+        assert pre_checkout_query.answer()
 
     def test_equality(self):
         a = PreCheckoutQuery(self.id, self.from_user, self.currency, self.total_amount,
