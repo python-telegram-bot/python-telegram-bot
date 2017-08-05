@@ -53,11 +53,11 @@ def update(request):
 class TestUpdate:
     update_id = 868573637
 
-    @pytest.mark.parametrize('dict', argvalues=params, ids=ids)
-    def test_de_json(self, bot, dict):
+    @pytest.mark.parametrize('paramdict', argvalues=params, ids=ids)
+    def test_de_json(self, bot, paramdict):
         json_dict = {'update_id': TestUpdate.update_id}
         # Convert the single update "item" to a dict of that item and apply it to the json_dict
-        json_dict.update({k: v.to_dict() for k, v in dict.items()})
+        json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
         update = Update.de_json(json_dict, bot)
 
         assert update.update_id == self.update_id
@@ -67,7 +67,7 @@ class TestUpdate:
         for type in all_types:
             if getattr(update, type) is not None:
                 i += 1
-                assert getattr(update, type) == dict[type]
+                assert getattr(update, type) == paramdict[type]
         assert i == 1
 
     def test_update_de_json_empty(self, bot):
@@ -108,18 +108,18 @@ class TestUpdate:
         else:
             assert user is None
 
-    def test_effective_message(self, update):
+    def test_effective_message(self, update, message):
         # Test that it's sometimes None per docstring
-        message = update.effective_message
+        eff_message = update.effective_message
         if not (update.inline_query is not None
                 or update.chosen_inline_result is not None
                 or (update.callback_query is not None
                     and update.callback_query.message is None)
                 or update.shipping_query is not None
                 or update.pre_checkout_query is not None):
-            assert message.message_id == 1
+            assert eff_message.message_id == message
         else:
-            assert message is None
+            assert eff_message is None
 
     def test_equality(self):
         a = Update(self.update_id, message=message)

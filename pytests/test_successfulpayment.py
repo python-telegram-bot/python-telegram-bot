@@ -30,8 +30,10 @@ def successful_payment():
                              currency=TestSuccessfulPayment.currency,
                              total_amount=TestSuccessfulPayment.total_amount,
                              order_info=TestSuccessfulPayment.order_info,
-                             telegram_payment_charge_id=TestSuccessfulPayment.telegram_payment_charge_id,
-                             provider_payment_charge_id=TestSuccessfulPayment.provider_payment_charge_id)
+                             telegram_payment_charge_id=TestSuccessfulPayment
+                             .telegram_payment_charge_id,
+                             provider_payment_charge_id=TestSuccessfulPayment
+                             .provider_payment_charge_id)
 
 
 class TestSuccessfulPayment:
@@ -45,13 +47,13 @@ class TestSuccessfulPayment:
 
     def test_de_json(self, bot):
         json_dict = {
-            'invoice_payload': TestSuccessfulPayment.invoice_payload,
-            'shipping_option_id': TestSuccessfulPayment.shipping_option_id,
-            'currency': TestSuccessfulPayment.currency,
-            'total_amount': TestSuccessfulPayment.total_amount,
-            'order_info': TestSuccessfulPayment.order_info.to_dict(),
-            'telegram_payment_charge_id': TestSuccessfulPayment.telegram_payment_charge_id,
-            'provider_payment_charge_id': TestSuccessfulPayment.provider_payment_charge_id
+            'invoice_payload': self.invoice_payload,
+            'shipping_option_id': self.shipping_option_id,
+            'currency': self.currency,
+            'total_amount': self.total_amount,
+            'order_info': self.order_info.to_dict(),
+            'telegram_payment_charge_id': self.telegram_payment_charge_id,
+            'provider_payment_charge_id': self.provider_payment_charge_id
         }
         successful_payment = SuccessfulPayment.de_json(json_dict, bot)
 

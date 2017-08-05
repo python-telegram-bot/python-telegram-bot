@@ -113,9 +113,9 @@ class TestVideoNote:
     def test_de_json(self, video_note, bot):
         json_dict = {
             'file_id': video_note.file_id,
-            'length': TestVideoNote.length,
-            'duration': TestVideoNote.duration,
-            'file_size': TestVideoNote.file_size
+            'length': self.length,
+            'duration': self.duration,
+            'file_size': self.file_size
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
 

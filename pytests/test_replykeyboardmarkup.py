@@ -38,10 +38,9 @@ class TestReplyKeyboardMarkup:
     selective = True
 
     def test_send_message_with_reply_keyboard_markup(self, bot, chat_id, reply_keyboard_markup):
-        message = bot.sendMessage(chat_id, 'Text', reply_markup=reply_keyboard_markup)
+        message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_markup)
 
-        json.loads(message.to_json())
-        assert message.text == u'Text'
+        assert message.text == 'Text'
 
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, list)

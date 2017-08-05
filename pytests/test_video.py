@@ -143,11 +143,11 @@ class TestVideo:
     def test_de_json(self, video, bot):
         json_dict = {
             'file_id': video.file_id,
-            'width': TestVideo.width,
-            'height': TestVideo.height,
-            'duration': TestVideo.duration,
-            'mime_type': TestVideo.mime_type,
-            'file_size': TestVideo.file_size
+            'width': self.width,
+            'height': self.height,
+            'duration': self.duration,
+            'mime_type': self.mime_type,
+            'file_size': self.file_size
         }
         json_video = Video.de_json(json_dict, bot)
 

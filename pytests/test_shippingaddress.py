@@ -43,12 +43,12 @@ class TestShippingAddress:
 
     def test_de_json(self, bot):
         json_dict = {
-            'country_code': TestShippingAddress.country_code,
-            'state': TestShippingAddress.state,
-            'city': TestShippingAddress.city,
-            'street_line1': TestShippingAddress.street_line1,
-            'street_line2': TestShippingAddress.street_line2,
-            'post_code': TestShippingAddress.post_code
+            'country_code': self.country_code,
+            'state': self.state,
+            'city': self.city,
+            'street_line1': self.street_line1,
+            'street_line2': self.street_line2,
+            'post_code': self.post_code
         }
         shipping_address = ShippingAddress.de_json(json_dict, bot)
 

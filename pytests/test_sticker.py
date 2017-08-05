@@ -51,6 +51,9 @@ class TestSticker:
     width = 510
     height = 512
     file_size = 39518
+    thumb_width = 90
+    thumb_heigth = 90
+    thumb_file_size = 3672
 
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
@@ -62,12 +65,12 @@ class TestSticker:
         assert sticker.thumb.file_id != ''
 
     def test_expected_values(self, sticker):
-        assert sticker.width == 510
-        assert sticker.height == 512
-        assert sticker.file_size == 39518
-        assert sticker.thumb.width == 90
-        assert sticker.thumb.height == 90
-        assert sticker.thumb.file_size == 3672
+        assert sticker.width == self.width
+        assert sticker.height == self.height
+        assert sticker.file_size == self.file_size
+        assert sticker.thumb.width == self.thumb_width
+        assert sticker.thumb.height == self.thumb_heigth
+        assert sticker.thumb.file_size == self.thumb_file_size
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -104,27 +107,15 @@ class TestSticker:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_resend(self, bot, chat_id, sticker):
-        message = bot.sendSticker(chat_id=chat_id, sticker=sticker.file_id)
+        message = bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 
-        assert isinstance(message.sticker, Sticker)
-        assert isinstance(message.sticker.file_id, str)
-        assert message.sticker.file_id != ''
-        assert message.sticker.width == sticker.width
-        assert message.sticker.height == sticker.height
-        assert message.sticker.file_size == sticker.file_size
-
-        assert isinstance(message.sticker.thumb, PhotoSize)
-        assert isinstance(message.sticker.thumb.file_id, str)
-        assert message.sticker.thumb.file_id != ''
-        assert message.sticker.thumb.width == sticker.thumb.width
-        assert message.sticker.thumb.height == sticker.thumb.height
-        assert message.sticker.thumb.file_size == sticker.thumb.file_size
+        assert message.sticker == sticker
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_on_server_emoji(self, bot, chat_id):
         server_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
-        message = bot.sendSticker(chat_id=chat_id, sticker=server_file_id)
+        message = bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
         if PY2:
             assert sticker.emoji == self.emoji.decode('utf-8')
@@ -134,7 +125,7 @@ class TestSticker:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_from_url(self, bot, chat_id):
-        message = bot.sendSticker(chat_id=chat_id, sticker=self.sticker_file_url)
+        message = bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
 
         assert isinstance(message.sticker, Sticker)
@@ -170,22 +161,13 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_with_sticker(self, bot, chat_id, sticker):
-        message = bot.send_sticker(chat_id, sticker=sticker)
+    def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
+        def test(_, url, data, **kwargs):
+            return data['sticker'] == sticker.file_id
 
-        assert isinstance(message.sticker, Sticker)
-        assert isinstance(message.sticker.file_id, str)
-        assert message.sticker.file_id != ''
-        assert message.sticker.width == sticker.width
-        assert message.sticker.height == sticker.height
-        assert message.sticker.file_size == sticker.file_size
-
-        assert isinstance(message.sticker.thumb, PhotoSize)
-        assert isinstance(message.sticker.thumb.file_id, str)
-        assert message.sticker.thumb.file_id != ''
-        assert message.sticker.thumb.width == sticker.thumb.width
-        assert message.sticker.thumb.height == sticker.thumb.height
-        assert message.sticker.thumb.file_size == sticker.thumb.file_size
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        message = bot.send_sticker(sticker=sticker, chat_id=chat_id)
+        assert message
 
     def test_to_json(self, sticker):
         json.loads(sticker.to_json())
@@ -204,19 +186,19 @@ class TestSticker:
     @pytest.mark.timeout(10)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.sendSticker(chat_id, open(os.devnull, 'rb'))
+            bot.send_sticker(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.sendSticker(chat_id, '')
+            bot.send_sticker(chat_id, '')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.sendSticker(chat_id)
+            bot.send_sticker(chat_id)
 
     def test_equality(self, sticker):
         a = Sticker(sticker.file_id, self.width, self.height)

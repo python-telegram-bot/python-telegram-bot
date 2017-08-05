@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import time
 from datetime import datetime, timedelta
 
@@ -24,97 +23,27 @@ import pytest
 from flaky import flaky
 from future.utils import string_types
 
-from telegram import (Bot, Update, ChatAction, TelegramError, error)
-from telegram.error import BadRequest
+from telegram import (Bot, Update, ChatAction, TelegramError, error, User, InlineKeyboardMarkup,
+                      InlineKeyboardButton)
+from telegram.error import BadRequest, InvalidToken
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
 
 
+@pytest.fixture(scope='class')
+def message(bot, chat_id):
+    return bot.send_message(chat_id, 'Text', reply_to_message_id=1,
+                            disable_web_page_preview=True, disable_notification=True)
+
+
+@pytest.fixture(scope='class')
+def media_message(bot, chat_id):
+    with open('tests/data/telegram.ogg', 'rb') as f:
+        return bot.send_voice(chat_id, voice=f, caption='my caption', timeout=10)
+
+
 class TestBot:
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_get_me(self, bot):
-        bot = bot.get_me()
-
-        json.loads(bot.to_json())
-        self._test_user_equals_bot(bot)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_message_other_args(self, bot, chat_id):
-        # parse_mode, reply_markup is tested plenty elsewhere
-        message = bot.send_message(chat_id, 'Text', reply_to_message_id=1,
-                                   disable_web_page_preview=True, disable_notification=True)
-
-        json.loads(message.to_json())
-        assert message.text == u'Text'
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_delete_message(self, bot, chat_id):
-        message = bot.send_message(chat_id=chat_id, text='This message will be deleted')
-
-        assert bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_delete_message_old_message(self, bot, chat_id):
-        with pytest.raises(TelegramError, match='can\'t be deleted'):
-            # Considering that the first message is old enough
-            bot.delete_message(chat_id=chat_id, message_id=1)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_get_updates(self, bot):
-        bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
-        updates = bot.getUpdates(timeout=1)
-
-        if updates:  # TODO: Actually send updates to the test bot so this can be tested properly
-            json.loads(updates[0].to_json())
-            assert isinstance(updates[0], Update)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_forward_message(self, bot, chat_id):
-        message = bot.forwardMessage(chat_id, from_chat_id=chat_id, message_id=2398)
-
-        json.loads(message.to_json())
-        assert message.text == 'teste'
-        assert message.forward_from.username == 'leandrotoledo'
-        assert isinstance(message.forward_date, datetime)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_game(self, bot, chat_id):
-        game_short_name = 'python_telegram_bot_test_game'
-        message = bot.send_game(chat_id, game_short_name)
-
-        json.loads(message.to_json())
-        assert message.game.description == 'This is a test game for python-telegram-bot.'
-        assert message.game.animation.file_id == 'CgADAQADKwIAAvjAuQABozciVqhFDO0C'
-        assert message.game.photo[0].file_size == 851
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_chat_action(self, bot, chat_id):
-        bot.sendChatAction(chat_id, ChatAction.TYPING)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_get_user_profile_photos(self, bot, chat_id):
-        user_profile_photos = bot.get_user_profile_photos(chat_id)
-
-        json.loads(user_profile_photos.to_json())
-        assert user_profile_photos.photos[0][0].file_size == 12421
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_get_one_user_profile_photo(self, bot, chat_id):
-        user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0)
-        json.loads(user_profile_photos.to_json())
-        assert user_profile_photos.photos[0][0].file_size == 12421
-
     @pytest.mark.parametrize('token', argvalues=[
         '123',
         '12a:abcd1234',
@@ -125,39 +54,245 @@ class TestBot:
         '1234:abcd 1234'
     ])
     def test_invalid_token(self, token):
-        with pytest.raises(error.InvalidToken, match='Invalid token'):
+        with pytest.raises(InvalidToken, match='Invalid token'):
             Bot(token)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_unauthorized_token(self):
-        with pytest.raises(error.Unauthorized):
-            bot = Bot('1234:abcd1234')
-            bot.get_me()
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_invalid_token_server_response(self, monkeypatch):
         monkeypatch.setattr('telegram.Bot._validate_token', lambda x, y: True)
         bot = Bot('12')
-        with pytest.raises(error.InvalidToken):
+        with pytest.raises(InvalidToken):
             bot.get_me()
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_get_me_and_properties(self, bot):
+        get_me_bot = bot.get_me()
+
+        assert isinstance(get_me_bot, User)
+        assert get_me_bot.id == bot.id
+        assert get_me_bot.username == bot.username
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_forward_message(self, bot, chat_id, message):
+        message = bot.forward_message(chat_id, from_chat_id=chat_id, message_id=message.message_id)
+
+        assert message.text == message.text
+        assert message.forward_from.username == message.from_user.username
+        assert isinstance(message.forward_date, datetime)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_delete_message(self, bot, chat_id):
+        message = bot.send_message(chat_id, text='will be deleted')
+
+        assert bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_delete_message_old_message(self, bot, chat_id):
+        with pytest.raises(TelegramError, match='can\'t be deleted'):
+            # Considering that the first message is old enough
+            bot.delete_message(chat_id=chat_id, message_id=1)
+
+    @pytest.mark.skip(reason='tested in test_photo')
+    def test_send_photo(self):
+        pass
+
+    @pytest.mark.skip(reason='tested in test_audio')
+    def test_send_audio(self):
+        pass
+
+    @pytest.mark.skip(reason='tested in test_document')
+    def test_send_document(self):
+        pass
+
+    @pytest.mark.skip(reason='tested in test_sticker')
+    def test_send_sticker(self):
+        pass
+
+    @pytest.mark.skip(reason='tested in test_video')
+    def test_send_video(self):
+        pass
+
+    @pytest.mark.skip(reason='tested in test_voice')
+    def test_send_voice(self):
+        pass
+
+    @pytest.mark.skip(reason='tested in test_videonote')
+    def test_send_video_note(self):
+        pass
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_location(self, bot, chat_id):
+        message = bot.send_location(chat_id=chat_id, latitude=-23.691288, longitude=-46.788279)
+
+        assert message.location
+        assert message.location.longitude == -46.788279
+        assert message.location.latitude == -23.691288
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_venue(self, bot, chat_id):
+        longitude = -46.788279
+        latitude = -23.691288
+        title = 'title'
+        address = 'address'
+        message = bot.send_venue(chat_id=chat_id, title=title, address=address, latitude=latitude,
+                                 longitude=longitude)
+
+        assert message.venue
+        assert message.venue.title == title
+        assert message.venue.address == address
+        assert message.venue.location.latitude == latitude
+        assert message.venue.location.longitude == longitude
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_contact(self, bot, chat_id):
+        phone_number = '+11234567890'
+        first_name = 'Leandro'
+        last_name = 'Toledo'
+        message = bot.send_contact(chat_id=chat_id, phone_number=phone_number,
+                                   first_name=first_name, last_name=last_name)
+
+        assert message.contact
+        assert message.contact.phone_number == phone_number
+        assert message.contact.first_name == first_name
+        assert message.contact.last_name == last_name
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_game(self, bot, chat_id):
+        game_short_name = 'python_telegram_bot_test_game'
+        message = bot.send_game(chat_id, game_short_name)
+
+        assert message.game
+        assert message.game.description == 'This is a test game for python-telegram-bot.'
+        assert message.game.animation.file_id == 'CgADAQADKwIAAvjAuQABozciVqhFDO0C'
+        assert message.game.photo[0].file_size == 851
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_chat_action(self, bot, chat_id):
+        assert bot.send_chat_action(chat_id, ChatAction.TYPING)
+
+    @pytest.mark.skip(reason='we need incomming inline query to test answer')
+    def test_answer_inline_query(self):
+        pass
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_get_user_profile_photos(self, bot, chat_id):
+        user_profile_photos = bot.get_user_profile_photos(chat_id)
+
+        assert user_profile_photos.photos[0][0].file_size == 12421
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_get_one_user_profile_photo(self, bot, chat_id):
+        user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0)
+        assert user_profile_photos.photos[0][0].file_size == 12421
+
+    @pytest.mark.skip(reason='tested in file tests')
+    def test_get_file(self):
+        pass
+
+    @pytest.mark.skip(reason='No feasable way to test until bots can add members')
+    def test_kick_chat_member(self):
+        pass
+
+    @pytest.mark.skip(reason='not tested yet')
+    def test_unban_chat_member(self):
+        pass
+
+    @pytest.mark.skip(reason='Need an incomming callbackquery to test')
+    def test_answer_callback_query(self):
+        pass
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_text(self, bot, message):
+        message = bot.edit_message_text(text='new_text', chat_id=message.chat_id,
+                                        message_id=message.message_id)
+
+        assert message.text == 'new_text'
+
+    @pytest.mark.skip(reason='need reference to an inline message')
+    def test_edit_message_text_inline(self):
+        pass
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_caption(self, bot, media_message):
+        message = bot.edit_message_caption(caption='new_caption', chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id)
+
+        assert message.caption == 'new_caption'
+
+    @pytest.mark.skip(reason='need reference to an inline message')
+    def test_edit_message_caption_inline(self):
+        pass
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_reply_markup(self, bot, message):
+        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
+        message = bot.edit_message_reply_markup(chat_id=message.chat_id,
+                                                message_id=message.message_id,
+                                                reply_markup=new_markup)
+
+        assert message is not True
+
+    @pytest.mark.skip(reason='need reference to an inline message')
+    def test_edit_reply_markup_inline(self):
+        pass
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_get_updates(self, bot):
+        bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+        updates = bot.get_updates(timeout=1)
+
+        assert isinstance(updates, list)
+        if updates:  # TODO: Actually send updates to the test bot so this can be tested properly
+            assert isinstance(updates[0], Update)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(15)
+    def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
+        url = 'https://python-telegram-bot.org/test/webhook'
+        max_connections = 7
+        allowed_updates = ['message']
+        bot.set_webhook(url, max_connections=max_connections, allowed_updates=allowed_updates)
+        time.sleep(2)
+        live_info = bot.get_webhook_info()
+        time.sleep(6)
+        bot.delete_webhook()
+        time.sleep(2)
+        info = bot.get_webhook_info()
+        assert info.url == ''
+        assert live_info.url == url
+        assert live_info.max_connections == max_connections
+        assert live_info.allowed_updates == allowed_updates
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_leave_chat(self, bot):
         with pytest.raises(error.BadRequest, match='Chat not found'):
-            chat = bot.leave_chat(-123456)
+            bot.leave_chat(-123456)
 
         with pytest.raises(error.NetworkError, match='Chat not found'):
-            chat = bot.leave_chat(-123456)
+            bot.leave_chat(-123456)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_chat(self, bot, group_id):
         chat = bot.get_chat(group_id)
 
-        json.loads(chat.to_json())
         assert chat.type == "group"
         assert chat.title == ">>> telegram.Bot() - Developers"
         assert chat.id == int(group_id)
@@ -167,13 +302,9 @@ class TestBot:
     def test_get_chat_administrators(self, bot, channel_id):
         admins = bot.get_chat_administrators(channel_id)
         assert isinstance(admins, list)
-        json.loads(admins[0].to_json())
 
         for a in admins:
             assert a.status in ("administrator", "creator")
-
-        bot = [a.user for a in admins if a.user.id == 133505823][0]
-        self._test_user_equals_bot(bot)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -185,42 +316,10 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_chat_member(self, bot, channel_id):
-        chat_member = bot.get_chat_member(channel_id, 133505823)
-        bot = chat_member.user
+        chat_member = bot.get_chat_member(channel_id, 103246792)  # Eldin
 
-        json.loads(chat_member.to_json())
         assert chat_member.status == "administrator"
-        self._test_user_equals_bot(chat_member.user)
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    @pytest.mark.xfail
-    def test_set_webhook_get_webhook_info(self, bot):
-        url = 'https://python-telegram-bot.org/test/webhook'
-        max_connections = 7
-        allowed_updates = ['message']
-        bot.set_webhook(url, max_connections=7, allowed_updates=['message'])
-        time.sleep(1)
-        info = bot.get_webhook_info()
-        time.sleep(1)
-        bot.delete_webhook()
-        time.sleep(1)
-        assert url == info.url
-        assert max_connections == info.max_connections
-        assert allowed_updates == info.allowed_updates
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    @pytest.mark.xfail
-    def test_delete_webhook(self, bot):
-        url = 'https://python-telegram-bot.org/test/webhook'
-        time.sleep(2)
-        bot.set_webhook(url)
-        time.sleep(1)
-        bot.delete_webhook()
-        time.sleep(2)
-        info = bot.get_webhook_info()
-        assert info.url == ''
+        assert chat_member.user.username == "EchteEldin"
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -235,7 +334,6 @@ class TestBot:
             chat_id=game.chat_id,
             message_id=game.message_id)
 
-        json.loads(game.to_json())
         assert message.game.description == game.game.description
         assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
@@ -257,7 +355,6 @@ class TestBot:
             message_id=game.message_id,
             disable_edit_message=True)
 
-        json.loads(game.to_json())
         assert message.game.description == game.game.description
         assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
@@ -295,7 +392,6 @@ class TestBot:
             message_id=game.message_id,
             force=True)
 
-        json.loads(game.to_json())
         assert message.game.description == game.game.description
         assert message.game.animation.file_id == game.game.animation.file_id
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
@@ -316,26 +412,21 @@ class TestBot:
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_error_pin_unpin_message(self, bot, chat_id):
-        msg = bot.send_message(chat_id, 'Pinned then unpinned')
-        # TODO: Add bot to supergroup so this can be tested properly
-        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            bot.pin_chat_message(chat_id, msg.message_id, disable_notification=True)
+    @pytest.mark.skip(reason='Not implemented')
+    def test_get_game_high_scores(self):
+        pass
 
-        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            bot.unpin_chat_message(chat_id)
+    @pytest.mark.skip(reason='Tested in test_invoice')
+    def test_send_invoice(self):
+        pass
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_set_chat_description(self, bot, channel_id):
-        assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
+    @pytest.mark.skip(reason='Need in incomming shippingquery')
+    def test_answer_shipping_query(self):
+        pass
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_set_chat_title(self, bot, channel_id):
-        assert bot.set_chat_title(channel_id, '>>> telegram.Bot() - Tests')
+    @pytest.mark.skip(reason='Need in incomming pre_checkout_query')
+    def test_answer_pre_checkout_query(self):
+        pass
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -377,32 +468,58 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_set_chat_photo(self, bot, channel_id):
+        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
+            assert bot.set_chat_photo(channel_id, f)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_delete_chat_photo(self, bot, channel_id):
         assert bot.delete_chat_photo(channel_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_set_chat_photo(self, bot, channel_id):
-        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
-            bot.set_chat_photo(channel_id, f)
-
-    def _test_user_equals_bot(self, user):
-        """Tests if user is our trusty @PythonTelegramBot."""
-        assert user.id == 133505823
-        assert user.first_name == 'PythonTelegramBot'
-        assert user.last_name is None
-        assert user.username == 'PythonTelegramBot'
-        assert user.name == '@PythonTelegramBot'
+    def test_set_chat_title(self, bot, channel_id):
+        assert bot.set_chat_title(channel_id, '>>> telegram.Bot() - Tests')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_info(self, bot):
-        # tests the Bot.info decorator and associated funcs
-        assert bot.id == 133505823
-        assert bot.first_name == 'PythonTelegramBot'
-        assert bot.last_name is None
-        assert bot.username == 'PythonTelegramBot'
-        assert bot.name == '@PythonTelegramBot'
+    def test_set_chat_description(self, bot, channel_id):
+        assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_error_pin_unpin_message(self, bot, message):
+        # TODO: Add bot to supergroup so this can be tested properly
+        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
+            bot.pin_chat_message(message.chat_id, message.message_id, disable_notification=True)
+
+        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
+            bot.unpin_chat_message(message.chat_id)
+
+    @pytest.mark.skip(reason='Tested in test_sticker')
+    def test_get_sticker_set(self):
+        pass
+
+    @pytest.mark.skip(reason='Tested in test_sticker')
+    def test_upload_sticker_file(self):
+        pass
+
+    @pytest.mark.skip(reason='Tested in test_sticker')
+    def test_create_new_sticker_set(self):
+        pass
+
+    @pytest.mark.skip(reason='Tested in test_sticker')
+    def test_add_sticker_to_set(self):
+        pass
+
+    @pytest.mark.skip(reason='Tested in test_sticker')
+    def test_set_sticker_position_in_set(self):
+        pass
+
+    @pytest.mark.skip(reason='Tested in test_sticker')
+    def test_delete_sticker_from_set(self):
+        pass
 
     def test_timeout_propagation(self, monkeypatch, bot, chat_id):
         class OkException(Exception):
