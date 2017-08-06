@@ -70,14 +70,6 @@ class TestMessageHandler:
     def mh_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def mh_pass_args_handler(self, bot, update, args):
-        if update.message.text == '/test':
-            self.test_flag = len(args) == 0
-        elif update.message.text == '/test@{}'.format(bot.username):
-            self.test_flag = len(args) == 0
-        else:
-            self.test_flag = args == ['one', 'two']
-
     def test_basic(self, dp, message):
         handler = MessageHandler(None, self.mh_basic_handler)
         dp.add_handler(handler)
@@ -122,6 +114,11 @@ class TestMessageHandler:
         assert handler.check_update(Update(0, message=message))
         assert handler.check_update(Update(0, channel_post=message))
         assert not handler.check_update(Update(0, edited_channel_post=message))
+
+    def test_none_allowed(self):
+        with pytest.raises(ValueError, match='are all False'):
+            handler = MessageHandler(None, self.mh_basic_handler, message_updates=False,
+                                     channel_post_updates=False, edited_updates=False)
 
     def test_with_filter(self, message):
         handler = MessageHandler(Filters.command, self.mh_basic_handler)
