@@ -43,7 +43,7 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='class')
 def message(bot):
     return Message(1, None, None, None, bot=bot)
 

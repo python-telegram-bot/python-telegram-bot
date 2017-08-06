@@ -47,7 +47,7 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='class')
 def chosen_inline_result():
     return Update(1, chosen_inline_result=ChosenInlineResult('result_id',
                                                              User(1, 'test_user'),

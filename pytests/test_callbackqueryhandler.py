@@ -45,7 +45,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture
+@pytest.fixture(scope='class')
 def callback_query(bot):
     return Update(0, callback_query=CallbackQuery(2, None, None, data="test data"))
 
