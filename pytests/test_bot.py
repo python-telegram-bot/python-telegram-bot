@@ -211,6 +211,7 @@ class TestBot:
 
         assert message.caption == 'new_caption'
 
+    @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_caption_without_required(self, bot):
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
             bot.edit_message_caption(caption='new_caption')
@@ -229,6 +230,7 @@ class TestBot:
 
         assert message is not True
 
+    @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_reply_markup_without_required(self, bot):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
