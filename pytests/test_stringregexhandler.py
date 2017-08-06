@@ -20,7 +20,7 @@ import pytest
 
 from telegram import Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery, \
     ChosenInlineResult, ShippingQuery, PreCheckoutQuery
-from telegram.ext import StringCommandHandler, StringRegexHandler
+from telegram.ext import StringRegexHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
 
@@ -38,18 +38,19 @@ params = [
 ]
 
 ids = ('message', 'edited_message', 'callback_query', 'channel_post',
-             'edited_channel_post', 'inline_query', 'chosen_inline_result',
-             'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+       'edited_channel_post', 'inline_query', 'chosen_inline_result',
+       'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+
 
 @pytest.fixture(params=params, ids=ids)
 def false_update(request):
     return Update(update_id=1, **request.param)
 
+
 class TestStringRegexHandler:
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
-
 
     def srh_basic_handler(self, bot, update):
         test_bot = isinstance(bot, Bot)
@@ -80,7 +81,7 @@ class TestStringRegexHandler:
 
     def test_with_passing_group_dict(self, dp):
         handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.srh_group_handler,
-                               pass_groups=True)
+                                     pass_groups=True)
         dp.add_handler(handler)
 
         dp.process_update('test message')
@@ -88,7 +89,7 @@ class TestStringRegexHandler:
 
         dp.remove_handler(handler)
         handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.srh_group_handler,
-                               pass_groupdict=True)
+                                     pass_groupdict=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -112,7 +113,7 @@ class TestStringRegexHandler:
 
         dp.remove_handler(handler)
         handler = StringRegexHandler('test', self.srh_queue_handler_2, pass_job_queue=True,
-                                 pass_update_queue=True)
+                                     pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False

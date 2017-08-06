@@ -38,18 +38,19 @@ params = [
 ]
 
 ids = ('message', 'edited_message', 'callback_query', 'channel_post',
-             'edited_channel_post', 'inline_query', 'chosen_inline_result',
-             'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+       'edited_channel_post', 'inline_query', 'chosen_inline_result',
+       'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+
 
 @pytest.fixture(params=params, ids=ids)
 def false_update(request):
     return Update(update_id=1, **request.param)
 
+
 class TestStringCommandHandler:
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
-
 
     def sch_basic_handler(self, bot, update):
         test_bot = isinstance(bot, Bot)
@@ -108,7 +109,7 @@ class TestStringCommandHandler:
 
         dp.remove_handler(handler)
         handler = StringCommandHandler('test', self.sch_queue_handler_2, pass_job_queue=True,
-                                 pass_update_queue=True)
+                                       pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False

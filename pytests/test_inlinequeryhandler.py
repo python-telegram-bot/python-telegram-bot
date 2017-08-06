@@ -46,7 +46,7 @@ def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='function')
 def inline_query(bot):
     return Update(0, inline_query=InlineQuery('id', User(2, 'test user'),
                                               'test query', offset='22',
