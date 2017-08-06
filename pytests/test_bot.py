@@ -25,7 +25,7 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton)
-from telegram.error import BadRequest, InvalidToken, NetworkError
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -155,6 +155,7 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.xfail(raises=RetryAfter)
     def test_send_contact(self, bot, chat_id):
         phone_number = '+11234567890'
         first_name = 'Leandro'
