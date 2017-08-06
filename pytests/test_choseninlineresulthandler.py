@@ -50,7 +50,7 @@ class TestCommandHandler:
     def ch_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def ch_pass_args_handler(self, bot, update, args):
+    def ch_test6(self, bot, update, args):
         if update.message.text == '/test':
             self.test_flag = len(args) == 0
         elif update.message.text == '/test@{}'.format(bot.username):
@@ -126,7 +126,7 @@ class TestCommandHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_pass_args(self, dp, message):
-        handler = CommandHandler('test', self.ch_pass_args_handler, pass_args=True)
+        handler = CommandHandler('test', self.ch_test6, pass_args=True)
         dp.add_handler(handler)
 
         message.text = '/test'
