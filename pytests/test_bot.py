@@ -100,33 +100,8 @@ class TestBot:
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
-    @pytest.mark.skip(reason='tested in test_photo')
-    def test_send_photo(self):
-        pass
-
-    @pytest.mark.skip(reason='tested in test_audio')
-    def test_send_audio(self):
-        pass
-
-    @pytest.mark.skip(reason='tested in test_document')
-    def test_send_document(self):
-        pass
-
-    @pytest.mark.skip(reason='tested in test_sticker')
-    def test_send_sticker(self):
-        pass
-
-    @pytest.mark.skip(reason='tested in test_video')
-    def test_send_video(self):
-        pass
-
-    @pytest.mark.skip(reason='tested in test_voice')
-    def test_send_voice(self):
-        pass
-
-    @pytest.mark.skip(reason='tested in test_videonote')
-    def test_send_video_note(self):
-        pass
+    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice
+    # and send_video_note are tested in their respective test modules. No need to duplicate here.
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -201,9 +176,7 @@ class TestBot:
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0)
         assert user_profile_photos.photos[0][0].file_size == 12421
 
-    @pytest.mark.skip(reason='tested in file tests')
-    def test_get_file(self):
-        pass
+    # get_file is tested multiple times in the test_*media* modules.
 
     @pytest.mark.skip(reason='No feasable way to test until bots can add members')
     def test_kick_chat_member(self):
@@ -430,9 +403,7 @@ class TestBot:
     def test_get_game_high_scores(self):
         pass
 
-    @pytest.mark.skip(reason='Tested in test_invoice')
-    def test_send_invoice(self):
-        pass
+    # send_invoice is tested in test_invoice
 
     @pytest.mark.skip(reason='Need in incomming shippingquery')
     def test_answer_shipping_query(self):
@@ -511,29 +482,9 @@ class TestBot:
         with pytest.raises(BadRequest, match='Method is available only for supergroups'):
             bot.unpin_chat_message(message.chat_id)
 
-    @pytest.mark.skip(reason='Tested in test_sticker')
-    def test_get_sticker_set(self):
-        pass
-
-    @pytest.mark.skip(reason='Tested in test_sticker')
-    def test_upload_sticker_file(self):
-        pass
-
-    @pytest.mark.skip(reason='Tested in test_sticker')
-    def test_create_new_sticker_set(self):
-        pass
-
-    @pytest.mark.skip(reason='Tested in test_sticker')
-    def test_add_sticker_to_set(self):
-        pass
-
-    @pytest.mark.skip(reason='Tested in test_sticker')
-    def test_set_sticker_position_in_set(self):
-        pass
-
-    @pytest.mark.skip(reason='Tested in test_sticker')
-    def test_delete_sticker_from_set(self):
-        pass
+    # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
+    # set_sticker_position_in_set and delete_sticker_from_set are tested in the
+    # test_sticker module.
 
     def test_timeout_propagation(self, monkeypatch, bot, chat_id):
         class OkException(Exception):
