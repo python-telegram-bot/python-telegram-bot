@@ -19,8 +19,31 @@
 
 import pytest
 
-from telegram import Message, Update, Chat, Bot
+from telegram import Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery, \
+    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
 from telegram.ext import CommandHandler, Filters
+
+message = Message(1, User(1, ''), None, Chat(1, ''), text='test')
+
+params = [
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
+    {'channel_post': message},
+    {'edited_channel_post': message},
+    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
+    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+]
+
+ids = ('callback_query', 'channel_post', 'edited_channel_post', 'inline_query',
+       'chosen_inline_result', 'shipping_query', 'pre_checkout_query',
+       'callback_query_without_message',)
+
+
+@pytest.fixture(params=params, ids=ids)
+def false_update(request):
+    return Update(update_id=1, **request.param)
 
 
 @pytest.fixture(scope='function')
@@ -98,14 +121,6 @@ class TestCommandHandler:
         assert handler.check_update(Update(0, message))
         assert handler.check_update(Update(0, edited_message=message))
 
-    def test_with_dispatcher(self, dp, message):
-        handler = CommandHandler('test', self.ch_basic_handler)
-        dp.add_handler(handler)
-
-        message.text = '/test'
-        dp.process_update(Update(0, message))
-        assert self.test_flag
-
     def test_directed_commands(self, message):
         handler = CommandHandler('test', self.ch_basic_handler)
 
@@ -165,7 +180,8 @@ class TestCommandHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_data_handler_2, pass_chat_data=True, pass_user_data=True)
+        handler = CommandHandler('test', self.ch_data_handler_2, pass_chat_data=True,
+                                 pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -196,3 +212,7 @@ class TestCommandHandler:
         self.test_flag = False
         dp.process_update(Update(0, message=message))
         assert self.test_flag
+
+    def test_other_update_types(self, false_update):
+        handler = CommandHandler('test', self.ch_basic_handler)
+        assert not handler.check_update(false_update)

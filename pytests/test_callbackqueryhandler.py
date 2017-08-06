@@ -18,8 +18,31 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, CallbackQuery, Bot
+from telegram import Update, CallbackQuery, Bot, Message, User, Chat, InlineQuery, \
+    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
 from telegram.ext import CallbackQueryHandler
+
+message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
+
+params = [
+    {'message': message},
+    {'edited_message': message},
+    {'channel_post': message},
+    {'edited_channel_post': message},
+    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
+    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')}
+]
+
+ids = ('message', 'edited_message', 'channel_post',
+       'edited_channel_post', 'inline_query', 'chosen_inline_result',
+       'shipping_query', 'pre_checkout_query')
+
+
+@pytest.fixture(params=params, ids=ids)
+def false_update(request):
+    return Update(update_id=2, **request.param)
 
 
 @pytest.fixture
@@ -73,7 +96,8 @@ class TestCallbackQueryHandler:
         assert not handler.check_update(callback_query)
 
     def test_with_passing_group_dict(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.cqh_group_handler, pattern='(?P<begin>.*)est(?P<end>.*)',
+        handler = CallbackQueryHandler(self.cqh_group_handler,
+                                       pattern='(?P<begin>.*)est(?P<end>.*)',
                                        pass_groups=True)
         dp.add_handler(handler)
 
@@ -81,7 +105,8 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.cqh_group_handler, pattern='(?P<begin>.*)est(?P<end>.*)',
+        handler = CallbackQueryHandler(self.cqh_group_handler,
+                                       pattern='(?P<begin>.*)est(?P<end>.*)',
                                        pass_groupdict=True)
         dp.add_handler(handler)
 
@@ -105,7 +130,8 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.cqh_data_handler_2, pass_chat_data=True, pass_user_data=True)
+        handler = CallbackQueryHandler(self.cqh_data_handler_2, pass_chat_data=True,
+                                       pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -128,9 +154,14 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.cqh_queue_handler_2, pass_job_queue=True, pass_update_queue=True)
+        handler = CallbackQueryHandler(self.cqh_queue_handler_2, pass_job_queue=True,
+                                       pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
         dp.process_update(callback_query)
         assert self.test_flag
+
+    def test_other_update_types(self, false_update):
+        handler = CallbackQueryHandler(self.cqh_basic_handler)
+        assert not handler.check_update(false_update)

@@ -19,13 +19,39 @@
 
 import pytest
 
-from telegram import Message, Update, Chat, Bot
-from telegram.ext import CommandHandler, Filters
+from telegram import Update, Chat, Bot, ChosenInlineResult, User, Message, CallbackQuery, \
+    InlineQuery, ShippingQuery, PreCheckoutQuery
+from telegram.ext import ChosenInlineResultHandler
 
+message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
+
+params = [
+    {'message': message},
+    {'edited_message': message},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
+    {'channel_post': message},
+    {'edited_channel_post': message},
+    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
+    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+]
+
+ids = ('message', 'edited_message', 'callback_query', 'channel_post',
+             'edited_channel_post', 'inline_query',
+             'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+
+
+
+@pytest.fixture(params=params, ids=ids)
+def false_update(request):
+    return Update(update_id=1, **request.param)
 
 @pytest.fixture(scope='function')
-def message(bot):
-    return Message(1, None, None, None, bot=bot)
+def chosen_inline_result():
+    return Update(1, chosen_inline_result=ChosenInlineResult('result_id',
+                                                             User(1, 'test_user'),
+                                                             'query'))
 
 
 class TestCommandHandler:
@@ -33,166 +59,77 @@ class TestCommandHandler:
     def reset(self):
         self.test_flag = False
 
-    def ch_basic_handler(self, bot, update):
+    def cir_basic_handler(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
-    def ch_data_handler_1(self, bot, update, user_data=None, chat_data=None):
+    def cir_data_handler_1(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) or (chat_data is not None)
 
-    def ch_data_handler_2(self, bot, update, user_data=None, chat_data=None):
+    def cir_data_handler_2(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) and (chat_data is not None)
 
-    def ch_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def cir_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def ch_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def cir_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def ch_test6(self, bot, update, args):
-        if update.message.text == '/test':
-            self.test_flag = len(args) == 0
-        elif update.message.text == '/test@{}'.format(bot.username):
-            self.test_flag = len(args) == 0
-        else:
-            self.test_flag = args == ['one', 'two']
-
-    def test_basic(self, dp, message):
-        handler = CommandHandler('test', self.ch_basic_handler)
+    def test_basic(self, dp, chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.cir_basic_handler)
         dp.add_handler(handler)
 
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-        dp.process_update(Update(0, message))
+        assert handler.check_update(chosen_inline_result)
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
-        message.text = '/nottest'
-        assert not handler.check_update(Update(0, message))
-
-        message.text = 'test'
-        assert not handler.check_update(Update(0, message))
-
-        message.text = 'not /test at start'
-        assert not handler.check_update(Update(0, message))
-
-    def test_command_list(self, message):
-        handler = CommandHandler(['test', 'start'], self.ch_basic_handler)
-
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-
-        message.text = '/start'
-        assert handler.check_update(Update(0, message))
-
-        message.text = '/stop'
-        assert not handler.check_update(Update(0, message))
-
-    def test_edited(self, message):
-        handler = CommandHandler('test', self.ch_basic_handler, allow_edited=False)
-
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-        assert not handler.check_update(Update(0, edited_message=message))
-        handler.allow_edited = True
-        assert handler.check_update(Update(0, message))
-        assert handler.check_update(Update(0, edited_message=message))
-
-    def test_with_dispatcher(self, dp, message):
-        handler = CommandHandler('test', self.ch_basic_handler)
+    def test_pass_user_or_chat_data(self,dp,  chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.cir_data_handler_1, pass_user_data=True)
         dp.add_handler(handler)
 
-        message.text = '/test'
-        dp.process_update(Update(0, message))
-        assert self.test_flag
-
-    def test_directed_commands(self, message):
-        handler = CommandHandler('test', self.ch_basic_handler)
-
-        message.text = '/test@{}'.format(message.bot.username)
-        assert handler.check_update(Update(0, message))
-
-        message.text = '/test@otherbot'
-        assert not handler.check_update(Update(0, message))
-
-    def test_with_filter(self, message):
-        handler = CommandHandler('test', self.ch_basic_handler, Filters.group)
-
-        message.chat = Chat(-23, 'group')
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-
-        message.chat = Chat(23, 'private')
-        assert not handler.check_update(Update(0, message))
-
-    def test_pass_args(self, dp, message):
-        handler = CommandHandler('test', self.ch_test6, pass_args=True)
-        dp.add_handler(handler)
-
-        message.text = '/test'
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        message.text = '/test@{}'.format(message.bot.username)
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        message.text = '/test one two'
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        message.text = '/test@{} one two'.format(message.bot.username)
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-    def test_pass_user_or_chat_data(self, dp, message):
-        handler = CommandHandler('test', self.ch_data_handler_1, pass_user_data=True)
-        dp.add_handler(handler)
-
-        message.text = '/test'
-        dp.process_update(Update(0, message=message))
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_data_handler_1, pass_chat_data=True)
+        handler = ChosenInlineResultHandler(self.cir_data_handler_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
-        dp.process_update(Update(0, message=message))
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_data_handler_2, pass_chat_data=True, pass_user_data=True)
+        handler = ChosenInlineResultHandler(self.cir_data_handler_2, pass_chat_data=True, pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
-        dp.process_update(Update(0, message=message))
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
-    def test_pass_job_or_update_queue(self, dp, message):
-        handler = CommandHandler('test', self.ch_queue_handler_1, pass_job_queue=True)
+    def test_pass_job_or_update_queue(self, dp, chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.cir_queue_handler_1, pass_job_queue=True)
         dp.add_handler(handler)
 
-        message.text = '/test'
-        dp.process_update(Update(0, message=message))
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_queue_handler_1, pass_update_queue=True)
+        handler = ChosenInlineResultHandler(self.cir_queue_handler_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
-        dp.process_update(Update(0, message=message))
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_queue_handler_2, pass_job_queue=True,
-                                 pass_update_queue=True)
+        handler = ChosenInlineResultHandler(self.cir_queue_handler_2, pass_job_queue=True,pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
-        dp.process_update(Update(0, message=message))
+        dp.process_update(chosen_inline_result)
         assert self.test_flag
+
+    def test_other_update_types(self, false_update):
+        handler = ChosenInlineResultHandler(self.cir_basic_handler)
+        assert not handler.check_update(false_update)
