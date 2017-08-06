@@ -38,14 +38,14 @@ params = [
 ]
 
 ids = ('message', 'edited_message', 'callback_query', 'channel_post',
-             'edited_channel_post', 'inline_query',
-             'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
-
+       'edited_channel_post', 'inline_query',
+       'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
 
 
 @pytest.fixture(params=params, ids=ids)
 def false_update(request):
     return Update(update_id=1, **request.param)
+
 
 @pytest.fixture(scope='function')
 def chosen_inline_result():
@@ -84,7 +84,7 @@ class TestChosenInlineResultHandler:
         dp.process_update(chosen_inline_result)
         assert self.test_flag
 
-    def test_pass_user_or_chat_data(self,dp,  chosen_inline_result):
+    def test_pass_user_or_chat_data(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.cir_data_handler_1, pass_user_data=True)
         dp.add_handler(handler)
 
@@ -100,7 +100,8 @@ class TestChosenInlineResultHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.cir_data_handler_2, pass_chat_data=True, pass_user_data=True)
+        handler = ChosenInlineResultHandler(self.cir_data_handler_2, pass_chat_data=True,
+                                            pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -123,7 +124,8 @@ class TestChosenInlineResultHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.cir_queue_handler_2, pass_job_queue=True,pass_update_queue=True)
+        handler = ChosenInlineResultHandler(self.cir_queue_handler_2, pass_job_queue=True,
+                                            pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False

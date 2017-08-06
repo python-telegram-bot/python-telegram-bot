@@ -20,7 +20,7 @@ import pytest
 
 from telegram import Update, CallbackQuery, Bot, Message, User, Chat, InlineQuery, \
     ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Location
-from telegram.ext import CallbackQueryHandler, InlineQueryHandler
+from telegram.ext import InlineQueryHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
 
@@ -101,8 +101,8 @@ class TestCallbackQueryHandler:
 
     def test_with_passing_group_dict(self, dp, inline_query):
         handler = InlineQueryHandler(self.iqh_group_handler,
-                                       pattern='(?P<begin>.*)est(?P<end>.*)',
-                                       pass_groups=True)
+                                     pattern='(?P<begin>.*)est(?P<end>.*)',
+                                     pass_groups=True)
         dp.add_handler(handler)
 
         dp.process_update(inline_query)
@@ -110,8 +110,8 @@ class TestCallbackQueryHandler:
 
         dp.remove_handler(handler)
         handler = InlineQueryHandler(self.iqh_group_handler,
-                                       pattern='(?P<begin>.*)est(?P<end>.*)',
-                                       pass_groupdict=True)
+                                     pattern='(?P<begin>.*)est(?P<end>.*)',
+                                     pass_groupdict=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -135,7 +135,7 @@ class TestCallbackQueryHandler:
 
         dp.remove_handler(handler)
         handler = InlineQueryHandler(self.iqh_data_handler_2, pass_chat_data=True,
-                                       pass_user_data=True)
+                                     pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -159,7 +159,7 @@ class TestCallbackQueryHandler:
 
         dp.remove_handler(handler)
         handler = InlineQueryHandler(self.iqh_queue_handler_2, pass_job_queue=True,
-                                       pass_update_queue=True)
+                                     pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
