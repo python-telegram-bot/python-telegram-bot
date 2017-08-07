@@ -27,6 +27,9 @@ from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
 
+_UNDEFINED = object()
+
+
 class Message(TelegramObject):
     """
     This object represents a message.
@@ -170,6 +173,7 @@ class Message(TelegramObject):
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
     """
+    _effective_attachment = _UNDEFINED
 
     def __init__(self,
                  message_id,
@@ -300,6 +304,39 @@ class Message(TelegramObject):
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
 
         return cls(bot=bot, **data)
+
+    @property
+    def effective_attachment(self):
+        """
+        :class:`telegram.Audio`
+            or :class:`telegram.Contact`
+            or :class:`telegram.Document`
+            or :class:`telegram.Game`
+            or :class:`telegram.Invoice`
+            or :class:`telegram.Location`
+            or List[:class:`telegram.PhotoSize`]
+            or :class:`telegram.Sticker`
+            or :class:`telegram.SuccessfulPayment`
+            or :class:`telegram.Venue`
+            or :class:`telegram.Video`
+            or :class:`telegram.VideoNote`
+            or :class:`telegram.Voice`: The attachment that this message was sent with. May be
+            ``None`` if no attachment was sent.
+
+        """
+        if self._effective_attachment is not _UNDEFINED:
+            return self._effective_attachment
+
+        for i in (self.audio, self.game, self.document, self.photo, self.sticker,
+                  self.video, self.voice, self.video_note, self.contact, self.location,
+                  self.venue, self.invoice, self.successful_payment):
+            if i is not None:
+                self._effective_attachment = i
+                break
+        else:
+            self._effective_attachment = None
+
+        return self._effective_attachment
 
     def __getitem__(self, item):
         if item in self.__dict__.keys():

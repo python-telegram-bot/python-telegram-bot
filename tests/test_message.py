@@ -205,6 +205,18 @@ class MessageTest(BaseTest, unittest.TestCase):
         self.assertNotEqual(a, e)
         self.assertNotEqual(hash(a), hash(e))
 
+    def test_effective_attachment(self):
+        for i in ('audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note',
+                  'contact', 'location', 'venue', 'invoice', 'invoice', 'successful_payment'):
+            dummy = object()
+            kwargs = {i: dummy}
+            msg = telegram.Message(1, telegram.User(1, ""), None, None, **kwargs)
+            self.assertIs(msg.effective_attachment, dummy,
+                          'invalid {} effective attachment'.format(i))
+
+        msg = telegram.Message(1, telegram.User(1, ""), None, None)
+        self.assertIsNone(msg.effective_attachment)
+
 
 if __name__ == '__main__':
     unittest.main()
