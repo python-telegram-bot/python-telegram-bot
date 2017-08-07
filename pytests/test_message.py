@@ -101,7 +101,7 @@ class TestMessage:
                      {'length': 4, 'offset': 25, 'type': 'code'},
                      {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
                      {'length': 3, 'offset': 41, 'type': 'pre'},
-                     {'length':17, 'offset':46, 'type': 'url'}]
+                     {'length': 17, 'offset': 46, 'type': 'url'}]
     test_text = 'Test for <bold, ita_lic, code, links and pre. http://google.com'
     test_message = Message(message_id=1,
                            from_user=None,
@@ -139,7 +139,8 @@ class TestMessage:
 
     def test_text_html_simple(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. http://google.com')
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            'http://google.com')
         text_html = self.test_message.text_html
         assert text_html == test_html_string
 
