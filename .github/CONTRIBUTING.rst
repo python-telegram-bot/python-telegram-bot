@@ -131,7 +131,7 @@ Here's how to make a one-off code change.
 
         $ git checkout your-branch-name
         $ git fetch upstream
-    $ git merge upstream/master
+        $ git merge upstream/master
         $ ...[fix the conflicts]...
         $ ...[make sure the tests pass before committing]...
         $ git commit -a
@@ -141,7 +141,7 @@ Here's how to make a one-off code change.
 
      .. code-block:: bash
 
-      	$ git submodule update --init --recursive
+        $ git submodule update --init --recursive
 
    - At the end, the reviewer will merge the pull request.
 
