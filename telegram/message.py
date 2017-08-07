@@ -308,12 +308,20 @@ class Message(TelegramObject):
     @property
     def effective_attachment(self):
         """
-        :class:`telegram.Audio` or :class:`telegram.Game` or :class:`telegram.Document` or
-            :class:`telegram.PhotoSize` or :class:`telegram.Sticker` or :class:`telegram.Video` or
-            :class:`telegram.Voice` or :class:`telegram.VideoNote` or :class:`telegram.Contact` or
-            :class:`telegram.Location` or :class:`telegram.Venue` or :class:`telegram.Invoice` or
-            :class:`telegram.SuccessfulPayment`: The attachment that this message was sent with.
-            May be ``None`` if no attachment was sent.
+        :class:`telegram.Audio`
+            or :class:`telegram.Contact`
+            or :class:`telegram.Document`
+            or :class:`telegram.Game`
+            or :class:`telegram.Invoice`
+            or :class:`telegram.Location`
+            or List[:class:`telegram.PhotoSize`]
+            or :class:`telegram.Sticker`
+            or :class:`telegram.SuccessfulPayment`
+            or :class:`telegram.Venue`
+            or :class:`telegram.Video`
+            or :class:`telegram.VideoNote`
+            or :class:`telegram.Voice`: The attachment that this message was sent with. May be
+            ``None`` if no attachment was sent.
 
         """
         if self._effective_attachment is not _UNDEFINED:
