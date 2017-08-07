@@ -22,7 +22,7 @@ from time import sleep
 
 import pytest
 
-from pytests.conftest import create_dp
+from tests.conftest import create_dp
 from telegram import TelegramError, Message, User, Chat, Update
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerContinue, \

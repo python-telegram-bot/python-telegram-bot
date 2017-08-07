@@ -32,7 +32,7 @@ from telegram.ext import Dispatcher, JobQueue
 TRAVIS = os.getenv('TRAVIS', False)
 
 if TRAVIS:
-    pytest_plugins = ['pytests.travis_fold']
+    pytest_plugins = ['tests.travis_fold']
 
 
 @pytest.fixture(scope='session')
