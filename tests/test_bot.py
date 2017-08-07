@@ -212,7 +212,7 @@ class TestBot:
             return chat_id and user_id and until_date
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
-        until = datetime(2020, 1, 1, 15, 00, 00)
+        until = datetime.utcfromtimestamp(1577887200)
 
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
