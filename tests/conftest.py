@@ -25,7 +25,7 @@ from time import sleep
 
 import pytest
 
-from pytests.bots import get_bot
+from tests.bots import get_bot
 from telegram import Bot
 from telegram.ext import Dispatcher, JobQueue
 
