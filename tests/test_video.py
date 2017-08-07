@@ -25,7 +25,6 @@ from flaky import flaky
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
 
 
 class VideoTest(BaseTest, unittest.TestCase):
@@ -33,12 +32,10 @@ class VideoTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(VideoTest, cls).setUpClass()
+
         cls.caption = u'VideoTest - Caption'
         cls.video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
-
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
 
         video_file = open('tests/data/telegram.mp4', 'rb')
         video = cls._bot.send_video(cls._chat_id, video=video_file, timeout=10).video

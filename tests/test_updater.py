@@ -939,6 +939,81 @@ class UpdaterTest(BaseTest, unittest.TestCase):
     def test_noTokenOrBot(self):
         self.assertRaises(ValueError, Updater)
 
+    def test_dispatcher_handler_flow_continue(self):
+        passed = []
+
+        def start1(b, u):
+            passed.append('start1')
+            raise DispatcherHandlerContinue
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        # noinspection PyTypeChecker
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=self._bot))
+
+        # Without raising Continue everything should work as before
+        passed = []
+        dp = Dispatcher(self._bot, Queue())
+        dp.add_handler(CommandHandler('start', start3))
+        dp.add_handler(CommandHandler('start', start2))
+        dp.add_error_handler(error)
+        dp.process_update(update)
+        self.assertEqual(passed, ['start3'])
+
+        # If Continue raised next handler should be proceed.
+        passed = []
+        dp = Dispatcher(self._bot, Queue())
+        dp.add_handler(CommandHandler('start', start1))
+        dp.add_handler(CommandHandler('start', start2))
+        dp.process_update(update)
+        self.assertEqual(passed, ['start1', 'start2'])
+
+    def test_dispatcher_handler_flow_stop(self):
+        passed = []
+
+        def start1(b, u):
+            passed.append('start1')
+            raise DispatcherHandlerStop
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        # noinspection PyTypeChecker
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=self._bot))
+
+        # Without raising Stop everything should work as before
+        passed = []
+        dp = Dispatcher(self._bot, Queue())
+        dp.add_handler(CommandHandler('start', start3), 1)
+        dp.add_handler(CommandHandler('start', start2), 2)
+        dp.add_error_handler(error)
+        dp.process_update(update)
+        self.assertEqual(passed, ['start3', 'start2'])
+
+        # If Stop raised handlers in other groups should not be called.
+        passed = []
+        dp = Dispatcher(self._bot, Queue())
+        dp.add_handler(CommandHandler('start', start1), 1)
+        dp.add_handler(CommandHandler('start', start3), 1)
+        dp.add_handler(CommandHandler('start', start2), 2)
+        dp.process_update(update)
+        self.assertEqual(passed, ['start1'])
+
 
 class MockBot(object):
     def __init__(self,

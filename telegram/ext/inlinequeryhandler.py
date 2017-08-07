@@ -38,7 +38,7 @@ class InlineQueryHandler(Handler):
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
             the callback function.
         pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
-            :attr:`telegram.CallbackQuery.data` against.
+            :attr:`telegram.InlineQuery.query` against.
         pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
@@ -67,7 +67,7 @@ class InlineQueryHandler(Handler):
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
         pattern (:obj:`str` | :obj:`Pattern`, optional): Regex pattern. If not ``None``,
-            ``re.match`` is used on :attr:`telegram.CallbackQuery.data` to determine if an update
+            ``re.match`` is used on :attr:`telegram.InlineQuery.query` to determine if an update
             should be handled by this handler.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.

@@ -25,7 +25,6 @@ from flaky import flaky
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
 
 
 class AudioTest(BaseTest, unittest.TestCase):
@@ -33,16 +32,14 @@ class AudioTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(AudioTest, cls).setUpClass()
+
         cls.caption = "Test audio"
         cls.performer = 'Leandro Toledo'
         cls.title = 'Teste'
         # cls.audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
         # Shortened link, the above one is cached with the wrong duration.
         cls.audio_file_url = "https://goo.gl/3En24v"
-
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
 
         audio_file = open('tests/data/telegram.mp3', 'rb')
         audio = cls._bot.send_audio(cls._chat_id, audio=audio_file, timeout=10).audio

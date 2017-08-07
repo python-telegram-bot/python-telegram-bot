@@ -27,6 +27,9 @@ from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
 
+_UNDEFINED = object()
+
+
 class Message(TelegramObject):
     """
     This object represents a message.
@@ -170,6 +173,7 @@ class Message(TelegramObject):
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
     """
+    _effective_attachment = _UNDEFINED
 
     def __init__(self,
                  message_id,
@@ -300,6 +304,39 @@ class Message(TelegramObject):
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
 
         return cls(bot=bot, **data)
+
+    @property
+    def effective_attachment(self):
+        """
+        :class:`telegram.Audio`
+            or :class:`telegram.Contact`
+            or :class:`telegram.Document`
+            or :class:`telegram.Game`
+            or :class:`telegram.Invoice`
+            or :class:`telegram.Location`
+            or List[:class:`telegram.PhotoSize`]
+            or :class:`telegram.Sticker`
+            or :class:`telegram.SuccessfulPayment`
+            or :class:`telegram.Venue`
+            or :class:`telegram.Video`
+            or :class:`telegram.VideoNote`
+            or :class:`telegram.Voice`: The attachment that this message was sent with. May be
+            ``None`` if no attachment was sent.
+
+        """
+        if self._effective_attachment is not _UNDEFINED:
+            return self._effective_attachment
+
+        for i in (self.audio, self.game, self.document, self.photo, self.sticker,
+                  self.video, self.voice, self.video_note, self.contact, self.location,
+                  self.venue, self.invoice, self.successful_payment):
+            if i is not None:
+                self._effective_attachment = i
+                break
+        else:
+            self._effective_attachment = None
+
+        return self._effective_attachment
 
     def __getitem__(self, item):
         if item in self.__dict__.keys():
@@ -697,23 +734,13 @@ class Message(TelegramObject):
             for entity in self.entities if entity.type in types
         }
 
-    @property
-    def text_html(self):
-        """
-        Creates an HTML-formatted string from the markup entities found in the message.
-
-        Use this if you want to retrieve the message text with the entities formatted as HTML.
-
-        Returns:
-            :obj:`str`: Message text with entities formatted as HTML.
-        """
-
+    def _text_html(self, urled=False):
         entities = self.parse_entities()
         message_text = self.text
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
-        markdown_text = ''
+        html_text = ''
         last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
@@ -721,7 +748,7 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
-            elif entity.type == MessageEntity.URL:
+            elif (entity.type == MessageEntity.URL) and urled:
                 insert = '<a href="{0}">{0}</a>'.format(text)
             elif entity.type == MessageEntity.BOLD:
                 insert = '<b>' + text + '</b>'
@@ -735,30 +762,46 @@ class Message(TelegramObject):
                 insert = text
 
             if sys.maxunicode == 0xffff:
-                markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
+                html_text += escape_html(message_text[last_offset:entity.offset]) + insert
             else:
-                markdown_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
-                                             .decode('utf-16-le')) + insert
+                html_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
+                                         .decode('utf-16-le')) + insert
 
             last_offset = entity.offset + entity.length
 
         if sys.maxunicode == 0xffff:
-            markdown_text += escape_html(message_text[last_offset:])
+            html_text += escape_html(message_text[last_offset:])
         else:
-            markdown_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
-        return markdown_text
+            html_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
+        return html_text
 
     @property
-    def text_markdown(self):
+    def text_html(self):
         """
-        Creates an Markdown-formatted string from the markup entities found in the message.
+        Creates an HTML-formatted string from the markup entities found in the message.
 
-        Use this if you want to retrieve the message text with the entities formatted as Markdown.
+        Use this if you want to retrieve the message text with the entities formatted as HTML in
+        the same way the original message was formatted.
 
         Returns:
-            :obj:`str`: Message text with entities formatted as Markdown.
+            :obj:`str`: Message text with entities formatted as HTML.
         """
+        return self._text_html(urled=False)
 
+    @property
+    def text_html_urled(self):
+        """
+        Creates an HTML-formatted string from the markup entities found in the message.
+
+        Use this if you want to retrieve the message text with the entities formatted as HTML.
+        This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as HTML.
+        """
+        return self._text_html(urled=True)
+
+    def _text_markdown(self, urled=False):
         entities = self.parse_entities()
         message_text = self.text
         if not sys.maxunicode == 0xffff:
@@ -772,7 +815,7 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '[{}]({})'.format(text, entity.url)
-            elif entity.type == MessageEntity.URL:
+            elif (entity.type == MessageEntity.URL) and urled:
                 insert = '[{0}]({0})'.format(text)
             elif entity.type == MessageEntity.BOLD:
                 insert = '*' + text + '*'
@@ -797,6 +840,34 @@ class Message(TelegramObject):
         else:
             markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
+
+    @property
+    def text_markdown(self):
+        """
+        Creates an Markdown-formatted string from the markup entities found in the message.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown
+        in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+        """
+
+        return self._text_markdown(urled=False)
+
+    @property
+    def text_markdown_urled(self):
+        """
+        Creates an Markdown-formatted string from the markup entities found in the message.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown.
+        This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+        """
+
+        return self._text_markdown(urled=True)
 
     @property
     def new_chat_member(self):
