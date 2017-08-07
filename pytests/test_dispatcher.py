@@ -24,8 +24,9 @@ import pytest
 
 from pytests.conftest import create_dp
 from telegram import TelegramError, Message, User, Chat, Update
-from telegram.ext import MessageHandler, Filters
-from telegram.ext.dispatcher import run_async, Dispatcher
+from telegram.ext import MessageHandler, Filters, CommandHandler
+from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerContinue, \
+    DispatcherHandlerStop
 
 
 @pytest.fixture()
@@ -169,3 +170,56 @@ class TestDispatcher:
         handler = MessageHandler(Filters.photo, self.callback_set_count(1))
         with pytest.raises(TypeError, match='group is not int'):
             dp.add_handler(handler, 'one')
+
+    def test_handler_flow_continue(self, bot, dp):
+        passed = []
+
+        def start1(b, u):
+            passed.append('start1')
+            raise DispatcherHandlerContinue
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+
+        # If Continue raised next handler should be proceed.
+        passed = []
+        dp.add_handler(CommandHandler('start', start1))
+        dp.add_handler(CommandHandler('start', start2))
+        dp.process_update(update)
+        assert passed == ['start1', 'start2']
+
+    def test_dispatcher_handler_flow_stop(self, dp, bot):
+        passed = []
+
+        def start1(b, u):
+            passed.append('start1')
+            raise DispatcherHandlerStop
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+
+        # If Stop raised handlers in other groups should not be called.
+        passed = []
+        dp.add_handler(CommandHandler('start', start1), 1)
+        dp.add_handler(CommandHandler('start', start3), 1)
+        dp.add_handler(CommandHandler('start', start2), 2)
+        dp.process_update(update)
+        assert passed == ['start1']
