@@ -24,7 +24,7 @@ from flaky import flaky
 from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
-                      InlineKeyboardButton)
+                      InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TimedOut
 
 BASE_TIME = time.time()
@@ -159,9 +159,33 @@ class TestBot:
     def test_send_chat_action(self, bot, chat_id):
         assert bot.send_chat_action(chat_id, ChatAction.TYPING)
 
-    @pytest.mark.skip(reason='we need incomming inline query to test answer')
-    def test_answer_inline_query(self):
-        pass
+    # TODO: Needs improvement. We need incoming inline query to test answer.
+    def test_answer_inline_query(self, monkeypatch, bot):
+        def test(*args, **kwargs):
+            data = args[2]
+            results = [InlineQueryResultArticle('11', 'first', InputTextMessageContent('first')),
+                       InlineQueryResultArticle('12', 'second', InputTextMessageContent('second'))]
+            inline_query_id = data['inline_query_id'] == 1234
+            result = data['results'] == [result.to_dict() for result in results]
+            cache_time = data['cache_time'] == 300
+            is_personal = data['is_personal'] is True
+            next_offset = data['next_offset'] == '42'
+            switch_pm_text = data['switch_pm_text'] == 'switch pm'
+            switch_pm_parameter = data['switch_pm_parameter'] == 'start_pm'
+            return inline_query_id and result and cache_time and is_personal and next_offset and \
+                   switch_pm_parameter and switch_pm_text
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        results = [InlineQueryResultArticle('11', 'first', InputTextMessageContent('first')),
+                   InlineQueryResultArticle('12', 'second', InputTextMessageContent('second'))]
+
+        assert bot.answer_inline_query(1234,
+                                       results=results,
+                                       cache_time=300,
+                                       is_personal=True,
+                                       next_offset='42',
+                                       switch_pm_text='switch pm',
+                                       switch_pm_parameter='start_pm')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -178,17 +202,49 @@ class TestBot:
 
     # get_file is tested multiple times in the test_*media* modules.
 
-    @pytest.mark.skip(reason='No feasable way to test until bots can add members')
-    def test_kick_chat_member(self):
-        pass
+    # TODO: Needs improvement. No feasable way to test until bots can add members.
+    def test_kick_chat_member(self, monkeypatch, bot):
+        def test(*args, **kwargs):
+            data = args[2]
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            until_date = data.get('until_date', 1577887200) == 1577887200
+            return chat_id and user_id and until_date
 
-    @pytest.mark.skip(reason='not tested yet')
-    def test_unban_chat_member(self):
-        pass
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        until = datetime(2020, 1, 1, 15, 00, 00)
 
-    @pytest.mark.skip(reason='Need an incomming callbackquery to test')
-    def test_answer_callback_query(self):
-        pass
+        assert bot.kick_chat_member(2, 32)
+        assert bot.kick_chat_member(2, 32, until_date=until)
+        assert bot.kick_chat_member(2, 32, until_date=1577887200)
+
+    # TODO: Needs improvement.
+    def test_unban_chat_member(self, monkeypatch, bot):
+        def test(*args, **kwargs):
+            data = args[2]
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            return chat_id and user_id
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.unban_chat_member(2, 32)
+
+    # TODO: Needs improvement. Need an incoming callbackquery to test
+    def test_answer_callback_query(self, monkeypatch, bot):
+        def test(*args, **kwargs):
+            data = args[2]
+            callback_query_id = data['callback_query_id'] == 23
+            text = data['text'] == 'answer'
+            show_alert = data['show_alert']
+            url = data['url'] == 'no_url'
+            cache_time = data['cache_time'] == 1
+            return callback_query_id and text and show_alert and url and cache_time
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.answer_callback_query(23, text='answer', show_alert=True, url='no_url',
+                                         cache_time=1)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
