@@ -16,26 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InputMessageContent"""
 
-import sys
-import unittest
-
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import InputMessageContent
 
 
-class InputMessageContentTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InputMessageContent."""
+class TestInputMessageContent:
+    def test_de_json(self, bot):
+        input_message_content = InputMessageContent.de_json(None, bot)
 
-    def test_imc_de_json(self):
-        imc = telegram.InputMessageContent.de_json(None, self._bot)
-
-        self.assertFalse(imc)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert input_message_content is None

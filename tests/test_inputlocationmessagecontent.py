@@ -16,63 +16,59 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InputLocationMessageContent"""
+import json
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import InputMessageContent, InputLocationMessageContent
 
 
-class InputLocationMessageContentTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InputLocationMessageContent."""
+@pytest.fixture()
+def json_dict():
+    return {
+        'longitude': TestInputLocationMessageContent.longitude,
+        'latitude': TestInputLocationMessageContent.latitude,
+    }
 
-    def setUp(self):
-        self.latitude = 1.
-        self.longitude = 2.
 
-        self.json_dict = {
-            'longitude': self.longitude,
-            'latitude': self.latitude,
-        }
+@pytest.fixture(scope='class')
+def input_location_message_content():
+    return InputLocationMessageContent(TestInputLocationMessageContent.longitude,
+                                       TestInputLocationMessageContent.latitude)
 
-    def test_ilmc_de_json(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(ilmc.longitude, self.longitude)
-        self.assertEqual(ilmc.latitude, self.latitude)
+class TestInputLocationMessageContent:
+    latitude = 1.
+    longitude = 2.
 
-    def test_ilmc_de_json_factory(self):
-        ilmc = telegram.InputMessageContent.de_json(self.json_dict, self._bot)
+    def test_de_json(self, json_dict, bot):
+        input_location_message_content_json = InputLocationMessageContent.de_json(json_dict, bot)
 
-        self.assertTrue(isinstance(ilmc, telegram.InputLocationMessageContent))
+        assert input_location_message_content_json.longitude == self.longitude
+        assert input_location_message_content_json.latitude == self.latitude
 
-    def test_ilmc_de_json_factory_without_required_args(self):
-        json_dict = self.json_dict
+    def test_input_location_message_content_json_de_json_factory(self, json_dict, bot):
+        input_location_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
+        assert isinstance(input_location_message_content_json, InputLocationMessageContent)
+
+    def test_de_json_factory_without_required_args(self, json_dict, bot):
         del (json_dict['longitude'])
-        # If none args are sent it will fall in a different condition
+        # If no args are passed it will fall in a different condition
         # del (json_dict['latitude'])
 
-        ilmc = telegram.InputMessageContent.de_json(json_dict, self._bot)
+        input_location_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
-        self.assertFalse(ilmc)
+        assert input_location_message_content_json is None
 
-    def test_ilmc_to_json(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot)
+    def test_to_json(self, input_location_message_content):
+        json.loads(input_location_message_content.to_json())
 
-        self.assertTrue(self.is_json(ilmc.to_json()))
+    def test_to_dict(self, input_location_message_content):
+        input_location_message_content_dict = input_location_message_content.to_dict()
 
-    def test_ilmc_to_dict(self):
-        ilmc = telegram.InputLocationMessageContent.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(ilmc))
-        self.assertDictEqual(self.json_dict, ilmc)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert isinstance(input_location_message_content_dict, dict)
+        assert input_location_message_content_dict['latitude'] == \
+               input_location_message_content.latitude
+        assert input_location_message_content_dict['longitude'] == \
+               input_location_message_content.longitude

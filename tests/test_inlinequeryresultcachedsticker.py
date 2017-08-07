@@ -16,80 +16,73 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultCachedSticker"""
+import json
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InputTextMessageContent, InlineKeyboardButton,
+                      InlineQueryResultCachedSticker, InlineQueryResultCachedVoice,
+                      InlineKeyboardMarkup)
 
 
-class InlineQueryResultCachedStickerTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedSticker."""
+@pytest.fixture(scope='class')
+def inline_query_result_cached_sticker():
+    return InlineQueryResultCachedSticker(TestInlineQueryResultCachedSticker.id,
+                                          TestInlineQueryResultCachedSticker.sticker_file_id,
+                                          input_message_content=TestInlineQueryResultCachedSticker.input_message_content,
+                                          reply_markup=TestInlineQueryResultCachedSticker.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'sticker'
-        self.sticker_file_id = 'sticker file id'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
 
-        self.json_dict = {
-            'type': self.type,
-            'id': self._id,
-            'sticker_file_id': self.sticker_file_id,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
+class TestInlineQueryResultCachedSticker:
+    id = 'id'
+    type = 'sticker'
+    sticker_file_id = 'sticker file id'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_sticker_de_json(self):
-        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict, self._bot)
+    def test_expected_values(self, inline_query_result_cached_sticker):
+        assert inline_query_result_cached_sticker.type == self.type
+        assert inline_query_result_cached_sticker.id == self.id
+        assert inline_query_result_cached_sticker.sticker_file_id == self.sticker_file_id
+        assert inline_query_result_cached_sticker.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_sticker.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-        self.assertEqual(sticker.type, self.type)
-        self.assertEqual(sticker.id, self._id)
-        self.assertEqual(sticker.sticker_file_id, self.sticker_file_id)
-        self.assertDictEqual(sticker.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(sticker.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_to_json(self, inline_query_result_cached_sticker):
+        json.loads(inline_query_result_cached_sticker.to_json())
 
-    def test_sticker_to_json(self):
-        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict, self._bot)
+    def test_to_dict(self, inline_query_result_cached_sticker):
+        inline_query_result_cached_sticker_dict = inline_query_result_cached_sticker.to_dict()
 
-        self.assertTrue(self.is_json(sticker.to_json()))
-
-    def test_sticker_to_dict(self):
-        sticker = telegram.InlineQueryResultCachedSticker.de_json(self.json_dict,
-                                                                  self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(sticker))
-        self.assertDictEqual(self.json_dict, sticker)
+        assert isinstance(inline_query_result_cached_sticker_dict, dict)
+        assert inline_query_result_cached_sticker_dict['type'] == \
+               inline_query_result_cached_sticker.type
+        assert inline_query_result_cached_sticker_dict['id'] == \
+               inline_query_result_cached_sticker.id
+        assert inline_query_result_cached_sticker_dict['sticker_file_id'] == \
+               inline_query_result_cached_sticker.sticker_file_id
+        assert inline_query_result_cached_sticker_dict['input_message_content'] == \
+               inline_query_result_cached_sticker.input_message_content.to_dict()
+        assert inline_query_result_cached_sticker_dict['reply_markup'] == \
+               inline_query_result_cached_sticker.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultCachedSticker(self._id, self.sticker_file_id)
-        b = telegram.InlineQueryResultCachedSticker(self._id, self.sticker_file_id)
-        c = telegram.InlineQueryResultCachedSticker(self._id, "")
-        d = telegram.InlineQueryResultCachedSticker("", self.sticker_file_id)
-        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+        a = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
+        b = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
+        c = InlineQueryResultCachedSticker(self.id, "")
+        d = InlineQueryResultCachedSticker("", self.sticker_file_id)
+        e = InlineQueryResultCachedVoice(self.id, "", "")
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

@@ -16,44 +16,32 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-LabeledPrice"""
+import json
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import LabeledPrice
 
 
-class LabeledPriceTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram LabeledPrice."""
-
-    def setUp(self):
-        self.label = 'label'
-        self.amount = 100
-
-        self.json_dict = {'label': self.label, 'amount': self.amount}
-
-    def test_labeledprice_de_json(self):
-        labeledprice = telegram.LabeledPrice.de_json(self.json_dict, self._bot)
-
-        self.assertEqual(labeledprice.label, self.label)
-        self.assertEqual(labeledprice.amount, self.amount)
-
-    def test_labeledprice_to_json(self):
-        labeledprice = telegram.LabeledPrice.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(labeledprice.to_json()))
-
-    def test_labeledprice_to_dict(self):
-        labeledprice = telegram.LabeledPrice.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(labeledprice))
-        self.assertDictEqual(self.json_dict, labeledprice)
+@pytest.fixture(scope='class')
+def labeled_price():
+    return LabeledPrice(TestLabeledPrice.label, TestLabeledPrice.amount)
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestLabeledPrice:
+    label = 'label'
+    amount = 100
+
+    def test_expected_values(self, labeled_price):
+        assert labeled_price.label == self.label
+        assert labeled_price.amount == self.amount
+
+    def test_to_json(self, labeled_price):
+        json.loads(labeled_price.to_json())
+
+    def test_to_dict(self, labeled_price):
+        labeledprice_dict = labeled_price.to_dict()
+
+        assert isinstance(labeledprice_dict, dict)
+        assert labeledprice_dict['label'] == labeled_price.label
+        assert labeledprice_dict['amount'] == labeled_price.amount

@@ -16,89 +16,81 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram File"""
+import json
 
-import sys
-import unittest
-import os
+import pytest
+from flaky import flaky
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import File, TelegramError, Voice
 
 
-class FileTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram File."""
+@pytest.fixture(scope='class')
+def file(bot):
+    return File(file_id=TestFile.file_id,
+                file_path=TestFile.file_path,
+                file_size=TestFile.file_size,
+                bot=bot)
 
-    def setUp(self):
-        self.json_dict = {
-            'file_id': "NOTVALIDDONTMATTER",
-            'file_path':
-            'https://api.telegram.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3',
-            'file_size': 28232
+
+class TestFile:
+    file_id = 'NOTVALIDDOESNOTMATTER'
+    file_path = (
+        u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
+    file_size = 28232
+
+    def test_de_json(self, bot):
+        json_dict = {
+            'file_id': self.file_id,
+            'file_path': self.file_path,
+            'file_size': self.file_size
         }
+        new_file = File.de_json(json_dict, bot)
 
-    def test_file_de_json(self):
-        new_file = telegram.File.de_json(self.json_dict, self._bot)
+        assert new_file.file_id == self.file_id
+        assert new_file.file_path == self.file_path
+        assert new_file.file_size == self.file_size
 
-        self.assertEqual(new_file.file_id, self.json_dict['file_id'])
-        self.assertEqual(new_file.file_path, self.json_dict['file_path'])
-        self.assertEqual(new_file.file_size, self.json_dict['file_size'])
+    def test_to_json(self, file):
+        json.loads(file.to_json())
 
-    def test_file_to_json(self):
-        new_file = telegram.File.de_json(self.json_dict, self._bot)
+    def test_to_dict(self, file):
+        file_dict = file.to_dict()
 
-        self.assertTrue(self.is_json(new_file.to_json()))
+        assert isinstance(file_dict, dict)
+        assert file_dict['file_id'] == file.file_id
+        assert file_dict['file_path'] == file.file_path
+        assert file_dict['file_size'] == file.file_size
 
-    def test_file_to_dict(self):
-        new_file = telegram.File.de_json(self.json_dict, self._bot).to_dict()
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_error_get_empty_file_id(self, bot):
+        with pytest.raises(TelegramError):
+            bot.get_file(file_id='')
 
-        self.assertTrue(self.is_dict(new_file))
-        self.assertEqual(new_file['file_id'], self.json_dict['file_id'])
-        self.assertEqual(new_file['file_path'], self.json_dict['file_path'])
-        self.assertEqual(new_file['file_size'], self.json_dict['file_size'])
+    def test_download(self, monkeypatch, file):
+        def test(*args, **kwargs):
+            raise TelegramError('test worked')
 
-    def test_error_get_empty_file_id(self):
-        json_dict = self.json_dict
-        json_dict['file_id'] = ''
-        del (json_dict['file_path'])
-        del (json_dict['file_size'])
+        monkeypatch.setattr('telegram.utils.request.Request.download', test)
+        with pytest.raises(TelegramError, match='test worked'):
+            file.download()
 
-        with self.assertRaises(telegram.TelegramError):
-            self._bot.getFile(**json_dict)
+    def test_equality(self, bot):
+        a = File(self.file_id, bot)
+        b = File(self.file_id, bot)
+        c = File(self.file_id, None)
+        d = File('', bot)
+        e = Voice(self.file_id, 0)
 
-    def test_error_file_without_required_args(self):
-        json_dict = self.json_dict
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        del (json_dict['file_id'])
-        del (json_dict['file_path'])
-        del (json_dict['file_size'])
+        assert a == c
+        assert hash(a) == hash(c)
 
-        with self.assertRaises(TypeError):
-            self._bot.getFile(**json_dict)
+        assert a != d
+        assert hash(a) != hash(d)
 
-
-    def test_equality(self):
-        a = telegram.File("DOESNTMATTER", self._bot)
-        b = telegram.File("DOESNTMATTER", self._bot)
-        c = telegram.File("DOESNTMATTER", None)
-        d = telegram.File("DOESNTMATTER2", self._bot)
-        e = telegram.Voice("DOESNTMATTER", 0)
-
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
-
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
-
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
-
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
@@ -17,67 +16,53 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram InlineKeyboardMarkup"""
+import json
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-class InlineKeyboardMarkupTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram KeyboardButton."""
+@pytest.fixture(scope='class')
+def inline_keyboard_markup():
+    return InlineKeyboardMarkup(TestInlineKeyboardMarkup.inline_keyboard)
 
-    def setUp(self):
-        self.inline_keyboard = [[
-            telegram.InlineKeyboardButton(
-                text='button1', callback_data='data1'), telegram.InlineKeyboardButton(
-                    text='button2', callback_data='data2')
-        ]]
 
-        self.json_dict = {
-            'inline_keyboard':
-            [[self.inline_keyboard[0][0].to_dict(), self.inline_keyboard[0][1].to_dict()]],
-        }
+class TestInlineKeyboardMarkup:
+    inline_keyboard = [[
+        InlineKeyboardButton(text='button1', callback_data='data1'),
+        InlineKeyboardButton(text='button2', callback_data='data2')
+    ]]
 
-    def test_send_message_with_inline_keyboard_markup(self):
-        message = self._bot.sendMessage(
-            self._chat_id,
+    def test_send_message_with_inline_keyboard_markup(self, bot, chat_id, inline_keyboard_markup):
+        message = bot.send_message(
+            chat_id,
             'Testing InlineKeyboardMarkup',
-            reply_markup=telegram.InlineKeyboardMarkup(self.inline_keyboard))
+            reply_markup=inline_keyboard_markup)
 
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text, 'Testing InlineKeyboardMarkup')
+        assert message.text == 'Testing InlineKeyboardMarkup'
 
-    def test_inline_keyboard_markup_de_json_empty(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(None, self._bot)
+    def test_de_json(self, bot, inline_keyboard_markup):
+        json_dict = {
+            'inline_keyboard': [[
+                self.inline_keyboard[0][0].to_dict(),
+                self.inline_keyboard[0][1].to_dict()
+            ]],
+        }
+        inline_keyboard_markup_json = InlineKeyboardMarkup.de_json(json_dict, bot)
 
-        self.assertFalse(inline_keyboard_markup)
+        assert inline_keyboard_markup_json.to_dict() == inline_keyboard_markup.to_dict()
 
-    def test_inline_keyboard_markup_de_json(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict, self._bot)
+    def test_to_json(self, inline_keyboard_markup):
+        json.loads(inline_keyboard_markup.to_json())
 
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
-        self.assertTrue(
-            isinstance(inline_keyboard_markup.inline_keyboard[0][0],
-                       telegram.InlineKeyboardButton))
+    def test_to_dict(self, inline_keyboard_markup):
+        inline_keyboard_markup_dict = inline_keyboard_markup.to_dict()
 
-    def test_inline_keyboard_markup_to_json(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(inline_keyboard_markup.to_json()))
-
-    def test_inline_keyboard_markup_to_dict(self):
-        inline_keyboard_markup = telegram.InlineKeyboardMarkup.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(isinstance(inline_keyboard_markup.inline_keyboard, list))
-        self.assertTrue(
-            isinstance(inline_keyboard_markup.inline_keyboard[0][0],
-                       telegram.InlineKeyboardButton))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert isinstance(inline_keyboard_markup_dict, dict)
+        assert inline_keyboard_markup_dict['inline_keyboard'] == [
+            [
+                self.inline_keyboard[0][0].to_dict(),
+                self.inline_keyboard[0][1].to_dict()
+            ]
+        ]
