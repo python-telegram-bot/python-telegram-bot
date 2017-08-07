@@ -697,23 +697,13 @@ class Message(TelegramObject):
             for entity in self.entities if entity.type in types
         }
 
-    @property
-    def text_html(self):
-        """
-        Creates an HTML-formatted string from the markup entities found in the message.
-
-        Use this if you want to retrieve the message text with the entities formatted as HTML.
-
-        Returns:
-            :obj:`str`: Message text with entities formatted as HTML.
-        """
-
+    def _text_html(self, urled=False):
         entities = self.parse_entities()
         message_text = self.text
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
-        markdown_text = ''
+        html_text = ''
         last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
@@ -721,7 +711,7 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
-            elif entity.type == MessageEntity.URL:
+            elif (entity.type == MessageEntity.URL) and urled:
                 insert = '<a href="{0}">{0}</a>'.format(text)
             elif entity.type == MessageEntity.BOLD:
                 insert = '<b>' + text + '</b>'
@@ -735,30 +725,46 @@ class Message(TelegramObject):
                 insert = text
 
             if sys.maxunicode == 0xffff:
-                markdown_text += escape_html(message_text[last_offset:entity.offset]) + insert
+                html_text += escape_html(message_text[last_offset:entity.offset]) + insert
             else:
-                markdown_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
-                                             .decode('utf-16-le')) + insert
+                html_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
+                                         .decode('utf-16-le')) + insert
 
             last_offset = entity.offset + entity.length
 
         if sys.maxunicode == 0xffff:
-            markdown_text += escape_html(message_text[last_offset:])
+            html_text += escape_html(message_text[last_offset:])
         else:
-            markdown_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
-        return markdown_text
+            html_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
+        return html_text
 
     @property
-    def text_markdown(self):
+    def text_html(self):
         """
-        Creates an Markdown-formatted string from the markup entities found in the message.
+        Creates an HTML-formatted string from the markup entities found in the message.
 
-        Use this if you want to retrieve the message text with the entities formatted as Markdown.
+        Use this if you want to retrieve the message text with the entities formatted as HTML in
+        the same way the original message was formatted.
 
         Returns:
-            :obj:`str`: Message text with entities formatted as Markdown.
+            :obj:`str`: Message text with entities formatted as HTML.
         """
+        return self._text_html(urled=False)
 
+    @property
+    def text_html_urled(self):
+        """
+        Creates an HTML-formatted string from the markup entities found in the message.
+
+        Use this if you want to retrieve the message text with the entities formatted as HTML.
+        This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as HTML.
+        """
+        return self._text_html(urled=True)
+
+    def _text_markdown(self, urled=False):
         entities = self.parse_entities()
         message_text = self.text
         if not sys.maxunicode == 0xffff:
@@ -772,7 +778,7 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '[{}]({})'.format(text, entity.url)
-            elif entity.type == MessageEntity.URL:
+            elif (entity.type == MessageEntity.URL) and urled:
                 insert = '[{0}]({0})'.format(text)
             elif entity.type == MessageEntity.BOLD:
                 insert = '*' + text + '*'
@@ -797,6 +803,34 @@ class Message(TelegramObject):
         else:
             markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
         return markdown_text
+
+    @property
+    def text_markdown(self):
+        """
+        Creates an Markdown-formatted string from the markup entities found in the message.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown
+        in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+        """
+
+        return self._text_markdown(urled=False)
+
+    @property
+    def text_markdown_urled(self):
+        """
+        Creates an Markdown-formatted string from the markup entities found in the message.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown.
+        This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+        """
+
+        return self._text_markdown(urled=True)
 
     @property
     def new_chat_member(self):
