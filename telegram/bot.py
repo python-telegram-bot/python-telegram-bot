@@ -1156,7 +1156,7 @@ class Bot(TelegramObject):
 
         data = {'user_id': user_id}
 
-        if offset:
+        if offset is not None:
             data['offset'] = offset
         if limit:
             data['limit'] = limit
@@ -1438,8 +1438,8 @@ class Bot(TelegramObject):
         """
 
         if inline_message_id is None and (chat_id is None or message_id is None):
-            raise TelegramError(
-                'editMessageCaption: Both chat_id and message_id are required when '
+            raise ValueError(
+                'edit_message_caption: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
         url = '{0}/editMessageCaption'.format(self.base_url)
@@ -1494,8 +1494,8 @@ class Bot(TelegramObject):
         """
 
         if inline_message_id is None and (chat_id is None or message_id is None):
-            raise TelegramError(
-                'editMessageCaption: Both chat_id and message_id are required when '
+            raise ValueError(
+                'edit_message_reply_markup: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
         url = '{0}/editMessageReplyMarkup'.format(self.base_url)
