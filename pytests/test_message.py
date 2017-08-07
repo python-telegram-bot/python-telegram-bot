@@ -100,8 +100,9 @@ class TestMessage:
                      {'length': 7, 'offset': 16, 'type': 'italic'},
                      {'length': 4, 'offset': 25, 'type': 'code'},
                      {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
-                     {'length': 3, 'offset': 41, 'type': 'pre'}, ]
-    test_text = 'Test for <bold, ita_lic, code, links and pre.'
+                     {'length': 3, 'offset': 41, 'type': 'pre'},
+                     {'length':17, 'offset':46, 'type': 'url'}]
+    test_text = 'Test for <bold, ita_lic, code, links and pre. http://google.com'
     test_message = Message(message_id=1,
                            from_user=None,
                            date=None,
@@ -138,15 +139,28 @@ class TestMessage:
 
     def test_text_html_simple(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>.')
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. http://google.com')
         text_html = self.test_message.text_html
-        assert test_html_string == text_html
+        assert text_html == test_html_string
+
+    def test_text_html_urled(self):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            '<a href="http://google.com">http://google.com</a>')
+        text_html = self.test_message.text_html_urled
+        assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
         test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
-                          '```pre```.')
+                          '```pre```. http://google.com')
         text_markdown = self.test_message.text_markdown
-        assert test_md_string == text_markdown
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_urled(self):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. [http://google.com](http://google.com)')
+        text_markdown = self.test_message.text_markdown_urled
+        assert text_markdown == test_md_string
 
     def test_text_html_emoji(self):
         text = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
