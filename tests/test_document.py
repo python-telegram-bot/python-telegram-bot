@@ -25,19 +25,17 @@ from flaky import flaky
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
+
 
 class DocumentTest(BaseTest, unittest.TestCase):
     """This object represents Tests for Telegram Document."""
 
     @classmethod
     def setUpClass(cls):
+        super(DocumentTest, cls).setUpClass()
+
         cls.caption = u'DocumentTest - Caption'
         cls.document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
-
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
 
         document_file = open('tests/data/telegram.png', 'rb')
         document = cls._bot.send_document(cls._chat_id, document=document_file, timeout=10).document

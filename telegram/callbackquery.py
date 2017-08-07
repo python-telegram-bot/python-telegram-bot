@@ -31,7 +31,7 @@ class CallbackQuery(TelegramObject):
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
-        Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
+        * Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
@@ -89,6 +89,8 @@ class CallbackQuery(TelegramObject):
         self.game_short_name = game_short_name
 
         self.bot = bot
+
+        self._id_attrs = ('id',)
 
     @classmethod
     def de_json(cls, data, bot):

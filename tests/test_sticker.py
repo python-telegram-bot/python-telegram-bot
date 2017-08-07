@@ -27,7 +27,6 @@ from future.utils import PY2
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
 
 
 class StickerTest(BaseTest, unittest.TestCase):
@@ -35,14 +34,12 @@ class StickerTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(StickerTest, cls).setUpClass()
+
         cls.emoji = '💪'
         # cls.sticker_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.webp"
         # Serving sticker from gh since our server sends wrong content_type
         cls.sticker_file_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/data/telegram.webp?raw=true"  # noqa
-
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
 
         sticker_file = open('tests/data/telegram.webp', 'rb')
         sticker = cls._bot.send_sticker(cls._chat_id, sticker=sticker_file, timeout=10).sticker

@@ -26,7 +26,6 @@ from flaky import flaky
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
 
 
 class PhotoTest(BaseTest, unittest.TestCase):
@@ -34,12 +33,10 @@ class PhotoTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(PhotoTest, cls).setUpClass()
+
         cls.caption = u'PhotoTest - Caption'
         cls.photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
-
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
 
         photo_file = open('tests/data/telegram.jpg', 'rb')
         photo = cls._bot.send_photo(cls._chat_id, photo=photo_file, timeout=10).photo

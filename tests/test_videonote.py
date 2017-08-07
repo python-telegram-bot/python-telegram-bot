@@ -24,7 +24,6 @@ from flaky import flaky
 
 import telegram
 from tests.base import BaseTest, timeout
-from tests.bots import get_bot
 
 
 class VideoNoteTest(BaseTest, unittest.TestCase):
@@ -32,9 +31,7 @@ class VideoNoteTest(BaseTest, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        bot_info = get_bot()
-        cls._chat_id = bot_info['chat_id']
-        cls._bot = telegram.Bot(bot_info['token'])
+        super(VideoNoteTest, cls).setUpClass()
 
         videonote_file = open('tests/data/telegram2.mp4', 'rb')
         video_note = cls._bot.send_video_note(cls._chat_id, video_note=videonote_file, timeout=10).video_note

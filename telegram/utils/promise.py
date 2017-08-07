@@ -56,3 +56,7 @@ class Promise(object):
         if self._exception is not None:
             raise self._exception  # pylint: disable=raising-bad-type
         return self._result
+
+    @property
+    def exception(self):
+        return self._exception

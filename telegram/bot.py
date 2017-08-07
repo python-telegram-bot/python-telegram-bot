@@ -616,7 +616,7 @@ class Bot(TelegramObject):
                 the Internet, or upload a new one using multipart/form-data. Lastly you can pass
                 an existing :class:`telegram.Video` object to send.
             duration (:obj:`int`, optional): Duration of sent video in seconds.
-            width (Optional[int)): Video width.
+            width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
                 by file_id), 0-200 characters.
@@ -1156,7 +1156,7 @@ class Bot(TelegramObject):
 
         data = {'user_id': user_id}
 
-        if offset:
+        if offset is not None:
             data['offset'] = offset
         if limit:
             data['limit'] = limit
@@ -1438,8 +1438,8 @@ class Bot(TelegramObject):
         """
 
         if inline_message_id is None and (chat_id is None or message_id is None):
-            raise TelegramError(
-                'editMessageCaption: Both chat_id and message_id are required when '
+            raise ValueError(
+                'edit_message_caption: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
         url = '{0}/editMessageCaption'.format(self.base_url)
@@ -1494,8 +1494,8 @@ class Bot(TelegramObject):
         """
 
         if inline_message_id is None and (chat_id is None or message_id is None):
-            raise TelegramError(
-                'editMessageCaption: Both chat_id and message_id are required when '
+            raise ValueError(
+                'edit_message_reply_markup: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
         url = '{0}/editMessageReplyMarkup'.format(self.base_url)
@@ -1971,7 +1971,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
         """
 
-        url = '{0}/setGameScore'.format(self.base_url)
+        url = '{0}/getGameHighScores'.format(self.base_url)
 
         data = {'user_id': user_id}
 
