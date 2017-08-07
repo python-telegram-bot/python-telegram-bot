@@ -23,6 +23,7 @@ import sys
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
+from telegram import ParseMode
 from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
@@ -399,6 +400,40 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
+    def reply_markdown(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.sendMessage(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args, **kwargs)``
+        Sends a message with markdown formatting.
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        kwargs['parse_mode'] = ParseMode.MARKDOWN
+
+        self._quote(kwargs)
+
+        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
+
+    def reply_html(self, *args, **kwargs):
+        """
+        Shortcut for ``bot.sendMessage(update.message.chat_id, parse_mode=ParseMode.HTML, *args, **kwargs)``
+        Sends a message with HTML formatting.
+
+        Keyword Args:
+            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
+                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+        """
+
+        kwargs['parse_mode'] = ParseMode.HTML
+
+        self._quote(kwargs)
+
+        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
+
     def reply_photo(self, *args, **kwargs):
         """
         Shortcut for::
@@ -619,6 +654,48 @@ class Message(TelegramObject):
         return self.bot.edit_message_text(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def edit_markdown(self, *args, **kwargs):
+        """
+        Shortcut for
+
+            >>> bot.editMessageText(chat_id=message.chat_id,
+            ...                     message_id=message.message_id,
+            ...                     parse_mode=ParseMode.MARKDOWN,
+            ...                     *args, **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself,
+            therefore this method can only be used on the
+            return value of the ``bot.send_*`` family of methods.
+
+        """
+
+        kwargs['parse_mode'] = ParseMode.MARKDOWN
+
+        return self.bot.edit_message_text(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def edit_html(self, *args, **kwargs):
+        """
+        Shortcut for
+
+            >>> bot.editMessageText(chat_id=message.chat_id,
+            ...                     message_id=message.message_id,
+            ...                     parse_mode=ParseMode.HTML
+            ...                     *args, **kwargs)
+
+        Note:
+            You can only edit messages that the bot sent itself,
+            therefore this method can only be used on the
+            return value of the ``bot.send_*`` family of methods.
+
+        """
+
+        kwargs['parse_mode'] = ParseMode.HTML
+
+        return self.bot.edit_message_text(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def edit_caption(self, *args, **kwargs):
         """
         Shortcut for::
@@ -732,7 +809,7 @@ class Message(TelegramObject):
         return {
             entity: self.parse_entity(entity)
             for entity in self.entities if entity.type in types
-        }
+            }
 
     def _text_html(self, urled=False):
         entities = self.parse_entities()

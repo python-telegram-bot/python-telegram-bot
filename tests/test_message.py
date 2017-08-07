@@ -148,6 +148,26 @@ class MessageTest(BaseTest, unittest.TestCase):
         self.assertEqual(message.text, 'Testing class method')
 
     @flaky(3, 1)
+    def test_reply_markdown(self):
+        """Test for Message.reply_text_markdown"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        text = 'Testing class method *with* _markdown_ `enabled`.'
+        message = message.reply_markdown(text)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text_markdown, text)
+
+    @flaky(3, 1)
+    def test_reply_html(self):
+        """Test for Message.reply_text_html"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        text = 'Testing class method <b>with</b> <i>html</i> <code>enabled</code>.'
+        message = message.reply_html(text)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text_html, text)
+
+    @flaky(3, 1)
     def test_forward(self):
         """Test for Message.forward"""
         message = self._bot.sendMessage(self._chat_id, 'Testing class method')
@@ -164,6 +184,26 @@ class MessageTest(BaseTest, unittest.TestCase):
 
         self.assertTrue(self.is_json(message.to_json()))
         self.assertEqual(message.text, 'Testing class method')
+
+    @flaky(3, 1)
+    def test_edit_markdown(self):
+        """Test for Message.edit_text"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        text = 'Testing class method *with* _markdown_ `enabled`.'
+        message = message.edit_markdown(text)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text_markdown, text)
+
+    @flaky(3, 1)
+    def test_edit_html(self):
+        """Test for Message.edit_text"""
+        message = self._bot.sendMessage(self._chat_id, '.')
+        text = 'Testing class method <b>with</b> <i>html</i> <code>enabled</code>.'
+        message = message.edit_html(text)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text_html, text)
 
     @flaky(3, 1)
     def test_delete1(self):
