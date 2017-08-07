@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from telegram import CallbackQuery, User, Message, Chat
+from telegram import CallbackQuery, User, Message, Chat, Audio
 
 
 @pytest.fixture(scope='class', params=['message', 'inline'])
@@ -55,15 +55,15 @@ class TestCallbackQuery:
                      'data': self.data,
                      'inline_message_id': self.inline_message_id,
                      'game_short_name': self.game_short_name}
-        callbackquery = CallbackQuery.de_json(json_dict, bot)
+        callback_query = CallbackQuery.de_json(json_dict, bot)
 
-        assert callbackquery.id == self.id
-        assert callbackquery.from_user == self.from_user
-        assert callbackquery.chat_instance == self.chat_instance
-        assert callbackquery.message == self.message
-        assert callbackquery.data == self.data
-        assert callbackquery.inline_message_id == self.inline_message_id
-        assert callbackquery.game_short_name == self.game_short_name
+        assert callback_query.id == self.id
+        assert callback_query.from_user == self.from_user
+        assert callback_query.chat_instance == self.chat_instance
+        assert callback_query.message == self.message
+        assert callback_query.data == self.data
+        assert callback_query.inline_message_id == self.inline_message_id
+        assert callback_query.game_short_name == self.game_short_name
 
     def test_to_json(self, callback_query):
         json.loads(callback_query.to_json())
@@ -134,3 +134,23 @@ class TestCallbackQuery:
 
         monkeypatch.setattr('telegram.Bot.edit_message_reply_markup', test)
         assert callback_query.edit_message_reply_markup(reply_markup=[["1", "2"]])
+
+    def test_equality(self):
+        a = CallbackQuery(self.id, self.from_user, 'chat')
+        b = CallbackQuery(self.id, self.from_user, 'chat')
+        c = CallbackQuery(self.id, None, '')
+        d = CallbackQuery('', None, 'chat')
+        e = Audio(self.id, 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a == c
+        assert hash(a) == hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
