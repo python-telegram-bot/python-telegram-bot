@@ -26,7 +26,7 @@ from telegram import File, TelegramError, Voice
 
 @pytest.fixture(scope='class')
 def file(bot):
-    return File(file_id=TestFile.file_id,
+    return File(TestFile.file_id,
                 file_path=TestFile.file_path,
                 file_size=TestFile.file_size,
                 bot=bot)

@@ -18,8 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, CallbackQuery, Bot, Message, User, Chat, InlineQuery, \
-    ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Location
+from telegram import (Update, CallbackQuery, Bot, Message, User, Chat, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Location)
 from telegram.ext import InlineQueryHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
@@ -55,35 +55,37 @@ def inline_query(bot):
 
 
 class TestCallbackQueryHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def iqh_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
-    def iqh_data_handler_1(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) or (chat_data is not None)
 
-    def iqh_data_handler_2(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) and (chat_data is not None)
 
-    def iqh_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def iqh_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def iqh_group_handler(self, bot, update, groups=None, groupdict=None):
+    def callback_group(self, bot, update, groups=None, groupdict=None):
         if groups is not None:
             self.test_flag = groups == ('t', ' query')
         if groupdict is not None:
             self.test_flag = groupdict == {'begin': 't', 'end': ' query'}
 
     def test_basic(self, dp, inline_query):
-        handler = InlineQueryHandler(self.iqh_basic_handler)
+        handler = InlineQueryHandler(self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update(inline_query)
@@ -92,7 +94,7 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
     def test_with_pattern(self, inline_query):
-        handler = InlineQueryHandler(self.iqh_basic_handler, pattern='(?P<begin>.*)est(?P<end>.*)')
+        handler = InlineQueryHandler(self.callback_basic, pattern='(?P<begin>.*)est(?P<end>.*)')
 
         assert handler.check_update(inline_query)
 
@@ -100,7 +102,7 @@ class TestCallbackQueryHandler:
         assert not handler.check_update(inline_query)
 
     def test_with_passing_group_dict(self, dp, inline_query):
-        handler = InlineQueryHandler(self.iqh_group_handler,
+        handler = InlineQueryHandler(self.callback_group,
                                      pattern='(?P<begin>.*)est(?P<end>.*)',
                                      pass_groups=True)
         dp.add_handler(handler)
@@ -109,7 +111,7 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.iqh_group_handler,
+        handler = InlineQueryHandler(self.callback_group,
                                      pattern='(?P<begin>.*)est(?P<end>.*)',
                                      pass_groupdict=True)
         dp.add_handler(handler)
@@ -119,14 +121,14 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, inline_query):
-        handler = InlineQueryHandler(self.iqh_data_handler_1, pass_user_data=True)
+        handler = InlineQueryHandler(self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(inline_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.iqh_data_handler_1, pass_chat_data=True)
+        handler = InlineQueryHandler(self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -134,7 +136,7 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.iqh_data_handler_2, pass_chat_data=True,
+        handler = InlineQueryHandler(self.callback_data_2, pass_chat_data=True,
                                      pass_user_data=True)
         dp.add_handler(handler)
 
@@ -143,14 +145,14 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, inline_query):
-        handler = InlineQueryHandler(self.iqh_queue_handler_1, pass_job_queue=True)
+        handler = InlineQueryHandler(self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(inline_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.iqh_queue_handler_1, pass_update_queue=True)
+        handler = InlineQueryHandler(self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -158,7 +160,7 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.iqh_queue_handler_2, pass_job_queue=True,
+        handler = InlineQueryHandler(self.callback_queue_2, pass_job_queue=True,
                                      pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -167,5 +169,5 @@ class TestCallbackQueryHandler:
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = InlineQueryHandler(self.iqh_basic_handler)
+        handler = InlineQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)

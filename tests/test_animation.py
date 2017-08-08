@@ -37,8 +37,6 @@ def animation(thumb, bot):
 
 
 class TestAnimation:
-    """Tests for telegram.Animation"""
-
     animation_file_id = 'CgADBAADFQEAAny4rAUgukhiTv2TWwI'
     file_name = "game.gif.mp4"
     mime_type = "video/mp4"

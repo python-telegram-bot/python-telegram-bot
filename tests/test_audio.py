@@ -39,8 +39,6 @@ def audio(bot, chat_id):
 
 
 class TestAudio:
-    """This object represents Tests for Telegram Audio."""
-
     caption = 'Test audio'
     performer = 'Leandro Toledo'
     title = 'Teste'

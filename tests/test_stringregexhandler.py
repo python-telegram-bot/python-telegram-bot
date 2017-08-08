@@ -18,8 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery, \
-    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
+from telegram import (Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import StringRegexHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
@@ -48,29 +48,31 @@ def false_update(request):
 
 
 class TestStringRegexHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def srh_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, str)
         self.test_flag = test_bot and test_update
 
-    def srh_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def srh_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def srh_group_handler(self, bot, update, groups=None, groupdict=None):
+    def callback_group(self, bot, update, groups=None, groupdict=None):
         if groups is not None:
             self.test_flag = groups == ('t', ' message')
         if groupdict is not None:
             self.test_flag = groupdict == {'begin': 't', 'end': ' message'}
 
     def test_basic(self, dp):
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.srh_basic_handler)
+        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update('test message')
@@ -80,7 +82,7 @@ class TestStringRegexHandler:
         assert not handler.check_update('does not match')
 
     def test_with_passing_group_dict(self, dp):
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.srh_group_handler,
+        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
                                      pass_groups=True)
         dp.add_handler(handler)
 
@@ -88,7 +90,7 @@ class TestStringRegexHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.srh_group_handler,
+        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
                                      pass_groupdict=True)
         dp.add_handler(handler)
 
@@ -97,14 +99,14 @@ class TestStringRegexHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp):
-        handler = StringRegexHandler('test', self.srh_queue_handler_1, pass_job_queue=True)
+        handler = StringRegexHandler('test', self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update('test')
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringRegexHandler('test', self.srh_queue_handler_1, pass_update_queue=True)
+        handler = StringRegexHandler('test', self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -112,7 +114,7 @@ class TestStringRegexHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringRegexHandler('test', self.srh_queue_handler_2, pass_job_queue=True,
+        handler = StringRegexHandler('test', self.callback_queue_2, pass_job_queue=True,
                                      pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -121,5 +123,5 @@ class TestStringRegexHandler:
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = StringRegexHandler('test', self.srh_basic_handler)
+        handler = StringRegexHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)

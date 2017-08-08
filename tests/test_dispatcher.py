@@ -22,11 +22,11 @@ from time import sleep
 
 import pytest
 
-from tests.conftest import create_dp
 from telegram import TelegramError, Message, User, Chat, Update
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerContinue, \
     DispatcherHandlerStop
+from tests.conftest import create_dp
 
 
 @pytest.fixture()
@@ -37,6 +37,8 @@ def dp2(bot):
 
 class TestDispatcher:
     message_update = Update(1, message=Message(1, User(1, ''), None, Chat(1, ''), text='Text'))
+    received = None
+    count = 0
 
     @pytest.fixture(autouse=True)
     def reset(self):

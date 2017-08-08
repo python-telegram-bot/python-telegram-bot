@@ -32,7 +32,7 @@ def message():
 @pytest.fixture(scope="function",
                 params=MessageEntity.ALL_TYPES)
 def message_entity(request):
-    return MessageEntity(type=request.param, offset=0, length=0, url="", user="")
+    return MessageEntity(request.param, 0, 0, url="", user="")
 
 
 class TestFilters:

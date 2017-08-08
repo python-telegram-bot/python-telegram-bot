@@ -25,23 +25,25 @@ from telegram.ext import TypeHandler
 
 
 class TestTypeHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def th_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, dict)
         self.test_flag = test_bot and test_update
 
-    def th_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def th_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def test_basic(self, dp):
-        handler = TypeHandler(dict, self.th_basic_handler)
+        handler = TypeHandler(dict, self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update({'a': 1, 'b': 2})
@@ -50,20 +52,20 @@ class TestTypeHandler:
         assert self.test_flag
 
     def test_strict(self):
-        handler = TypeHandler(dict, self.th_basic_handler, strict=True)
+        handler = TypeHandler(dict, self.callback_basic, strict=True)
         o = OrderedDict({'a': 1, 'b': 2})
         assert handler.check_update({'a': 1, 'b': 2})
         assert not handler.check_update(o)
 
     def test_pass_job_or_update_queue(self, dp):
-        handler = TypeHandler(dict, self.th_queue_handler_1, pass_job_queue=True)
+        handler = TypeHandler(dict, self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.th_queue_handler_1, pass_update_queue=True)
+        handler = TypeHandler(dict, self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -71,7 +73,7 @@ class TestTypeHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.th_queue_handler_2, pass_job_queue=True,
+        handler = TypeHandler(dict, self.callback_queue_2, pass_job_queue=True,
                               pass_update_queue=True)
         dp.add_handler(handler)
 

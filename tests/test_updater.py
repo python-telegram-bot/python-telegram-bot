@@ -53,6 +53,10 @@ def updater(bot):
 
 
 class TestUpdater:
+    message_count = 0
+    received = None
+    attempts = 0
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.message_count = 0

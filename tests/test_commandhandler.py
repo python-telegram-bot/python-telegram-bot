@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery, \
-    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
+from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import CommandHandler, Filters
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='test')
@@ -52,28 +52,30 @@ def message(bot):
 
 
 class TestCommandHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def ch_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
-    def ch_data_handler_1(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) or (chat_data is not None)
 
-    def ch_data_handler_2(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) and (chat_data is not None)
 
-    def ch_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def ch_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def ch_pass_args_handler(self, bot, update, args):
+    def ch_callback_args(self, bot, update, args):
         if update.message.text == '/test':
             self.test_flag = len(args) == 0
         elif update.message.text == '/test@{}'.format(bot.username):
@@ -82,7 +84,7 @@ class TestCommandHandler:
             self.test_flag = args == ['one', 'two']
 
     def test_basic(self, dp, message):
-        handler = CommandHandler('test', self.ch_basic_handler)
+        handler = CommandHandler('test', self.callback_basic)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -100,7 +102,7 @@ class TestCommandHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_command_list(self, message):
-        handler = CommandHandler(['test', 'start'], self.ch_basic_handler)
+        handler = CommandHandler(['test', 'start'], self.callback_basic)
 
         message.text = '/test'
         assert handler.check_update(Update(0, message))
@@ -112,7 +114,7 @@ class TestCommandHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_edited(self, message):
-        handler = CommandHandler('test', self.ch_basic_handler, allow_edited=False)
+        handler = CommandHandler('test', self.callback_basic, allow_edited=False)
 
         message.text = '/test'
         assert handler.check_update(Update(0, message))
@@ -122,7 +124,7 @@ class TestCommandHandler:
         assert handler.check_update(Update(0, edited_message=message))
 
     def test_directed_commands(self, message):
-        handler = CommandHandler('test', self.ch_basic_handler)
+        handler = CommandHandler('test', self.callback_basic)
 
         message.text = '/test@{}'.format(message.bot.username)
         assert handler.check_update(Update(0, message))
@@ -131,7 +133,7 @@ class TestCommandHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_with_filter(self, message):
-        handler = CommandHandler('test', self.ch_basic_handler, Filters.group)
+        handler = CommandHandler('test', self.callback_basic, Filters.group)
 
         message.chat = Chat(-23, 'group')
         message.text = '/test'
@@ -141,7 +143,7 @@ class TestCommandHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_pass_args(self, dp, message):
-        handler = CommandHandler('test', self.ch_pass_args_handler, pass_args=True)
+        handler = CommandHandler('test', self.ch_callback_args, pass_args=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -164,7 +166,7 @@ class TestCommandHandler:
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, message):
-        handler = CommandHandler('test', self.ch_data_handler_1, pass_user_data=True)
+        handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -172,7 +174,7 @@ class TestCommandHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_data_handler_1, pass_chat_data=True)
+        handler = CommandHandler('test', self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -180,7 +182,7 @@ class TestCommandHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_data_handler_2, pass_chat_data=True,
+        handler = CommandHandler('test', self.callback_data_2, pass_chat_data=True,
                                  pass_user_data=True)
         dp.add_handler(handler)
 
@@ -189,7 +191,7 @@ class TestCommandHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, message):
-        handler = CommandHandler('test', self.ch_queue_handler_1, pass_job_queue=True)
+        handler = CommandHandler('test', self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -197,7 +199,7 @@ class TestCommandHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_queue_handler_1, pass_update_queue=True)
+        handler = CommandHandler('test', self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -205,7 +207,7 @@ class TestCommandHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.ch_queue_handler_2, pass_job_queue=True,
+        handler = CommandHandler('test', self.callback_queue_2, pass_job_queue=True,
                                  pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -214,5 +216,5 @@ class TestCommandHandler:
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = CommandHandler('test', self.ch_basic_handler)
+        handler = CommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)

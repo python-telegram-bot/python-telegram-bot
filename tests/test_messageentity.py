@@ -33,7 +33,7 @@ def message_entity(request):
     user = None
     if type == MessageEntity.TEXT_MENTION:
         user = User(1, 'test_user')
-    return MessageEntity(type=type, offset=1, length=3, url=url, user=user)
+    return MessageEntity(type, 1, 3, url=url, user=user)
 
 
 class TestMessageEntity:

@@ -19,9 +19,9 @@
 
 import pytest
 
-from telegram import Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery, \
-    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
-from telegram.ext import Filters, MessageHandler, RegexHandler
+from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
+from telegram.ext import RegexHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
 
@@ -35,7 +35,8 @@ params = [
 ]
 
 ids = ('callback_query', 'inline_query', 'chosen_inline_result',
-             'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+       'shipping_query', 'pre_checkout_query', 'callback_query_without_message')
+
 
 @pytest.fixture(params=params, ids=ids)
 def false_update(request):
@@ -48,58 +49,62 @@ def message(bot):
 
 
 class TestRegexHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def rh_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
-    def rh_data_handler_1(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) or (chat_data is not None)
 
-    def rh_data_handler_2(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) and (chat_data is not None)
 
-    def rh_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def rh_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def rh_group_handler(self, bot, update, groups=None, groupdict=None):
+    def callback_group(self, bot, update, groups=None, groupdict=None):
         if groups is not None:
             self.test_flag = groups == ('t', ' message')
         if groupdict is not None:
             self.test_flag = groupdict == {'begin': 't', 'end': ' message'}
 
     def test_basic(self, dp, message):
-        handler = RegexHandler('.*', self.rh_basic_handler)
+        handler = RegexHandler('.*', self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert self.test_flag
-    
+
     def test_pattern(self, message):
-        handler = RegexHandler('.*est.*', self.rh_basic_handler)
-        
+        handler = RegexHandler('.*est.*', self.callback_basic)
+
         assert handler.check_update(Update(0, message))
-        
-        handler = RegexHandler('.*not in here.*', self.rh_basic_handler)
+
+        handler = RegexHandler('.*not in here.*', self.callback_basic)
         assert not handler.check_update(Update(0, message))
 
     def test_with_passing_group_dict(self, dp, message):
-        handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.rh_group_handler, pass_groups=True)
+        handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
+                               pass_groups=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.rh_group_handler, pass_groupdict=True)
+        handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
+                               pass_groupdict=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -107,8 +112,8 @@ class TestRegexHandler:
         assert self.test_flag
 
     def test_edited(self, message):
-        handler = RegexHandler('.*', self.rh_basic_handler, edited_updates=True,
-                                 message_updates=False, channel_post_updates=False)
+        handler = RegexHandler('.*', self.callback_basic, edited_updates=True,
+                               message_updates=False, channel_post_updates=False)
 
         assert handler.check_update(Update(0, edited_message=message))
         assert not handler.check_update(Update(0, message=message))
@@ -116,8 +121,8 @@ class TestRegexHandler:
         assert not handler.check_update(Update(0, edited_channel_post=message))
 
     def test_channel_post(self, message):
-        handler = RegexHandler('.*', self.rh_basic_handler, edited_updates=False,
-                                 message_updates=False, channel_post_updates=True)
+        handler = RegexHandler('.*', self.callback_basic, edited_updates=False,
+                               message_updates=False, channel_post_updates=True)
 
         assert not handler.check_update(Update(0, edited_message=message))
         assert not handler.check_update(Update(0, message=message))
@@ -125,8 +130,8 @@ class TestRegexHandler:
         assert not handler.check_update(Update(0, edited_channel_post=message))
 
     def test_multiple_flags(self, message):
-        handler = RegexHandler('.*', self.rh_basic_handler, edited_updates=True,
-                                 message_updates=True, channel_post_updates=True)
+        handler = RegexHandler('.*', self.callback_basic, edited_updates=True,
+                               message_updates=True, channel_post_updates=True)
 
         assert handler.check_update(Update(0, edited_message=message))
         assert handler.check_update(Update(0, message=message))
@@ -135,8 +140,8 @@ class TestRegexHandler:
 
     def test_allow_updated(self, message):
         with pytest.warns(UserWarning):
-            handler = RegexHandler('.*', self.rh_basic_handler, message_updates=True,
-                                     allow_edited=True)
+            handler = RegexHandler('.*', self.callback_basic, message_updates=True,
+                                   allow_edited=True)
 
         assert handler.check_update(Update(0, edited_message=message))
         assert handler.check_update(Update(0, message=message))
@@ -145,18 +150,18 @@ class TestRegexHandler:
 
     def test_none_allowed(self):
         with pytest.raises(ValueError, match='are all False'):
-            handler = RegexHandler('.*', self.rh_basic_handler, message_updates=False,
-                                     channel_post_updates=False, edited_updates=False)
+            handler = RegexHandler('.*', self.callback_basic, message_updates=False,
+                                   channel_post_updates=False, edited_updates=False)
 
     def test_pass_user_or_chat_data(self, dp, message):
-        handler = RegexHandler('.*', self.rh_data_handler_1, pass_user_data=True)
+        handler = RegexHandler('.*', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = RegexHandler('.*', self.rh_data_handler_1, pass_chat_data=True)
+        handler = RegexHandler('.*', self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -164,8 +169,8 @@ class TestRegexHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = RegexHandler('.*', self.rh_data_handler_2, pass_chat_data=True,
-                                 pass_user_data=True)
+        handler = RegexHandler('.*', self.callback_data_2, pass_chat_data=True,
+                               pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -173,14 +178,14 @@ class TestRegexHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, message):
-        handler = RegexHandler('.*', self.rh_queue_handler_1, pass_job_queue=True)
+        handler = RegexHandler('.*', self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = RegexHandler('.*', self.rh_queue_handler_1, pass_update_queue=True)
+        handler = RegexHandler('.*', self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -188,8 +193,8 @@ class TestRegexHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = RegexHandler('.*', self.rh_queue_handler_2, pass_job_queue=True,
-                                 pass_update_queue=True)
+        handler = RegexHandler('.*', self.callback_queue_2, pass_job_queue=True,
+                               pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -197,5 +202,5 @@ class TestRegexHandler:
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = RegexHandler('.*', self.rh_basic_handler, edited_updates=True)
+        handler = RegexHandler('.*', self.callback_basic, edited_updates=True)
         assert not handler.check_update(false_update)

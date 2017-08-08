@@ -25,17 +25,17 @@ from telegram import CallbackQuery, User, Message, Chat, Audio
 
 @pytest.fixture(scope='class', params=['message', 'inline'])
 def callback_query(bot, request):
-    cb = CallbackQuery(id=TestCallbackQuery.id,
-                       from_user=TestCallbackQuery.from_user,
-                       chat_instance=TestCallbackQuery.chat_instance,
-                       data=TestCallbackQuery.data,
-                       game_short_name=TestCallbackQuery.game_short_name,
-                       bot=bot)
+    cbq = CallbackQuery(TestCallbackQuery.id,
+                        TestCallbackQuery.from_user,
+                        TestCallbackQuery.chat_instance,
+                        data=TestCallbackQuery.data,
+                        game_short_name=TestCallbackQuery.game_short_name,
+                        bot=bot)
     if request.param == 'message':
-        cb.message = TestCallbackQuery.message
+        cbq.message = TestCallbackQuery.message
     else:
-        cb.inline_message_id = TestCallbackQuery.inline_message_id
-    return cb
+        cbq.inline_message_id = TestCallbackQuery.inline_message_id
+    return cbq
 
 
 class TestCallbackQuery:

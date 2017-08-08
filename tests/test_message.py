@@ -20,9 +20,9 @@ from datetime import datetime
 
 import pytest
 
-from telegram import Update, Message, User, MessageEntity, Chat, Audio, Document, \
-    Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue, Invoice, \
-    SuccessfulPayment
+from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
+                      Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
+                      Invoice, SuccessfulPayment)
 
 
 @pytest.fixture(scope="class")

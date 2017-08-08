@@ -40,6 +40,10 @@ class TestConversationHandler:
     # and then we can start coding!
     END, THIRSTY, BREWING, DRINKING, CODING = range(-1, 4)
 
+    current_state, entry_points, states, fallbacks = None, None, None, None
+    group = Chat(0, Chat.GROUP)
+    second_group = Chat(1, Chat.GROUP)
+
     # Test related
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -58,9 +62,6 @@ class TestConversationHandler:
             ],
         }
         self.fallbacks = [CommandHandler('eat', self.start)]
-
-        self.group = Chat(0, Chat.GROUP)
-        self.second_group = Chat(1, Chat.GROUP)
 
     # State handlers
     def _set_state(self, update, state):

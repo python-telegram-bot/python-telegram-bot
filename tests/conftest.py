@@ -25,9 +25,9 @@ from time import sleep
 
 import pytest
 
-from tests.bots import get_bot
 from telegram import Bot
 from telegram.ext import Dispatcher, JobQueue
+from tests.bots import get_bot
 
 TRAVIS = os.getenv('TRAVIS', False)
 

@@ -25,15 +25,13 @@ from telegram import OrderInfo, SuccessfulPayment
 
 @pytest.fixture(scope='class')
 def successful_payment():
-    return SuccessfulPayment(invoice_payload=TestSuccessfulPayment.invoice_payload,
+    return SuccessfulPayment(TestSuccessfulPayment.currency,
+                             TestSuccessfulPayment.total_amount,
+                             TestSuccessfulPayment.invoice_payload,
+                             TestSuccessfulPayment.telegram_payment_charge_id,
+                             TestSuccessfulPayment.provider_payment_charge_id,
                              shipping_option_id=TestSuccessfulPayment.shipping_option_id,
-                             currency=TestSuccessfulPayment.currency,
-                             total_amount=TestSuccessfulPayment.total_amount,
-                             order_info=TestSuccessfulPayment.order_info,
-                             telegram_payment_charge_id=TestSuccessfulPayment
-                             .telegram_payment_charge_id,
-                             provider_payment_charge_id=TestSuccessfulPayment
-                             .provider_payment_charge_id)
+                             order_info=TestSuccessfulPayment.order_info)
 
 
 class TestSuccessfulPayment:

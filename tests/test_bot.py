@@ -466,10 +466,6 @@ class TestBot:
 
     # send_invoice is tested in test_invoice
 
-    @pytest.mark.skip(reason='Need in incomming shippingquery')
-    def test_answer_shipping_query(self):
-        pass
-
     # TODO: Needs improvement. Need incoming shippping queries to test
     def test_answer_shipping_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data

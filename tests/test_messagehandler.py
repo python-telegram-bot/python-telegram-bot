@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery, \
-    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
+from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import Filters, MessageHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
@@ -49,29 +49,31 @@ def message(bot):
 
 
 class TestMessageHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def mh_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, Update)
         self.test_flag = test_bot and test_update
 
-    def mh_data_handler_1(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) or (chat_data is not None)
 
-    def mh_data_handler_2(self, bot, update, user_data=None, chat_data=None):
+    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
         self.test_flag = (user_data is not None) and (chat_data is not None)
 
-    def mh_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def mh_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def test_basic(self, dp, message):
-        handler = MessageHandler(None, self.mh_basic_handler)
+        handler = MessageHandler(None, self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update(Update(0, message))
@@ -79,7 +81,7 @@ class TestMessageHandler:
         assert self.test_flag
 
     def test_edited(self, message):
-        handler = MessageHandler(None, self.mh_basic_handler, edited_updates=True,
+        handler = MessageHandler(None, self.callback_basic, edited_updates=True,
                                  message_updates=False, channel_post_updates=False)
 
         assert handler.check_update(Update(0, edited_message=message))
@@ -88,7 +90,7 @@ class TestMessageHandler:
         assert not handler.check_update(Update(0, edited_channel_post=message))
 
     def test_channel_post(self, message):
-        handler = MessageHandler(None, self.mh_basic_handler, edited_updates=False,
+        handler = MessageHandler(None, self.callback_basic, edited_updates=False,
                                  message_updates=False, channel_post_updates=True)
 
         assert not handler.check_update(Update(0, edited_message=message))
@@ -97,7 +99,7 @@ class TestMessageHandler:
         assert not handler.check_update(Update(0, edited_channel_post=message))
 
     def test_multiple_flags(self, message):
-        handler = MessageHandler(None, self.mh_basic_handler, edited_updates=True,
+        handler = MessageHandler(None, self.callback_basic, edited_updates=True,
                                  message_updates=True, channel_post_updates=True)
 
         assert handler.check_update(Update(0, edited_message=message))
@@ -107,7 +109,7 @@ class TestMessageHandler:
 
     def test_allow_updated(self, message):
         with pytest.warns(UserWarning):
-            handler = MessageHandler(None, self.mh_basic_handler, message_updates=True,
+            handler = MessageHandler(None, self.callback_basic, message_updates=True,
                                      allow_edited=True)
 
         assert handler.check_update(Update(0, edited_message=message))
@@ -117,11 +119,11 @@ class TestMessageHandler:
 
     def test_none_allowed(self):
         with pytest.raises(ValueError, match='are all False'):
-            handler = MessageHandler(None, self.mh_basic_handler, message_updates=False,
+            handler = MessageHandler(None, self.callback_basic, message_updates=False,
                                      channel_post_updates=False, edited_updates=False)
 
     def test_with_filter(self, message):
-        handler = MessageHandler(Filters.command, self.mh_basic_handler)
+        handler = MessageHandler(Filters.command, self.callback_basic)
 
         message.text = '/test'
         assert handler.check_update(Update(0, message))
@@ -130,14 +132,14 @@ class TestMessageHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_pass_user_or_chat_data(self, dp, message):
-        handler = MessageHandler(None, self.mh_data_handler_1, pass_user_data=True)
+        handler = MessageHandler(None, self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.mh_data_handler_1, pass_chat_data=True)
+        handler = MessageHandler(None, self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -145,7 +147,7 @@ class TestMessageHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.mh_data_handler_2, pass_chat_data=True,
+        handler = MessageHandler(None, self.callback_data_2, pass_chat_data=True,
                                  pass_user_data=True)
         dp.add_handler(handler)
 
@@ -154,14 +156,14 @@ class TestMessageHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, message):
-        handler = MessageHandler(None, self.mh_queue_handler_1, pass_job_queue=True)
+        handler = MessageHandler(None, self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.mh_queue_handler_1, pass_update_queue=True)
+        handler = MessageHandler(None, self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -169,7 +171,7 @@ class TestMessageHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.mh_queue_handler_2, pass_job_queue=True,
+        handler = MessageHandler(None, self.callback_queue_2, pass_job_queue=True,
                                  pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -178,5 +180,5 @@ class TestMessageHandler:
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = MessageHandler(None, self.mh_basic_handler, edited_updates=True)
+        handler = MessageHandler(None, self.callback_basic, edited_updates=True)
         assert not handler.check_update(false_update)

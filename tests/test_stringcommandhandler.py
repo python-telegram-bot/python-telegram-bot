@@ -18,8 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery, \
-    ChosenInlineResult, ShippingQuery, PreCheckoutQuery
+from telegram import (Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import StringCommandHandler
 
 message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
@@ -48,29 +48,31 @@ def false_update(request):
 
 
 class TestStringCommandHandler:
+    test_flag = False
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = False
 
-    def sch_basic_handler(self, bot, update):
+    def callback_basic(self, bot, update):
         test_bot = isinstance(bot, Bot)
         test_update = isinstance(update, str)
         self.test_flag = test_bot and test_update
 
-    def sch_queue_handler_1(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) or (update_queue is not None)
 
-    def sch_queue_handler_2(self, bot, update, job_queue=None, update_queue=None):
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def sch_pass_args_handler(self, bot, update, args):
+    def sch_callback_args(self, bot, update, args):
         if update == '/test':
             self.test_flag = len(args) == 0
         else:
             self.test_flag = args == ['one', 'two']
 
     def test_basic(self, dp):
-        handler = StringCommandHandler('test', self.sch_basic_handler)
+        handler = StringCommandHandler('test', self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update('/test')
@@ -82,7 +84,7 @@ class TestStringCommandHandler:
         assert handler.check_update('/test followed by text')
 
     def test_pass_args(self, dp):
-        handler = StringCommandHandler('test', self.sch_pass_args_handler, pass_args=True)
+        handler = StringCommandHandler('test', self.sch_callback_args, pass_args=True)
         dp.add_handler(handler)
 
         dp.process_update('/test')
@@ -93,14 +95,14 @@ class TestStringCommandHandler:
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp):
-        handler = StringCommandHandler('test', self.sch_queue_handler_1, pass_job_queue=True)
+        handler = StringCommandHandler('test', self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update('/test')
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.sch_queue_handler_1, pass_update_queue=True)
+        handler = StringCommandHandler('test', self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -108,7 +110,7 @@ class TestStringCommandHandler:
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.sch_queue_handler_2, pass_job_queue=True,
+        handler = StringCommandHandler('test', self.callback_queue_2, pass_job_queue=True,
                                        pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -117,5 +119,5 @@ class TestStringCommandHandler:
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = StringCommandHandler('test', self.sch_basic_handler)
+        handler = StringCommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)

@@ -36,6 +36,9 @@ def job_queue(bot):
 
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
+    result = 0
+    job_time = 0
+
     @pytest.fixture(autouse=True)
     def reset(self):
         self.result = 0

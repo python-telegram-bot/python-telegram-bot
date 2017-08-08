@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from telegram import ForceReply, GameHighScore, User
+from telegram import GameHighScore, User
 
 
 @pytest.fixture(scope='class')
@@ -36,15 +36,15 @@ class TestGameHighScore:
     score = 42
 
     def test_de_json(self, bot):
-        json_dict= {'position': self.position,
-                    'user': self.user.to_dict(),
-                    'score': self.score}
+        json_dict = {'position': self.position,
+                     'user': self.user.to_dict(),
+                     'score': self.score}
         highscore = GameHighScore.de_json(json_dict, bot)
-        
+
         assert highscore.position == self.position
         assert highscore.user == self.user
         assert highscore.score == self.score
-    
+
     def test_to_json(self, game_highscore):
         json.loads(game_highscore.to_json())
 
