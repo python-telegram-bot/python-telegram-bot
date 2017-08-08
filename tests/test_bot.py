@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
 from datetime import datetime, timedelta
+from platform import python_implementation
 
 import pytest
 from flaky import flaky
@@ -133,6 +134,8 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     @pytest.mark.xfail(raises=RetryAfter)
+    @pytest.mark.skipif(python_implementation() == 'PyPy',
+                        reason='Unstable on pypy for some reason')
     def test_send_contact(self, bot, chat_id):
         phone_number = '+11234567890'
         first_name = 'Leandro'
