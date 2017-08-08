@@ -24,8 +24,10 @@ from flaky import flaky
 from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
-                      InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent)
+                      InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
+                      ShippingOption, LabeledPrice)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TimedOut
+from telegram.utils.helpers import from_timestamp
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -161,19 +163,16 @@ class TestBot:
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     def test_answer_inline_query(self, monkeypatch, bot):
-        def test(*args, **kwargs):
-            data = args[2]
-            results = [InlineQueryResultArticle('11', 'first', InputTextMessageContent('first')),
-                       InlineQueryResultArticle('12', 'second', InputTextMessageContent('second'))]
-            inline_query_id = data['inline_query_id'] == 1234
-            result = data['results'] == [result.to_dict() for result in results]
-            cache_time = data['cache_time'] == 300
-            is_personal = data['is_personal'] is True
-            next_offset = data['next_offset'] == '42'
-            switch_pm_text = data['switch_pm_text'] == 'switch pm'
-            switch_pm_parameter = data['switch_pm_parameter'] == 'start_pm'
-            return inline_query_id and result and cache_time and is_personal and next_offset and \
-                   switch_pm_parameter and switch_pm_text
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            return data == {'cache_time': 300,
+                            'results': [{'title': 'first', 'id': '11', 'type': 'article',
+                                         'input_message_content': {'message_text': 'first'}},
+                                        {'title': 'second', 'id': '12', 'type': 'article',
+                                         'input_message_content': {'message_text': 'second'}}],
+                            'next_offset': '42', 'switch_pm_parameter': 'start_pm',
+                            'inline_query_id': 1234, 'is_personal': True,
+                            'switch_pm_text': 'switch pm'}
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         results = [InlineQueryResultArticle('11', 'first', InputTextMessageContent('first')),
@@ -204,15 +203,14 @@ class TestBot:
 
     # TODO: Needs improvement. No feasable way to test until bots can add members.
     def test_kick_chat_member(self, monkeypatch, bot):
-        def test(*args, **kwargs):
-            data = args[2]
+        def test(_, url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
             until_date = data.get('until_date', 1577887200) == 1577887200
             return chat_id and user_id and until_date
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
-        until = datetime.utcfromtimestamp(1577887200)
+        until = from_timestamp(1577887200)
 
         assert bot.kick_chat_member(2, 32)
         assert bot.kick_chat_member(2, 32, until_date=until)
@@ -220,8 +218,7 @@ class TestBot:
 
     # TODO: Needs improvement.
     def test_unban_chat_member(self, monkeypatch, bot):
-        def test(*args, **kwargs):
-            data = args[2]
+        def test(_, url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             user_id = data['user_id'] == 32
             return chat_id and user_id
@@ -232,14 +229,10 @@ class TestBot:
 
     # TODO: Needs improvement. Need an incoming callbackquery to test
     def test_answer_callback_query(self, monkeypatch, bot):
-        def test(*args, **kwargs):
-            data = args[2]
-            callback_query_id = data['callback_query_id'] == 23
-            text = data['text'] == 'answer'
-            show_alert = data['show_alert']
-            url = data['url'] == 'no_url'
-            cache_time = data['cache_time'] == 1
-            return callback_query_id and text and show_alert and url and cache_time
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            return data == {'callback_query_id': 23, 'show_alert': True, 'url': 'no_url',
+                            'cache_time': 1, 'text': 'answer'}
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
 
@@ -474,9 +467,67 @@ class TestBot:
     def test_answer_shipping_query(self):
         pass
 
-    @pytest.mark.skip(reason='Need in incomming pre_checkout_query')
-    def test_answer_pre_checkout_query(self):
-        pass
+    # TODO: Needs improvement. Need incoming shippping queries to test
+    def test_answer_shipping_query_ok(self, monkeypatch, bot):
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            return data == {'shipping_query_id': 1, 'ok': True,
+                            'shipping_options': [{'title': 'option1',
+                                                  'prices': [{'label': 'price', 'amount': 100}],
+                                                  'id': 1}]}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        shipping_options = ShippingOption(1, 'option1', [LabeledPrice('price', 100)])
+        assert bot.answer_shipping_query(1, True, shipping_options=[shipping_options])
+
+    def test_answer_shipping_query_error_message(self, monkeypatch, bot):
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            return data == {'shipping_query_id': 1, 'error_message': 'Not enough fish',
+                            'ok': False}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.answer_shipping_query(1, False, error_message='Not enough fish')
+
+    def test_answer_shipping_query_errors(self, monkeypatch, bot):
+        shipping_options = ShippingOption(1, 'option1', [LabeledPrice('price', 100)])
+
+        with pytest.raises(TelegramError, match='should not be empty and there should not be'):
+            bot.answer_shipping_query(1, True, error_message='Not enough fish')
+
+        with pytest.raises(TelegramError, match='should not be empty and there should not be'):
+            bot.answer_shipping_query(1, False)
+
+        with pytest.raises(TelegramError, match='should not be empty and there should not be'):
+            bot.answer_shipping_query(1, False, shipping_options=shipping_options)
+
+        with pytest.raises(TelegramError, match='should not be empty and there should not be'):
+            bot.answer_shipping_query(1, True)
+
+    # TODO: Needs improvement. Need incoming shippping queries to test
+    def test_answer_pre_checkout_query_ok(self, monkeypatch, bot):
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            return data == {'pre_checkout_query_id': 1, 'ok': True}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.answer_pre_checkout_query(1, True)
+
+    def test_answer_pre_checkout_query_error_message(self, monkeypatch, bot):
+        # For now just test that our internals pass the correct data
+        def test(_, url, data, *args, **kwargs):
+            return data == {'pre_checkout_query_id': 1, 'error_message': 'Not enough fish',
+                            'ok': False}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.answer_pre_checkout_query(1, False, error_message='Not enough fish')
+
+    def test_answer_pre_checkout_query_errors(self, monkeypatch, bot):
+        with pytest.raises(TelegramError, match='should not be'):
+            bot.answer_pre_checkout_query(1, True, error_message='Not enough fish')
+
+        with pytest.raises(TelegramError, match='should not be empty'):
+            bot.answer_pre_checkout_query(1, False)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
