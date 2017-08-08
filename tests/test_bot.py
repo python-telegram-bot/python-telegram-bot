@@ -458,9 +458,15 @@ class TestBot:
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 
-    @pytest.mark.skip(reason='Not implemented')
-    def test_get_game_high_scores(self):
-        pass
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_get_game_high_scores(self, bot, chat_id):
+        # We need a game to get the scores for
+        game_short_name = 'python_telegram_bot_test_game'
+        game = bot.send_game(chat_id, game_short_name)
+        high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
+        # We assume that the other game score tests ran within 20 sec
+        assert pytest.approx(high_scores[0].score, abs=20) == int(BASE_TIME) - HIGHSCORE_DELTA
 
     # send_invoice is tested in test_invoice
 
