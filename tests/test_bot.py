@@ -504,7 +504,7 @@ class TestBot:
         with pytest.raises(TelegramError, match='should not be empty and there should not be'):
             bot.answer_shipping_query(1, True)
 
-    # TODO: Needs improvement. Need incoming shippping queries to test
+    # TODO: Needs improvement. Need incoming pre checkout queries to test
     def test_answer_pre_checkout_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
         def test(_, url, data, *args, **kwargs):
