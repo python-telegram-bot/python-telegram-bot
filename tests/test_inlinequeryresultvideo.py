@@ -103,11 +103,11 @@ class TestInlineQueryResultVideo:
                                    self.thumb_url, self.title)
         b = InlineQueryResultVideo(self.id, self.video_url, self.mime_type,
                                    self.thumb_url, self.title)
-        c = InlineQueryResultVideo(self.id, "", self.mime_type, self.thumb_url,
+        c = InlineQueryResultVideo(self.id, '', self.mime_type, self.thumb_url,
                                    self.title)
-        d = InlineQueryResultVideo("", self.video_url, self.mime_type, self.thumb_url,
+        d = InlineQueryResultVideo('', self.video_url, self.mime_type, self.thumb_url,
                                    self.title)
-        e = InlineQueryResultVoice(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

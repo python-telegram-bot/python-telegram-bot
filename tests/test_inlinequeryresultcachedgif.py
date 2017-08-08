@@ -75,9 +75,9 @@ class TestInlineQueryResultCachedGif:
     def test_equality(self):
         a = InlineQueryResultCachedGif(self.id, self.gif_file_id)
         b = InlineQueryResultCachedGif(self.id, self.gif_file_id)
-        c = InlineQueryResultCachedGif(self.id, "")
-        d = InlineQueryResultCachedGif("", self.gif_file_id)
-        e = InlineQueryResultCachedVoice(self.id, "", "")
+        c = InlineQueryResultCachedGif(self.id, '')
+        d = InlineQueryResultCachedGif('', self.gif_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

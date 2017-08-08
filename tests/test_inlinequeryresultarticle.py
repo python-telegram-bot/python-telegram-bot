@@ -93,9 +93,9 @@ class TestInlineQueryResultArticle:
     def test_equality(self):
         a = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
         b = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
-        c = InlineQueryResultArticle(self.id, "", self.input_message_content)
-        d = InlineQueryResultArticle("", self.title, self.input_message_content)
-        e = InlineQueryResultAudio(self.id, "", "")
+        c = InlineQueryResultArticle(self.id, '', self.input_message_content)
+        d = InlineQueryResultArticle('', self.title, self.input_message_content)
+        e = InlineQueryResultAudio(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

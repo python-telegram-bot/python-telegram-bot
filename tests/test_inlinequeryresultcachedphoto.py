@@ -83,9 +83,9 @@ class TestInlineQueryResultCachedPhoto:
     def test_equality(self):
         a = InlineQueryResultCachedPhoto(self.id, self.photo_file_id)
         b = InlineQueryResultCachedPhoto(self.id, self.photo_file_id)
-        c = InlineQueryResultCachedPhoto(self.id, "")
-        d = InlineQueryResultCachedPhoto("", self.photo_file_id)
-        e = InlineQueryResultCachedVoice(self.id, "", "")
+        c = InlineQueryResultCachedPhoto(self.id, '')
+        d = InlineQueryResultCachedPhoto('', self.photo_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

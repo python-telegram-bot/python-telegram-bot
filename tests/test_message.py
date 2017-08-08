@@ -25,15 +25,13 @@ from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Documen
                       Invoice, SuccessfulPayment)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope='class')
 def message(bot):
-    return Message(message_id=TestMessage.id,
-                   from_user=TestMessage.from_user,
-                   date=TestMessage.date,
-                   chat=TestMessage.chat, bot=bot)
+    return Message(TestMessage.id, TestMessage.from_user, TestMessage.date, TestMessage.chat,
+                   bot=bot)
 
 
-@pytest.fixture(scope="function",
+@pytest.fixture(scope='function',
                 params=[
                     {'forward_from': User(99, 'forward_user'),
                      'forward_date': datetime.now()},
@@ -45,7 +43,7 @@ def message(bot):
                     {'test': 'a text message',
                      'enitites': [MessageEntity('bold', 10, 4),
                                   MessageEntity('italic', 16, 7)]},
-                    {'audio': Audio("audio_id", 12),
+                    {'audio': Audio('audio_id', 12),
                      'caption': 'audio_file'},
                     {'document': Document('document_id'),
                      'caption': 'document_file'},
@@ -54,7 +52,7 @@ def message(bot):
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file'},
                     {'sticker': Sticker('sticker_id', 50, 50)},
-                    {'video': Video("video_id", 12, 12, 12),
+                    {'video': Video('video_id', 12, 12, 12),
                      'caption': 'video_file'},
                     {'voice': Voice('voice_id', 5)},
                     {'video_note': VideoNote('video_note_id', 20, 12)},
@@ -217,8 +215,8 @@ class TestMessage:
             return id and photo and reply
 
         monkeypatch.setattr('telegram.Bot.send_photo', test)
-        assert message.reply_photo(photo="test_photo")
-        assert message.reply_photo(photo="test_photo", quote=True)
+        assert message.reply_photo(photo='test_photo')
+        assert message.reply_photo(photo='test_photo', quote=True)
 
     def test_reply_audio(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -231,8 +229,8 @@ class TestMessage:
             return id and audio and reply
 
         monkeypatch.setattr('telegram.Bot.send_audio', test)
-        assert message.reply_audio(audio="test_audio")
-        assert message.reply_audio(audio="test_audio", quote=True)
+        assert message.reply_audio(audio='test_audio')
+        assert message.reply_audio(audio='test_audio', quote=True)
 
     def test_reply_document(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -245,8 +243,8 @@ class TestMessage:
             return id and document and reply
 
         monkeypatch.setattr('telegram.Bot.send_document', test)
-        assert message.reply_document(document="test_document")
-        assert message.reply_document(document="test_document", quote=True)
+        assert message.reply_document(document='test_document')
+        assert message.reply_document(document='test_document', quote=True)
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -259,8 +257,8 @@ class TestMessage:
             return id and sticker and reply
 
         monkeypatch.setattr('telegram.Bot.send_sticker', test)
-        assert message.reply_sticker(sticker="test_sticker")
-        assert message.reply_sticker(sticker="test_sticker", quote=True)
+        assert message.reply_sticker(sticker='test_sticker')
+        assert message.reply_sticker(sticker='test_sticker', quote=True)
 
     def test_reply_video(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -273,8 +271,8 @@ class TestMessage:
             return id and video and reply
 
         monkeypatch.setattr('telegram.Bot.send_video', test)
-        assert message.reply_video(video="test_video")
-        assert message.reply_video(video="test_video", quote=True)
+        assert message.reply_video(video='test_video')
+        assert message.reply_video(video='test_video', quote=True)
 
     def test_reply_video_note(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -287,8 +285,8 @@ class TestMessage:
             return id and video_note and reply
 
         monkeypatch.setattr('telegram.Bot.send_video_note', test)
-        assert message.reply_video_note(video_note="test_video_note")
-        assert message.reply_video_note(video_note="test_video_note", quote=True)
+        assert message.reply_video_note(video_note='test_video_note')
+        assert message.reply_video_note(video_note='test_video_note', quote=True)
 
     def test_reply_voice(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -301,8 +299,8 @@ class TestMessage:
             return id and voice and reply
 
         monkeypatch.setattr('telegram.Bot.send_voice', test)
-        assert message.reply_voice(voice="test_voice")
-        assert message.reply_voice(voice="test_voice", quote=True)
+        assert message.reply_voice(voice='test_voice')
+        assert message.reply_voice(voice='test_voice', quote=True)
 
     def test_reply_location(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -315,8 +313,8 @@ class TestMessage:
             return id and location and reply
 
         monkeypatch.setattr('telegram.Bot.send_location', test)
-        assert message.reply_location(location="test_location")
-        assert message.reply_location(location="test_location", quote=True)
+        assert message.reply_location(location='test_location')
+        assert message.reply_location(location='test_location', quote=True)
 
     def test_reply_venue(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -329,8 +327,8 @@ class TestMessage:
             return id and venue and reply
 
         monkeypatch.setattr('telegram.Bot.send_venue', test)
-        assert message.reply_venue(venue="test_venue")
-        assert message.reply_venue(venue="test_venue", quote=True)
+        assert message.reply_venue(venue='test_venue')
+        assert message.reply_venue(venue='test_venue', quote=True)
 
     def test_reply_contact(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -343,8 +341,8 @@ class TestMessage:
             return id and contact and reply
 
         monkeypatch.setattr('telegram.Bot.send_contact', test)
-        assert message.reply_contact(contact="test_contact")
-        assert message.reply_contact(contact="test_contact", quote=True)
+        assert message.reply_contact(contact='test_contact')
+        assert message.reply_contact(contact='test_contact', quote=True)
 
     def test_forward(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -370,7 +368,7 @@ class TestMessage:
             return chat_id and message_id and text
 
         monkeypatch.setattr('telegram.Bot.edit_message_text', test)
-        assert message.edit_text(text="test")
+        assert message.edit_text(text='test')
 
     def test_edit_caption(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -386,11 +384,11 @@ class TestMessage:
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
-            reply_markup = kwargs['reply_markup'] == [["1", "2"]]
+            reply_markup = kwargs['reply_markup'] == [['1', '2']]
             return chat_id and message_id and reply_markup
 
         monkeypatch.setattr('telegram.Bot.edit_message_reply_markup', test)
-        assert message.edit_reply_markup(reply_markup=[["1", "2"]])
+        assert message.edit_reply_markup(reply_markup=[['1', '2']])
 
     def test_delete(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -405,7 +403,7 @@ class TestMessage:
         id = 1
         a = Message(id, self.from_user, self.date, self.chat)
         b = Message(id, self.from_user, self.date, self.chat)
-        c = Message(id, User(0, ""), self.date, self.chat)
+        c = Message(id, User(0, ''), self.date, self.chat)
         d = Message(0, self.from_user, self.date, self.chat)
         e = Update(id)
 

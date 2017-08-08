@@ -79,9 +79,9 @@ class TestInlineQueryResultVoice:
     def test_equality(self):
         a = InlineQueryResultVoice(self.id, self.voice_url, self.title)
         b = InlineQueryResultVoice(self.id, self.voice_url, self.title)
-        c = InlineQueryResultVoice(self.id, "", self.title)
-        d = InlineQueryResultVoice("", self.voice_url, self.title)
-        e = InlineQueryResultAudio(self.id, "", "")
+        c = InlineQueryResultVoice(self.id, '', self.title)
+        d = InlineQueryResultVoice('', self.voice_url, self.title)
+        e = InlineQueryResultAudio(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

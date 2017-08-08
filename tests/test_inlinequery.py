@@ -73,10 +73,10 @@ class TestInlineQuery:
         assert inline_query.answer()
 
     def test_equality(self):
-        a = InlineQuery(self.id, User(1, ""), "", "")
-        b = InlineQuery(self.id, User(1, ""), "", "")
-        c = InlineQuery(self.id, User(0, ""), "", "")
-        d = InlineQuery(0, User(1, ""), "", "")
+        a = InlineQuery(self.id, User(1, ''), '', '')
+        b = InlineQuery(self.id, User(1, ''), '', '')
+        c = InlineQuery(self.id, User(0, ''), '', '')
+        d = InlineQuery(0, User(1, ''), '', '')
         e = Update(self.id)
 
         assert a == b

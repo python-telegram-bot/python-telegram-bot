@@ -29,8 +29,8 @@ class TestConstants:
     def test_max_message_length(self, bot, chat_id):
         bot.send_message(chat_id=chat_id, text='a' * constants.MAX_MESSAGE_LENGTH)
 
-        with pytest.raises(BadRequest, message="MAX_MESSAGE_LENGTH is no longer valid",
-                           match="too long"):
+        with pytest.raises(BadRequest, message='MAX_MESSAGE_LENGTH is no longer valid',
+                           match='too long'):
             bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
 
     @flaky(3, 1)

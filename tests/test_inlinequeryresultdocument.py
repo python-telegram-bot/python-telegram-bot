@@ -101,9 +101,9 @@ class TestInlineQueryResultDocument:
                                       self.mime_type)
         b = InlineQueryResultDocument(self.id, self.document_url, self.title,
                                       self.mime_type)
-        c = InlineQueryResultDocument(self.id, "", self.title, self.mime_type)
-        d = InlineQueryResultDocument("", self.document_url, self.title, self.mime_type)
-        e = InlineQueryResultVoice(self.id, "", "")
+        c = InlineQueryResultDocument(self.id, '', self.title, self.mime_type)
+        d = InlineQueryResultDocument('', self.document_url, self.title, self.mime_type)
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

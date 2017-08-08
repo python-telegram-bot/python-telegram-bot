@@ -168,7 +168,7 @@ class TestVoice:
         a = Voice(voice.file_id, self.duration)
         b = Voice(voice.file_id, self.duration)
         c = Voice(voice.file_id, 0)
-        d = Voice("", self.duration)
+        d = Voice('', self.duration)
         e = Audio(voice.file_id, self.duration)
 
         assert a == b

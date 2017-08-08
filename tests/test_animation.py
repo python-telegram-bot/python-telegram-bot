@@ -31,15 +31,15 @@ def thumb():
 
 @pytest.fixture(scope='class')
 def animation(thumb, bot):
-    return Animation(file_id=TestAnimation.animation_file_id, thumb=thumb.to_dict(),
+    return Animation(TestAnimation.animation_file_id, thumb=thumb.to_dict(),
                      file_name=TestAnimation.file_name, mime_type=TestAnimation.mime_type,
                      file_size=TestAnimation.file_size, bot=bot)
 
 
 class TestAnimation:
     animation_file_id = 'CgADBAADFQEAAny4rAUgukhiTv2TWwI'
-    file_name = "game.gif.mp4"
-    mime_type = "video/mp4"
+    file_name = 'game.gif.mp4'
+    mime_type = 'video/mp4'
     file_size = 4008
 
     def test_de_json(self, bot, thumb):
@@ -73,7 +73,7 @@ class TestAnimation:
     def test_equality(self):
         a = Animation(self.animation_file_id)
         b = Animation(self.animation_file_id)
-        d = Animation("")
+        d = Animation('')
         e = Voice(self.animation_file_id, 0)
 
         assert a == b

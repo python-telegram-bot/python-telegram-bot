@@ -89,7 +89,7 @@ Here's how to make a one-off code change.
 
      .. code-block::
 
-        $ nosetests -v
+        $ pytest -v
 
    - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 

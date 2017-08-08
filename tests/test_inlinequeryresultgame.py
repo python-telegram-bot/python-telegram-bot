@@ -61,9 +61,9 @@ class TestInlineQueryResultGame:
     def test_equality(self):
         a = InlineQueryResultGame(self.id, self.game_short_name)
         b = InlineQueryResultGame(self.id, self.game_short_name)
-        c = InlineQueryResultGame(self.id, "")
-        d = InlineQueryResultGame("", self.game_short_name)
-        e = InlineQueryResultVoice(self.id, "", "")
+        c = InlineQueryResultGame(self.id, '')
+        d = InlineQueryResultGame('', self.game_short_name)
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

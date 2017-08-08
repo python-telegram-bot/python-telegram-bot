@@ -98,10 +98,10 @@ class TestInlineQueryResultVenue:
                                    self.address)
         b = InlineQueryResultVenue(self.id, self.longitude, self.latitude, self.title,
                                    self.address)
-        c = InlineQueryResultVenue(self.id, "", self.latitude, self.title, self.address)
-        d = InlineQueryResultVenue("", self.longitude, self.latitude, self.title,
+        c = InlineQueryResultVenue(self.id, '', self.latitude, self.title, self.address)
+        d = InlineQueryResultVenue('', self.longitude, self.latitude, self.title,
                                    self.address)
-        e = InlineQueryResultVoice(self.id, "", "")
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

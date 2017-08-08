@@ -48,7 +48,7 @@ class TestJobQueue:
         self.result += 1
 
     def job_with_exception(self, bot, job):
-        raise Exception("Test Error")
+        raise Exception('Test Error')
 
     def job_remove_self(self, bot, job):
         self.result += 1

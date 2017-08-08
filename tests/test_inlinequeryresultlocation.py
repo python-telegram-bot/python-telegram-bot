@@ -91,8 +91,8 @@ class TestInlineQueryResultLocation:
         a = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
         b = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
         c = InlineQueryResultLocation(self.id, 0, self.latitude, self.title)
-        d = InlineQueryResultLocation("", self.longitude, self.latitude, self.title)
-        e = InlineQueryResultVoice(self.id, "", "")
+        d = InlineQueryResultLocation('', self.longitude, self.latitude, self.title)
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

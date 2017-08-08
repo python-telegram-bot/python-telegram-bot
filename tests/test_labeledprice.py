@@ -40,8 +40,8 @@ class TestLabeledPrice:
         json.loads(labeled_price.to_json())
 
     def test_to_dict(self, labeled_price):
-        labeledprice_dict = labeled_price.to_dict()
+        labeled_price_dict = labeled_price.to_dict()
 
-        assert isinstance(labeledprice_dict, dict)
-        assert labeledprice_dict['label'] == labeled_price.label
-        assert labeledprice_dict['amount'] == labeled_price.amount
+        assert isinstance(labeled_price_dict, dict)
+        assert labeled_price_dict['label'] == labeled_price.label
+        assert labeled_price_dict['amount'] == labeled_price.amount

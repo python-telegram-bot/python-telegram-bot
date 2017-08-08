@@ -275,7 +275,7 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_edit_reply_markup(self, bot, message):
-        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
+        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text='test', callback_data='1')]])
         message = bot.edit_message_reply_markup(chat_id=message.chat_id,
                                                 message_id=message.message_id,
                                                 reply_markup=new_markup)
@@ -284,7 +284,7 @@ class TestBot:
 
     @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_reply_markup_without_required(self, bot):
-        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
+        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text='test', callback_data='1')]])
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
             bot.edit_message_reply_markup(reply_markup=new_markup)
 
@@ -335,8 +335,8 @@ class TestBot:
     def test_get_chat(self, bot, group_id):
         chat = bot.get_chat(group_id)
 
-        assert chat.type == "group"
-        assert chat.title == ">>> telegram.Bot() - Developers"
+        assert chat.type == 'group'
+        assert chat.title == '>>> telegram.Bot() - Developers'
         assert chat.id == int(group_id)
 
     @flaky(3, 1)
@@ -346,7 +346,7 @@ class TestBot:
         assert isinstance(admins, list)
 
         for a in admins:
-            assert a.status in ("administrator", "creator")
+            assert a.status in ('administrator', 'creator')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -360,8 +360,8 @@ class TestBot:
     def test_get_chat_member(self, bot, channel_id):
         chat_member = bot.get_chat_member(channel_id, 103246792)  # Eldin
 
-        assert chat_member.status == "administrator"
-        assert chat_member.user.username == "EchteEldin"
+        assert chat_member.status == 'administrator'
+        assert chat_member.user.username == 'EchteEldin'
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

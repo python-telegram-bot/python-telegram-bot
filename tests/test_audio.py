@@ -163,7 +163,7 @@ class TestAudio:
     @pytest.mark.timeout(10)
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_audio(chat_id=chat_id, audio="")
+            bot.send_audio(chat_id=chat_id, audio='')
 
     def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):

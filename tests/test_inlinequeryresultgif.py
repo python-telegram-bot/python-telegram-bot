@@ -89,9 +89,9 @@ class TestInlineQueryResultGif:
     def test_equality(self):
         a = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)
         b = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)
-        c = InlineQueryResultGif(self.id, "", self.thumb_url)
-        d = InlineQueryResultGif("", self.gif_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id, "", "")
+        c = InlineQueryResultGif(self.id, '', self.thumb_url)
+        d = InlineQueryResultGif('', self.gif_url, self.thumb_url)
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

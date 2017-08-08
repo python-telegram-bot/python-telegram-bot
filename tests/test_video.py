@@ -189,7 +189,7 @@ class TestVideo:
         a = Video(video.file_id, self.width, self.height, self.duration)
         b = Video(video.file_id, self.width, self.height, self.duration)
         c = Video(video.file_id, 0, 0, 0)
-        d = Video("", self.width, self.height, self.duration)
+        d = Video('', self.width, self.height, self.duration)
         e = Voice(video.file_id, self.duration)
 
         assert a == b

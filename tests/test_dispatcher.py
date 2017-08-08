@@ -66,10 +66,10 @@ class TestDispatcher:
 
     def test_error_handler(self, dp):
         dp.add_error_handler(self.error_handler)
-        error = TelegramError("Unauthorized.")
+        error = TelegramError('Unauthorized.')
         dp.update_queue.put(error)
         sleep(.1)
-        assert self.received == "Unauthorized."
+        assert self.received == 'Unauthorized.'
 
         # Remove handler
         dp.remove_error_handler(self.error_handler)

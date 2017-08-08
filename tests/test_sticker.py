@@ -42,7 +42,7 @@ def sticker(bot, chat_id):
 
 
 class TestSticker:
-    # sticker_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.webp"
+    # sticker_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
     # Serving sticker from gh since our server sends wrong content_type
     sticker_file_url = ('https://github.com/python-telegram-bot/python-telegram-bot/blob/master'
                         '/tests/data/telegram.webp?raw=true')
@@ -204,7 +204,7 @@ class TestSticker:
         a = Sticker(sticker.file_id, self.width, self.height)
         b = Sticker(sticker.file_id, self.width, self.height)
         c = Sticker(sticker.file_id, 0, 0)
-        d = Sticker("", self.width, self.height)
+        d = Sticker('', self.width, self.height)
         e = PhotoSize(sticker.file_id, self.width, self.height)
 
         assert a == b

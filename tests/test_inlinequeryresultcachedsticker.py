@@ -70,9 +70,9 @@ class TestInlineQueryResultCachedSticker:
     def test_equality(self):
         a = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
         b = InlineQueryResultCachedSticker(self.id, self.sticker_file_id)
-        c = InlineQueryResultCachedSticker(self.id, "")
-        d = InlineQueryResultCachedSticker("", self.sticker_file_id)
-        e = InlineQueryResultCachedVoice(self.id, "", "")
+        c = InlineQueryResultCachedSticker(self.id, '')
+        d = InlineQueryResultCachedSticker('', self.sticker_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

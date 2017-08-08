@@ -152,7 +152,7 @@ class TestVideoNote:
         a = VideoNote(video_note.file_id, self.length, self.duration)
         b = VideoNote(video_note.file_id, self.length, self.duration)
         c = VideoNote(video_note.file_id, 0, 0)
-        d = VideoNote("", self.length, self.duration)
+        d = VideoNote('', self.length, self.duration)
         e = Voice(video_note.file_id, self.duration)
 
         assert a == b

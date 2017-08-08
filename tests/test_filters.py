@@ -26,13 +26,13 @@ from telegram.ext import Filters, BaseFilter
 
 @pytest.fixture()
 def message():
-    return Message(0, User(0, "Testuser"), datetime.datetime.now(), Chat(0, 'private'))
+    return Message(0, User(0, 'Testuser'), datetime.datetime.now(), Chat(0, 'private'))
 
 
-@pytest.fixture(scope="function",
+@pytest.fixture(scope='function',
                 params=MessageEntity.ALL_TYPES)
 def message_entity(request):
-    return MessageEntity(request.param, 0, 0, url="", user="")
+    return MessageEntity(request.param, 0, 0, url='', user='')
 
 
 class TestFilters:
@@ -52,7 +52,7 @@ class TestFilters:
         assert Filters.command(message)
 
     def test_filters_reply(self, message):
-        another_message = Message(1, User(1, "TestOther"), datetime.datetime.now(),
+        another_message = Message(1, User(1, 'TestOther'), datetime.datetime.now(),
                                   Chat(0, 'private'))
         message.text = 'test'
         assert not Filters.reply(message)
@@ -187,14 +187,14 @@ class TestFilters:
 
     def test_private_filter(self, message):
         assert Filters.private(message)
-        message.chat.type = "group"
+        message.chat.type = 'group'
         assert not Filters.private(message)
 
     def test_group_filter(self, message):
         assert not Filters.group(message)
-        message.chat.type = "group"
+        message.chat.type = 'group'
         assert Filters.group(message)
-        message.chat.type = "supergroup"
+        message.chat.type = 'supergroup'
         assert Filters.group(message)
 
     def test_filters_user(self):

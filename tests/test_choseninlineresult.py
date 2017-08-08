@@ -53,14 +53,14 @@ class TestChosenInlineResult:
                      'from': user.to_dict(),
                      'query': self.query,
                      'location': loc.to_dict(),
-                     'inline_message_id': "a random id"}
+                     'inline_message_id': 'a random id'}
         result = ChosenInlineResult.de_json(json_dict, bot)
 
         assert result.result_id == self.result_id
         assert result.from_user == user
         assert result.query == self.query
         assert result.location == loc
-        assert result.inline_message_id == "a random id"
+        assert result.inline_message_id == 'a random id'
 
     def test_to_json(self, chosen_inline_result):
         json.loads(chosen_inline_result.to_json())

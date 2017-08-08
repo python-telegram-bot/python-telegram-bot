@@ -47,7 +47,7 @@ def false_update(request):
 
 @pytest.fixture(scope='function')
 def callback_query(bot):
-    return Update(0, callback_query=CallbackQuery(2, None, None, data="test data"))
+    return Update(0, callback_query=CallbackQuery(2, None, None, data='test data'))
 
 
 class TestCallbackQueryHandler:
@@ -94,7 +94,7 @@ class TestCallbackQueryHandler:
 
         assert handler.check_update(callback_query)
 
-        callback_query.callback_query.data = "nothing here"
+        callback_query.callback_query.data = 'nothing here'
         assert not handler.check_update(callback_query)
 
     def test_with_passing_group_dict(self, dp, callback_query):

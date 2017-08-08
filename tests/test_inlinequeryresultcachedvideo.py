@@ -83,9 +83,9 @@ class TestInlineQueryResultCachedVideo:
     def test_equality(self):
         a = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
         b = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
-        c = InlineQueryResultCachedVideo(self.id, "", self.title)
-        d = InlineQueryResultCachedVideo("", self.video_file_id, self.title)
-        e = InlineQueryResultCachedVoice(self.id, "", "")
+        c = InlineQueryResultCachedVideo(self.id, '', self.title)
+        d = InlineQueryResultCachedVideo('', self.video_file_id, self.title)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

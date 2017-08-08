@@ -98,7 +98,7 @@ class TestCallbackQueryHandler:
 
         assert handler.check_update(inline_query)
 
-        inline_query.inline_query.query = "nothing here"
+        inline_query.inline_query.query = 'nothing here'
         assert not handler.check_update(inline_query)
 
     def test_with_passing_group_dict(self, dp, inline_query):

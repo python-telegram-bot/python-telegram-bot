@@ -80,7 +80,7 @@ class TestUpdater:
         updater.dispatcher.add_error_handler(self.error_handler)
         updater.start_polling(0.01)
         sleep(.1)
-        assert self.received == "Test Error 2"
+        assert self.received == 'Test Error 2'
 
     def test_webhook(self, monkeypatch, updater):
         q = Queue()

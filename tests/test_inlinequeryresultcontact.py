@@ -91,9 +91,9 @@ class TestInlineQueryResultContact:
     def test_equality(self):
         a = InlineQueryResultContact(self.id, self.phone_number, self.first_name)
         b = InlineQueryResultContact(self.id, self.phone_number, self.first_name)
-        c = InlineQueryResultContact(self.id, "", self.first_name)
-        d = InlineQueryResultContact("", self.phone_number, self.first_name)
-        e = InlineQueryResultVoice(self.id, "", "")
+        c = InlineQueryResultContact(self.id, '', self.first_name)
+        d = InlineQueryResultContact('', self.phone_number, self.first_name)
+        e = InlineQueryResultVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

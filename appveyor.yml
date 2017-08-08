@@ -24,8 +24,4 @@ build: off
 cache: C:\Users\appveyor\pip\wheels
 
 test_script:
-  - "%python%\\Scripts\\nosetests -v --with-flaky --no-flaky-report tests"
-
-after_test:
-  # This step builds your wheels.
-  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+  - "%python%\\Scripts\\pytest -v --cov=telegram"

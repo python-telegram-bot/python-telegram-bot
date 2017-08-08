@@ -156,13 +156,13 @@ class TestPhoto:
 
         # raw image bytes
         raw_bytes = BytesIO(open(file_name, 'rb').read())
-        inputfile = InputFile({"photo": raw_bytes})
+        inputfile = InputFile({'photo': raw_bytes})
         assert inputfile.mimetype == 'application/octet-stream'
 
         # raw image bytes with name info
         raw_bytes = BytesIO(open(file_name, 'rb').read())
         raw_bytes.name = file_name
-        inputfile = InputFile({"photo": raw_bytes})
+        inputfile = InputFile({'photo': raw_bytes})
         assert inputfile.mimetype == 'image/jpeg'
 
         # send raw photo
@@ -180,7 +180,7 @@ class TestPhoto:
         def test(_, url, data, **kwargs):
             return data['photo'] == photo.file_id
 
-        monkeypatch.setattr("telegram.utils.request.Request.post", test)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_photo(photo=photo, chat_id=chat_id)
         assert message
 
@@ -253,7 +253,7 @@ class TestPhoto:
         a = PhotoSize(photo.file_id, self.width, self.height)
         b = PhotoSize(photo.file_id, self.width, self.height)
         c = PhotoSize(photo.file_id, 0, 0)
-        d = PhotoSize("", self.width, self.height)
+        d = PhotoSize('', self.width, self.height)
         e = Sticker(photo.file_id, self.width, self.height)
 
         assert a == b

@@ -84,9 +84,9 @@ class TestInlineQueryResultCachedDocument:
     def test_equality(self):
         a = InlineQueryResultCachedDocument(self.id, self.title, self.document_file_id)
         b = InlineQueryResultCachedDocument(self.id, self.title, self.document_file_id)
-        c = InlineQueryResultCachedDocument(self.id, self.title, "")
-        d = InlineQueryResultCachedDocument("", self.title, self.document_file_id)
-        e = InlineQueryResultCachedVoice(self.id, "", "")
+        c = InlineQueryResultCachedDocument(self.id, self.title, '')
+        d = InlineQueryResultCachedDocument('', self.title, self.document_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
         assert a == b
         assert hash(a) == hash(b)
