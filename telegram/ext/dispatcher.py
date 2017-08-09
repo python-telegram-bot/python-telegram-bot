@@ -370,8 +370,5 @@ class Dispatcher(object):
                 callback(self.bot, update, error)
 
         else:
-            try:
-                raise error
-
-            except:
-                self.logger.exception('No error handlers are registered, logging exception...')
+            self.logger.exception(
+                'No error handlers are registered, logging exception...', exc_info=error)
