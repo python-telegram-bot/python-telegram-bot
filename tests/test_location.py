@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -52,9 +51,6 @@ class TestLocation:
     def test_send_location_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either location or latitude and longitude'):
             bot.send_location(chat_id=chat_id)
-
-    def test_to_json(self, location):
-        json.loads(location.to_json())
 
     def test_to_dict(self, location):
         location_dict = location.to_dict()

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import os
 
 import pytest
@@ -133,9 +132,6 @@ class TestVoice:
         assert json_voice.duration == self.duration
         assert json_voice.mime_type == self.mime_type
         assert json_voice.file_size == self.file_size
-
-    def test_to_json(self, voice):
-        json.loads(voice.to_json())
 
     def test_to_dict(self, voice):
         voice_dict = voice.to_dict()

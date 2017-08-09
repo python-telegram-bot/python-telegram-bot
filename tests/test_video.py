@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import os
 
 import pytest
@@ -158,9 +157,6 @@ class TestVideo:
         assert json_video.duration == self.duration
         assert json_video.mime_type == self.mime_type
         assert json_video.file_size == self.file_size
-
-    def test_to_json(self, video):
-        json.loads(video.to_json())
 
     def test_to_dict(self, video):
         video_dict = video.to_dict()

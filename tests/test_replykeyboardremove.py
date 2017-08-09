@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -40,9 +39,6 @@ class TestReplyKeyboardRemove:
     def test_expected_values(self, reply_keyboard_remove):
         assert reply_keyboard_remove.remove_keyboard == self.remove_keyboard
         assert reply_keyboard_remove.selective == self.selective
-
-    def test_to_json(self, reply_keyboard_remove):
-        json.loads(reply_keyboard_remove.to_json())
 
     def test_to_dict(self, reply_keyboard_remove):
         reply_keyboard_remove_dict = reply_keyboard_remove.to_dict()

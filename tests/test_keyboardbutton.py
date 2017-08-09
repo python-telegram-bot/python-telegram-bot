@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -45,9 +44,6 @@ class TestKeyboardButton:
         inline_keyboard_buttons = KeyboardButton.de_list(keyboard_json, bot)
 
         assert inline_keyboard_buttons == [keyboard_button, keyboard_button]
-
-    def test_to_json(self, keyboard_button):
-        json.loads(keyboard_button.to_json())
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()

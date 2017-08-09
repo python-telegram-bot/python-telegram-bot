@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -74,9 +73,6 @@ class TestUpdate:
         update = Update.de_json(None, bot)
 
         assert update is None
-
-    def test_to_json(self, update):
-        json.loads(update.to_json())
 
     def test_to_dict(self, update):
         update_dict = update.to_dict()

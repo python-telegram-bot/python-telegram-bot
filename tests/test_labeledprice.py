@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -35,9 +34,6 @@ class TestLabeledPrice:
     def test_expected_values(self, labeled_price):
         assert labeled_price.label == self.label
         assert labeled_price.amount == self.amount
-
-    def test_to_json(self, labeled_price):
-        json.loads(labeled_price.to_json())
 
     def test_to_dict(self, labeled_price):
         labeled_price_dict = labeled_price.to_dict()

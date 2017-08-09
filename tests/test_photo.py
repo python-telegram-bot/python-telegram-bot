@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import os
 from io import BytesIO
 
@@ -218,9 +217,6 @@ class TestPhoto:
         assert json_photo.width == self.width
         assert json_photo.height == self.height
         assert json_photo.file_size == self.file_size
-
-    def test_to_json(self, photo):
-        json.loads(photo.to_json())
 
     def test_to_dict(self, photo):
         photo_dict = photo.to_dict()

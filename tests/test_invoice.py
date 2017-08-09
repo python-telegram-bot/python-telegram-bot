@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 from flaky import flaky
@@ -53,9 +52,6 @@ class TestInvoice:
         assert invoice_json.start_parameter == self.start_parameter
         assert invoice_json.currency == self.currency
         assert invoice_json.total_amount == self.total_amount
-
-    def test_to_json(self, invoice):
-        json.loads(invoice.to_json())
 
     def test_to_dict(self, invoice):
         invoice_dict = invoice.to_dict()

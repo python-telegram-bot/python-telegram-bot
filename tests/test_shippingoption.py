@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -41,9 +40,6 @@ class TestShippingOption:
         assert shipping_option.id == self.id
         assert shipping_option.title == self.title
         assert shipping_option.prices == self.prices
-
-    def test_to_json(self, shipping_option):
-        json.loads(shipping_option.to_json())
 
     def test_to_dict(self, shipping_option):
         shipping_option_dict = shipping_option.to_dict()

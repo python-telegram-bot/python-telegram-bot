@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -48,9 +47,6 @@ class TestOrderInfo:
         assert order_info.phone_number == self.phone_number
         assert order_info.email == self.email
         assert order_info.shipping_address == self.shipping_address
-
-    def test_to_json(self, bot, order_info):
-        json.loads(order_info.to_json())
 
     def test_to_dict(self, order_info):
         order_info_dict = order_info.to_dict()

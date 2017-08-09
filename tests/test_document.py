@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import os
 
 import pytest
@@ -132,9 +131,6 @@ class TestDocument:
         test_document = Document.de_json(json_dict, bot)
 
         assert test_document == document
-
-    def test_to_json(self, document):
-        json.loads(document.to_json())
 
     def test_to_dict(self, document):
         document_dict = document.to_dict()

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -50,9 +49,6 @@ class TestChat:
         assert chat.title == self.title
         assert chat.type == self.type
         assert chat.all_members_are_administrators == self.all_members_are_administrators
-
-    def test_to_json(self, chat):
-        json.loads(chat.to_json())
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()

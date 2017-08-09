@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import os
 
 import pytest
@@ -123,9 +122,6 @@ class TestVideoNote:
         assert json_video_note.length == self.length
         assert json_video_note.duration == self.duration
         assert json_video_note.file_size == self.file_size
-
-    def test_to_json(self, video_note):
-        json.loads(video_note.to_json())
 
     def test_to_dict(self, video_note):
         video_note_dict = video_note.to_dict()

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -63,9 +62,6 @@ class TestInputContactMessageContent:
         input_contact_message_content_json = InputMessageContent.de_json(json_dict, bot)
 
         assert input_contact_message_content_json is None
-
-    def test_to_json(self, input_contact_message_content):
-        json.loads(input_contact_message_content.to_json())
 
     def test_to_dict(self, input_contact_message_content):
         input_contact_message_content_dict = input_contact_message_content.to_dict()

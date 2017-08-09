@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -52,9 +51,6 @@ class TestInlineKeyboardMarkup:
         inline_keyboard_markup_json = InlineKeyboardMarkup.de_json(json_dict, bot)
 
         assert inline_keyboard_markup_json.to_dict() == inline_keyboard_markup.to_dict()
-
-    def test_to_json(self, inline_keyboard_markup):
-        json.loads(inline_keyboard_markup.to_json())
 
     def test_to_dict(self, inline_keyboard_markup):
         inline_keyboard_markup_dict = inline_keyboard_markup.to_dict()

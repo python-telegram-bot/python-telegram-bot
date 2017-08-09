@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -58,9 +57,6 @@ class TestInlineQueryResultAudio:
         assert inline_query_result_audio.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_audio.reply_markup.to_dict() == self.reply_markup.to_dict()
-
-    def test_to_json(self, inline_query_result_audio):
-        json.loads(inline_query_result_audio.to_json())
 
     def test_to_dict(self, inline_query_result_audio):
         inline_query_result_audio_dict = inline_query_result_audio.to_dict()

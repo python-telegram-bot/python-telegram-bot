@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 from telegram import ParseMode
 
@@ -30,12 +29,10 @@ class TestParseMode:
         message = bot.sendMessage(chat_id=chat_id, text=self.markdown_text,
                                   parse_mode=ParseMode.MARKDOWN)
 
-        json.loads(message.to_json())
         assert message.text == self.formatted_text_formatted
 
     def test_send_message_with_parse_mode_html(self, bot, chat_id):
         message = bot.sendMessage(chat_id=chat_id, text=self.html_text,
                                   parse_mode=ParseMode.HTML)
 
-        json.loads(message.to_json())
         assert message.text == self.formatted_text_formatted

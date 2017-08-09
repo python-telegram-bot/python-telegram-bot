@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -56,9 +55,6 @@ class TestAnimation:
         assert animation.file_name == self.file_name
         assert animation.mime_type == self.mime_type
         assert animation.file_size == self.file_size
-
-    def test_to_json(self, animation):
-        json.loads(animation.to_json())
 
     def test_to_dict(self, animation, thumb):
         animation_dict = animation.to_dict()

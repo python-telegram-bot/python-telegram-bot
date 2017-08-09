@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -71,9 +70,6 @@ class TestGame:
         assert game.text == self.text
         assert game.text_entities == self.text_entities
         assert game.animation == self.animation
-
-    def test_to_json(self, game):
-        json.loads(game.to_json())
 
     def test_to_dict(self, game):
         game_dict = game.to_dict()

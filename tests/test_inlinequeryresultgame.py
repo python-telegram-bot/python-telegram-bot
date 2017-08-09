@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -43,9 +42,6 @@ class TestInlineQueryResultGame:
         assert inline_query_result_game.game_short_name == self.game_short_name
         assert inline_query_result_game.reply_markup.to_dict() == \
                self.reply_markup.to_dict()
-
-    def test_to_json(self, inline_query_result_game):
-        json.loads(inline_query_result_game.to_json())
 
     def test_to_dict(self, inline_query_result_game):
         inline_query_result_game_dict = inline_query_result_game.to_dict()

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -61,9 +60,6 @@ class TestChosenInlineResult:
         assert result.query == self.query
         assert result.location == loc
         assert result.inline_message_id == 'a random id'
-
-    def test_to_json(self, chosen_inline_result):
-        json.loads(chosen_inline_result.to_json())
 
     def test_to_dict(self, chosen_inline_result):
         chosen_inline_result_dict = chosen_inline_result.to_dict()

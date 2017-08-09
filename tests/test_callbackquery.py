@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -64,9 +63,6 @@ class TestCallbackQuery:
         assert callback_query.data == self.data
         assert callback_query.inline_message_id == self.inline_message_id
         assert callback_query.game_short_name == self.game_short_name
-
-    def test_to_json(self, callback_query):
-        json.loads(callback_query.to_json())
 
     def test_to_dict(self, callback_query):
         callback_query_dict = callback_query.to_dict()

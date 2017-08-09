@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -53,9 +52,6 @@ class TestMessageEntity:
         assert entity.type == self.type
         assert entity.offset == self.offset
         assert entity.length == self.length
-
-    def test_to_json(self, message_entity):
-        json.loads(message_entity.to_json())
 
     def test_to_dict(self, message_entity):
         entity_dict = message_entity.to_dict()

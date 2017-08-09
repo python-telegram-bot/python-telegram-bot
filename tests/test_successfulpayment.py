@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -61,9 +60,6 @@ class TestSuccessfulPayment:
         assert successful_payment.order_info == self.order_info
         assert successful_payment.telegram_payment_charge_id == self.telegram_payment_charge_id
         assert successful_payment.provider_payment_charge_id == self.provider_payment_charge_id
-
-    def test_to_json(self, successful_payment):
-        json.loads(successful_payment.to_json())
 
     def test_to_dict(self, successful_payment):
         successful_payment_dict = successful_payment.to_dict()

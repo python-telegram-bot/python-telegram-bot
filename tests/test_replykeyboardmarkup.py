@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 from flaky import flaky
@@ -59,9 +58,6 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
-
-    def test_to_json(self, reply_keyboard_markup):
-        json.loads(reply_keyboard_markup.to_json())
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()

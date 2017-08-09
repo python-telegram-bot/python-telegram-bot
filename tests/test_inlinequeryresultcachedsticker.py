@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -48,9 +47,6 @@ class TestInlineQueryResultCachedSticker:
                self.input_message_content.to_dict()
         assert inline_query_result_cached_sticker.reply_markup.to_dict() == \
                self.reply_markup.to_dict()
-
-    def test_to_json(self, inline_query_result_cached_sticker):
-        json.loads(inline_query_result_cached_sticker.to_json())
 
     def test_to_dict(self, inline_query_result_cached_sticker):
         inline_query_result_cached_sticker_dict = inline_query_result_cached_sticker.to_dict()

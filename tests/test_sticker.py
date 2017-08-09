@@ -17,7 +17,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 import os
 
 import pytest
@@ -169,9 +168,6 @@ class TestSticker:
         message = bot.send_sticker(sticker=sticker, chat_id=chat_id)
         assert message
 
-    def test_to_json(self, sticker):
-        json.loads(sticker.to_json())
-
     def test_to_dict(self, sticker):
         sticker_dict = sticker.to_dict()
 
@@ -247,9 +243,6 @@ class TestStickerSet:
         assert sticker_set.contains_masks == self.contains_masks
         assert sticker_set.stickers == self.stickers
 
-    def test_sticker_set_to_json(self, sticker_set):
-        json.loads(sticker_set.to_json())
-
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
 
@@ -321,9 +314,6 @@ class TestMaskPosition:
         assert mask_position.x_shift == self.x_shift
         assert mask_position.y_shift == self.y_shift
         assert mask_position.scale == self.scale
-
-    def test_mask_positiont_to_json(self, mask_position):
-        json.loads(mask_position.to_json())
 
     def test_mask_position_to_dict(self, mask_position):
         mask_position_dict = mask_position.to_dict()

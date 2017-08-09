@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -44,9 +43,6 @@ class TestGameHighScore:
         assert highscore.position == self.position
         assert highscore.user == self.user
         assert highscore.score == self.score
-
-    def test_to_json(self, game_highscore):
-        json.loads(game_highscore.to_json())
 
     def test_to_dict(self, game_highscore):
         game_highscore_dict = game_highscore.to_dict()

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
-import json
 
 import pytest
 
@@ -82,9 +81,6 @@ class TestChatMember:
         assert chat_member.can_send_media_messages is True
         assert chat_member.can_send_other_messages is False
         assert chat_member.can_add_web_page_previews is True
-
-    def test_to_json(self, chat_member):
-        json.loads(chat_member.to_json())
 
     def test_to_dict(self, chat_member):
         chat_member_dict = chat_member.to_dict()

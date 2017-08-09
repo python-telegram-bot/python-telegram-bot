@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -40,9 +39,6 @@ class TestForceReply:
     def test_expected(self, force_reply):
         assert force_reply.force_reply == self.force_reply
         assert force_reply.selective == self.selective
-
-    def test_to_json(self, force_reply):
-        json.loads(force_reply.to_json())
 
     def test_to_dict(self, force_reply):
         force_reply_dict = force_reply.to_dict()

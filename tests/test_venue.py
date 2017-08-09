@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -66,9 +65,6 @@ class TestVenue:
     def test_send_venue_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either venue or latitude, longitude, address and'):
             bot.send_venue(chat_id=chat_id)
-
-    def test_to_json(self, venue):
-        json.loads(venue.to_json())
 
     def test_to_dict(self, venue):
         venue_dict = venue.to_dict()

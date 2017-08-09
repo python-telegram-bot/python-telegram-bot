@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -64,9 +63,6 @@ class TestInlineQueryResultArticle:
         assert inline_query_result_article.thumb_url == self.thumb_url
         assert inline_query_result_article.thumb_height == self.thumb_height
         assert inline_query_result_article.thumb_width == self.thumb_width
-
-    def test_to_json(self, inline_query_result_article):
-        json.loads(inline_query_result_article.to_json())
 
     def test_to_dict(self, inline_query_result_article):
         inline_query_result_article_dict = inline_query_result_article.to_dict()

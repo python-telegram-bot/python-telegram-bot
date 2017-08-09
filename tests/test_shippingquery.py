@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -51,9 +50,6 @@ class TestShippingQuery:
         assert shipping_query.invoice_payload == self.invoice_payload
         assert shipping_query.from_user == self.from_user
         assert shipping_query.shipping_address == self.shipping_address
-
-    def test_to_json(self, shipping_query):
-        json.loads(shipping_query.to_json())
 
     def test_to_dict(self, shipping_query):
         shipping_query_dict = shipping_query.to_dict()

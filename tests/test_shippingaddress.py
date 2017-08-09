@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -58,9 +57,6 @@ class TestShippingAddress:
         assert shipping_address.street_line1 == self.street_line1
         assert shipping_address.street_line2 == self.street_line2
         assert shipping_address.post_code == self.post_code
-
-    def test_to_json(self, shipping_address):
-        json.loads(shipping_address.to_json())
 
     def test_to_dict(self, shipping_address):
         shipping_address_dict = shipping_address.to_dict()

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 from flaky import flaky
@@ -49,9 +48,6 @@ class TestFile:
         assert new_file.file_id == self.file_id
         assert new_file.file_path == self.file_path
         assert new_file.file_size == self.file_size
-
-    def test_to_json(self, file):
-        json.loads(file.to_json())
 
     def test_to_dict(self, file):
         file_dict = file.to_dict()

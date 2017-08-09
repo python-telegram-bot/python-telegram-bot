@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -61,9 +60,6 @@ class TestInlineQueryResultLocation:
         assert inline_query_result_location.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
-
-    def test_to_json(self, inline_query_result_location):
-        json.loads(inline_query_result_location.to_json())
 
     def test_to_dict(self, inline_query_result_location):
         inline_query_result_location_dict = inline_query_result_location.to_dict()

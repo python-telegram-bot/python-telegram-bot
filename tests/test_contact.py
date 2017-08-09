@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -66,9 +65,6 @@ class TestContact:
     def test_send_contact_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):
             bot.send_contact(chat_id=chat_id)
-
-    def test_to_json(self, contact):
-        json.loads(contact.to_json())
 
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()

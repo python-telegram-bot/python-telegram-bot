@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import json
 
 import pytest
 
@@ -62,9 +61,6 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query.currency == self.currency
         assert pre_checkout_query.from_user == self.from_user
         assert pre_checkout_query.order_info == self.order_info
-
-    def test_to_json(self, pre_checkout_query):
-        json.loads(pre_checkout_query.to_json())
 
     def test_to_dict(self, pre_checkout_query):
         pre_checkout_query_dict = pre_checkout_query.to_dict()
