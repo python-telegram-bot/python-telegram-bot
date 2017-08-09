@@ -133,6 +133,10 @@ class UpdaterTest(BaseTest, unittest.TestCase):
             self.received_message = update.message.text
             self.message_count += 1
 
+    @run_async
+    def asyncHandlerErrorTest(self, bot, update):
+        raise TelegramError('foobar')
+
     def stringHandlerTest(self, bot, update):
         self.received_message = update
         self.message_count += 1
@@ -170,8 +174,9 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         raise TelegramError(update)
 
     def errorHandlerTest(self, bot, update, error):
-        self.received_message = error.message
-        self.message_count += 1
+        with self.lock:
+            self.received_message = error.message
+            self.message_count += 1
 
     def test_addRemoveTelegramMessageHandler(self):
         self._setup_updater('Test')
@@ -572,6 +577,17 @@ class UpdaterTest(BaseTest, unittest.TestCase):
         sleep(1.2)
         self.assertEqual(self.received_message, 'Test5')
         self.assertEqual(self.message_count, 2)
+
+    def test_runAsyncError(self):
+        self._setup_updater('Test32', messages=1)
+        d = self.updater.dispatcher
+        handler = MessageHandler([], self.asyncHandlerErrorTest)
+        d.add_handler(handler)
+        d.add_error_handler(self.errorHandlerTest)
+        self.updater.start_polling(0.01)
+        sleep(.2)
+        self.assertEqual(self.received_message, 'foobar')
+        self.assertEqual(self.message_count, 1)
 
     def test_multiple_dispatchers(self):
 

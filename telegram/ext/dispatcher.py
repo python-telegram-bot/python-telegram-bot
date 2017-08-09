@@ -188,6 +188,9 @@ class Dispatcher(object):
                 self.logger.warning('DispatcherHandlerFlow is not supported with async '
                                     'functions; func: %s', promise.pooled_function.__name__)
 
+            elif isinstance(promise.exception, TelegramError):
+                self.update_queue.put(promise.exception)
+
     def run_async(self, func, *args, **kwargs):
         """
         Queue a function (with given args/kwargs) to be run asynchronously.
