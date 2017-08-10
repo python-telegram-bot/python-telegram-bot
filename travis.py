@@ -91,5 +91,5 @@ def main():
 
 if __name__ == '__main__':
     import os
-    os.environ['PYVER'] = ''.join(sys.version_info[:2])
+    os.environ['PYVER'] = '{0[0]}{0[1]}'.format(sys.version_info[:2])
     main()
