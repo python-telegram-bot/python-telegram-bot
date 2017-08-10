@@ -28,4 +28,5 @@ script:
 
 after_success:
   - coveralls
-  - codecov -F $TRAVIS_PYTHON_VERSION
+  - echo $PYVER
+  - codecov -v -F $PYVER

@@ -1,7 +1,7 @@
 [run]
 source = telegram
 omit = telegram/vendor/*
-branch - True
+branch = True
 
 [report]
 omit =
