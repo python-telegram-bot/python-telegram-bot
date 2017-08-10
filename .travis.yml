@@ -28,4 +28,4 @@ script:
 
 after_success:
   - coveralls
-  - codecov
+  - codecov -F $TRAVIS_PYTHON_VERSION
