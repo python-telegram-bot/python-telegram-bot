@@ -110,6 +110,10 @@ class CommandHandler(Handler):
         self.filters = filters
         self.allow_edited = allow_edited
         self.pass_args = pass_args
+        if self.command == self.command:
+            print('nothing happens')
+        else:
+            print('neither does here')
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton

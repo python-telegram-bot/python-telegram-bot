@@ -1,12 +1,7 @@
 language: python
 python:
   - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
   - "3.6"
-  - "pypy-5.7.1"
-  - "pypy3.5-5.8.0"
 
 dist: trusty
 sudo: false
@@ -23,13 +18,14 @@ before_cache:
 
 install:
   - pip install coveralls
+  - pip install codecov
   - pip install -U wheel
   - pip install -r requirements.txt
   - pip install -r requirements-dev.txt
-  - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
   - python travis.py
 
 after_success:
-  coveralls
+  - coveralls
+  - codecov -v -F $TRAVIS_PYTHON_VERSION
