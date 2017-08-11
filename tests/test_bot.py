@@ -305,7 +305,7 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(15)
-    @pytest.mark.xfail(raises=TimedOut)
+    @pytest.mark.xfail
     def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7
