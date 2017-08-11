@@ -46,7 +46,7 @@ def media_message(bot, chat_id):
         return bot.send_voice(chat_id, voice=f, caption='my caption', timeout=10)
 
 
-class TestBot:
+class TestBot(object):
     @pytest.mark.parametrize('token', argvalues=[
         '123',
         '12a:abcd1234',

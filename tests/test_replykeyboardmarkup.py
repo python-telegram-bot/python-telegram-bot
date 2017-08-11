@@ -31,7 +31,7 @@ def reply_keyboard_markup():
                                selective=TestReplyKeyboardMarkup.selective)
 
 
-class TestReplyKeyboardMarkup:
+class TestReplyKeyboardMarkup(object):
     keyboard = [[KeyboardButton('button1'), KeyboardButton('button2')]]
     resize_keyboard = True
     one_time_keyboard = True

@@ -51,7 +51,7 @@ def message(bot):
     return Message(1, None, None, None, bot=bot)
 
 
-class TestCommandHandler:
+class TestCommandHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

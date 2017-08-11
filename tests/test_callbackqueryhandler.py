@@ -50,7 +50,7 @@ def callback_query(bot):
     return Update(0, callback_query=CallbackQuery(2, None, None, data='test data'))
 
 
-class TestCallbackQueryHandler:
+class TestCallbackQueryHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

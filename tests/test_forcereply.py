@@ -27,7 +27,7 @@ def force_reply():
     return ForceReply(TestForceReply.force_reply, TestForceReply.selective)
 
 
-class TestForceReply:
+class TestForceReply(object):
     force_reply = True
     selective = True
 

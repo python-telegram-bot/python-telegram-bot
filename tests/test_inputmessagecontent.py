@@ -20,7 +20,7 @@
 from telegram import InputMessageContent
 
 
-class TestInputMessageContent:
+class TestInputMessageContent(object):
     def test_de_json(self, bot):
         input_message_content = InputMessageContent.de_json(None, bot)
 

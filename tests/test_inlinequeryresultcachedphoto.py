@@ -34,7 +34,7 @@ def inline_query_result_cached_photo():
                                         reply_markup=TestInlineQueryResultCachedPhoto.reply_markup)
 
 
-class TestInlineQueryResultCachedPhoto:
+class TestInlineQueryResultCachedPhoto(object):
     id = 'id'
     type = 'photo'
     photo_file_id = 'photo file id'

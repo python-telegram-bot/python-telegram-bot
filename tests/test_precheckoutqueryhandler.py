@@ -53,7 +53,7 @@ def pre_checkout_query():
                                                          'invoice_payload'))
 
 
-class TestPreCheckoutQueryHandler:
+class TestPreCheckoutQueryHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

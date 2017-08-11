@@ -38,7 +38,7 @@ def user(bot):
                 username=TestUser.username, language_code=TestUser.language_code, bot=bot)
 
 
-class TestUser:
+class TestUser(object):
     id = 1
     first_name = 'first_name'
     last_name = 'last_name'

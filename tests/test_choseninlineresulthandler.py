@@ -54,7 +54,7 @@ def chosen_inline_result():
                                                              'query'))
 
 
-class TestChosenInlineResultHandler:
+class TestChosenInlineResultHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

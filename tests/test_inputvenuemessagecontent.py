@@ -42,7 +42,7 @@ def input_venue_message_content():
                                     foursquare_id=TestInputVenueMessageContent.foursquare_id)
 
 
-class TestInputVenueMessageContent:
+class TestInputVenueMessageContent(object):
     latitude = 1.
     longitude = 2.
     title = 'title'

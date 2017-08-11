@@ -34,7 +34,7 @@ def chat_member(user):
     return ChatMember(user, TestChatMember.status)
 
 
-class TestChatMember:
+class TestChatMember(object):
     status = ChatMember.CREATOR
 
     def test_de_json_required_args(self, bot, user):

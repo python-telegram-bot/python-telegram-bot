@@ -37,7 +37,7 @@ def inline_query_result_mpeg4_gif():
                                      reply_markup=TestInlineQueryResultMpeg4Gif.reply_markup)
 
 
-class TestInlineQueryResultMpeg4Gif:
+class TestInlineQueryResultMpeg4Gif(object):
     id = 'id'
     type = 'mpeg4_gif'
     mpeg4_url = 'mpeg4 url'

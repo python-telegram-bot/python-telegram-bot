@@ -47,7 +47,7 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-class TestStringRegexHandler:
+class TestStringRegexHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

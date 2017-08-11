@@ -27,7 +27,7 @@ def labeled_price():
     return LabeledPrice(TestLabeledPrice.label, TestLabeledPrice.amount)
 
 
-class TestLabeledPrice:
+class TestLabeledPrice(object):
     label = 'label'
     amount = 100
 

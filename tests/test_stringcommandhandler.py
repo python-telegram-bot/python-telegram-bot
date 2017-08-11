@@ -47,7 +47,7 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-class TestStringCommandHandler:
+class TestStringCommandHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

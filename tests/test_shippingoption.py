@@ -28,7 +28,7 @@ def shipping_option():
                           TestShippingOption.prices)
 
 
-class TestShippingOption:
+class TestShippingOption(object):
     id = 'id'
     title = 'title'
     prices = [

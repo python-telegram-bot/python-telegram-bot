@@ -29,7 +29,7 @@ def game_highscore():
                          TestGameHighScore.score)
 
 
-class TestGameHighScore:
+class TestGameHighScore(object):
     position = 12
     user = User(2, 'test user')
     score = 42

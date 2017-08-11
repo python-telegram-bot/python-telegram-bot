@@ -38,7 +38,7 @@ def input_contact_message_content():
                                       last_name=TestInputContactMessageContent.last_name)
 
 
-class TestInputContactMessageContent:
+class TestInputContactMessageContent(object):
     phone_number = 'phone number'
     first_name = 'first name'
     last_name = 'last name'

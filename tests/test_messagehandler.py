@@ -48,7 +48,7 @@ def message(bot):
     return Message(1, None, None, None, bot=bot)
 
 
-class TestMessageHandler:
+class TestMessageHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

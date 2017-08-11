@@ -36,7 +36,7 @@ def input_location_message_content():
                                        TestInputLocationMessageContent.latitude)
 
 
-class TestInputLocationMessageContent:
+class TestInputLocationMessageContent(object):
     latitude = 1.
     longitude = 2.
 

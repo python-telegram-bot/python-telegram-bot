@@ -35,7 +35,7 @@ def inline_query_result_voice():
                                   reply_markup=TestInlineQueryResultVoice.reply_markup)
 
 
-class TestInlineQueryResultVoice:
+class TestInlineQueryResultVoice(object):
     id = 'id'
     type = 'voice'
     voice_url = 'voice url'

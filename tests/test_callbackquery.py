@@ -37,7 +37,7 @@ def callback_query(bot, request):
     return cbq
 
 
-class TestCallbackQuery:
+class TestCallbackQuery(object):
     id = 'id'
     from_user = User(1, 'test_user')
     chat_instance = 'chat_instance'

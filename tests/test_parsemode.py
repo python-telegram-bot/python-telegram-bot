@@ -20,7 +20,7 @@
 from telegram import ParseMode
 
 
-class TestParseMode:
+class TestParseMode(object):
     markdown_text = '*bold* _italic_ [link](http://google.com).'
     html_text = '<b>bold</b> <i>italic</i> <a href="http://google.com">link</a>.'
     formatted_text_formatted = u'bold italic link.'

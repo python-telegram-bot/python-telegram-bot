@@ -33,7 +33,7 @@ def inline_query_result_cached_gif():
                                       reply_markup=TestInlineQueryResultCachedGif.reply_markup)
 
 
-class TestInlineQueryResultCachedGif:
+class TestInlineQueryResultCachedGif(object):
     id = 'id'
     type = 'gif'
     gif_file_id = 'gif file id'

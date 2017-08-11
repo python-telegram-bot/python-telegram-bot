@@ -20,7 +20,7 @@
 from telegram.utils import helpers
 
 
-class TestHelpers:
+class TestHelpers(object):
     def test_escape_markdown(self):
         test_str = '*bold*, _italic_, `code`, [text_link](http://github.com/)'
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'

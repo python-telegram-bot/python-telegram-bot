@@ -52,7 +52,7 @@ def updater(bot):
         up.stop()
 
 
-class TestUpdater:
+class TestUpdater(object):
     message_count = 0
     received = None
     attempts = 0

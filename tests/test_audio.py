@@ -37,7 +37,7 @@ def audio(bot, chat_id):
         return bot.send_audio(chat_id, audio=f, timeout=10).audio
 
 
-class TestAudio:
+class TestAudio(object):
     caption = 'Test audio'
     performer = 'Leandro Toledo'
     title = 'Teste'

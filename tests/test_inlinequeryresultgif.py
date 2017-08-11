@@ -37,7 +37,7 @@ def inline_query_result_gif():
                                 reply_markup=TestInlineQueryResultGif.reply_markup)
 
 
-class TestInlineQueryResultGif:
+class TestInlineQueryResultGif(object):
     id = 'id'
     type = 'gif'
     gif_url = 'gif url'

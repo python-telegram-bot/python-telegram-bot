@@ -22,7 +22,7 @@ from time import sleep
 import telegram.ext.messagequeue as mq
 
 
-class TestDelayQueue:
+class TestDelayQueue(object):
     N = 128
     burst_limit = 30
     time_limit_ms = 1000

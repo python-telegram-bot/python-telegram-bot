@@ -35,7 +35,7 @@ def animation(thumb, bot):
                      file_size=TestAnimation.file_size, bot=bot)
 
 
-class TestAnimation:
+class TestAnimation(object):
     animation_file_id = 'CgADBAADFQEAAny4rAUgukhiTv2TWwI'
     file_name = 'game.gif.mp4'
     mime_type = 'video/mp4'

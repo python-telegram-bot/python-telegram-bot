@@ -33,7 +33,7 @@ def inline_query_result_cached_voice():
                                         reply_markup=TestInlineQueryResultCachedVoice.reply_markup)
 
 
-class TestInlineQueryResultCachedVoice:
+class TestInlineQueryResultCachedVoice(object):
     id = 'id'
     type = 'voice'
     voice_file_id = 'voice file id'

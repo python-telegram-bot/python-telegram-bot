@@ -36,7 +36,7 @@ def inline_query_result_location():
                                      reply_markup=TestInlineQueryResultLocation.reply_markup)
 
 
-class TestInlineQueryResultLocation:
+class TestInlineQueryResultLocation(object):
     id = 'id'
     type = 'location'
     latitude = 0.0

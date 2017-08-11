@@ -31,7 +31,7 @@ def file(bot):
                 bot=bot)
 
 
-class TestFile:
+class TestFile(object):
     file_id = 'NOTVALIDDOESNOTMATTER'
     file_path = (
         u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')

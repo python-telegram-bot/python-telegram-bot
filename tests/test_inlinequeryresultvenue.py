@@ -38,7 +38,7 @@ def inline_query_result_venue():
                                   reply_markup=TestInlineQueryResultVenue.reply_markup)
 
 
-class TestInlineQueryResultVenue:
+class TestInlineQueryResultVenue(object):
     id = 'id'
     type = 'venue'
     latitude = 'latitude'

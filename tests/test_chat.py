@@ -30,7 +30,7 @@ def chat(bot):
                 bot=bot)
 
 
-class TestChat:
+class TestChat(object):
     id = -28767330
     title = 'ToledosPalaceBot - Group'
     type = 'group'

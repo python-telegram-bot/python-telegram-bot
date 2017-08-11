@@ -49,7 +49,7 @@ def update(request):
     return Update(update_id=TestUpdate.update_id, **request.param)
 
 
-class TestUpdate:
+class TestUpdate(object):
     update_id = 868573637
 
     @pytest.mark.parametrize('paramdict', argvalues=params, ids=ids)

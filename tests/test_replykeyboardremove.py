@@ -27,7 +27,7 @@ def reply_keyboard_remove():
     return ReplyKeyboardRemove(selective=TestReplyKeyboardRemove.selective)
 
 
-class TestReplyKeyboardRemove:
+class TestReplyKeyboardRemove(object):
     remove_keyboard = True
     selective = True
 

@@ -37,7 +37,7 @@ def voice(bot, chat_id):
         return bot.send_voice(chat_id, voice=f, timeout=10).voice
 
 
-class TestVoice:
+class TestVoice(object):
     duration = 3
     mime_type = 'audio/ogg'
     file_size = 9199

@@ -30,10 +30,10 @@ def call_pre_commit_hook(hook_id):
 
 
 @pytest.mark.parametrize('hook_id', argvalues=('yapf', 'flake8', 'pylint'))
-@pytest.mark.skipif(not os.getenv('TRAVIS'), reason='Not running in travis.')
-@pytest.mark.skipif(not sys.version_info[:2] == (3, 6) or python_implementation() != 'CPython',
-                    reason='Only running pre-commit-hooks on newest tested python version, '
-                           'as they are slow and consistent across platforms.')
+#@pytest.mark.skipif(not os.getenv('TRAVIS'), reason='Not running in travis.')
+#@pytest.mark.skipif(not sys.version_info[:2] == (3, 6) or python_implementation() != 'CPython',
+#                    reason='Only running pre-commit-hooks on newest tested python version, '
+#                           'as they are slow and consistent across platforms.')
 def test_pre_commit_hook(hook_id):
     assert call_pre_commit_hook(hook_id) == 0
 

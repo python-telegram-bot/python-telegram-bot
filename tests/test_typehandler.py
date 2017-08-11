@@ -24,7 +24,7 @@ from telegram import Bot
 from telegram.ext import TypeHandler
 
 
-class TestTypeHandler:
+class TestTypeHandler(object):
     test_flag = False
 
     @pytest.fixture(autouse=True)

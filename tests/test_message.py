@@ -89,7 +89,7 @@ def message_params(bot, request):
                    chat=TestMessage.chat, bot=bot, **request.param)
 
 
-class TestMessage:
+class TestMessage(object):
     id = 1
     from_user = User(2, 'testuser')
     date = datetime.now()

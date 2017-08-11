@@ -34,7 +34,7 @@ def inline_keyboard_button():
                                 pay=TestInlineKeyboardButton.pay)
 
 
-class TestInlineKeyboardButton:
+class TestInlineKeyboardButton(object):
     text = 'text'
     url = 'url'
     callback_data = 'callback data'
