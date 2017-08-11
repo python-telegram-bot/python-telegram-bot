@@ -1,11 +1,28 @@
-import sys
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2017
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
-import warnings
+import sys
 from collections import namedtuple
-import platform
+from platform import python_implementation
 
 import certifi
-import logging
+import pytest
 from bs4 import BeautifulSoup
 
 sys.path.append('.')
@@ -15,8 +32,6 @@ import telegram
 
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
 IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot'}
-
-logger = logging.getLogger(__name__)
 
 
 def find_next_sibling_until(tag, name, until):
@@ -50,7 +65,6 @@ def check_method(h4):
     checked = []
     for parameter in table:
         param = sig.parameters.get(parameter.Parameters)
-        logger.debug(parameter)
         assert param is not None
         # TODO: Check type via docstring
         # TODO: Check if optional or required
@@ -70,8 +84,6 @@ def check_method(h4):
     elif name == 'sendVenue':
         ignored |= {'venue'}  # Added for ease of use
 
-    logger.debug((sig.parameters.keys(), checked, ignored,
-                 sig.parameters.keys() - checked - ignored))
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
 
@@ -94,7 +106,6 @@ def check_object(h4):
             continue
 
         param = sig.parameters.get(field)
-        logger.debug(parameter)
         assert param is not None
         # TODO: Check type via docstring
         # TODO: Check if optional or required
@@ -111,50 +122,34 @@ def check_object(h4):
     if name.startswith('InlineQueryResult'):
         ignored |= {'type'}
 
-    logger.debug((sig.parameters.keys(), checked, ignored,
-                 sig.parameters.keys() - checked - ignored))
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
 
-def test_official():
-    if not sys.version_info >= (3, 5) or platform.python_implementation() != 'CPython':
-        warnings.warn('Not running "official" tests, since follow_wrapped is not supported'
-                      'on this platform (cpython version >= 3.5 required)')
-        return
+argvalues = []
+names = []
+http = urllib3.PoolManager(
+    cert_reqs='CERT_REQUIRED',
+    ca_certs=certifi.where())
+request = http.request('GET', 'https://core.telegram.org/bots/api')
+soup = BeautifulSoup(request.data.decode('utf-8'), 'html.parser')
 
-    http = urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where())
-    request = http.request('GET', 'https://core.telegram.org/bots/api')
-    soup = BeautifulSoup(request.data.decode('utf-8'), 'html.parser')
+for thing in soup.select('h4 > a.anchor'):
+    # Methods and types don't have spaces in them, luckily all other sections of the docs do
+    # TODO: don't depend on that
+    if '-' not in thing['name']:
+        h4 = thing.parent
 
-    for thing in soup.select('h4 > a.anchor'):
-        # Methods and types don't have spaces in them, luckily all other sections of the docs do
-        # TODO: don't depend on that
-        if '-' not in thing['name']:
-            h4 = thing.parent
-            name = h4.text
-
-            test = None
-            # Is it a method
-            if h4.text[0].lower() == h4.text[0]:
-                test = check_method
-            else:  # Or a type/object
-                if name not in IGNORED_OBJECTS:
-                    test = check_object
-
-            if test:
-                def fn():
-                    return test(h4)
-                fn.description = '{}({}) ({})'.format(test.__name__, h4.text, __name__)
-                yield fn
+        # Is it a method
+        if h4.text[0].lower() == h4.text[0]:
+            argvalues.append((check_method, h4))
+            names.append(h4.text)
+        elif h4.text not in IGNORED_OBJECTS:  # Or a type/object
+            argvalues.append((check_object, h4))
+            names.append(h4.text)
 
 
-if __name__ == '__main__':
-    # Since we don't have the nice unittest asserts which show the comparison
-    # We turn on debugging
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.DEBUG)
-    for f in test_official():
-        f()
+@pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
+@pytest.mark.skipif(not sys.version_info >= (3, 5) or python_implementation() != 'CPython',
+                    reason='follow_wrapped (inspect.signature) is not supported on this platform')
+def test_official(method, data):
+    method(data)

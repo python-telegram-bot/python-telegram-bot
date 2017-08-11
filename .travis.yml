@@ -18,18 +18,20 @@ branches:
 cache:
   directories:
     - $HOME/.cache/pip
+    - $HOME/.pre-commit
 before_cache:
   - rm -f $HOME/.cache/pip/log/debug.log
+  - rm -f $HOME/.pre-commit/pre-commit.log
 
 install:
-  - pip install coveralls
+  - pip install coveralls pytest-cov
   - pip install -U wheel
-  - pip install -r requirements.txt
-  - pip install -r requirements-dev.txt
+  - pip install -U -r requirements.txt
+  - pip install -U -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - python travis.py
+  - pytest -v --cov=telegram
 
 after_success:
   coveralls

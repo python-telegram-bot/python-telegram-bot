@@ -1,10 +1,10 @@
 How To Contribute
-===================
+=================
 
 Every open source project lives from the generous help by contributors that sacrifice their time and ``python-telegram-bot`` is no different. To make participation as pleasant as possible, this project adheres to the `Code of Conduct`_ by the Python Software Foundation.
 
 Setting things up
--------------------
+-----------------
 
 1. Fork the ``python-telegram-bot`` repository to your GitHub account.
 
@@ -35,7 +35,7 @@ Setting things up
       $ pre-commit install
 
 Finding something to do
-###################
+#######################
 
 If you already know what you'd like to work on, you can skip this section.
 
@@ -44,7 +44,7 @@ If you have an idea for something to do, first check if it's already been filed 
 Another great way to start contributing is by writing tests. Tests are really important because they help prevent developers from accidentally breaking existing code, allowing them to build cool things faster. If you're interested in helping out, let the development team know by posting to the `developers' mailing list`_, and we'll help you get started.
 
 Instructions for making a code change
-####################
+#####################################
 
 The central development branch is ``master``, which should be clean and ready for release at any time. In general, all changes should be done as feature branches based off of ``master``.
 
@@ -89,7 +89,7 @@ Here's how to make a one-off code change.
 
      .. code-block::
 
-        $ nosetests -v
+        $ pytest -v
 
    - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 
@@ -129,19 +129,19 @@ Here's how to make a one-off code change.
 
      .. code-block:: bash
 
-      	$ git checkout your-branch-name
-      	$ git fetch upstream
-	$ git merge upstream/master
-      	$ ...[fix the conflicts]...
-      	$ ...[make sure the tests pass before committing]...
-      	$ git commit -a
-      	$ git push origin your-branch-name
+        $ git checkout your-branch-name
+        $ git fetch upstream
+        $ git merge upstream/master
+        $ ...[fix the conflicts]...
+        $ ...[make sure the tests pass before committing]...
+        $ git commit -a
+        $ git push origin your-branch-name
 
    - If after merging you see local modified files in ``telegram/vendor/`` directory, that you didn't actually touch, that means you need to update submodules with this command:
 
      .. code-block:: bash
 
-      	$ git submodule update --init --recursive
+        $ git submodule update --init --recursive
 
    - At the end, the reviewer will merge the pull request.
 
@@ -155,20 +155,29 @@ Here's how to make a one-off code change.
 7. **Celebrate.** Congratulations, you have contributed to ``python-telegram-bot``!
 
 Style commandments
----------------------
+------------------
 
 Specific commandments
 #####################
 
 - Avoid using "double quotes" where you can reasonably use 'single quotes'.
 
-AssertEqual argument order
-######################
+Assert comparison order
+#######################
 
-- assertEqual method's arguments should be in ('actual', 'expected') order.
+- assert statements should compare in **actual** == **expected** order.
+For example (assuming ``test_call`` is the thing being tested):
+
+.. code-block:: python
+
+    # GOOD
+    assert test_call() == 5
+
+    # BAD
+    assert 5 == test_call()
 
 Properly calling callables
-#######################
+##########################
 
 Methods, functions and classes can specify optional parameters (with default
 values) using Python's keyword arg syntax. When providing a value to such a
@@ -186,7 +195,7 @@ This gives us the flexibility to re-order arguments and more importantly
 to add new required arguments. It's also more explicit and easier to read.
 
 Properly defining optional arguments
-########################
+####################################
 
 It's always good to not initialize optional arguments at class creation,
 instead use ``**kwargs`` to get them. It's well known Telegram API can
