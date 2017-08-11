@@ -569,14 +569,14 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_set_chat_photo(self, bot, channel_id):
-        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
-            assert bot.set_chat_photo(channel_id, f)
+    def test_delete_chat_photo(self, bot, channel_id):
+        assert bot.delete_chat_photo(channel_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_delete_chat_photo(self, bot, channel_id):
-        assert bot.delete_chat_photo(channel_id)
+    def test_set_chat_photo(self, bot, channel_id):
+        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
+            assert bot.set_chat_photo(channel_id, f)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
