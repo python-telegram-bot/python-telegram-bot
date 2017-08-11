@@ -24,7 +24,7 @@ from telegram import Message, User, Chat, MessageEntity
 from telegram.ext import Filters, BaseFilter
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def message():
     return Message(0, User(0, 'Testuser'), datetime.datetime.now(), Chat(0, 'private'))
 

@@ -44,7 +44,7 @@ signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                        'whole process on windows')
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def updater(bot):
     up = Updater(bot=bot, workers=2)
     yield up

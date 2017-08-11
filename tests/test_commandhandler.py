@@ -41,7 +41,7 @@ ids = ('callback_query', 'channel_post', 'edited_channel_post', 'inline_query',
        'callback_query_without_message',)
 
 
-@pytest.fixture(params=params, ids=ids)
+@pytest.fixture(scope='class', params=params, ids=ids)
 def false_update(request):
     return Update(update_id=1, **request.param)
 

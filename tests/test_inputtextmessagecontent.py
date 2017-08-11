@@ -22,7 +22,7 @@ import pytest
 from telegram import InputTextMessageContent, InputMessageContent, ParseMode
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def json_dict():
     return {
         'parse_mode': TestInputTextMessageContent.parse_mode,

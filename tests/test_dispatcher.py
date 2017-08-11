@@ -29,7 +29,7 @@ from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerCont
 from tests.conftest import create_dp
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def dp2(bot):
     for dp in create_dp(bot):
         yield dp

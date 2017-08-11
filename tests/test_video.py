@@ -24,7 +24,7 @@ from flaky import flaky
 from telegram import Video, TelegramError, Voice, PhotoSize
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def video_file():
     f = open('tests/data/telegram.mp4', 'rb')
     yield f
@@ -130,8 +130,6 @@ class TestVideo:
 
         assert message.video == video
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_with_video(self, monkeypatch, bot, chat_id, video):
         def test(_, url, data, **kwargs):
             return data['video'] == video.file_id
@@ -140,9 +138,9 @@ class TestVideo:
         message = bot.send_video(chat_id, video=video)
         assert message
 
-    def test_de_json(self, video, bot):
+    def test_de_json(self, bot):
         json_dict = {
-            'file_id': video.file_id,
+            'file_id': 'not a file id',
             'width': self.width,
             'height': self.height,
             'duration': self.duration,
@@ -151,7 +149,7 @@ class TestVideo:
         }
         json_video = Video.de_json(json_dict, bot)
 
-        assert json_video.file_id == video.file_id
+        assert json_video.file_id == 'not a file id'
         assert json_video.width == self.width
         assert json_video.height == self.height
         assert json_video.duration == self.duration
@@ -180,6 +178,10 @@ class TestVideo:
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video(chat_id, '')
+
+    def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            bot.send_video(chat_id=chat_id)
 
     def test_equality(self, video):
         a = Video(video.file_id, self.width, self.height, self.duration)

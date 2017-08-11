@@ -24,7 +24,7 @@ from flaky import flaky
 from telegram import Document, PhotoSize, TelegramError, Voice
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def document_file():
     f = open('tests/data/telegram.png', 'rb')
     yield f
@@ -122,15 +122,20 @@ class TestDocument:
         assert message
 
     def test_de_json(self, bot, document):
-        json_dict = {'file_id': document.file_id,
+        json_dict = {'file_id': 'not a file id',
                      'thumb': document.thumb.to_dict(),
-                     'file_name': document.file_name,
-                     'mime_type': document.mime_type,
-                     'file_size': document.file_size
+                     'file_name': self.file_name,
+                     'mime_type': self.mime_type,
+                     'file_size': self.file_size
                      }
         test_document = Document.de_json(json_dict, bot)
 
-        assert test_document == document
+        assert isinstance(test_document, dict)
+        assert test_document.file_id == 'not a file id'
+        assert test_document.thumb == document.thumb
+        assert test_document.file_name == self.file_name
+        assert test_document.mime_type == self.mime_type
+        assert test_document.file_size == self.file_size
 
     def test_to_dict(self, document):
         document_dict = document.to_dict()

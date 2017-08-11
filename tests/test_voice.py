@@ -24,7 +24,7 @@ from flaky import flaky
 from telegram import Audio, Voice, TelegramError
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def voice_file():
     f = open('tests/data/telegram.ogg', 'rb')
     yield f
@@ -68,7 +68,6 @@ class TestVoice:
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
-
         assert message.caption == self.caption
 
     @flaky(3, 1)
@@ -101,15 +100,8 @@ class TestVoice:
     def test_resend(self, bot, chat_id, voice):
         message = bot.sendVoice(chat_id, voice.file_id)
 
-        assert isinstance(message.voice, Voice)
-        assert isinstance(message.voice.file_id, str)
-        assert message.voice.file_id != ''
-        assert message.voice.duration == voice.duration
-        assert message.voice.mime_type == voice.mime_type
-        assert message.voice.file_size == voice.file_size
+        assert message.voice == voice
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_with_voice(self, monkeypatch, bot, chat_id, voice):
         def test(_, url, data, **kwargs):
             return data['voice'] == voice.file_id
@@ -118,9 +110,9 @@ class TestVoice:
         message = bot.send_voice(chat_id, voice=voice)
         assert message
 
-    def test_de_json(self, bot, voice):
+    def test_de_json(self, bot):
         json_dict = {
-            'file_id': voice.file_id,
+            'file_id': 'not a file id',
             'duration': self.duration,
             'caption': self.caption,
             'mime_type': self.mime_type,
@@ -128,7 +120,7 @@ class TestVoice:
         }
         json_voice = Voice.de_json(json_dict, bot)
 
-        assert json_voice.file_id == voice.file_id
+        assert json_voice.file_id == 'not a file id'
         assert json_voice.duration == self.duration
         assert json_voice.mime_type == self.mime_type
         assert json_voice.file_size == self.file_size
@@ -154,8 +146,6 @@ class TestVoice:
         with pytest.raises(TelegramError):
             bot.sendVoice(chat_id, '')
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.sendVoice(chat_id)

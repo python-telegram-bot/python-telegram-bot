@@ -27,7 +27,7 @@ from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskP
 from telegram.error import BadRequest
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def sticker_file():
     f = open('tests/data/telegram.webp', 'rb')
     yield f
@@ -141,9 +141,9 @@ class TestSticker:
         assert message.sticker.thumb.height == sticker.thumb.height
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
 
-    def test_de_json(self, bot, sticker):
+    def test_de_json(self, bot):
         json_dict = {
-            'file_id': sticker.file_id,
+            'file_id': 'not a file id',
             'width': self.width,
             'height': self.height,
             'thumb': sticker.thumb.to_dict(),
@@ -152,14 +152,12 @@ class TestSticker:
         }
         json_sticker = Sticker.de_json(json_dict, bot)
 
-        assert json_sticker.file_id == sticker.file_id
+        assert json_sticker.file_id == 'not a file id'
         assert json_sticker.width == self.width
         assert json_sticker.height == self.height
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
         def test(_, url, data, **kwargs):
             return data['sticker'] == sticker.file_id
@@ -190,8 +188,6 @@ class TestSticker:
         with pytest.raises(TelegramError):
             bot.send_sticker(chat_id, '')
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_sticker(chat_id)

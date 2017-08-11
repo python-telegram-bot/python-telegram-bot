@@ -22,7 +22,7 @@ import pytest
 from telegram import MessageEntity, Game, PhotoSize, Animation
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def game():
     return Game(TestGame.title,
                 TestGame.description,

@@ -22,7 +22,7 @@ import pytest
 from telegram import InputContactMessageContent, InputMessageContent
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def json_dict():
     return {
         'first_name': TestInputContactMessageContent.first_name,

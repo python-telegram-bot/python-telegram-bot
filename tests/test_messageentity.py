@@ -22,7 +22,7 @@ import pytest
 from telegram import MessageEntity, User
 
 
-@pytest.fixture(scope='function',
+@pytest.fixture(scope="class",
                 params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     type = request.param

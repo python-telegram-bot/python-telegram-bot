@@ -24,7 +24,7 @@ from flaky import flaky
 from telegram import Audio, TelegramError, Voice
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def audio_file():
     f = open('tests/data/telegram.mp3', 'rb')
     yield f
@@ -63,7 +63,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, audio_file, audio):
+    def test_send_all_args(self, bot, chat_id, audio_file):
         message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
                                  duration=self.duration, performer=self.performer,
                                  title=self.title, disable_notification=False)
@@ -121,8 +121,8 @@ class TestAudio:
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
-    def test_de_json(self, bot, audio):
-        json_dict = {'file_id': audio.file_id,
+    def test_de_json(self, bot):
+        json_dict = {'file_id': 'not a file id',
                      'duration': self.duration,
                      'performer': self.performer,
                      'title': self.title,
@@ -131,7 +131,7 @@ class TestAudio:
                      'file_size': self.file_size}
         json_audio = Audio.de_json(json_dict, bot)
 
-        assert json_audio.file_id == audio.file_id
+        assert json_audio.file_id == 'not a file id'
         assert json_audio.duration == self.duration
         assert json_audio.performer == self.performer
         assert json_audio.title == self.title

@@ -26,7 +26,7 @@ from flaky import flaky
 from telegram.ext import JobQueue, Updater, Job
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def job_queue(bot):
     jq = JobQueue(bot)
     jq.start()

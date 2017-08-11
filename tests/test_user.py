@@ -21,7 +21,7 @@ import pytest
 from telegram import User, Update
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def json_dict():
     return {
         'id': TestUser.id,
@@ -32,7 +32,7 @@ def json_dict():
     }
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def user(bot):
     return User(TestUser.id, TestUser.first_name, last_name=TestUser.last_name,
                 username=TestUser.username, language_code=TestUser.language_code, bot=bot)

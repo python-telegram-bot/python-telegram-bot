@@ -24,12 +24,12 @@ from telegram import Update, Message, User, Chat, CallbackQuery
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='class')
 def user1():
     return User(first_name='Misses Test', id=123)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='class')
 def user2():
     return User(first_name='Mister Test', id=124)
 

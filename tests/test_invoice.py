@@ -63,6 +63,7 @@ class TestInvoice:
         assert invoice_dict['currency'] == invoice.currency
         assert invoice_dict['total_amount'] == invoice.total_amount
 
+    @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = bot.send_invoice(chat_id, self.title, self.description, self.payload,

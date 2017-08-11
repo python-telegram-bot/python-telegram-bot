@@ -22,7 +22,7 @@ import pytest
 from telegram import InputVenueMessageContent, InputMessageContent
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def json_dict():
     return {
         'longitude': TestInputVenueMessageContent.longitude,

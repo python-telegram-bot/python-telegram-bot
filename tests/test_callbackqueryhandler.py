@@ -40,7 +40,7 @@ ids = ('message', 'edited_message', 'channel_post',
        'shipping_query', 'pre_checkout_query')
 
 
-@pytest.fixture(params=params, ids=ids)
+@pytest.fixture(scope='class', params=params, ids=ids)
 def false_update(request):
     return Update(update_id=2, **request.param)
 

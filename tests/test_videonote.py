@@ -24,7 +24,7 @@ from flaky import flaky
 from telegram import VideoNote, TelegramError, Voice, PhotoSize
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def video_note_file():
     f = open('tests/data/telegram2.mp4', 'rb')
     yield f
@@ -99,8 +99,6 @@ class TestVideoNote:
 
         assert message.video_note == video_note
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
         def test(_, url, data, **kwargs):
             return data['video_note'] == video_note.file_id
@@ -109,16 +107,16 @@ class TestVideoNote:
         message = bot.send_video_note(chat_id, video_note=video_note)
         assert message
 
-    def test_de_json(self, video_note, bot):
+    def test_de_json(self, bot):
         json_dict = {
-            'file_id': video_note.file_id,
+            'file_id': 'not a file id',
             'length': self.length,
             'duration': self.duration,
             'file_size': self.file_size
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
 
-        assert json_video_note.file_id == video_note.file_id
+        assert json_video_note.file_id == 'not a file id'
         assert json_video_note.length == self.length
         assert json_video_note.duration == self.duration
         assert json_video_note.file_size == self.file_size
@@ -143,6 +141,10 @@ class TestVideoNote:
     def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video_note(chat_id, '')
+
+    def test_error_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            bot.send_video_note(chat_id=chat_id)
 
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, self.length, self.duration)

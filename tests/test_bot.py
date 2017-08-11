@@ -199,7 +199,7 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_one_user_profile_photo(self, bot, chat_id):
-        user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0)
+        user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
         assert user_profile_photos.photos[0][0].file_size == 12421
 
     # get_file is tested multiple times in the test_*media* modules.
@@ -292,6 +292,7 @@ class TestBot:
     def test_edit_reply_markup_inline(self):
         pass
 
+    # TODO: Actually send updates to the test bot so this can be tested properly
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_updates(self, bot):
@@ -299,7 +300,7 @@ class TestBot:
         updates = bot.get_updates(timeout=1)
 
         assert isinstance(updates, list)
-        if updates:  # TODO: Actually send updates to the test bot so this can be tested properly
+        if updates:
             assert isinstance(updates[0], Update)
 
     @flaky(3, 1)
