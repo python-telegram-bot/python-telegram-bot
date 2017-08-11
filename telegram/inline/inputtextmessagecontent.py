@@ -49,7 +49,3 @@ class InputTextMessageContent(InputMessageContent):
         # Optionals
         self.parse_mode = parse_mode
         self.disable_web_page_preview = disable_web_page_preview
-
-    @classmethod
-    def de_json(cls, data, bot):
-        return cls(**data)

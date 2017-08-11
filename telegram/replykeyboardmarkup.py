@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from telegram import ReplyMarkup, KeyboardButton
+from telegram import ReplyMarkup
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
@@ -71,17 +71,6 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.resize_keyboard = bool(resize_keyboard)
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        data = super(ReplyKeyboardMarkup, cls).de_json(data, bot)
-
-        data['keyboard'] = [KeyboardButton.de_list(keyboard, bot) for keyboard in data['keyboard']]
-
-        return cls(**data)
 
     def to_dict(self):
         data = super(ReplyKeyboardMarkup, self).to_dict()

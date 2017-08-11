@@ -19,7 +19,7 @@
 """This module contains the classes that represent Telegram
 InlineQueryResultGame"""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup
+from telegram import InlineQueryResult
 
 
 class InlineQueryResultGame(InlineQueryResult):
@@ -49,14 +49,3 @@ class InlineQueryResultGame(InlineQueryResult):
 
         if reply_markup:
             self.reply_markup = reply_markup
-
-    @classmethod
-    def de_json(cls, data, bot):
-        data = super(InlineQueryResultGame, cls).de_json(data, bot)
-
-        if not data:
-            return None
-
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-
-        return cls(**data)

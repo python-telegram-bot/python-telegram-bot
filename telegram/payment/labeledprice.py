@@ -41,21 +41,3 @@ class LabeledPrice(TelegramObject):
     def __init__(self, label, amount, **kwargs):
         self.label = label
         self.amount = amount
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
-
-    @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return []
-
-        labeled_prices = list()
-        for labeled_price in data:
-            labeled_prices.append(cls.de_json(labeled_price, bot))
-
-        return labeled_prices
