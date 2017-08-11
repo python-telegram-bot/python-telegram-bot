@@ -63,7 +63,7 @@ def main():
     config = Config(verbosity=2, plugins=DefaultPluginManager(), env={'NOSE_REDNOSE': '1'})
     tests = nose.run(argv=['--with-flaky', '--no-flaky-report',
                            '--with-coverage', '--cover-package=telegram/',
-                           '--with-travis-fold',
+                           '--with-travis-fold', '--cover-branches',
                            'tests'],
                      addplugins=[FoldPlugin(), CustomCoverage()],
                      config=config)
