@@ -330,7 +330,7 @@ class Message(TelegramObject):
         for i in (self.audio, self.game, self.document, self.photo, self.sticker,
                   self.video, self.voice, self.video_note, self.contact, self.location,
                   self.venue, self.invoice, self.successful_payment):
-            if i is not None:
+            if i:
                 self._effective_attachment = i
                 break
         else:

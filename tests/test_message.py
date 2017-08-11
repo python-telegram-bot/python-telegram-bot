@@ -189,6 +189,17 @@ class TestMessage:
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
+    def test_effective_attachment(self, message_params):
+        for i in ('audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note',
+                  'contact', 'location', 'venue', 'invoice', 'invoice', 'successful_payment'):
+            item = getattr(message_params, i, None)
+            if item:
+                break
+        else:
+            item = None
+        assert message_params.effective_attachment == item
+
+
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):
             id = args[1] == message.chat_id
