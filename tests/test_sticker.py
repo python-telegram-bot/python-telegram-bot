@@ -141,7 +141,7 @@ class TestSticker:
         assert message.sticker.thumb.height == sticker.thumb.height
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
 
-    def test_de_json(self, bot):
+    def test_de_json(self, bot, sticker):
         json_dict = {
             'file_id': 'not a file id',
             'width': self.width,
@@ -157,6 +157,7 @@ class TestSticker:
         assert json_sticker.height == self.height
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
+        assert json_sticker.thumb == sticker.thumb
 
     def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
         def test(_, url, data, **kwargs):

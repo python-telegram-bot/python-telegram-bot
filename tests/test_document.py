@@ -130,7 +130,6 @@ class TestDocument:
                      }
         test_document = Document.de_json(json_dict, bot)
 
-        assert isinstance(test_document, dict)
         assert test_document.file_id == 'not a file id'
         assert test_document.thumb == document.thumb
         assert test_document.file_name == self.file_name
