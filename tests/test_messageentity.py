@@ -5,64 +5,62 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-MessageEntity"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import MessageEntity, User
 
 
-class MessageEntityTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram MessageEntity."""
+@pytest.fixture(scope="class",
+                params=MessageEntity.ALL_TYPES)
+def message_entity(request):
+    type = request.param
+    url = None
+    if type == MessageEntity.TEXT_LINK:
+        url = 't.me'
+    user = None
+    if type == MessageEntity.TEXT_MENTION:
+        user = User(1, 'test_user')
+    return MessageEntity(type, 1, 3, url=url, user=user)
 
-    def setUp(self):
-        self.type = 'type'
-        self.offset = 1
-        self.length = 2
-        self.url = 'url'
 
-        self.json_dict = {
+class TestMessageEntity(object):
+    type = 'url'
+    offset = 1
+    length = 2
+    url = 'url'
+
+    def test_de_json(self, bot):
+        json_dict = {
             'type': self.type,
             'offset': self.offset,
-            'length': self.length,
-            'url': self.url
+            'length': self.length
         }
+        entity = MessageEntity.de_json(json_dict, bot)
 
-    def test_messageentity_de_json(self):
-        entity = telegram.MessageEntity.de_json(self.json_dict, self._bot)
+        assert entity.type == self.type
+        assert entity.offset == self.offset
+        assert entity.length == self.length
 
-        self.assertEqual(entity.type, self.type)
-        self.assertEqual(entity.offset, self.offset)
-        self.assertEqual(entity.length, self.length)
-        self.assertEqual(entity.url, self.url)
+    def test_to_dict(self, message_entity):
+        entity_dict = message_entity.to_dict()
 
-    def test_messageentity_to_json(self):
-        entity = telegram.MessageEntity.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(entity.to_json()))
-
-    def test_messageentity_to_dict(self):
-        entity = telegram.MessageEntity.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(entity))
-        self.assertDictEqual(self.json_dict, entity)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert isinstance(entity_dict, dict)
+        assert entity_dict['type'] == message_entity.type
+        assert entity_dict['offset'] == message_entity.offset
+        assert entity_dict['length'] == message_entity.length
+        if message_entity.url:
+            assert entity_dict['url'] == message_entity.url
+        if message_entity.user:
+            assert entity_dict['user'] == message_entity.user.to_dict()

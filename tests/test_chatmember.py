@@ -5,67 +5,101 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram ChatMember"""
+import datetime
 
-import unittest
-import sys
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import User, ChatMember
+from telegram.utils.helpers import to_timestamp
 
 
-class ChatMemberTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram ChatMember."""
+@pytest.fixture(scope='class')
+def user():
+    return User(1, 'First name')
 
-    def setUp(self):
-        self.user = {'id': 1, 'first_name': 'User'}
-        self.status = telegram.ChatMember.CREATOR
 
-        self.json_dict = {'user': self.user, 'status': self.status}
+@pytest.fixture(scope='class')
+def chat_member(user):
+    return ChatMember(user, TestChatMember.status)
 
-    def test_chatmember_de_json(self):
-        chatmember = telegram.ChatMember.de_json(self.json_dict, self._bot)
 
-        self.assertEqual(chatmember.user.to_dict(), self.user)
-        self.assertEqual(chatmember.status, self.status)
+class TestChatMember(object):
+    status = ChatMember.CREATOR
 
-    def test_chatmember_to_json(self):
-        chatmember = telegram.ChatMember.de_json(self.json_dict, self._bot)
+    def test_de_json_required_args(self, bot, user):
+        json_dict = {'user': user.to_dict(), 'status': self.status}
 
-        self.assertTrue(self.is_json(chatmember.to_json()))
+        chat_member = ChatMember.de_json(json_dict, bot)
 
-    def test_chatmember_to_dict(self):
-        chatmember = telegram.ChatMember.de_json(self.json_dict, self._bot)
+        assert chat_member.user == user
+        assert chat_member.status == self.status
 
-        self.assertTrue(self.is_dict(chatmember.to_dict()))
-        self.assertEqual(chatmember['user'].to_dict(), self.user)
-        self.assertEqual(chatmember['status'], self.status)
+    def test_de_json_all_args(self, bot, user):
+        time = datetime.datetime.now()
+        json_dict = {'user': user.to_dict(),
+                     'status': self.status,
+                     'until_date': to_timestamp(time),
+                     'can_be_edited': False,
+                     'can_change_info': True,
+                     'can_post_messages': False,
+                     'can_edit_messages': True,
+                     'can_delete_messages': True,
+                     'can_invite_users': False,
+                     'can_restrict_members': True,
+                     'can_pin_messages': False,
+                     'can_promote_members': True,
+                     'can_send_messages': False,
+                     'can_send_media_messages': True,
+                     'can_send_other_messages': False,
+                     'can_add_web_page_previews': True}
+
+        chat_member = ChatMember.de_json(json_dict, bot)
+
+        assert chat_member.user == user
+        assert chat_member.status == self.status
+        assert chat_member.can_be_edited is False
+        assert chat_member.can_change_info is True
+        assert chat_member.can_post_messages is False
+        assert chat_member.can_edit_messages is True
+        assert chat_member.can_delete_messages is True
+        assert chat_member.can_invite_users is False
+        assert chat_member.can_restrict_members is True
+        assert chat_member.can_pin_messages is False
+        assert chat_member.can_promote_members is True
+        assert chat_member.can_send_messages is False
+        assert chat_member.can_send_media_messages is True
+        assert chat_member.can_send_other_messages is False
+        assert chat_member.can_add_web_page_previews is True
+
+    def test_to_dict(self, chat_member):
+        chat_member_dict = chat_member.to_dict()
+        assert isinstance(chat_member_dict, dict)
+        assert chat_member_dict['user'] == chat_member.user.to_dict()
+        assert chat_member['status'] == chat_member.status
 
     def test_equality(self):
-        a = telegram.ChatMember(telegram.User(1, ""), telegram.ChatMember.ADMINISTRATOR)
-        b = telegram.ChatMember(telegram.User(1, ""), telegram.ChatMember.ADMINISTRATOR)
-        d = telegram.ChatMember(telegram.User(2, ""), telegram.ChatMember.ADMINISTRATOR)
-        d2 = telegram.ChatMember(telegram.User(1, ""), telegram.ChatMember.CREATOR)
+        a = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
+        b = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
+        d = ChatMember(User(2, ''), ChatMember.ADMINISTRATOR)
+        d2 = ChatMember(User(1, ''), ChatMember.CREATOR)
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, d2)
-        self.assertNotEqual(hash(a), hash(d2))
+        assert a != d2
+        assert hash(a) != hash(d2)

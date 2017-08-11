@@ -5,103 +5,101 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultContact"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InlineQueryResultVoice, InputTextMessageContent, InlineKeyboardButton,
+                      InlineKeyboardMarkup, InlineQueryResultContact)
 
 
-class InlineQueryResultContactTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultContact."""
+@pytest.fixture(scope='class')
+def inline_query_result_contact():
+    return InlineQueryResultContact(TestInlineQueryResultContact.id,
+                                    TestInlineQueryResultContact.phone_number,
+                                    TestInlineQueryResultContact.first_name,
+                                    last_name=TestInlineQueryResultContact.last_name,
+                                    thumb_url=TestInlineQueryResultContact.thumb_url,
+                                    thumb_width=TestInlineQueryResultContact.thumb_width,
+                                    thumb_height=TestInlineQueryResultContact.thumb_height,
+                                    input_message_content=TestInlineQueryResultContact.input_message_content,
+                                    reply_markup=TestInlineQueryResultContact.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'contact'
-        self.phone_number = 'phone_number'
-        self.first_name = 'first_name'
-        self.last_name = 'last_name'
-        self.thumb_url = 'thumb url'
-        self.thumb_width = 10
-        self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
-        self.json_dict = {
-            'id': self._id,
-            'type': self.type,
-            'phone_number': self.phone_number,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'thumb_url': self.thumb_url,
-            'thumb_width': self.thumb_width,
-            'thumb_height': self.thumb_height,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
 
-    def test_contact_de_json(self):
-        contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot)
+class TestInlineQueryResultContact(object):
+    id = 'id'
+    type = 'contact'
+    phone_number = 'phone_number'
+    first_name = 'first_name'
+    last_name = 'last_name'
+    thumb_url = 'thumb url'
+    thumb_width = 10
+    thumb_height = 15
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        self.assertEqual(contact.id, self._id)
-        self.assertEqual(contact.type, self.type)
-        self.assertEqual(contact.phone_number, self.phone_number)
-        self.assertEqual(contact.first_name, self.first_name)
-        self.assertEqual(contact.last_name, self.last_name)
-        self.assertEqual(contact.thumb_url, self.thumb_url)
-        self.assertEqual(contact.thumb_width, self.thumb_width)
-        self.assertEqual(contact.thumb_height, self.thumb_height)
-        self.assertDictEqual(contact.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(contact.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_expected_values(self, inline_query_result_contact):
+        assert inline_query_result_contact.id == self.id
+        assert inline_query_result_contact.type == self.type
+        assert inline_query_result_contact.phone_number == self.phone_number
+        assert inline_query_result_contact.first_name == self.first_name
+        assert inline_query_result_contact.last_name == self.last_name
+        assert inline_query_result_contact.thumb_url == self.thumb_url
+        assert inline_query_result_contact.thumb_width == self.thumb_width
+        assert inline_query_result_contact.thumb_height == self.thumb_height
+        assert inline_query_result_contact.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_contact.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-    def test_contact_to_json(self):
-        contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot)
+    def test_to_dict(self, inline_query_result_contact):
+        inline_query_result_contact_dict = inline_query_result_contact.to_dict()
 
-        self.assertTrue(self.is_json(contact.to_json()))
-
-    def test_contact_to_dict(self):
-        contact = telegram.InlineQueryResultContact.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(contact))
-        self.assertDictEqual(self.json_dict, contact)
+        assert isinstance(inline_query_result_contact_dict, dict)
+        assert inline_query_result_contact_dict['id'] == inline_query_result_contact.id
+        assert inline_query_result_contact_dict['type'] == inline_query_result_contact.type
+        assert inline_query_result_contact_dict['phone_number'] == \
+               inline_query_result_contact.phone_number
+        assert inline_query_result_contact_dict['first_name'] == \
+               inline_query_result_contact.first_name
+        assert inline_query_result_contact_dict['last_name'] == \
+               inline_query_result_contact.last_name
+        assert inline_query_result_contact_dict['thumb_url'] == \
+               inline_query_result_contact.thumb_url
+        assert inline_query_result_contact_dict['thumb_width'] == \
+               inline_query_result_contact.thumb_width
+        assert inline_query_result_contact_dict['thumb_height'] == \
+               inline_query_result_contact.thumb_height
+        assert inline_query_result_contact_dict['input_message_content'] == \
+               inline_query_result_contact.input_message_content.to_dict()
+        assert inline_query_result_contact_dict['reply_markup'] == \
+               inline_query_result_contact.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultContact(self._id, self.phone_number, self.first_name)
-        b = telegram.InlineQueryResultContact(self._id, self.phone_number, self.first_name)
-        c = telegram.InlineQueryResultContact(self._id, "", self.first_name)
-        d = telegram.InlineQueryResultContact("", self.phone_number, self.first_name)
-        e = telegram.InlineQueryResultArticle(self._id, "", "")
+        a = InlineQueryResultContact(self.id, self.phone_number, self.first_name)
+        b = InlineQueryResultContact(self.id, self.phone_number, self.first_name)
+        c = InlineQueryResultContact(self.id, '', self.first_name)
+        d = InlineQueryResultContact('', self.phone_number, self.first_name)
+        e = InlineQueryResultVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

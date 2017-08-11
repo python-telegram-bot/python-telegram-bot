@@ -5,96 +5,88 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultCachedVoice"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InlineQueryResultCachedVoice, InlineKeyboardButton, InlineKeyboardMarkup,
+                      InlineQueryResultCachedAudio, InputTextMessageContent)
 
 
-class InlineQueryResultCachedVoiceTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedVoice."""
+@pytest.fixture(scope='class')
+def inline_query_result_cached_voice():
+    return InlineQueryResultCachedVoice(TestInlineQueryResultCachedVoice.id,
+                                        TestInlineQueryResultCachedVoice.voice_file_id,
+                                        TestInlineQueryResultCachedVoice.title,
+                                        caption=TestInlineQueryResultCachedVoice.caption,
+                                        input_message_content=TestInlineQueryResultCachedVoice.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedVoice.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'voice'
-        self.voice_file_id = 'voice file id'
-        self.title = 'title'
-        self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
 
-        self.json_dict = {
-            'type': self.type,
-            'id': self._id,
-            'voice_file_id': self.voice_file_id,
-            'title': self.title,
-            'caption': self.caption,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
+class TestInlineQueryResultCachedVoice(object):
+    id = 'id'
+    type = 'voice'
+    voice_file_id = 'voice file id'
+    title = 'title'
+    caption = 'caption'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_voice_de_json(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot)
+    def test_expected_values(self, inline_query_result_cached_voice):
+        assert inline_query_result_cached_voice.type == self.type
+        assert inline_query_result_cached_voice.id == self.id
+        assert inline_query_result_cached_voice.voice_file_id == self.voice_file_id
+        assert inline_query_result_cached_voice.title == self.title
+        assert inline_query_result_cached_voice.caption == self.caption
+        assert inline_query_result_cached_voice.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_voice.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-        self.assertEqual(voice.type, self.type)
-        self.assertEqual(voice.id, self._id)
-        self.assertEqual(voice.voice_file_id, self.voice_file_id)
-        self.assertEqual(voice.title, self.title)
-        self.assertEqual(voice.caption, self.caption)
-        self.assertDictEqual(voice.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(voice.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_to_dict(self, inline_query_result_cached_voice):
+        inline_query_result_cached_voice_dict = inline_query_result_cached_voice.to_dict()
 
-    def test_voice_to_json(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(voice.to_json()))
-
-    def test_voice_to_dict(self):
-        voice = telegram.InlineQueryResultCachedVoice.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(voice))
-        self.assertDictEqual(self.json_dict, voice)
+        assert isinstance(inline_query_result_cached_voice_dict, dict)
+        assert inline_query_result_cached_voice_dict['type'] == \
+               inline_query_result_cached_voice.type
+        assert inline_query_result_cached_voice_dict['id'] == inline_query_result_cached_voice.id
+        assert inline_query_result_cached_voice_dict['voice_file_id'] == \
+               inline_query_result_cached_voice.voice_file_id
+        assert inline_query_result_cached_voice_dict['title'] == \
+               inline_query_result_cached_voice.title
+        assert inline_query_result_cached_voice_dict['caption'] == \
+               inline_query_result_cached_voice.caption
+        assert inline_query_result_cached_voice_dict['input_message_content'] == \
+               inline_query_result_cached_voice.input_message_content.to_dict()
+        assert inline_query_result_cached_voice_dict['reply_markup'] == \
+               inline_query_result_cached_voice.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultCachedVoice(self._id, self.voice_file_id, self.title)
-        b = telegram.InlineQueryResultCachedVoice(self._id, self.voice_file_id, self.title)
-        c = telegram.InlineQueryResultCachedVoice(self._id, "", self.title)
-        d = telegram.InlineQueryResultCachedVoice("", self.voice_file_id, self.title)
-        e = telegram.InlineQueryResultCachedAudio(self._id, "", "")
+        a = InlineQueryResultCachedVoice(self.id, self.voice_file_id, self.title)
+        b = InlineQueryResultCachedVoice(self.id, self.voice_file_id, self.title)
+        c = InlineQueryResultCachedVoice(self.id, '', self.title)
+        d = InlineQueryResultCachedVoice('', self.voice_file_id, self.title)
+        e = InlineQueryResultCachedAudio(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

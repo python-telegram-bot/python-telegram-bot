@@ -1651,7 +1651,7 @@ class Bot(TelegramObject):
         url_ = '{0}/setWebhook'.format(self.base_url)
 
         # Backwards-compatibility: 'url' used to be named 'webhook_url'
-        if 'webhook_url' in kwargs:
+        if 'webhook_url' in kwargs:  # pragma: no cover
             warnings.warn("The 'webhook_url' parameter has been renamed to 'url' in accordance "
                           "with the API")
 

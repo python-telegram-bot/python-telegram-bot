@@ -5,99 +5,93 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultCachedVideo"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InputTextMessageContent,
+                      InlineQueryResultCachedVideo, InlineQueryResultCachedVoice)
 
 
-class InlineQueryResultCachedVideoTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedVideo."""
+@pytest.fixture(scope='class')
+def inline_query_result_cached_video():
+    return InlineQueryResultCachedVideo(TestInlineQueryResultCachedVideo.id,
+                                        TestInlineQueryResultCachedVideo.video_file_id,
+                                        TestInlineQueryResultCachedVideo.title,
+                                        caption=TestInlineQueryResultCachedVideo.caption,
+                                        description=TestInlineQueryResultCachedVideo.description,
+                                        input_message_content=TestInlineQueryResultCachedVideo.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedVideo.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'video'
-        self.video_file_id = 'video file id'
-        self.title = 'title'
-        self.caption = 'caption'
-        self.description = 'description'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
 
-        self.json_dict = {
-            'type': self.type,
-            'id': self._id,
-            'video_file_id': self.video_file_id,
-            'title': self.title,
-            'caption': self.caption,
-            'description': self.description,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
+class TestInlineQueryResultCachedVideo(object):
+    id = 'id'
+    type = 'video'
+    video_file_id = 'video file id'
+    title = 'title'
+    caption = 'caption'
+    description = 'description'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_video_de_json(self):
-        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot)
+    def test_expected_values(self, inline_query_result_cached_video):
+        assert inline_query_result_cached_video.type == self.type
+        assert inline_query_result_cached_video.id == self.id
+        assert inline_query_result_cached_video.video_file_id == self.video_file_id
+        assert inline_query_result_cached_video.title == self.title
+        assert inline_query_result_cached_video.description == self.description
+        assert inline_query_result_cached_video.caption == self.caption
+        assert inline_query_result_cached_video.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_video.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-        self.assertEqual(video.type, self.type)
-        self.assertEqual(video.id, self._id)
-        self.assertEqual(video.video_file_id, self.video_file_id)
-        self.assertEqual(video.title, self.title)
-        self.assertEqual(video.description, self.description)
-        self.assertEqual(video.caption, self.caption)
-        self.assertDictEqual(video.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(video.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_to_dict(self, inline_query_result_cached_video):
+        inline_query_result_cached_video_dict = inline_query_result_cached_video.to_dict()
 
-    def test_video_to_json(self):
-        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(video.to_json()))
-
-    def test_video_to_dict(self):
-        video = telegram.InlineQueryResultCachedVideo.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(video))
-        self.assertDictEqual(self.json_dict, video)
+        assert isinstance(inline_query_result_cached_video_dict, dict)
+        assert inline_query_result_cached_video_dict['type'] == \
+               inline_query_result_cached_video.type
+        assert inline_query_result_cached_video_dict['id'] == inline_query_result_cached_video.id
+        assert inline_query_result_cached_video_dict['video_file_id'] == \
+               inline_query_result_cached_video.video_file_id
+        assert inline_query_result_cached_video_dict['title'] == \
+               inline_query_result_cached_video.title
+        assert inline_query_result_cached_video_dict['description'] == \
+               inline_query_result_cached_video.description
+        assert inline_query_result_cached_video_dict['caption'] == \
+               inline_query_result_cached_video.caption
+        assert inline_query_result_cached_video_dict['input_message_content'] == \
+               inline_query_result_cached_video.input_message_content.to_dict()
+        assert inline_query_result_cached_video_dict['reply_markup'] == \
+               inline_query_result_cached_video.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultCachedVideo(self._id, self.video_file_id, self.title)
-        b = telegram.InlineQueryResultCachedVideo(self._id, self.video_file_id, self.title)
-        c = telegram.InlineQueryResultCachedVideo(self._id, "", self.title)
-        d = telegram.InlineQueryResultCachedVideo("", self.video_file_id, self.title)
-        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+        a = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
+        b = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
+        c = InlineQueryResultCachedVideo(self.id, '', self.title)
+        d = InlineQueryResultCachedVideo('', self.video_file_id, self.title)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

@@ -1,91 +1,63 @@
-'''This module contains telegram.ext.messagequeue test logic'''
-from __future__ import print_function, division
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2017
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import sys
-import os
-import time
-import unittest
+from time import sleep
 
-sys.path.insert(0, os.path.dirname(__file__) + os.sep + '..')
-from tests.base import BaseTest
-
-from telegram.ext import messagequeue as mq
+import telegram.ext.messagequeue as mq
 
 
-class DelayQueueTest(BaseTest, unittest.TestCase):
+class TestDelayQueue(object):
+    N = 128
+    burst_limit = 30
+    time_limit_ms = 1000
+    margin_ms = 0
+    testtimes = []
 
-    def __init__(self, *args, **kwargs):
-        self._N = kwargs.pop('N', 128)
-        self._msglimit = kwargs.pop('burst_limit', 30)
-        self._timelimit = kwargs.pop('time_limit_ms', 1000)
-        self._margin = kwargs.pop('margin_ms', 0)
-        isprint = kwargs.pop('isprint', False)
-
-        def noprint(*args, **kwargs):
-            pass
-
-        self._print = print if isprint else noprint
-        super(DelayQueueTest, self).__init__(*args, **kwargs)
-
-    def setUp(self):
-        print = self._print
-        print('Self-test with N = {} msgs, burst_limit = {} msgs, '
-              'time_limit = {:.2f} ms, margin = {:.2f} ms'
-              ''.format(self._N, self._msglimit, self._timelimit, self._margin))
-        self.testtimes = []
-
-        def testcall():
-            self.testtimes.append(mq.curtime())
-
-        self.testcall = testcall
+    def call(self):
+        self.testtimes.append(mq.curtime())
 
     def test_delayqueue_limits(self):
-        '''Test that DelayQueue dispatched calls don't hit time-window limit'''
-        print = self._print
-        dsp = mq.DelayQueue(
-            burst_limit=self._msglimit, time_limit_ms=self._timelimit, autostart=True)
-        print('Started dispatcher {}\nStatus: {}'
-              ''.format(dsp, ['inactive', 'active'][dsp.is_alive()]))
-        self.assertTrue(dsp.is_alive())
+        dsp = mq.DelayQueue(burst_limit=self.burst_limit, time_limit_ms=self.time_limit_ms,
+                            autostart=True)
+        assert dsp.is_alive() is True
 
-        print('Dispatching {} calls @ {}'.format(self._N, time.asctime()))
-
-        for i in range(self._N):
-            dsp(self.testcall)
-
-        print('Queue filled, waiting 4 dispatch finish @ ' + str(time.asctime()))
+        for i in range(self.N):
+            dsp(self.call)
 
         starttime = mq.curtime()
         app_endtime = (
-            (self._N * self._msglimit /
-             (1000 * self._timelimit)) + starttime + 20)  # wait up to 20 sec more than needed
+            (self.N * self.burst_limit /
+             (1000 * self.time_limit_ms)) + starttime + 20)  # wait up to 20 sec more than needed
         while not dsp._queue.empty() and mq.curtime() < app_endtime:
-            time.sleep(1)
-        self.assertTrue(dsp._queue.empty())  # check loop exit condition
+            sleep(1)
+        assert dsp._queue.empty() is True  # check loop exit condition
 
         dsp.stop()
-        print('Dispatcher ' + ['stopped', '!NOT STOPPED!'][dsp.is_alive()] + ' @ ' + str(
-            time.asctime()))
-        self.assertFalse(dsp.is_alive())
+        assert dsp.is_alive() is False
 
-        self.assertTrue(self.testtimes or self._N == 0)
-        print('Calculating call time windows')
+        assert self.testtimes or self.N == 0 is True
         passes, fails = [], []
-        delta = (self._timelimit - self._margin) / 1000
-        it = enumerate(range(self._msglimit + 1, len(self.testtimes)))
-        for start, stop in it:
+        delta = (self.time_limit_ms - self.margin_ms) / 1000
+        for start, stop in enumerate(range(self.burst_limit + 1, len(self.testtimes))):
             part = self.testtimes[start:stop]
             if (part[-1] - part[0]) >= delta:
                 passes.append(part)
             else:
                 fails.append(part)
-
-        print('Tested: {}, Passed: {}, Failed: {}'
-              ''.format(len(passes + fails), len(passes), len(fails)))
-        if fails:
-            print('(!) Got mismatches: ' + ';\n'.join(map(str, fails)))
-        self.assertFalse(fails)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert fails == []

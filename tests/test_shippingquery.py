@@ -5,87 +5,84 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-ShippingQuery"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import Update, User, ShippingAddress, ShippingQuery
 
 
-class ShippingQueryTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram ShippingQuery."""
+@pytest.fixture(scope='class')
+def shipping_query(bot):
+    return ShippingQuery(TestShippingQuery.id,
+                         TestShippingQuery.from_user,
+                         TestShippingQuery.invoice_payload,
+                         TestShippingQuery.shipping_address,
+                         bot=bot)
 
-    def setUp(self):
-        self._id = 5
-        self.invoice_payload = 'invoice_payload'
-        self.from_user = telegram.User(0, '')
-        self.shipping_address = telegram.ShippingAddress('GB', '', 'London', '12 Grimmauld Place',
-                                                         '', 'WC1')
 
-        self.json_dict = {
-            'id': self._id,
-            'invoice_payload': self.invoice_payload,
-            'from': self.from_user.to_dict(),
-            'shipping_address': self.shipping_address.to_dict()
+class TestShippingQuery(object):
+    id = 5
+    invoice_payload = 'invoice_payload'
+    from_user = User(0, '')
+    shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
+
+    def test_de_json(self, bot):
+        json_dict = {
+            'id': TestShippingQuery.id,
+            'invoice_payload': TestShippingQuery.invoice_payload,
+            'from': TestShippingQuery.from_user.to_dict(),
+            'shipping_address': TestShippingQuery.shipping_address.to_dict()
         }
+        shipping_query = ShippingQuery.de_json(json_dict, bot)
 
-    def test_shippingquery_de_json(self):
-        shippingquery = telegram.ShippingQuery.de_json(self.json_dict, self._bot)
+        assert shipping_query.id == self.id
+        assert shipping_query.invoice_payload == self.invoice_payload
+        assert shipping_query.from_user == self.from_user
+        assert shipping_query.shipping_address == self.shipping_address
 
-        self.assertEqual(shippingquery.id, self._id)
-        self.assertEqual(shippingquery.invoice_payload, self.invoice_payload)
-        self.assertEqual(shippingquery.from_user, self.from_user)
-        self.assertEqual(shippingquery.shipping_address, self.shipping_address)
+    def test_to_dict(self, shipping_query):
+        shipping_query_dict = shipping_query.to_dict()
 
-    def test_shippingquery_to_json(self):
-        shippingquery = telegram.ShippingQuery.de_json(self.json_dict, self._bot)
+        assert isinstance(shipping_query_dict, dict)
+        assert shipping_query_dict['id'] == shipping_query.id
+        assert shipping_query_dict['invoice_payload'] == shipping_query.invoice_payload
+        assert shipping_query_dict['from'] == shipping_query.from_user.to_dict()
+        assert shipping_query_dict['shipping_address'] == shipping_query.shipping_address.to_dict()
 
-        self.assertTrue(self.is_json(shippingquery.to_json()))
+    def test_answer(self, monkeypatch, shipping_query):
+        def test(*args, **kwargs):
+            return args[1] == shipping_query.id
 
-    def test_shippingquery_to_dict(self):
-        shippingquery = telegram.ShippingQuery.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(shippingquery))
-        self.assertDictEqual(self.json_dict, shippingquery)
+        monkeypatch.setattr('telegram.Bot.answer_shipping_query', test)
+        assert shipping_query.answer()
 
     def test_equality(self):
-        a = telegram.ShippingQuery(self._id, self.from_user, self.invoice_payload,
-                                   self.shipping_address)
-        b = telegram.ShippingQuery(self._id, self.from_user, self.invoice_payload,
-                                   self.shipping_address)
-        c = telegram.ShippingQuery(self._id, None, '', None)
-        d = telegram.ShippingQuery(0, self.from_user, self.invoice_payload, self.shipping_address)
-        e = telegram.Update(self._id)
+        a = ShippingQuery(self.id, self.from_user, self.invoice_payload, self.shipping_address)
+        b = ShippingQuery(self.id, self.from_user, self.invoice_payload, self.shipping_address)
+        c = ShippingQuery(self.id, None, '', None)
+        d = ShippingQuery(0, self.from_user, self.invoice_payload, self.shipping_address)
+        e = Update(self.id)
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

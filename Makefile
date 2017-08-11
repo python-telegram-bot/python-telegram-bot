@@ -2,7 +2,7 @@
 .PHONY: clean pep257 pep8 yapf lint test install
 
 PYLINT          := pylint
-NOSETESTS       := nosetests
+PYTEST          := pytest
 PEP257          := pep257
 PEP8            := flake8
 YAPF            := yapf
@@ -29,7 +29,7 @@ lint:
 	$(PYLINT) -E telegram --disable=no-name-in-module,import-error
 
 test:
-	$(NOSETESTS) -v
+	$(PYTEST) -v
 
 install:
 	$(PIP)  install -r requirements.txt -r requirements-dev.txt
@@ -41,11 +41,11 @@ help:
 	@echo "- pep8        Check style with flake8"
 	@echo "- lint        Check style with pylint"
 	@echo "- yapf        Check style with yapf"
-	@echo "- test        Run tests"
+	@echo "- test        Run tests using pytest"
 	@echo
 	@echo "Available variables:"
 	@echo "- PYLINT      default: $(PYLINT)"
-	@echo "- NOSETESTS   default: $(NOSETESTS)"
+	@echo "- PYTEST      default: $(PYTEST)"
 	@echo "- PEP257      default: $(PEP257)"
 	@echo "- PEP8        default: $(PEP8)"
 	@echo "- YAPF        default: $(YAPF)"

@@ -5,108 +5,92 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram Contact"""
 
-import unittest
-import sys
+import pytest
 
-from flaky import flaky
-
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import Contact, Voice
 
 
-class ContactTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Contact."""
+@pytest.fixture(scope='class')
+def contact():
+    return Contact(TestContact.phone_number, TestContact.first_name, TestContact.last_name,
+                   TestContact.user_id)
 
-    def setUp(self):
-        self.phone_number = '+11234567890'
-        self.first_name = 'Leandro Toledo'
-        self.last_name = ''
-        self.user_id = 0
 
-        self.json_dict = {
-            'phone_number': self.phone_number,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'user_id': self.user_id
-        }
+class TestContact(object):
+    phone_number = '+11234567890'
+    first_name = 'Leandro'
+    last_name = 'Toledo'
+    user_id = 23
 
-    def test_contact_de_json(self):
-        contact = telegram.Contact.de_json(self.json_dict, self._bot)
+    def test_de_json_required(self, bot):
+        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name}
+        contact = Contact.de_json(json_dict, bot)
 
-        self.assertEqual(contact.phone_number, self.phone_number)
-        self.assertEqual(contact.first_name, self.first_name)
-        self.assertEqual(contact.last_name, self.last_name)
-        self.assertEqual(contact.user_id, self.user_id)
+        assert contact.phone_number == self.phone_number
+        assert contact.first_name == self.first_name
 
-    '''Commented out because it caused too many "RetryAfter: Flood control exceeded" errors.
-    def test_send_contact_with_contact(self):
-        con = telegram.Contact.de_json(self.json_dict, self._bot)
-        message = self._bot.send_contact(contact=con, chat_id=self._chat_id)
-        contact = message.contact
+    def test_de_json_all(self, bot):
+        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name,
+                     'last_name': self.last_name, 'user_id': self.user_id}
+        contact = Contact.de_json(json_dict, bot)
 
-        self.assertEqual(contact, con)
-    '''
+        assert contact.phone_number == self.phone_number
+        assert contact.first_name == self.first_name
+        assert contact.last_name == self.last_name
+        assert contact.user_id == self.user_id
 
-    def test_contact_to_json(self):
-        contact = telegram.Contact.de_json(self.json_dict, self._bot)
+    def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
+        def test(_, url, data, **kwargs):
+            phone = data['phone_number'] == contact.phone_number
+            first = data['first_name'] == contact.first_name
+            last = data['last_name'] == contact.last_name
+            return phone and first and last
 
-        self.assertTrue(self.is_json(contact.to_json()))
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        message = bot.send_contact(contact=contact, chat_id=chat_id)
+        assert message
 
-    def test_contact_to_dict(self):
-        contact = telegram.Contact.de_json(self.json_dict, self._bot)
+    def test_send_contact_without_required(self, bot, chat_id):
+        with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):
+            bot.send_contact(chat_id=chat_id)
 
-        self.assertTrue(self.is_dict(contact.to_dict()))
-        self.assertEqual(contact['phone_number'], self.phone_number)
-        self.assertEqual(contact['first_name'], self.first_name)
-        self.assertEqual(contact['last_name'], self.last_name)
-        self.assertEqual(contact['user_id'], self.user_id)
+    def test_to_dict(self, contact):
+        contact_dict = contact.to_dict()
+
+        assert isinstance(contact_dict, dict)
+        assert contact_dict['phone_number'] == contact.phone_number
+        assert contact_dict['first_name'] == contact.first_name
+        assert contact_dict['last_name'] == contact.last_name
+        assert contact_dict['user_id'] == contact.user_id
 
     def test_equality(self):
-        a = telegram.Contact(self.phone_number, self.first_name)
-        b = telegram.Contact(self.phone_number, self.first_name)
-        c = telegram.Contact(self.phone_number, "")
-        d = telegram.Contact("", self.first_name)
-        e = telegram.Voice("", 0)
+        a = Contact(self.phone_number, self.first_name)
+        b = Contact(self.phone_number, self.first_name)
+        c = Contact(self.phone_number, '')
+        d = Contact('', self.first_name)
+        e = Voice('', 0)
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-''' Commented out, because it would cause "Too Many Requests (429)" errors.
-    @flaky(3, 1)
-    def test_reply_contact(self):
-        """Test for Message.reply_contact"""
-        message = self._bot.sendMessage(self._chat_id, '.')
-        message = message.reply_contact(self.phone_number, self.first_name)
-
-        self.assertEqual(message.contact.phone_number, self.phone_number)
-        self.assertEqual(message.contact.first_name, self.first_name)
-'''
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

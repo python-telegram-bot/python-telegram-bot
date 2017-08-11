@@ -5,218 +5,175 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram Document"""
-
 import os
-import unittest
 
+import pytest
 from flaky import flaky
 
-import telegram
-from tests.base import BaseTest, timeout
+from telegram import Document, PhotoSize, TelegramError, Voice
 
 
-class DocumentTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Document."""
+@pytest.fixture(scope='function')
+def document_file():
+    f = open('tests/data/telegram.png', 'rb')
+    yield f
+    f.close()
 
-    @classmethod
-    def setUpClass(cls):
-        super(DocumentTest, cls).setUpClass()
 
-        cls.caption = u'DocumentTest - Caption'
-        cls.document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
+@pytest.fixture(scope='class')
+def document(bot, chat_id):
+    with open('tests/data/telegram.png', 'rb') as f:
+        return bot.send_document(chat_id, document=f).document
 
-        document_file = open('tests/data/telegram.png', 'rb')
-        document = cls._bot.send_document(cls._chat_id, document=document_file, timeout=10).document
-        cls.document = document
 
-        # Make sure file has been uploaded.
-        # Simple assertions PY2 Only
-        assert isinstance(cls.document, telegram.Document)
-        assert isinstance(cls.document.file_id, str)
-        assert cls.document.file_id is not ''
+class TestDocument(object):
+    caption = 'DocumentTest - Caption'
+    document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
+    file_size = 12948
+    mime_type = 'image/png'
+    file_name = 'telegram.png'
+    thumb_file_size = 2364
+    thumb_width = 90
+    thumb_heigth = 90
 
-    def setUp(self):
-        self.document_file = open('tests/data/telegram.png', 'rb')
-        self.json_dict = {
-            'file_id': self.document.file_id,
-            'thumb': self.document.thumb.to_dict(),
-            'file_name': self.document.file_name,
-            'mime_type': self.document.mime_type,
-            'file_size': self.document.file_size
-        }
+    def test_creation(self, document):
+        assert isinstance(document, Document)
+        assert isinstance(document.file_id, str)
+        assert document.file_id is not ''
 
-    def test_expected_values(self):
-        self.assertEqual(self.document.file_size, 12948)
-        self.assertEqual(self.document.mime_type, 'image/png')
-        self.assertEqual(self.document.file_name, 'telegram.png')
-        self.assertEqual(self.document.thumb.file_size, 2364)
-        self.assertEqual(self.document.thumb.width, 90)
-        self.assertEqual(self.document.thumb.height, 90)
+    def test_expected_values(self, document):
+        assert document.file_size == self.file_size
+        assert document.mime_type == self.mime_type
+        assert document.file_name == self.file_name
+        assert document.thumb.file_size == self.thumb_file_size
+        assert document.thumb.width == self.thumb_width
+        assert document.thumb.height == self.thumb_heigth
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_document_all_args(self):
-        message = self._bot.sendDocument(self._chat_id, document=self.document_file, caption=self.caption,
-                                         disable_notification=False)
+    @pytest.mark.timeout(10)
+    def test_send_all_args(self, bot, chat_id, document_file, document):
+        message = bot.send_document(chat_id, document=document_file, caption=self.caption,
+                                    disable_notification=False, filename='telegram_custom.png')
 
-        document = message.document
-
-        self.assertIsInstance(document, telegram.Document)
-        self.assertIsInstance(document.file_id, str)
-        self.assertNotEqual(document.file_id, '')
-        self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
-        self.assertEqual(document.file_name, self.document.file_name)
-        self.assertEqual(document.mime_type, self.document.mime_type)
-        self.assertEqual(document.file_size, self.document.file_size)
-        self.assertEqual(document.thumb, self.document.thumb)
-        self.assertEqual(message.caption, self.caption)
+        assert isinstance(message.document, Document)
+        assert isinstance(message.document.file_id, str)
+        assert message.document.file_id != ''
+        assert isinstance(message.document.thumb, PhotoSize)
+        assert message.document.file_name == 'telegram_custom.png'
+        assert message.document.mime_type == document.mime_type
+        assert message.document.file_size == document.file_size
+        assert message.document.thumb == document.thumb
+        assert message.caption == self.caption
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_get_and_download_document(self):
-        new_file = self._bot.getFile(self.document.file_id)
+    @pytest.mark.timeout(10)
+    def test_get_and_download(self, bot, document):
+        new_file = bot.get_file(document.file_id)
 
-        self.assertEqual(new_file.file_size, self.document.file_size)
-        self.assertEqual(new_file.file_id, self.document.file_id)
-        self.assertTrue(new_file.file_path.startswith('https://'))
+        assert new_file.file_size == document.file_size
+        assert new_file.file_id == document.file_id
+        assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.png')
 
-        self.assertTrue(os.path.isfile('telegram.png'))
+        assert os.path.isfile('telegram.png')
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_document_png_file_with_custom_file_name(self):
-        message = self._bot.sendDocument(
-            self._chat_id, self.document_file, filename='telegram_custom.png')
+    @pytest.mark.timeout(10)
+    def test_send_url_gif_file(self, bot, chat_id):
+        message = bot.send_document(chat_id, self.document_file_url)
 
         document = message.document
 
-        self.assertEqual(document.file_name, 'telegram_custom.png')
+        assert isinstance(document, Document)
+        assert isinstance(document.file_id, str)
+        assert document.file_id != ''
+        assert isinstance(document.thumb, PhotoSize)
+        assert document.file_name == 'telegram.gif'
+        assert document.mime_type == 'image/gif'
+        assert document.file_size == 3878
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_document_url_gif_file(self):
-        message = self._bot.sendDocument(self._chat_id, self.document_file_url)
+    @pytest.mark.timeout(10)
+    def test_send_resend(self, bot, chat_id, document):
+        message = bot.send_document(chat_id=chat_id, document=document.file_id)
 
-        document = message.document
+        assert message.document == document
 
-        self.assertIsInstance(document, telegram.Document)
-        self.assertIsInstance(document.file_id, str)
-        self.assertNotEqual(document.file_id, '')
-        self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
-        self.assertEqual(document.file_name, 'telegram.gif')
-        self.assertEqual(document.mime_type, 'image/gif')
-        self.assertEqual(document.file_size, 3878)
+    def test_send_with_document(self, monkeypatch, bot, chat_id, document):
+        def test(_, url, data, **kwargs):
+            return data['document'] == document.file_id
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_document_resend(self):
-        message = self._bot.sendDocument(chat_id=self._chat_id, document=self.document.file_id)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
 
-        document = message.document
+        message = bot.send_document(document=document, chat_id=chat_id)
 
-        self.assertEqual(document, self.document)
+        assert message
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_document_with_document(self):
-        message = self._bot.send_document(document=self.document, chat_id=self._chat_id)
-        document = message.document
+    def test_de_json(self, bot, document):
+        json_dict = {'file_id': 'not a file id',
+                     'thumb': document.thumb.to_dict(),
+                     'file_name': self.file_name,
+                     'mime_type': self.mime_type,
+                     'file_size': self.file_size
+                     }
+        test_document = Document.de_json(json_dict, bot)
 
-        self.assertEqual(document, self.document)
+        assert test_document.file_id == 'not a file id'
+        assert test_document.thumb == document.thumb
+        assert test_document.file_name == self.file_name
+        assert test_document.mime_type == self.mime_type
+        assert test_document.file_size == self.file_size
 
+    def test_to_dict(self, document):
+        document_dict = document.to_dict()
 
-    def test_document_de_json(self):
-        document = telegram.Document.de_json(self.json_dict, self._bot)
-
-        self.assertEqual(document, self.document)
-
-    def test_document_to_json(self):
-        self.assertTrue(self.is_json(self.document.to_json()))
-
-    def test_document_to_dict(self):
-        document = self.document.to_dict()
-
-        self.assertTrue(self.is_dict(document))
-        self.assertEqual(document['file_id'], self.document.file_id)
-        self.assertEqual(document['file_name'], self.document.file_name)
-        self.assertEqual(document['mime_type'], self.document.mime_type)
-        self.assertEqual(document['file_size'], self.document.file_size)
+        assert isinstance(document_dict, dict)
+        assert document_dict['file_id'] == document.file_id
+        assert document_dict['file_name'] == document.file_name
+        assert document_dict['mime_type'] == document.mime_type
+        assert document_dict['file_size'] == document.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_error_send_document_empty_file(self):
-        json_dict = self.json_dict
-
-        del (json_dict['file_id'])
-        json_dict['document'] = open(os.devnull, 'rb')
-
-        with self.assertRaises(telegram.TelegramError):
-            self._bot.sendDocument(chat_id=self._chat_id, **json_dict)
+    @pytest.mark.timeout(10)
+    def test_error_send_empty_file(self, bot, chat_id):
+        with open(os.devnull, 'rb') as f:
+            with pytest.raises(TelegramError):
+                bot.send_document(chat_id=chat_id, document=f)
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_error_send_document_empty_file_id(self):
-        json_dict = self.json_dict
+    @pytest.mark.timeout(10)
+    def test_error_send_empty_file_id(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            bot.send_document(chat_id=chat_id, document='')
 
-        del (json_dict['file_id'])
-        json_dict['document'] = ''
+    def test_error_send_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            bot.send_document(chat_id=chat_id)
 
-        with self.assertRaises(telegram.TelegramError):
-            self._bot.sendDocument(chat_id=self._chat_id, **json_dict)
+    def test_equality(self, document):
+        a = Document(document.file_id)
+        b = Document(document.file_id)
+        d = Document('')
+        e = Voice(document.file_id, 0)
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_error_document_without_required_args(self):
-        json_dict = self.json_dict
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        del (json_dict['file_id'])
+        assert a != d
+        assert hash(a) != hash(d)
 
-        with self.assertRaises(TypeError): self._bot.sendDocument(chat_id=self._chat_id, **json_dict)
-
-    @flaky(3, 1)
-    @timeout(10)
-    def test_reply_document(self):
-        """Test for Message.reply_document"""
-        message = self._bot.sendMessage(self._chat_id, '.')
-        message = message.reply_document(self.document_file)
-
-        document = message.document
-
-        self.assertIsInstance(document, telegram.Document)
-        self.assertIsInstance(document.file_id, str)
-        self.assertNotEqual(document.file_id, '')
-        self.assertTrue(isinstance(document.thumb, telegram.PhotoSize))
-
-    def test_equality(self):
-        a = telegram.Document(self.document.file_id)
-        b = telegram.Document(self.document.file_id)
-        d = telegram.Document("")
-        e = telegram.Voice(self.document.file_id, 0)
-
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
-
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
-
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

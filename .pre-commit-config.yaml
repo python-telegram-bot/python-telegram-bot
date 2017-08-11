@@ -17,4 +17,4 @@
         files: ^telegram/.*\.py$
         args:
         - --errors-only
-        - --disable=no-name-in-module,import-error
+        - --disable=import-error

@@ -135,12 +135,6 @@ class Dispatcher(object):
             else:
                 self._set_singleton(None)
 
-    @classmethod
-    def _reset_singleton(cls):
-        # NOTE: This method was added mainly for test_updater benefit and specifically pypy. Never
-        #       call it in production code.
-        cls.__singleton_semaphore.release()
-
     def _init_async_threads(self, base_name, workers):
         base_name = '{}_'.format(base_name) if base_name else ''
 

@@ -1,8 +1,0 @@
-[run]
-source = telegram
-omit = telegram/vendor/*
-
-[report]
-omit =
-    tests/
-    telegram/vendor/*

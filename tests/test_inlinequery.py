@@ -5,90 +5,85 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQuery"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import User, Location, InlineQuery, Update
 
 
-class InlineQueryTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQuery."""
+@pytest.fixture(scope='class')
+def inline_query(bot):
+    return InlineQuery(TestInlineQuery.id, TestInlineQuery.from_user, TestInlineQuery.query,
+                       TestInlineQuery.offset, location=TestInlineQuery.location, bot=bot)
 
-    def setUp(self):
-        user = telegram.User(1, 'First name')
-        location = telegram.Location(8.8, 53.1)
 
-        self._id = 1234
-        self.from_user = user
-        self.query = 'query text'
-        self.offset = 'offset'
-        self.location = location
+class TestInlineQuery(object):
+    id = 1234
+    from_user = User(1, 'First name')
+    query = 'query text'
+    offset = 'offset'
+    location = Location(8.8, 53.1)
 
-        self.json_dict = {
-            'id': self._id,
+    def test_de_json(self, bot):
+        json_dict = {
+            'id': self.id,
             'from': self.from_user.to_dict(),
             'query': self.query,
             'offset': self.offset,
             'location': self.location.to_dict()
         }
+        inline_query_json = InlineQuery.de_json(json_dict, bot)
 
-    def test_inlinequery_de_json(self):
-        inlinequery = telegram.InlineQuery.de_json(self.json_dict, self._bot)
+        assert inline_query_json.id == self.id
+        assert inline_query_json.from_user == self.from_user
+        assert inline_query_json.location == self.location
+        assert inline_query_json.query == self.query
+        assert inline_query_json.offset == self.offset
 
-        self.assertEqual(inlinequery.id, self._id)
-        self.assertDictEqual(inlinequery.from_user.to_dict(), self.from_user.to_dict())
-        self.assertDictEqual(inlinequery.location.to_dict(), self.location.to_dict())
-        self.assertEqual(inlinequery.query, self.query)
-        self.assertEqual(inlinequery.offset, self.offset)
+    def test_to_dict(self, inline_query):
+        inline_query_dict = inline_query.to_dict()
 
-    def test_inlinequery_to_json(self):
-        inlinequery = telegram.InlineQuery.de_json(self.json_dict, self._bot)
+        assert isinstance(inline_query_dict, dict)
+        assert inline_query_dict['id'] == inline_query.id
+        assert inline_query_dict['from'] == inline_query.from_user.to_dict()
+        assert inline_query_dict['location'] == inline_query.location.to_dict()
+        assert inline_query_dict['query'] == inline_query.query
+        assert inline_query_dict['offset'] == inline_query.offset
 
-        self.assertTrue(self.is_json(inlinequery.to_json()))
+    def test_answer(self, monkeypatch, inline_query):
+        def test(*args, **kwargs):
+            return args[1] == inline_query.id
 
-    def test_inlinequery_to_dict(self):
-        inlinequery = telegram.InlineQuery.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(inlinequery))
-        self.assertDictEqual(inlinequery, self.json_dict)
+        monkeypatch.setattr('telegram.Bot.answer_inline_query', test)
+        assert inline_query.answer()
 
     def test_equality(self):
-        a = telegram.InlineQuery(self._id, telegram.User(1, ""), "", "")
-        b = telegram.InlineQuery(self._id, telegram.User(1, ""), "", "")
-        c = telegram.InlineQuery(self._id, telegram.User(0, ""), "", "")
-        d = telegram.InlineQuery(0, telegram.User(1, ""), "", "")
-        e = telegram.Update(self._id)
+        a = InlineQuery(self.id, User(1, ''), '', '')
+        b = InlineQuery(self.id, User(1, ''), '', '')
+        c = InlineQuery(self.id, User(0, ''), '', '')
+        d = InlineQuery(0, User(1, ''), '', '')
+        e = Update(self.id)
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

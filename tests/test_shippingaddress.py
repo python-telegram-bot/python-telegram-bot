@@ -5,41 +5,43 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-ShippingAddress"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import ShippingAddress
 
 
-class ShippingAddressTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram ShippingAddress."""
+@pytest.fixture(scope='class')
+def shipping_address():
+    return ShippingAddress(TestShippingAddress.country_code,
+                           TestShippingAddress.state,
+                           TestShippingAddress.city,
+                           TestShippingAddress.street_line1,
+                           TestShippingAddress.street_line2,
+                           TestShippingAddress.post_code)
 
-    def setUp(self):
-        self.country_code = 'GB'
-        self.state = 'state'
-        self.city = 'London'
-        self.street_line1 = '12 Grimmauld Place'
-        self.street_line2 = 'street_line2'
-        self.post_code = 'WC1'
 
-        self.json_dict = {
+class TestShippingAddress(object):
+    country_code = 'GB'
+    state = 'state'
+    city = 'London'
+    street_line1 = '12 Grimmauld Place'
+    street_line2 = 'street_line2'
+    post_code = 'WC1'
+
+    def test_de_json(self, bot):
+        json_dict = {
             'country_code': self.country_code,
             'state': self.state,
             'city': self.city,
@@ -47,68 +49,62 @@ class ShippingAddressTest(BaseTest, unittest.TestCase):
             'street_line2': self.street_line2,
             'post_code': self.post_code
         }
+        shipping_address = ShippingAddress.de_json(json_dict, bot)
 
-    def test_shippingaddress_de_json(self):
-        shippingaddress = telegram.ShippingAddress.de_json(self.json_dict, self._bot)
+        assert shipping_address.country_code == self.country_code
+        assert shipping_address.state == self.state
+        assert shipping_address.city == self.city
+        assert shipping_address.street_line1 == self.street_line1
+        assert shipping_address.street_line2 == self.street_line2
+        assert shipping_address.post_code == self.post_code
 
-        self.assertEqual(shippingaddress.country_code, self.country_code)
-        self.assertEqual(shippingaddress.state, self.state)
-        self.assertEqual(shippingaddress.city, self.city)
-        self.assertEqual(shippingaddress.street_line1, self.street_line1)
-        self.assertEqual(shippingaddress.street_line2, self.street_line2)
-        self.assertEqual(shippingaddress.post_code, self.post_code)
+    def test_to_dict(self, shipping_address):
+        shipping_address_dict = shipping_address.to_dict()
 
-    def test_shippingaddress_to_json(self):
-        shippingaddress = telegram.ShippingAddress.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(shippingaddress.to_json()))
-
-    def test_shippingaddress_to_dict(self):
-        shippingaddress = telegram.ShippingAddress.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(shippingaddress))
-        self.assertDictEqual(self.json_dict, shippingaddress)
+        assert isinstance(shipping_address_dict, dict)
+        assert shipping_address_dict['country_code'] == shipping_address.country_code
+        assert shipping_address_dict['state'] == shipping_address.state
+        assert shipping_address_dict['city'] == shipping_address.city
+        assert shipping_address_dict['street_line1'] == shipping_address.street_line1
+        assert shipping_address_dict['street_line2'] == shipping_address.street_line2
+        assert shipping_address_dict['post_code'] == shipping_address.post_code
 
     def test_equality(self):
-        a = telegram.ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                                     self.street_line2, self.post_code)
-        b = telegram.ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                                     self.street_line2, self.post_code)
-        d = telegram.ShippingAddress('', self.state, self.city, self.street_line1,
-                                     self.street_line2, self.post_code)
-        d2 = telegram.ShippingAddress(self.country_code, '', self.city, self.street_line1,
-                                      self.street_line2, self.post_code)
-        d3 = telegram.ShippingAddress(self.country_code, self.state, '', self.street_line1,
-                                      self.street_line2, self.post_code)
-        d4 = telegram.ShippingAddress(self.country_code, self.state, self.city, '',
-                                      self.street_line2, self.post_code)
-        d5 = telegram.ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                                      '', self.post_code)
-        d6 = telegram.ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
-                                      self.street_line2, '')
+        a = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
+                            self.street_line2, self.post_code)
+        b = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
+                            self.street_line2, self.post_code)
+        d = ShippingAddress('', self.state, self.city, self.street_line1,
+                            self.street_line2, self.post_code)
+        d2 = ShippingAddress(self.country_code, '', self.city, self.street_line1,
+                             self.street_line2, self.post_code)
+        d3 = ShippingAddress(self.country_code, self.state, '', self.street_line1,
+                             self.street_line2, self.post_code)
+        d4 = ShippingAddress(self.country_code, self.state, self.city, '',
+                             self.street_line2, self.post_code)
+        d5 = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
+                             '', self.post_code)
+        d6 = ShippingAddress(self.country_code, self.state, self.city, self.street_line1,
+                             self.street_line2, '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, d2)
-        self.assertNotEqual(hash(a), hash(d2))
+        assert a != d2
+        assert hash(a) != hash(d2)
 
-        self.assertNotEqual(a, d3)
-        self.assertNotEqual(hash(a), hash(d3))
+        assert a != d3
+        assert hash(a) != hash(d3)
 
-        self.assertNotEqual(a, d4)
-        self.assertNotEqual(hash(a), hash(d4))
+        assert a != d4
+        assert hash(a) != hash(d4)
 
-        self.assertNotEqual(a, d5)
-        self.assertNotEqual(hash(a), hash(d5))
+        assert a != d5
+        assert hash(a) != hash(d5)
 
-        self.assertNotEqual(a, d6)
-        self.assertNotEqual(hash(6), hash(d6))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != d6
+        assert hash(6) != hash(d6)

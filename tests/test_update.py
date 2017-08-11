@@ -1,116 +1,138 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram Update"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
+from telegram import (Message, User, Update, Chat, CallbackQuery, InlineQuery,
+                      ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 
-import telegram
-from tests.base import BaseTest
+message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
+
+params = [
+    {'message': message},
+    {'edited_message': message},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
+    {'channel_post': message},
+    {'edited_channel_post': message},
+    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
+    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+]
+
+all_types = ('message', 'edited_message', 'callback_query', 'channel_post',
+             'edited_channel_post', 'inline_query', 'chosen_inline_result',
+             'shipping_query', 'pre_checkout_query')
+
+ids = all_types + ('callback_query_without_message',)
 
 
-class UpdateTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Update."""
+@pytest.fixture(params=params, ids=ids)
+def update(request):
+    return Update(update_id=TestUpdate.update_id, **request.param)
 
-    def setUp(self):
-        self.update_id = 868573637
-        self.message = {
-            'message_id': 319,
-            'from': {
-                'id': 12173560,
-                'first_name': "Leandro",
-                'last_name': "S.",
-                'username': "leandrotoledo"
-            },
-            'chat': {
-                'id': 12173560,
-                'type': 'private',
-                'first_name': "Leandro",
-                'last_name': "S.",
-                'username': "leandrotoledo"
-            },
-            'date': 1441644592,
-            'text': "Update Test"
-        }
 
-        self.json_dict = {'update_id': self.update_id, 'message': self.message}
+class TestUpdate(object):
+    update_id = 868573637
 
-    def test_update_de_json(self):
-        update = telegram.Update.de_json(self.json_dict, self._bot)
+    @pytest.mark.parametrize('paramdict', argvalues=params, ids=ids)
+    def test_de_json(self, bot, paramdict):
+        json_dict = {'update_id': TestUpdate.update_id}
+        # Convert the single update 'item' to a dict of that item and apply it to the json_dict
+        json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
+        update = Update.de_json(json_dict, bot)
 
-        self.assertEqual(update.update_id, self.update_id)
-        self.assertTrue(isinstance(update.message, telegram.Message))
+        assert update.update_id == self.update_id
 
-    def test_update_de_json_empty(self):
-        update = telegram.Update.de_json(None, self._bot)
+        # Make sure only one thing in the update (other than update_id) is not None
+        i = 0
+        for type in all_types:
+            if getattr(update, type) is not None:
+                i += 1
+                assert getattr(update, type) == paramdict[type]
+        assert i == 1
 
-        self.assertFalse(update)
+    def test_update_de_json_empty(self, bot):
+        update = Update.de_json(None, bot)
 
-    def test_update_to_json(self):
-        update = telegram.Update.de_json(self.json_dict, self._bot)
+        assert update is None
 
-        self.assertTrue(self.is_json(update.to_json()))
+    def test_to_dict(self, update):
+        update_dict = update.to_dict()
 
-    def test_update_to_dict(self):
-        update = telegram.Update.de_json(self.json_dict, self._bot)
+        assert isinstance(update_dict, dict)
+        assert update_dict['update_id'] == update.update_id
+        for type in all_types:
+            if getattr(update, type) is not None:
+                assert update_dict[type] == getattr(update, type).to_dict()
 
-        self.assertTrue(self.is_dict(update.to_dict()))
-        self.assertEqual(update['update_id'], self.update_id)
-        self.assertTrue(isinstance(update['message'], telegram.Message))
-
-    def test_effective_chat(self):
-        update = telegram.Update.de_json(self.json_dict, self._bot)
+    def test_effective_chat(self, update):
+        # Test that it's sometimes None per docstring
         chat = update.effective_chat
-        self.assertEqual(update.message.chat, chat)
+        if not (update.inline_query is not None
+                or update.chosen_inline_result is not None
+                or (update.callback_query is not None
+                    and update.callback_query.message is None)
+                or update.shipping_query is not None
+                or update.pre_checkout_query is not None):
+            assert chat.id == 1
+        else:
+            assert chat is None
 
-    def test_effective_user(self):
-        update = telegram.Update.de_json(self.json_dict, self._bot)
+    def test_effective_user(self, update):
+        # Test that it's sometimes None per docstring
         user = update.effective_user
-        self.assertEqual(update.message.from_user, user)
+        if not (update.channel_post is not None or update.edited_channel_post is not None):
+            assert user.id == 1
+        else:
+            assert user is None
 
-    def test_effective_message(self):
-        update = telegram.Update.de_json(self.json_dict, self._bot)
-        message = update.effective_message
-        self.assertEqual(update.message.text, message.text)
+    def test_effective_message(self, update):
+        # Test that it's sometimes None per docstring
+        eff_message = update.effective_message
+        if not (update.inline_query is not None
+                or update.chosen_inline_result is not None
+                or (update.callback_query is not None
+                    and update.callback_query.message is None)
+                or update.shipping_query is not None
+                or update.pre_checkout_query is not None):
+            assert eff_message.message_id == message.message_id
+        else:
+            assert eff_message is None
 
     def test_equality(self):
-        a = telegram.Update(self.update_id, message=self.message)
-        b = telegram.Update(self.update_id, message=self.message)
-        c = telegram.Update(self.update_id)
-        d = telegram.Update(0, message=self.message)
-        e = telegram.User(self.update_id, "")
+        a = Update(self.update_id, message=message)
+        b = Update(self.update_id, message=message)
+        c = Update(self.update_id)
+        d = Update(0, message=message)
+        e = User(self.update_id, '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

@@ -5,106 +5,134 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram Chat"""
 
-import unittest
-import sys
+import pytest
 
-from flaky import flaky
-
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import Chat, ChatAction
+from telegram import User
 
 
-class ChatTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Chat."""
+@pytest.fixture(scope='class')
+def chat(bot):
+    return Chat(TestChat.id, TestChat.title, TestChat.type,
+                all_members_are_administrators=TestChat.all_members_are_administrators,
+                bot=bot)
 
-    def setUp(self):
-        self._id = -28767330
-        self.title = 'ToledosPalaceBot - Group'
-        self.type = 'group'
-        self.all_members_are_administrators = False
 
-        self.json_dict = {
-            'id': self._id,
-            'title': self.title,
-            'type': self.type,
-            'all_members_are_administrators': self.all_members_are_administrators
+class TestChat(object):
+    id = -28767330
+    title = 'ToledosPalaceBot - Group'
+    type = 'group'
+    all_members_are_administrators = False
+
+    def test_de_json(self, bot):
+        json_dict = {
+            'id': TestChat.id,
+            'title': TestChat.title,
+            'type': TestChat.type,
+            'all_members_are_administrators': TestChat.all_members_are_administrators
         }
+        chat = Chat.de_json(json_dict, bot)
 
-    def test_group_chat_de_json_empty_json(self):
-        group_chat = telegram.Chat.de_json({}, self._bot)
+        assert chat.id == self.id
+        assert chat.title == self.title
+        assert chat.type == self.type
+        assert chat.all_members_are_administrators == self.all_members_are_administrators
 
-        self.assertEqual(group_chat, None)
+    def test_to_dict(self, chat):
+        chat_dict = chat.to_dict()
 
-    def test_group_chat_de_json(self):
-        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
+        assert isinstance(chat_dict, dict)
+        assert chat_dict['id'] == chat.id
+        assert chat_dict['title'] == chat.title
+        assert chat_dict['type'] == chat.type
+        assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
 
-        self.assertEqual(group_chat.id, self._id)
-        self.assertEqual(group_chat.title, self.title)
-        self.assertEqual(group_chat.type, self.type)
-        self.assertEqual(group_chat.all_members_are_administrators,
-                         self.all_members_are_administrators)
+    def test_send_action(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            id = args[1] == chat.id
+            action = kwargs['action'] == ChatAction.TYPING
+            return id and action
 
-    def test_group_chat_to_json(self):
-        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
+        monkeypatch.setattr('telegram.Bot.send_chat_action', test)
+        assert chat.send_action(action=ChatAction.TYPING)
 
-        self.assertTrue(self.is_json(group_chat.to_json()))
+    def test_leave(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id
 
-    def test_group_chat_to_dict(self):
-        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
+        monkeypatch.setattr('telegram.Bot.leave_chat', test)
+        assert chat.leave()
 
-        self.assertTrue(self.is_dict(group_chat.to_dict()))
-        self.assertEqual(group_chat['id'], self._id)
-        self.assertEqual(group_chat['title'], self.title)
-        self.assertEqual(group_chat['type'], self.type)
-        self.assertEqual(group_chat['all_members_are_administrators'],
-                         self.all_members_are_administrators)
+    def test_get_administrators(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id
 
-    @flaky(3, 1)
-    def test_send_action(self):
-        """Test for Chat.send_action"""
-        self.json_dict['id'] = self._chat_id
-        group_chat = telegram.Chat.de_json(self.json_dict, self._bot)
-        group_chat.bot = self._bot
+        monkeypatch.setattr('telegram.Bot.get_chat_administrators', test)
+        assert chat.get_administrators()
 
-        result = group_chat.send_action(telegram.ChatAction.TYPING)
+    def test_get_members_count(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id
 
-        self.assertTrue(result)
+        monkeypatch.setattr('telegram.Bot.get_chat_members_count', test)
+        assert chat.get_members_count()
+
+    def test_get_member(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            chat_id = args[1] == chat.id
+            user_id = args[2] == 42
+            return chat_id and user_id
+
+        monkeypatch.setattr('telegram.Bot.get_chat_member', test)
+        assert chat.get_member(42)
+
+    def test_kick_member(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            chat_id = args[1] == chat.id
+            user_id = args[2] == 42
+            until = kwargs['until_date'] == 43
+            return chat_id and user_id and until
+
+        monkeypatch.setattr('telegram.Bot.kick_chat_member', test)
+        assert chat.kick_member(42, until_date=43)
+
+    def test_unban_member(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            chat_id = args[1] == chat.id
+            user_id = args[2] == 42
+            return chat_id and user_id
+
+        monkeypatch.setattr('telegram.Bot.unban_chat_member', test)
+        assert chat.unban_member(42)
 
     def test_equality(self):
-        a = telegram.Chat(self._id, self.title, self.type)
-        b = telegram.Chat(self._id, self.title, self.type)
-        c = telegram.Chat(self._id, "", "")
-        d = telegram.Chat(0, self.title, self.type)
-        e = telegram.User(self._id, "")
+        a = Chat(self.id, self.title, self.type)
+        b = Chat(self.id, self.title, self.type)
+        c = Chat(self.id, '', '')
+        d = Chat(0, self.title, self.type)
+        e = User(self.id, '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)
