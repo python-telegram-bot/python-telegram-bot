@@ -34,5 +34,5 @@ script:
   - pytest -v --cov=telegram
 
 after_success:
-  coverage combine
-  coveralls
+  - coverage combine
+  - coveralls
