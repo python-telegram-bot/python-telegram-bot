@@ -24,8 +24,7 @@ import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update
 from telegram.ext import MessageHandler, Filters, CommandHandler
-from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerContinue, \
-    DispatcherHandlerStop
+from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from tests.conftest import create_dp
 
 
@@ -173,33 +172,7 @@ class TestDispatcher(object):
         with pytest.raises(TypeError, match='group is not int'):
             dp.add_handler(handler, 'one')
 
-    def test_handler_flow_continue(self, bot, dp):
-        passed = []
-
-        def start1(b, u):
-            passed.append('start1')
-            raise DispatcherHandlerContinue
-
-        def start2(b, u):
-            passed.append('start2')
-
-        def start3(b, u):
-            passed.append('start3')
-
-        def error(b, u, e):
-            passed.append('error')
-            passed.append(e)
-
-        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
-
-        # If Continue raised next handler should be proceed.
-        passed = []
-        dp.add_handler(CommandHandler('start', start1))
-        dp.add_handler(CommandHandler('start', start2))
-        dp.process_update(update)
-        assert passed == ['start1', 'start2']
-
-    def test_dispatcher_handler_flow_stop(self, dp, bot):
+    def test_flow_stop(self, dp, bot):
         passed = []
 
         def start1(b, u):
@@ -225,3 +198,93 @@ class TestDispatcher(object):
         dp.add_handler(CommandHandler('start', start2), 2)
         dp.process_update(update)
         assert passed == ['start1']
+
+    def test_exception_in_handler(self, dp, bot):
+        passed = []
+
+        def start1(b, u):
+            passed.append('start1')
+            raise Exception('General exception')
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+
+        # If an unhandled exception was caught, no further handlers from the same group should be
+        # called.
+        passed = []
+        dp.add_handler(CommandHandler('start', start1), 1)
+        dp.add_handler(CommandHandler('start', start2), 1)
+        dp.add_handler(CommandHandler('start', start3), 2)
+        dp.add_error_handler(error)
+        dp.process_update(update)
+        assert passed == ['start1', 'start3']
+
+    def test_telegram_error_in_handler(self, dp, bot):
+        passed = []
+        err = TelegramError('Telegram error')
+
+        def start1(b, u):
+            passed.append('start1')
+            raise err
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+
+        # If a TelegramException was caught, an error handler should be called and no further
+        # handlers from the same group should be called.
+        dp.add_handler(CommandHandler('start', start1), 1)
+        dp.add_handler(CommandHandler('start', start2), 1)
+        dp.add_handler(CommandHandler('start', start3), 2)
+        dp.add_error_handler(error)
+        dp.process_update(update)
+        assert passed == ['start1', 'error', err, 'start3']
+        assert passed[2] is err
+
+    def test_flow_stop_in_error_handler(self, dp, bot):
+        passed = []
+        err = TelegramError('Telegram error')
+
+        def start1(b, u):
+            passed.append('start1')
+            raise err
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+            raise DispatcherHandlerStop
+
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+
+        # If a TelegramException was caught, an error handler should be called and no further
+        # handlers from the same group should be called.
+        dp.add_handler(CommandHandler('start', start1), 1)
+        dp.add_handler(CommandHandler('start', start2), 1)
+        dp.add_handler(CommandHandler('start', start3), 2)
+        dp.add_error_handler(error)
+        dp.process_update(update)
+        assert passed == ['start1', 'error', err]
+        assert passed[2] is err
