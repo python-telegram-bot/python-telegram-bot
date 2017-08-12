@@ -26,7 +26,7 @@ import pytest
 
 def call_pre_commit_hook(hook_id):
     __tracebackhide__ = True
-    return subprocess.call(['pre-commit', 'run', '--all-files', hook_id])
+    return os.system(' '.join(['pre-commit', 'run', '--all-files', hook_id]))
 
 
 @pytest.mark.parametrize('hook_id', argvalues=('yapf', 'flake8', 'pylint'))
@@ -39,4 +39,4 @@ def test_pre_commit_hook(hook_id):
 
 
 def test_build():
-    assert subprocess.call(['python', 'setup.py', 'bdist_dumb']) == 0
+    assert os.system('python setup.py bdist_dumb') == 0
