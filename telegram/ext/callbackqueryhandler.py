@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the CallbackQueryHandler class """
+"""This module contains the CallbackQueryHandler class."""
 
 import re
 
@@ -27,8 +27,8 @@ from .handler import Handler
 
 
 class CallbackQueryHandler(Handler):
-    """
-    Handler class to handle Telegram callback queries. Optionally based on a regex.
+    """Handler class to handle Telegram callback queries. Optionally based on a regex.
+
     Read the documentation of the ``re`` module for more information.
 
     Attributes:
@@ -79,6 +79,7 @@ class CallbackQueryHandler(Handler):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+
     """
 
     def __init__(self,
@@ -105,16 +106,15 @@ class CallbackQueryHandler(Handler):
         self.pass_groupdict = pass_groupdict
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         if isinstance(update, Update) and update.callback_query:
             if self.pattern:
                 if update.callback_query.data:
@@ -124,14 +124,13 @@ class CallbackQueryHandler(Handler):
                 return True
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
 
+        """
         optional_args = self.collect_optional_args(dispatcher, update)
         if self.pattern:
             match = re.match(self.pattern, update.callback_query.data)

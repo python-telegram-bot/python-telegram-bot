@@ -16,14 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the TypeHandler class """
+"""This module contains the TypeHandler class."""
 
 from .handler import Handler
 
 
 class TypeHandler(Handler):
-    """
-    Handler class to handle updates of custom types.
+    """Handler class to handle updates of custom types.
 
     Attributes:
         type (:obj:`type`): The ``type`` of updates this handler should process.
@@ -51,6 +50,7 @@ class TypeHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+
     """
 
     def __init__(self, type, callback, strict=False, pass_update_queue=False,
@@ -61,14 +61,14 @@ class TypeHandler(Handler):
         self.strict = strict
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
             :obj:`bool`
+
         """
 
         if not self.strict:
@@ -77,14 +77,13 @@ class TypeHandler(Handler):
             return type(update) is self.type
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
 
+        """
         optional_args = self.collect_optional_args(dispatcher)
 
         return self.callback(dispatcher.bot, update, **optional_args)

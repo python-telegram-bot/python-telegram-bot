@@ -16,14 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram InlineQueryResult"""
+"""This module contains the classes that represent Telegram InlineQueryResult."""
 
 from telegram import TelegramObject
 
 
 class InlineQueryResult(TelegramObject):
-    """
-    Baseclass for the InlineQueryResult* classes.
+    """Baseclass for the InlineQueryResult* classes.
 
     Attributes:
         type (:obj:`str`): Type of the result.
@@ -33,6 +32,7 @@ class InlineQueryResult(TelegramObject):
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, type, id, **kwargs):

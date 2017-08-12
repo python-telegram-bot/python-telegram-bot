@@ -22,8 +22,7 @@ from telegram import TelegramObject, User, ShippingAddress
 
 
 class ShippingQuery(TelegramObject):
-    """
-    This object contains information about an incoming shipping query.
+    """This object contains information about an incoming shipping query.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
@@ -42,6 +41,7 @@ class ShippingQuery(TelegramObject):
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, id, from_user, invoice_payload, shipping_address, bot=None, **kwargs):
@@ -74,10 +74,9 @@ class ShippingQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)
+            bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)
 
         Args:
             ok (:obj:`bool`): Specify True if delivery to the specified address is possible and
@@ -89,6 +88,6 @@ class ShippingQuery(TelegramObject):
                 readable form that explains why it is impossible to complete the order (e.g.
                 "Sorry, delivery to your desired address is unavailable'). Telegram will display
                 this message to the user.
-        """
 
+        """
         return self.bot.answer_shipping_query(self.id, *args, **kwargs)

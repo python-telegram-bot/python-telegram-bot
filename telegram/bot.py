@@ -72,8 +72,7 @@ def message(func):
 
 
 class Bot(TelegramObject):
-    """
-    This object represents a Telegram Bot.
+    """This object represents a Telegram Bot.
 
     Args:
         token (:obj:`str`): Bot's unique authentication.
@@ -81,6 +80,7 @@ class Bot(TelegramObject):
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
         request (:obj:`telegram.utils.Request`, optional): Pre initialized
             :obj:`telegram.utils.Request`.
+
     """
 
     def __init__(self, token, base_url=None, base_file_url=None, request=None):
@@ -104,7 +104,7 @@ class Bot(TelegramObject):
 
     @staticmethod
     def _validate_token(token):
-        """a very basic validation on token"""
+        """A very basic validation on token."""
         if any(x.isspace() for x in token):
             raise InvalidToken()
 
@@ -117,44 +117,34 @@ class Bot(TelegramObject):
     @property
     @info
     def id(self):
-        """
-        :obj:`int`: Unique identifier for this bot.
-        """
+        """:obj:`int`: Unique identifier for this bot."""
 
         return self.bot.id
 
     @property
     @info
     def first_name(self):
-        """
-        :obj:`str`: Bot's first name.
-        """
+        """:obj:`str`: Bot's first name."""
 
         return self.bot.first_name
 
     @property
     @info
     def last_name(self):
-        """
-        :obj:`str`: Optional. Bot's last name.
-        """
+        """:obj:`str`: Optional. Bot's last name."""
 
         return self.bot.last_name
 
     @property
     @info
     def username(self):
-        """
-        :obj:`str`: Bot's username.
-        """
+        """:obj:`str`: Bot's username."""
 
         return self.bot.username
 
     @property
     def name(self):
-        """
-        :obj:`str`: Bot's @username.
-        """
+        """:obj:`str`: Bot's @username."""
 
         return '@{0}'.format(self.username)
 
@@ -181,8 +171,7 @@ class Bot(TelegramObject):
 
     @log
     def get_me(self, timeout=None, **kwargs):
-        """
-        A simple method for testing your bot's auth token. Requires no parameters.
+        """A simple method for testing your bot's auth token. Requires no parameters.
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -195,8 +184,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getMe'.format(self.base_url)
 
         result = self._request.get(url, timeout=timeout)
@@ -217,8 +206,7 @@ class Bot(TelegramObject):
                      reply_markup=None,
                      timeout=None,
                      **kwargs):
-        """
-        Use this method to send text messages.
+        """Use this method to send text messages.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -247,8 +235,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'text': text}
@@ -286,8 +274,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/deleteMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'message_id': message_id}
@@ -305,8 +293,7 @@ class Bot(TelegramObject):
                         disable_notification=False,
                         timeout=None,
                         **kwargs):
-        """
-        Use this method to forward messages of any kind.
+        """Use this method to forward messages of any kind.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -327,8 +314,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/forwardMessage'.format(self.base_url)
 
         data = {}
@@ -353,8 +340,7 @@ class Bot(TelegramObject):
                    reply_markup=None,
                    timeout=20.,
                    **kwargs):
-        """
-        Use this method to send photos.
+        """Use this method to send photos.
 
         Note:
             The video argument can be either a file_id, an URL or a file from disk
@@ -385,8 +371,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendPhoto'.format(self.base_url)
 
         if isinstance(photo, PhotoSize):
@@ -452,8 +438,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendAudio'.format(self.base_url)
 
         if isinstance(audio, Audio):
@@ -484,8 +470,7 @@ class Bot(TelegramObject):
                       reply_markup=None,
                       timeout=20.,
                       **kwargs):
-        """
-        Use this method to send general files.
+        """Use this method to send general files.
 
         Note:
             The document argument can be either a file_id, an URL or a file from disk
@@ -518,8 +503,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendDocument'.format(self.base_url)
 
         if isinstance(document, Document):
@@ -544,8 +529,7 @@ class Bot(TelegramObject):
                      reply_markup=None,
                      timeout=None,
                      **kwargs):
-        """
-        Use this method to send .webp stickers.
+        """Use this method to send .webp stickers.
 
         Note:
             The sticker argument can be either a file_id, an URL or a file from disk
@@ -574,8 +558,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendSticker'.format(self.base_url)
 
         if isinstance(sticker, Sticker):
@@ -635,8 +619,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendVideo'.format(self.base_url)
 
         if isinstance(video, Video):
@@ -701,8 +685,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendVoice'.format(self.base_url)
 
         if isinstance(voice, Voice):
@@ -729,8 +713,7 @@ class Bot(TelegramObject):
                         reply_markup=None,
                         timeout=20.,
                         **kwargs):
-        """
-        Use this method to send video messages.
+        """Use this method to send video messages.
 
         Note:
             The video_note argument can be either a file_id or a file from disk
@@ -761,8 +744,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendVideoNote'.format(self.base_url)
 
         if isinstance(video_note, VideoNote):
@@ -789,8 +772,7 @@ class Bot(TelegramObject):
                       timeout=None,
                       location=None,
                       **kwargs):
-        """
-        Use this method to send point on the map.
+        """Use this method to send point on the map.
 
         Note:
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
@@ -818,8 +800,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendLocation'.format(self.base_url)
 
         if not (all([latitude, longitude]) or location):
@@ -849,8 +831,7 @@ class Bot(TelegramObject):
                    timeout=None,
                    venue=None,
                    **kwargs):
-        """
-        Use this method to send information about a venue.
+        """Use this method to send information about a venue.
 
         Note:
             you can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
@@ -882,8 +863,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendVenue'.format(self.base_url)
 
         if not (venue or all([latitude, longitude, address, title])):
@@ -923,8 +904,7 @@ class Bot(TelegramObject):
                      timeout=None,
                      contact=None,
                      **kwargs):
-        """
-        Use this method to send phone contacts.
+        """Use this method to send phone contacts.
 
         Note:
             You can either supply :obj:`contact` or :obj:`phone_number` and :obj:`first_name`
@@ -954,8 +934,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendContact'.format(self.base_url)
 
         if (not contact) and (not all([phone_number, first_name])):
@@ -984,8 +964,7 @@ class Bot(TelegramObject):
                   reply_markup=None,
                   timeout=None,
                   **kwargs):
-        """
-        Use this method to send a game.
+        """Use this method to send a game.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1009,8 +988,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendGame'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
@@ -1040,8 +1019,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendChatAction'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'action': action}
@@ -1104,8 +1083,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/answerInlineQuery'.format(self.base_url)
 
         results = [res.to_dict() for res in results]
@@ -1131,8 +1110,7 @@ class Bot(TelegramObject):
 
     @log
     def get_user_profile_photos(self, user_id, offset=None, limit=100, timeout=None, **kwargs):
-        """
-        Use this method to get a list of profile pictures for a user.
+        """Use this method to get a list of profile pictures for a user.
 
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
@@ -1150,8 +1128,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getUserProfilePhotos'.format(self.base_url)
 
         data = {'user_id': user_id}
@@ -1187,8 +1165,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getFile'.format(self.base_url)
 
         data = {'file_id': file_id}
@@ -1230,8 +1208,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/kickChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
@@ -1248,8 +1226,8 @@ class Bot(TelegramObject):
 
     @log
     def unban_chat_member(self, chat_id, user_id, timeout=None, **kwargs):
-        """
-        Use this method to unban a previously kicked user in a supergroup.
+        """Use this method to unban a previously kicked user in a supergroup.
+
         The user will not return to the group automatically, but will be able to join via link,
         etc. The bot must be an administrator in the group for this to work.
 
@@ -1267,8 +1245,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/unbanChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
@@ -1319,8 +1297,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url_ = '{0}/answerCallbackQuery'.format(self.base_url)
 
         data = {'callback_query_id': callback_query_id}
@@ -1380,8 +1358,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/editMessageText'.format(self.base_url)
 
         data = {'text': text}
@@ -1435,8 +1413,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
                 'edit_message_caption: Both chat_id and message_id are required when '
@@ -1491,8 +1469,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
                 'edit_message_reply_markup: Both chat_id and message_id are required when '
@@ -1520,8 +1498,7 @@ class Bot(TelegramObject):
                     read_latency=2.,
                     allowed_updates=None,
                     **kwargs):
-        """
-        Use this method to receive incoming updates using long polling.
+        """Use this method to receive incoming updates using long polling.
 
         Args:
             offset (:obj:`int`, optional): Identifier of the first update to be returned. Must be
@@ -1557,8 +1534,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getUpdates'.format(self.base_url)
 
         if network_delay is not None:
@@ -1646,8 +1623,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url_ = '{0}/setWebhook'.format(self.base_url)
 
         # Backwards-compatibility: 'url' used to be named 'webhook_url'
@@ -1694,8 +1671,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/deleteWebhook'.format(self.base_url)
 
         data = kwargs
@@ -1706,8 +1683,7 @@ class Bot(TelegramObject):
 
     @log
     def leave_chat(self, chat_id, timeout=None, **kwargs):
-        """
-        Use this method for your bot to leave a group, supergroup or channel.
+        """Use this method for your bot to leave a group, supergroup or channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1722,8 +1698,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/leaveChat'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1752,8 +1728,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getChat'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1784,8 +1760,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getChatAdministrators'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1797,8 +1773,7 @@ class Bot(TelegramObject):
 
     @log
     def get_chat_members_count(self, chat_id, timeout=None, **kwargs):
-        """
-        Use this method to get the number of members in a chat
+        """Use this method to get the number of members in a chat
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1813,8 +1788,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getChatMembersCount'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -1826,8 +1801,7 @@ class Bot(TelegramObject):
 
     @log
     def get_chat_member(self, chat_id, user_id, timeout=None, **kwargs):
-        """
-        Use this method to get information about a member of a chat.
+        """Use this method to get information about a member of a chat.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1843,8 +1817,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
@@ -1855,8 +1829,8 @@ class Bot(TelegramObject):
         return ChatMember.de_json(result, self)
 
     def get_webhook_info(self, timeout=None, **kwargs):
-        """
-        Use this method to get current webhook status. Requires no parameters.
+        """Use this method to get current webhook status. Requires no parameters.
+
         If the bot is using getUpdates, will return an object with the url field empty.
 
         Args:
@@ -1867,8 +1841,8 @@ class Bot(TelegramObject):
 
         Returns:
             :class:`telegram.WebhookInfo`
-        """
 
+        """
         url = '{0}/getWebhookInfo'.format(self.base_url)
 
         data = kwargs
@@ -1920,8 +1894,8 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.TelegramError`: If the new score is not greater than the user's
             current score in the chat and force is False.
-        """
 
+        """
         url = '{0}/setGameScore'.format(self.base_url)
 
         data = {'user_id': user_id, 'score': score}
@@ -1969,8 +1943,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getGameHighScores'.format(self.base_url)
 
         data = {'user_id': user_id}
@@ -2012,8 +1986,7 @@ class Bot(TelegramObject):
                      reply_markup=None,
                      timeout=None,
                      **kwargs):
-        """
-        Use this method to send invoices.
+        """Use this method to send invoices.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
@@ -2060,8 +2033,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/sendInvoice'.format(self.base_url)
 
         data = {
@@ -2130,8 +2103,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         ok = bool(ok)
 
         if ok and (shipping_options is None or error_message is not None):
@@ -2189,8 +2162,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         ok = bool(ok)
 
         if not (ok ^ (error_message is not None)):
@@ -2247,8 +2220,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/restrictChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
@@ -2314,8 +2287,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/promoteChatMember'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'user_id': user_id}
@@ -2361,8 +2334,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/exportChatInviteLink'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -2374,8 +2347,8 @@ class Bot(TelegramObject):
 
     @log
     def set_chat_photo(self, chat_id, photo, timeout=None, **kwargs):
-        """
-        Use this method to set a new profile photo for the chat.
+        """Use this method to set a new profile photo for the chat.
+
         Photos can't be changed for private chats. The bot must be an administrator in the chat
         for this to work and must have the appropriate admin rights.
 
@@ -2397,8 +2370,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/setChatPhoto'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'photo': photo}
@@ -2432,8 +2405,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/deleteChatPhoto'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -2468,8 +2441,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/setChatTitle'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'title': title}
@@ -2499,8 +2472,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/setChatDescription'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'description': description}
@@ -2533,8 +2506,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/pinChatMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id, 'message_id': message_id}
@@ -2566,8 +2539,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/unpinChatMessage'.format(self.base_url)
 
         data = {'chat_id': chat_id}
@@ -2579,8 +2552,7 @@ class Bot(TelegramObject):
 
     @log
     def get_sticker_set(self, name, timeout=None, **kwargs):
-        """
-        Use this method to get a sticker set.
+        """Use this method to get a sticker set.
 
         Args:
             name (:obj:`str`): Short name of the sticker set that is used in t.me/addstickers/
@@ -2595,8 +2567,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/getStickerSet'.format(self.base_url)
 
         data = {'name': name}
@@ -2632,8 +2604,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/uploadStickerFile'.format(self.base_url)
 
         data = {'user_id': user_id, 'png_sticker': png_sticker}
@@ -2646,8 +2618,8 @@ class Bot(TelegramObject):
     @log
     def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis,
                                contains_masks=None, mask_position=None, timeout=None, **kwargs):
-        """
-        Use this method to create new sticker set owned by a user.
+        """Use this method to create new sticker set owned by a user.
+
         The bot will be able to edit the created sticker set.
 
         Note:
@@ -2683,8 +2655,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/createNewStickerSet'.format(self.base_url)
 
         data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
@@ -2703,8 +2675,7 @@ class Bot(TelegramObject):
     @log
     def add_sticker_to_set(self, user_id, name, png_sticker, emojis, mask_position=None,
                            timeout=None, **kwargs):
-        """
-        Use this method to add a new sticker to a set created by the bot.
+        """Use this method to add a new sticker to a set created by the bot.
 
         Note:
             The png_sticker argument can be either a file_id, an URL or a file from disk
@@ -2732,8 +2703,8 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-        """
 
+        """
         url = '{0}/addStickerToSet'.format(self.base_url)
 
         data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker, 'emojis': emojis}
@@ -2748,8 +2719,7 @@ class Bot(TelegramObject):
 
     @log
     def set_sticker_position_in_set(self, sticker, position, timeout=None, **kwargs):
-        """
-        Use this method to move a sticker in a set created by the bot to a specific position.
+        """Use this method to move a sticker in a set created by the bot to a specific position.
 
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
@@ -2764,6 +2734,7 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
+
         """
         url = '{0}/setStickerPositionInSet'.format(self.base_url)
 
@@ -2776,8 +2747,7 @@ class Bot(TelegramObject):
 
     @log
     def delete_sticker_from_set(self, sticker, timeout=None, **kwargs):
-        """
-        Use this method to delete a sticker from a set created by the bot.
+        """Use this method to delete a sticker from a set created by the bot.
 
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
@@ -2791,6 +2761,7 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
+
         """
         url = '{0}/deleteStickerFromSet'.format(self.base_url)
 

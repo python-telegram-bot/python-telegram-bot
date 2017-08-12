@@ -16,14 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the base class for handlers as used by the
-Dispatcher """
+"""This module contains the base class for handlers as used by the Dispatcher."""
 
 
 class Handler(object):
-    """
-    The base class for all update handlers. You can create your own handlers by inheriting from
-    this class.
+    """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
@@ -58,6 +55,7 @@ class Handler(object):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+
     """
 
     def __init__(self,
@@ -82,6 +80,7 @@ class Handler(object):
 
         Returns:
             :obj:`bool`
+
         """
         raise NotImplementedError
 
@@ -101,12 +100,11 @@ class Handler(object):
         raise NotImplementedError
 
     def collect_optional_args(self, dispatcher, update=None):
-        """
-        Prepares the optional arguments that are the same for all types of
-        handlers.
+        """Prepares the optional arguments that are the same for all types of handlers.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
+
         """
         optional_args = dict()
 

@@ -14,8 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""
-Constants in the Telegram network.
+"""Constants in the Telegram network.
 
 The following constants were extracted from the
 `Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_.
@@ -37,6 +36,7 @@ The following constant have been found by experimentation:
 Attributes:
     MAX_MESSAGE_ENTITIES (:obj:`int`): 100 (Beyond this cap telegram will simply ignore further
         formatting styles)
+
 """
 
 MAX_MESSAGE_LENGTH = 4096

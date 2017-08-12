@@ -35,8 +35,7 @@ class Days(object):
 
 
 class JobQueue(object):
-    """
-    This class allows you to periodically perform tasks with the bot.
+    """This class allows you to periodically perform tasks with the bot.
 
     Attributes:
         queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
@@ -48,6 +47,7 @@ class JobQueue(object):
     Deprecated:
         prevent_autostart (:obj:`bool`, optional): Thread does not start during initialisation.
         Use `start` method instead.
+
     """
 
     def __init__(self, bot, prevent_autostart=None):
@@ -65,8 +65,7 @@ class JobQueue(object):
         self._running = False
 
     def put(self, job, next_t=None):
-        """
-        Queue a new job.
+        """Queue a new job.
 
         Note:
             This method is deprecated. Please use: :attr:`run_once`, :attr:`run_daily`
@@ -87,6 +86,7 @@ class JobQueue(object):
                 * :obj:`datetime.time` will be interpreted as a specific time at which the job
                   should run. This could be either today or, if the time has already passed,
                   tomorrow.
+
         """
 
         warnings.warn("'JobQueue.put' is being deprecated, use 'JobQueue.run_once', "
@@ -125,8 +125,7 @@ class JobQueue(object):
         self._set_next_peek(next_t)
 
     def run_once(self, callback, when, context=None, name=None):
-        """
-        Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
@@ -155,15 +154,14 @@ class JobQueue(object):
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
-        """
 
+        """
         job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
         self._put(job, next_t=when)
         return job
 
     def run_repeating(self, callback, interval, first=None, context=None, name=None):
-        """
-        Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
@@ -196,6 +194,7 @@ class JobQueue(object):
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
+
         """
 
         job = Job(callback,
@@ -208,8 +207,7 @@ class JobQueue(object):
         return job
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
-        """
-        Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs once and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
@@ -227,6 +225,7 @@ class JobQueue(object):
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
+
         """
 
         job = Job(callback,
@@ -250,9 +249,7 @@ class JobQueue(object):
                 self.__tick.set()
 
     def tick(self):
-        """
-        Run all jobs that are due and re-enqueue them with their interval.
-        """
+        """Run all jobs that are due and re-enqueue them with their interval."""
 
         now = time.time()
 
@@ -300,9 +297,7 @@ class JobQueue(object):
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
     def start(self):
-        """
-        Starts the job_queue thread.
-        """
+        """Starts the job_queue thread."""
 
         self.__start_lock.acquire()
 
@@ -319,8 +314,8 @@ class JobQueue(object):
         """
         Thread target of thread ``job_queue``. Runs in background and performs ticks on the job
         queue.
-        """
 
+        """
         while self._running:
             # self._next_peek may be (re)scheduled during self.tick() or self.put()
             with self.__next_peek_lock:
@@ -339,9 +334,7 @@ class JobQueue(object):
         self.logger.debug('%s thread stopped', self.__class__.__name__)
 
     def stop(self):
-        """
-        Stops the thread.
-        """
+        """Stops the thread."""
 
         with self.__start_lock:
             self._running = False
@@ -351,16 +344,13 @@ class JobQueue(object):
             self.__thread.join()
 
     def jobs(self):
-        """
-        Returns a tuple of all jobs that are currently in the ``JobQueue``
-        """
+        """Returns a tuple of all jobs that are currently in the ``JobQueue``."""
 
         return tuple(job[1] for job in self.queue.queue if job)
 
 
 class Job(object):
-    """
-    This class encapsulates a Job
+    """This class encapsulates a Job.
 
     Attributes:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
@@ -385,6 +375,7 @@ class Job(object):
             Defaults to ``Days.EVERY_DAY``
         job_queue (class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
+
     """
 
     def __init__(self,
@@ -415,9 +406,7 @@ class Job(object):
         self._enabled.set()
 
     def run(self, bot):
-        """
-        Executes the callback function.
-        """
+        """Executes the callback function."""
 
         self.callback(bot, self)
 
@@ -425,24 +414,19 @@ class Job(object):
         """
         Schedules this job for removal from the ``JobQueue``. It will be removed without executing
         its callback function again.
+
         """
 
         self._remove.set()
 
     @property
     def removed(self):
-        """
-        :obj:`bool`: Whether this job is due to be removed.
-        """
-
+        """:obj:`bool`: Whether this job is due to be removed."""
         return self._remove.is_set()
 
     @property
     def enabled(self):
-        """
-        :obj:`bool`: Whether this job is enabled.
-        """
-
+        """:obj:`bool`: Whether this job is enabled."""
         return self._enabled.is_set()
 
     @enabled.setter
@@ -457,8 +441,8 @@ class Job(object):
         """
         :obj:`int` | :obj:`float` | :obj:`datetime.timedelta`: Optional. The interval in which the
             job will run.
-        """
 
+        """
         return self._interval
 
     @interval.setter
@@ -474,10 +458,7 @@ class Job(object):
 
     @property
     def interval_seconds(self):
-        """
-        :obj:`int`: The interval for this job in seconds.
-        """
-
+        """:obj:`int`: The interval for this job in seconds."""
         if isinstance(self.interval, datetime.timedelta):
             return self.interval.total_seconds()
         else:
@@ -485,10 +466,7 @@ class Job(object):
 
     @property
     def repeat(self):
-        """
-        :obj:`bool`: Optional. If this job should be periodically execute its callback function.
-        """
-
+        """:obj:`bool`: Optional. If this job should periodically execute its callback function."""
         return self._repeat
 
     @repeat.setter
@@ -499,9 +477,7 @@ class Job(object):
 
     @property
     def days(self):
-        """
-        Tuple[:obj:`int`]: Optional. Defines on which days of the week the job should run.
-        """
+        """Tuple[:obj:`int`]: Optional. Defines on which days of the week the job should run."""
 
         return self._days
 
@@ -521,9 +497,7 @@ class Job(object):
 
     @property
     def job_queue(self):
-        """
-        :class:`telegram.ext.JobQueue`: Optional. The ``JobQueue`` this job belongs to.
-        """
+        """:class:`telegram.ext.JobQueue`: Optional. The ``JobQueue`` this job belongs to."""
 
         return self._job_queue
 

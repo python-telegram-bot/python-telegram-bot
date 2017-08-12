@@ -16,15 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultGame"""
+"""This module contains the classes that represent Telegram InlineQueryResultGame."""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup
 
 
 class InlineQueryResultGame(InlineQueryResult):
-    """
-    Represents a Game.
+    """Represents a Game.
 
     Attributes:
         type (:obj:`str`): 'game'.
@@ -39,6 +37,7 @@ class InlineQueryResultGame(InlineQueryResult):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, id, game_short_name, reply_markup=None, **kwargs):

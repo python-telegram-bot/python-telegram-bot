@@ -54,6 +54,7 @@ class Game(TelegramObject):
             appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
             game message in chats. Upload via BotFather.
+
     """
 
     def __init__(self,
@@ -94,8 +95,7 @@ class Game(TelegramObject):
         return data
 
     def parse_text_entity(self, entity):
-        """
-        Returns the text from a given :class:`telegram.MessageEntity`.
+        """Returns the text from a given :class:`telegram.MessageEntity`.
 
         Note:
             This method is present because Telegram calculates the offset and length in
@@ -108,8 +108,8 @@ class Game(TelegramObject):
 
         Returns:
             :obj:`str`: The text of the given entity.
-        """
 
+        """
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.text[entity.offset:entity.offset + entity.length]
@@ -138,8 +138,8 @@ class Game(TelegramObject):
         Returns:
             Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
-        """
 
+        """
         if types is None:
             types = MessageEntity.ALL_TYPES
 

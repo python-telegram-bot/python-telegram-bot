@@ -61,6 +61,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

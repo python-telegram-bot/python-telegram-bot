@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the StringRegexHandler class """
+"""This module contains the StringRegexHandler class."""
 
 import re
 
@@ -26,11 +26,10 @@ from .handler import Handler
 
 
 class StringRegexHandler(Handler):
-    """
-    Handler class to handle string updates based on a regex. It uses a
-    regular expression to check update content. Read the documentation of the
-    ``re`` module for more information. The ``re.match`` function is used to
-    determine if an update should be handled by this handler.
+    """Handler class to handle string updates based on a regex which checks the update content.
+
+    Read the documentation of the ``re`` module for more information. The ``re.match`` function is
+    used to determine if an update should be handled by this handler.
 
     Note:
         This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
@@ -67,6 +66,7 @@ class StringRegexHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+
     """
 
     def __init__(self,
@@ -87,27 +87,25 @@ class StringRegexHandler(Handler):
         self.pass_groupdict = pass_groupdict
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:obj:`str`): An incomming command.
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         return isinstance(update, string_types) and bool(re.match(self.pattern, update))
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:obj:`str`): An incomming command.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
-        """
 
+        """
         optional_args = self.collect_optional_args(dispatcher)
         match = re.match(self.pattern, update)
 

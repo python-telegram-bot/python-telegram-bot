@@ -31,8 +31,7 @@ _UNDEFINED = object()
 
 
 class Message(TelegramObject):
-    """
-    This object represents a message.
+    """This object represents a message.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
@@ -172,6 +171,7 @@ class Message(TelegramObject):
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
+
     """
     _effective_attachment = _UNDEFINED
 
@@ -263,9 +263,7 @@ class Message(TelegramObject):
 
     @property
     def chat_id(self):
-        """
-        :obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`.
-        """
+        """:obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`."""
         return self.chat.id
 
     @classmethod
@@ -368,7 +366,7 @@ class Message(TelegramObject):
         return data
 
     def _quote(self, kwargs):
-        """Modify kwargs for replying with or without quoting"""
+        """Modify kwargs for replying with or without quoting."""
         if 'reply_to_message_id' in kwargs:
             if 'quote' in kwargs:
                 del kwargs['quote']
@@ -384,8 +382,7 @@ class Message(TelegramObject):
                 kwargs['reply_to_message_id'] = self.message_id
 
     def reply_text(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_message(update.message.chat_id, *args, **kwargs)
 
@@ -394,14 +391,13 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_photo(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_photo(update.message.chat_id, *args, **kwargs)
 
@@ -412,14 +408,13 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_photo(self.chat_id, *args, **kwargs)
 
     def reply_audio(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_audio(update.message.chat_id, *args, **kwargs)
 
@@ -430,14 +425,13 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_audio(self.chat_id, *args, **kwargs)
 
     def reply_document(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_document(update.message.chat_id, *args, **kwargs)
 
@@ -448,14 +442,13 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_document(self.chat_id, *args, **kwargs)
 
     def reply_sticker(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_sticker(update.message.chat_id, *args, **kwargs)
 
@@ -466,16 +459,15 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_sticker(self.chat_id, *args, **kwargs)
 
     def reply_video(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.send_video(update.message.chat_id, *args, **kwargs)
+            bot.send_video(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
@@ -484,16 +476,15 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_video(self.chat_id, *args, **kwargs)
 
     def reply_video_note(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.send_video_note(update.message.chat_id, *args, **kwargs)
+            bot.send_video_note(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
@@ -502,14 +493,13 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_video_note(self.chat_id, *args, **kwargs)
 
     def reply_voice(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_voice(update.message.chat_id, *args, **kwargs)
 
@@ -520,16 +510,15 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_voice(self.chat_id, *args, **kwargs)
 
     def reply_location(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.send_location(update.message.chat_id, *args, **kwargs)
+            bot.send_location(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
@@ -538,16 +527,15 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_location(self.chat_id, *args, **kwargs)
 
     def reply_venue(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.send_venue(update.message.chat_id, *args, **kwargs)
+            bot.send_venue(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
@@ -556,16 +544,15 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_venue(self.chat_id, *args, **kwargs)
 
     def reply_contact(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.send_contact(update.message.chat_id, *args, **kwargs)
+            bot.send_contact(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
@@ -574,24 +561,23 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
-        """
 
+        """
         self._quote(kwargs)
         return self.bot.send_contact(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, disable_notification=False):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.forward_message(chat_id=chat_id,
-                                    from_chat_id=update.message.chat_id,
-                                    disable_notification=disable_notification,
-                                    message_id=update.message.message_id)
+            bot.forward_message(chat_id=chat_id,
+                                from_chat_id=update.message.chat_id,
+                                disable_notification=disable_notification,
+                                message_id=update.message.message_id)
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message forwarded.
-        """
 
+        """
         return self.bot.forward_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
@@ -599,13 +585,12 @@ class Message(TelegramObject):
             message_id=self.message_id)
 
     def edit_text(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.edit_message_text(chat_id=message.chat_id,
-                                      message_id=message.message_id,
-                                      *args,
-                                      **kwargs)
+            bot.edit_message_text(chat_id=message.chat_id,
+                                  message_id=message.message_id,
+                                  *args,
+                                  **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself,
@@ -614,19 +599,18 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
-        """
 
+        """
         return self.bot.edit_message_text(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def edit_caption(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.edit_message_caption(chat_id=message.chat_id,
-                                         message_id=message.message_id,
-                                         *args,
-                                         **kwargs)
+            bot.edit_message_caption(chat_id=message.chat_id,
+                                     message_id=message.message_id,
+                                     *args,
+                                     **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself,
@@ -635,19 +619,18 @@ class Message(TelegramObject):
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
-        """
 
+        """
         return self.bot.edit_message_caption(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def edit_reply_markup(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.edit_message_reply_markup(chat_id=message.chat_id,
-                                              message_id=message.message_id,
-                                              *args,
-                                              **kwargs)
+            bot.edit_message_reply_markup(chat_id=message.chat_id,
+                                          message_id=message.message_id,
+                                          *args,
+                                          **kwargs)
 
         Note:
             You can only edit messages that the bot sent itself,
@@ -657,18 +640,16 @@ class Message(TelegramObject):
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
         """
-
         return self.bot.edit_message_reply_markup(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                 bot.delete_message(chat_id=message.chat_id,
-                                    message_id=message.message_id,
-                                    *args,
-                                    **kwargs)
+             bot.delete_message(chat_id=message.chat_id,
+                                message_id=message.message_id,
+                                *args,
+                                **kwargs)
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
@@ -678,8 +659,7 @@ class Message(TelegramObject):
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
     def parse_entity(self, entity):
-        """
-        Returns the text from a given :class:`telegram.MessageEntity`.
+        """Returns the text from a given :class:`telegram.MessageEntity`.
 
         Note:
             This method is present because Telegram calculates the offset and length in
@@ -692,8 +672,8 @@ class Message(TelegramObject):
 
         Returns:
             str: The text of the given entity
-        """
 
+        """
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xffff:
             return self.text[entity.offset:entity.offset + entity.length]
@@ -724,8 +704,8 @@ class Message(TelegramObject):
         Returns:
             Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
             the text that belongs to them, calculated based on UTF-16 codepoints.
-        """
 
+        """
         if types is None:
             types = MessageEntity.ALL_TYPES
 
@@ -777,27 +757,27 @@ class Message(TelegramObject):
 
     @property
     def text_html(self):
-        """
-        Creates an HTML-formatted string from the markup entities found in the message.
+        """Creates an HTML-formatted string from the markup entities found in the message.
 
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
+
         """
         return self._text_html(urled=False)
 
     @property
     def text_html_urled(self):
-        """
-        Creates an HTML-formatted string from the markup entities found in the message.
+        """Creates an HTML-formatted string from the markup entities found in the message.
 
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
+
         """
         return self._text_html(urled=True)
 
@@ -843,30 +823,28 @@ class Message(TelegramObject):
 
     @property
     def text_markdown(self):
-        """
-        Creates an Markdown-formatted string from the markup entities found in the message.
+        """Creates an Markdown-formatted string from the markup entities found in the message.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
-        """
 
+        """
         return self._text_markdown(urled=False)
 
     @property
     def text_markdown_urled(self):
-        """
-        Creates an Markdown-formatted string from the markup entities found in the message.
+        """Creates an Markdown-formatted string from the markup entities found in the message.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
-        """
 
+        """
         return self._text_markdown(urled=True)
 
     @property

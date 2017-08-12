@@ -24,8 +24,7 @@ from telegram import TelegramObject
 
 
 class ChatPhoto(TelegramObject):
-    """
-    This object represents a chat photo.
+    """This object represents a chat photo.
 
     Attributes:
         small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo.
@@ -38,6 +37,7 @@ class ChatPhoto(TelegramObject):
             can be used only for photo download.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, small_file_id, big_file_id, bot=None, **kwargs):

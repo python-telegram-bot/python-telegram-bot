@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class Animation(TelegramObject):
-    """
-    This object represents an animation file to be displayed in the message containing a game.
+    """This object represents an animation file to be displayed in the message containing a game.
 
     Attributes:
         file_id (:obj:`str`): Unique file identifier.
@@ -39,6 +38,7 @@ class Animation(TelegramObject):
         file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
+
     """
 
     def __init__(self,

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the ChosenInlineResultHandler class """
+"""This module contains the ChosenInlineResultHandler class."""
 
 from .handler import Handler
 from telegram import Update
@@ -24,8 +24,7 @@ from telegram.utils.deprecate import deprecate
 
 
 class ChosenInlineResultHandler(Handler):
-    """
-    Handler class to handle Telegram updates that contain a chosen inline result.
+    """Handler class to handle Telegram updates that contain a chosen inline result.
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
@@ -60,6 +59,7 @@ class ChosenInlineResultHandler(Handler):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+
     """
 
     def __init__(self,
@@ -76,27 +76,25 @@ class ChosenInlineResultHandler(Handler):
             pass_chat_data=pass_chat_data)
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         return isinstance(update, Update) and update.chosen_inline_result
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
 
+        """
         optional_args = self.collect_optional_args(dispatcher, update)
 
         return self.callback(dispatcher.bot, update, **optional_args)

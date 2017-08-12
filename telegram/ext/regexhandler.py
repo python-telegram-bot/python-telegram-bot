@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # TODO: Remove allow_edited
-""" This module contains the RegexHandler class """
+"""This module contains the RegexHandler class."""
 
 import re
 import warnings
@@ -29,11 +29,11 @@ from .handler import Handler
 
 
 class RegexHandler(Handler):
-    """
-    Handler class to handle Telegram updates based on a regex. It uses a
-    regular expression to check text messages. Read the documentation of the
-    ``re`` module for more information. The ``re.match`` function is used to
-    determine if an update should be handled by this handler.
+    """Handler class to handle Telegram updates based on a regex.
+
+    It uses a regular expression to check text messages. Read the documentation of the ``re``
+    module for more information. The ``re.match`` function is used to determine if an update should
+    be handled by this handler.
 
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -91,6 +91,7 @@ class RegexHandler(Handler):
 
     Raises:
         ValueError
+
     """
 
     def __init__(self,
@@ -133,14 +134,14 @@ class RegexHandler(Handler):
         self.edited_updates = edited_updates
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
             :obj:`bool`
+
         """
         if not isinstance(update, Update) and not update.effective_message:
             return False
@@ -153,12 +154,12 @@ class RegexHandler(Handler):
         return False
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+
         """
 
         optional_args = self.collect_optional_args(dispatcher, update)

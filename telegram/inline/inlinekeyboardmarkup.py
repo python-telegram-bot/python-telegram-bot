@@ -33,6 +33,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
             each represented by an Array of InlineKeyboardButton objects.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, inline_keyboard, **kwargs):

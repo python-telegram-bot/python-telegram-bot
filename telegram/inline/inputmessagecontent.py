@@ -16,18 +16,18 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputMessageContent"""
+"""This module contains the classes that represent Telegram InputMessageContent."""
 
 from telegram import TelegramObject
 
 
 class InputMessageContent(TelegramObject):
-    """
-    Base class for Telegram InputMessageContent Objects
+    """Base class for Telegram InputMessageContent Objects.
+
     See: :class:`telegram.InputContactMessageContent`,
     :class:`telegram.InputLocationMessageContent`, :class:`telegram.InputTextMessageContent` and
     :class:`telegram.InputVenueMessageContent` for more details.
+
     """
 
     @classmethod

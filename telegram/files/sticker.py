@@ -22,8 +22,7 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Sticker(TelegramObject):
-    """
-    This object represents a sticker.
+    """This object represents a sticker.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -50,6 +49,7 @@ class Sticker(TelegramObject):
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size.
         **kwargs (obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,
@@ -96,8 +96,7 @@ class Sticker(TelegramObject):
 
 
 class StickerSet(TelegramObject):
-    """
-    This object represents a sticker set.
+    """This object represents a sticker set.
 
     Attributes:
         name (:obj:`str`): Sticker set name.
@@ -110,6 +109,7 @@ class StickerSet(TelegramObject):
         title (:obj:`str`): Sticker set title.
         contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+
     """
 
     def __init__(self, name, title, contains_masks, stickers, bot=None, **kwargs):
@@ -140,8 +140,7 @@ class StickerSet(TelegramObject):
 
 
 class MaskPosition(TelegramObject):
-    """
-    This object describes the position on faces where a mask should be placed by default.
+    """This object describes the position on faces where a mask should be placed by default.
 
     Attributes:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
@@ -164,8 +163,8 @@ class MaskPosition(TelegramObject):
             size, from top to bottom. For example, 1.0 will place the mask just below the default
             mask position.
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
-    """
 
+    """
     FOREHEAD = 'forehead'
     """:obj:`str`: 'forehead'"""
     EYES = 'eyes'

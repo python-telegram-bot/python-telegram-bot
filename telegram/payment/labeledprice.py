@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class LabeledPrice(TelegramObject):
-    """
-    This object represents a portion of the price for goods or services.
+    """This object represents a portion of the price for goods or services.
 
     Attributes:
         label (:obj:`str`): Portion label.
@@ -36,6 +35,7 @@ class LabeledPrice(TelegramObject):
             parameter in currencies.json, it shows the number of digits past the decimal point for
             each currency (2 for the majority of currencies).
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, label, amount, **kwargs):

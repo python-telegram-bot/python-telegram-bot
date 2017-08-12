@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram InlineQueryResultContact"""
+"""This module contains the classes that represent Telegram InlineQueryResultContact."""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 

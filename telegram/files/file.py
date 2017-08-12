@@ -44,6 +44,7 @@ class File(TelegramObject):
         file_path (:obj:`str`, optional): File path. Use :attr:`download` to get the file.
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, file_id, bot=None, file_size=None, file_path=None, **kwargs):
@@ -85,8 +86,8 @@ class File(TelegramObject):
 
         Raises:
             ValueError: If both ``custom_path`` and ``out`` are passed.
-        """
 
+        """
         if custom_path is not None and out is not None:
             raise ValueError('custom_path and out are mutually exclusive')
 

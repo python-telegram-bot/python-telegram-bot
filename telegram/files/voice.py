@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class Voice(TelegramObject):
-    """
-    This object represents a voice note.
+    """This object represents a voice note.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -37,6 +36,7 @@ class Voice(TelegramObject):
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):

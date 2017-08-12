@@ -23,8 +23,7 @@ from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
 
 
 class Update(TelegramObject):
-    """
-    This object represents an incoming update.
+    """This object represents an incoming update.
 
     Note:
         At most one of the optional parameters can be present in any given update.
@@ -65,6 +64,7 @@ class Update(TelegramObject):
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`, optional): New incoming
             pre-checkout query. Contains full information about checkout
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,
@@ -103,8 +103,8 @@ class Update(TelegramObject):
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
             is. Will be ``None`` for :attr:`channel_post`.
-        """
 
+        """
         if self._effective_user:
             return self._effective_user
 
@@ -141,8 +141,8 @@ class Update(TelegramObject):
             update this is. Will be ``None`` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query` and :attr:`pre_checkout_query`.
-        """
 
+        """
         if self._effective_chat:
             return self._effective_chat
 
@@ -173,8 +173,8 @@ class Update(TelegramObject):
             update this is. Will be ``None`` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query` and :attr:`pre_checkout_query`.
-        """
 
+        """
         if self._effective_message:
             return self._effective_message
 

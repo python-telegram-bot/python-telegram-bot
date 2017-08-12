@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputLocationMessageContent"""
+"""This module contains the classes that represent Telegram InputLocationMessageContent."""
 
 from telegram import InputMessageContent
 
@@ -34,6 +33,7 @@ class InputLocationMessageContent(InputMessageContent):
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, latitude, longitude, **kwargs):

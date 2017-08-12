@@ -22,8 +22,7 @@ from telegram import TelegramObject, User
 
 
 class GameHighScore(TelegramObject):
-    """
-    This object represents one row of the high scores table for a game.
+    """This object represents one row of the high scores table for a game.
 
     Attributes:
         position (:obj:`int`): Position in high score table for the game.
@@ -34,6 +33,7 @@ class GameHighScore(TelegramObject):
         position (:obj:`int`): Position in high score table for the game.
         user (:class:`telegram.User`): User.
         score (:obj:`int`): Score.
+
     """
 
     def __init__(self, position, user, score):

@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class Audio(TelegramObject):
-    """
-    This object represents an audio file to be treated as music by the Telegram clients.
+    """This object represents an audio file to be treated as music by the Telegram clients.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -43,6 +42,7 @@ class Audio(TelegramObject):
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,
