@@ -86,6 +86,8 @@ class Request(object):
             sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30))
             sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8))
 
+        self._con_pool_size = con_pool_size
+
         kwargs = dict(
             maxsize=con_pool_size,
             cert_reqs='CERT_REQUIRED',
@@ -125,6 +127,11 @@ class Request(object):
                     mgr.proxy_headers.update(auth_hdrs)
 
         self._con_pool = mgr
+
+    @property
+    def con_pool_size(self):
+        """The size of the connection pool used."""
+        return self._con_pool_size
 
     def stop(self):
         self._con_pool.clear()
