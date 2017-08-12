@@ -34,7 +34,7 @@ class TestInputTextMessageContent(object):
     parse_mode = ParseMode.MARKDOWN
     disable_web_page_preview = True
 
-    def test_exspected_values(self, input_text_message_content):
+    def test_expected_values(self, input_text_message_content):
         assert input_text_message_content.parse_mode == self.parse_mode
         assert input_text_message_content.message_text == self.message_text
         assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview

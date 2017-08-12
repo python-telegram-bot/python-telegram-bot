@@ -24,8 +24,8 @@ from telegram import InputLocationMessageContent
 
 @pytest.fixture(scope='class')
 def input_location_message_content():
-    return InputLocationMessageContent(longitude=TestInputLocationMessageContent.longitude,
-                                       latitude=TestInputLocationMessageContent.latitude)
+    return InputLocationMessageContent(TestInputLocationMessageContent.latitude,
+                                       TestInputLocationMessageContent.longitude)
 
 
 class TestInputLocationMessageContent(object):
