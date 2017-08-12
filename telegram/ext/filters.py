@@ -353,6 +353,33 @@ class Filters(object):
                         self.migrate(message) or self.pinned_message(message))
 
     status_update = _StatusUpdate()
+    """Subset for messages containing a status update.
+
+    Examples:
+        Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+        ``Filters.status_update`` for all status update messages.
+
+    Attributes:
+        chat_created (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.group_chat_created`,
+            :attr:`telegram.Message.supergroup_chat_created` or
+            :attr:`telegram.Message.channel_chat_created`.
+        delete_chat_photo (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.delete_chat_photo`.
+        left_chat_member (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.left_chat_member`.
+        migrate (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.migrate_from_chat_id` or
+            :attr: `telegram.Message.migrate_from_chat_id`.
+        new_chat_members (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.new_chat_member`.
+        new_chat_photo (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.new_chat_photo`.
+        new_chat_title (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.new_chat_title`.
+        pinned_message (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.pinned_message`.
+    """
 
     class _Forwarded(BaseFilter):
         name = 'Filters.forwarded'
