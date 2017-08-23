@@ -122,7 +122,7 @@ class TestChat(object):
         b = Chat(self.id, self.title, self.type)
         c = Chat(self.id, '', '')
         d = Chat(0, self.title, self.type)
-        e = User(self.id, '')
+        e = User(self.id, '', False)
 
         assert a == b
         assert hash(a) == hash(b)

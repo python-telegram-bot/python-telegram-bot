@@ -26,7 +26,7 @@ from telegram.utils.helpers import to_timestamp
 
 @pytest.fixture(scope='class')
 def user():
-    return User(1, 'First name')
+    return User(1, 'First name', False)
 
 
 @pytest.fixture(scope='class')
@@ -89,10 +89,10 @@ class TestChatMember(object):
         assert chat_member['status'] == chat_member.status
 
     def test_equality(self):
-        a = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
-        b = ChatMember(User(1, ''), ChatMember.ADMINISTRATOR)
-        d = ChatMember(User(2, ''), ChatMember.ADMINISTRATOR)
-        d2 = ChatMember(User(1, ''), ChatMember.CREATOR)
+        a = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
+        b = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
+        d = ChatMember(User(2, '', False), ChatMember.ADMINISTRATOR)
+        d2 = ChatMember(User(1, '', False), ChatMember.CREATOR)
 
         assert a == b
         assert hash(a) == hash(b)

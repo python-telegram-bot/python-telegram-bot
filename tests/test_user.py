@@ -35,7 +35,7 @@ def json_dict():
 
 @pytest.fixture(scope='function')
 def user(bot):
-    return User(TestUser.id, TestUser.is_bot, TestUser.first_name, last_name=TestUser.last_name,
+    return User(TestUser.id, TestUser.first_name, TestUser.is_bot, last_name=TestUser.last_name,
                 username=TestUser.username, language_code=TestUser.language_code, bot=bot)
 
 
@@ -99,10 +99,10 @@ class TestUser(object):
         assert user.get_profile_photos()
 
     def test_equality(self):
-        a = User(self.id, self.first_name, self.last_name)
-        b = User(self.id, self.first_name, self.last_name)
-        c = User(self.id, self.first_name)
-        d = User(0, self.first_name, self.last_name)
+        a = User(self.id, self.first_name, self.is_bot, self.last_name)
+        b = User(self.id, self.first_name, self.is_bot, self.last_name)
+        c = User(self.id, self.first_name, self.is_bot)
+        d = User(0, self.first_name, self.is_bot, self.last_name)
         e = Update(self.id)
 
         assert a == b
