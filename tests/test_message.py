@@ -76,7 +76,7 @@ def message(bot):
                                                              'charge_id', 'provider_id',
                                                              order_info={})},
                     {'forward_signature': 'some_forward_sign'},
-                    {'author_signature': 'some_autohr_sign'}
+                    {'author_signature': 'some_author_sign'}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
                      'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',

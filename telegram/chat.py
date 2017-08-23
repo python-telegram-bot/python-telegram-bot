@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 
-from telegram import TelegramObject, ChatPhoto, Message
+from telegram import TelegramObject, ChatPhoto
 
 
 class Chat(TelegramObject):
@@ -38,7 +38,7 @@ class Chat(TelegramObject):
         description (:obj:`str`): Optional. Description, for supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
-            Returned only in getChat.
+            Returned only in get_chat.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -60,7 +60,7 @@ class Chat(TelegramObject):
         invite_link (:obj:`str`, optional): Chat invite link, for supergroups and channel chats.
             Returned only in get_chat.
         pinned_message (:class:`telegram.Message`, optional): Pinned message, for supergroups.
-            Returned only in getChat.
+            Returned only in get_chat.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -112,6 +112,7 @@ class Chat(TelegramObject):
             return None
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
+        from telegram import Message
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
 
         return cls(bot=bot, **data)

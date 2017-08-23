@@ -20,6 +20,9 @@
 """This module contains an object that represents a Telegram User."""
 
 from telegram import TelegramObject
+from telegram.utils.helpers import mention_markdown as util_mention_markdown
+from telegram.utils.helpers import mention_html as util_mention_html
+
 
 
 class User(TelegramObject):
@@ -109,3 +112,29 @@ class User(TelegramObject):
             users.append(cls.de_json(user, bot))
 
         return users
+
+    def mention_markdown(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): If provided, will overwrite the user's name.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as markdown.
+        """
+        if not name:
+            return util_mention_markdown(self.id, self.name)
+        else:
+            return util_mention_markdown(self.id, name)
+
+    def mention_html(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): If provided, will overwrite the user's name.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as HTML.
+        """
+        if not name:
+            return util_mention_html(self.name, self.id)
+        else:
+            return util_mention_html(name, self.id)
