@@ -25,6 +25,7 @@ from telegram import User, Update
 def json_dict():
     return {
         'id': TestUser.id,
+        'is_bot': TestUser.is_bot,
         'first_name': TestUser.first_name,
         'last_name': TestUser.last_name,
         'username': TestUser.username,
@@ -34,12 +35,13 @@ def json_dict():
 
 @pytest.fixture(scope='function')
 def user(bot):
-    return User(TestUser.id, TestUser.first_name, last_name=TestUser.last_name,
+    return User(TestUser.id, TestUser.is_bot, TestUser.first_name, last_name=TestUser.last_name,
                 username=TestUser.username, language_code=TestUser.language_code, bot=bot)
 
 
 class TestUser(object):
     id = 1
+    is_bot = True
     first_name = 'first_name'
     last_name = 'last_name'
     username = 'username'
@@ -49,6 +51,7 @@ class TestUser(object):
         user = User.de_json(json_dict, bot)
 
         assert user.id == self.id
+        assert user.is_bot == self.is_bot
         assert user.first_name == self.first_name
         assert user.last_name == self.last_name
         assert user.username == self.username
@@ -60,6 +63,7 @@ class TestUser(object):
         user = User.de_json(json_dict, bot)
 
         assert user.id == self.id
+        assert user.is_bot == self.is_bot
         assert user.first_name == self.first_name
         assert user.last_name == self.last_name
         assert user.username is None
@@ -72,6 +76,7 @@ class TestUser(object):
         user = User.de_json(json_dict, bot)
 
         assert user.id == self.id
+        assert user.is_bot == self.is_bot
         assert user.first_name == self.first_name
         assert user.last_name is None
         assert user.username is None

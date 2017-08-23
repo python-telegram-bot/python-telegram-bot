@@ -74,14 +74,16 @@ def message(bot):
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
                     {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
                                                              'charge_id', 'provider_id',
-                                                             order_info={})}
+                                                             order_info={})},
+                    {'forward_signature': 'some_forward_sign'},
+                    {'author_signature': 'some_autohr_sign'}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
                      'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
                      'new_members', 'contact', 'location', 'venue', 'left_member', 'new_title',
                      'new_photo', 'delete_photo', 'group_created', 'supergroup_created',
                      'channel_created', 'migrated_to', 'migrated_from', 'pinned', 'invoice',
-                     'successful_payment'])
+                     'successful_payment', 'forward_signature', 'author_signature'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,

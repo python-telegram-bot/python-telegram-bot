@@ -28,6 +28,7 @@ class User(TelegramObject):
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): True, if this user is a bot
         first_name (:obj:`str`): User's or bot's first name.
         last_name (:obj:`str`): Optional. User's or bot's last name.
         username (:obj:`str`): Optional. User's or bot's last name.
@@ -36,6 +37,7 @@ class User(TelegramObject):
 
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): True, if this user is a bot
         first_name (:obj:`str`): User's or bot's first name.
         last_name (:obj:`str`, optional): User's or bot's last name.
         username (:obj:`str`, optional): User's or bot's username.
@@ -45,6 +47,7 @@ class User(TelegramObject):
 
     def __init__(self,
                  id,
+                 is_bot,
                  first_name,
                  last_name=None,
                  username=None,
@@ -53,6 +56,7 @@ class User(TelegramObject):
                  **kwargs):
         # Required
         self.id = int(id)
+        self.is_bot = is_bot
         self.first_name = first_name
         # Optionals
         self.last_name = last_name

@@ -20,6 +20,7 @@
 
 import re
 from datetime import datetime
+from telegram import User, Message
 
 try:
     from html import escape as escape_html  # noqa: F401
@@ -72,3 +73,45 @@ def from_timestamp(unixtime):
         return None
 
     return datetime.fromtimestamp(unixtime)
+
+
+def mention(user, html=False, name=None):
+    """
+    Args:
+        user (:obj:`int` | :class:`telegram.User` | :class:`telegram.Message`)
+            The user's id, or User object, or a Message from the user which you want to mention.
+        html (:obj:`bool`) Default output as markdown, pass True to use HTML.
+        name (:obj:`str`) The name the mention is showing. Required when id is provided in user.
+            Optional if User or Message is provided and will overwrite the name in user.
+
+    Returns:
+        str:
+    """
+    if not user:
+        return None
+
+    if isinstance(user, Message):
+        user = Message.from_user
+
+    if isinstance(user, int) and name:
+        if html:
+            return '<a href="tg://user?id={}">{}</a>'.format(user, escape_html(name))
+        else:
+            return "[{}](tg://user?id={}".format(escape_markdown(name), user)
+
+    elif isinstance(user, User):
+        if not name:
+            if user.last_name:
+                fullname = '{} {}'.format(user.first_name, user.last_name)
+            else:
+                fullname = user.first_name
+
+            if html:
+                return '<a href="tg://user?id={}">{}</a>'.format(user.id, escape_html(fullname))
+            else:
+                return "[{}](tg://user?id={}".format(escape_markdown(fullname), user.id)
+        else:
+            if html:
+                return '<a href="tg://user?id={}">{}</a>'.format(user.id, escape_html(name))
+            else:
+                return "[{}](tg://user?id={}".format(escape_markdown(name), user.id)
