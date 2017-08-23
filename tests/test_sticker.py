@@ -249,12 +249,17 @@ class TestStickerSet(object):
         assert sticker_set_dict['contains_masks'] == sticker_set.contains_masks
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
 
+    @flaky(3,1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.xfail(raises=BadRequest)
     def test_bot_methods_1(self, bot, sticker_set):
         with open('tests/data/telegram_sticker.png', 'rb') as f:
             file = bot.upload_sticker_file(95205500, f)
         assert file
         assert bot.add_sticker_to_set(95205500, sticker_set.name, file.file_id, '😄')
 
+    @flaky(3,1)
+    @pytest.mark.timeout(10)
     @pytest.mark.xfail(raises=BadRequest, reason='STICKERSET_NOT_MODIFIED errors on deletion')
     def test_bot_methods_2(self, bot, sticker_set):
         updated_sticker_set = bot.get_sticker_set(sticker_set.name)
