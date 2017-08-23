@@ -50,8 +50,8 @@ class User(TelegramObject):
 
     def __init__(self,
                  id,
-                 is_bot,
                  first_name,
+                 is_bot,
                  last_name=None,
                  username=None,
                  language_code=None,
@@ -59,8 +59,8 @@ class User(TelegramObject):
                  **kwargs):
         # Required
         self.id = int(id)
-        self.is_bot = is_bot
         self.first_name = first_name
+        self.is_bot = is_bot
         # Optionals
         self.last_name = last_name
         self.username = username

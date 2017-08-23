@@ -35,7 +35,7 @@ def dp2(bot):
 
 
 class TestDispatcher(object):
-    message_update = Update(1, message=Message(1, User(1, ''), None, Chat(1, ''), text='Text'))
+    message_update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''), text='Text'))
     received = None
     count = 0
 

@@ -39,9 +39,9 @@ def callback_query(bot, request):
 
 class TestCallbackQuery(object):
     id = 'id'
-    from_user = User(1, 'test_user')
+    from_user = User(1, 'test_user', False)
     chat_instance = 'chat_instance'
-    message = Message(3, User(5, 'bot'), None, Chat(4, 'private'))
+    message = Message(3, User(5, 'bot', False), None, Chat(4, 'private'))
     data = 'data'
     inline_message_id = 'inline_message_id'
     game_short_name = 'the_game'
