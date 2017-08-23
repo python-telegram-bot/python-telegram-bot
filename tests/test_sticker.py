@@ -263,7 +263,7 @@ class TestStickerSet(object):
     @pytest.mark.xfail(raises=BadRequest, reason='STICKERSET_NOT_MODIFIED errors on deletion')
     def test_bot_methods_2(self, bot, sticker_set):
         updated_sticker_set = bot.get_sticker_set(sticker_set.name)
-        assert len(updated_sticker_set.stickers) > 1  # Otherwise test_bot_methods_1 failed
+        assert len(updated_sticker_set.stickers) == 6  # Otherwise test_bot_methods_1 failed
         file_id = updated_sticker_set.stickers[-1].file_id
         assert bot.set_sticker_position_in_set(file_id, len(updated_sticker_set.stickers) - 1)
         assert bot.delete_sticker_from_set(file_id)
