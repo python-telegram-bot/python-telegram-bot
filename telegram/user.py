@@ -24,7 +24,6 @@ from telegram.utils.helpers import mention_markdown as util_mention_markdown
 from telegram.utils.helpers import mention_html as util_mention_html
 
 
-
 class User(TelegramObject):
     """
     This object represents a Telegram user or bot.
