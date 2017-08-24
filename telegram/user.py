@@ -134,6 +134,6 @@ class User(TelegramObject):
             :obj:`str`: The inline mention for the user as HTML.
         """
         if not name:
-            return util_mention_html(self.name, self.id)
+            return util_mention_html(self.id, self.name)
         else:
-            return util_mention_html(name, self.id)
+            return util_mention_html(self.id, name)
