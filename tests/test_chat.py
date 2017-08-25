@@ -59,6 +59,18 @@ class TestChat(object):
         assert chat_dict['type'] == chat.type
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
 
+    def test_name(self, chat):
+        a = Chat(234156, Chat.PRIVATE, username='user', first_name='UserUser', last_name='Testing')
+        b = Chat(234156, Chat.PRIVATE, first_name='UserUser')
+        c = Chat(234156, Chat.PRIVATE, first_name='UserUser', last_name='Testing')
+        d = Chat(self.id, self.type, username='chat', title=self.title)
+
+        assert chat.name == chat.title
+        assert a.name == '@user'
+        assert b.name == 'UserUser'
+        assert c.name == 'UserUser Testing'
+        assert d.name == '@chat'
+
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):
             id = args[1] == chat.id

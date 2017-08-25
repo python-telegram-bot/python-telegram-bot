@@ -109,6 +109,19 @@ class Chat(TelegramObject):
 
         return cls(bot=bot, **data)
 
+    @property
+    def name(self):
+        """
+        :obj:`str`: Returns chat username, if present. Otherwise returns chat title (in case of
+            groups and channels) or first name and, if present, last name (in case of private chats)
+        """
+
+        if self.username:
+            return '@{0}'.format(self.username)
+        if self.last_name:  # assuming that if `last_name` is present, `first_name` is present also.
+            return '{0} {1}'.format(self.first_name, self.last_name)
+        return self.first_name or self.title
+
     def send_action(self, *args, **kwargs):
         """
         Shortcut for::
