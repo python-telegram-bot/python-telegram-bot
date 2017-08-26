@@ -47,6 +47,9 @@ class TestDispatcher(object):
     def error_handler(self, bot, update, error):
         self.received = error.message
 
+    def error_handler_raise_error(self, bot, update, error):
+        raise Exception('Failing bigly')
+
     def callback_increase_count(self, bot, update):
         self.count += 1
 
@@ -77,6 +80,30 @@ class TestDispatcher(object):
         dp.update_queue.put(error)
         sleep(.1)
         assert self.received is None
+
+    def test_error_handler_that_raises_errors(self, dp):
+        """
+        Make sure that errors raised in error handlers don't break the main loop of the dispatcher
+        """
+        handler_raise_error = MessageHandler(Filters.all, self.callback_raise_error)
+        handler_increase_count = MessageHandler(Filters.all, self.callback_increase_count)
+        error = TelegramError('Unauthorized.')
+
+        dp.add_error_handler(self.error_handler_raise_error)
+
+        # From errors caused by handlers
+        dp.add_handler(handler_raise_error)
+        dp.update_queue.put(self.message_update)
+        sleep(.1)
+
+        # From errors in the update_queue
+        dp.remove_handler(handler_raise_error)
+        dp.add_handler(handler_increase_count)
+        dp.update_queue.put(error)
+        dp.update_queue.put(self.message_update)
+        sleep(.1)
+
+        assert self.count == 1
 
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
