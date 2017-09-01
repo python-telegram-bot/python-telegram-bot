@@ -1,6 +1,47 @@
 =======
 Changes
 =======
+**2017-09-01**
+*Released 8.0.0*
+
+New features
+
+- Fully support Bot Api 3.3 (PR `#806`_).
+- DispatcherHandlerStop (`see docs`_).
+- Regression fix for text_html & text_markdown (PR `#777`_).
+- Added effective_attachment to message (PR `#766`_).
+
+Non backward compatible changes
+
+- Removed Botan support from the library  (PR `#776`_).
+- Fully support Bot Api 3.3 (PR `#806`_).
+- Remove de_json() (PR `#789`_).
+
+Changes
+
+- Sane defaults for tcp socket options on linux (PR `#754`_).
+- Add RESTRICTED as constant to ChatMember (PR `#761`_).
+- Add rich comparison to CallbackQuery (PR `#764`_).
+- Fix get_game_high_scores (PR `#771`_).
+- Warn on small con_pool_size during custom initalization of Updater (PR `#793`_).
+- Catch exceptions in error handlerfor errors that happen during polling (PR `#810`_).
+- For testing we switched to pytest (PR `#788`_).
+- Lot's of small improvements to our tests and documentation.
+
+
+.. _`see docs`: http://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler
+.. _`#777`: https://github.com/python-telegram-bot/python-telegram-bot/pull/777
+.. _`#806`: https://github.com/python-telegram-bot/python-telegram-bot/pull/806
+.. _`#766`: https://github.com/python-telegram-bot/python-telegram-bot/pull/766
+.. _`#776`: https://github.com/python-telegram-bot/python-telegram-bot/pull/776
+.. _`#789`: https://github.com/python-telegram-bot/python-telegram-bot/pull/789
+.. _`#754`: https://github.com/python-telegram-bot/python-telegram-bot/pull/754
+.. _`#761`: https://github.com/python-telegram-bot/python-telegram-bot/pull/761
+.. _`#764`: https://github.com/python-telegram-bot/python-telegram-bot/pull/764
+.. _`#771`: https://github.com/python-telegram-bot/python-telegram-bot/pull/771
+.. _`#788`: https://github.com/python-telegram-bot/python-telegram-bot/pull/788
+.. _`#793`: https://github.com/python-telegram-bot/python-telegram-bot/pull/793
+.. _`#810`: https://github.com/python-telegram-bot/python-telegram-bot/pull/810
 
 **2017-07-28**
 *Released 7.0.1*
