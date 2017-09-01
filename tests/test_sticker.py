@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from time import sleep
 
 import pytest
 from flaky import flaky
@@ -214,9 +215,12 @@ class TestSticker(object):
         assert hash(a) != hash(e)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='function')
 def sticker_set(bot):
-    return bot.get_sticker_set('test_by_{0}'.format(bot.username))
+    ss = bot.get_sticker_set('test_by_{0}'.format(bot.username))
+    if len(ss.stickers) > 100:
+        raise Exception('stickerset is growing too large.')
+    return ss
 
 
 class TestStickerSet(object):
@@ -249,18 +253,25 @@ class TestStickerSet(object):
         assert sticker_set_dict['contains_masks'] == sticker_set.contains_masks
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
 
+    @flaky(3,1)
+    @pytest.mark.timeout(10)
     def test_bot_methods_1(self, bot, sticker_set):
         with open('tests/data/telegram_sticker.png', 'rb') as f:
             file = bot.upload_sticker_file(95205500, f)
         assert file
         assert bot.add_sticker_to_set(95205500, sticker_set.name, file.file_id, '😄')
 
-    @pytest.mark.xfail(raises=BadRequest, reason='STICKERSET_NOT_MODIFIED errors on deletion')
+    @flaky(3,1)
+    @pytest.mark.timeout(10)
     def test_bot_methods_2(self, bot, sticker_set):
-        updated_sticker_set = bot.get_sticker_set(sticker_set.name)
-        assert len(updated_sticker_set.stickers) > 1  # Otherwise test_bot_methods_1 failed
-        file_id = updated_sticker_set.stickers[-1].file_id
-        assert bot.set_sticker_position_in_set(file_id, len(updated_sticker_set.stickers) - 1)
+        file_id = sticker_set.stickers[0].file_id
+        assert bot.set_sticker_position_in_set(file_id, 1)
+
+    @flaky(10, 1)
+    @pytest.mark.timeout(10)
+    def test_bot_methods_3(self, bot, sticker_set):
+        sleep(1)
+        file_id = sticker_set.stickers[-1].file_id
         assert bot.delete_sticker_from_set(file_id)
 
     def test_equality(self):
