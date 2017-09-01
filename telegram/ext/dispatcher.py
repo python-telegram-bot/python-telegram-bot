@@ -258,8 +258,12 @@ class Dispatcher(object):
         """
         # An error happened while polling
         if isinstance(update, TelegramError):
-            self.dispatch_error(None, update)
+            try:
+                self.dispatch_error(None, update)
+            except Exception:
+                self.logger.exception('An uncaught error was raised while handling the error')
             return
+
         for group in self.groups:
             try:
                 for handler in (x for x in self.handlers[group] if x.check_update(update)):
