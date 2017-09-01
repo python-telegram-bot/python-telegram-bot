@@ -40,7 +40,7 @@ class TestPreCheckoutQuery(object):
     shipping_option_id = 'shipping_option_id'
     currency = 'EUR'
     total_amount = 100
-    from_user = User(0, '')
+    from_user = User(0, '', False)
     order_info = OrderInfo()
 
     def test_de_json(self, bot):

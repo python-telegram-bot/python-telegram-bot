@@ -33,7 +33,7 @@ def message(bot):
 
 @pytest.fixture(scope='function',
                 params=[
-                    {'forward_from': User(99, 'forward_user'),
+                    {'forward_from': User(99, 'forward_user', False),
                      'forward_date': datetime.now()},
                     {'forward_from_chat': Chat(-23, 'channel'),
                      'forward_from_message_id': 101,
@@ -56,12 +56,12 @@ def message(bot):
                      'caption': 'video_file'},
                     {'voice': Voice('voice_id', 5)},
                     {'video_note': VideoNote('video_note_id', 20, 12)},
-                    {'new_chat_members': [User(55, 'new_user')]},
+                    {'new_chat_members': [User(55, 'new_user', False)]},
                     {'contact': Contact('phone_numner', 'contact_name')},
                     {'location': Location(-23.691288, 46.788279)},
                     {'venue': Venue(Location(-23.691288, 46.788279),
                                     'some place', 'right here')},
-                    {'left_chat_member': User(33, 'kicked')},
+                    {'left_chat_member': User(33, 'kicked', False)},
                     {'new_chat_title': 'new title'},
                     {'new_chat_photo': [PhotoSize('photo_id', 50, 50)]},
                     {'delete_chat_photo': True},
@@ -74,14 +74,16 @@ def message(bot):
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
                     {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
                                                              'charge_id', 'provider_id',
-                                                             order_info={})}
+                                                             order_info={})},
+                    {'forward_signature': 'some_forward_sign'},
+                    {'author_signature': 'some_author_sign'}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
                      'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
                      'new_members', 'contact', 'location', 'venue', 'left_member', 'new_title',
                      'new_photo', 'delete_photo', 'group_created', 'supergroup_created',
                      'channel_created', 'migrated_to', 'migrated_from', 'pinned', 'invoice',
-                     'successful_payment'])
+                     'successful_payment', 'forward_signature', 'author_signature'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -91,7 +93,7 @@ def message_params(bot, request):
 
 class TestMessage(object):
     id = 1
-    from_user = User(2, 'testuser')
+    from_user = User(2, 'testuser', False)
     date = datetime.now()
     chat = Chat(3, 'private')
     test_entities = [{'length': 4, 'offset': 10, 'type': 'bold'},
@@ -414,7 +416,7 @@ class TestMessage(object):
         id = 1
         a = Message(id, self.from_user, self.date, self.chat)
         b = Message(id, self.from_user, self.date, self.chat)
-        c = Message(id, User(0, ''), self.date, self.chat)
+        c = Message(id, User(0, '', False), self.date, self.chat)
         d = Message(0, self.from_user, self.date, self.chat)
         e = Update(id)
 

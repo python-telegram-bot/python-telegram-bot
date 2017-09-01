@@ -26,7 +26,7 @@ from telegram.ext import Filters, BaseFilter
 
 @pytest.fixture(scope='function')
 def message():
-    return Message(0, User(0, 'Testuser'), datetime.datetime.now(), Chat(0, 'private'))
+    return Message(0, User(0, 'Testuser', False), datetime.datetime.now(), Chat(0, 'private'))
 
 
 @pytest.fixture(scope='function',
@@ -52,7 +52,7 @@ class TestFilters(object):
         assert Filters.command(message)
 
     def test_filters_reply(self, message):
-        another_message = Message(1, User(1, 'TestOther'), datetime.datetime.now(),
+        another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
                                   Chat(0, 'private'))
         message.text = 'test'
         assert not Filters.reply(message)

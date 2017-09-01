@@ -31,7 +31,7 @@ def message_entity(request):
         url = 't.me'
     user = None
     if type == MessageEntity.TEXT_MENTION:
-        user = User(1, 'test_user')
+        user = User(1, 'test_user', False)
     return MessageEntity(type, 1, 3, url=url, user=user)
 
 

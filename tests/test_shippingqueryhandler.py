@@ -23,18 +23,18 @@ from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, Call
                       InlineQuery, ShippingQuery, PreCheckoutQuery, ShippingAddress)
 from telegram.ext import ShippingQueryHandler
 
-message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
+message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
 params = [
     {'message': message},
     {'edited_message': message},
-    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
     {'channel_post': message},
     {'edited_channel_post': message},
-    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+    {'inline_query': InlineQuery(1, User(1, '', False), '', '')},
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')}
 ]
 
 ids = ('message', 'edited_message', 'callback_query', 'channel_post',
@@ -49,7 +49,7 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def shiping_query():
-    return Update(1, shipping_query=ShippingQuery(42, User(1, 'test user'), 'invoice_payload',
+    return Update(1, shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
                                                   ShippingAddress('EN', 'my_state', 'my_city',
                                                                   'steer_1', '', 'post_code')))
 

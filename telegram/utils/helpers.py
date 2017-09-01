@@ -72,3 +72,29 @@ def from_timestamp(unixtime):
         return None
 
     return datetime.fromtimestamp(unixtime)
+
+
+def mention_html(user_id, name):
+    """
+    Args:
+        user_id (:obj:`int`) The user's id which you want to mention.
+        name (:obj:`str`) The name the mention is showing.
+
+    Returns:
+        :obj:`str`: The inline mention for the user as html.
+    """
+    if isinstance(user_id, int):
+        return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape_html(name))
+
+
+def mention_markdown(user_id, name):
+    """
+    Args:
+        user_id (:obj:`int`) The user's id which you want to mention.
+        name (:obj:`str`) The name the mention is showing.
+
+    Returns:
+        :obj:`str`: The inline mention for the user as markdown.
+    """
+    if isinstance(user_id, int):
+        return '[{}](tg://user?id={})'.format(escape_markdown(name), user_id)

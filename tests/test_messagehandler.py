@@ -23,15 +23,15 @@ from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQue
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
 from telegram.ext import Filters, MessageHandler
 
-message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
+message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
 params = [
-    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
-    {'inline_query': InlineQuery(1, User(1, ''), '', '')},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
-    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
+    {'inline_query': InlineQuery(1, User(1, '', False), '', '')},
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
+    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')}
 ]
 
 ids = ('callback_query', 'inline_query', 'chosen_inline_result',

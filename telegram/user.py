@@ -20,6 +20,8 @@
 """This module contains an object that represents a Telegram User."""
 
 from telegram import TelegramObject
+from telegram.utils.helpers import mention_markdown as util_mention_markdown
+from telegram.utils.helpers import mention_html as util_mention_html
 
 
 class User(TelegramObject):
@@ -28,6 +30,7 @@ class User(TelegramObject):
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): True, if this user is a bot
         first_name (:obj:`str`): User's or bot's first name.
         last_name (:obj:`str`): Optional. User's or bot's last name.
         username (:obj:`str`): Optional. User's or bot's last name.
@@ -36,6 +39,7 @@ class User(TelegramObject):
 
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): True, if this user is a bot
         first_name (:obj:`str`): User's or bot's first name.
         last_name (:obj:`str`, optional): User's or bot's last name.
         username (:obj:`str`, optional): User's or bot's username.
@@ -46,6 +50,7 @@ class User(TelegramObject):
     def __init__(self,
                  id,
                  first_name,
+                 is_bot,
                  last_name=None,
                  username=None,
                  language_code=None,
@@ -54,6 +59,7 @@ class User(TelegramObject):
         # Required
         self.id = int(id)
         self.first_name = first_name
+        self.is_bot = is_bot
         # Optionals
         self.last_name = last_name
         self.username = username
@@ -105,3 +111,29 @@ class User(TelegramObject):
             users.append(cls.de_json(user, bot))
 
         return users
+
+    def mention_markdown(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): If provided, will overwrite the user's name.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as markdown.
+        """
+        if not name:
+            return util_mention_markdown(self.id, self.name)
+        else:
+            return util_mention_markdown(self.id, name)
+
+    def mention_html(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): If provided, will overwrite the user's name.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as HTML.
+        """
+        if not name:
+            return util_mention_html(self.id, self.name)
+        else:
+            return util_mention_html(self.id, name)
