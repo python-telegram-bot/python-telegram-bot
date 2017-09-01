@@ -22,8 +22,7 @@ from telegram import TelegramObject, User, OrderInfo
 
 
 class PreCheckoutQuery(TelegramObject):
-    """
-    This object contains information about an incoming pre-checkout query.
+    """This object contains information about an incoming pre-checkout query.
 
     Note:
         * In Python `from` is a reserved word, use `from_user` instead.
@@ -53,6 +52,7 @@ class PreCheckoutQuery(TelegramObject):
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,
@@ -97,10 +97,9 @@ class PreCheckoutQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
+            bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
         Args:
             ok (:obj:`bool`): Specify True if everything is alright (goods are available, etc.) and
@@ -111,6 +110,6 @@ class PreCheckoutQuery(TelegramObject):
                 were busy filling out your payment details. Please choose a different color or
                 garment!"). Telegram will display this message to the user.
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-        """
 
+        """
         return self.bot.answer_pre_checkout_query(self.id, *args, **kwargs)

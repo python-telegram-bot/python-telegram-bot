@@ -16,15 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputContactMessageContent"""
+"""This module contains the classes that represent Telegram InputContactMessageContent."""
 
 from telegram import InputMessageContent
 
 
 class InputContactMessageContent(InputMessageContent):
-    """
-    Represents the content of a contact message to be sent as the result of an inline query.
+    """Represents the content of a contact message to be sent as the result of an inline query.
 
     Attributes:
         phone_number (:obj:`str`): Contact's phone number.
@@ -36,6 +34,7 @@ class InputContactMessageContent(InputMessageContent):
         first_name (:obj:`str`): Contact's first name.
         last_name (:obj:`str`, optional): Contact's last name.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, phone_number, first_name, last_name=None, **kwargs):

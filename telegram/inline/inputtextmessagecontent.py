@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputTextMessageContent"""
+"""This module contains the classes that represent Telegram InputTextMessageContent."""
 
 from telegram import InputMessageContent
 
@@ -41,6 +40,7 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None, **kwargs):

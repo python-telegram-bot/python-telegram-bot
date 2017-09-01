@@ -17,7 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram InlineQuery"""
+"""This module contains an object that represents a Telegram InlineQuery."""
 
 from telegram import TelegramObject, User, Location
 
@@ -47,6 +47,7 @@ class InlineQuery(TelegramObject):
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, id, from_user, query, offset, location=None, bot=None, **kwargs):
@@ -83,10 +84,9 @@ class InlineQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                bot.answer_inline_query(update.inline_query.id, *args, **kwargs)
+            bot.answer_inline_query(update.inline_query.id, *args, **kwargs)
 
         Args:
             results (List[:class:`telegram.InlineQueryResult`]): A list of results for the inline
@@ -106,6 +106,6 @@ class InlineQuery(TelegramObject):
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
                 message sent to the bot when user presses the switch button. 1-64 characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
-        """
 
+        """
         return self.bot.answer_inline_query(self.id, *args, **kwargs)

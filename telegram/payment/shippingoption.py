@@ -22,8 +22,7 @@ from telegram import TelegramObject, LabeledPrice
 
 
 class ShippingOption(TelegramObject):
-    """
-    This object represents one shipping option.
+    """This object represents one shipping option.
 
     Attributes:
         id (:obj:`str`): Shipping option identifier.
@@ -35,6 +34,7 @@ class ShippingOption(TelegramObject):
         title (:obj:`str`): Option title.
         prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, id, title, prices, **kwargs):

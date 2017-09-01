@@ -22,10 +22,7 @@ from telegram import PhotoSize, TelegramObject
 
 
 class UserProfilePhotos(TelegramObject):
-    """
-    This object represents a Telegram UserProfilePhotos.
-
-    This object represent a user's profile pictures.
+    """This object represent a user's profile pictures.
 
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.
@@ -35,6 +32,7 @@ class UserProfilePhotos(TelegramObject):
         total_count (:obj:`int`): Total number of profile pictures the target user has.
         photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
             sizes each).
+
     """
 
     def __init__(self, total_count, photos, **kwargs):

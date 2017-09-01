@@ -19,7 +19,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
-"""A throughput-limiting message processor for Telegram bots"""
+"""A throughput-limiting message processor for Telegram bots."""
 from telegram.utils import promise
 
 import functools
@@ -44,9 +44,7 @@ else:
 
 
 class DelayQueueError(RuntimeError):
-    """
-    Indicates processing errors.
-    """
+    """Indicates processing errors."""
     pass
 
 
@@ -78,6 +76,7 @@ class DelayQueue(threading.Thread):
             creation; if ``False``, should be started manually by `start` method. Defaults to True.
         name (:obj:`str`, optional): Thread's name. Defaults to ``'DelayQueue-N'``, where N is
             sequential number of object created.
+
     """
 
     _instcnt = 0  # instance counter
@@ -105,7 +104,8 @@ class DelayQueue(threading.Thread):
     def run(self):
         """
         Do not use the method except for unthreaded testing purposes, the method normally is
-        automatically called by autostart argument .
+        automatically called by autostart argument.
+
         """
 
         times = []  # used to store each callable processing time
@@ -134,14 +134,14 @@ class DelayQueue(threading.Thread):
                 self.exc_route(exc)  # to prevent thread exit
 
     def stop(self, timeout=None):
-        """
-        Used to gently stop processor and shutdown its thread.
+        """Used to gently stop processor and shutdown its thread.
 
         Args:
             timeout (:obj:`float`): Indicates maximum time to wait for processor to stop and its
                 thread to exit. If timeout exceeds and processor has not stopped, method silently
                 returns. :attr:`is_alive` could be used afterwards to check the actual status.
                 ``timeout`` set to None, blocks until processor is shut down. Defaults to None.
+
         """
 
         self.__exit_req = True  # gently request
@@ -153,19 +153,20 @@ class DelayQueue(threading.Thread):
         """
         Dummy exception handler which re-raises exception in thread. Could be possibly overwritten
         by subclasses.
+
         """
 
         raise exc
 
     def __call__(self, func, *args, **kwargs):
-        """
-        Used to process callbacks in throughput-limiting thread through queue.
+        """Used to process callbacks in throughput-limiting thread through queue.
 
         Args:
             func (:obj:`callable`): The actual function (or any callable) that is processed through
                 queue.
             *args (:obj:`list`): Variable-length `func` arguments.
             **kwargs (:obj:`dict`): Arbitrary keyword-arguments to `func`.
+
         """
 
         if not self.is_alive() or self.__exit_req:
@@ -202,6 +203,7 @@ class MessageQueue(object):
         autostart (:obj:`bool`, optional): If True, processors are started immediately after
             object's creation; if ``False``, should be started manually by :attr:`start` method.
             Defaults to ``True``.
+
     """
 
     def __init__(self,
@@ -224,9 +226,7 @@ class MessageQueue(object):
             autostart=autostart)
 
     def start(self):
-        """
-        Method is used to manually start the ``MessageQueue`` processing.
-        """
+        """Method is used to manually start the ``MessageQueue`` processing."""
         self._all_delayq.start()
         self._group_delayq.start()
 
@@ -258,6 +258,7 @@ class MessageQueue(object):
 
         Returns:
             :obj:`callable`: Used as ``promise`` argument.
+
         """
 
         if not is_group_msg:  # ignore middle group delay
@@ -268,8 +269,7 @@ class MessageQueue(object):
 
 
 def queuedmessage(method):
-    """
-    A decorator to be used with :attr:`telegram.Bot` send* methods.
+    """A decorator to be used with :attr:`telegram.Bot` send* methods.
 
     Note:
         As it probably wouldn't be a good idea to make this decorator a property, it has been coded
@@ -297,6 +297,7 @@ def queuedmessage(method):
     Returns:
         ``telegram.utils.promise.Promise``: In case call is queued or original method's return
         value if it's not.
+
     """
 
     @functools.wraps(method)

@@ -45,6 +45,7 @@ class KeyboardButton(TelegramObject):
     Note:
         :attr:`request_contact` and :attr:`request_location` options will only work in Telegram
         versions released after 9 April, 2016. Older clients will ignore them.
+
     """
 
     def __init__(self, text, request_contact=None, request_location=None, **kwargs):

@@ -22,8 +22,7 @@ from telegram import TelegramObject, Location
 
 
 class Venue(TelegramObject):
-    """
-    This object represents a venue.
+    """This object represents a venue.
 
     Attributes:
         location (:class:`telegram.Location`): Venue location.
@@ -37,6 +36,7 @@ class Venue(TelegramObject):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, location, title, address, foursquare_id=None, **kwargs):

@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultAudio"""
+"""This module contains the classes that represent Telegram InlineQueryResultAudio."""
 
 from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
 
@@ -53,6 +52,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the audio.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the CommandHandler class """
+"""This module contains the CommandHandler class."""
 import warnings
 
 from future.utils import string_types
@@ -26,10 +26,10 @@ from telegram import Update
 
 
 class CommandHandler(Handler):
-    """
-    Handler class to handle Telegram commands. Commands are Telegram messages
-    that start with ``/``, optionally followed by an ``@`` and the bot's
-    name and/or some additional text.
+    """Handler class to handle Telegram commands.
+
+    Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
+    bot's name and/or some additional text.
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -84,6 +84,7 @@ class CommandHandler(Handler):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+
     """
 
     def __init__(self,
@@ -119,16 +120,15 @@ class CommandHandler(Handler):
                           'instead. More info: https://git.io/vPTbc.')
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         if (isinstance(update, Update)
                 and (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
@@ -154,14 +154,13 @@ class CommandHandler(Handler):
             return False
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
 
+        """
         optional_args = self.collect_optional_args(dispatcher, update)
 
         message = update.message or update.edited_message

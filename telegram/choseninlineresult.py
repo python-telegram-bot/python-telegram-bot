@@ -47,6 +47,7 @@ class ChosenInlineResult(TelegramObject):
             callback queries and can be used to edit the message.
         query (:obj:`str`): The query that was used to obtain the result.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

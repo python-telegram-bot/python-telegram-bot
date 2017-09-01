@@ -41,6 +41,7 @@ class ForceReply(ReplyMarkup):
                original message.
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, force_reply=True, selective=False, **kwargs):

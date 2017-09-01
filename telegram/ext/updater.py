@@ -16,8 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the class Updater, which tries to make creating
-Telegram bots intuitive."""
+"""This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
 
 import logging
 import os
@@ -78,6 +77,7 @@ class Updater(object):
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
+
     """
 
     _request = None
@@ -159,8 +159,7 @@ class Updater(object):
                       bootstrap_retries=0,
                       read_latency=2.,
                       allowed_updates=None):
-        """
-        Starts polling updates from Telegram.
+        """Starts polling updates from Telegram.
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -185,6 +184,7 @@ class Updater(object):
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
+
         """
 
         if network_delay is not None:
@@ -243,6 +243,7 @@ class Updater(object):
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
+
         """
 
         with self.__lock:
@@ -404,9 +405,7 @@ class Updater(object):
             updates = self.bot.get_updates(updates[-1].update_id + 1)
 
     def stop(self):
-        """
-        Stops the polling/webhook thread, the dispatcher and the job queue.
-        """
+        """Stops the polling/webhook thread, the dispatcher and the job queue."""
 
         self.job_queue.stop()
         with self.__lock:
@@ -454,15 +453,14 @@ class Updater(object):
             os._exit(1)
 
     def idle(self, stop_signals=(SIGINT, SIGTERM, SIGABRT)):
-        """
-        Blocks until one of the signals are received and stops the updater.
+        """Blocks until one of the signals are received and stops the updater.
 
         Args:
             stop_signals (:obj:`iterable`): Iterable containing signals from the signal module that
                 should be subscribed to. Updater.stop() will be called on receiving one of those
                 signals. Defaults to (``SIGINT``, ``SIGTERM``, ``SIGABRT``).
-        """
 
+        """
         for sig in stop_signals:
             signal(sig, self.signal_handler)
 

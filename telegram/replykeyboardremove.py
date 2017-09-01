@@ -46,6 +46,7 @@ class ReplyKeyboardRemove(ReplyMarkup):
                message.
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, selective=False, **kwargs):

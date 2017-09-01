@@ -22,8 +22,7 @@ from telegram import TelegramObject, OrderInfo
 
 
 class SuccessfulPayment(TelegramObject):
-    """
-    This object contains basic information about a successful payment.
+    """This object contains basic information about a successful payment.
 
     Attributes:
         currency (:obj:`str`): Three-letter ISO 4217 currency code.
@@ -48,6 +47,7 @@ class SuccessfulPayment(TelegramObject):
         telegram_payment_charge_id (:obj:`str`): Telegram payment identifier.
         provider_payment_charge_id (:obj:`str`): Provider payment identifier.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

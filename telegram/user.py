@@ -25,8 +25,7 @@ from telegram.utils.helpers import mention_html as util_mention_html
 
 
 class User(TelegramObject):
-    """
-    This object represents a Telegram user or bot.
+    """This object represents a Telegram user or bot.
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -45,6 +44,7 @@ class User(TelegramObject):
         username (:obj:`str`, optional): User's or bot's username.
         language_code (:obj:`str`, optional): IETF language tag of the user's language.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
     """
 
     def __init__(self,
@@ -74,6 +74,7 @@ class User(TelegramObject):
         """
         :obj:`str`: The users :attr:`username` if available, if not it returns the first name and
             if present :attr:`first_name` and :attr:`last_name`.
+
         """
 
         if self.username:

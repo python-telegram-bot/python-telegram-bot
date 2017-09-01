@@ -40,8 +40,7 @@ FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certif
 
 
 class InputFile(object):
-    """
-    This object represents a Telegram InputFile.
+    """This object represents a Telegram InputFile.
 
     Attributes:
         data (:obj:`dict`): Data containing an inputfile.
@@ -51,6 +50,7 @@ class InputFile(object):
 
     Raises:
         TelegramError
+
     """
 
     def __init__(self, data):
@@ -88,28 +88,22 @@ class InputFile(object):
 
     @property
     def headers(self):
-        """
-        :obj:`dict`: Headers.
-        """
+        """:obj:`dict`: Headers."""
 
         return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
 
     @property
     def content_type(self):
-        """
-        :obj:`str`: Content type
-        """
-
+        """:obj:`str`: Content type"""
         return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
-        """
-        Transform the inputfile to multipart/form data.
+        """Transform the inputfile to multipart/form data.
 
         Returns:
             :obj:`str`
-        """
 
+        """
         form = []
         form_boundary = '--' + self.boundary
 
@@ -148,16 +142,15 @@ class InputFile(object):
 
     @staticmethod
     def is_image(stream):
-        """
-        Check if the content file is an image by analyzing its headers.
+        """Check if the content file is an image by analyzing its headers.
 
         Args:
             stream (:obj:`str`): A str representing the content of a file.
 
         Returns:
             :obj:`str`: The str mime-type of an image.
-        """
 
+        """
         image = imghdr.what(None, stream)
         if image:
             return 'image/%s' % image
@@ -166,16 +159,15 @@ class InputFile(object):
 
     @staticmethod
     def is_inputfile(data):
-        """
-        Check if the request is a file request.
+        """Check if the request is a file request.
 
         Args:
             data (Dict[:obj:`str`, :obj:`str`]): A dict of (str, str) key/value pairs.
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         if data:
             file_type = [i for i in iter(data) if i in FILE_TYPES]
 

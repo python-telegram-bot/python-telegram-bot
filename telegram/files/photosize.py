@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class PhotoSize(TelegramObject):
-    """
-    This object represents one size of a photo or a file/sticker thumbnail.
+    """This object represents one size of a photo or a file/sticker thumbnail.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -37,6 +36,7 @@ class PhotoSize(TelegramObject):
         height (:obj:`int`): Photo height.
         file_size (:obj:`int`, optional): File size.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, file_id, width, height, file_size=None, **kwargs):

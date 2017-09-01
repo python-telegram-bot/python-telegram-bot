@@ -16,15 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputVenueMessageContent"""
+"""This module contains the classes that represent Telegram InputVenueMessageContent."""
 
 from telegram import InputMessageContent
 
 
 class InputVenueMessageContent(InputMessageContent):
-    """
-    Represents the content of a venue message to be sent as the result of an inline query.
+    """Represents the content of a venue message to be sent as the result of an inline query.
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -40,6 +38,7 @@ class InputVenueMessageContent(InputMessageContent):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue, if known.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, latitude, longitude, title, address, foursquare_id=None, **kwargs):

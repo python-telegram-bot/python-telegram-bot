@@ -27,9 +27,7 @@ from abc import ABCMeta
 
 
 class TelegramObject(object):
-    """
-    Base class for most telegram objects.
-    """
+    """Base class for most telegram objects."""
 
     __metaclass__ = ABCMeta
     _id_attrs = ()
@@ -53,6 +51,7 @@ class TelegramObject(object):
         """
         Returns:
             :obj:`str`
+
         """
 
         return json.dumps(self.to_dict())

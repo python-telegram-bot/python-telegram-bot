@@ -16,15 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-InlineKeyboardButton"""
+"""This module contains an object that represents a Telegram InlineKeyboardButton."""
 
 from telegram import TelegramObject
 
 
 class InlineKeyboardButton(TelegramObject):
-    """
-    This object represents one button of an inline keyboard.
+    """This object represents one button of an inline keyboard.
 
     Note:
         You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
@@ -67,6 +65,7 @@ class InlineKeyboardButton(TelegramObject):
         pay (:obj:`bool`, optional): Specify True, to send a Pay button. This type of button must
             always be the ``first`` button in the first row.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

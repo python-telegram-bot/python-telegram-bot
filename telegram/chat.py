@@ -23,8 +23,7 @@ from telegram import TelegramObject, ChatPhoto
 
 
 class Chat(TelegramObject):
-    """
-    This object represents a chat.
+    """This object represents a chat.
 
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
@@ -118,32 +117,30 @@ class Chat(TelegramObject):
         return cls(bot=bot, **data)
 
     def send_action(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.send_chat_action(update.message.chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
+
         """
 
         return self.bot.send_chat_action(self.id, *args, **kwargs)
 
     def leave(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.leave_chat(update.message.chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool` If the action was sent successfully.
-        """
 
+        """
         return self.bot.leave_chat(self.id, *args, **kwargs)
 
     def get_administrators(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.get_chat_administrators(update.message.chat.id, *args, **kwargs)
 
@@ -152,39 +149,36 @@ class Chat(TelegramObject):
             :class:`telegram.ChatMember` objects that contains information about all
             chat administrators except other bots. If the chat is a group or a supergroup
             and no administrators were appointed, only the creator will be returned
-        """
 
+        """
         return self.bot.get_chat_administrators(self.id, *args, **kwargs)
 
     def get_members_count(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.get_chat_members_count(update.message.chat.id, *args, **kwargs)
 
         Returns:
             :obj:`int`
-        """
 
+        """
         return self.bot.get_chat_members_count(self.id, *args, **kwargs)
 
     def get_member(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.get_chat_member(update.message.chat.id, *args, **kwargs)
 
         Returns:
             :class:`telegram.ChatMember`
-        """
 
+        """
         return self.bot.get_chat_member(self.id, *args, **kwargs)
 
     def kick_member(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-            bot.kick_chat_member(update.message.chat.id, *args, **kwargs)
+                bot.kick_chat_member(update.message.chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool`: If the action was sent succesfully.
@@ -193,17 +187,17 @@ class Chat(TelegramObject):
             This method will only work if the `All Members Are Admins` setting is off in the
             target group. Otherwise members may only be removed by the group's creator or by the
             member that added them.
-        """
 
+        """
         return self.bot.kick_chat_member(self.id, *args, **kwargs)
 
     def unban_member(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-            bot.unban_chat_member(update.message.chat.id, *args, **kwargs)
+                bot.unban_chat_member(update.message.chat.id, *args, **kwargs)
 
         Returns:
             :obj:`bool`: If the action was sent successfully.
+
         """
         return self.bot.unban_chat_member(self.id, *args, **kwargs)

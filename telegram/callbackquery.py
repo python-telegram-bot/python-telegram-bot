@@ -66,6 +66,7 @@ class CallbackQuery(TelegramObject):
         until you call :attr:`answer`. It is, therefore, necessary to react
         by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
         is needed (e.g., without specifying any of the optional parameters).
+
     """
 
     def __init__(self,
@@ -112,20 +113,18 @@ class CallbackQuery(TelegramObject):
         return data
 
     def answer(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
             bot.answer_callback_query(update.callback_query.id, *args, **kwargs)
 
         Returns:
             :obj:`bool`: On success, ``True`` is returned.
-        """
 
+        """
         return self.bot.answerCallbackQuery(self.id, *args, **kwargs)
 
     def edit_message_text(self, *args, **kwargs):
-        """
-        Shortcut for either::
+        """Shortcut for either::
 
             bot.edit_message_text(chat_id=update.callback_query.message.chat_id,
                                 message_id=update.callback_query.message.message_id,
@@ -139,8 +138,8 @@ class CallbackQuery(TelegramObject):
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
-        """
 
+        """
         if self.inline_message_id:
             return self.bot.edit_message_text(
                 inline_message_id=self.inline_message_id, *args, **kwargs)
@@ -149,8 +148,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
 
     def edit_message_caption(self, *args, **kwargs):
-        """
-        Shortcut for either::
+        """Shortcut for either::
 
             bot.edit_message_caption(chat_id=update.callback_query.message.chat_id,
                                    message_id=update.callback_query.message.message_id,
@@ -164,8 +162,8 @@ class CallbackQuery(TelegramObject):
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
-        """
 
+        """
         if self.inline_message_id:
             return self.bot.edit_message_caption(
                 inline_message_id=self.inline_message_id, *args, **kwargs)
@@ -174,8 +172,7 @@ class CallbackQuery(TelegramObject):
                 chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
 
     def edit_message_reply_markup(self, *args, **kwargs):
-        """
-        Shortcut for either::
+        """Shortcut for either::
 
             bot.edit_message_replyMarkup(chat_id=update.callback_query.message.chat_id,
                                        message_id=update.callback_query.message.message_id,
@@ -189,8 +186,8 @@ class CallbackQuery(TelegramObject):
         Returns:
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
-        """
 
+        """
         if self.inline_message_id:
             return self.bot.edit_message_reply_markup(
                 inline_message_id=self.inline_message_id, *args, **kwargs)

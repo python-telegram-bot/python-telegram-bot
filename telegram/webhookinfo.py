@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class WebhookInfo(TelegramObject):
-    """
-    This object represents a Telegram WebhookInfo.
+    """This object represents a Telegram WebhookInfo.
 
     Contains information about the current status of a webhook.
 
@@ -51,6 +50,7 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
             to. Defaults to all update types.
+
     """
 
     def __init__(self,

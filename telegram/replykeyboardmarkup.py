@@ -22,8 +22,7 @@ from telegram import ReplyMarkup, KeyboardButton
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
-    """
-    This object represents a custom keyboard with reply options.
+    """This object represents a custom keyboard with reply options.
 
     Attributes:
         keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
@@ -57,6 +56,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
             Defaults to ``False``.
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

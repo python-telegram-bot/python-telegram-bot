@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains helper functions """
+"""This module contains helper functions."""
 
 import re
 from datetime import datetime
@@ -41,7 +41,7 @@ else:
 
 
 def escape_markdown(text):
-    """Helper function to escape telegram markup symbols"""
+    """Helper function to escape telegram markup symbols."""
     escape_chars = '\*_`\['
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
@@ -53,6 +53,7 @@ def to_timestamp(dt_obj):
 
     Returns:
         int:
+
     """
     if not dt_obj:
         return None
@@ -67,6 +68,7 @@ def from_timestamp(unixtime):
 
     Returns:
         datetime.datetime:
+
     """
     if not unixtime:
         return None

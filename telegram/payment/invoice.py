@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class Invoice(TelegramObject):
-    """
-    This object contains basic information about an invoice.
+    """This object contains basic information about an invoice.
 
     Attributes:
         title (:obj:`str`): Product name.
@@ -41,6 +40,7 @@ class Invoice(TelegramObject):
         total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not
             float/double). For example, for a price of US$ 1.45 pass amount = 145.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, title, description, start_parameter, currency, total_amount, **kwargs):

@@ -22,8 +22,7 @@ from telegram import TelegramObject
 
 
 class Contact(TelegramObject):
-    """
-    This object represents a phone contact.
+    """This object represents a phone contact.
 
     Attributes:
         phone_number (:obj:`str`): Contact's phone number.
@@ -37,6 +36,7 @@ class Contact(TelegramObject):
         last_name (:obj:`str`, optional): Contact's last name.
         user_id (:obj:`int`, optional): Contact's user identifier in Telegram.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, phone_number, first_name, last_name=None, user_id=None, **kwargs):

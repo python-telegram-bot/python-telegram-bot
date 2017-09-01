@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the ConversationHandler """
+"""This module contains the ConversationHandler."""
 
 import logging
 
@@ -110,8 +110,8 @@ class ConversationHandler(Handler):
 
     Raises:
         ValueError
-    """
 
+    """
     END = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
 
@@ -203,8 +203,8 @@ class ConversationHandler(Handler):
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         # Ignore messages in channels
         if (not isinstance(update, Update) or update.channel_post or self.per_chat
                 and (update.inline_query or update.chosen_inline_result) or self.per_message
@@ -285,14 +285,13 @@ class ConversationHandler(Handler):
         return True
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the callback for the current state and Handler
+        """Send the update to the callback for the current state and Handler
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
 
+        """
         new_state = self.current_handler.handle_update(update, dispatcher)
 
         self.update_state(new_state, self.current_conversation)

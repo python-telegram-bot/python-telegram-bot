@@ -26,5 +26,6 @@ class ReplyMarkup(TelegramObject):
 
     See :class:`telegram.ReplyKeyboardMarkup` and :class:`telegram.InlineKeyboardMarkup` for
     detailed use.
+
     """
     pass

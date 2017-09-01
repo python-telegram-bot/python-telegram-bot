@@ -22,8 +22,7 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Video(TelegramObject):
-    """
-    This object represents a video file.
+    """This object represents a video file.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -43,6 +42,7 @@ class Video(TelegramObject):
         mime_type (:obj:`str`, optional): Mime type of a file as defined by sender.
         file_size (:obj:`int`, optional): File size.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self,

@@ -43,6 +43,7 @@ class MessageEntity(TelegramObject):
         url (:obj:`str`, optional): For "text_link" only, url that will be opened after usertaps on
             the text.
         user (:class:`telegram.User`, optional): For "text_mention" only, the mentioned user.
+
     """
 
     def __init__(self, type, offset, length, url=None, user=None, **kwargs):

@@ -22,8 +22,7 @@ from telegram import PhotoSize, TelegramObject
 
 
 class Document(TelegramObject):
-    """
-    This object represents a general file (as opposed to photos, voice messages and audio files).
+    """This object represents a general file (as opposed to photos, voice messages and audio files).
 
     Attributes:
         file_id (:obj:`str`): Unique file identifier.
@@ -39,8 +38,8 @@ class Document(TelegramObject):
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-    """
 
+    """
     _id_keys = ('file_id',)
 
     def __init__(self,

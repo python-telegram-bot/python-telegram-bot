@@ -22,8 +22,7 @@ from telegram import TelegramObject, ShippingAddress
 
 
 class OrderInfo(TelegramObject):
-    """
-    This object represents information about an order.
+    """This object represents information about an order.
 
     Attributes:
         name (:obj:`str`): Optional. User name.
@@ -37,6 +36,7 @@ class OrderInfo(TelegramObject):
         email (:obj:`str`, optional): User email.
         shipping_address (:class:`telegram.ShippingAddress`, optional): User shipping address.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, name=None, phone_number=None, email=None, shipping_address=None, **kwargs):

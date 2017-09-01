@@ -16,14 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the Filters for use with the MessageHandler class """
+"""This module contains the Filters for use with the MessageHandler class."""
 from telegram import Chat
 from future.utils import string_types
 
 
 class BaseFilter(object):
-    """
-    Base class for all Message Filters
+    """Base class for all Message Filters.
 
     Subclassing from this class filters to be combined using bitwise operators:
 
@@ -55,6 +54,7 @@ class BaseFilter(object):
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
+
     """
 
     name = None
@@ -78,14 +78,14 @@ class BaseFilter(object):
         return self.name
 
     def filter(self, message):
-        """
-        This method must be overwritten.
+        """This method must be overwritten.
 
         Args:
             message (:class:`telegram.Message`): The message that is tested.
 
         Returns:
             :obj:`bool`
+
         """
 
         raise NotImplementedError
@@ -96,6 +96,7 @@ class InvertedFilter(BaseFilter):
 
     Args:
         f: The filter to invert.
+
     """
 
     def __init__(self, f):
@@ -115,6 +116,7 @@ class MergedFilter(BaseFilter):
         base_filter: Filter 1 of the merged filter
         and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
+
     """
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
@@ -134,12 +136,12 @@ class MergedFilter(BaseFilter):
 
 
 class Filters(object):
-    """
-    Predefined filters for use with the `filter` argument of :class:`telegram.ext.MessageHandler`.
+    """Predefined filters for use as the `filter` argument of :class:`telegram.ext.MessageHandler`.
 
     Examples:
         Use ``MessageHandler(Filters.video, callback_method)`` to filter all video
         messages. Use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
+
     """
 
     class _All(BaseFilter):
@@ -260,12 +262,12 @@ class Filters(object):
     """:obj:`Filter`: Messages that contain :class:`telegram.Venue`."""
 
     class _StatusUpdate(BaseFilter):
-        """
-        Subset for messages containing a status update.
+        """Subset for messages containing a status update.
 
         Examples:
             Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
             ``Filters.status_update`` for all status update messages.
+
         """
 
         class _NewChatMembers(BaseFilter):
@@ -410,6 +412,7 @@ class Filters(object):
         Args:
             entity_type: Entity type to check for. All types can be found as constants
                 in :class:`telegram.MessageEntity`.
+
         """
 
         def __init__(self, entity_type):
@@ -438,8 +441,7 @@ class Filters(object):
     """:obj:`Filter`: Messages sent in a group chat."""
 
     class user(BaseFilter):
-        """
-        Filters messages to allow only those which are from specified user ID.
+        """Filters messages to allow only those which are from specified user ID.
 
         Examples:
             ``MessageHandler(Filters.user(1234), callback_method)``
@@ -451,6 +453,7 @@ class Filters(object):
 
         Raises:
             ValueError: If chat_id and username are both present, or neither is.
+
         """
 
         def __init__(self, user_id=None, username=None):
@@ -476,8 +479,7 @@ class Filters(object):
                             message.from_user.username in self.usernames)
 
     class chat(BaseFilter):
-        """
-        Filters messages to allow only those which are from specified chat ID.
+        """Filters messages to allow only those which are from specified chat ID.
 
         Examples:
             ``MessageHandler(Filters.chat(-1234), callback_method)``
@@ -489,6 +491,7 @@ class Filters(object):
 
         Raises:
             ValueError: If chat_id and username are both present, or neither is.
+
         """
 
         def __init__(self, chat_id=None, username=None):
@@ -531,10 +534,10 @@ class Filters(object):
     """:obj:`Filter`: Messages that confirm a :class:`telegram.SuccessfulPayment`."""
 
     class language(BaseFilter):
-        """
-        Filters messages to only allow those which are from users with a certain language code.
-        Note that according to telegrams documentation, every single user does not have the
-        language_code attribute.
+        """Filters messages to only allow those which are from users with a certain language code.
+
+        Note: According to telegrams documentation, every single user does not have the
+        `language_code` attribute.
 
         Examples:
             ``MessageHandler(Filters.language("en"), callback_method)``
@@ -543,6 +546,7 @@ class Filters(object):
             lang (:obj:`str` | List[:obj:`str`]): Which language code(s) to allow through. This
                 will be matched using ``.startswith`` meaning that 'en' will match both 'en_US'
                 and 'en_GB'.
+
         """
 
         def __init__(self, lang):

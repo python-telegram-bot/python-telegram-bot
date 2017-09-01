@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # TODO: Remove allow_edited
-""" This module contains the MessageHandler class """
+"""This module contains the MessageHandler class."""
 import warnings
 
 from .handler import Handler
@@ -25,8 +25,7 @@ from telegram import Update
 
 
 class MessageHandler(Handler):
-    """
-    Handler class to handle telegram messages. They might contain text, media or status updates.
+    """Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Attributes:
         filters (:obj:`Filter`): Only allow updates with these Filters. See
@@ -86,6 +85,7 @@ class MessageHandler(Handler):
 
     Raises:
         ValueError
+
     """
 
     def __init__(self,
@@ -130,16 +130,15 @@ class MessageHandler(Handler):
                     (self.channel_post_updates and update.channel_post)])
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
             :obj:`bool`
-        """
 
+        """
         if isinstance(update, Update) and self._is_allowed_update(update):
 
             if not self.filters:
@@ -158,14 +157,13 @@ class MessageHandler(Handler):
         return res
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
 
+        """
         optional_args = self.collect_optional_args(dispatcher, update)
 
         return self.callback(dispatcher.bot, update, **optional_args)

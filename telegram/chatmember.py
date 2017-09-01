@@ -23,8 +23,7 @@ from telegram.utils.helpers import to_timestamp, from_timestamp
 
 
 class ChatMember(TelegramObject):
-    """
-    This object contains information about one member of the chat.
+    """This object contains information about one member of the chat.
 
     Attributes:
         user (:class:`telegram.User`): Information about the user.
@@ -91,8 +90,8 @@ class ChatMember(TelegramObject):
             send animations, games, stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. True, if user may add
             web page previews to his messages, implies can_send_media_messages.
-    """
 
+    """
     ADMINISTRATOR = 'administrator'
     """:obj:`str`: 'administrator'"""
     CREATOR = 'creator'

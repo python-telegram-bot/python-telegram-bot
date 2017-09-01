@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the StringCommandHandler class """
+"""This module contains the StringCommandHandler class."""
 
 from future.utils import string_types
 
@@ -24,9 +24,7 @@ from .handler import Handler
 
 
 class StringCommandHandler(Handler):
-    """
-    Handler class to handle string commands. Commands are string updates
-    that start with ``/``.
+    """Handler class to handle string commands. Commands are string updates that start with ``/``.
 
     Note:
         This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
@@ -60,6 +58,7 @@ class StringCommandHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+
     """
 
     def __init__(self,
@@ -74,26 +73,26 @@ class StringCommandHandler(Handler):
         self.pass_args = pass_args
 
     def check_update(self, update):
-        """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
             update (:obj:`str`): An incomming command.
 
         Returns:
             :obj:`bool`
+
         """
 
         return (isinstance(update, string_types) and update.startswith('/')
                 and update[1:].split(' ')[0] == self.command)
 
     def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
+        """Send the update to the :attr:`callback`.
 
         Args:
             update (:obj:`str`): An incomming command.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
+
         """
 
         optional_args = self.collect_optional_args(dispatcher)
