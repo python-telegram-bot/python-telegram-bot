@@ -180,7 +180,7 @@ class Message(TelegramObject):
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
     """
-    
+
     _effective_attachment = _UNDEFINED
 
     def __init__(self,

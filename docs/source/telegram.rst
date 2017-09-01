@@ -3,7 +3,6 @@ telegram package
 
 .. toctree::
 
-   telegram.contrib
    telegram.ext
    telegram.audio
    telegram.bot
