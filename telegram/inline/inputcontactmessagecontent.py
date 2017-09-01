@@ -43,7 +43,3 @@ class InputContactMessageContent(InputMessageContent):
         self.first_name = first_name
         # Optionals
         self.last_name = last_name
-
-    @classmethod
-    def de_json(cls, data, bot):
-        return cls(**data)

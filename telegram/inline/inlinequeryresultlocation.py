@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
+from telegram import InlineQueryResult
 
 
 class InlineQueryResultLocation(InlineQueryResult):
@@ -85,16 +85,3 @@ class InlineQueryResultLocation(InlineQueryResult):
             self.thumb_width = thumb_width
         if thumb_height:
             self.thumb_height = thumb_height
-
-    @classmethod
-    def de_json(cls, data, bot):
-        data = super(InlineQueryResultLocation, cls).de_json(data, bot)
-
-        if not data:
-            return None
-
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'), bot)
-
-        return cls(**data)

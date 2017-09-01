@@ -49,7 +49,3 @@ class InputVenueMessageContent(InputMessageContent):
         self.address = address
         # Optionals
         self.foursquare_id = foursquare_id
-
-    @classmethod
-    def de_json(cls, data, bot):
-        return cls(**data)

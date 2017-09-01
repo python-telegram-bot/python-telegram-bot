@@ -54,21 +54,3 @@ class KeyboardButton(TelegramObject):
         # Optionals
         self.request_contact = request_contact
         self.request_location = request_location
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)
-
-    @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return []
-
-        keyboards = list()
-        for keyboard in data:
-            keyboards.append(cls.de_json(keyboard, bot))
-
-        return keyboards

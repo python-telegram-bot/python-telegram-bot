@@ -49,10 +49,3 @@ class ForceReply(ReplyMarkup):
         self.force_reply = bool(force_reply)
         # Optionals
         self.selective = bool(selective)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

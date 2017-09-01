@@ -87,23 +87,3 @@ class InlineKeyboardButton(TelegramObject):
         self.switch_inline_query_current_chat = switch_inline_query_current_chat
         self.callback_game = callback_game
         self.pay = pay
-
-    @classmethod
-    def de_json(cls, data, bot):
-        data = super(InlineKeyboardButton, cls).de_json(data, bot)
-
-        if not data:
-            return None
-
-        return cls(**data)
-
-    @classmethod
-    def de_list(cls, data, bot):
-        if not data:
-            return []
-
-        inline_keyboards = list()
-        for inline_keyboard in data:
-            inline_keyboards.append(cls.de_json(inline_keyboard, bot))
-
-        return inline_keyboards

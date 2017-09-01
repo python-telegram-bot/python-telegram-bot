@@ -19,16 +19,7 @@
 
 import pytest
 
-from telegram import InputTextMessageContent, InputMessageContent, ParseMode
-
-
-@pytest.fixture(scope='function')
-def json_dict():
-    return {
-        'parse_mode': TestInputTextMessageContent.parse_mode,
-        'message_text': TestInputTextMessageContent.message_text,
-        'disable_web_page_preview': TestInputTextMessageContent.disable_web_page_preview,
-    }
+from telegram import InputTextMessageContent, ParseMode
 
 
 @pytest.fixture(scope='class')
@@ -43,25 +34,10 @@ class TestInputTextMessageContent(object):
     parse_mode = ParseMode.MARKDOWN
     disable_web_page_preview = True
 
-    def test_de_json(self, json_dict, bot):
-        input_text_message_content_json = InputTextMessageContent.de_json(json_dict, bot)
-
-        assert input_text_message_content_json.parse_mode == self.parse_mode
-        assert input_text_message_content_json.message_text == self.message_text
-        assert input_text_message_content_json.disable_web_page_preview == \
-               self.disable_web_page_preview
-
-    def test_input_text_message_content_json_de_json_factory(self, json_dict, bot):
-        input_text_message_content_json = InputMessageContent.de_json(json_dict, bot)
-
-        assert isinstance(input_text_message_content_json, InputTextMessageContent)
-
-    def test_de_json_factory_without_required_args(self, json_dict, bot):
-        del (json_dict['message_text'])
-
-        input_text_message_content_json = InputMessageContent.de_json(json_dict, bot)
-
-        assert input_text_message_content_json is None
+    def test_expected_values(self, input_text_message_content):
+        assert input_text_message_content.parse_mode == self.parse_mode
+        assert input_text_message_content.message_text == self.message_text
+        assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
 
     def test_to_dict(self, input_text_message_content):
         input_text_message_content_dict = input_text_message_content.to_dict()

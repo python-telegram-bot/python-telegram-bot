@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
-from telegram import TelegramObject, LabeledPrice
+from telegram import TelegramObject
 
 
 class ShippingOption(TelegramObject):
@@ -43,17 +43,6 @@ class ShippingOption(TelegramObject):
         self.prices = prices
 
         self._id_attrs = (self.id,)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        data = super(ShippingOption, cls).de_json(data, bot)
-
-        data['prices'] = LabeledPrice.de_list(data.get('prices'), bot)
-
-        return cls(**data)
 
     def to_dict(self):
         data = super(ShippingOption, self).to_dict()

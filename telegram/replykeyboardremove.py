@@ -54,10 +54,3 @@ class ReplyKeyboardRemove(ReplyMarkup):
         self.remove_keyboard = True
         # Optionals
         self.selective = bool(selective)
-
-    @classmethod
-    def de_json(cls, data, bot):
-        if not data:
-            return None
-
-        return cls(**data)

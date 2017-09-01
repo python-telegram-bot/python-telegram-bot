@@ -19,16 +19,7 @@
 
 import pytest
 
-from telegram import InputContactMessageContent, InputMessageContent
-
-
-@pytest.fixture(scope='function')
-def json_dict():
-    return {
-        'first_name': TestInputContactMessageContent.first_name,
-        'phone_number': TestInputContactMessageContent.phone_number,
-        'last_name': TestInputContactMessageContent.last_name,
-    }
+from telegram import InputContactMessageContent
 
 
 @pytest.fixture(scope='class')
@@ -43,25 +34,10 @@ class TestInputContactMessageContent(object):
     first_name = 'first name'
     last_name = 'last name'
 
-    def test_de_json(self, json_dict, bot):
-        input_contact_message_content_json = InputContactMessageContent.de_json(json_dict, bot)
-
-        assert input_contact_message_content_json.first_name == self.first_name
-        assert input_contact_message_content_json.phone_number == self.phone_number
-        assert input_contact_message_content_json.last_name == self.last_name
-
-    def test_de_json_factory(self, json_dict, bot):
-        input_contact_message_content_json = InputMessageContent.de_json(json_dict, bot)
-
-        assert isinstance(input_contact_message_content_json, InputContactMessageContent)
-
-    def test_de_json_factory_without_required_args(self, json_dict, bot):
-        del (json_dict['phone_number'])
-        del (json_dict['first_name'])
-
-        input_contact_message_content_json = InputMessageContent.de_json(json_dict, bot)
-
-        assert input_contact_message_content_json is None
+    def test_expected_values(self, input_contact_message_content):
+        assert input_contact_message_content.first_name == self.first_name
+        assert input_contact_message_content.phone_number == self.phone_number
+        assert input_contact_message_content.last_name == self.last_name
 
     def test_to_dict(self, input_contact_message_content):
         input_contact_message_content_dict = input_contact_message_content.to_dict()

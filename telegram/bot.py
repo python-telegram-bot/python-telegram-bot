@@ -2772,12 +2772,6 @@ class Bot(TelegramObject):
 
         return result
 
-    @classmethod
-    def de_json(cls, data, bot):
-        data = super(Bot, cls).de_json(data, bot)
-
-        return cls(**data)
-
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.username}
 

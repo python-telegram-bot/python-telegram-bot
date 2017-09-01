@@ -43,19 +43,7 @@ class TestInlineKeyboardButton(object):
     callback_game = 'callback_game'
     pay = 'pay'
 
-    def test_de_json(self, bot):
-        json_dict = {
-            'text': self.text,
-            'url': self.url,
-            'callback_data': self.callback_data,
-            'switch_inline_query': self.switch_inline_query,
-            'switch_inline_query_current_chat':
-                self.switch_inline_query_current_chat,
-            'callback_game': self.callback_game,
-            'pay': self.pay
-        }
-        inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, bot)
-
+    def test_expected_values(self, inline_keyboard_button):
         assert inline_keyboard_button.text == self.text
         assert inline_keyboard_button.url == self.url
         assert inline_keyboard_button.callback_data == self.callback_data
@@ -64,12 +52,6 @@ class TestInlineKeyboardButton(object):
                self.switch_inline_query_current_chat
         assert inline_keyboard_button.callback_game == self.callback_game
         assert inline_keyboard_button.pay == self.pay
-
-    def test_de_list(self, bot, inline_keyboard_button):
-        keyboard_json = [inline_keyboard_button.to_dict(), inline_keyboard_button.to_dict()]
-        inline_keyboard_buttons = InlineKeyboardButton.de_list(keyboard_json, bot)
-
-        assert inline_keyboard_buttons == [inline_keyboard_button, inline_keyboard_button]
 
     def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()

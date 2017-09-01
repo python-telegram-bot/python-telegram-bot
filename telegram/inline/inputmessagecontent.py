@@ -29,36 +29,4 @@ class InputMessageContent(TelegramObject):
     :class:`telegram.InputVenueMessageContent` for more details.
 
     """
-
-    @classmethod
-    def de_json(cls, data, bot):
-        data = super(InputMessageContent, cls).de_json(data, bot)
-
-        if not data:
-            return None
-
-        try:
-            from telegram import InputTextMessageContent
-            return InputTextMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        try:
-            from telegram import InputVenueMessageContent
-            return InputVenueMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        try:
-            from telegram import InputLocationMessageContent
-            return InputLocationMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        try:
-            from telegram import InputContactMessageContent
-            return InputContactMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        return None
+    pass

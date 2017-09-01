@@ -19,46 +19,22 @@
 
 import pytest
 
-from telegram import InputMessageContent, InputLocationMessageContent
-
-
-@pytest.fixture(scope='function')
-def json_dict():
-    return {
-        'longitude': TestInputLocationMessageContent.longitude,
-        'latitude': TestInputLocationMessageContent.latitude,
-    }
+from telegram import InputLocationMessageContent
 
 
 @pytest.fixture(scope='class')
 def input_location_message_content():
-    return InputLocationMessageContent(TestInputLocationMessageContent.longitude,
-                                       TestInputLocationMessageContent.latitude)
+    return InputLocationMessageContent(TestInputLocationMessageContent.latitude,
+                                       TestInputLocationMessageContent.longitude)
 
 
 class TestInputLocationMessageContent(object):
-    latitude = 1.
-    longitude = 2.
+    latitude = -23.691288
+    longitude = -46.788279
 
-    def test_de_json(self, json_dict, bot):
-        input_location_message_content_json = InputLocationMessageContent.de_json(json_dict, bot)
-
-        assert input_location_message_content_json.longitude == self.longitude
-        assert input_location_message_content_json.latitude == self.latitude
-
-    def test_input_location_message_content_json_de_json_factory(self, json_dict, bot):
-        input_location_message_content_json = InputMessageContent.de_json(json_dict, bot)
-
-        assert isinstance(input_location_message_content_json, InputLocationMessageContent)
-
-    def test_de_json_factory_without_required_args(self, json_dict, bot):
-        del (json_dict['longitude'])
-        # If no args are passed it will fall in a different condition
-        # del (json_dict['latitude'])
-
-        input_location_message_content_json = InputMessageContent.de_json(json_dict, bot)
-
-        assert input_location_message_content_json is None
+    def test_expected_values(self, input_location_message_content):
+        assert input_location_message_content.longitude == self.longitude
+        assert input_location_message_content.latitude == self.latitude
 
     def test_to_dict(self, input_location_message_content):
         input_location_message_content_dict = input_location_message_content.to_dict()

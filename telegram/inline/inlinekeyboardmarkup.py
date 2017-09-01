@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from telegram import ReplyMarkup, InlineKeyboardButton
+from telegram import ReplyMarkup
 
 
 class InlineKeyboardMarkup(ReplyMarkup):
@@ -39,20 +39,6 @@ class InlineKeyboardMarkup(ReplyMarkup):
     def __init__(self, inline_keyboard, **kwargs):
         # Required
         self.inline_keyboard = inline_keyboard
-
-    @classmethod
-    def de_json(cls, data, bot):
-        data = super(InlineKeyboardMarkup, cls).de_json(data, bot)
-
-        if not data:
-            return None
-
-        data['inline_keyboard'] = [
-            InlineKeyboardButton.de_list(inline_keyboard, bot)
-            for inline_keyboard in data['inline_keyboard']
-        ]
-
-        return cls(**data)
 
     def to_dict(self):
         data = super(InlineKeyboardMarkup, self).to_dict()
