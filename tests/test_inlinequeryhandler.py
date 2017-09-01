@@ -22,18 +22,18 @@ from telegram import (Update, CallbackQuery, Bot, Message, User, Chat, InlineQue
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Location)
 from telegram.ext import InlineQueryHandler
 
-message = Message(1, User(1, ''), None, Chat(1, ''), text='Text')
+message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
 params = [
     {'message': message},
     {'edited_message': message},
-    {'callback_query': CallbackQuery(1, User(1, ''), 'chat', message=message)},
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
     {'channel_post': message},
     {'edited_channel_post': message},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, ''), '')},
-    {'shipping_query': ShippingQuery('id', User(1, ''), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, ''), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, ''), 'chat')}
+    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
+    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
+    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')}
 ]
 
 ids = ('message', 'edited_message', 'callback_query', 'channel_post',
@@ -48,7 +48,7 @@ def false_update(request):
 
 @pytest.fixture(scope='function')
 def inline_query(bot):
-    return Update(0, inline_query=InlineQuery('id', User(2, 'test user'),
+    return Update(0, inline_query=InlineQuery('id', User(2, 'test user', False),
                                               'test query', offset='22',
                                               location=Location(latitude=-23.691288,
                                                                 longitude=-46.788279)))

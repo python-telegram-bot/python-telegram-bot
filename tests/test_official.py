@@ -65,7 +65,8 @@ def check_method(h4):
     checked = []
     for parameter in table:
         param = sig.parameters.get(parameter.Parameters)
-        assert param is not None
+        assert param is not None, "Parameter {} not found in {}".format(parameter.Parameters,
+                                                                        method.__name__)
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(parameter.Parameters)
@@ -106,7 +107,7 @@ def check_object(h4):
             continue
 
         param = sig.parameters.get(field)
-        assert param is not None
+        assert param is not None, "Attribute {} not found in {}".format(field, obj.__name__)
         # TODO: Check type via docstring
         # TODO: Check if optional or required
         checked.append(field)
@@ -149,7 +150,7 @@ for thing in soup.select('h4 > a.anchor'):
 
 
 @pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(not sys.version_info >= (3, 5) or python_implementation() != 'CPython',
+@pytest.mark.skipif(not sys.version_info >= (3, 6) or python_implementation() != 'CPython',
                     reason='follow_wrapped (inspect.signature) is not supported on this platform')
 def test_official(method, data):
     method(data)

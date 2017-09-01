@@ -30,7 +30,7 @@ def inline_query(bot):
 
 class TestInlineQuery(object):
     id = 1234
-    from_user = User(1, 'First name')
+    from_user = User(1, 'First name', False)
     query = 'query text'
     offset = 'offset'
     location = Location(8.8, 53.1)
@@ -69,10 +69,10 @@ class TestInlineQuery(object):
         assert inline_query.answer()
 
     def test_equality(self):
-        a = InlineQuery(self.id, User(1, ''), '', '')
-        b = InlineQuery(self.id, User(1, ''), '', '')
-        c = InlineQuery(self.id, User(0, ''), '', '')
-        d = InlineQuery(0, User(1, ''), '', '')
+        a = InlineQuery(self.id, User(1, '', False), '', '')
+        b = InlineQuery(self.id, User(1, '', False), '', '')
+        c = InlineQuery(self.id, User(0, '', False), '', '')
+        d = InlineQuery(0, User(1, '', False), '', '')
         e = Update(self.id)
 
         assert a == b

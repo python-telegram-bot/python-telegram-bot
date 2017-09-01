@@ -24,7 +24,7 @@ from telegram import User, ChosenInlineResult, Location, Voice
 
 @pytest.fixture(scope='class')
 def user():
-    return User(1, 'First name')
+    return User(1, 'First name', False)
 
 
 @pytest.fixture(scope='class')

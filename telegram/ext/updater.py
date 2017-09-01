@@ -95,8 +95,16 @@ class Updater(object):
         if (token is not None) and (bot is not None):
             raise ValueError('`token` and `bot` are mutually exclusive')
 
+        self.logger = logging.getLogger(__name__)
+
+        con_pool_size = workers + 4
+
         if bot is not None:
             self.bot = bot
+            if bot.request.con_pool_size < con_pool_size:
+                self.logger.warning(
+                    'Connection pool of Request object is smaller than optimal value (%s)',
+                    con_pool_size)
         else:
             # we need a connection pool the size of:
             # * for each of the workers
@@ -107,7 +115,7 @@ class Updater(object):
             if request_kwargs is None:
                 request_kwargs = {}
             if 'con_pool_size' not in request_kwargs:
-                request_kwargs['con_pool_size'] = workers + 4
+                request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request)
         self.user_sig_handler = user_sig_handler
@@ -121,7 +129,6 @@ class Updater(object):
             workers=workers,
             exception_event=self.__exception_event)
         self.last_update_id = 0
-        self.logger = logging.getLogger(__name__)
         self.running = False
         self.is_idle = False
         self.httpd = None

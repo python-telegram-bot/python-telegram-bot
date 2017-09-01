@@ -26,12 +26,12 @@ from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHand
 
 @pytest.fixture(scope='class')
 def user1():
-    return User(first_name='Misses Test', id=123)
+    return User(first_name='Misses Test', id=123, is_bot=False)
 
 
 @pytest.fixture(scope='class')
 def user2():
-    return User(first_name='Mister Test', id=124)
+    return User(first_name='Mister Test', id=124, is_bot=False)
 
 
 class TestConversationHandler(object):

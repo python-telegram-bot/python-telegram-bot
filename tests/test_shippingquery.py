@@ -34,7 +34,7 @@ def shipping_query(bot):
 class TestShippingQuery(object):
     id = 5
     invoice_payload = 'invoice_payload'
-    from_user = User(0, '')
+    from_user = User(0, '', False)
     shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
 
     def test_de_json(self, bot):

@@ -31,7 +31,7 @@ def game_highscore():
 
 class TestGameHighScore(object):
     position = 12
-    user = User(2, 'test user')
+    user = User(2, 'test user', False)
     score = 42
 
     def test_de_json(self, bot):
