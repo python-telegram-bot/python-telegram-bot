@@ -78,7 +78,7 @@ class Bot(TelegramObject):
         token (:obj:`str`): Bot's unique authentication.
         base_url (:obj:`str`, optional): Telegram Bot API service URL.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
-        request (:obj:`telegram.utils.Request`, optional): Pre initialized
+        request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.Request`.
 
     """
