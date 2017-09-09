@@ -24,7 +24,7 @@ before_cache:
   - rm -f $HOME/.pre-commit/pre-commit.log
 
 install:
-  - pip install -U coveralls pytest-cov
+  - pip install -U codecov pytest-cov
   - pip install -U wheel
   - pip install -U -r requirements.txt
   - pip install -U -r requirements-dev.txt
@@ -36,4 +36,4 @@ script:
 
 after_success:
   - coverage combine
-  - coveralls
+  - codecov
