@@ -35,8 +35,8 @@ def call_pre_commit_hook(hook_id):
                    reason='Only running pre-commit-hooks on newest tested python version, '
                           'as they are slow and consistent across platforms.')
 def test_pre_commit_hook(hook_id):
-    assert call_pre_commit_hook(hook_id) == 0
+    assert call_pre_commit_hook(hook_id) == 0  # pragma: no cover
 
 
 def test_build():
-    assert os.system('python setup.py bdist_dumb') == 0
+    assert os.system('python setup.py bdist_dumb') == 0  # pragma: no cover
