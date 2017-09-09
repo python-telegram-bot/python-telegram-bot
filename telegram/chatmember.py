@@ -150,3 +150,11 @@ class ChatMember(TelegramObject):
         data['until_date'] = to_timestamp(self.until_date)
 
         return data
+
+    @property
+    def is_admin(self):
+        return self.status in (self.ADMINISTRATOR, self.CREATOR)
+
+    @property
+    def is_not_admin(self):
+        return self.status not in (self.ADMINISTRATOR, self.CREATOR)
