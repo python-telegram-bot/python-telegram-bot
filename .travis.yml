@@ -24,14 +24,15 @@ before_cache:
   - rm -f $HOME/.pre-commit/pre-commit.log
 
 install:
-  - pip install coveralls pytest-cov
+  - pip install -U coveralls pytest-cov
   - pip install -U wheel
   - pip install -U -r requirements.txt
   - pip install -U -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - pytest -v --cov=telegram
+  - pytest -v -m nocoverage
+  - pytest -v -m "not nocoverage" --cov
 
 after_success:
   - coverage combine
