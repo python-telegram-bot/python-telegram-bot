@@ -88,6 +88,9 @@ class TestChatMember(object):
         assert chat_member_dict['user'] == chat_member.user.to_dict()
         assert chat_member['status'] == chat_member.status
 
+    def test_is_admin(self, chat_member):
+        assert chat_member.is_admin
+
     def test_equality(self):
         a = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
         b = ChatMember(User(1, '', False), ChatMember.ADMINISTRATOR)
