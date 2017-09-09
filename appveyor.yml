@@ -24,4 +24,4 @@ build: off
 cache: C:\Users\appveyor\pip\wheels
 
 test_script:
-  - "%python%\\Scripts\\pytest -v --cov=telegram"
+  - "%python%\\Scripts\\pytest -v --cov"
