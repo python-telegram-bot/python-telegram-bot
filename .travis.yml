@@ -32,7 +32,9 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - pytest -v --cov=telegram
+#  - pytest -v --cov=telegram
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pre-commit run --all-files; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 -o $TRAVIS_PYTHON_VERSION == 2.7 ]]; then python setup.py bdist_dumb; fi
 
 after_success:
   - coverage combine
