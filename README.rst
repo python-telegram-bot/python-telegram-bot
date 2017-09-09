@@ -35,9 +35,9 @@ We have made you a wrapper you can't refuse
    :target: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot
    :alt: Code Climate
 
-.. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
-   :alt: Coveralls
+.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot
+   :alt: Code coverage
    
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
