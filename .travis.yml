@@ -24,7 +24,6 @@ before_cache:
   - rm -f $HOME/.pre-commit/pre-commit.log
 
 install:
-  - pip install -U coverage
   - pip install -U coveralls pytest-cov
   - pip install -U wheel
   - pip install -U -r requirements.txt
@@ -32,9 +31,8 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-#  - pytest -v --cov=telegram
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pre-commit run --all-files; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 -o $TRAVIS_PYTHON_VERSION == 2.7 ]]; then python setup.py bdist_dumb; fi
+  - pytest -v -m nocoverage
+  - pytest -v -m "not nocoverage" --cov
 
 after_success:
   - coverage combine
