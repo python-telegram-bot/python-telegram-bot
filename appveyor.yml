@@ -13,11 +13,11 @@ environment:
     - PYTHON: "C:\\Python36"
 
 install:
+  - "git submodule update --init --recursive"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts"
   # Check that we have the expected version and architecture for Python
   - "python --version"
   # We need wheel installed to build wheels
-  - "git submodule update --init --recursive"
   - "pip install -U codecov pytest-cov"
   - "pip install -U wheel"
   - "pip install -r requirements.txt"
