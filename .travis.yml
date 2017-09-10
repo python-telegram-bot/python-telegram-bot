@@ -35,4 +35,5 @@ script:
   - pytest -v -m "not nocoverage" --cov
 
 after_success:
+  - coverage combine
   - codecov -F Travis
