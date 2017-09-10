@@ -26,8 +26,7 @@ install:
 build: off
 
 test_script:
-  - "pytest -v -m nocoverage"
-  - "pytest -v -m \"not nocoverage\" --cov"
+  - "pytest -m \"not nocoverage\" --cov"
 
 after_test:
  - "codecov"
