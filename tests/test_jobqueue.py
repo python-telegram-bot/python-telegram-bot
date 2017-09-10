@@ -36,7 +36,7 @@ def job_queue(bot):
 
 
 @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                    reason="The expected specific timings are not met on appveyor due to their "
+                    reason="Precise timings are not met on appveyor due to their "
                            "inaccuracy with time.sleep()")
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue(object):

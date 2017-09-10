@@ -26,7 +26,7 @@ import telegram.ext.messagequeue as mq
 
 
 @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                    reason="The expected specific timings are not met on appveyor due to their "
+                    reason="Precise timings are not met on appveyor due to their "
                            "inaccuracy with time.sleep()")
 class TestDelayQueue(object):
     N = 128
