@@ -66,7 +66,25 @@ def message(func):
     @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         url, data = func(self, *args, **kwargs)
-        return self._message_wrapper(url, data, *args, **kwargs)
+        if kwargs.get('reply_to_message_id'):
+            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
+
+        if kwargs.get('disable_notification'):
+            data['disable_notification'] = kwargs.get('disable_notification')
+
+        if kwargs.get('reply_markup'):
+            reply_markup = kwargs.get('reply_markup')
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+
+        if result is True:
+            return result
+
+        return Message.de_json(result, self)
 
     return decorator
 
@@ -147,27 +165,6 @@ class Bot(TelegramObject):
         """:obj:`str`: Bot's @username."""
 
         return '@{0}'.format(self.username)
-
-    def _message_wrapper(self, url, data, *args, **kwargs):
-        if kwargs.get('reply_to_message_id'):
-            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
-
-        if kwargs.get('disable_notification'):
-            data['disable_notification'] = kwargs.get('disable_notification')
-
-        if kwargs.get('reply_markup'):
-            reply_markup = kwargs.get('reply_markup')
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
-
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
-
-        if result is True:
-            return result
-
-        return Message.de_json(result, self)
 
     @log
     def get_me(self, timeout=None, **kwargs):
