@@ -29,4 +29,4 @@ test_script:
   - "pytest -m \"not nocoverage\" --cov --cov-report xml:coverage.xml"
 
 after_test:
- - "codecov -f coverage.xml"
+ - "codecov -f coverage.xml -F Appveyor"
