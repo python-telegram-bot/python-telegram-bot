@@ -208,11 +208,6 @@ class TestMessage(object):
         assert message.parse_entities() == {link_entity: text}
         assert next(iter(message.parse_entities())).url == url
 
-    def test_type(self, message, message_params):
-        message.photo = [PhotoSize('photo_id', 50, 50)]
-        message.photo.caption = 'Test'
-        assert message.type == 'photo'
-
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
