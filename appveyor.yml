@@ -12,6 +12,14 @@ environment:
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
 
+branches:
+  only:
+  - master
+
+skip_branch_with_pr: true
+
+max_jobs: 1
+
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "git submodule update --init --recursive"
