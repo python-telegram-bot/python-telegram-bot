@@ -149,9 +149,7 @@ class TestBot(object):
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_game(self, bot, chat_id):
@@ -370,9 +368,7 @@ class TestBot(object):
         assert chat_member.status == 'administrator'
         assert chat_member.user.username == 'EchteEldin'
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
@@ -391,9 +387,7 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text != game.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_2(self, bot, chat_id):
@@ -415,9 +409,7 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text == game.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_3(self, bot, chat_id):
@@ -434,9 +426,7 @@ class TestBot(object):
                 chat_id=game.chat_id,
                 message_id=game.message_id)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_4(self, bot, chat_id):
@@ -462,9 +452,7 @@ class TestBot(object):
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_too_low_score(self, bot, chat_id):
@@ -476,9 +464,7 @@ class TestBot(object):
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'),
-                        reason='Skip game tests on Appveyor because no game made for the bot ('
-                               'yet)')
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_game_high_scores(self, bot, chat_id):
