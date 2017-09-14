@@ -419,9 +419,10 @@ class Message(TelegramObject):
         Sends a message with markdown formatting.
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
         """
 
         kwargs['parse_mode'] = ParseMode.MARKDOWN
@@ -441,9 +442,10 @@ class Message(TelegramObject):
         Sends a message with HTML formatting.
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
         """
 
         kwargs['parse_mode'] = ParseMode.HTML
