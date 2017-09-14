@@ -409,12 +409,9 @@ class Message(TelegramObject):
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_markdown(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                ``bot.sendMessage(update.message.chat_id,
-                                  parse_mode=ParseMode.MARKDOWN,
-                                  *args, **kwargs)``
+            bot.sendMessage(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args, **kwargs)
 
         Sends a message with markdown formatting.
 
@@ -432,12 +429,9 @@ class Message(TelegramObject):
         return self.bot.sendMessage(self.chat_id, *args, **kwargs)
 
     def reply_html(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                ``bot.sendMessage(update.message.chat_id,
-                                  parse_mode=ParseMode.HTML,
-                                  *args, **kwargs)``
+            bot.sendMessage(update.message.chat_id, parse_mode=ParseMode.HTML, *args, **kwargs)
 
         Sends a message with HTML formatting.
 
