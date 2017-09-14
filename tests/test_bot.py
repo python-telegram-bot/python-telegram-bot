@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import time
 from datetime import datetime, timedelta
 from platform import python_implementation
@@ -27,7 +28,7 @@ from future.utils import string_types
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
                       ShippingOption, LabeledPrice)
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TimedOut
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp
 
 BASE_TIME = time.time()
@@ -148,6 +149,7 @@ class TestBot(object):
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_game(self, bot, chat_id):
@@ -191,14 +193,16 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_user_profile_photos(self, bot, chat_id):
+    def test_get_user_profile_photos(self, bot):
+        chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
         assert user_profile_photos.photos[0][0].file_size == 12421
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_one_user_profile_photo(self, bot, chat_id):
+    def test_get_one_user_profile_photo(self, bot):
+        chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
         assert user_profile_photos.photos[0][0].file_size == 12421
 
@@ -364,6 +368,7 @@ class TestBot(object):
         assert chat_member.status == 'administrator'
         assert chat_member.user.username == 'EchteEldin'
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
@@ -382,6 +387,7 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text != game.game.text
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_2(self, bot, chat_id):
@@ -403,6 +409,7 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text == game.game.text
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_3(self, bot, chat_id):
@@ -419,6 +426,7 @@ class TestBot(object):
                 chat_id=game.chat_id,
                 message_id=game.message_id)
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_4(self, bot, chat_id):
@@ -444,6 +452,7 @@ class TestBot(object):
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_too_low_score(self, bot, chat_id):
@@ -455,6 +464,7 @@ class TestBot(object):
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_game_high_scores(self, bot, chat_id):
