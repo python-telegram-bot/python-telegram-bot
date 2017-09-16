@@ -105,13 +105,6 @@ class CallbackQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
-        data = super(CallbackQuery, self).to_dict()
-
-        # Required
-        data['from'] = data.pop('from_user', None)
-        return data
-
     def answer(self, *args, **kwargs):
         """Shortcut for::
 
@@ -180,7 +173,8 @@ class CallbackQuery(TelegramObject):
 
         or::
 
-            bot.edit_message_reply_markup(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_reply_markup(
+            inline_message_id=update.callback_query.inline_message_id,
                                        *args, **kwargs)
 
         Returns:

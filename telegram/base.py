@@ -70,6 +70,8 @@ class TelegramObject(object):
                 else:
                     data[key] = value
 
+        if data.get('from_user'):
+            data['from'] = data.pop('from_user', None)
         return data
 
     def __eq__(self, other):
