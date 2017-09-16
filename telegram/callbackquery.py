@@ -173,8 +173,7 @@ class CallbackQuery(TelegramObject):
 
         or::
 
-            bot.edit_message_reply_markup(
-            inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_reply_markup(inline_message_id=update.callback_query.inline_message_id,
                                        *args, **kwargs)
 
         Returns:
