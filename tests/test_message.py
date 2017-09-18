@@ -217,6 +217,37 @@ class TestMessage(object):
         assert message.reply_text('test', quote=True)
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
+    def test_reply_markdown(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            markdown_text = args[2] == 'test'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and text and reply
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_markdown('test')
+        assert message.reply_markdown('test', quote=True)
+        assert message.reply_markdown('test', reply_to_message_id=message.message_id, quote=True)
+
+    def test_reply_markdown(self):
+        message = self._bot.sendMessage(self._chat_id, '.')
+        text = 'Testing class method *with* _markdown_ `enabled`.'
+        message = message.reply_markdown(text)
+
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text_markdown, text)
+
+    def test_reply_html(self):
+        message = self._bot.sendMessage(self._chat_id, '.')
+        text = 'Testing class method <b>with</b> <i>html</i> <code>enabled</code>.'
+        message = message.reply_html(text)
+ 
+        self.assertTrue(self.is_json(message.to_json()))
+        self.assertEqual(message.text_html, text)
+
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):
             id = args[1] == message.chat_id
