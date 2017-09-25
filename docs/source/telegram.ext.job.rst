@@ -1,7 +1,7 @@
-telegram.ext.JobQueue
+telegram.ext.Job
 =====================
 
-.. autoclass:: telegram.ext.JobQueue
+.. autoclass:: telegram.ext.Job
     :members:
     :show-inheritance:
     :special-members:
