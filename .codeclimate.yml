@@ -3,3 +3,17 @@ languages:
 exclude_paths:
 - "telegram/emoji.py"
 - "tests/*"
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python:
+    checks:
+      Similar code:
+        enabled: false
+
+  radon:
+    enabled: true
+    config:
+      threshold: "C"
