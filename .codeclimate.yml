@@ -15,3 +15,6 @@ engines:
     enabled: true
     config:
       threshold: "C"
+ratings:
+  paths:
+    - "**.py"
