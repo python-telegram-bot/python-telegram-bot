@@ -29,6 +29,7 @@ except ImportError:
     import json
 
 import certifi
+
 try:
     import telegram.vendor.ptb_urllib3.urllib3 as urllib3
     import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
@@ -150,7 +151,7 @@ class Request(object):
         except ValueError:
             raise TelegramError('Invalid server response')
 
-        if not data.get('ok'):
+        if not data.get('ok'):  # pragma: no cover
             description = data.get('description')
             parameters = data.get('parameters')
             if parameters:
