@@ -260,7 +260,7 @@ class Updater(object):
                 return self.update_queue
 
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
-                       allowed_updates):
+                       allowed_updates):  # pragma: no cover
         # """
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
