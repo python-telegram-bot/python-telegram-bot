@@ -1,6 +1,6 @@
 exclude_paths:
 - "tests/*"
-- "examples/*
+- "examples/*"
 engines:
   duplication:
     enabled: true
