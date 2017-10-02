@@ -21,6 +21,8 @@
 import re
 from datetime import datetime
 
+from ordered_set import OrderedSet
+
 try:
     from html import escape as escape_html  # noqa: F401
 except ImportError:
@@ -100,3 +102,24 @@ def mention_markdown(user_id, name):
     """
     if isinstance(user_id, int):
         return '[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
+
+
+def extract_urls(message):
+    """
+    Extracts all Hyperlinks that are contained in a message.
+
+    Args:
+        message (:obj:`telegram.Message`) The message to extract from
+
+    Returns:
+        :obj:`list`: A list of URLs contained in the message
+    """
+    from telegram import MessageEntity
+
+    results = message.parse_entities(types=[
+        MessageEntity.URL,
+        MessageEntity.TEXT_LINK])
+    urls = list(OrderedSet(
+        [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
+    ))
+    return urls
