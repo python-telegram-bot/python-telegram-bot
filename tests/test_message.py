@@ -33,52 +33,34 @@ def message(bot):
 
 @pytest.fixture(scope='function',
                 params=[
-                    {
-                        'forward_from': User(99, 'forward_user', False),
-                        'forward_date': datetime.now()
-                    },
-                    {
-                        'forward_from_chat': Chat(-23, 'channel'),
-                        'forward_from_message_id': 101,
-                        'forward_date': datetime.now()
-                    },
+                    {'forward_from': User(99, 'forward_user', False),
+                     'forward_date': datetime.now()},
+                    {'forward_from_chat': Chat(-23, 'channel'),
+                     'forward_from_message_id': 101,
+                     'forward_date': datetime.now()},
                     {'reply_to_message': Message(50, None, None, None)},
                     {'edit_date': datetime.now()},
-                    {
-                        'test': 'a text message',
-                        'enitites': [MessageEntity('bold', 10, 4),
-                                     MessageEntity('italic', 16, 7)]
-                    },
-                    {
-                        'audio': Audio('audio_id', 12),
-                        'caption': 'audio_file'
-                    },
-                    {
-                        'document': Document('document_id'),
-                        'caption': 'document_file'
-                    },
-                    {
-                        'game': Game('my_game', 'just my game',
-                                     [PhotoSize('game_photo_id', 30, 30), ])
-                    },
-                    {
-                        'photo': [PhotoSize('photo_id', 50, 50)],
-                        'caption': 'photo_file'
-                    },
+                    {'test': 'a text message',
+                     'enitites': [MessageEntity('bold', 10, 4),
+                                  MessageEntity('italic', 16, 7)]},
+                    {'audio': Audio('audio_id', 12),
+                     'caption': 'audio_file'},
+                    {'document': Document('document_id'),
+                     'caption': 'document_file'},
+                    {'game': Game('my_game', 'just my game',
+                                  [PhotoSize('game_photo_id', 30, 30), ])},
+                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                     'caption': 'photo_file'},
                     {'sticker': Sticker('sticker_id', 50, 50)},
-                    {
-                        'video': Video('video_id', 12, 12, 12),
-                        'caption': 'video_file'
-                    },
+                    {'video': Video('video_id', 12, 12, 12),
+                     'caption': 'video_file'},
                     {'voice': Voice('voice_id', 5)},
                     {'video_note': VideoNote('video_note_id', 20, 12)},
                     {'new_chat_members': [User(55, 'new_user', False)]},
                     {'contact': Contact('phone_numner', 'contact_name')},
                     {'location': Location(-23.691288, 46.788279)},
-                    {
-                        'venue': Venue(Location(-23.691288, 46.788279),
-                                       'some place', 'right here')
-                    },
+                    {'venue': Venue(Location(-23.691288, 46.788279),
+                                    'some place', 'right here')},
                     {'left_chat_member': User(33, 'kicked', False)},
                     {'new_chat_title': 'new title'},
                     {'new_chat_photo': [PhotoSize('photo_id', 50, 50)]},
@@ -90,11 +72,9 @@ def message(bot):
                     {'migrate_from_chat_id': -54321},
                     {'pinned_message': Message(7, None, None, None)},
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
-                    {
-                        'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
-                                                                'charge_id', 'provider_id',
-                                                                order_info={})
-                    },
+                    {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
+                                                             'charge_id', 'provider_id',
+                                                             order_info={})},
                     {'forward_signature': 'some_forward_sign'},
                     {'author_signature': 'some_author_sign'}
                 ],
@@ -220,6 +200,7 @@ class TestMessage(object):
         else:
             item = None
         assert message_params.effective_attachment == item
+
 
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):
