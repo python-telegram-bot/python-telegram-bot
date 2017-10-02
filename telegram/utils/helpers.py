@@ -128,3 +128,5 @@ def effective_message_type(entity):
     for i in Message.MESSAGE_TYPES:
         if getattr(message, i, None):
             return i
+
+    return None
