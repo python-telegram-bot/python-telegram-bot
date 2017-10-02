@@ -1,7 +1,6 @@
-telegram.ext.conversationhandler module
-=======================================
+telegram.ext.ConversationHandler
+================================
 
-.. automodule:: telegram.ext.conversationhandler
+.. autoclass:: telegram.ext.ConversationHandler
     :members:
-    :undoc-members:
     :show-inheritance:

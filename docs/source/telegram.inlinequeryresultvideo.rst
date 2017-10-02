@@ -1,7 +1,6 @@
-telegram.inlinequeryresultvideo module
-======================================
+telegram.InlineQueryResultVideo
+===============================
 
-.. automodule:: telegram.inlinequeryresultvideo
+.. autoclass:: telegram.InlineQueryResultVideo
     :members:
-    :undoc-members:
     :show-inheritance:

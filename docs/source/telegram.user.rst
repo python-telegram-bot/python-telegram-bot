@@ -1,7 +1,7 @@
-telegram.user module
-====================
+telegram.User
+=============
 
-.. automodule:: telegram.user
+.. autoclass:: telegram.User
     :members:
     :undoc-members:
     :show-inheritance:

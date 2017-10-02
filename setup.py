@@ -18,11 +18,6 @@ def requirements():
 
 
 packages = find_packages(exclude=['tests*'])
-packages.extend(['telegram.vendor.urllib3.urllib3',
-                'telegram.vendor.urllib3.urllib3.packages', 'telegram.vendor.urllib3.urllib3.packages.ssl_match_hostname',
-                'telegram.vendor.urllib3.urllib3.packages.backports', 'telegram.vendor.urllib3.urllib3.contrib',
-                'telegram.vendor.urllib3.urllib3.util',
-                ])
 
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
     fn = os.path.join('telegram', 'version.py')

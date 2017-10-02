@@ -1,6 +1,8 @@
-# python-telegram-bot - a Python interface to the Telegram Bot API
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
-# by the python-telegram-bot contributors <devs@python-telegram-bot.org>
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser Public License as published by
@@ -14,60 +16,33 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""Test the Telegram constants."""
-
-import sys
-import unittest
-
+import pytest
 from flaky import flaky
 
-sys.path.append('.')
-
-import telegram
+from telegram import constants
 from telegram.error import BadRequest
-from tests.base import BaseTest, timeout
 
 
-class ConstantsTest(BaseTest, unittest.TestCase):
+class TestConstants(object):
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_max_message_length(self, bot, chat_id):
+        bot.send_message(chat_id=chat_id, text='a' * constants.MAX_MESSAGE_LENGTH)
+
+        with pytest.raises(BadRequest, message='MAX_MESSAGE_LENGTH is no longer valid',
+                           match='too long'):
+            bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
 
     @flaky(3, 1)
-    @timeout(10)
-    def testMaxMessageLength(self):
-        self._bot.sendMessage(
-            chat_id=self._chat_id, text='a' * telegram.constants.MAX_MESSAGE_LENGTH)
-
-        try:
-            self._bot.sendMessage(
-                chat_id=self._chat_id, text='a' * (telegram.constants.MAX_MESSAGE_LENGTH + 1))
-        except BadRequest as e:
-            err = str(e)
-
-        self.assertTrue("too long" in err)  # BadRequest: 'Message is too long'
-
-    @flaky(3, 1)
-    @timeout(10)
-    def testMaxCaptionLength(self):
-        good_caption = 'a' * telegram.constants.MAX_CAPTION_LENGTH
-        good_msg = self._bot.sendPhoto(
-            photo=open('tests/data/telegram.png', 'rb'),
-            caption=good_caption,
-            chat_id=self._chat_id)
-        self.assertEqual(good_msg.caption, good_caption)
+    @pytest.mark.timeout(10)
+    def test_max_caption_length(self, bot, chat_id):
+        good_caption = 'a' * constants.MAX_CAPTION_LENGTH
+        with open('tests/data/telegram.png', 'rb') as f:
+            good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
+        assert good_msg.caption == good_caption
 
         bad_caption = good_caption + 'Z'
-        try:
-            bad_msg = self._bot.sendPhoto(
-                photo=open('tests/data/telegram.png', 'rb'),
-                caption='a' * (telegram.constants.MAX_CAPTION_LENGTH + 1),
-                chat_id=self._chat_id)
-        except BadRequest as e:
-            # This used to be the way long caption was handled before Oct? Nov? 2016
-            err = str(e)
-            self.assertTrue("TOO_LONG" in err)  # BadRequest: 'MEDIA_CAPTION_TOO_LONG'
-        else:
-            self.assertNotEqual(bad_msg.caption, bad_caption)
-            self.assertEqual(len(bad_msg.caption), telegram.constants.MAX_CAPTION_LENGTH)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        with open('tests/data/telegram.png', 'rb') as f:
+            bad_message = bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
+        assert bad_message.caption != bad_caption
+        assert len(bad_message.caption) == constants.MAX_CAPTION_LENGTH

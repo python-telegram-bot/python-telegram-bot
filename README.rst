@@ -15,6 +15,10 @@ We have made you a wrapper you can't refuse
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: Supported python versions
 
+.. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
+   :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
+   :alt: PyPi Package Monthly Download
+
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
    :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
@@ -31,9 +35,9 @@ We have made you a wrapper you can't refuse
    :target: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot
    :alt: Code Climate
 
-.. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
-   :alt: Coveralls
+.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot
+   :alt: Code coverage
    
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
@@ -84,13 +88,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **21. May 2017**, all types and methods of the Telegram Bot API 2.3.1 are supported. Additionally, the ``deleteMessage`` API function and the field ``User.language_code`` are supported.
-
-Also, version 6.1 beta 0 is available, offering full but experimental Bot API 3.0 coverage:
-
-.. code:: shell
-
-    $ pip install python-telegram-bot==6.1b0
+As of **23. July 2017**, all types and methods of the Telegram Bot API 3.2 are supported.
 
 ==========
 Installing

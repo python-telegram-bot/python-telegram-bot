@@ -1,7 +1,6 @@
-telegram.audio module
-=====================
+telegram.Audio
+==============
 
-.. automodule:: telegram.audio
+.. autoclass:: telegram.Audio
     :members:
-    :undoc-members:
     :show-inheritance:

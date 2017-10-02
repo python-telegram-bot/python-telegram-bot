@@ -1,7 +1,7 @@
-telegram.ext.handler module
-===========================
+telegram.ext.Handler
+====================
 
-.. automodule:: telegram.ext.handler
+.. autoclass:: telegram.ext.Handler
     :members:
     :undoc-members:
     :show-inheritance:

@@ -5,99 +5,93 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultCachedPhoto"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InputTextMessageContent, InlineQueryResultCachedPhoto, InlineKeyboardButton,
+                      InlineQueryResultCachedVoice, InlineKeyboardMarkup)
 
 
-class InlineQueryResultCachedPhotoTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedPhoto."""
+@pytest.fixture(scope='class')
+def inline_query_result_cached_photo():
+    return InlineQueryResultCachedPhoto(TestInlineQueryResultCachedPhoto.id,
+                                        TestInlineQueryResultCachedPhoto.photo_file_id,
+                                        title=TestInlineQueryResultCachedPhoto.title,
+                                        description=TestInlineQueryResultCachedPhoto.description,
+                                        caption=TestInlineQueryResultCachedPhoto.caption,
+                                        input_message_content=TestInlineQueryResultCachedPhoto.input_message_content,
+                                        reply_markup=TestInlineQueryResultCachedPhoto.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'photo'
-        self.photo_file_id = 'photo file id'
-        self.title = 'title'
-        self.description = 'description'
-        self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
 
-        self.json_dict = {
-            'type': self.type,
-            'id': self._id,
-            'photo_file_id': self.photo_file_id,
-            'title': self.title,
-            'description': self.description,
-            'caption': self.caption,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
+class TestInlineQueryResultCachedPhoto(object):
+    id = 'id'
+    type = 'photo'
+    photo_file_id = 'photo file id'
+    title = 'title'
+    description = 'description'
+    caption = 'caption'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_photo_de_json(self):
-        photo = telegram.InlineQueryResultCachedPhoto.de_json(self.json_dict, self._bot)
+    def test_expected_values(self, inline_query_result_cached_photo):
+        assert inline_query_result_cached_photo.type == self.type
+        assert inline_query_result_cached_photo.id == self.id
+        assert inline_query_result_cached_photo.photo_file_id == self.photo_file_id
+        assert inline_query_result_cached_photo.title == self.title
+        assert inline_query_result_cached_photo.description == self.description
+        assert inline_query_result_cached_photo.caption == self.caption
+        assert inline_query_result_cached_photo.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_photo.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-        self.assertEqual(photo.type, self.type)
-        self.assertEqual(photo.id, self._id)
-        self.assertEqual(photo.photo_file_id, self.photo_file_id)
-        self.assertEqual(photo.title, self.title)
-        self.assertEqual(photo.description, self.description)
-        self.assertEqual(photo.caption, self.caption)
-        self.assertDictEqual(photo.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(photo.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_to_dict(self, inline_query_result_cached_photo):
+        inline_query_result_cached_photo_dict = inline_query_result_cached_photo.to_dict()
 
-    def test_photo_to_json(self):
-        photo = telegram.InlineQueryResultCachedPhoto.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(photo.to_json()))
-
-    def test_photo_to_dict(self):
-        photo = telegram.InlineQueryResultCachedPhoto.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(photo))
-        self.assertDictEqual(self.json_dict, photo)
+        assert isinstance(inline_query_result_cached_photo_dict, dict)
+        assert inline_query_result_cached_photo_dict['type'] == \
+               inline_query_result_cached_photo.type
+        assert inline_query_result_cached_photo_dict['id'] == inline_query_result_cached_photo.id
+        assert inline_query_result_cached_photo_dict['photo_file_id'] == \
+               inline_query_result_cached_photo.photo_file_id
+        assert inline_query_result_cached_photo_dict['title'] == \
+               inline_query_result_cached_photo.title
+        assert inline_query_result_cached_photo_dict['description'] == \
+               inline_query_result_cached_photo.description
+        assert inline_query_result_cached_photo_dict['caption'] == \
+               inline_query_result_cached_photo.caption
+        assert inline_query_result_cached_photo_dict['input_message_content'] == \
+               inline_query_result_cached_photo.input_message_content.to_dict()
+        assert inline_query_result_cached_photo_dict['reply_markup'] == \
+               inline_query_result_cached_photo.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultCachedPhoto(self._id, self.photo_file_id)
-        b = telegram.InlineQueryResultCachedPhoto(self._id, self.photo_file_id)
-        c = telegram.InlineQueryResultCachedPhoto(self._id, "")
-        d = telegram.InlineQueryResultCachedPhoto("", self.photo_file_id)
-        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+        a = InlineQueryResultCachedPhoto(self.id, self.photo_file_id)
+        b = InlineQueryResultCachedPhoto(self.id, self.photo_file_id)
+        c = InlineQueryResultCachedPhoto(self.id, '')
+        d = InlineQueryResultCachedPhoto('', self.photo_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

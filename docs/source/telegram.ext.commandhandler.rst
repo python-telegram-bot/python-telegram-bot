@@ -1,7 +1,6 @@
-telegram.ext.commandhandler module
-==================================
+telegram.ext.CommandHandler
+===========================
 
-.. automodule:: telegram.ext.commandhandler
+.. autoclass:: telegram.ext.CommandHandler
     :members:
-    :undoc-members:
     :show-inheritance:

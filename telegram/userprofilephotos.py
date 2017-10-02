@@ -16,22 +16,23 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-UserProfilePhotos."""
+"""This module contains an object that represents a Telegram UserProfilePhotos."""
 
 from telegram import PhotoSize, TelegramObject
 
 
 class UserProfilePhotos(TelegramObject):
-    """This object represents a Telegram UserProfilePhotos.
+    """This object represent a user's profile pictures.
 
     Attributes:
-        total_count (int):
-        photos (List[List[:class:`telegram.PhotoSize`]]):
+        total_count (:obj:`int`): Total number of profile pictures.
+        photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.
 
     Args:
-        total_count (int):
-        photos (List[List[:class:`telegram.PhotoSize`]]):
+        total_count (:obj:`int`): Total number of profile pictures the target user has.
+        photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
+            sizes each).
+
     """
 
     def __init__(self, total_count, photos, **kwargs):
@@ -39,30 +40,18 @@ class UserProfilePhotos(TelegramObject):
         self.total_count = int(total_count)
         self.photos = photos
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.UserProfilePhotos:
-        """
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(UserProfilePhotos, UserProfilePhotos).de_json(data, bot)
+        data = super(UserProfilePhotos, cls).de_json(data, bot)
 
         data['photos'] = [PhotoSize.de_list(photo, bot) for photo in data['photos']]
 
-        return UserProfilePhotos(**data)
+        return cls(**data)
 
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = super(UserProfilePhotos, self).to_dict()
 
         data['photos'] = []

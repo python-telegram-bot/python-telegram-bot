@@ -1,7 +1,7 @@
-telegram.update module
-======================
+telegram.Update
+===============
 
-.. automodule:: telegram.update
+.. autoclass:: telegram.Update
     :members:
     :undoc-members:
     :show-inheritance:

@@ -5,107 +5,102 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultPhoto"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InputTextMessageContent, InlineKeyboardButton, InlineKeyboardMarkup,
+                      InlineQueryResultPhoto, InlineQueryResultVoice)
 
 
-class InlineQueryResultPhotoTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultPhoto."""
+@pytest.fixture(scope='class')
+def inline_query_result_photo():
+    return InlineQueryResultPhoto(TestInlineQueryResultPhoto.id,
+                                  TestInlineQueryResultPhoto.photo_url,
+                                  TestInlineQueryResultPhoto.thumb_url,
+                                  photo_width=TestInlineQueryResultPhoto.photo_width,
+                                  photo_height=TestInlineQueryResultPhoto.photo_height,
+                                  title=TestInlineQueryResultPhoto.title,
+                                  description=TestInlineQueryResultPhoto.description,
+                                  caption=TestInlineQueryResultPhoto.caption,
+                                  input_message_content=TestInlineQueryResultPhoto.input_message_content,
+                                  reply_markup=TestInlineQueryResultPhoto.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'photo'
-        self.photo_url = 'photo url'
-        self.photo_width = 10
-        self.photo_height = 15
-        self.thumb_url = 'thumb url'
-        self.title = 'title'
-        self.description = 'description'
-        self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
 
-        self.json_dict = {
-            'type': self.type,
-            'id': self._id,
-            'photo_url': self.photo_url,
-            'photo_width': self.photo_width,
-            'photo_height': self.photo_height,
-            'thumb_url': self.thumb_url,
-            'title': self.title,
-            'description': self.description,
-            'caption': self.caption,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
+class TestInlineQueryResultPhoto(object):
+    id = 'id'
+    type = 'photo'
+    photo_url = 'photo url'
+    photo_width = 10
+    photo_height = 15
+    thumb_url = 'thumb url'
+    title = 'title'
+    description = 'description'
+    caption = 'caption'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_photo_de_json(self):
-        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot)
+    def test_expected_values(self, inline_query_result_photo):
+        assert inline_query_result_photo.type == self.type
+        assert inline_query_result_photo.id == self.id
+        assert inline_query_result_photo.photo_url == self.photo_url
+        assert inline_query_result_photo.photo_width == self.photo_width
+        assert inline_query_result_photo.photo_height == self.photo_height
+        assert inline_query_result_photo.thumb_url == self.thumb_url
+        assert inline_query_result_photo.title == self.title
+        assert inline_query_result_photo.description == self.description
+        assert inline_query_result_photo.caption == self.caption
+        assert inline_query_result_photo.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        self.assertEqual(photo.type, self.type)
-        self.assertEqual(photo.id, self._id)
-        self.assertEqual(photo.photo_url, self.photo_url)
-        self.assertEqual(photo.photo_width, self.photo_width)
-        self.assertEqual(photo.photo_height, self.photo_height)
-        self.assertEqual(photo.thumb_url, self.thumb_url)
-        self.assertEqual(photo.title, self.title)
-        self.assertEqual(photo.description, self.description)
-        self.assertEqual(photo.caption, self.caption)
-        self.assertDictEqual(photo.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(photo.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_to_dict(self, inline_query_result_photo):
+        inline_query_result_photo_dict = inline_query_result_photo.to_dict()
 
-    def test_photo_to_json(self):
-        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(photo.to_json()))
-
-    def test_photo_to_dict(self):
-        photo = telegram.InlineQueryResultPhoto.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(photo))
-        self.assertDictEqual(self.json_dict, photo)
+        assert isinstance(inline_query_result_photo_dict, dict)
+        assert inline_query_result_photo_dict['type'] == inline_query_result_photo.type
+        assert inline_query_result_photo_dict['id'] == inline_query_result_photo.id
+        assert inline_query_result_photo_dict['photo_url'] == inline_query_result_photo.photo_url
+        assert inline_query_result_photo_dict['photo_width'] == \
+               inline_query_result_photo.photo_width
+        assert inline_query_result_photo_dict['photo_height'] == \
+               inline_query_result_photo.photo_height
+        assert inline_query_result_photo_dict['thumb_url'] == inline_query_result_photo.thumb_url
+        assert inline_query_result_photo_dict['title'] == inline_query_result_photo.title
+        assert inline_query_result_photo_dict['description'] == \
+               inline_query_result_photo.description
+        assert inline_query_result_photo_dict['caption'] == inline_query_result_photo.caption
+        assert inline_query_result_photo_dict['input_message_content'] == \
+               inline_query_result_photo.input_message_content.to_dict()
+        assert inline_query_result_photo_dict['reply_markup'] == \
+               inline_query_result_photo.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultPhoto(self._id, self.photo_url, self.thumb_url)
-        b = telegram.InlineQueryResultPhoto(self._id, self.photo_url, self.thumb_url)
-        c = telegram.InlineQueryResultPhoto(self._id, "", self.thumb_url)
-        d = telegram.InlineQueryResultPhoto("", self.photo_url, self.thumb_url)
-        e = telegram.InlineQueryResultArticle(self._id, "", "")
+        a = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)
+        b = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)
+        c = InlineQueryResultPhoto(self.id, '', self.thumb_url)
+        d = InlineQueryResultPhoto('', self.photo_url, self.thumb_url)
+        e = InlineQueryResultVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

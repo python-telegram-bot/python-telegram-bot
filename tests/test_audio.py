@@ -5,289 +5,182 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram Audio"""
-
-import sys
-import unittest
 import os
 
+import pytest
 from flaky import flaky
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest, timeout
+from telegram import Audio, TelegramError, Voice
 
 
-class AudioTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Audio."""
+@pytest.fixture(scope='function')
+def audio_file():
+    f = open('tests/data/telegram.mp3', 'rb')
+    yield f
+    f.close()
 
-    def setUp(self):
-        self.audio_file = open('tests/data/telegram.mp3', 'rb')
-        self.audio_file_id = 'CQADAQADDwADHyP1B6PSPq2HjX8kAg'
-        self.audio_file_url = 'https://raw.githubusercontent.com/python-telegram-bot/python-telegram-bot/master/tests/data/telegram.mp3'
-        self.duration = 4
-        self.performer = 'Leandro Toledo'
-        self.title = 'Teste'
-        self.caption = "Test audio"
-        self.mime_type = 'audio/mpeg'
-        self.file_size = 28232
 
-        self.json_dict = {
-            'file_id': self.audio_file_id,
-            'duration': self.duration,
-            'performer': self.performer,
-            'title': self.title,
-            'caption': self.caption,
-            'mime_type': self.mime_type,
-            'file_size': self.file_size
-        }
+@pytest.fixture(scope='class')
+def audio(bot, chat_id):
+    with open('tests/data/telegram.mp3', 'rb') as f:
+        return bot.send_audio(chat_id, audio=f, timeout=10).audio
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_required_args_only(self):
-        message = self._bot.sendAudio(self._chat_id, self.audio_file)
 
-        self.assertEqual(message.caption, None)
+class TestAudio(object):
+    caption = 'Test audio'
+    performer = 'Leandro Toledo'
+    title = 'Teste'
+    duration = 3
+    # audio_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp3'
+    # Shortened link, the above one is cached with the wrong duration.
+    audio_file_url = 'https://goo.gl/3En24v'
+    mime_type = 'audio/mpeg'
+    file_size = 122920
 
-        audio = message.audio
+    def test_creation(self, audio):
+        # Make sure file has been uploaded.
+        assert isinstance(audio, Audio)
+        assert isinstance(audio.file_id, str)
+        assert audio.file_id is not ''
 
-        self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, None)
-        # self.assertEqual(audio.duration, 4)
-        self.assertEqual(audio.performer, None)
-        self.assertEqual(audio.title, None)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
+    def test_expected_values(self, audio):
+        assert audio.duration == self.duration
+        assert audio.performer is None
+        assert audio.title is None
+        assert audio.mime_type == self.mime_type
+        assert audio.file_size == self.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_all_args(self):
-        message = self._bot.sendAudio(
-            self._chat_id,
-            self.audio_file,
-            duration=self.duration,
-            performer=self.performer,
-            title=self.title,
-            caption=self.caption,
-            mime_type=self.mime_type,
-            file_size=self.file_size)
+    @pytest.mark.timeout(10)
+    def test_send_all_args(self, bot, chat_id, audio_file):
+        message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
+                                 duration=self.duration, performer=self.performer,
+                                 title=self.title, disable_notification=False)
 
-        self.assertEqual(message.caption, self.caption)
+        assert message.caption == self.caption
 
-        audio = message.audio
-
-        self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, None)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
+        assert isinstance(message.audio, Audio)
+        assert isinstance(message.audio.file_id, str)
+        assert message.audio.file_id is not None
+        assert message.audio.duration == self.duration
+        assert message.audio.performer == self.performer
+        assert message.audio.title == self.title
+        assert message.audio.mime_type == self.mime_type
+        assert message.audio.file_size == self.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_mp3_file(self):
-        message = self._bot.sendAudio(
-            chat_id=self._chat_id,
-            audio=self.audio_file,
-            duration=self.duration,
-            performer=self.performer,
-            title=self.title,
-            caption=self.caption)
+    @pytest.mark.timeout(10)
+    def test_get_and_download(self, bot, audio):
+        new_file = bot.get_file(audio.file_id)
 
-        self.assertEqual(message.caption, self.caption)
+        assert new_file.file_size == self.file_size
+        assert new_file.file_id == audio.file_id
+        assert new_file.file_path.startswith('https://')
 
-        audio = message.audio
+        new_file.download('telegram.mp3')
 
-        self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, None)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
+        assert os.path.isfile('telegram.mp3')
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_mp3_file_custom_filename(self):
-        message = self._bot.sendAudio(
-            chat_id=self._chat_id,
-            audio=self.audio_file,
-            duration=self.duration,
-            performer=self.performer,
-            title=self.title,
-            caption=self.caption,
-            filename='telegram_custom.mp3')
+    @pytest.mark.timeout(10)
+    def test_send_mp3_url_file(self, bot, chat_id, audio):
+        message = bot.send_audio(chat_id=chat_id, audio=self.audio_file_url, caption=self.caption)
 
-        self.assertEqual(message.caption, self.caption)
+        assert message.caption == self.caption
 
-        audio = message.audio
-
-        self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, None)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
+        assert isinstance(message.audio, Audio)
+        assert isinstance(message.audio.file_id, str)
+        assert message.audio.file_id is not None
+        assert message.audio.duration == audio.duration
+        assert message.audio.mime_type == audio.mime_type
+        assert message.audio.file_size == audio.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_mp3_url_file(self):
-        message = self._bot.sendAudio(
-            chat_id=self._chat_id, audio=self.audio_file_url, duration=self.duration)
+    @pytest.mark.timeout(10)
+    def test_resend(self, bot, chat_id, audio):
+        message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
 
-        audio = message.audio
+        assert message.audio == audio
 
-        self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, None)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
+    def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
+        def test(_, url, data, **kwargs):
+            return data['audio'] == audio.file_id
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_mp3_url_file_with_caption(self):
-        message = self._bot.sendAudio(
-            chat_id=self._chat_id,
-            audio=self.audio_file_url,
-            duration=self.duration,
-            caption=self.caption)
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        message = bot.send_audio(audio=audio, chat_id=chat_id)
+        assert message
 
-        self.assertEqual(message.caption, self.caption)
+    def test_de_json(self, bot):
+        json_dict = {'file_id': 'not a file id',
+                     'duration': self.duration,
+                     'performer': self.performer,
+                     'title': self.title,
+                     'caption': self.caption,
+                     'mime_type': self.mime_type,
+                     'file_size': self.file_size}
+        json_audio = Audio.de_json(json_dict, bot)
 
-        audio = message.audio
+        assert json_audio.file_id == 'not a file id'
+        assert json_audio.duration == self.duration
+        assert json_audio.performer == self.performer
+        assert json_audio.title == self.title
+        assert json_audio.mime_type == self.mime_type
+        assert json_audio.file_size == self.file_size
 
-        self.assertTrue(isinstance(audio.file_id, str))
-        self.assertNotEqual(audio.file_id, None)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
+    def test_to_dict(self, audio):
+        audio_dict = audio.to_dict()
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_send_audio_resend(self):
-        message = self._bot.sendAudio(
-            chat_id=self._chat_id,
-            audio=self.audio_file_id,
-            duration=self.duration,
-            performer=self.performer,
-            title=self.title,
-            caption=self.caption)
-
-        self.assertEqual(message.caption, self.caption)
-
-        audio = message.audio
-
-        self.assertEqual(audio.file_id, self.audio_file_id)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
-        self.assertEqual(audio.mime_type, self.mime_type)
-
-    def test_audio_de_json(self):
-        audio = telegram.Audio.de_json(self.json_dict, self._bot)
-
-        self.assertEqual(audio.file_id, self.audio_file_id)
-        self.assertEqual(audio.duration, self.duration)
-        self.assertEqual(audio.performer, self.performer)
-        self.assertEqual(audio.title, self.title)
-        self.assertEqual(audio.mime_type, self.mime_type)
-        self.assertEqual(audio.file_size, self.file_size)
-
-    def test_audio_to_json(self):
-        audio = telegram.Audio.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(audio.to_json()))
-
-    def test_audio_to_dict(self):
-        audio = telegram.Audio.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_dict(audio.to_dict()))
-        self.assertEqual(audio['file_id'], self.audio_file_id)
-        self.assertEqual(audio['duration'], self.duration)
-        self.assertEqual(audio['performer'], self.performer)
-        self.assertEqual(audio['title'], self.title)
-        self.assertEqual(audio['mime_type'], self.mime_type)
-        self.assertEqual(audio['file_size'], self.file_size)
+        assert isinstance(audio_dict, dict)
+        assert audio_dict['file_id'] == audio.file_id
+        assert audio_dict['duration'] == audio.duration
+        assert audio_dict['mime_type'] == audio.mime_type
+        assert audio_dict['file_size'] == audio.file_size
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_error_send_audio_empty_file(self):
-        json_dict = self.json_dict
+    @pytest.mark.timeout(10)
+    def test_error_send_empty_file(self, bot, chat_id):
+        audio_file = open(os.devnull, 'rb')
 
-        del (json_dict['file_id'])
-        json_dict['audio'] = open(os.devnull, 'rb')
-
-        self.assertRaises(
-            telegram.TelegramError,
-            lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
+        with pytest.raises(TelegramError):
+            bot.send_audio(chat_id=chat_id, audio=audio_file)
 
     @flaky(3, 1)
-    @timeout(10)
-    def test_error_send_audio_empty_file_id(self):
-        json_dict = self.json_dict
+    @pytest.mark.timeout(10)
+    def test_error_send_empty_file_id(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            bot.send_audio(chat_id=chat_id, audio='')
 
-        del (json_dict['file_id'])
-        json_dict['audio'] = ''
+    def test_error_send_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            bot.send_audio(chat_id=chat_id)
 
-        self.assertRaises(
-            telegram.TelegramError,
-            lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
+    def test_equality(self, audio):
+        a = Audio(audio.file_id, audio.duration)
+        b = Audio(audio.file_id, audio.duration)
+        c = Audio(audio.file_id, 0)
+        d = Audio('', audio.duration)
+        e = Voice(audio.file_id, audio.duration)
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_error_audio_without_required_args(self):
-        json_dict = self.json_dict
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        del (json_dict['file_id'])
-        del (json_dict['duration'])
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertRaises(
-            TypeError,
-            lambda: self._bot.sendAudio(chat_id=self._chat_id, **json_dict))
+        assert a != d
+        assert hash(a) != hash(d)
 
-    @flaky(3, 1)
-    @timeout(10)
-    def test_reply_audio(self):
-        """Test for Message.reply_audio"""
-        message = self._bot.sendMessage(self._chat_id, '.')
-        message = message.reply_audio(self.audio_file)
-
-        self.assertNotEqual(message.audio.file_id, None)
-
-    def test_equality(self):
-        a = telegram.Audio(self.audio_file_id, self.duration)
-        b = telegram.Audio(self.audio_file_id, self.duration)
-        c = telegram.Audio(self.audio_file_id, 0)
-        d = telegram.Audio("", self.duration)
-        e = telegram.Voice(self.audio_file_id, self.duration)
-
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
-
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
-
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
-
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

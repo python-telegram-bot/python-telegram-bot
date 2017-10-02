@@ -1,7 +1,6 @@
-telegram.ext.stringcommandhandler module
-========================================
+telegram.ext.StringCommandHandler
+=================================
 
-.. automodule:: telegram.ext.stringcommandhandler
+.. autoclass:: telegram.ext.StringCommandHandler
     :members:
-    :undoc-members:
     :show-inheritance:

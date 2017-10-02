@@ -5,103 +5,100 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultLocation"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InputTextMessageContent, InlineQueryResultLocation, InlineKeyboardButton,
+                      InlineQueryResultVoice, InlineKeyboardMarkup)
 
 
-class InlineQueryResultLocationTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultLocation."""
+@pytest.fixture(scope='class')
+def inline_query_result_location():
+    return InlineQueryResultLocation(TestInlineQueryResultLocation.id,
+                                     TestInlineQueryResultLocation.latitude,
+                                     TestInlineQueryResultLocation.longitude,
+                                     TestInlineQueryResultLocation.title,
+                                     thumb_url=TestInlineQueryResultLocation.thumb_url,
+                                     thumb_width=TestInlineQueryResultLocation.thumb_width,
+                                     thumb_height=TestInlineQueryResultLocation.thumb_height,
+                                     input_message_content=TestInlineQueryResultLocation.input_message_content,
+                                     reply_markup=TestInlineQueryResultLocation.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'location'
-        self.latitude = 0.0
-        self.longitude = 0.0
-        self.title = 'title'
-        self.thumb_url = 'thumb url'
-        self.thumb_width = 10
-        self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
-        self.json_dict = {
-            'id': self._id,
-            'type': self.type,
-            'latitude': self.latitude,
-            'longitude': self.longitude,
-            'title': self.title,
-            'thumb_url': self.thumb_url,
-            'thumb_width': self.thumb_width,
-            'thumb_height': self.thumb_height,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
 
-    def test_location_de_json(self):
-        location = telegram.InlineQueryResultLocation.de_json(self.json_dict, self._bot)
+class TestInlineQueryResultLocation(object):
+    id = 'id'
+    type = 'location'
+    latitude = 0.0
+    longitude = 1.0
+    title = 'title'
+    thumb_url = 'thumb url'
+    thumb_width = 10
+    thumb_height = 15
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        self.assertEqual(location.id, self._id)
-        self.assertEqual(location.type, self.type)
-        self.assertEqual(location.latitude, self.latitude)
-        self.assertEqual(location.longitude, self.longitude)
-        self.assertEqual(location.title, self.title)
-        self.assertEqual(location.thumb_url, self.thumb_url)
-        self.assertEqual(location.thumb_width, self.thumb_width)
-        self.assertEqual(location.thumb_height, self.thumb_height)
-        self.assertDictEqual(location.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(location.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_expected_values(self, inline_query_result_location):
+        assert inline_query_result_location.id == self.id
+        assert inline_query_result_location.type == self.type
+        assert inline_query_result_location.latitude == self.latitude
+        assert inline_query_result_location.longitude == self.longitude
+        assert inline_query_result_location.title == self.title
+        assert inline_query_result_location.thumb_url == self.thumb_url
+        assert inline_query_result_location.thumb_width == self.thumb_width
+        assert inline_query_result_location.thumb_height == self.thumb_height
+        assert inline_query_result_location.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-    def test_location_to_json(self):
-        location = telegram.InlineQueryResultLocation.de_json(self.json_dict, self._bot)
+    def test_to_dict(self, inline_query_result_location):
+        inline_query_result_location_dict = inline_query_result_location.to_dict()
 
-        self.assertTrue(self.is_json(location.to_json()))
-
-    def test_location_to_dict(self):
-        location = telegram.InlineQueryResultLocation.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(location))
-        self.assertDictEqual(self.json_dict, location)
+        assert isinstance(inline_query_result_location_dict, dict)
+        assert inline_query_result_location_dict['id'] == inline_query_result_location.id
+        assert inline_query_result_location_dict['type'] == inline_query_result_location.type
+        assert inline_query_result_location_dict['latitude'] == \
+               inline_query_result_location.latitude
+        assert inline_query_result_location_dict['longitude'] == \
+               inline_query_result_location.longitude
+        assert inline_query_result_location_dict['title'] == inline_query_result_location.title
+        assert inline_query_result_location_dict['thumb_url'] == \
+               inline_query_result_location.thumb_url
+        assert inline_query_result_location_dict['thumb_width'] == \
+               inline_query_result_location.thumb_width
+        assert inline_query_result_location_dict['thumb_height'] == \
+               inline_query_result_location.thumb_height
+        assert inline_query_result_location_dict['input_message_content'] == \
+               inline_query_result_location.input_message_content.to_dict()
+        assert inline_query_result_location_dict['reply_markup'] == \
+               inline_query_result_location.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultLocation(self._id, self.longitude, self.latitude, self.title)
-        b = telegram.InlineQueryResultLocation(self._id, self.longitude, self.latitude, self.title)
-        c = telegram.InlineQueryResultLocation(self._id, 0, self.latitude, self.title)
-        d = telegram.InlineQueryResultLocation("", self.longitude, self.latitude, self.title)
-        e = telegram.InlineQueryResultArticle(self._id, "", "")
+        a = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
+        b = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)
+        c = InlineQueryResultLocation(self.id, 0, self.latitude, self.title)
+        d = InlineQueryResultLocation('', self.longitude, self.latitude, self.title)
+        e = InlineQueryResultVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)
