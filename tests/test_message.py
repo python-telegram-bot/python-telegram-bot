@@ -20,6 +20,7 @@ from datetime import datetime
 
 import pytest
 
+from telegram import ParseMode
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment)
@@ -33,34 +34,52 @@ def message(bot):
 
 @pytest.fixture(scope='function',
                 params=[
-                    {'forward_from': User(99, 'forward_user', False),
-                     'forward_date': datetime.now()},
-                    {'forward_from_chat': Chat(-23, 'channel'),
-                     'forward_from_message_id': 101,
-                     'forward_date': datetime.now()},
+                    {
+                        'forward_from': User(99, 'forward_user', False),
+                        'forward_date': datetime.now()
+                    },
+                    {
+                        'forward_from_chat': Chat(-23, 'channel'),
+                        'forward_from_message_id': 101,
+                        'forward_date': datetime.now()
+                    },
                     {'reply_to_message': Message(50, None, None, None)},
                     {'edit_date': datetime.now()},
-                    {'test': 'a text message',
-                     'enitites': [MessageEntity('bold', 10, 4),
-                                  MessageEntity('italic', 16, 7)]},
-                    {'audio': Audio('audio_id', 12),
-                     'caption': 'audio_file'},
-                    {'document': Document('document_id'),
-                     'caption': 'document_file'},
-                    {'game': Game('my_game', 'just my game',
-                                  [PhotoSize('game_photo_id', 30, 30), ])},
-                    {'photo': [PhotoSize('photo_id', 50, 50)],
-                     'caption': 'photo_file'},
+                    {
+                        'test': 'a text message',
+                        'enitites': [MessageEntity('bold', 10, 4),
+                                     MessageEntity('italic', 16, 7)]
+                    },
+                    {
+                        'audio': Audio('audio_id', 12),
+                        'caption': 'audio_file'
+                    },
+                    {
+                        'document': Document('document_id'),
+                        'caption': 'document_file'
+                    },
+                    {
+                        'game': Game('my_game', 'just my game',
+                                     [PhotoSize('game_photo_id', 30, 30), ])
+                    },
+                    {
+                        'photo': [PhotoSize('photo_id', 50, 50)],
+                        'caption': 'photo_file'
+                    },
                     {'sticker': Sticker('sticker_id', 50, 50)},
-                    {'video': Video('video_id', 12, 12, 12),
-                     'caption': 'video_file'},
+                    {
+                        'video': Video('video_id', 12, 12, 12),
+                        'caption': 'video_file'
+                    },
                     {'voice': Voice('voice_id', 5)},
                     {'video_note': VideoNote('video_note_id', 20, 12)},
                     {'new_chat_members': [User(55, 'new_user', False)]},
                     {'contact': Contact('phone_numner', 'contact_name')},
                     {'location': Location(-23.691288, 46.788279)},
-                    {'venue': Venue(Location(-23.691288, 46.788279),
-                                    'some place', 'right here')},
+                    {
+                        'venue': Venue(Location(-23.691288, 46.788279),
+                                       'some place', 'right here')
+                    },
                     {'left_chat_member': User(33, 'kicked', False)},
                     {'new_chat_title': 'new title'},
                     {'new_chat_photo': [PhotoSize('photo_id', 50, 50)]},
@@ -72,9 +91,11 @@ def message(bot):
                     {'migrate_from_chat_id': -54321},
                     {'pinned_message': Message(7, None, None, None)},
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
-                    {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
-                                                             'charge_id', 'provider_id',
-                                                             order_info={})},
+                    {
+                        'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
+                                                                'charge_id', 'provider_id',
+                                                                order_info={})
+                    },
                     {'forward_signature': 'some_forward_sign'},
                     {'author_signature': 'some_author_sign'}
                 ],
@@ -201,7 +222,6 @@ class TestMessage(object):
             item = None
         assert message_params.effective_attachment == item
 
-
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):
             id = args[1] == message.chat_id
@@ -218,35 +238,53 @@ class TestMessage(object):
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_markdown(self, monkeypatch, message):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. http://google.com')
+
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
-            markdown_text = args[2] == 'test'
+            cid = args[1] == message.chat_id
+            markdown_text = args[2] == test_md_string
+            markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and text and reply
+            return all([cid, markdown_text, reply, markdown_enabled])
+
+        text_markdown = self.test_message.text_markdown
+        assert text_markdown == test_md_string
 
         monkeypatch.setattr('telegram.Bot.send_message', test)
-        assert message.reply_markdown('test')
-        assert message.reply_markdown('test', quote=True)
-        assert message.reply_markdown('test', reply_to_message_id=message.message_id, quote=True)
+        assert message.reply_markdown(self.test_message.text_markdown)
+        assert message.reply_markdown(self.test_message.text_markdown, quote=True)
+        assert message.reply_markdown(self.test_message.text_markdown,
+                                      reply_to_message_id=message.message_id,
+                                      quote=True)
 
-    def test_reply_markdown(self):
-        message = self._bot.sendMessage(self._chat_id, '.')
-        text = 'Testing class method *with* _markdown_ `enabled`.'
-        message = message.reply_markdown(text)
+    def test_reply_html(self, monkeypatch, message):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            'http://google.com')
 
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text_markdown, text)
+        def test(*args, **kwargs):
+            cid = args[1] == message.chat_id
+            html_text = args[2] == test_html_string
+            html_enabled = kwargs['parse_mode'] == ParseMode.HTML
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, html_text, reply, html_enabled])
 
-    def test_reply_html(self):
-        message = self._bot.sendMessage(self._chat_id, '.')
-        text = 'Testing class method <b>with</b> <i>html</i> <code>enabled</code>.'
-        message = message.reply_html(text)
- 
-        self.assertTrue(self.is_json(message.to_json()))
-        self.assertEqual(message.text_html, text)
+        text_html = self.test_message.text_html
+        assert text_html == test_html_string
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_html(self.test_message.text_html)
+        assert message.reply_html(self.test_message.text_html, quote=True)
+        assert message.reply_html(self.test_message.text_html,
+                                  reply_to_message_id=message.message_id,
+                                  quote=True)
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):

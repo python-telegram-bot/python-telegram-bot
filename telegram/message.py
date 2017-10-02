@@ -428,7 +428,7 @@ class Message(TelegramObject):
 
         self._quote(kwargs)
 
-        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_html(self, *args, **kwargs):
         """
@@ -450,7 +450,7 @@ class Message(TelegramObject):
 
         self._quote(kwargs)
 
-        return self.bot.sendMessage(self.chat_id, *args, **kwargs)
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_photo(self, *args, **kwargs):
         """Shortcut for::
