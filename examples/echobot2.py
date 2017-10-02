@@ -15,9 +15,6 @@ Basic Echobot example, repeats messages.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
-from pprint import pprint
-
-from telegram.utils import helpers
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
@@ -40,7 +37,7 @@ def help(bot, update):
 
 
 def echo(bot, update):
-    update.message.reply_text(helpers.extract_urls(update.message))
+    update.message.reply_text(update.message.text)
 
 
 def error(bot, update, error):
@@ -49,7 +46,7 @@ def error(bot, update, error):
 
 def main():
     # Create the EventHandler and pass it your bot's token.
-    updater = Updater("324133401:AAHVjjXotCDXC_kIIkfM0O6bm9-l7BfJw-I")
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -59,21 +56,13 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.photo, echo))
+    dp.add_handler(MessageHandler(Filters.text, echo))
 
     # log all errors
     dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()
-
-    urls = "http://google.com and http://github.com/ and python-telegram-bot.readthedocs.io/en/latest/"
-    result = helpers._extract_urls_from_text(urls)
-    pprint(result)
-    assert len(result) == 3
-    assert result[0] == 'http://google.com'
-    assert result[1] == 'http://github.com/'
-    assert result[2] == 'python-telegram-bot.readthedocs.io/en/latest/'
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
