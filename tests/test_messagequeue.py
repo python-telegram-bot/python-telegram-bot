@@ -17,11 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import os
 from time import sleep
+
+import pytest
 
 import telegram.ext.messagequeue as mq
 
 
+@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
 class TestDelayQueue(object):
     N = 128
     burst_limit = 30

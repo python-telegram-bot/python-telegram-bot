@@ -25,7 +25,6 @@ from flaky import flaky
 from future.utils import PY2
 
 from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition
-from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='function')
@@ -244,6 +243,7 @@ class TestStickerSet(object):
         assert sticker_set.contains_masks == self.contains_masks
         assert sticker_set.stickers == self.stickers
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
 
@@ -253,7 +253,8 @@ class TestStickerSet(object):
         assert sticker_set_dict['contains_masks'] == sticker_set.contains_masks
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
 
-    @flaky(3,1)
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
+    @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_1(self, bot, sticker_set):
         with open('tests/data/telegram_sticker.png', 'rb') as f:
@@ -261,12 +262,14 @@ class TestStickerSet(object):
         assert file
         assert bot.add_sticker_to_set(95205500, sticker_set.name, file.file_id, '😄')
 
-    @flaky(3,1)
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
+    @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_2(self, bot, sticker_set):
         file_id = sticker_set.stickers[0].file_id
         assert bot.set_sticker_position_in_set(file_id, 1)
 
+    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
     @flaky(10, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_3(self, bot, sticker_set):

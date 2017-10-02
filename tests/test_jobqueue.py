@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import os
 import time
 from time import sleep
 
@@ -34,6 +35,7 @@ def job_queue(bot):
     jq.stop()
 
 
+@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue(object):
     result = 0

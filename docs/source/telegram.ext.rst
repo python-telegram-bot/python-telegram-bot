@@ -6,6 +6,7 @@ telegram.ext package
     telegram.ext.updater
     telegram.ext.dispatcher
     telegram.ext.filters
+    telegram.ext.job
     telegram.ext.jobqueue
     telegram.ext.messagequeue
     telegram.ext.delayqueue
