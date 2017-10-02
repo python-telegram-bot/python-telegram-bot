@@ -29,6 +29,13 @@ class TestHelpers(object):
 
         assert expected_str == helpers.escape_markdown(test_str)
 
+    def test_extract_urls_from_text(self):
+        urls = "http://google.com and http://github.com/ and python-telegram-bot.readthedocs.io/en/latest/"
+        result = helpers._extract_urls_from_text(urls)
+        assert len(result) == 2
+        assert result[0] == 'http://google.com'
+        assert result[1] == 'http://github.com/'
+
     def test_extract_urls_entities(self):
         test_entities = [{
             'length': 6, 'offset': 0, 'type': 'text_link',

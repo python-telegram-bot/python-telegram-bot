@@ -105,8 +105,11 @@ def mention_markdown(user_id, name):
         return '[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
 
 
-def __extract_urls(text):
-    """Returns a list of urls from a text string."""
+def _extract_urls_from_text(text):
+    """
+    Returns a list of urls from a text string.
+    URLs without a leading `http://` or `www.` won't be found.
+    """
     out = []
     for word in text.split(' '):
         thing = urlparse(word.strip())
@@ -138,7 +141,7 @@ def extract_urls(message):
                 else k.url for k, v in results.items()]
 
     if message.caption:
-        all_urls += __extract_urls(message.caption)
+        all_urls += _extract_urls_from_text(message.caption)
 
     # Remove exact duplicates
     urls = OrderedDict({k: None for k in all_urls})
