@@ -21,6 +21,7 @@
 import re
 from collections import OrderedDict
 from datetime import datetime
+from urllib.parse import urlparse
 
 try:
     from html import escape as escape_html  # noqa: F401
@@ -104,11 +105,23 @@ def mention_markdown(user_id, name):
         return '[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
 
 
+def __extract_urls(text):
+    """Returns a list of urls from a text string."""
+    out = []
+    for word in text.split(' '):
+        thing = urlparse(word.strip())
+        if thing.scheme:
+            out.append(word)
+    return out
+
+
 def extract_urls(message):
     """
-    Extracts all Hyperlinks that are contained in a message.
+    Extracts all Hyperlinks that are contained in a message. This includes
+    message entities and the media caption.
 
-    Exact duplicates are removed, but there may still be URLs that link to the same resource.
+    Note: Exact duplicates are removed, but there may still be URLs that link
+    to the same resource.
 
     Args:
         message (:obj:`telegram.Message`) The message to extract from
@@ -121,7 +134,11 @@ def extract_urls(message):
     results = message.parse_entities(types=[
         MessageEntity.URL,
         MessageEntity.TEXT_LINK])
-    all_urls = [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
+    all_urls = [v if k.type == MessageEntity.URL
+                else k.url for k, v in results.items()]
+
+    if message.caption:
+        all_urls += __extract_urls(message.caption)
 
     # Remove exact duplicates
     urls = OrderedDict({k: None for k in all_urls})

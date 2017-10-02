@@ -29,16 +29,16 @@ class TestHelpers(object):
 
         assert expected_str == helpers.escape_markdown(test_str)
 
-    def test_extract_urls(self):
+    def test_extract_urls_entities(self):
         test_entities = [{
-                             'length': 6, 'offset': 0, 'type': 'text_link',
-                             'url': 'http://github.com/'
-                         },
-                         {'length': 17, 'offset': 23, 'type': 'url'},
-                         {
-                             'length': 14, 'offset': 43, 'type': 'text_link',
-                             'url': 'http://google.com'
-                         }]
+            'length': 6, 'offset': 0, 'type': 'text_link',
+            'url': 'http://github.com/'
+        },
+            {'length': 17, 'offset': 23, 'type': 'url'},
+            {
+                'length': 14, 'offset': 43, 'type': 'text_link',
+                'url': 'http://google.com'
+            }]
         test_text = 'Github can be found at http://github.com. Google is here.'
         test_message = Message(message_id=1,
                                from_user=None,
@@ -52,3 +52,16 @@ class TestHelpers(object):
         assert (test_entities[0]['url'] == result[0])
         assert (result[1] == 'http://github.com')
         assert (test_entities[2]['url'] == result[2])
+
+    def test_extract_urls_caption(self):
+        caption = "Taken from https://stackoverflow.com/questions/520031/whats" \
+                  "-the-cleanest-way-to-extract-urls-from-a-string-using-python"
+        test_message = Message(message_id=1,
+                               from_user=None,
+                               date=None,
+                               chat=None,
+                               caption=caption)
+        result = helpers.extract_urls(test_message)
+
+        assert result[0] == 'https://stackoverflow.com/questions/520031/whats-the-' \
+                            'cleanest-way-to-extract-urls-from-a-string-using-python'
