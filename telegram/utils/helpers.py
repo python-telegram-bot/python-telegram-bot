@@ -21,7 +21,10 @@
 import re
 from collections import OrderedDict
 from datetime import datetime
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
 
 try:
     from html import escape as escape_html  # noqa: F401
