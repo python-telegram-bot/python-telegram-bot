@@ -409,19 +409,17 @@ class Message(TelegramObject):
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_markdown(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                ``bot.sendMessage(update.message.chat_id,
-                                  parse_mode=ParseMode.MARKDOWN,
-                                  *args, **kwargs)``
+            bot.sendMessage(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args, **kwargs)
 
         Sends a message with markdown formatting.
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
         """
 
         kwargs['parse_mode'] = ParseMode.MARKDOWN
@@ -431,19 +429,17 @@ class Message(TelegramObject):
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
     def reply_html(self, *args, **kwargs):
-        """
-        Shortcut for::
+        """Shortcut for::
 
-                ``bot.sendMessage(update.message.chat_id,
-                                  parse_mode=ParseMode.HTML,
-                                  *args, **kwargs)``
+            bot.sendMessage(update.message.chat_id, parse_mode=ParseMode.HTML, *args, **kwargs)
 
         Sends a message with HTML formatting.
 
         Keyword Args:
-            quote (Optional[bool]): If set to ``True``, the message is sent as an actual reply to
-                this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
-                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
         """
 
         kwargs['parse_mode'] = ParseMode.HTML
