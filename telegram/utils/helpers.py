@@ -19,9 +19,8 @@
 """This module contains helper functions."""
 
 import re
+from collections import OrderedDict
 from datetime import datetime
-
-from ordered_set import OrderedSet
 
 try:
     from html import escape as escape_html  # noqa: F401
@@ -109,6 +108,8 @@ def extract_urls(message):
     """
     Extracts all Hyperlinks that are contained in a message.
 
+    Exact duplicates are removed, but there may still be URLs that link to the same resource.
+
     Args:
         message (:obj:`telegram.Message`) The message to extract from
 
@@ -120,7 +121,8 @@ def extract_urls(message):
     results = message.parse_entities(types=[
         MessageEntity.URL,
         MessageEntity.TEXT_LINK])
-    urls = list(OrderedSet(
-        [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
-    ))
-    return urls
+    all_urls = [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
+
+    # Remove exact duplicates
+    urls = OrderedDict({k: None for k in all_urls})
+    return list(urls.keys())

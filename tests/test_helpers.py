@@ -32,6 +32,10 @@ class TestHelpers(object):
     def test_extract_urls(self):
         test_entities = [{
                              'length': 6, 'offset': 0, 'type': 'text_link',
+                             'url': 'http://github.com'
+                         },
+                         {
+                             'length': 5, 'offset': 14, 'type': 'text_link',
                              'url': 'http://github.com/'
                          },
                          {'length': 17, 'offset': 23, 'type': 'url'},
@@ -48,7 +52,7 @@ class TestHelpers(object):
                                entities=[MessageEntity(**e) for e in test_entities])
         result = helpers.extract_urls(test_message)
 
-        assert len(result) == 3
+        assert len(result) == 2
         assert (test_entities[0]['url'] == result[0])
         assert (result[1] == 'http://github.com')
         assert (test_entities[2]['url'] == result[2])
