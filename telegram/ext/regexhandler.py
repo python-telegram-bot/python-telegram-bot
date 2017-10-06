@@ -38,6 +38,8 @@ class RegexHandler(Handler):
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
@@ -62,6 +64,11 @@ class RegexHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and pass objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield
+            a warning.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -97,6 +104,7 @@ class RegexHandler(Handler):
     def __init__(self,
                  pattern,
                  callback,
+                 autowire=False,
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_update_queue=False,
@@ -117,6 +125,7 @@ class RegexHandler(Handler):
 
         super(RegexHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,

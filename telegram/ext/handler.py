@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
+import warnings
+
+from telegram.utils.inspection import get_positional_arguments
 
 
 class Handler(object):
@@ -24,6 +27,8 @@ class Handler(object):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -43,6 +48,11 @@ class Handler(object):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and pass objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield
+            a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -60,11 +70,15 @@ class Handler(object):
 
     def __init__(self,
                  callback,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False):
         self.callback = callback
+        self.autowire = autowire
+        if self.autowire and any((pass_update_queue, pass_job_queue, pass_user_data, pass_chat_data)):
+            warnings.warn('If `autowire` is set to `True`, it is unnecessary to provide any `pass_*` flags.')
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
@@ -108,18 +122,28 @@ class Handler(object):
         """
         optional_args = dict()
 
-        if self.pass_update_queue:
-            optional_args['update_queue'] = dispatcher.update_queue
-        if self.pass_job_queue:
-            optional_args['job_queue'] = dispatcher.job_queue
-        if self.pass_user_data or self.pass_chat_data:
-            chat = update.effective_chat
-            user = update.effective_user
-
-            if self.pass_user_data:
+        if self.autowire:
+            callback_args = get_positional_arguments(self.callback)
+            if 'update_queue' in callback_args:
+                optional_args['update_queue'] = dispatcher.update_queue
+            if 'job_queue' in callback_args:
+                optional_args['job_queue'] = dispatcher.job_queue
+            if 'user_data' in callback_args:
+                user = update.effective_user
                 optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
-
+            if 'chat_data' in callback_args:
+                chat = update.effective_chat
+                optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
+        else:
+            if self.pass_update_queue:
+                optional_args['update_queue'] = dispatcher.update_queue
+            if self.pass_job_queue:
+                optional_args['job_queue'] = dispatcher.job_queue
+            if self.pass_user_data:
+                user = update.effective_user
+                optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
             if self.pass_chat_data:
+                chat = update.effective_chat
                 optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
 
         return optional_args

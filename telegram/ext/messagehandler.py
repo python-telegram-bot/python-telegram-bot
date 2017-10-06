@@ -31,6 +31,8 @@ class MessageHandler(Handler):
         filters (:obj:`Filter`): Only allow updates with these Filters. See
             :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -92,6 +94,7 @@ class MessageHandler(Handler):
                  filters,
                  callback,
                  allow_edited=False,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
@@ -108,6 +111,7 @@ class MessageHandler(Handler):
 
         super(MessageHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,

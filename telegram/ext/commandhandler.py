@@ -39,6 +39,8 @@ class CommandHandler(Handler):
             Filters.
         allow_edited (:obj:`bool`): Optional. Determines Whether the handler should also accept
             edited messages.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
             ``args``.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
@@ -68,6 +70,11 @@ class CommandHandler(Handler):
             operators (& for and, | for or, ~ for not).
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and pass objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield
+            a warning.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -92,6 +99,7 @@ class CommandHandler(Handler):
                  callback,
                  filters=None,
                  allow_edited=False,
+                 autowire=False,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
@@ -99,6 +107,7 @@ class CommandHandler(Handler):
                  pass_chat_data=False):
         super(CommandHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,

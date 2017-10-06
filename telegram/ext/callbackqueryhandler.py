@@ -72,7 +72,18 @@ class CallbackQueryHandler(Handler):
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
-        pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
+        pass_groupdict (:obj:`bool`, import inspect
+
+try:
+    def inspect_arguments(func):
+        args, _, _, defaults = inspect.getargspec(func)
+        # Filter out positional arguments
+        kwargs = args[:-len(defaults)]
+        return kwargs
+except Warning:  # `getargspec()` is deprecated in Python3
+    def inspect_arguments(func):
+        _, varargs, _, _, _, _, _ = inspect.getfullargspec(func)
+        return varargsoptional): If the callback should be passed the result of
             ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
             Default is ``False``
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
@@ -84,6 +95,7 @@ class CallbackQueryHandler(Handler):
 
     def __init__(self,
                  callback,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pattern=None,
@@ -93,6 +105,7 @@ class CallbackQueryHandler(Handler):
                  pass_chat_data=False):
         super(CallbackQueryHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
