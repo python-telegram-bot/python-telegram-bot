@@ -1,12 +1,10 @@
 import inspect
 
 try:
-    def get_positional_arguments(func):
-        args, _, _, defaults = inspect.getargspec(func)
-        # Filter out positional arguments
-        kwargs = args[:-len(defaults)]
-        return kwargs
+    def inspect_arguments(func):
+        args, _, _, _ = inspect.getargspec(func)
+        return args
 except Warning:  # `getargspec()` is deprecated in Python3
-    def get_positional_arguments(func):
-        _, varargs, _, _, _, _, _ = inspect.getfullargspec(func)
-        return varargs
+    def inspect_arguments(func):
+        args, varargs, varkw, defaults, kwonlyargs, kwonlydefaults, annotations = inspect.getfullargspec(func)
+        return args

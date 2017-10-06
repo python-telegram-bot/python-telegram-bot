@@ -53,12 +53,22 @@ class TypeHandler(Handler):
 
     """
 
-    def __init__(self, type, callback, strict=False, pass_update_queue=False,
+    def __init__(self,
+                 type,
+                 callback,
+                 strict=False,
+                 autowire=False,
+                 pass_update_queue=False,
                  pass_job_queue=False):
         super(TypeHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            autowire=autowire,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue)
         self.type = type
         self.strict = strict
+        if self.autowire:
+            self.set_autowired_flags({'update_queue', 'job_queue'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.

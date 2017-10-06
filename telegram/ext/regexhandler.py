@@ -137,6 +137,8 @@ class RegexHandler(Handler):
         self.pattern = pattern
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
+        if self.autowire:
+            self.set_autowired_flags({'groups', 'groupdict', 'update_queue', 'job_queue', 'user_data', 'chat_data'})
         self.allow_edited = allow_edited
         self.message_updates = message_updates
         self.channel_post_updates = channel_post_updates

@@ -82,6 +82,8 @@ class ShippingQueryHandler(Handler):
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
+        if self.autowire:
+            self.set_autowired_flags()
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.

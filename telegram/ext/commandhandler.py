@@ -21,8 +21,8 @@ import warnings
 
 from future.utils import string_types
 
-from .handler import Handler
 from telegram import Update
+from .handler import Handler
 
 
 class CommandHandler(Handler):
@@ -73,8 +73,7 @@ class CommandHandler(Handler):
         autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
             inspected for positional arguments and pass objects whose names match any of the
             ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
-            ``autowire`` will yield
-            a warning.
+            ``autowire`` will yield a warning.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -113,13 +112,16 @@ class CommandHandler(Handler):
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
 
+        self.pass_args = pass_args
+        if self.autowire:
+            self.set_autowired_flags({'update_queue', 'job_queue', 'user_data', 'chat_data', 'args'})
+
         if isinstance(command, string_types):
             self.command = [command.lower()]
         else:
             self.command = [x.lower() for x in command]
         self.filters = filters
         self.allow_edited = allow_edited
-        self.pass_args = pass_args
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -139,7 +141,7 @@ class CommandHandler(Handler):
 
         """
         if (isinstance(update, Update)
-                and (update.message or update.edited_message and self.allow_edited)):
+            and (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
             if message.text:
@@ -170,6 +172,7 @@ class CommandHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        self.set_autowired_flags({'args', 'update_queue', 'job_queue', 'user_data', 'chat_data'})
         optional_args = self.collect_optional_args(dispatcher, update)
 
         message = update.message or update.edited_message

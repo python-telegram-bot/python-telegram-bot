@@ -19,7 +19,7 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 import warnings
 
-from telegram.utils.inspection import get_positional_arguments
+from telegram.utils.inspection import inspect_arguments
 
 
 class Handler(object):
@@ -77,12 +77,12 @@ class Handler(object):
                  pass_chat_data=False):
         self.callback = callback
         self.autowire = autowire
-        if self.autowire and any((pass_update_queue, pass_job_queue, pass_user_data, pass_chat_data)):
-            warnings.warn('If `autowire` is set to `True`, it is unnecessary to provide any `pass_*` flags.')
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self._autowire_initialized = False
+        self._callback_args = None
 
     def check_update(self, update):
         """
@@ -113,8 +113,77 @@ class Handler(object):
         """
         raise NotImplementedError
 
+    def __get_available_pass_flags(self):
+        """
+        Used to provide warnings if the user decides to use `autowire` in conjunction with
+        `pass_*` flags, and to recalculate all flags.
+
+        Getting objects dynamically is better than hard-coding all passable objects and setting
+        them to False in here, because the base class should not know about the existence of
+        passable objects that are only relevant to subclasses (e.g. args, groups, groupdict).
+        """
+        return [f for f in dir(self) if f.startswith('pass_')]
+
+    def set_autowired_flags(self, passable={'update_queue', 'job_queue', 'user_data', 'chat_data'}):
+        """
+
+        Make the passable arguments explicit as opposed to dynamically generated to be absolutely
+        safe that no arguments will be passed that are not allowed.
+        """
+
+        if not self.autowire:
+            raise ValueError("This handler is not autowired.")
+
+        if self._autowire_initialized:
+            # In case that users decide to change their callback signatures at runtime, give the
+            # possibility to recalculate all flags.
+            for flag in self.__get_available_pass_flags():
+                setattr(self, flag, False)
+
+        all_passable_objects = {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args', 'groups', 'groupdict'}
+
+        self._callback_args = inspect_arguments(self.callback)
+
+        def should_pass_obj(name):
+            """
+            Utility to determine whether a passable object is part of
+            the user handler's signature, makes sense in this context,
+            and is not explicitly set to `False`.
+            """
+            is_requested = name in all_passable_objects and name in self._callback_args
+            if is_requested and name not in passable:
+                warnings.warn("The argument `{}` cannot be autowired since it is not available "
+                              "on `{}s`.".format(name, type(self).__name__))
+                return False
+            return is_requested
+
+        # Check whether the user has set any `pass_*` flag to True in addition to `autowire`
+        for flag in self.__get_available_pass_flags():
+            to_pass = bool(getattr(self, flag))
+            if to_pass is True:
+                warnings.warn('If `autowire` is set to `True`, it is unnecessary '
+                              'to provide the `{}` flag.'.format(flag))
+
+        if should_pass_obj('update_queue'):
+            self.pass_update_queue = True
+        if should_pass_obj('job_queue'):
+            self.pass_job_queue = True
+        if should_pass_obj('user_data'):
+            self.pass_user_data = True
+        if should_pass_obj('chat_data'):
+            self.pass_chat_data = True
+        if should_pass_obj('args'):
+            self.pass_args = True
+        if should_pass_obj('groups'):
+            self.pass_groups = True
+        if should_pass_obj('groupdict'):
+            self.pass_groupdict = True
+
+        self._autowire_initialized = True
+
     def collect_optional_args(self, dispatcher, update=None):
-        """Prepares the optional arguments that are the same for all types of handlers.
+        """
+        Prepares the optional arguments that are the same for all types of handlers.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
@@ -123,27 +192,32 @@ class Handler(object):
         optional_args = dict()
 
         if self.autowire:
-            callback_args = get_positional_arguments(self.callback)
-            if 'update_queue' in callback_args:
-                optional_args['update_queue'] = dispatcher.update_queue
-            if 'job_queue' in callback_args:
-                optional_args['job_queue'] = dispatcher.job_queue
-            if 'user_data' in callback_args:
-                user = update.effective_user
-                optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
-            if 'chat_data' in callback_args:
-                chat = update.effective_chat
-                optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
-        else:
-            if self.pass_update_queue:
-                optional_args['update_queue'] = dispatcher.update_queue
-            if self.pass_job_queue:
-                optional_args['job_queue'] = dispatcher.job_queue
-            if self.pass_user_data:
-                user = update.effective_user
-                optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
-            if self.pass_chat_data:
-                chat = update.effective_chat
-                optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
+            # Subclasses are responsible for calling `set_autowired_flags` in their __init__
+            assert self._autowire_initialized
+
+        if self.pass_update_queue:
+            optional_args['update_queue'] = dispatcher.update_queue
+        if self.pass_job_queue:
+            optional_args['job_queue'] = dispatcher.job_queue
+        if self.pass_user_data:
+            user = update.effective_user
+            optional_args['user_data'] = dispatcher.user_data[user.id if user else None]
+        if self.pass_chat_data:
+            chat = update.effective_chat
+            optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
 
         return optional_args
+
+    def collect_bot_update_args(self, dispatcher, update):
+        if self.autowire:
+            # Subclasses are responsible for calling `set_autowired_flags` in their __init__
+            assert self._autowire_initialized
+
+            positional_args = []
+            if 'bot' in self._callback_args:
+                positional_args.append(dispatcher.bot)
+            if 'update' in self._callback_args:
+                positional_args.append(update)
+            return positional_args
+        else:
+            return (dispatcher.bot, update)

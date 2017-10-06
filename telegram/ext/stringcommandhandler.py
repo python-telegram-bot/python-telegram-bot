@@ -64,6 +64,7 @@ class StringCommandHandler(Handler):
     def __init__(self,
                  command,
                  callback,
+                 autowire=False,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
@@ -71,6 +72,8 @@ class StringCommandHandler(Handler):
             callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
         self.command = command
         self.pass_args = pass_args
+        if self.autowire:
+            self.set_autowired_flags(passable={'groups', 'groupdict', 'user_data', 'chat_data', 'args'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.

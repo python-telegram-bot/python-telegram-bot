@@ -28,6 +28,8 @@ class ChosenInlineResultHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -47,6 +49,10 @@ class ChosenInlineResultHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and pass objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -64,16 +70,20 @@ class ChosenInlineResultHandler(Handler):
 
     def __init__(self,
                  callback,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False):
         super(ChosenInlineResultHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
+        if self.autowire:
+            self.set_autowired_flags()
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.

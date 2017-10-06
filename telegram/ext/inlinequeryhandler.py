@@ -112,6 +112,8 @@ class InlineQueryHandler(Handler):
         self.pattern = pattern
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
+        if self.autowire:
+            self.set_autowired_flags(passable={'groups', 'groupdict', 'user_data', 'chat_data'})
 
     def check_update(self, update):
         """
@@ -142,6 +144,7 @@ class InlineQueryHandler(Handler):
         """
 
         optional_args = self.collect_optional_args(dispatcher, update)
+
         if self.pattern:
             match = re.match(self.pattern, update.inline_query.query)
 
