@@ -65,7 +65,7 @@ def regex_with_groups(bot, update, groups, groupdict):
 
 
 def main():
-    # Create the EventHandler and pass it your bot's token.
+    # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
