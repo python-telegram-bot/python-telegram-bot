@@ -8,14 +8,14 @@ This bot shows how to use `autowire=True` in Handler definitions to save a lot o
 the explicit pass_* flags.
 
 Usage:
-Autowiring example: Try sending /start, "test", /data or something random.
+Autowiring example: Try sending /start, /data, "My name is Leandro", or some random text.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, RegexHandler
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -39,7 +39,7 @@ def start(bot, update, args):
 def simple_update_only(update):
     """
     A simple handler that only needs an `update` object.
-    Useful e.g. for /help commands that need to do nothing but reply with some text.
+    Useful e.g. for basic commands like /help that need to do nothing but reply with some text.
     """
     update.message.reply_text("This should have produced an error "
                               "for the MessageHandler in group=1.")
@@ -59,6 +59,11 @@ def callback_with_data(bot, update, chat_data, user_data):
     update.message.reply_text(msg, quote=True)
 
 
+def regex_with_groups(bot, update, groups, groupdict):
+    update.message.reply_text("Nice, your {} is {}.".format(groups[0], groups[1]))
+    update.message.reply_text('Groupdict: {}'.format(groupdict))
+
+
 def main():
     # Create the EventHandler and pass it your bot's token.
     updater = Updater("TOKEN")
@@ -69,10 +74,16 @@ def main():
     # Inject the `args` parameter automagically
     dp.add_handler(CommandHandler("start", start, autowire=True))
 
+    # A RegexHandler example where `groups` and `groupdict` are passed automagically
+    # Examples: Send "My name is Leandro" or "My cat is blue".
+    dp.add_handler(RegexHandler(r'[Mm]y (?P<object>.*) is (?P<value>.*)',
+                                regex_with_groups,
+                                autowire=True))
+
     # This will raise an error because the bot argument is missing...
-    dp.add_handler(MessageHandler(Filters.text, simple_update_only), group=1)
+    dp.add_handler(CommandHandler('help', simple_update_only), group=1)
     # ... but with the autowiring capability, you can have callbacks with only an `update` argument.
-    dp.add_handler(MessageHandler(Filters.text, simple_update_only, autowire=True), group=2)
+    dp.add_handler(CommandHandler('help', simple_update_only, autowire=True), group=2)
 
     # Passing `chat_data` and `user_data` explicitly...
     dp.add_handler(CommandHandler("data", callback_with_data,
