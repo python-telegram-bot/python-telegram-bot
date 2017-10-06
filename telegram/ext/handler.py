@@ -87,6 +87,7 @@ class Handler(object):
         self.pass_chat_data = pass_chat_data
         self._autowire_initialized = False
         self._callback_args = None
+        self._passable = None
 
     def check_update(self, update):
         """
@@ -119,13 +120,13 @@ class Handler(object):
 
     def __warn_autowire(self):
         """ Warn if the user has set any `pass_*` flags to True in addition to `autowire` """
-        for flag in self.__get_available_pass_flags():
+        for flag in self._get_available_pass_flags():
             to_pass = bool(getattr(self, flag))
             if to_pass is True:
                 warnings.warn('If `autowire` is set to `True`, it is unnecessary '
                               'to provide the `{}` flag.'.format(flag))
 
-    def __get_available_pass_flags(self):
+    def _get_available_pass_flags(self):
         """
         Used to provide warnings if the user decides to use `autowire` in conjunction with
         ``pass_*`` flags, and to recalculate all flags.
@@ -135,6 +136,20 @@ class Handler(object):
         passable objects that are only relevant to subclasses (e.g. args, groups, groupdict).
         """
         return [f for f in dir(self) if f.startswith('pass_')]
+
+    def __should_pass_obj(self, name):
+        """
+        Utility to determine whether a passable object is part of
+        the user handler's signature, makes sense in this context,
+        and is not explicitly set to `False`.
+        """
+        all_passable_objects = {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args', 'groups', 'groupdict'}
+        is_requested = name in all_passable_objects and name in self._callback_args
+        if is_requested and name not in self._passable:
+            warnings.warn("The argument `{}` cannot be autowired since it is not available "
+                          "on `{}s`.".format(name, type(self).__name__))
+            return False
+        return is_requested
 
     def set_autowired_flags(self, passable={'update_queue', 'job_queue', 'user_data', 'chat_data'}):
         """
@@ -148,47 +163,34 @@ class Handler(object):
         The ``passable`` arguments are required to be explicit as opposed to dynamically generated
         to be absolutely safe that no arguments will be passed that are not allowed.
         """
+        self._passable = passable
 
         if not self.autowire:
             raise ValueError("This handler is not autowired.")
-        self.__warn_autowire()
 
         if self._autowire_initialized:
             # In case that users decide to change their callback signatures at runtime, give the
             # possibility to recalculate all flags.
-            for flag in self.__get_available_pass_flags():
+            for flag in self._get_available_pass_flags():
                 setattr(self, flag, False)
 
-        all_passable_objects = {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args', 'groups', 'groupdict'}
+        self.__warn_autowire()
 
         self._callback_args = inspect_arguments(self.callback)
 
-        def should_pass_obj(name):
-            """
-            Utility to determine whether a passable object is part of
-            the user handler's signature, makes sense in this context,
-            and is not explicitly set to `False`.
-            """
-            is_requested = name in all_passable_objects and name in self._callback_args
-            if is_requested and name not in passable:
-                warnings.warn("The argument `{}` cannot be autowired since it is not available "
-                              "on `{}s`.".format(name, type(self).__name__))
-                return False
-            return is_requested
-
-        if should_pass_obj('update_queue'):
+        if self.__should_pass_obj('update_queue'):
             self.pass_update_queue = True
-        if should_pass_obj('job_queue'):
+        if self.__should_pass_obj('job_queue'):
             self.pass_job_queue = True
-        if should_pass_obj('user_data'):
+        if self.__should_pass_obj('user_data'):
             self.pass_user_data = True
-        if should_pass_obj('chat_data'):
+        if self.__should_pass_obj('chat_data'):
             self.pass_chat_data = True
-        if should_pass_obj('args'):
+        if self.__should_pass_obj('args'):
             self.pass_args = True
-        if should_pass_obj('groups'):
+        if self.__should_pass_obj('groups'):
             self.pass_groups = True
-        if should_pass_obj('groupdict'):
+        if self.__should_pass_obj('groupdict'):
             self.pass_groupdict = True
 
         self._autowire_initialized = True
