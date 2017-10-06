@@ -71,7 +71,7 @@ class CommandHandler(Handler):
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
         autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
-            inspected for positional arguments and pass objects whose names match any of the
+            inspected for positional arguments and be passed objects whose names match any of the
             ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
             ``autowire`` will yield a warning.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
@@ -172,7 +172,7 @@ class CommandHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
-        self.set_autowired_flags({'args', 'update_queue', 'job_queue', 'user_data', 'chat_data'})
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
 
         message = update.message or update.edited_message
@@ -180,4 +180,4 @@ class CommandHandler(Handler):
         if self.pass_args:
             optional_args['args'] = message.text.split()[1:]
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

@@ -49,7 +49,7 @@ class PreCheckoutQueryHandler(Handler):
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
         autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
-            inspected for positional arguments and pass objects whose names match any of the
+            inspected for positional arguments and be passed objects whose names match any of the
             ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
             ``autowire`` will yield
             a warning.
@@ -105,5 +105,7 @@ class PreCheckoutQueryHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
-        return self.callback(dispatcher.bot, update, **optional_args)
+
+        return self.callback(*positional_args, **optional_args)

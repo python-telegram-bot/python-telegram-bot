@@ -23,7 +23,12 @@ from telegram.utils.inspection import inspect_arguments
 
 
 class Handler(object):
-    """The base class for all update handlers. Create custom handlers by inheriting from it.
+    """
+    The base class for all update handlers. Create custom handlers by inheriting from it.
+
+    If your subclass needs the *autowiring* functionality, make sure to call ``set_autowired_flags``
+    **after** initializing the ``pass_*`` members. The ``passable`` argument to this method denotes
+    all the flags your Handler supports, e.g. ``{'update_queue', 'job_queue', 'args'}``.
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
@@ -49,10 +54,9 @@ class Handler(object):
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
         autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
-            inspected for positional arguments and pass objects whose names match any of the
+            inspected for positional arguments and be passed objects whose names match any of the
             ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
-            ``autowire`` will yield
-            a warning.
+            ``autowire`` will yield a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -116,7 +120,7 @@ class Handler(object):
     def __get_available_pass_flags(self):
         """
         Used to provide warnings if the user decides to use `autowire` in conjunction with
-        `pass_*` flags, and to recalculate all flags.
+        ``pass_*`` flags, and to recalculate all flags.
 
         Getting objects dynamically is better than hard-coding all passable objects and setting
         them to False in here, because the base class should not know about the existence of
@@ -126,9 +130,15 @@ class Handler(object):
 
     def set_autowired_flags(self, passable={'update_queue', 'job_queue', 'user_data', 'chat_data'}):
         """
+        This method inspects the callback handler for used arguments. If it finds arguments that
+        are ``passable``, i.e. types that can also be passed by the various ``pass_*`` flags,
+        it sets the according flags to true.
 
-        Make the passable arguments explicit as opposed to dynamically generated to be absolutely
-        safe that no arguments will be passed that are not allowed.
+        If the handler signature is prone to change at runtime for whatever reason, you can call
+        this method again to recalculate the flags to use.
+
+        The ``passable`` arguments are required to be explicit as opposed to dynamically generated
+        to be absolutely safe that no arguments will be passed that are not allowed.
         """
 
         if not self.autowire:
@@ -192,7 +202,8 @@ class Handler(object):
         optional_args = dict()
 
         if self.autowire:
-            # Subclasses are responsible for calling `set_autowired_flags` in their __init__
+            # Subclasses are responsible for calling `set_autowired_flags`
+            # at the end of their __init__
             assert self._autowire_initialized
 
         if self.pass_update_queue:
@@ -209,6 +220,20 @@ class Handler(object):
         return optional_args
 
     def collect_bot_update_args(self, dispatcher, update):
+        """
+        Prepares the positional arguments ``bot`` and/or ``update`` that are required for every
+        python-telegram-bot handler that is not **autowired**. If ``autowire`` is set to ``True``,
+        this method uses the inspected callback arguments to decide whether bot or update,
+        respectively, need to be passed. The order is always (bot, update).
+
+
+        Args:
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
+            update (:class:`telegram.Update`): The update.
+
+        Returns:
+            A tuple of bot, update, or both
+        """
         if self.autowire:
             # Subclasses are responsible for calling `set_autowired_flags` in their __init__
             assert self._autowire_initialized
@@ -218,6 +243,6 @@ class Handler(object):
                 positional_args.append(dispatcher.bot)
             if 'update' in self._callback_args:
                 positional_args.append(update)
-            return positional_args
+            return tuple(positional_args)
         else:
             return (dispatcher.bot, update)

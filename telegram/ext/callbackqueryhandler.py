@@ -33,6 +33,8 @@ class CallbackQueryHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -58,6 +60,10 @@ class CallbackQueryHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -72,25 +78,13 @@ class CallbackQueryHandler(Handler):
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
-        pass_groupdict (:obj:`bool`, import inspect
-
-try:
-    def inspect_arguments(func):
-        args, _, _, defaults = inspect.getargspec(func)
-        # Filter out positional arguments
-        kwargs = args[:-len(defaults)]
-        return kwargs
-except Warning:  # `getargspec()` is deprecated in Python3
-    def inspect_arguments(func):
-        _, varargs, _, _, _, _, _ = inspect.getfullargspec(func)
-        return varargsoptional): If the callback should be passed the result of
+        pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
             Default is ``False``
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
-
     """
 
     def __init__(self,
@@ -119,7 +113,8 @@ except Warning:  # `getargspec()` is deprecated in Python3
         self.pass_groupdict = pass_groupdict
 
         if self.autowire:
-            self.set_autowired_flags(passable={'groups', 'groupdict', 'user_data', 'chat_data'})
+            self.set_autowired_flags(passable={'groups', 'groupdict', 'user_data',
+                                               'chat_data', 'update_queue', 'job_queue'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -147,6 +142,7 @@ except Warning:  # `getargspec()` is deprecated in Python3
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
 
         if self.pattern:
@@ -157,4 +153,4 @@ except Warning:  # `getargspec()` is deprecated in Python3
             if self.pass_groupdict:
                 optional_args['groupdict'] = match.groupdict()
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

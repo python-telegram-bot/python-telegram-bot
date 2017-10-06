@@ -112,6 +112,7 @@ class StringRegexHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher)
         match = re.match(self.pattern, update)
 
@@ -120,4 +121,4 @@ class StringRegexHandler(Handler):
         if self.pass_groupdict:
             optional_args['groupdict'] = match.groupdict()
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)
