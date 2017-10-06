@@ -117,6 +117,14 @@ class Handler(object):
         """
         raise NotImplementedError
 
+    def __warn_autowire(self):
+        """ Warn if the user has set any `pass_*` flags to True in addition to `autowire` """
+        for flag in self.__get_available_pass_flags():
+            to_pass = bool(getattr(self, flag))
+            if to_pass is True:
+                warnings.warn('If `autowire` is set to `True`, it is unnecessary '
+                              'to provide the `{}` flag.'.format(flag))
+
     def __get_available_pass_flags(self):
         """
         Used to provide warnings if the user decides to use `autowire` in conjunction with
@@ -143,6 +151,7 @@ class Handler(object):
 
         if not self.autowire:
             raise ValueError("This handler is not autowired.")
+        self.__warn_autowire()
 
         if self._autowire_initialized:
             # In case that users decide to change their callback signatures at runtime, give the
@@ -166,13 +175,6 @@ class Handler(object):
                               "on `{}s`.".format(name, type(self).__name__))
                 return False
             return is_requested
-
-        # Check whether the user has set any `pass_*` flag to True in addition to `autowire`
-        for flag in self.__get_available_pass_flags():
-            to_pass = bool(getattr(self, flag))
-            if to_pass is True:
-                warnings.warn('If `autowire` is set to `True`, it is unnecessary '
-                              'to provide the `{}` flag.'.format(flag))
 
         if should_pass_obj('update_queue'):
             self.pass_update_queue = True
