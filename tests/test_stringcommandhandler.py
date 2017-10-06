@@ -119,13 +119,6 @@ class TestStringCommandHandler(object):
         assert self.test_flag
 
     def test_autowire(self, dp):
-        handler = StringCommandHandler('test', self.callback_queue_1, autowire=True)
-        dp.add_handler(handler)
-
-        dp.process_update('/test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
         handler = StringCommandHandler('test', self.callback_queue_2, autowire=True)
         dp.add_handler(handler)
 
