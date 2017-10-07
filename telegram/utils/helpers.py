@@ -143,6 +143,9 @@ def extract_urls(message):
     if message.caption:
         all_urls += _extract_urls_from_text(message.caption)
 
+    # Strip trailing slash from URL so we can compare them for equality
+    stripped_urls = [x[:-1] if x[-1] == '/' else x for x in all_urls]
+
     # Remove exact duplicates
-    urls = OrderedDict({k: None for k in all_urls})
+    urls = OrderedDict({k: None for k in stripped_urls})
     return list(urls.keys())
