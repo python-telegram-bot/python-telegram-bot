@@ -30,7 +30,8 @@ class TestHelpers(object):
         assert expected_str == helpers.escape_markdown(test_str)
 
     def test_extract_urls_from_text(self):
-        urls = "http://google.com and http://github.com/ and python-telegram-bot.readthedocs.io/en/latest/"
+        urls = "http://google.com and http://github.com/ and " \
+               "python-telegram-bot.readthedocs.io/en/latest/"
         result = helpers._extract_urls_from_text(urls)
         assert len(result) == 2
         assert result[0] == 'http://google.com'
@@ -40,12 +41,12 @@ class TestHelpers(object):
         test_entities = [{
             'length': 6, 'offset': 0, 'type': 'text_link',
             'url': 'http://github.com/'
-        },
-            {'length': 17, 'offset': 23, 'type': 'url'},
-            {
-                'length': 14, 'offset': 43, 'type': 'text_link',
-                'url': 'http://google.com'
-            }]
+        }, {
+            'length': 17, 'offset': 23, 'type': 'url'
+        }, {
+            'length': 14, 'offset': 43, 'type': 'text_link',
+            'url': 'http://google.com'
+        }]
         test_text = 'Github can be found at http://github.com. Google is here.'
         test_message = Message(message_id=1,
                                from_user=None,

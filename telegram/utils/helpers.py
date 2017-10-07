@@ -21,10 +21,11 @@
 import re
 from collections import OrderedDict
 from datetime import datetime
+
 try:
     from urllib.parse import urlparse
 except ImportError:
-     from urlparse import urlparse
+    from urlparse import urlparse
 
 try:
     from html import escape as escape_html  # noqa: F401
@@ -40,7 +41,6 @@ if hasattr(datetime, 'timestamp'):
 else:
     # Python < 3.3 (incl 2.7)
     from time import mktime
-
 
     def _timestamp(dt_obj):
         return mktime(dt_obj.timetuple())
@@ -137,11 +137,8 @@ def extract_urls(message):
     """
     from telegram import MessageEntity
 
-    results = message.parse_entities(types=[
-        MessageEntity.URL,
-        MessageEntity.TEXT_LINK])
-    all_urls = [v if k.type == MessageEntity.URL
-                else k.url for k, v in results.items()]
+    results = message.parse_entities(types=[MessageEntity.URL, MessageEntity.TEXT_LINK])
+    all_urls = [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
 
     if message.caption:
         all_urls += _extract_urls_from_text(message.caption)
