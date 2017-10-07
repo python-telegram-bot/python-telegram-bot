@@ -195,7 +195,6 @@ class TestCallbackQueryHandler(object):
         dp.process_update(callback_query)
         assert self.test_flag
 
-
     def test_other_update_types(self, false_update):
         handler = CallbackQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)

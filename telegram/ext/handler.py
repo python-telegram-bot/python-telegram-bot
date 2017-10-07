@@ -26,9 +26,10 @@ class Handler(object):
     """
     The base class for all update handlers. Create custom handlers by inheriting from it.
 
-    If your subclass needs the *autowiring* functionality, make sure to call ``set_autowired_flags``
-    **after** initializing the ``pass_*`` members. The ``passable`` argument to this method denotes
-    all the flags your Handler supports, e.g. ``{'update_queue', 'job_queue', 'args'}``.
+    If your subclass needs the *autowiring* functionality, make sure to call
+    ``set_autowired_flags`` **after** initializing the ``pass_*`` members. The ``passable``
+    argument to this method denotes all the flags your Handler supports, e.g.
+    ``{'update_queue', 'job_queue', 'args'}``.
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
@@ -153,7 +154,8 @@ class Handler(object):
             return False
         return is_requested
 
-    def set_autowired_flags(self, passable={'update_queue', 'job_queue', 'user_data', 'chat_data'}):
+    def set_autowired_flags(self,
+                            passable={'update_queue', 'job_queue', 'user_data', 'chat_data'}):
         """
         This method inspects the callback handler for used arguments. If it finds arguments that
         are ``passable``, i.e. types that can also be passed by the various ``pass_*`` flags,

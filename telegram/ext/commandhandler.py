@@ -114,7 +114,8 @@ class CommandHandler(Handler):
 
         self.pass_args = pass_args
         if self.autowire:
-            self.set_autowired_flags({'update_queue', 'job_queue', 'user_data', 'chat_data', 'args'})
+            self.set_autowired_flags(
+                {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args'})
 
         if isinstance(command, string_types):
             self.command = [command.lower()]
@@ -140,8 +141,8 @@ class CommandHandler(Handler):
             :obj:`bool`
 
         """
-        if (isinstance(update, Update)
-            and (update.message or update.edited_message and self.allow_edited)):
+        if (isinstance(update, Update) and
+                (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
             if message.text:

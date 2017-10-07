@@ -49,7 +49,8 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def pre_checkout_query():
-    return Update(1, pre_checkout_query=PreCheckoutQuery('id', User(1, 'test user', False), 'EUR', 223,
+    return Update(1, pre_checkout_query=PreCheckoutQuery('id', User(1, 'test user', False), 'EUR',
+                                                         223,
                                                          'invoice_payload'))
 
 

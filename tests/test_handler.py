@@ -21,6 +21,7 @@ import pytest
 
 from telegram.ext import Handler
 
+
 class TestHandler(object):
     test_flag = False
 
@@ -117,5 +118,6 @@ class TestHandler(object):
 
         handler.set_autowired_flags()
 
-        assert set(handler._get_available_pass_flags()) == {'pass_update_queue', 'pass_job_queue', 'pass_chat_data',
+        assert set(handler._get_available_pass_flags()) == {'pass_update_queue', 'pass_job_queue',
+                                                            'pass_chat_data',
                                                             'pass_user_data'}
