@@ -72,6 +72,8 @@ class Handler(object):
 
     """
 
+    PASSABLE_OBJECTS = {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args', 'groups', 'groupdict'}
+
     def __init__(self,
                  callback,
                  autowire=False,
@@ -143,8 +145,7 @@ class Handler(object):
         the user handler's signature, makes sense in this context,
         and is not explicitly set to `False`.
         """
-        all_passable_objects = {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args', 'groups', 'groupdict'}
-        is_requested = name in all_passable_objects and name in self._callback_args
+        is_requested = name in self.PASSABLE_OBJECTS and name in self._callback_args
         if is_requested and name not in self._passable:
             warnings.warn("The argument `{}` cannot be autowired since it is not available "
                           "on `{}s`.".format(name, type(self).__name__))
@@ -162,6 +163,9 @@ class Handler(object):
 
         The ``passable`` arguments are required to be explicit as opposed to dynamically generated
         to be absolutely safe that no arguments will be passed that are not allowed.
+
+        Args:
+            passable: An iterable that contains the allowed flags for this handler
         """
         self._passable = passable
 
@@ -178,20 +182,10 @@ class Handler(object):
 
         self._callback_args = inspect_arguments(self.callback)
 
-        if self.__should_pass_obj('update_queue'):
-            self.pass_update_queue = True
-        if self.__should_pass_obj('job_queue'):
-            self.pass_job_queue = True
-        if self.__should_pass_obj('user_data'):
-            self.pass_user_data = True
-        if self.__should_pass_obj('chat_data'):
-            self.pass_chat_data = True
-        if self.__should_pass_obj('args'):
-            self.pass_args = True
-        if self.__should_pass_obj('groups'):
-            self.pass_groups = True
-        if self.__should_pass_obj('groupdict'):
-            self.pass_groupdict = True
+        # Actually set `pass_*` flags to True
+        for to_pass in self.PASSABLE_OBJECTS:
+            if self.__should_pass_obj(to_pass):
+                setattr(self, 'pass_' + to_pass, True)
 
         self._autowire_initialized = True
 

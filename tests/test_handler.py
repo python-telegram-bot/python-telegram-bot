@@ -21,7 +21,6 @@ import pytest
 
 from telegram.ext import Handler
 
-
 class TestHandler(object):
     test_flag = False
 
