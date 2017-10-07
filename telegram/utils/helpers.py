@@ -42,6 +42,7 @@ else:
     # Python < 3.3 (incl 2.7)
     from time import mktime
 
+
     def _timestamp(dt_obj):
         return mktime(dt_obj.timetuple())
 
@@ -146,6 +147,8 @@ def extract_urls(message):
     # Strip trailing slash from URL so we can compare them for equality
     stripped_urls = [x[:-1] if x[-1] == '/' else x for x in all_urls]
 
+    sorted_urls = sorted(stripped_urls, key=str.lower)
+
     # Remove exact duplicates
-    urls = OrderedDict({k: None for k in stripped_urls})
+    urls = OrderedDict({k: None for k in sorted_urls})
     return list(urls.keys())

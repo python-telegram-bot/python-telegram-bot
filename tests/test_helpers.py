@@ -58,7 +58,6 @@ class TestHelpers(object):
 
         assert len(result) == 2
         assert (test_entities[0]['url'][:-1] == result[0])
-        assert (result[0] == 'http://github.com')
         assert (test_entities[2]['url'] == result[1])
 
     def test_extract_urls_caption(self):
