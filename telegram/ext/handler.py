@@ -72,7 +72,8 @@ class Handler(object):
 
     """
 
-    PASSABLE_OBJECTS = {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args', 'groups', 'groupdict'}
+    PASSABLE_OBJECTS = {'update_queue', 'job_queue', 'user_data', 'chat_data',
+                        'args', 'groups', 'groupdict'}
 
     def __init__(self,
                  callback,
