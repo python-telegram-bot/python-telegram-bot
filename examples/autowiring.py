@@ -70,7 +70,7 @@ def callback_undefined_arguments(bot, update, chat_data, groups):
 
 def main():
     # Create the Updater and pass it your bot's token.
-    updater = Updater("324133401:AAHVjjXotCDXC_kIIkfM0O6bm9-l7BfJw-I")
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
