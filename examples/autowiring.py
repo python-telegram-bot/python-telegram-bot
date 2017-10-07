@@ -64,9 +64,13 @@ def regex_with_groups(bot, update, groups, groupdict):
     update.message.reply_text('Groupdict: {}'.format(groupdict))
 
 
+def callback_undefined_arguments(bot, update, chat_data, groups):
+    pass
+
+
 def main():
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater("324133401:AAHVjjXotCDXC_kIIkfM0O6bm9-l7BfJw-I")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -91,6 +95,10 @@ def main():
                                   pass_user_data=True))
     # ... is equivalent to passing them automagically.
     dp.add_handler(CommandHandler("data", callback_with_data, autowire=True))
+
+    # An example of using the `groups` parameter which is not defined for a CommandHandler.
+    # Uncomment the line below and you will see a warning.
+    # dp.add_handler(CommandHandler("erroneous", callback_undefined_arguments, autowire=True))
 
     dp.add_error_handler(error)
     updater.start_polling()
