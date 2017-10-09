@@ -31,7 +31,7 @@ We have made you a wrapper you can't refuse
    :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
    :alt: Travis CI Status
 
-.. image:: https://img.shields.io/appveyor/ci/Eldinnie/python-telegram-bot/master.svg
+.. image:: https://img.shields.io/appveyor/ci/Eldinnie/python-telegram-bot/master.svg?logo=appveyor
    :target: https://ci.appveyor.com/project/Eldinnie/python-telegram-bot
    :alt: AppVeyor CI Status
 
