@@ -51,6 +51,10 @@ We have made you a wrapper you can't refuse
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group
 
+.. image:: https://img.shields.io/badge/IRC-Channel-blue.svg
+   :target: https://webchat.freenode.net/?channels=##python-telegram-bot
+   :alt: IRC Bridge
+
 =================
 Table of contents
 =================
