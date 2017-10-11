@@ -771,6 +771,7 @@ class Bot(TelegramObject):
                       reply_markup=None,
                       timeout=None,
                       location=None,
+                      live_period=None,
                       **kwargs):
         """Use this method to send point on the map.
 
@@ -783,6 +784,8 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            live_period (:obj:`int`, optional): Period in seconds for which the location will be
+                updated, should be between 60 and 86400.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -813,6 +816,108 @@ class Bot(TelegramObject):
             longitude = location.longitude
 
         data = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
+
+        if live_period:
+            data['live_period'] = live_period
+
+        return url, data
+
+    @log
+    @message
+    def edit_message_live_location(self,
+                                   chat_id=None,
+                                   message_id=None,
+                                   inline_message_id=None,
+                                   latitude=None,
+                                   longitude=None,
+                                   location=None,
+                                   reply_markup=None,
+                                   **kwargs):
+        """"Use this method to edit live location messages sent by the bot or via the bot
+        (for inline bots). A location can be edited until its live_period expires or editing
+        is explicitly disabled by a call to stop_message_live_location.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            latitude (:obj:`float`, optional): Latitude of location.
+            longitude (:obj:`float`, optional): Longitude of location.
+            location (:class:`telegram.Location`, optional): The location to send.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
+        Returns:
+             :class:`Telegram.Message`: On success the edited message.
+        """
+
+        url = '{0}/editMessageLiveLocation'.format(self.base_url)
+
+        if not (all([latitude, longitude]) or location):
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument")
+
+        if isinstance(location, Location):
+            latitude = location.latitude
+            longitude = location.longitude
+
+        data = {'latitude': latitude, 'longitude': longitude}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        return url, data
+
+    @log
+    @message
+    def stop_message_live_location(self,
+                                   chat_id=None,
+                                   message_id=None,
+                                   inline_message_id=None,
+                                   reply_markup=None,
+                                   **kwargs):
+        """Use this method to stop updating a live location message sent by the bot or via the bot
+        (for inline bots) before live_period expires.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
+        Returns:
+            :class:`Telegram.Message`: On success the edited message.
+        """
+
+        url = '{0}/stopMessageLiveLocation'.format(self.base_url)
+
+        data = {}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
 
         return url, data
 
@@ -2797,6 +2902,8 @@ class Bot(TelegramObject):
     sendVoice = send_voice
     sendVideoNote = send_video_note
     sendLocation = send_location
+    editMessageLiveLocation = edit_message_live_location
+    stopMessageLiveLocation = stop_message_live_location
     sendVenue = send_venue
     sendContact = send_contact
     sendGame = send_game

@@ -18,8 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import Location
+from telegram.error import BadRequest
 
 
 @pytest.fixture(scope='class')
@@ -38,6 +40,36 @@ class TestLocation(object):
 
         assert location.latitude == self.latitude
         assert location.longitude == self.longitude
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_location(self, bot, chat_id):
+        message = bot.send_location(chat_id=chat_id, latitude=-23.691288, longitude=-46.788279)
+
+        assert message.location
+        assert message.location.longitude == -46.788279
+        assert message.location.latitude == -23.691288
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_live_location(self, bot, chat_id):
+        message = bot.send_location(chat_id=chat_id, latitude=52.223880, longitude=5.166146,
+                                    live_period=80)
+        message2 = bot.edit_message_live_location(message.chat_id, message.message_id,
+                                                  latitude=52.223098, longitude=5.164306)
+
+        assert message2.location.latitude == 52.223098
+        assert message2.location.longitude == 5.164306
+
+        bot.stop_message_live_location(message.chat_id, message.message_id)
+        # should throw error to capture with with pytest.raises. Need to know the error though.¿
+        with pytest.raises(BadRequest):
+            bot.edit_message_live_location(message.chat_id, message.message_id, latitude=52.223880,
+                                           longitude=5.164306)
+
+    @pytest.mark.skip(reason='need reference to an inline message')
+    def test_live_inline_message(self):
+        pass
 
     def test_send_with_location(self, monkeypatch, bot, chat_id, location):
         def test(_, url, data, **kwargs):

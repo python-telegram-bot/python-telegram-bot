@@ -32,11 +32,14 @@ class InputLocationMessageContent(InputMessageContent):
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
+        live_period	(:obj:`int`, optional): Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, latitude, longitude, **kwargs):
+    def __init__(self, latitude, longitude, live_period=None, **kwargs):
         # Required
         self.latitude = latitude
         self.longitude = longitude
+        self.live_period = live_period
