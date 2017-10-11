@@ -63,7 +63,7 @@ class TestLocation(object):
 
         bot.stop_message_live_location(message.chat_id, message.message_id)
         # should throw error to capture with with pytest.raises. Need to know the error though.¿
-        with pytest.raises(BadRequest):
+        with pytest.raises(BadRequest, match="not modified"):
             bot.edit_message_live_location(message.chat_id, message.message_id, latitude=52.223880,
                                            longitude=5.164306)
 
