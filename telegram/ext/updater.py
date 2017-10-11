@@ -69,8 +69,10 @@ class Updater(object):
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) setable with :attr:`idle`.
-        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a request
-            object (ignored if `bot` argument is used).
+        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
+            `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
+            request_kwargs are very useful for the advanced users who would like to control the
+            default timeouts and/or control the proxy used for http communication.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
