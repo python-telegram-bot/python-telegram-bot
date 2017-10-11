@@ -373,7 +373,7 @@ class Job(object):
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
         days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should run.
             Defaults to ``Days.EVERY_DAY``
-        job_queue (class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
+        job_queue (:class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
 
     """

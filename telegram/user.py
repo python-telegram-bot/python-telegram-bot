@@ -32,7 +32,7 @@ class User(TelegramObject):
         is_bot (:obj:`bool`): True, if this user is a bot
         first_name (:obj:`str`): User's or bot's first name.
         last_name (:obj:`str`): Optional. User's or bot's last name.
-        username (:obj:`str`): Optional. User's or bot's last name.
+        username (:obj:`str`): Optional. User's or bot's username.
         language_code (:obj:`str`): Optional. IETF language tag of the user's language.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
