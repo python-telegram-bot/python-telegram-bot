@@ -33,6 +33,8 @@ import telegram
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
 IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot',
                       'new_chat_member'}
+
+
 # TODO: New_chat_member is still in our lib but already removed from TG's docs.
 
 
@@ -82,7 +84,7 @@ def check_method(h4):
         ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
     elif name == 'sendContact':
         ignored |= {'contact'}  # Added for ease of use
-    elif name == 'sendLocation':
+    elif name in ['sendLocation', 'editMessageLiveLocation']:
         ignored |= {'location'}  # Added for ease of use
     elif name == 'sendVenue':
         ignored |= {'venue'}  # Added for ease of use

@@ -359,6 +359,14 @@ class TestBot(object):
         assert chat_member.status == 'administrator'
         assert chat_member.user.username == 'EchteEldin'
 
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_set_chat_sticker_set(self):
+        pass
+
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_delete_chat_sticker_set(self):
+        pass
+
     @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)

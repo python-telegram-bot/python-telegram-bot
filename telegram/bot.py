@@ -1933,6 +1933,62 @@ class Bot(TelegramObject):
 
         return ChatMember.de_json(result, self)
 
+    @log
+    def set_chat_sticker_set(self, chat_id, sticker_set_name, timeout=None, **kwargs):
+        """Use this method to set a new group sticker set for a supergroup.
+        The bot must be an administrator in the chat for this to work and must have the appropriate
+        admin rights. Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned
+        in :attr:`get_chat` requests to check if the bot can use this method.
+
+        Args:
+            chat_id (:obj:`int` | : obj:`str`): Unique identifier for the target chat or username
+                of the target supergroup (in the format @supergroupusername).
+            sticker_set_name (:obj:`str`): Name of the sticker set to be set as the group
+                sticker set.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: True on success.
+        """
+
+        url = '{0}/setChatStickerSet'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def delete_chat_sticker_set(self, chat_id, timeout=None, **kwargs):
+        """Use this method to delete a group sticker set from a supergroup. The bot must be an
+        administrator in the chat for this to work and must have the appropriate admin rights.
+        Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
+        `attr:`get_chat` requests to check if the bot can use this method.
+
+        Args:
+            chat_id (:obj:`int` | : obj:`str`): Unique identifier for the target chat or username
+                of the target supergroup (in the format @supergroupusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+             :obj:`bool`: True on success.
+        """
+
+        url = '{0}/deleteChatStickerSet'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
     def get_webhook_info(self, timeout=None, **kwargs):
         """Use this method to get current webhook status. Requires no parameters.
 
@@ -2924,6 +2980,8 @@ class Bot(TelegramObject):
     getChat = get_chat
     getChatAdministrators = get_chat_administrators
     getChatMember = get_chat_member
+    setChatStickerSet = set_chat_sticker_set
+    deleteChatStickerSet = delete_chat_sticker_set
     getChatMembersCount = get_chat_members_count
     getWebhookInfo = get_webhook_info
     setGameScore = set_game_score

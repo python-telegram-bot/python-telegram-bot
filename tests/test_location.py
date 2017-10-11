@@ -43,18 +43,13 @@ class TestLocation(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_location(self, bot, chat_id):
-        message = bot.send_location(chat_id=chat_id, latitude=-23.691288, longitude=-46.788279)
-
-        assert message.location
-        assert message.location.longitude == -46.788279
-        assert message.location.latitude == -23.691288
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_live_location(self, bot, chat_id):
         message = bot.send_location(chat_id=chat_id, latitude=52.223880, longitude=5.166146,
                                     live_period=80)
+        assert message.location
+        assert message.location.longitude == 52.223880
+        assert message.location.latitude == 5.166146
+
         message2 = bot.edit_message_live_location(message.chat_id, message.message_id,
                                                   latitude=52.223098, longitude=5.164306)
 
@@ -62,7 +57,6 @@ class TestLocation(object):
         assert message2.location.longitude == 5.164306
 
         bot.stop_message_live_location(message.chat_id, message.message_id)
-        # should throw error to capture with with pytest.raises. Need to know the error though.¿
         with pytest.raises(BadRequest, match="not modified"):
             bot.edit_message_live_location(message.chat_id, message.message_id, latitude=52.223880,
                                            longitude=5.164306)
