@@ -47,8 +47,8 @@ class TestLocation(object):
         message = bot.send_location(chat_id=chat_id, latitude=52.223880, longitude=5.166146,
                                     live_period=80)
         assert message.location
-        assert message.location.longitude == 52.223880
-        assert message.location.latitude == 5.166146
+        assert message.location.latitude == 52.223880
+        assert message.location.longitude == 5.166146
 
         message2 = bot.edit_message_live_location(message.chat_id, message.message_id,
                                                   latitude=52.223098, longitude=5.164306)
