@@ -809,7 +809,11 @@ class Bot(TelegramObject):
 
         if not (all([latitude, longitude]) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
-                             "argument")
+                             "argument.")
+
+        if all([latitude, longitude]) and location:
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument. Not both.")
 
         if isinstance(location, Location):
             latitude = location.latitude
@@ -865,7 +869,10 @@ class Bot(TelegramObject):
 
         if not (all([latitude, longitude]) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
-                             "argument")
+                             "argument.")
+        if all([latitude, longitude]) and location:
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument. Not both.")
 
         if isinstance(location, Location):
             latitude = location.latitude

@@ -61,9 +61,25 @@ class TestLocation(object):
             bot.edit_message_live_location(message.chat_id, message.message_id, latitude=52.223880,
                                            longitude=5.164306)
 
-    @pytest.mark.skip(reason='need reference to an inline message')
-    def test_live_inline_message(self):
-        pass
+    # TODO: Needs improvement with in inline sent live location.
+    def test_edit_live_inline_message(self, monkeypatch, bot, location):
+        def test(_, url, data, **kwargs):
+            lat = data['latitude'] == location.latitude
+            lon = data['longitude'] == location.longitude
+            id = data['inline_message_id'] == 1234
+            return lat and lon and id
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.edit_message_live_location(inline_message_id=1234, location=location)
+
+    # TODO: Needs improvement with in inline sent live location.
+    def test_stop_live_inline_message(self, monkeypatch, bot):
+        def test(_, url, data, **kwargs):
+            id = data['inline_message_id'] == 1234
+            return id
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.stop_message_live_location(inline_message_id=1234)
 
     def test_send_with_location(self, monkeypatch, bot, chat_id, location):
         def test(_, url, data, **kwargs):
@@ -74,9 +90,31 @@ class TestLocation(object):
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         assert bot.send_location(location=location, chat_id=chat_id)
 
+    def test_edit_live_location_with_location(self, monkeypatch, bot, location):
+        def test(_, url, data, **kwargs):
+            lat = data['latitude'] == location.latitude
+            lon = data['longitude'] == location.longitude
+            return lat and lon
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.edit_message_live_location(None, None, location=location)
+
     def test_send_location_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either location or latitude and longitude'):
             bot.send_location(chat_id=chat_id)
+
+    def test_edit_location_without_required(self, bot):
+        with pytest.raises(ValueError, match='Either location or latitude and longitude'):
+            bot.edit_message_live_location(chat_id=2, message_id=3)
+
+    def test_send_location_with_all_args(self, bot, location):
+        with pytest.raises(ValueError, match='Not both'):
+            bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
+
+    def test_edit_location_with_all_args(self, bot, location):
+        with pytest.raises(ValueError, match='Not both'):
+            bot.edit_message_live_location(chat_id=1, message_id=7, latitude=2.5, longitude=4.6,
+                                           location=location)
 
     def test_to_dict(self, location):
         location_dict = location.to_dict()
