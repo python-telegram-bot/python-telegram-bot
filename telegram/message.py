@@ -713,7 +713,7 @@ class Message(TelegramObject):
         Note:
             This method is present because Telegram calculates the offset and length in
             UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
-            (That is, you can't just slice ``Message.text`` with the offset and length.)
+            (That is, you can't just slice ``Message.caption`` with the offset and length.)
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must

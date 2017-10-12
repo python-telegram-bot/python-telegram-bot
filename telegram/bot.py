@@ -833,9 +833,12 @@ class Bot(TelegramObject):
                                    location=None,
                                    reply_markup=None,
                                    **kwargs):
-        """"Use this method to edit live location messages sent by the bot or via the bot
-        (for inline bots). A location can be edited until its live_period expires or editing
-        is explicitly disabled by a call to stop_message_live_location.
+        """Use this method to edit live location messages sent by the bot or via the bot
+        (for inline bots). A location can be edited until its :attr:`live_period` expires or
+        editing is explicitly disabled by a call to :attr:`stop_message_live_location`.
+
+        Note:
+            You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -855,7 +858,7 @@ class Bot(TelegramObject):
                 the connection pool).
 
         Returns:
-             :class:`Telegram.Message`: On success the edited message.
+             :class:`telegram.Message`: On success the edited message.
         """
 
         url = '{0}/editMessageLiveLocation'.format(self.base_url)
@@ -905,7 +908,7 @@ class Bot(TelegramObject):
                 the connection pool).
 
         Returns:
-            :class:`Telegram.Message`: On success the edited message.
+            :class:`telegram.Message`: On success the edited message.
         """
 
         url = '{0}/stopMessageLiveLocation'.format(self.base_url)
@@ -1941,7 +1944,7 @@ class Bot(TelegramObject):
         in :attr:`get_chat` requests to check if the bot can use this method.
 
         Args:
-            chat_id (:obj:`int` | : obj:`str`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             sticker_set_name (:obj:`str`): Name of the sticker set to be set as the group
                 sticker set.
@@ -1949,6 +1952,7 @@ class Bot(TelegramObject):
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
 
         Returns:
             :obj:`bool`: True on success.
@@ -1967,10 +1971,10 @@ class Bot(TelegramObject):
         """Use this method to delete a group sticker set from a supergroup. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
         Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
-        `attr:`get_chat` requests to check if the bot can use this method.
+        :attr:`get_chat` requests to check if the bot can use this method.
 
         Args:
-            chat_id (:obj:`int` | : obj:`str`): Unique identifier for the target chat or username
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
