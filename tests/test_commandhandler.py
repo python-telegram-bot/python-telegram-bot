@@ -165,6 +165,15 @@ class TestCommandHandler(object):
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
+    def test_newline(self, dp, message):
+        handler = CommandHandler('test', self.callback_basic)
+        dp.add_handler(handler)
+
+        message.text = '/test\nfoobar'
+        assert handler.check_update(Update(0, message))
+        dp.process_update(Update(0, message))
+        assert self.test_flag
+
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
