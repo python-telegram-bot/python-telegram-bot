@@ -55,6 +55,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
+- `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `thodnev <https://github.com/thodnev>`_
 - `Valentijn <https://github.com/Faalentijn>`_

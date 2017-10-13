@@ -34,12 +34,12 @@ def start(bot, update):
 
 
 def alarm(bot, job):
-    """Function to send the alarm message"""
+    """Send the alarm message."""
     bot.send_message(job.context, text='Beep!')
 
 
-def set(bot, update, args, job_queue, chat_data):
-    """Adds a job to the queue"""
+def set_timer(bot, update, args, job_queue, chat_data):
+    """Add a job to the queue."""
     chat_id = update.message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
@@ -59,7 +59,7 @@ def set(bot, update, args, job_queue, chat_data):
 
 
 def unset(bot, update, chat_data):
-    """Removes the job if the user changed their mind"""
+    """Remove the job if the user changed their mind."""
 
     if 'job' not in chat_data:
         update.message.reply_text('You have no active timer')
@@ -73,10 +73,12 @@ def unset(bot, update, chat_data):
 
 
 def error(bot, update, error):
-    logger.warning('Update "%s" caused error "%s"' % (update, error))
+    """Log errors."""
+    logger.warning('Update "{}" caused error "{}"'.format(update, error))
 
 
 def main():
+    """Run bot."""
     updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
@@ -85,7 +87,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(CommandHandler("set", set,
+    dp.add_handler(CommandHandler("set", set_timer,
                                   pass_args=True,
                                   pass_job_queue=True,
                                   pass_chat_data=True))

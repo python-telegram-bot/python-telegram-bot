@@ -10,13 +10,14 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler,
 import logging
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+    logger.warn('Update "{}" caused error "{}"'.format(update, error))
 
 
 def start_callback(bot, update):
@@ -31,7 +32,7 @@ def start_with_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # get your provider_token at @botfather, see https://core.telegram.org/bots/payments#getting-a-token
+    # to get your provider_token see https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"
@@ -55,7 +56,7 @@ def start_without_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # get your provider_token at @botfather, see https://core.telegram.org/bots/payments#getting-a-token
+    # check https://core.telegram.org/bots/payments#supported-currencies for more details
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"

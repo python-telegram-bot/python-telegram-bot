@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Simple Bot to reply to Telegram messages
-# This program is dedicated to the public domain under the CC0 license.
-"""
+
+"""Simple Bot to reply to Telegram messages.
+This program is dedicated to the public domain under the CC0 license.
+
 This Bot uses the Updater class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
@@ -34,10 +34,12 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
+    """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
 def help(bot, update):
+    """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
@@ -48,31 +50,30 @@ def escape_markdown(text):
 
 
 def inlinequery(bot, update):
+    """Handle the inline query."""
     query = update.inline_query.query
-    results = list()
-
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title="Caps",
-                                            input_message_content=InputTextMessageContent(
-                                                query.upper())))
-
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title="Bold",
-                                            input_message_content=InputTextMessageContent(
-                                                "*%s*" % escape_markdown(query),
-                                                parse_mode=ParseMode.MARKDOWN)))
-
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title="Italic",
-                                            input_message_content=InputTextMessageContent(
-                                                "_%s_" % escape_markdown(query),
-                                                parse_mode=ParseMode.MARKDOWN)))
+    results = [
+               InlineQueryResultArticle(id=uuid4(),
+                                        title="Caps",
+                                        input_message_content=InputTextMessageContent(
+                                                query.upper())),
+               InlineQueryResultArticle(id=uuid4(),
+                                        title="Bold",
+                                        input_message_content=InputTextMessageContent(
+                                                "*{}*".format(escape_markdown(query)),
+                                                parse_mode=ParseMode.MARKDOWN)),
+               InlineQueryResultArticle(id=uuid4(),
+                                        title="Italic",
+                                        input_message_content=InputTextMessageContent(
+                                                "_{}_".format(escape_markdown(query)),
+                                                parse_mode=ParseMode.MARKDOWN))]
 
     update.inline_query.answer(results)
 
 
 def error(bot, update, error):
-    logger.warning('Update "%s" caused error "%s"' % (update, error))
+    """Log any Errors."""
+    logger.warning('Update "{}" caused error "{}"'.format(update, error))
 
 
 def main():
