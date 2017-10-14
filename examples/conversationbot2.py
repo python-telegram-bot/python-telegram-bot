@@ -48,9 +48,9 @@ def facts_to_str(user_data):
 
 def start(bot, update):
     update.message.reply_text(
-            "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
-            "Why don't you tell me something about yourself?",
-            reply_markup=markup)
+        "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
+        "Why don't you tell me something about yourself?",
+        reply_markup=markup)
 
     return CHOOSING
 
