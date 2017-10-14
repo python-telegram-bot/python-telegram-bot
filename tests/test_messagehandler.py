@@ -87,7 +87,7 @@ class TestMessageHandler(object):
         assert handler.check_update(Update(0, edited_message=message))
         assert not handler.check_update(Update(0, message=message))
         assert not handler.check_update(Update(0, channel_post=message))
-        assert not handler.check_update(Update(0, edited_channel_post=message))
+        assert handler.check_update(Update(0, edited_channel_post=message))
 
     def test_channel_post(self, message):
         handler = MessageHandler(None, self.callback_basic, edited_updates=False,
@@ -105,17 +105,17 @@ class TestMessageHandler(object):
         assert handler.check_update(Update(0, edited_message=message))
         assert handler.check_update(Update(0, message=message))
         assert handler.check_update(Update(0, channel_post=message))
-        assert not handler.check_update(Update(0, edited_channel_post=message))
+        assert handler.check_update(Update(0, edited_channel_post=message))
 
-    def test_allow_updated(self, message):
+    def test_allow_edited(self, message):
         with pytest.warns(UserWarning):
             handler = MessageHandler(None, self.callback_basic, message_updates=True,
-                                     allow_edited=True)
+                                     allow_edited=True, channel_post_updates=False)
 
         assert handler.check_update(Update(0, edited_message=message))
         assert handler.check_update(Update(0, message=message))
-        assert handler.check_update(Update(0, channel_post=message))
-        assert not handler.check_update(Update(0, edited_channel_post=message))
+        assert not handler.check_update(Update(0, channel_post=message))
+        assert handler.check_update(Update(0, edited_channel_post=message))
 
     def test_none_allowed(self):
         with pytest.raises(ValueError, match='are all False'):

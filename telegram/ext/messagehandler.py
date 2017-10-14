@@ -20,8 +20,8 @@
 """This module contains the MessageHandler class."""
 import warnings
 
-from .handler import Handler
 from telegram import Update
+from .handler import Handler
 
 
 class MessageHandler(Handler):
@@ -125,9 +125,9 @@ class MessageHandler(Handler):
                           'instead. More info: https://git.io/vPTbc.')
 
     def _is_allowed_update(self, update):
-        return any([(self.message_updates and update.message),
-                    (self.edited_updates and update.edited_message),
-                    (self.channel_post_updates and update.channel_post)])
+        return any([self.message_updates and update.message,
+                    self.edited_updates and (update.edited_message or update.edited_channel_post),
+                    self.channel_post_updates and update.channel_post])
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
