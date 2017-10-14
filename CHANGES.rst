@@ -1,6 +1,24 @@
 =======
 Changes
 =======
+**2010-10-14**
+*Released 8.1.0*
+
+New features
+- Support Bot API 3.4 (PR `#865`_).
+
+Changes
+- MessgaeHandler & RegexHandler now consider channel_updates.
+- Fix command not recognized if it is directly followed by a newline (PR `#869`_).
+- Removed Bot._message_wrapper (PR `#822`_).
+- Unitests are now also running on Appveyor (Windows VM).
+- Various unitest improvments.
+- Documentation fixes.
+
+.. _`#822`: https://github.com/python-telegram-bot/python-telegram-bot/pull/822
+.. _`#865`: https://github.com/python-telegram-bot/python-telegram-bot/pull/865
+.. _`#869`: https://github.com/python-telegram-bot/python-telegram-bot/pull/869
+
 **2017-09-01**
 *Released 8.0.0*
 
