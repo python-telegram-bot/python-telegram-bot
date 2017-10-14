@@ -72,8 +72,7 @@ def inlinequery(bot, update):
 
 
 def error(bot, update, error):
-    """Log any Errors."""
-    logger.warning('Update "{}" caused error "{}"'.format(update, error))
+    logger.warn('Update "%s" caused error "%s"', update, error)
 
 
 def main():

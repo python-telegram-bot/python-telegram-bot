@@ -98,7 +98,8 @@ def done(bot, update, user_data):
 
 
 def error(bot, update, error):
-    logger.warn('Update "{}" caused error "{}"'.format(update, error))
+    logger.warn('Update "%s" caused error "%s"', update, error)
+
 
 
 def main():

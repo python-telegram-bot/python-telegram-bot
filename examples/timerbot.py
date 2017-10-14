@@ -73,8 +73,7 @@ def unset(bot, update, chat_data):
 
 
 def error(bot, update, error):
-    """Log errors."""
-    logger.warning('Update "{}" caused error "{}"'.format(update, error))
+    logger.warn('Update "%s" caused error "%s"', update, error)
 
 
 def main():

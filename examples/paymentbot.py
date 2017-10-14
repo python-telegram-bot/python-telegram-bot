@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def error(bot, update, error):
-    logger.warn('Update "{}" caused error "{}"'.format(update, error))
+    logger.warn('Update "%s" caused error "%s"', update, error)
+
 
 
 def start_callback(bot, update):

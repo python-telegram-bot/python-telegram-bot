@@ -36,7 +36,8 @@ def help(bot, update):
 
 
 def error(bot, update, error):
-    logging.warning('Update "{}" caused error "{}"'.format(update, error))
+    logger.warn('Update "%s" caused error "%s"', update, error)
+
 
 
 def main():
