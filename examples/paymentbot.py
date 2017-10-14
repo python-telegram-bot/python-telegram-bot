@@ -20,7 +20,6 @@ def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"', update, error)
 
 
-
 def start_callback(bot, update):
     msg = "Use /shipping to get an invoice for shipping-payment, "
     msg += "or /noshipping for an invoice without shipping."
@@ -33,7 +32,8 @@ def start_with_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # to get your provider_token see https://core.telegram.org/bots/payments#getting-a-token
+    # In order to get a provider_token to get your provider_token see
+    # https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"
@@ -57,7 +57,8 @@ def start_without_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # check https://core.telegram.org/bots/payments#supported-currencies for more details
+    # In order to get a provider_token to get your provider_token see
+    # https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"
