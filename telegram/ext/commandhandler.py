@@ -134,7 +134,7 @@ class CommandHandler(Handler):
             message = update.message or update.edited_message
 
             if message.text:
-                command = message.text[1:].split(' ')[0].split('@')
+                command = message.text[1:].split(None, 1)[0].split('@')
                 command.append(
                     message.bot.username)  # in case the command was send without a username
 
