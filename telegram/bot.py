@@ -768,6 +768,7 @@ class Bot(TelegramObject):
                       reply_markup=None,
                       timeout=None,
                       location=None,
+                      live_period=None,
                       **kwargs):
         """Use this method to send point on the map.
 
@@ -780,6 +781,8 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
+            live_period (:obj:`int`, optional): Period in seconds for which the location will be
+                updated, should be between 60 and 86400.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -803,13 +806,125 @@ class Bot(TelegramObject):
 
         if not (all([latitude, longitude]) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
-                             "argument")
+                             "argument.")
+
+        if not ((latitude is not None or longitude is not None) ^ bool(location)):
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument. Not both.")
 
         if isinstance(location, Location):
             latitude = location.latitude
             longitude = location.longitude
 
         data = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
+
+        if live_period:
+            data['live_period'] = live_period
+
+        return url, data
+
+    @log
+    @message
+    def edit_message_live_location(self,
+                                   chat_id=None,
+                                   message_id=None,
+                                   inline_message_id=None,
+                                   latitude=None,
+                                   longitude=None,
+                                   location=None,
+                                   reply_markup=None,
+                                   **kwargs):
+        """Use this method to edit live location messages sent by the bot or via the bot
+        (for inline bots). A location can be edited until its :attr:`live_period` expires or
+        editing is explicitly disabled by a call to :attr:`stop_message_live_location`.
+
+        Note:
+            You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            latitude (:obj:`float`, optional): Latitude of location.
+            longitude (:obj:`float`, optional): Longitude of location.
+            location (:class:`telegram.Location`, optional): The location to send.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
+        Returns:
+             :class:`telegram.Message`: On success the edited message.
+        """
+
+        url = '{0}/editMessageLiveLocation'.format(self.base_url)
+
+        if not (all([latitude, longitude]) or location):
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument.")
+        if not ((latitude is not None or longitude is not None) ^ bool(location)):
+            raise ValueError("Either location or latitude and longitude must be passed as"
+                             "argument. Not both.")
+
+        if isinstance(location, Location):
+            latitude = location.latitude
+            longitude = location.longitude
+
+        data = {'latitude': latitude, 'longitude': longitude}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        return url, data
+
+    @log
+    @message
+    def stop_message_live_location(self,
+                                   chat_id=None,
+                                   message_id=None,
+                                   inline_message_id=None,
+                                   reply_markup=None,
+                                   **kwargs):
+        """Use this method to stop updating a live location message sent by the bot or via the bot
+        (for inline bots) before live_period expires.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+
+        Returns:
+            :class:`telegram.Message`: On success the edited message.
+        """
+
+        url = '{0}/stopMessageLiveLocation'.format(self.base_url)
+
+        data = {}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
 
         return url, data
 
@@ -1825,6 +1940,63 @@ class Bot(TelegramObject):
 
         return ChatMember.de_json(result, self)
 
+    @log
+    def set_chat_sticker_set(self, chat_id, sticker_set_name, timeout=None, **kwargs):
+        """Use this method to set a new group sticker set for a supergroup.
+        The bot must be an administrator in the chat for this to work and must have the appropriate
+        admin rights. Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned
+        in :attr:`get_chat` requests to check if the bot can use this method.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target supergroup (in the format @supergroupusername).
+            sticker_set_name (:obj:`str`): Name of the sticker set to be set as the group
+                sticker set.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+
+        Returns:
+            :obj:`bool`: True on success.
+        """
+
+        url = '{0}/setChatStickerSet'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'sticker_set_name': sticker_set_name}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def delete_chat_sticker_set(self, chat_id, timeout=None, **kwargs):
+        """Use this method to delete a group sticker set from a supergroup. The bot must be an
+        administrator in the chat for this to work and must have the appropriate admin rights.
+        Use the field :attr:`telegram.Chat.can_set_sticker_set` optionally returned in
+        :attr:`get_chat` requests to check if the bot can use this method.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target supergroup (in the format @supergroupusername).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+             :obj:`bool`: True on success.
+        """
+
+        url = '{0}/deleteChatStickerSet'.format(self.base_url)
+
+        data = {'chat_id': chat_id}
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
     def get_webhook_info(self, timeout=None, **kwargs):
         """Use this method to get current webhook status. Requires no parameters.
 
@@ -2794,6 +2966,8 @@ class Bot(TelegramObject):
     sendVoice = send_voice
     sendVideoNote = send_video_note
     sendLocation = send_location
+    editMessageLiveLocation = edit_message_live_location
+    stopMessageLiveLocation = stop_message_live_location
     sendVenue = send_venue
     sendContact = send_contact
     sendGame = send_game
@@ -2814,6 +2988,8 @@ class Bot(TelegramObject):
     getChat = get_chat
     getChatAdministrators = get_chat_administrators
     getChatMember = get_chat_member
+    setChatStickerSet = set_chat_sticker_set
+    deleteChatStickerSet = delete_chat_sticker_set
     getChatMembersCount = get_chat_members_count
     getWebhookInfo = get_webhook_info
     setGameScore = set_game_score

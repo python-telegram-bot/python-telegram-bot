@@ -40,9 +40,12 @@ def message(bot):
                      'forward_date': datetime.now()},
                     {'reply_to_message': Message(50, None, None, None)},
                     {'edit_date': datetime.now()},
-                    {'test': 'a text message',
+                    {'text': 'a text message',
                      'enitites': [MessageEntity('bold', 10, 4),
                                   MessageEntity('italic', 16, 7)]},
+                    {'caption': 'A message caption',
+                     'caption_entities': [MessageEntity('bold', 1, 1),
+                                          MessageEntity('text_link', 4, 3)]},
                     {'audio': Audio('audio_id', 12),
                      'caption': 'audio_file'},
                     {'document': Document('document_id'),
@@ -78,12 +81,13 @@ def message(bot):
                     {'forward_signature': 'some_forward_sign'},
                     {'author_signature': 'some_author_sign'}
                 ],
-                ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
-                     'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
-                     'new_members', 'contact', 'location', 'venue', 'left_member', 'new_title',
-                     'new_photo', 'delete_photo', 'group_created', 'supergroup_created',
-                     'channel_created', 'migrated_to', 'migrated_from', 'pinned', 'invoice',
-                     'successful_payment', 'forward_signature', 'author_signature'])
+                ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
+                     'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
+                     'voice', 'video_note', 'new_members', 'contact', 'location', 'venue',
+                     'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
+                     'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
+                     'pinned', 'invoice', 'successful_payment', 'forward_signature',
+                     'author_signature'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -127,6 +131,14 @@ class TestMessage(object):
         message = Message(1, self.from_user, self.date, self.chat, text=text, entities=[entity])
         assert message.parse_entity(entity) == 'http://google.com'
 
+    def test_parse_caption_entity(self):
+        caption = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                   b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        message = Message(1, self.from_user, self.date, self.chat, caption=caption,
+                          caption_entities=[entity])
+        assert message.parse_caption_entity(entity) == 'http://google.com'
+
     def test_parse_entities(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
@@ -136,6 +148,16 @@ class TestMessage(object):
                           text=text, entities=[entity_2, entity])
         assert message.parse_entities(MessageEntity.URL) == {entity: 'http://google.com'}
         assert message.parse_entities() == {entity: 'http://google.com', entity_2: 'h'}
+
+    def test_parse_caption_entities(self):
+        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
+        message = Message(1, self.from_user, self.date, self.chat,
+                          caption=text, caption_entities=[entity_2, entity])
+        assert message.parse_caption_entities(MessageEntity.URL) == {entity: 'http://google.com'}
+        assert message.parse_caption_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_text_html_simple(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
@@ -200,7 +222,6 @@ class TestMessage(object):
         else:
             item = None
         assert message_params.effective_attachment == item
-
 
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):

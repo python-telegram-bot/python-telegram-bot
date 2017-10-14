@@ -33,6 +33,8 @@ import telegram
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
 IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot',
                       'new_chat_member'}
+
+
 # TODO: New_chat_member is still in our lib but already removed from TG's docs.
 
 
@@ -49,10 +51,10 @@ def parse_table(h4):
     if not table:
         return []
     head = [td.text for td in table.tr.find_all('td')]
-    row = namedtuple('{}TableRow'.format(h4.text), ','.join(head))
+    # row = namedtuple('{}TableRow'.format(h4.text), ','.join(head))
     t = []
     for tr in table.find_all('tr')[1:]:
-        t.append(row(*[td.text for td in tr.find_all('td')]))
+        t.append([td.text for td in tr.find_all('td')])
     return t
 
 
@@ -66,12 +68,12 @@ def check_method(h4):
 
     checked = []
     for parameter in table:
-        param = sig.parameters.get(parameter.Parameters)
-        assert param is not None, "Parameter {} not found in {}".format(parameter.Parameters,
+        param = sig.parameters.get(parameter[0])
+        assert param is not None, "Parameter {} not found in {}".format(parameter[0],
                                                                         method.__name__)
         # TODO: Check type via docstring
         # TODO: Check if optional or required
-        checked.append(parameter.Parameters)
+        checked.append(parameter[0])
 
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'getUpdates':
@@ -82,7 +84,7 @@ def check_method(h4):
         ignored |= {'edit_message'}  # TODO: Now deprecated, so no longer in telegrams docs
     elif name == 'sendContact':
         ignored |= {'contact'}  # Added for ease of use
-    elif name == 'sendLocation':
+    elif name in ['sendLocation', 'editMessageLiveLocation']:
         ignored |= {'location'}  # Added for ease of use
     elif name == 'sendVenue':
         ignored |= {'venue'}  # Added for ease of use
@@ -100,7 +102,7 @@ def check_object(h4):
 
     checked = []
     for parameter in table:
-        field = parameter.Field
+        field = parameter[0]
         if field == 'from':
             field = 'from_user'
         elif name.startswith('InlineQueryResult') and field == 'type':

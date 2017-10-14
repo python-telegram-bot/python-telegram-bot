@@ -26,7 +26,6 @@ from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Stick
 from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
-
 _UNDEFINED = object()
 
 
@@ -54,6 +53,10 @@ class Message(TelegramObject):
             usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
             properly.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+            usernames, URLs, bot commands, etc. that appear in the caption. See
+            :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities` methods for how
+            to use properly.
         audio (:class:`telegram.Audio`): Optional. Information about the file.
         document (:class:`telegram.Document`): Optional. Information about the file.
         game (:class:`telegram.Game`): Optional. Information about the game.
@@ -119,6 +122,10 @@ class Message(TelegramObject):
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             attr:`parse_entity` and attr:`parse_entities` methods for how to use properly.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. For Messages with a
+            Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
+            caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
+            methods for how to use properly.
         audio (:class:`telegram.Audio`, optional): Message is an audio file, information
             about the file.
         document (:class:`telegram.Document`, optional): Message is a general file, information
@@ -196,6 +203,7 @@ class Message(TelegramObject):
                  edit_date=None,
                  text=None,
                  entities=None,
+                 caption_entities=None,
                  audio=None,
                  document=None,
                  game=None,
@@ -239,6 +247,7 @@ class Message(TelegramObject):
         self.edit_date = edit_date
         self.text = text
         self.entities = entities or list()
+        self.caption_entities = caption_entities or list()
         self.audio = audio
         self.game = game
         self.document = document
@@ -289,6 +298,7 @@ class Message(TelegramObject):
         data['date'] = from_timestamp(data['date'])
         data['chat'] = Chat.de_json(data.get('chat'), bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
+        data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
         data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
         data['forward_date'] = from_timestamp(data.get('forward_date'))
@@ -369,6 +379,8 @@ class Message(TelegramObject):
             data['photo'] = [p.to_dict() for p in self.photo]
         if self.entities:
             data['entities'] = [e.to_dict() for e in self.entities]
+        if self.caption_entities:
+            data['caption_entities'] = [e.to_dict() for e in self.caption_entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
         data['new_chat_member'] = data.pop('_new_chat_member', None)
@@ -683,7 +695,7 @@ class Message(TelegramObject):
             be an entity that belongs to this message.
 
         Returns:
-            str: The text of the given entity
+            :obj:`str`: The text of the given entity
 
         """
         # Is it a narrow build, if so we don't need to convert
@@ -691,6 +703,31 @@ class Message(TelegramObject):
             return self.text[entity.offset:entity.offset + entity.length]
         else:
             entity_text = self.text.encode('utf-16-le')
+            entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
+
+        return entity_text.decode('utf-16-le')
+
+    def parse_caption_entity(self, entity):
+        """Returns the text from a given :class:`telegram.MessageEntity`.
+
+        Note:
+            This method is present because Telegram calculates the offset and length in
+            UTF-16 codepoint pairs, which some versions of Python don't handle automatically.
+            (That is, you can't just slice ``Message.caption`` with the offset and length.)
+
+        Args:
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
+            be an entity that belongs to this message.
+
+        Returns:
+            :obj:`str`: The text of the given entity
+
+        """
+        # Is it a narrow build, if so we don't need to convert
+        if sys.maxunicode == 0xffff:
+            return self.caption[entity.offset:entity.offset + entity.length]
+        else:
+            entity_text = self.caption.encode('utf-16-le')
             entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
 
         return entity_text.decode('utf-16-le')
@@ -724,6 +761,37 @@ class Message(TelegramObject):
         return {
             entity: self.parse_entity(entity)
             for entity in self.entities if entity.type in types
+        }
+
+    def parse_caption_entities(self, types=None):
+        """
+        Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
+        It contains entities from this message's caption filtered by their
+        :attr:`telegram.MessageEntity.type` attribute as the key, and the text that each entity
+        belongs to as the value of the :obj:`dict`.
+
+        Note:
+            This method should always be used instead of the :attr:`caption_entities` attribute,
+            since it calculates the correct substring from the message text based on UTF-16
+            codepoints. See :attr:`parse_entity` for more info.
+
+        Args:
+            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+                strings. If the ``type`` attribute of an entity is contained in this list, it will
+                be returned. Defaults to a list of all types. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        Returns:
+            Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to
+            the text that belongs to them, calculated based on UTF-16 codepoints.
+
+        """
+        if types is None:
+            types = MessageEntity.ALL_TYPES
+
+        return {
+            entity: self.parse_caption_entity(entity)
+            for entity in self.caption_entities if entity.type in types
         }
 
     def _text_html(self, urled=False):

@@ -109,15 +109,6 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_location(self, bot, chat_id):
-        message = bot.send_location(chat_id=chat_id, latitude=-23.691288, longitude=-46.788279)
-
-        assert message.location
-        assert message.location.longitude == -46.788279
-        assert message.location.latitude == -23.691288
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
     def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
         latitude = -23.691288
@@ -367,6 +358,14 @@ class TestBot(object):
 
         assert chat_member.status == 'administrator'
         assert chat_member.user.username == 'EchteEldin'
+
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_set_chat_sticker_set(self):
+        pass
+
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_delete_chat_sticker_set(self):
+        pass
 
     @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
