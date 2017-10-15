@@ -111,29 +111,29 @@ def main():
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler('start', start)],
 
-            states={
-                CHOOSING: [RegexHandler('^(Age|Favourite colour|Number of siblings)$',
-                                        regular_choice,
-                                        pass_user_data=True),
-                           RegexHandler('^Something else...$',
-                                        custom_choice),
+        states={
+            CHOOSING: [RegexHandler('^(Age|Favourite colour|Number of siblings)$',
+                                    regular_choice,
+                                    pass_user_data=True),
+                       RegexHandler('^Something else...$',
+                                    custom_choice),
+                       ],
+
+            TYPING_CHOICE: [MessageHandler(Filters.text,
+                                           regular_choice,
+                                           pass_user_data=True),
+                            ],
+
+            TYPING_REPLY: [MessageHandler(Filters.text,
+                                          received_information,
+                                          pass_user_data=True),
                            ],
+            },
 
-                TYPING_CHOICE: [MessageHandler(Filters.text,
-                                               regular_choice,
-                                               pass_user_data=True),
-                                ],
-
-                TYPING_REPLY: [MessageHandler(Filters.text,
-                                              received_information,
-                                              pass_user_data=True),
-                               ],
-                },
-
-            fallbacks=[RegexHandler('^Done$', done, pass_user_data=True)]
-            )
+        fallbacks=[RegexHandler('^Done$', done, pass_user_data=True)]
+        )
 
     dp.add_handler(conv_handler)
 
