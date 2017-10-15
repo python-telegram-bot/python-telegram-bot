@@ -59,7 +59,7 @@ def regular_choice(bot, update, user_data):
     text = update.message.text
     user_data['choice'] = text
     update.message.reply_text(
-            'Your {}? Yes, I would love to hear about that!'.format(text.lower()))
+        'Your {}? Yes, I would love to hear about that!'.format(text.lower()))
 
     return TYPING_REPLY
 
@@ -80,7 +80,7 @@ def received_information(bot, update, user_data):
     update.message.reply_text("Neat! Just so you know, this is what you already told me:"
                               "{}"
                               "You can tell me more, or change your opinion on something.".format(
-                               facts_to_str(user_data)), reply_markup=markup)
+                                  facts_to_str(user_data)), reply_markup=markup)
 
     return CHOOSING
 
@@ -99,7 +99,6 @@ def done(bot, update, user_data):
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"', update, error)
-
 
 
 def main():
@@ -130,10 +129,10 @@ def main():
                                           received_information,
                                           pass_user_data=True),
                            ],
-            },
+        },
 
         fallbacks=[RegexHandler('^Done$', done, pass_user_data=True)]
-        )
+    )
 
     dp.add_handler(conv_handler)
 
@@ -151,3 +150,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
