@@ -32,8 +32,7 @@ def start_with_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # In order to get a provider_token to get your provider_token see
-    # https://core.telegram.org/bots/payments#getting-a-token
+    # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"
