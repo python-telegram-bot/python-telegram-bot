@@ -1,7 +1,14 @@
 =======
 Changes
 =======
-**2010-10-14**
+**2017-10-15**
+*Released 8.1.1*
+
+- Fix Commandhandler crashing on single character messages (PR `#873`_).
+
+.. _`#873`: https://github.com/python-telegram-bot/python-telegram-bot/pull/871
+
+**2017-10-14**
 *Released 8.1.0*
 
 New features

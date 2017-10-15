@@ -174,6 +174,22 @@ class TestCommandHandler(object):
         dp.process_update(Update(0, message))
         assert self.test_flag
 
+    def test_single_char(self, dp, message):
+        # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
+        handler = CommandHandler('test', self.callback_basic)
+        dp.add_handler(handler)
+
+        message.text = 'a'
+        assert not handler.check_update(Update(0, message))
+
+    def test_single_slash(self, dp, message):
+        # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
+        handler = CommandHandler('test', self.callback_basic)
+        dp.add_handler(handler)
+
+        message.text = '/'
+        assert not handler.check_update(Update(0, message))
+
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
