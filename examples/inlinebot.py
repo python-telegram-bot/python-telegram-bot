@@ -20,6 +20,8 @@ from uuid import uuid4
 
 import re
 
+from telegram.utils.helpers import escape_markdown
+
 from telegram import InlineQueryResultArticle, ParseMode, \
     InputTextMessageContent
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
@@ -42,12 +44,6 @@ def start(bot, update):
 def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
-
-
-def escape_markdown(text):
-    """Escape telegram markup symbols."""
-    escape_chars = '\*_`\['
-    return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
 
 def inlinequery(bot, update):
