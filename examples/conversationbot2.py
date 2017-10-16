@@ -98,7 +98,8 @@ def done(bot, update, user_data):
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"', update, error)
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
@@ -150,4 +151,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

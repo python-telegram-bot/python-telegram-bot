@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Basic example for a bot that can receive payment from user.
-# This program is dedicated to the public domain under the CC0 license.
+"""Basic example for a bot that can receive payment from user.
+
+This program is dedicated to the public domain under the CC0 license.
+"""
 
 from telegram import (LabeledPrice, ShippingOption)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
@@ -17,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"', update, error)
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def start_callback(bot, update):

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Simple Bot to send timed Telegram messages
+
+
+"""Simple Bot to send timed Telegram messages.
+
 # This program is dedicated to the public domain under the CC0 license.
-"""
+
 This Bot uses the Updater class to handle the bot and the JobQueue to send
 timed messages.
 
@@ -17,7 +19,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater, CommandHandler, Job
+from telegram.ext import Updater, CommandHandler
 import logging
 
 # Enable logging
@@ -60,7 +62,6 @@ def set_timer(bot, update, args, job_queue, chat_data):
 
 def unset(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
-
     if 'job' not in chat_data:
         update.message.reply_text('You have no active timer')
         return
@@ -73,7 +74,8 @@ def unset(bot, update, chat_data):
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"', update, error)
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():

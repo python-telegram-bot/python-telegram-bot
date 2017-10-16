@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Basic example for a bot that uses inline keyboards.
-# This program is dedicated to the public domain under the CC0 license.
+"""Basic example for a bot that uses inline keyboards.
 
+# This program is dedicated to the public domain under the CC0 license.
+"""
 import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def start(bot, update):
@@ -36,8 +37,8 @@ def help(bot, update):
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"', update, error)
-
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():

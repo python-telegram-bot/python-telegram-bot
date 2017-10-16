@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Simple Bot to reply to Telegram messages.
+
 This program is dedicated to the public domain under the CC0 license.
 
 This Bot uses the Updater class to handle the bot.
@@ -44,8 +45,8 @@ def echo(bot, update):
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"', update, error)
-
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():

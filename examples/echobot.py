@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Simple Bot to reply to Telegram messages.
+
 This is built on the API wrapper, see echobot2.py to see the same example built
 on the telegram.ext bot framework.
 This program is dedicated to the public domain under the CC0 license.

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Simple Bot to reply to Telegram messages.
+
 This program is dedicated to the public domain under the CC0 license.
 
 This Bot uses the Updater class to handle the bot.
@@ -44,7 +45,7 @@ def help(bot, update):
 
 
 def escape_markdown(text):
-    """Helper function to escape telegram markup symbols"""
+    """Escape telegram markup symbols."""
     escape_chars = '\*_`\['
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
@@ -75,7 +76,8 @@ def inlinequery(bot, update):
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"', update, error)
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
