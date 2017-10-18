@@ -33,6 +33,8 @@ class InlineQueryResultLocation(InlineQueryResult):
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
+        live_period (:obj:`int`): Optional. Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -46,6 +48,8 @@ class InlineQueryResultLocation(InlineQueryResult):
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
+        live_period (:obj:`int`, optional): Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -62,6 +66,7 @@ class InlineQueryResultLocation(InlineQueryResult):
                  latitude,
                  longitude,
                  title,
+                 live_period=None,
                  reply_markup=None,
                  input_message_content=None,
                  thumb_url=None,
@@ -75,6 +80,8 @@ class InlineQueryResultLocation(InlineQueryResult):
         self.title = title
 
         # Optionals
+        if live_period:
+            self.live_period = live_period
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

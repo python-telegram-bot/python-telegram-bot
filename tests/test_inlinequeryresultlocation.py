@@ -29,6 +29,7 @@ def inline_query_result_location():
                                      TestInlineQueryResultLocation.latitude,
                                      TestInlineQueryResultLocation.longitude,
                                      TestInlineQueryResultLocation.title,
+                                     live_period=TestInlineQueryResultLocation.live_period,
                                      thumb_url=TestInlineQueryResultLocation.thumb_url,
                                      thumb_width=TestInlineQueryResultLocation.thumb_width,
                                      thumb_height=TestInlineQueryResultLocation.thumb_height,
@@ -42,6 +43,7 @@ class TestInlineQueryResultLocation(object):
     latitude = 0.0
     longitude = 1.0
     title = 'title'
+    live_period = 70
     thumb_url = 'thumb url'
     thumb_width = 10
     thumb_height = 15
@@ -54,6 +56,7 @@ class TestInlineQueryResultLocation(object):
         assert inline_query_result_location.latitude == self.latitude
         assert inline_query_result_location.longitude == self.longitude
         assert inline_query_result_location.title == self.title
+        assert inline_query_result_location.live_period == self.live_period
         assert inline_query_result_location.thumb_url == self.thumb_url
         assert inline_query_result_location.thumb_width == self.thumb_width
         assert inline_query_result_location.thumb_height == self.thumb_height
@@ -72,6 +75,8 @@ class TestInlineQueryResultLocation(object):
         assert inline_query_result_location_dict['longitude'] == \
                inline_query_result_location.longitude
         assert inline_query_result_location_dict['title'] == inline_query_result_location.title
+        assert inline_query_result_location_dict[
+                   'live_period'] == inline_query_result_location.live_period
         assert inline_query_result_location_dict['thumb_url'] == \
                inline_query_result_location.thumb_url
         assert inline_query_result_location_dict['thumb_width'] == \

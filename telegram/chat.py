@@ -38,6 +38,9 @@ class Chat(TelegramObject):
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
             Returned only in get_chat.
+        sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
+        can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
+            sticker set.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -61,6 +64,10 @@ class Chat(TelegramObject):
         pinned_message (:class:`telegram.Message`, optional): Pinned message, for supergroups.
             Returned only in get_chat.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        sticker_set_name (:obj:`str`, optional): For supergroups, name of Group sticker set.
+            Returned only in get_chat.
+        can_set_sticker_set (:obj:`bool`, optional): ``True``, if the bot can change group the
+            sticker set. Returned only in get_chat.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -87,6 +94,8 @@ class Chat(TelegramObject):
                  description=None,
                  invite_link=None,
                  pinned_message=None,
+                 sticker_set_name=None,
+                 can_set_sticker_set=None,
                  **kwargs):
         # Required
         self.id = int(id)
@@ -101,6 +110,8 @@ class Chat(TelegramObject):
         self.description = description
         self.invite_link = invite_link
         self.pinned_message = pinned_message
+        self.sticker_set_name = sticker_set_name
+        self.can_set_sticker_set = can_set_sticker_set
 
         self.bot = bot
         self._id_attrs = (self.id,)

@@ -27,7 +27,8 @@ from telegram import User
 def chat(bot):
     return Chat(TestChat.id, TestChat.title, TestChat.type,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
-                bot=bot)
+                bot=bot, sticker_set_name=TestChat.sticker_set_name,
+                can_set_sticker_set=TestChat.can_set_sticker_set)
 
 
 class TestChat(object):
@@ -35,13 +36,17 @@ class TestChat(object):
     title = 'ToledosPalaceBot - Group'
     type = 'group'
     all_members_are_administrators = False
+    sticker_set_name = 'stickers'
+    can_set_sticker_set = False
 
     def test_de_json(self, bot):
         json_dict = {
-            'id': TestChat.id,
-            'title': TestChat.title,
-            'type': TestChat.type,
-            'all_members_are_administrators': TestChat.all_members_are_administrators
+            'id': self.id,
+            'title': self.title,
+            'type': self.type,
+            'all_members_are_administrators': self.all_members_are_administrators,
+            'sticker_set_name': self.sticker_set_name,
+            'can_set_sticker_set': self.can_set_sticker_set
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -49,6 +54,8 @@ class TestChat(object):
         assert chat.title == self.title
         assert chat.type == self.type
         assert chat.all_members_are_administrators == self.all_members_are_administrators
+        assert chat.sticker_set_name == self.sticker_set_name
+        assert chat.can_set_sticker_set == self.can_set_sticker_set
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
