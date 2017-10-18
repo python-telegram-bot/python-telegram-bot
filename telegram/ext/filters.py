@@ -20,7 +20,8 @@
 from telegram import Chat
 from future.utils import string_types
 from sys import maxsize
-from telegram import constants
+#from telegram import constants
+import constants
 
 
 class BaseFilter(object):
@@ -244,28 +245,28 @@ class Filters(object):
     document = _Document()
     """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
 
-    @staticmethod
-    def file_size(min=0, max=maxsize):
-        class _FileSize(BaseFilter):
-            name = "Filters.file_size()"
+    class _FileSize(BaseFilter):
+        name = "Filters.file_size()"
+        def __init__(self, min=0, max=maxsize):
+            self.min = min
+            self.max = max
 
-            def filter(self, message):
-                if bool(message.audio):
-                    filesize = message.audio.file_size
-                elif bool(message.document):
-                    filesize = message.document.file_size
-                elif bool(message.photo):
-                    filesize = message.photo.file_size
-                elif bool(message.sticker):
-                    filesize = message.sticker.file_size
-                elif bool(message.video):
-                    filesize = message.video.file_size
-                elif bool(message.voice):
-                    filesize = message.voice.file_size
-                else:
-                    return False
-                return bool(min <= filesize <= max)
-        return _FileSize()
+        def filter(self, message):
+            if bool(message.audio):
+                filesize = message.audio.file_size
+            elif bool(message.document):
+                filesize = message.document.file_size
+            elif bool(message.photo):
+                filesize = message.photo.file_size
+            elif bool(message.sticker):
+                filesize = message.sticker.file_size
+            elif bool(message.video):
+                filesize = message.video.file_size
+            elif bool(message.voice):
+                filesize = message.voice.file_size
+            else:
+                return False
+            return bool(self.min <= filesize <= self.max)
 
     class _Photo(BaseFilter):
         name = 'Filters.photo'
