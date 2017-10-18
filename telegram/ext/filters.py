@@ -19,6 +19,8 @@
 """This module contains the Filters for use with the MessageHandler class."""
 from telegram import Chat
 from future.utils import string_types
+from sys import maxsize
+from telegram import constants
 
 
 class BaseFilter(object):
@@ -192,11 +194,78 @@ class Filters(object):
     class _Document(BaseFilter):
         name = 'Filters.document'
 
+        class Category(BaseFilter):
+            name = "Filters.document.Category()"
+            """WARNING: User can set mime-type on his own!"""
+
+            def __init__(self, category):
+                self.category = category
+
+            def filter(self, message):
+                if message.document:
+                    return bool(message.document.mime_type.startswith(self.category))
+
+        application = Category(constants.MediaTypes.application)
+        audio = Category(constants.MediaTypes.audio)
+        image = Category(constants.MediaTypes.image)
+        video = Category(constants.MediaTypes.video)
+        text = Category(constants.MediaTypes.text)
+
+        class FileType(BaseFilter):
+            name = "Filters.document.Filetype()"
+            """WARNING: User can set mime-type on his own!"""
+
+            def __init__(self, filetype):
+                self.filetype = filetype
+
+            def filter(self, message):
+                print(message)
+                if message.document:
+                    return bool(message.document.mime_type == self.filetype)
+
+        apk = FileType(constants.Document.apk)
+        docx = FileType(constants.Document.docx)
+        exe = FileType(constants.Document.exe)
+        gif = FileType(constants.Document.gif)
+        jpg = FileType(constants.Document.jpg)
+        mp3 = FileType(constants.Document.mp3)
+        pdf = FileType(constants.Document.pdf)
+        py = FileType(constants.Document.py)
+        svg = FileType(constants.Document.svg)
+        txt = FileType(constants.Document.txt)
+        targz = FileType(constants.Document.targz)
+        wav = FileType(constants.Document.wav)
+        xml = FileType(constants.Document.xml)
+        zip = FileType(constants.Document.zip)
+
         def filter(self, message):
             return bool(message.document)
 
     document = _Document()
     """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
+
+    @staticmethod
+    def file_size(min=0, max=maxsize):
+        class _FileSize(BaseFilter):
+            name = "Filters.file_size()"
+
+            def filter(self, message):
+                if bool(message.audio):
+                    filesize = message.audio.file_size
+                elif bool(message.document):
+                    filesize = message.document.file_size
+                elif bool(message.photo):
+                    filesize = message.photo.file_size
+                elif bool(message.sticker):
+                    filesize = message.sticker.file_size
+                elif bool(message.video):
+                    filesize = message.video.file_size
+                elif bool(message.voice):
+                    filesize = message.voice.file_size
+                else:
+                    return False
+                return bool(min <= filesize <= max)
+        return _FileSize()
 
     class _Photo(BaseFilter):
         name = 'Filters.photo'
@@ -335,7 +404,7 @@ class Filters(object):
 
         migrate = _Migrate()
         """:obj:`Filter`: Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr: `telegram.Message.migrate_to_chat_id`."""
+            :attr: `telegram.Message.migrate_from_chat_id`."""
 
         class _PinnedMessage(BaseFilter):
             name = 'Filters.status_update.pinned_message'
