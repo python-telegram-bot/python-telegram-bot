@@ -265,7 +265,7 @@ class Filters(object):
         """Subset for messages containing a status update.
 
         Examples:
-            Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+            Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
             ``Filters.status_update`` for all status update messages.
 
         """
