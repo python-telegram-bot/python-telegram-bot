@@ -52,3 +52,27 @@ MAX_MESSAGES_PER_SECOND = 30
 MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
 MAX_MESSAGE_ENTITIES = 100
 MAX_INLINE_QUERY_RESULTS = 50
+
+class MediaTypes:
+    application = "application/"
+    audio = "audio/"
+    image = "image/"
+    video = "video/"
+    text = "text/"
+
+class Document:
+    apk = "application/vnd.android.package-archive"
+    docx = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    exe = "application/x-ms-dos-executable"
+    gif = "video/mp4"
+    jpg = "image/jpeg"
+    mp3 = "audio/mpeg"
+    pdf = "application/pdf"
+    png = "image/png"
+    py = "text/x-python"
+    svg = "image/svg+xml"
+    txt = "text/plain"
+    targz = "application/x-compressed-tar"
+    wav = "audio/x-wav"
+    xml = "application/xml"
+    zip = "application/zip"
