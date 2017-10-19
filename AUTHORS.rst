@@ -53,6 +53,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
