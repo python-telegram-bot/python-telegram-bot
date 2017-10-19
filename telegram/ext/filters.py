@@ -197,22 +197,22 @@ class Filters(object):
 
         class Category(BaseFilter):
             """This Filter filters documents by their category in the mime-type attribute
-            
+
             Note:
-                This Filter only filters by the mime_type of the document, 
+                This Filter only filters by the mime_type of the document,
                     it doesn't check the validity of the document.
-                The user can manipulate the mime-type of a message and 
+                The user can manipulate the mime-type of a message and
                     send media with wrong types that don't fit to this handler.
-                    
+
             Examples:
-                Filters.documents.Category("audio/") returnes `True` for all types 
+                Filters.documents.Category("audio/") returnes `True` for all types
                 of audio sent as file, for example "audio/mpeg" or "audio/x-wav"
             """
             name = "Filters.document.Category()"
 
             def __init__(self, category):
                 """Initialize the category you want to filter
-                
+
                 Args:
                     category (str, optional): Category of the media you want to filter"""
                 self.category = category
@@ -231,9 +231,9 @@ class Filters(object):
             """This Filter filters documents by their mime-type attribute
 
             Note:
-                This Filter only filters by the mime_type of the document, 
+                This Filter only filters by the mime_type of the document,
                     it doesn't check the validity of document.
-                The user can manipulate the mime-type of a message and 
+                The user can manipulate the mime-type of a message and
                     send media with wrong types that don't fit to this handler.
 
             Examples:
@@ -282,9 +282,9 @@ class Filters(object):
             """Initialize the limits of the file_size in the `__init__` method.
             
             Args:
-                min (int, optional): Minimum `file_size` of the message media in Byte. 
+                min (int, optional): Minimum `file_size` of the message media in Byte.
                     Default is zero.
-                max (int, optional): Maximum `file_size` of the message media in Byte. 
+                max (int, optional): Maximum `file_size` of the message media in Byte.
                     Default is infinity.
             """
             self.min = min
