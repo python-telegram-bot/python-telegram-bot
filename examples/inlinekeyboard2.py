@@ -72,7 +72,7 @@ def error(bot, update, error):
 def  main():
         
     # Create the Updater and pass it your bot's token.
-    updater = Updater("476482598:AAGR26TlclQP1ZdsAbBuGy9AeCkybP8k-kA")
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
