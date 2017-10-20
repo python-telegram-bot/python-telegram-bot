@@ -25,13 +25,13 @@ FIRST, SECOND = range(2)
 
 def start(bot, update):
     user = update.message.from_user
-    logger.info("User %s started the conversation." % user.first_name)
+    logger.info("User %s started the conversation.", user.first_name)
     keyboard = [
-        [InlineKeyboardButton(u"Next", callback_data=str(FIRST))]
+        [InlineKeyboardButton("Next", callback_data=str(FIRST))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text(
-        u"Start handler, Press next",
+        "Start handler, Press next",
         reply_markup=reply_markup
     )
     return FIRST
@@ -39,13 +39,13 @@ def start(bot, update):
 def first(bot, update):
     query = update.callback_query
     keyboard = [
-        [InlineKeyboardButton(u"Next", callback_data=str(SECOND))]
+        [InlineKeyboardButton("Next", callback_data=str(SECOND))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     bot.edit_message_text(
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
-        text=u"First CallbackQueryHandler, Press next"
+        text="First CallbackQueryHandler, Press next"
     )
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -62,17 +62,15 @@ def second(bot, update):
     bot.edit_message_text(
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
-        text=u"Second CallbackQueryHandler"
+        text="Second CallbackQueryHandler"
     )
-    return
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))    
+    logger.warn('Update "%s" caused error "%s"', (update, error))    
 
-def  main():
-        
-    # Create the Updater and pass it your bot's token. Below is an example token
-    updater = Updater("476482598:AAGR26TlclQP1ZdsAbBuGy9AeCkybP8k-kA")
+def main():
+    # Create the Updater and pass it your bot's token.
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -87,7 +85,6 @@ def  main():
         fallbacks=[CommandHandler('start', start)]
     )
 
-
     dp.add_handler(conv_handler)
 
     # log all errors
@@ -95,7 +92,6 @@ def  main():
 
     # Start the Bot
     updater.start_polling()
-
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
