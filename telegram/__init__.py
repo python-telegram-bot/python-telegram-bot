@@ -20,13 +20,14 @@
 
 from .base import TelegramObject
 from .user import User
+from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatmember import ChatMember
 from .files.photosize import PhotoSize
 from .files.audio import Audio
 from .files.voice import Voice
 from .files.document import Document
-from .files.sticker import Sticker
+from .files.sticker import Sticker, StickerSet, MaskPosition
 from .files.video import Video
 from .files.contact import Contact
 from .files.location import Location
@@ -37,16 +38,16 @@ from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
-from .replykeyboardremove import ReplyKeyboardRemove, ReplyKeyboardHide
+from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
 from .error import TelegramError
 from .files.inputfile import InputFile
 from .files.file import File
-from .emoji import Emoji
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.animation import Animation
 from .games.game import Game
+from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
 from .payment.successfulpayment import SuccessfulPayment
@@ -101,7 +102,7 @@ __author__ = 'devs@python-telegram-bot.org'
 
 __all__ = [
     'Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery',
-    'Contact', 'Document', 'Emoji', 'File', 'ForceReply', 'InlineKeyboardButton',
+    'Contact', 'Document', 'File', 'ForceReply', 'InlineKeyboardButton',
     'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
     'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
     'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
@@ -119,5 +120,6 @@ __all__ = [
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
-    'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery'
+    'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
+    'StickerSet', 'MaskPosition', 'CallbackGame'
 ]

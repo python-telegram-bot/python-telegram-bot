@@ -22,22 +22,21 @@ from telegram import TelegramObject
 
 
 class PhotoSize(TelegramObject):
-    """This object represents a Telegram PhotoSize.
+    """This object represents one size of a photo or a file/sticker thumbnail.
 
     Attributes:
-        file_id (str):
-        width (int):
-        height (int):
-        file_size (int):
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Photo width.
+        height (:obj:`int`): Photo height.
+        file_size (:obj:`int`): Optional. File size.
 
     Args:
-        file_id (str):
-        width (int):
-        height (int):
-        **kwargs: Arbitrary keyword arguments.
+        file_id (:obj:`str`): Unique identifier for this file.
+        width (:obj:`int`): Photo width.
+        height (:obj:`int`): Photo height.
+        file_size (:obj:`int`, optional): File size.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Keyword Args:
-        file_size (Optional[int]):
     """
 
     def __init__(self, file_id, width, height, file_size=None, **kwargs):
@@ -50,36 +49,20 @@ class PhotoSize(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.PhotoSize:
-        """
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        return PhotoSize(**data)
+        return cls(**data)
 
-    @staticmethod
-    def de_list(data, bot):
-        """
-        Args:
-            data (list):
-            bot (telegram.Bot):
-
-        Returns:
-            List<telegram.PhotoSize>:
-        """
+    @classmethod
+    def de_list(cls, data, bot):
         if not data:
             return []
 
         photos = list()
         for photo in data:
-            photos.append(PhotoSize.de_json(photo, bot))
+            photos.append(cls.de_json(photo, bot))
 
         return photos

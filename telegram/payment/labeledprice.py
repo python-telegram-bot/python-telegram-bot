@@ -25,46 +25,19 @@ class LabeledPrice(TelegramObject):
     """This object represents a portion of the price for goods or services.
 
     Attributes:
-        label (str): Portion label
-        amount (int): Price of the product in the smallest units of the currency (integer)
-        **kwargs (dict): Arbitrary keyword arguments.
+        label (:obj:`str`): Portion label.
+        amount (:obj:`int`): Price of the product in the smallest units of the currency.
+
+    Args:
+        label (:obj:`str`): Portion label
+        amount (:obj:`int`): Price of the product in the smallest units of the currency (integer,
+            not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp
+            parameter in currencies.json, it shows the number of digits past the decimal point for
+            each currency (2 for the majority of currencies).
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
     """
 
     def __init__(self, label, amount, **kwargs):
         self.label = label
         self.amount = amount
-
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.LabeledPrice:
-
-        """
-        if not data:
-            return None
-
-        return LabeledPrice(**data)
-
-    @staticmethod
-    def de_list(data, bot):
-        """
-        Args:
-            data (list):
-            bot (telegram.Bot):
-
-        Returns:
-            List<telegram.PhotoSize>:
-        """
-        if not data:
-            return []
-
-        labeled_prices = list()
-        for labeled_price in data:
-            labeled_prices.append(LabeledPrice.de_json(labeled_price, bot))
-
-        return labeled_prices

@@ -5,99 +5,94 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultCachedDocument"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InlineQueryResultCachedDocument, InlineKeyboardButton, InlineKeyboardMarkup,
+                      InputTextMessageContent, InlineQueryResultCachedVoice)
 
 
-class InlineQueryResultCachedDocumentTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram
-    InlineQueryResultCachedDocument."""
+@pytest.fixture(scope='class')
+def inline_query_result_cached_document():
+    return InlineQueryResultCachedDocument(TestInlineQueryResultCachedDocument.id,
+                                           TestInlineQueryResultCachedDocument.title,
+                                           TestInlineQueryResultCachedDocument.document_file_id,
+                                           caption=TestInlineQueryResultCachedDocument.caption,
+                                           description=TestInlineQueryResultCachedDocument.description,
+                                           input_message_content=TestInlineQueryResultCachedDocument.input_message_content,
+                                           reply_markup=TestInlineQueryResultCachedDocument.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'document'
-        self.document_file_id = 'document file id'
-        self.title = 'title'
-        self.caption = 'caption'
-        self.description = 'description'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
-        self.json_dict = {
-            'id': self._id,
-            'type': self.type,
-            'document_file_id': self.document_file_id,
-            'title': self.title,
-            'caption': self.caption,
-            'description': self.description,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
 
-    def test_document_de_json(self):
-        document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict, self._bot)
+class TestInlineQueryResultCachedDocument(object):
+    id = 'id'
+    type = 'document'
+    document_file_id = 'document file id'
+    title = 'title'
+    caption = 'caption'
+    description = 'description'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        self.assertEqual(document.id, self._id)
-        self.assertEqual(document.type, self.type)
-        self.assertEqual(document.document_file_id, self.document_file_id)
-        self.assertEqual(document.title, self.title)
-        self.assertEqual(document.caption, self.caption)
-        self.assertEqual(document.description, self.description)
-        self.assertDictEqual(document.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(document.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_expected_values(self, inline_query_result_cached_document):
+        assert inline_query_result_cached_document.id == self.id
+        assert inline_query_result_cached_document.type == self.type
+        assert inline_query_result_cached_document.document_file_id == self.document_file_id
+        assert inline_query_result_cached_document.title == self.title
+        assert inline_query_result_cached_document.caption == self.caption
+        assert inline_query_result_cached_document.description == self.description
+        assert inline_query_result_cached_document.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_document.reply_markup.to_dict() == \
+               self.reply_markup.to_dict()
 
-    def test_document_to_json(self):
-        document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict, self._bot)
+    def test_to_dict(self, inline_query_result_cached_document):
+        inline_query_result_cached_document_dict = inline_query_result_cached_document.to_dict()
 
-        self.assertTrue(self.is_json(document.to_json()))
-
-    def test_document_to_dict(self):
-        document = telegram.InlineQueryResultCachedDocument.de_json(self.json_dict,
-                                                                    self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(document))
-        self.assertDictEqual(self.json_dict, document)
+        assert isinstance(inline_query_result_cached_document_dict, dict)
+        assert inline_query_result_cached_document_dict['id'] == \
+               inline_query_result_cached_document.id
+        assert inline_query_result_cached_document_dict['type'] == \
+               inline_query_result_cached_document.type
+        assert inline_query_result_cached_document_dict['document_file_id'] == \
+               inline_query_result_cached_document.document_file_id
+        assert inline_query_result_cached_document_dict['title'] == \
+               inline_query_result_cached_document.title
+        assert inline_query_result_cached_document_dict['caption'] == \
+               inline_query_result_cached_document.caption
+        assert inline_query_result_cached_document_dict['description'] == \
+               inline_query_result_cached_document.description
+        assert inline_query_result_cached_document_dict['input_message_content'] == \
+               inline_query_result_cached_document.input_message_content.to_dict()
+        assert inline_query_result_cached_document_dict['reply_markup'] == \
+               inline_query_result_cached_document.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultCachedDocument(self._id, self.title, self.document_file_id)
-        b = telegram.InlineQueryResultCachedDocument(self._id, self.title, self.document_file_id)
-        c = telegram.InlineQueryResultCachedDocument(self._id, self.title, "")
-        d = telegram.InlineQueryResultCachedDocument("", self.title, self.document_file_id)
-        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+        a = InlineQueryResultCachedDocument(self.id, self.title, self.document_file_id)
+        b = InlineQueryResultCachedDocument(self.id, self.title, self.document_file_id)
+        c = InlineQueryResultCachedDocument(self.id, self.title, '')
+        d = InlineQueryResultCachedDocument('', self.title, self.document_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

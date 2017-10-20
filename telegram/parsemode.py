@@ -17,12 +17,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-Message Parse Modes."""
+"""This module contains an object that represents a Telegram Message Parse Modes."""
 
 
 class ParseMode(object):
     """This object represents a Telegram Message Parse Modes."""
 
     MARKDOWN = 'Markdown'
+    """:obj:`str`: 'Markdown'"""
     HTML = 'HTML'
+    """:obj:`str`: 'HTML'"""

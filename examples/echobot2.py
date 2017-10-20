@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Simple Bot to reply to Telegram messages
-# This program is dedicated to the public domain under the CC0 license.
-"""
+
+"""Simple Bot to reply to Telegram messages.
+
+This program is dedicated to the public domain under the CC0 license.
+
 This Bot uses the Updater class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
@@ -29,22 +30,27 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
+    """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
 def help(bot, update):
+    """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
 def echo(bot, update):
+    """Echo the user message."""
     update.message.reply_text(update.message.text)
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
+    """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
     updater = Updater("TOKEN")
 

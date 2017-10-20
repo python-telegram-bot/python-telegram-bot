@@ -16,13 +16,43 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultVoice"""
+"""This module contains the classes that represent Telegram InlineQueryResultVoice."""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
+from telegram import InlineQueryResult
 
 
 class InlineQueryResultVoice(InlineQueryResult):
+    """
+    Represents a link to a voice recording in an .ogg container encoded with OPUS. By default,
+    this voice recording will be sent by the user. Alternatively, you can use
+    :attr:`input_message_content` to send a message with the specified content instead of the
+    the voice message.
+
+    Attributes:
+        type (:obj:`str`): 'voice'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_url (:obj:`str`): A valid URL for the voice recording.
+        title (:obj:`str`): Voice message title.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        voice_duration (:obj:`int`): Optional. Recording duration in seconds.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
+            message to be sent instead of the voice.
+
+    Args:
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        voice_url (:obj:`str`): A valid URL for the voice recording.
+        title (:obj:`str`): Voice message title.
+        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        voice_duration (:obj:`int`, optional): Recording duration in seconds.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the voice.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    """
 
     def __init__(self,
                  id,
@@ -48,13 +78,3 @@ class InlineQueryResultVoice(InlineQueryResult):
             self.reply_markup = reply_markup
         if input_message_content:
             self.input_message_content = input_message_content
-
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultVoice, InlineQueryResultVoice).de_json(data, bot)
-
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'), bot)
-
-        return InlineQueryResultVoice(**data)

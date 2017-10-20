@@ -15,6 +15,10 @@ We have made you a wrapper you can't refuse
    :target: https://pypi.python.org/pypi/python-telegram-bot
    :alt: Supported python versions
 
+.. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
+   :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
+   :alt: PyPi Package Monthly Download
+
 .. image:: https://img.shields.io/badge/docs-latest-af1a97.svg
    :target: https://python-telegram-bot.readthedocs.io/
    :alt: Documentation Status
@@ -27,13 +31,17 @@ We have made you a wrapper you can't refuse
    :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
    :alt: Travis CI Status
 
+.. image:: https://img.shields.io/appveyor/ci/Eldinnie/python-telegram-bot/master.svg?logo=appveyor
+   :target: https://ci.appveyor.com/project/Eldinnie/python-telegram-bot
+   :alt: AppVeyor CI Status
+
 .. image:: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot/badges/gpa.svg
    :target: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot
    :alt: Code Climate
 
-.. image:: https://coveralls.io/repos/python-telegram-bot/python-telegram-bot/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/python-telegram-bot/python-telegram-bot?branch=master
-   :alt: Coveralls
+.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot
+   :alt: Code coverage
    
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
@@ -42,6 +50,10 @@ We have made you a wrapper you can't refuse
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group
+
+.. image:: https://img.shields.io/badge/IRC-Channel-blue.svg
+   :target: https://webchat.freenode.net/?channels=##python-telegram-bot
+   :alt: IRC Bridge
 
 =================
 Table of contents
@@ -84,7 +96,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **18. June 2017**, all types and methods of the Telegram Bot API 3.0 are supported.
+All types and methods of the Telegram Bot API 3.4 are supported.
 
 ==========
 Installing

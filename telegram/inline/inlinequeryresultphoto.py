@@ -16,29 +16,48 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram InlineQueryResultPhoto"""
+"""This module contains the classes that represent Telegram InlineQueryResultPhoto."""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
+from telegram import InlineQueryResult
 
 
 class InlineQueryResultPhoto(InlineQueryResult):
-    """Represents a link to a photo. By default, this photo will be sent by the user with optional
-    caption. Alternatively, you can use input_message_content to send a message with the specified
-    content instead of the photo.
+    """
+    Represents a link to a photo. By default, this photo will be sent by the user with optional
+    caption. Alternatively, you can use :attr:`input_message_content` to send a message with the
+    specified content instead of the photo.
 
     Attributes:
-        photo_url (str): A valid URL of the photo. Photo must be in jpeg format. Photo size must
-            not exceed 5MB.
-        thumb_url (str): URL of the thumbnail for the photo.
-        photo_width (Optional[int]): Width of the photo.
-        photo_height (Optional[int]): Height of the photo.
-        title (Optional[str]): Title for the result.
-        description	(Optional[str]): Short description of the result.
-        caption (Optional[str]): Caption of the photo to be sent, 0-200 characters.
-        reply_markup (Optional[:class:`telegram.InlineKeyboardMarkup`]): Inline keyboard attached
+        type (:obj:`str`): 'photo'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
+            must not exceed 5MB.
+        thumb_url (:obj:`str`): URL of the thumbnail for the photo.
+        photo_width (:obj:`int`): Optional. Width of the photo.
+        photo_height (:obj:`int`): Optional. Height of the photo.
+        title (:obj:`str`): Optional. Title for the result.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (Optional[:class:`telegram.InputMessageContent`]): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the photo.
+
+    Args:
+        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
+            must not exceed 5MB.
+        thumb_url (:obj:`str`): URL of the thumbnail for the photo.
+        photo_width (:obj:`int`, optional): Width of the photo.
+        photo_height (:obj:`int`, optional): Height of the photo.
+        title (:obj:`str`, optional): Title for the result.
+        description (:obj:`str`, optional): Short description of the result.
+        caption (:obj:`str`, optional): Caption, 0-200 characters
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
+        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+            message to be sent instead of the photo.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
@@ -74,13 +93,3 @@ class InlineQueryResultPhoto(InlineQueryResult):
             self.reply_markup = reply_markup
         if input_message_content:
             self.input_message_content = input_message_content
-
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultPhoto, InlineQueryResultPhoto).de_json(data, bot)
-
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'), bot)
-
-        return InlineQueryResultPhoto(**data)

@@ -16,20 +16,30 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputLocationMessageContent"""
+"""This module contains the classes that represent Telegram InputLocationMessageContent."""
 
 from telegram import InputMessageContent
 
 
 class InputLocationMessageContent(InputMessageContent):
-    """Base class for Telegram InputLocationMessageContent Objects"""
+    """
+    Represents the content of a location message to be sent as the result of an inline query.
 
-    def __init__(self, latitude, longitude, **kwargs):
+    Attributes:
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+
+    Args:
+        latitude (:obj:`float`): Latitude of the location in degrees.
+        longitude (:obj:`float`): Longitude of the location in degrees.
+        live_period	(:obj:`int`, optional): Period in seconds for which the location can be
+            updated, should be between 60 and 86400.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self, latitude, longitude, live_period=None, **kwargs):
         # Required
         self.latitude = latitude
         self.longitude = longitude
-
-    @staticmethod
-    def de_json(data, bot):
-        return InputLocationMessageContent(**data)
+        self.live_period = live_period

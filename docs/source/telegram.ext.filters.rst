@@ -1,7 +1,6 @@
-telegram.ext.filters module
+telegram.ext.filters Module
 ===========================
 
 .. automodule:: telegram.ext.filters
     :members:
-    :undoc-members:
     :show-inheritance:

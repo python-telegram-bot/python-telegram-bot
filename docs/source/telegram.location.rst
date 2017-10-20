@@ -1,7 +1,6 @@
-telegram.location module
-========================
+telegram.Location
+=================
 
-.. automodule:: telegram.location
+.. autoclass:: telegram.Location
     :members:
-    :undoc-members:
     :show-inheritance:

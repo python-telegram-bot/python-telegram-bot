@@ -16,45 +16,45 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResultArticle"""
+"""This module contains the classes that represent Telegram InlineQueryResultArticle."""
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup, InputMessageContent
+from telegram import InlineQueryResult
 
 
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
     Attributes:
-        id (str):
-        title (str):
-        input_message_content (:class:`telegram.InputMessageContent`):
-        reply_markup (:class:`telegram.ReplyMarkup`):
-        url (str):
-        hide_url (bool):
-        description (str):
-        thumb_url (str):
-        thumb_width (int):
-        thumb_height (int):
-
-    Deprecated: 4.0
-        message_text (str): Use :class:`InputTextMessageContent` instead.
-
-        parse_mode (str): Use :class:`InputTextMessageContent` instead.
-
-        disable_web_page_preview (bool): Use :class:`InputTextMessageContent` instead.
+        type (:obj:`str`): 'article'.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        title (:obj:`str`): Title of the result.
+        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
+            be sent.
+        reply_markup (:class:`telegram.ReplyMarkup`): Optional. Inline keyboard attached to
+            the message.
+        url (:obj:`str`): Optional. URL of the result.
+        hide_url (:obj:`bool`): Optional. Pass True, if you don't want the URL to be shown in the
+            message.
+        description (:obj:`str`): Optional. Short description of the result.
+        thumb_url (:obj:`str`): Optional. Url of the thumbnail for the result.
+        thumb_width (:obj:`int`): Optional. Thumbnail width.
+        thumb_height (:obj:`int`): Optional. Thumbnail height.
 
     Args:
-        id (str): Unique identifier for this result, 1-64 Bytes
-        title (str):
-        reply_markup (:class:`telegram.ReplyMarkup`):
-        url (Optional[str]):
-        hide_url (Optional[bool]):
-        description (Optional[str]):
-        thumb_url (Optional[str]):
-        thumb_width (Optional[int]):
-        thumb_height (Optional[int]):
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        title (:obj:`str`): Title of the result.
+        input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
+            be sent.
+        reply_markup (:class:`telegram.ReplyMarkup`, optional): Inline keyboard attached to
+            the message
+        url (:obj:`str`, optional): URL of the result.
+        hide_url (:obj:`bool`, optional): Pass True, if you don't want the URL to be shown in the
+            message.
+        description (:obj:`str`, optional): Short description of the result.
+        thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
+        thumb_width (:obj:`int`, optional): Thumbnail width.
+        thumb_height (:obj:`int`, optional): Thumbnail height.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
@@ -91,13 +91,3 @@ class InlineQueryResultArticle(InlineQueryResult):
             self.thumb_width = thumb_width
         if thumb_height:
             self.thumb_height = thumb_height
-
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InlineQueryResultArticle, InlineQueryResultArticle).de_json(data, bot)
-
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['input_message_content'] = InputMessageContent.de_json(
-            data.get('input_message_content'), bot)
-
-        return InlineQueryResultArticle(**data)

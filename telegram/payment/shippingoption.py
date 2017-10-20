@@ -18,20 +18,22 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
-from telegram import TelegramObject, LabeledPrice
+from telegram import TelegramObject
 
 
 class ShippingOption(TelegramObject):
     """This object represents one shipping option.
 
-    Note:
-        * In Python `from` is a reserved word, use `from_user` instead.
-
     Attributes:
-        id (str): Shipping option identifier
-        title (str): Option title
-        prices (List[:class:`telegram.LabeledPrice`]): List of price portions
-        **kwargs (dict): Arbitrary keyword arguments.
+        id (:obj:`str`): Shipping option identifier.
+        title (:obj:`str`): Option title.
+        prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
+
+    Args:
+        id (:obj:`str`): Shipping option identifier.
+        title (:obj:`str`): Option title.
+        prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
@@ -42,30 +44,7 @@ class ShippingOption(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.ShippingOption:
-        """
-        if not data:
-            return None
-
-        data = super(ShippingOption, ShippingOption).de_json(data, bot)
-
-        data['prices'] = LabeledPrice.de_list(data.get('prices'), bot)
-
-        return ShippingOption(**data)
-
     def to_dict(self):
-        """
-        Returns:
-            dict:
-        """
         data = super(ShippingOption, self).to_dict()
 
         data['prices'] = [p.to_dict() for p in self.prices]

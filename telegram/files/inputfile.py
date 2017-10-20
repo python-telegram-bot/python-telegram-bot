@@ -36,11 +36,22 @@ from telegram import TelegramError
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate',
-              'video_note')
+              'video_note', 'png_sticker')
 
 
 class InputFile(object):
-    """This object represents a Telegram InputFile."""
+    """This object represents a Telegram InputFile.
+
+    Attributes:
+        data (:obj:`dict`): Data containing an inputfile.
+
+    Args:
+        data (:obj:`dict`): Data containing an inputfile.
+
+    Raises:
+        TelegramError
+
+    """
 
     def __init__(self, data):
         self.data = data
@@ -77,24 +88,21 @@ class InputFile(object):
 
     @property
     def headers(self):
-        """
-        Returns:
-            str
-        """
+        """:obj:`dict`: Headers."""
+
         return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
 
     @property
     def content_type(self):
-        """
-        Returns:
-            str
-        """
+        """:obj:`str`: Content type"""
         return 'multipart/form-data; boundary=%s' % self.boundary
 
     def to_form(self):
-        """
+        """Transform the inputfile to multipart/form data.
+
         Returns:
-            str
+            :obj:`str`
+
         """
         form = []
         form_boundary = '--' + self.boundary
@@ -120,10 +128,6 @@ class InputFile(object):
 
     @staticmethod
     def _parse(form):
-        """
-        Returns:
-            str
-        """
         if sys.version_info > (3,):
             # on Python 3 form needs to be byte encoded
             encoded_form = []
@@ -141,10 +145,11 @@ class InputFile(object):
         """Check if the content file is an image by analyzing its headers.
 
         Args:
-            stream (str): A str representing the content of a file.
+            stream (:obj:`str`): A str representing the content of a file.
 
         Returns:
-            str: The str mimetype of an image.
+            :obj:`str`: The str mime-type of an image.
+
         """
         image = imghdr.what(None, stream)
         if image:
@@ -157,10 +162,11 @@ class InputFile(object):
         """Check if the request is a file request.
 
         Args:
-            data (dict): A dict of (str, unicode) key/value pairs
+            data (Dict[:obj:`str`, :obj:`str`]): A dict of (str, str) key/value pairs.
 
         Returns:
-            bool
+            :obj:`bool`
+
         """
         if data:
             file_type = [i for i in iter(data) if i in FILE_TYPES]

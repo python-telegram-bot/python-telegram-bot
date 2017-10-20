@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains methods to make POST and GET requests"""
+"""This module contains methods to make POST and GET requests."""
 import os
 import socket
+import sys
 import logging
 import warnings
 
@@ -28,12 +29,13 @@ except ImportError:
     import json
 
 import certifi
+
 try:
     import telegram.vendor.ptb_urllib3.urllib3 as urllib3
     import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
     from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
-except ImportError:
+except ImportError:  # pragma: no cover
     warnings.warn("python-telegram-bot wasn't properly installed. Please refer to README.rst on "
                   "how to properly install.")
     raise
@@ -76,13 +78,22 @@ class Request(object):
 
         self._connect_timeout = connect_timeout
 
+        sockopts = HTTPConnection.default_socket_options + [
+            (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
+
+        # TODO: Support other platforms like mac and windows.
+        if 'linux' in sys.platform:
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120))
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30))
+            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8))
+
+        self._con_pool_size = con_pool_size
+
         kwargs = dict(
             maxsize=con_pool_size,
             cert_reqs='CERT_REQUIRED',
             ca_certs=certifi.where(),
-            socket_options=HTTPConnection.default_socket_options + [
-                (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-            ],
+            socket_options=sockopts,
             timeout=urllib3.Timeout(
                 connect=self._connect_timeout, read=read_timeout, total=None))
 
@@ -118,6 +129,11 @@ class Request(object):
 
         self._con_pool = mgr
 
+    @property
+    def con_pool_size(self):
+        """The size of the connection pool used."""
+        return self._con_pool_size
+
     def stop(self):
         self._con_pool.clear()
 
@@ -135,7 +151,7 @@ class Request(object):
         except ValueError:
             raise TelegramError('Invalid server response')
 
-        if not data.get('ok'):
+        if not data.get('ok'):  # pragma: no cover
             description = data.get('description')
             parameters = data.get('parameters')
             if parameters:
@@ -207,10 +223,10 @@ class Request(object):
         """Request an URL.
 
         Args:
-            url (str): The web location we want to retrieve.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            url (:obj:`str`): The web location we want to retrieve.
+            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
+                timeout from the server (instead of the one specified during creation of the
+                connection pool).
 
         Returns:
           A JSON object.
@@ -227,11 +243,11 @@ class Request(object):
     def post(self, url, data, timeout=None):
         """Request an URL.
         Args:
-            url (str): The web location we want to retrieve.
+            url (:obj:`str`): The web location we want to retrieve.
             data (dict[str, str|int]): A dict of key/value pairs. Note: On py2.7 value is unicode.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
+                timeout from the server (instead of the one specified during creation of the
+                connection pool).
 
         Returns:
           A JSON object.
@@ -261,10 +277,10 @@ class Request(object):
         """Retrieve the contents of a file by its URL.
 
         Args:
-            url (str): The web location we want to retrieve.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            url (:obj:`str`): The web location we want to retrieve.
+            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
+                timeout from the server (instead of the one specified during creation of the
+                connection pool).
 
         """
         urlopen_kwargs = {}
@@ -277,9 +293,9 @@ class Request(object):
         """Download a file by its URL.
         Args:
             url (str): The web location we want to retrieve.
-            timeout (Optional[int|float]): If this value is specified, use it as the read timeout
-                from the server (instead of the one specified during creation of the connection
-                pool).
+            timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
+                timeout from the server (instead of the one specified during creation of the
+                connection pool).
 
           filename:
             The filename within the path to download the file.

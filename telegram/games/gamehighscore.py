@@ -22,12 +22,17 @@ from telegram import TelegramObject, User
 
 
 class GameHighScore(TelegramObject):
-    """This object represents a Telegram GameHighScore.
+    """This object represents one row of the high scores table for a game.
 
     Attributes:
-        position (int): Position in high score table for the game.
-        user (:class:`telegram.User`): User object.
-        score (int): Score.
+        position (:obj:`int`): Position in high score table for the game.
+        user (:class:`telegram.User`): User.
+        score (:obj:`int`): Score.
+
+    Args:
+        position (:obj:`int`): Position in high score table for the game.
+        user (:class:`telegram.User`): User.
+        score (:obj:`int`): Score.
 
     """
 
@@ -36,21 +41,13 @@ class GameHighScore(TelegramObject):
         self.user = user
         self.score = score
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.Game:
-        """
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(GameHighScore, GameHighScore).de_json(data, bot)
+        data = super(GameHighScore, cls).de_json(data, bot)
 
         data['user'] = User.de_json(data.get('user'), bot)
 
-        return GameHighScore(**data)
+        return cls(**data)

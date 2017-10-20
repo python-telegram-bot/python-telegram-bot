@@ -1,7 +1,6 @@
-telegram.inputlocationmessagecontent module
-===========================================
+telegram.InputLocationMessageContent
+====================================
 
-.. automodule:: telegram.inputlocationmessagecontent
+.. autoclass:: telegram.InputLocationMessageContent
     :members:
-    :undoc-members:
     :show-inheritance:

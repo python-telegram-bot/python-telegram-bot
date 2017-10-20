@@ -16,23 +16,22 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InlineQueryResult"""
+"""This module contains the classes that represent Telegram InlineQueryResult."""
 
 from telegram import TelegramObject
 
 
 class InlineQueryResult(TelegramObject):
-    """This object represents a Telegram InlineQueryResult.
+    """Baseclass for the InlineQueryResult* classes.
 
     Attributes:
-        type (str): Type of the result.
-        id (str): Unique identifier for this result, 1-64 Bytes
+        type (:obj:`str`): Type of the result.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
 
     Args:
-        type (str): Type of the result.
-        id (str): Unique identifier for this result, 1-64 Bytes
-        **kwargs (dict): Arbitrary keyword arguments.
+        type (:obj:`str`): Type of the result.
+        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
@@ -42,7 +41,3 @@ class InlineQueryResult(TelegramObject):
         self.id = str(id)
 
         self._id_attrs = (self.id,)
-
-    @staticmethod
-    def de_json(data, bot):
-        return super(InlineQueryResult, InlineQueryResult).de_json(data, bot)

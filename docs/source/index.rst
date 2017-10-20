@@ -6,6 +6,9 @@
 Welcome to Python Telegram Bot's documentation!
 ===============================================
 
+Below you can find the documentation for the python-telegram-bot library. except for the .ext package most of the
+objects in the package reflect the types as defined by the `telegram bot api <https://core.telegram.org/bots/api>`_.
+
 .. toctree::
    telegram
 

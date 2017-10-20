@@ -1,7 +1,6 @@
-telegram.inlinequeryresultcachedvoice module
-============================================
+telegram.InlineQueryResultCachedVoice
+=====================================
 
-.. automodule:: telegram.inlinequeryresultcachedvoice
+.. autoclass:: telegram.InlineQueryResultCachedVoice
     :members:
-    :undoc-members:
     :show-inheritance:

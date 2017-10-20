@@ -16,50 +16,29 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram
-InlineKeyboardMarkup"""
+"""This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from telegram import ReplyMarkup, InlineKeyboardButton
+from telegram import ReplyMarkup
 
 
 class InlineKeyboardMarkup(ReplyMarkup):
-    """This object represents a Telegram InlineKeyboardMarkup.
+    """
+    This object represents an inline keyboard that appears right next to the message it belongs to.
 
     Attributes:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
+            each represented by an Array of InlineKeyboardButton objects.
 
     Args:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]):
-        **kwargs (dict): Arbitrary keyword arguments.
+        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): Array of button rows,
+            each represented by an Array of InlineKeyboardButton objects.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
     def __init__(self, inline_keyboard, **kwargs):
         # Required
         self.inline_keyboard = inline_keyboard
-
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.InlineKeyboardMarkup:
-
-        """
-        data = super(InlineKeyboardMarkup, InlineKeyboardMarkup).de_json(data, bot)
-
-        if not data:
-            return None
-
-        data['inline_keyboard'] = [
-            InlineKeyboardButton.de_list(inline_keyboard, bot)
-            for inline_keyboard in data['inline_keyboard']
-        ]
-
-        return InlineKeyboardMarkup(**data)
 
     def to_dict(self):
         data = super(InlineKeyboardMarkup, self).to_dict()

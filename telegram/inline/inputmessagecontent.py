@@ -16,44 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram
-InputMessageContent"""
+"""This module contains the classes that represent Telegram InputMessageContent."""
 
 from telegram import TelegramObject
 
 
 class InputMessageContent(TelegramObject):
-    """Base class for Telegram InputMessageContent Objects"""
+    """Base class for Telegram InputMessageContent Objects.
 
-    @staticmethod
-    def de_json(data, bot):
-        data = super(InputMessageContent, InputMessageContent).de_json(data, bot)
+    See: :class:`telegram.InputContactMessageContent`,
+    :class:`telegram.InputLocationMessageContent`, :class:`telegram.InputTextMessageContent` and
+    :class:`telegram.InputVenueMessageContent` for more details.
 
-        if not data:
-            return None
-
-        try:
-            from telegram import InputTextMessageContent
-            return InputTextMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        try:
-            from telegram import InputVenueMessageContent
-            return InputVenueMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        try:
-            from telegram import InputLocationMessageContent
-            return InputLocationMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        try:
-            from telegram import InputContactMessageContent
-            return InputContactMessageContent.de_json(data, bot)
-        except TypeError:
-            pass
-
-        return None
+    """
+    pass

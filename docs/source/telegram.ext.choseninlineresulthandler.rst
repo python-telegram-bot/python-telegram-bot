@@ -1,7 +1,6 @@
-telegram.ext.choseninlineresulthandler module
-=============================================
+telegram.ext.ChosenInlineResultHandler
+======================================
 
-.. automodule:: telegram.ext.choseninlineresulthandler
+.. autoclass:: telegram.ext.ChosenInlineResultHandler
     :members:
-    :undoc-members:
     :show-inheritance:
