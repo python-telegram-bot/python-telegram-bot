@@ -183,14 +183,20 @@ class Dispatcher(object):
         self.__async_queue.put(promise)
         return promise
 
-    def start(self):
+    def start(self, ready=None):
         """Thread target of thread 'dispatcher'.
 
         Runs in background and processes the update queue.
 
+        Args:
+            ready (:obj:`threading.Event`, optional): If specified, the event will be set once the
+                dispatcher is ready.
+
         """
         if self.running:
             self.logger.warning('already running')
+            if ready is not None:
+                ready.set()
             return
 
         if self.__exception_event.is_set():
@@ -201,6 +207,9 @@ class Dispatcher(object):
         self._init_async_threads(uuid4(), self.workers)
         self.running = True
         self.logger.debug('Dispatcher started')
+
+        if ready is not None:
+            ready.set()
 
         while 1:
             try:
