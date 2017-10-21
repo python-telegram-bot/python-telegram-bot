@@ -195,6 +195,8 @@ class Dispatcher(object):
         """
         if self.running:
             self.logger.warning('already running')
+            if ready is not None:
+                ready.set()
             return
 
         if self.__exception_event.is_set():
