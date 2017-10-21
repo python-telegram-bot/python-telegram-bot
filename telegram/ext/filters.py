@@ -17,10 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
-import mimetypes
-
-from telegram import Chat
 from future.utils import string_types
+from telegram import Chat
 
 
 class BaseFilter(object):
@@ -252,20 +250,20 @@ class Filters(object):
                     return message.document.mime_type == self.filetype
 
         apk = file_type("application/vnd.android.package-archive")
-        doc = file_type(mimetypes.types_map[".doc"])
+        doc = file_type("application/msword")
         docx = file_type("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
         exe = file_type("application/x-ms-dos-executable")
-        gif = file_type(mimetypes.types_map[".mp4"])
-        jpg = file_type(mimetypes.types_map[".jpg"])
-        mp3 = file_type(mimetypes.types_map[".mp3"])
-        pdf = file_type(mimetypes.types_map[".pdf"])
-        py = file_type(mimetypes.types_map[".py"])
-        svg = file_type(mimetypes.types_map[".svg"])
-        txt = file_type(mimetypes.types_map[".txt"])
+        gif = file_type("video/mp4")
+        jpg = file_type("image/jpeg")
+        mp3 = file_type("audio/mpeg")
+        pdf = file_type("application/pdf")
+        py = file_type("text/x-python")
+        svg = file_type("image/svg+xml")
+        txt = file_type("text/plain")
         targz = file_type("application/x-compressed-tar")
-        wav = file_type(mimetypes.types_map[".wav"])
+        wav = file_type("audio/x-wav")
         xml = file_type("application/xml")
-        zip = file_type(mimetypes.types_map[".zip"])
+        zip = file_type("application/zip")
 
         def filter(self, message):
             return bool(message.document)
@@ -381,7 +379,7 @@ class Filters(object):
         """Subset for messages containing a status update.
 
         Examples:
-            Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
+            Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
             ``Filters.status_update`` for all status update messages.
 
         """
@@ -451,7 +449,7 @@ class Filters(object):
 
         migrate = _Migrate()
         """:obj:`Filter`: Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr: `telegram.Message.migrate_to_chat_id`."""
+            :attr: `telegram.Message.migrate_from_chat_id`."""
 
         class _PinnedMessage(BaseFilter):
             name = 'Filters.status_update.pinned_message'
