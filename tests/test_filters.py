@@ -22,6 +22,7 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity
 from telegram.ext import Filters, BaseFilter
+from telegram.files.document import Document
 
 
 @pytest.fixture(scope='function')
@@ -68,6 +69,112 @@ class TestFilters(object):
         assert not Filters.document(message)
         message.document = 'test'
         assert Filters.document(message)
+
+        message.document = Document("file_id", mime_type="application/vnd.android.package-archive")
+        assert Filters.document.apk(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.doc(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = mimetypes.types_map[".doc"]
+        assert Filters.document.doc(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.docx(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = "application/vnd.openxmlformats-" \
+                                     "officedocument.wordprocessingml.document"
+        assert Filters.document.docx(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.exe(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = "application/x-ms-dos-executable"
+        assert Filters.document.exe(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.docx(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = mimetypes.types_map[".mp4"]
+        assert Filters.document.gif(message)
+        assert Filters.document.video(message)
+        assert not Filters.document.jpg(message)
+        assert not Filters.document.text(message)
+
+        message.document.mime_type = mimetypes.types_map[".jpg"]
+        assert Filters.document.jpg(message)
+        assert Filters.document.image(message)
+        assert not Filters.document.mp3(message)
+        assert not Filters.document.video(message)
+
+        message.document.mime_type = mimetypes.types_map[".mp3"]
+        assert Filters.document.mp3(message)
+        assert Filters.document.audio(message)
+        assert not Filters.document.pdf(message)
+        assert not Filters.document.image(message)
+
+        message.document.mime_type = mimetypes.types_map[".pdf"]
+        assert Filters.document.pdf(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.py(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = mimetypes.types_map[".py"]
+        assert Filters.document.py(message)
+        assert Filters.document.text(message)
+        assert not Filters.document.svg(message)
+        assert not Filters.document.application(message)
+
+        message.document.mime_type = mimetypes.types_map[".svg"]
+        assert Filters.document.svg(message)
+        assert Filters.document.image(message)
+        assert not Filters.document.txt(message)
+        assert not Filters.document.video(message)
+
+        message.document.mime_type = mimetypes.types_map[".txt"]
+        assert Filters.document.txt(message)
+        assert Filters.document.text(message)
+        assert not Filters.document.targz(message)
+        assert not Filters.document.application(message)
+
+        message.document.mime_type = "application/x-compressed-tar"
+        assert Filters.document.targz(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.wav(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = mimetypes.types_map[".wav"]
+        assert Filters.document.wav(message)
+        assert Filters.document.audio(message)
+        assert not Filters.document.xml(message)
+        assert not Filters.document.image(message)
+
+        message.document.mime_type = "application/xml"
+        assert Filters.document.xml(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.zip(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = mimetypes.types_map[".zip"]
+        assert Filters.document.zip(message)
+        assert Filters.document.application(message)
+        assert not Filters.document.apk(message)
+        assert not Filters.document.audio(message)
+
+        message.document.mime_type = "image/x-rgb"
+        assert not Filters.document.category("application/")(message)
+        assert not Filters.document.file_type("application/x-sh")(message)
+        message.document.mime_type = "application/x-sh"
+        assert Filters.document.category("application/")(message)
+        assert Filters.document.file_type("application/x-sh")(message)
+
+    def test_filters_filesize(self, message):
+        assert not Filters.file_size()(message)
+        message.document = Document("file_id", file_size=1000)
+        assert Filters.file_size()(message)
+        assert Filters.file_size(min=500, max=1500)(message)
+        assert not Filters.file_size(min=1500)(message)
+        assert not Filters.file_size(max=500)(message)
 
     def test_filters_photo(self, message):
         assert not Filters.photo(message)
