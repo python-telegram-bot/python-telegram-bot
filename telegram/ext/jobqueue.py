@@ -296,7 +296,7 @@ class JobQueue(object):
             else:
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
-    def  start(self):
+    def start(self):
         """Starts the job_queue thread."""
 
         self.__start_lock.acquire()
