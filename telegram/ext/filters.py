@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
+import mimetypes
+
 from telegram import Chat
 from future.utils import string_types
 
@@ -192,11 +194,125 @@ class Filters(object):
     class _Document(BaseFilter):
         name = 'Filters.document'
 
+        class category(BaseFilter):
+            """This Filter filters documents by their category in the mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of the document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.category("audio/") returnes `True` for all types
+                of audio sent as file, for example "audio/mpeg" or "audio/x-wav"
+            """
+
+            def __init__(self, category):
+                """Initialize the category you want to filter
+
+                Args:
+                    category (str, optional): category of the media you want to filter"""
+                self.category = category
+                self.name = "Filters.document.category(\"{}\")".format(self.category)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type.startswith(self.category)
+
+        application = category("application/")
+        audio = category("audio/")
+        image = category("image/")
+        video = category("video/")
+        text = category("text/")
+
+        class file_type(BaseFilter):
+            """This Filter filters documents by their mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.file_type("audio/mpeg") filters all audio in mp3 format.
+            """
+
+            def __init__(self, filetype):
+                """Initialize the category you want to filter
+
+                Args:
+                    filetype (str, optional): mime_type of the media you want to filter"""
+                self.filetype = filetype
+                self.name = "Filters.document.Filetype(\"{}\")".format(self.filetype)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type == self.filetype
+
+        apk = file_type("application/vnd.android.package-archive")
+        doc = file_type(mimetypes.types_map[".doc"])
+        docx = file_type("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        exe = file_type("application/x-ms-dos-executable")
+        gif = file_type(mimetypes.types_map[".mp4"])
+        jpg = file_type(mimetypes.types_map[".jpg"])
+        mp3 = file_type(mimetypes.types_map[".mp3"])
+        pdf = file_type(mimetypes.types_map[".pdf"])
+        py = file_type(mimetypes.types_map[".py"])
+        svg = file_type(mimetypes.types_map[".svg"])
+        txt = file_type(mimetypes.types_map[".txt"])
+        targz = file_type("application/x-compressed-tar")
+        wav = file_type(mimetypes.types_map[".wav"])
+        xml = file_type("application/xml")
+        zip = file_type(mimetypes.types_map[".zip"])
+
         def filter(self, message):
             return bool(message.document)
 
     document = _Document()
     """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
+
+    class file_size(BaseFilter):
+        """This Filter filters all messages with a `file_size` attribute."""
+
+        def __init__(self, min=None, max=None):
+            """Initialize the limits of the file_size in the `__init__` method.
+
+            Note:
+                If no limits are given, the filter returns `True` for every message
+                with file_size attritute
+
+            Args:
+                min (int, optional): Minimum `file_size` of the message media in Byte.
+                max (int, optional): Maximum `file_size` of the message media in Byte.
+            """
+            self.min = min
+            self.max = max
+            self.name = "Filters.file_size(min={0}, max={1})".format(self.min, self.max)
+
+        def filter(self, message):
+            if message.audio:
+                filesize = message.audio.file_size
+            elif message.document:
+                filesize = message.document.file_size
+            elif message.photo:
+                filesize = message.photo.file_size
+            elif message.sticker:
+                filesize = message.sticker.file_size
+            elif message.video:
+                filesize = message.video.file_size
+            elif message.voice:
+                filesize = message.voice.file_size
+            else:
+                return False
+            if self.min is not None:
+                if filesize < self.min:
+                    return False
+            if self.max is not None:
+                if filesize > self.max:
+                    return False
+            return True
 
     class _Photo(BaseFilter):
         name = 'Filters.photo'
