@@ -16,447 +16,660 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
-
-import mimetypes
-import pytest
-
-from telegram import Message, User, Chat, MessageEntity
-from telegram.ext import Filters, BaseFilter
-from telegram.files.document import Document
-
-
-@pytest.fixture(scope='function')
-def message():
-    return Message(0, User(0, 'Testuser', False), datetime.datetime.now(), Chat(0, 'private'))
-
-
-@pytest.fixture(scope='function',
-                params=MessageEntity.ALL_TYPES)
-def message_entity(request):
-    return MessageEntity(request.param, 0, 0, url='', user='')
-
-
-class TestFilters(object):
-    def test_filters_all(self, message):
-        assert Filters.all(message)
-
-    def test_filters_text(self, message):
-        message.text = 'test'
-        assert Filters.text(message)
-        message.text = '/test'
-        assert not Filters.text(message)
-
-    def test_filters_command(self, message):
-        message.text = 'test'
-        assert not Filters.command(message)
-        message.text = '/test'
-        assert Filters.command(message)
-
-    def test_filters_reply(self, message):
-        another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
-                                  Chat(0, 'private'))
-        message.text = 'test'
-        assert not Filters.reply(message)
-        message.reply_to_message = another_message
-        assert Filters.reply(message)
-
-    def test_filters_audio(self, message):
-        assert not Filters.audio(message)
-        message.audio = 'test'
-        assert Filters.audio(message)
-
-    def test_filters_document(self, message):
-        assert not Filters.document(message)
-        message.document = 'test'
-        assert Filters.document(message)
-
-        message.document = Document("file_id", mime_type="application/vnd.android.package-archive")
-        assert Filters.document.apk(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.doc(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = mimetypes.types_map[".doc"]
-        assert Filters.document.doc(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.docx(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = "application/vnd.openxmlformats-" \
-                                     "officedocument.wordprocessingml.document"
-        assert Filters.document.docx(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.exe(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = "application/x-ms-dos-executable"
-        assert Filters.document.exe(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.docx(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = mimetypes.types_map[".mp4"]
-        assert Filters.document.gif(message)
-        assert Filters.document.video(message)
-        assert not Filters.document.jpg(message)
-        assert not Filters.document.text(message)
-
-        message.document.mime_type = mimetypes.types_map[".jpg"]
-        assert Filters.document.jpg(message)
-        assert Filters.document.image(message)
-        assert not Filters.document.mp3(message)
-        assert not Filters.document.video(message)
-
-        message.document.mime_type = mimetypes.types_map[".mp3"]
-        assert Filters.document.mp3(message)
-        assert Filters.document.audio(message)
-        assert not Filters.document.pdf(message)
-        assert not Filters.document.image(message)
-
-        message.document.mime_type = mimetypes.types_map[".pdf"]
-        assert Filters.document.pdf(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.py(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = mimetypes.types_map[".py"]
-        assert Filters.document.py(message)
-        assert Filters.document.text(message)
-        assert not Filters.document.svg(message)
-        assert not Filters.document.application(message)
-
-        message.document.mime_type = mimetypes.types_map[".svg"]
-        assert Filters.document.svg(message)
-        assert Filters.document.image(message)
-        assert not Filters.document.txt(message)
-        assert not Filters.document.video(message)
-
-        message.document.mime_type = mimetypes.types_map[".txt"]
-        assert Filters.document.txt(message)
-        assert Filters.document.text(message)
-        assert not Filters.document.targz(message)
-        assert not Filters.document.application(message)
-
-        message.document.mime_type = "application/x-compressed-tar"
-        assert Filters.document.targz(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.wav(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = mimetypes.types_map[".wav"]
-        assert Filters.document.wav(message)
-        assert Filters.document.audio(message)
-        assert not Filters.document.xml(message)
-        assert not Filters.document.image(message)
-
-        message.document.mime_type = "application/xml"
-        assert Filters.document.xml(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.zip(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = mimetypes.types_map[".zip"]
-        assert Filters.document.zip(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.apk(message)
-        assert not Filters.document.audio(message)
-
-        message.document.mime_type = "image/x-rgb"
-        assert not Filters.document.category("application/")(message)
-        assert not Filters.document.file_type("application/x-sh")(message)
-        message.document.mime_type = "application/x-sh"
-        assert Filters.document.category("application/")(message)
-        assert Filters.document.file_type("application/x-sh")(message)
-
-    def test_filters_filesize(self, message):
-        assert not Filters.file_size()(message)
-        message.document = Document("file_id", file_size=1000)
-        assert Filters.file_size()(message)
-        assert Filters.file_size(min=500, max=1500)(message)
-        assert not Filters.file_size(min=1500)(message)
-        assert not Filters.file_size(max=500)(message)
-
-    def test_filters_photo(self, message):
-        assert not Filters.photo(message)
-        message.photo = 'test'
-        assert Filters.photo(message)
-
-    def test_filters_sticker(self, message):
-        assert not Filters.sticker(message)
-        message.sticker = 'test'
-        assert Filters.sticker(message)
-
-    def test_filters_video(self, message):
-        assert not Filters.video(message)
-        message.video = 'test'
-        assert Filters.video(message)
-
-    def test_filters_voice(self, message):
-        assert not Filters.voice(message)
-        message.voice = 'test'
-        assert Filters.voice(message)
-
-    def test_filters_contact(self, message):
-        assert not Filters.contact(message)
-        message.contact = 'test'
-        assert Filters.contact(message)
-
-    def test_filters_location(self, message):
-        assert not Filters.location(message)
-        message.location = 'test'
-        assert Filters.location(message)
-
-    def test_filters_venue(self, message):
-        assert not Filters.venue(message)
-        message.venue = 'test'
-        assert Filters.venue(message)
-
-    def test_filters_status_update(self, message):
-        assert not Filters.status_update(message)
-
-        message.new_chat_members = ['test']
-        assert Filters.status_update(message)
-        assert Filters.status_update.new_chat_members(message)
-        message.new_chat_members = None
-
-        message.left_chat_member = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.left_chat_member(message)
-        message.left_chat_member = None
-
-        message.new_chat_title = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.new_chat_title(message)
-        message.new_chat_title = ''
-
-        message.new_chat_photo = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.new_chat_photo(message)
-        message.new_chat_photo = None
-
-        message.delete_chat_photo = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.delete_chat_photo(message)
-        message.delete_chat_photo = False
-
-        message.group_chat_created = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.chat_created(message)
-        message.group_chat_created = False
-
-        message.supergroup_chat_created = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.chat_created(message)
-        message.supergroup_chat_created = False
-
-        message.channel_chat_created = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.chat_created(message)
-        message.channel_chat_created = False
-
-        message.migrate_to_chat_id = 100
-        assert Filters.status_update(message)
-        assert Filters.status_update.migrate(message)
-        message.migrate_to_chat_id = 0
-
-        message.migrate_from_chat_id = 100
-        assert Filters.status_update(message)
-        assert Filters.status_update.migrate(message)
-        message.migrate_from_chat_id = 0
-
-        message.pinned_message = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.pinned_message(message)
-        message.pinned_message = None
-
-    def test_filters_forwarded(self, message):
-        assert not Filters.forwarded(message)
-        message.forward_date = 'test'
-        assert Filters.forwarded(message)
-
-    def test_filters_game(self, message):
-        assert not Filters.game(message)
-        message.game = 'test'
-        assert Filters.game(message)
-
-    def test_entities_filter(self, message, message_entity):
-        message.entities = [message_entity]
-        assert Filters.entity(message_entity.type)(message)
-
-        message.entities = []
-        assert not Filters.entity(MessageEntity.MENTION)(message)
-
-        second = message_entity.to_dict()
-        second['type'] = 'bold'
-        second = MessageEntity.de_json(second, None)
-        message.entities = [message_entity, second]
-        assert Filters.entity(message_entity.type)(message)
-
-    def test_private_filter(self, message):
-        assert Filters.private(message)
-        message.chat.type = 'group'
-        assert not Filters.private(message)
-
-    def test_group_filter(self, message):
-        assert not Filters.group(message)
-        message.chat.type = 'group'
-        assert Filters.group(message)
-        message.chat.type = 'supergroup'
-        assert Filters.group(message)
-
-    def test_filters_user(self):
-        with pytest.raises(ValueError, match='user_id or username'):
-            Filters.user(user_id=1, username='user')
-        with pytest.raises(ValueError, match='user_id or username'):
-            Filters.user()
-
-    def test_filters_user_id(self, message):
-        assert not Filters.user(user_id=1)(message)
-        message.from_user.id = 1
-        assert Filters.user(user_id=1)(message)
-        message.from_user.id = 2
-        assert Filters.user(user_id=[1, 2])(message)
-        assert not Filters.user(user_id=[3, 4])(message)
-
-    def test_filters_username(self, message):
-        assert not Filters.user(username='user')(message)
-        assert not Filters.user(username='Testuser')(message)
-        message.from_user.username = 'user'
-        assert Filters.user(username='@user')(message)
-        assert Filters.user(username='user')(message)
-        assert Filters.user(username=['user1', 'user', 'user2'])(message)
-        assert not Filters.user(username=['@username', '@user_2'])(message)
-
-    def test_filters_chat(self):
-        with pytest.raises(ValueError, match='chat_id or username'):
-            Filters.chat(chat_id=-1, username='chat')
-        with pytest.raises(ValueError, match='chat_id or username'):
-            Filters.chat()
-
-    def test_filters_chat_id(self, message):
-        assert not Filters.chat(chat_id=-1)(message)
-        message.chat.id = -1
-        assert Filters.chat(chat_id=-1)(message)
-        message.chat.id = -2
-        assert Filters.chat(chat_id=[-1, -2])(message)
-        assert not Filters.chat(chat_id=[-3, -4])(message)
-
-    def test_filters_chat_username(self, message):
-        assert not Filters.chat(username='chat')(message)
-        message.chat.username = 'chat'
-        assert Filters.chat(username='@chat')(message)
-        assert Filters.chat(username='chat')(message)
-        assert Filters.chat(username=['chat1', 'chat', 'chat2'])(message)
-        assert not Filters.chat(username=['@chat1', 'chat_2'])(message)
-
-    def test_filters_invoice(self, message):
-        assert not Filters.invoice(message)
-        message.invoice = 'test'
-        assert Filters.invoice(message)
-
-    def test_filters_successful_payment(self, message):
-        assert not Filters.successful_payment(message)
-        message.successful_payment = 'test'
-        assert Filters.successful_payment(message)
-
-    def test_language_filter_single(self, message):
-        message.from_user.language_code = 'en_US'
-        assert (Filters.language('en_US'))(message)
-        assert (Filters.language('en'))(message)
-        assert not (Filters.language('en_GB'))(message)
-        assert not (Filters.language('da'))(message)
-        message.from_user.language_code = 'da'
-        assert not (Filters.language('en_US'))(message)
-        assert not (Filters.language('en'))(message)
-        assert not (Filters.language('en_GB'))(message)
-        assert (Filters.language('da'))(message)
-
-    def test_language_filter_multiple(self, message):
-        f = Filters.language(['en_US', 'da'])
-        message.from_user.language_code = 'en_US'
-        assert f(message)
-        message.from_user.language_code = 'en_GB'
-        assert not f(message)
-        message.from_user.language_code = 'da'
-        assert f(message)
-
-    def test_and_filters(self, message):
-        message.text = 'test'
-        message.forward_date = True
-        assert (Filters.text & Filters.forwarded)(message)
-        message.text = '/test'
-        assert not (Filters.text & Filters.forwarded)(message)
-        message.text = 'test'
-        message.forward_date = None
-        assert not (Filters.text & Filters.forwarded)(message)
-
-        message.text = 'test'
-        message.forward_date = True
-        assert (Filters.text & Filters.forwarded & Filters.private)(message)
-
-    def test_or_filters(self, message):
-        message.text = 'test'
-        assert (Filters.text | Filters.status_update)(message)
-        message.group_chat_created = True
-        assert (Filters.text | Filters.status_update)(message)
-        message.text = None
-        assert (Filters.text | Filters.status_update)(message)
-        message.group_chat_created = False
-        assert not (Filters.text | Filters.status_update)(message)
-
-    def test_and_or_filters(self, message):
-        message.text = 'test'
-        message.forward_date = True
-        assert (Filters.text & (Filters.forwarded | Filters.status_update))(message)
-        message.forward_date = False
-        assert not (Filters.text & (Filters.forwarded | Filters.status_update))(message)
-        message.pinned_message = True
-        assert (Filters.text & (Filters.forwarded | Filters.status_update)(message))
-
-        assert str((Filters.text & (Filters.forwarded | Filters.entity(
-            MessageEntity.MENTION)))) == '<Filters.text and <Filters.forwarded or ' \
-                                         'Filters.entity(mention)>>'
-
-    def test_inverted_filters(self, message):
-        message.text = '/test'
-        assert Filters.command(message)
-        assert not (~Filters.command)(message)
-        message.text = 'test'
-        assert not Filters.command(message)
-        assert (~Filters.command)(message)
-
-    def test_inverted_and_filters(self, message):
-        message.text = '/test'
-        message.forward_date = 1
-        assert (Filters.forwarded & Filters.command)(message)
-        assert not (~Filters.forwarded & Filters.command)(message)
-        assert not (Filters.forwarded & ~Filters.command)(message)
-        assert not (~(Filters.forwarded & Filters.command))(message)
-        message.forward_date = None
-        assert not (Filters.forwarded & Filters.command)(message)
-        assert (~Filters.forwarded & Filters.command)(message)
-        assert not (Filters.forwarded & ~Filters.command)(message)
-        assert (~(Filters.forwarded & Filters.command))(message)
-        message.text = 'test'
-        assert not (Filters.forwarded & Filters.command)(message)
-        assert not (~Filters.forwarded & Filters.command)(message)
-        assert not (Filters.forwarded & ~Filters.command)(message)
-        assert (~(Filters.forwarded & Filters.command))(message)
-
-    def test_faulty_custom_filter(self, message):
-        class _CustomFilter(BaseFilter):
-            pass
-
-        custom = _CustomFilter()
-
-        with pytest.raises(NotImplementedError):
-            (custom & Filters.text)(message)
-
-    def test_custom_unnamed_filter(self, message):
-        class Unnamed(BaseFilter):
-            def filter(self, mes):
-                return True
-
-        unnamed = Unnamed()
-        assert str(unnamed) == Unnamed.__name__
+"""This module contains the Filters for use with the MessageHandler class."""
+from future.utils import string_types
+from telegram import Chat
+
+
+class BaseFilter(object):
+    """Base class for all Message Filters.
+
+    Subclassing from this class filters to be combined using bitwise operators:
+
+    And:
+
+        >>> (Filters.text & Filters.entity(MENTION))
+
+    Or:
+
+        >>> (Filters.audio | Filters.video)
+
+    Not:
+
+        >>> ~ Filters.command
+
+    Also works with more than two filters:
+
+        >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
+        >>> Filters.text & (~ Filters.forwarded)
+
+    If you want to create your own filters create a class inheriting from this class and implement
+    a `filter` method that returns a boolean: `True` if the message should be handled, `False`
+    otherwise. Note that the filters work only as class instances, not actual class objects
+    (so remember to initialize your filter classes).
+
+    By default the filters name (what will get printed when converted to a string for display)
+    will be the class name. If you want to overwrite this assign a better name to the `name`
+    class variable.
+
+    Attributes:
+        name (:obj:`str`): Name for this filter. Defaults to the type of filter.
+
+    """
+
+    name = None
+
+    def __call__(self, message):
+        return self.filter(message)
+
+    def __and__(self, other):
+        return MergedFilter(self, and_filter=other)
+
+    def __or__(self, other):
+        return MergedFilter(self, or_filter=other)
+
+    def __invert__(self):
+        return InvertedFilter(self)
+
+    def __repr__(self):
+        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
+        if self.name is None:
+            self.name = self.__class__.__name__
+        return self.name
+
+    def filter(self, message):
+        """This method must be overwritten.
+
+        Args:
+            message (:class:`telegram.Message`): The message that is tested.
+
+        Returns:
+            :obj:`bool`
+
+        """
+
+        raise NotImplementedError
+
+
+class InvertedFilter(BaseFilter):
+    """Represents a filter that has been inverted.
+
+    Args:
+        f: The filter to invert.
+
+    """
+
+    def __init__(self, f):
+        self.f = f
+
+    def filter(self, message):
+        return not self.f(message)
+
+    def __repr__(self):
+        return "<inverted {}>".format(self.f)
+
+
+class MergedFilter(BaseFilter):
+    """Represents a filter consisting of two other filters.
+
+    Args:
+        base_filter: Filter 1 of the merged filter
+        and_filter: Optional filter to "and" with base_filter. Mutually exclusive with or_filter.
+        or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
+
+    """
+
+    def __init__(self, base_filter, and_filter=None, or_filter=None):
+        self.base_filter = base_filter
+        self.and_filter = and_filter
+        self.or_filter = or_filter
+
+    def filter(self, message):
+        if self.and_filter:
+            return self.base_filter(message) and self.and_filter(message)
+        elif self.or_filter:
+            return self.base_filter(message) or self.or_filter(message)
+
+    def __repr__(self):
+        return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
+                                   self.and_filter or self.or_filter)
+
+
+class Filters(object):
+    """Predefined filters for use as the `filter` argument of :class:`telegram.ext.MessageHandler`.
+
+    Examples:
+        Use ``MessageHandler(Filters.video, callback_method)`` to filter all video
+        messages. Use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
+
+    """
+
+    class _All(BaseFilter):
+        name = 'Filters.all'
+
+        def filter(self, message):
+            return True
+
+    all = _All()
+    """:obj:`Filter`: All Messages."""
+
+    class _Text(BaseFilter):
+        name = 'Filters.text'
+
+        def filter(self, message):
+            return bool(message.text and not message.text.startswith('/'))
+
+    text = _Text()
+    """:obj:`Filter`: Text Messages."""
+
+    class _Command(BaseFilter):
+        name = 'Filters.command'
+
+        def filter(self, message):
+            return bool(message.text and message.text.startswith('/'))
+
+    command = _Command()
+    """:obj:`Filter`: Messages starting with ``/``."""
+
+    class _Reply(BaseFilter):
+        name = 'Filters.reply'
+
+        def filter(self, message):
+            return bool(message.reply_to_message)
+
+    reply = _Reply()
+    """:obj:`Filter`: Messages that are a reply to another message."""
+
+    class _Audio(BaseFilter):
+        name = 'Filters.audio'
+
+        def filter(self, message):
+            return bool(message.audio)
+
+    audio = _Audio()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Audio`."""
+
+    class _Document(BaseFilter):
+        name = 'Filters.document'
+
+        class category(BaseFilter):
+            """This Filter filters documents by their category in the mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of the document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.category("audio/") returnes `True` for all types
+                of audio sent as file, for example "audio/mpeg" or "audio/x-wav"
+            """
+
+            def __init__(self, category):
+                """Initialize the category you want to filter
+
+                Args:
+                    category (str, optional): category of the media you want to filter"""
+                self.category = category
+                self.name = "Filters.document.category(\"{}\")".format(self.category)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type.startswith(self.category)
+
+        application = category("application/")
+        audio = category("audio/")
+        image = category("image/")
+        video = category("video/")
+        text = category("text/")
+
+        class file_type(BaseFilter):
+            """This Filter filters documents by their mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.file_type("audio/mpeg") filters all audio in mp3 format.
+            """
+
+            def __init__(self, filetype):
+                """Initialize the category you want to filter
+
+                Args:
+                    filetype (str, optional): mime_type of the media you want to filter"""
+                self.filetype = filetype
+                self.name = "Filters.document.Filetype(\"{}\")".format(self.filetype)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type == self.filetype
+
+        apk = file_type("application/vnd.android.package-archive")
+        doc = file_type("application/msword")
+        docx = file_type("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        exe = file_type("application/x-ms-dos-executable")
+        gif = file_type("video/mp4")
+        jpg = file_type("image/jpeg")
+        mp3 = file_type("audio/mpeg")
+        pdf = file_type("application/pdf")
+        py = file_type("text/x-python")
+        svg = file_type("image/svg+xml")
+        txt = file_type("text/plain")
+        targz = file_type("application/x-compressed-tar")
+        wav = file_type("audio/x-wav")
+        xml = file_type("application/xml")
+        zip = file_type("application/zip")
+
+        def filter(self, message):
+            return bool(message.document)
+
+    document = _Document()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
+
+    class file_size(BaseFilter):
+        """This Filter filters all messages with a `file_size` attribute."""
+
+        def __init__(self, min=None, max=None):
+            """Initialize the limits of the file_size in the `__init__` method.
+
+            Note:
+                If no limits are given, the filter returns `True` for every message
+                with file_size attritute
+
+            Args:
+                min (int, optional): Minimum `file_size` of the message media in Byte.
+                max (int, optional): Maximum `file_size` of the message media in Byte.
+            """
+            self.min = min
+            self.max = max
+            self.name = "Filters.file_size(min={0}, max={1})".format(self.min, self.max)
+
+        def filter(self, message):
+            if message.audio:
+                filesize = message.audio.file_size
+            elif message.document:
+                filesize = message.document.file_size
+            elif message.photo:
+                filesize = message.photo.file_size
+            elif message.sticker:
+                filesize = message.sticker.file_size
+            elif message.video:
+                filesize = message.video.file_size
+            elif message.voice:
+                filesize = message.voice.file_size
+            else:
+                return False
+            if self.min is not None:
+                if filesize < self.min:
+                    return False
+            if self.max is not None:
+                if filesize > self.max:
+                    return False
+            return True
+
+    class _Photo(BaseFilter):
+        name = 'Filters.photo'
+
+        def filter(self, message):
+            return bool(message.photo)
+
+    photo = _Photo()
+    """:obj:`Filter`: Messages that contain :class:`telegram.PhotoSize`."""
+
+    class _Sticker(BaseFilter):
+        name = 'Filters.sticker'
+
+        def filter(self, message):
+            return bool(message.sticker)
+
+    sticker = _Sticker()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Sticker`."""
+
+    class _Video(BaseFilter):
+        name = 'Filters.video'
+
+        def filter(self, message):
+            return bool(message.video)
+
+    video = _Video()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Video`."""
+
+    class _Voice(BaseFilter):
+        name = 'Filters.voice'
+
+        def filter(self, message):
+            return bool(message.voice)
+
+    voice = _Voice()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Voice`."""
+
+    class _Contact(BaseFilter):
+        name = 'Filters.contact'
+
+        def filter(self, message):
+            return bool(message.contact)
+
+    contact = _Contact()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Contact`."""
+
+    class _Location(BaseFilter):
+        name = 'Filters.location'
+
+        def filter(self, message):
+            return bool(message.location)
+
+    location = _Location()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Location`."""
+
+    class _Venue(BaseFilter):
+        name = 'Filters.venue'
+
+        def filter(self, message):
+            return bool(message.venue)
+
+    venue = _Venue()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Venue`."""
+
+    class _StatusUpdate(BaseFilter):
+        """Subset for messages containing a status update.
+
+        Examples:
+            Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+            ``Filters.status_update`` for all status update messages.
+
+        """
+
+        class _NewChatMembers(BaseFilter):
+            name = 'Filters.status_update.new_chat_members'
+
+            def filter(self, message):
+                return bool(message.new_chat_members)
+
+        new_chat_members = _NewChatMembers()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_member`."""
+
+        class _LeftChatMember(BaseFilter):
+            name = 'Filters.status_update.left_chat_member'
+
+            def filter(self, message):
+                return bool(message.left_chat_member)
+
+        left_chat_member = _LeftChatMember()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.left_chat_member`."""
+
+        class _NewChatTitle(BaseFilter):
+            name = 'Filters.status_update.new_chat_title'
+
+            def filter(self, message):
+                return bool(message.new_chat_title)
+
+        new_chat_title = _NewChatTitle()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_title`."""
+
+        class _NewChatPhoto(BaseFilter):
+            name = 'Filters.status_update.new_chat_photo'
+
+            def filter(self, message):
+                return bool(message.new_chat_photo)
+
+        new_chat_photo = _NewChatPhoto()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_photo`."""
+
+        class _DeleteChatPhoto(BaseFilter):
+            name = 'Filters.status_update.delete_chat_photo'
+
+            def filter(self, message):
+                return bool(message.delete_chat_photo)
+
+        delete_chat_photo = _DeleteChatPhoto()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
+
+        class _ChatCreated(BaseFilter):
+            name = 'Filters.status_update.chat_created'
+
+            def filter(self, message):
+                return bool(message.group_chat_created or message.supergroup_chat_created or
+                            message.channel_chat_created)
+
+        chat_created = _ChatCreated()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.group_chat_created`,
+            :attr: `telegram.Message.supergroup_chat_created` or
+            :attr: `telegram.Message.channel_chat_created`."""
+
+        class _Migrate(BaseFilter):
+            name = 'Filters.status_update.migrate'
+
+            def filter(self, message):
+                return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
+
+        migrate = _Migrate()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
+            :attr: `telegram.Message.migrate_from_chat_id`."""
+
+        class _PinnedMessage(BaseFilter):
+            name = 'Filters.status_update.pinned_message'
+
+            def filter(self, message):
+                return bool(message.pinned_message)
+
+        pinned_message = _PinnedMessage()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.pinned_message`."""
+
+        name = 'Filters.status_update'
+
+        def filter(self, message):
+            return bool(self.new_chat_members(message) or self.left_chat_member(message) or
+                        self.new_chat_title(message) or self.new_chat_photo(message) or
+                        self.delete_chat_photo(message) or self.chat_created(message) or
+                        self.migrate(message) or self.pinned_message(message))
+
+    status_update = _StatusUpdate()
+    """Subset for messages containing a status update.
+
+    Examples:
+        Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+        ``Filters.status_update`` for all status update messages.
+
+    Attributes:
+        chat_created (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.group_chat_created`,
+            :attr:`telegram.Message.supergroup_chat_created` or
+            :attr:`telegram.Message.channel_chat_created`.
+        delete_chat_photo (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.delete_chat_photo`.
+        left_chat_member (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.left_chat_member`.
+        migrate (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.migrate_from_chat_id` or
+            :attr: `telegram.Message.migrate_from_chat_id`.
+        new_chat_members (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.new_chat_member`.
+        new_chat_photo (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.new_chat_photo`.
+        new_chat_title (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.new_chat_title`.
+        pinned_message (:obj:`Filter`): Messages that contain
+            :attr:`telegram.Message.pinned_message`.
+    """
+
+    class _Forwarded(BaseFilter):
+        name = 'Filters.forwarded'
+
+        def filter(self, message):
+            return bool(message.forward_date)
+
+    forwarded = _Forwarded()
+    """:obj:`Filter`: Messages that are forwarded."""
+
+    class _Game(BaseFilter):
+        name = 'Filters.game'
+
+        def filter(self, message):
+            return bool(message.game)
+
+    game = _Game()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Game`."""
+
+    class entity(BaseFilter):
+        """
+        Filters messages to only allow those which have a :class:`telegram.MessageEntity`
+        where their `type` matches `entity_type`.
+
+        Examples:
+            Example ``MessageHandler(Filters.entity("hashtag"), callback_method)``
+
+        Args:
+            entity_type: Entity type to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        """
+
+        def __init__(self, entity_type):
+            self.entity_type = entity_type
+            self.name = 'Filters.entity({})'.format(self.entity_type)
+
+        def filter(self, message):
+            return any([entity.type == self.entity_type for entity in message.entities])
+
+    class _Private(BaseFilter):
+        name = 'Filters.private'
+
+        def filter(self, message):
+            return message.chat.type == Chat.PRIVATE
+
+    private = _Private()
+    """:obj:`Filter`: Messages sent in a private chat."""
+
+    class _Group(BaseFilter):
+        name = 'Filters.group'
+
+        def filter(self, message):
+            return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
+
+    group = _Group()
+    """:obj:`Filter`: Messages sent in a group chat."""
+
+    class user(BaseFilter):
+        """Filters messages to allow only those which are from specified user ID.
+
+        Examples:
+            ``MessageHandler(Filters.user(1234), callback_method)``
+
+        Args:
+            user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow through.
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
+                If username starts with '@' symbol, it will be ignored.
+
+        Raises:
+            ValueError: If chat_id and username are both present, or neither is.
+
+        """
+
+        def __init__(self, user_id=None, username=None):
+            if not (bool(user_id) ^ bool(username)):
+                raise ValueError('One and only one of user_id or username must be used')
+            if user_id is not None and isinstance(user_id, int):
+                self.user_ids = [user_id]
+            else:
+                self.user_ids = user_id
+            if username is None:
+                self.usernames = username
+            elif isinstance(username, string_types):
+                self.usernames = [username.replace('@', '')]
+            else:
+                self.usernames = [user.replace('@', '') for user in username]
+
+        def filter(self, message):
+            if self.user_ids is not None:
+                return bool(message.from_user and message.from_user.id in self.user_ids)
+            else:
+                # self.usernames is not None
+                return bool(message.from_user and message.from_user.username and
+                            message.from_user.username in self.usernames)
+
+    class chat(BaseFilter):
+        """Filters messages to allow only those which are from specified chat ID.
+
+        Examples:
+            ``MessageHandler(Filters.chat(-1234), callback_method)``
+
+        Args:
+            chat_id(:obj:`int` | List[:obj:`int`], optional): Which chat ID(s) to allow through.
+            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
+                If username start swith '@' symbol, it will be ignored.
+
+        Raises:
+            ValueError: If chat_id and username are both present, or neither is.
+
+        """
+
+        def __init__(self, chat_id=None, username=None):
+            if not (bool(chat_id) ^ bool(username)):
+                raise ValueError('One and only one of chat_id or username must be used')
+            if chat_id is not None and isinstance(chat_id, int):
+                self.chat_ids = [chat_id]
+            else:
+                self.chat_ids = chat_id
+            if username is None:
+                self.usernames = username
+            elif isinstance(username, string_types):
+                self.usernames = [username.replace('@', '')]
+            else:
+                self.usernames = [chat.replace('@', '') for chat in username]
+
+        def filter(self, message):
+            if self.chat_ids is not None:
+                return bool(message.chat_id in self.chat_ids)
+            else:
+                # self.usernames is not None
+                return bool(message.chat.username and message.chat.username in self.usernames)
+
+    class _Invoice(BaseFilter):
+        name = 'Filters.invoice'
+
+        def filter(self, message):
+            return bool(message.invoice)
+
+    invoice = _Invoice()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Invoice`."""
+
+    class _SuccessfulPayment(BaseFilter):
+        name = 'Filters.successful_payment'
+
+        def filter(self, message):
+            return bool(message.successful_payment)
+
+    successful_payment = _SuccessfulPayment()
+    """:obj:`Filter`: Messages that confirm a :class:`telegram.SuccessfulPayment`."""
+
+    class language(BaseFilter):
+        """Filters messages to only allow those which are from users with a certain language code.
+
+        Note: According to telegrams documentation, every single user does not have the
+        `language_code` attribute.
+
+        Examples:
+            ``MessageHandler(Filters.language("en"), callback_method)``
+
+        Args:
+            lang (:obj:`str` | List[:obj:`str`]): Which language code(s) to allow through. This
+                will be matched using ``.startswith`` meaning that 'en' will match both 'en_US'
+                and 'en_GB'.
+
+        """
+
+        def __init__(self, lang):
+            if isinstance(lang, string_types):
+                self.lang = [lang]
+            else:
+                self.lang = lang
+            self.name = 'Filters.language({})'.format(self.lang)
+
+        def filter(self, message):
+            return message.from_user.language_code and any(
+                [message.from_user.language_code.startswith(x) for x in self.lang])
