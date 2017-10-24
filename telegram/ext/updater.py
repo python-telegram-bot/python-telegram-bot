@@ -199,9 +199,12 @@ class Updater(object):
 
                 # Create & start threads
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher")
+                dispatcher_ready = Event()
+                self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
                                   read_latency, bootstrap_retries, clean, allowed_updates)
+
+                dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
