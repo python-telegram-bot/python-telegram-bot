@@ -277,3 +277,27 @@ class TestConversationHandler(object):
         message = Message(0, None, None, Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
         update = Update(0, message=message)
         assert not handler.check_update(update)
+
+    def test_conversation_timeout(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, then reach timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+        # Start state machine, do something, then reach timeout
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
