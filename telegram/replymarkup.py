@@ -29,3 +29,6 @@ class ReplyMarkup(TelegramObject):
 
     """
     pass
+
+    def never_to_use_test_method(self):
+        print("this will never be calld")
