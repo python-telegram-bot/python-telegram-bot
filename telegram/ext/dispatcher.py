@@ -33,6 +33,8 @@ from future.builtins import range
 from telegram import TelegramError
 from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
+from telegram.ext import BasePersistence
+
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 DEFAULT_GROUP = 0
@@ -70,6 +72,8 @@ class Dispatcher(object):
             instance to pass onto handler callbacks.
         workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
             decorator.
+        user_data (:obj:`dict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`dict`): A dictionary handlers can use to store data for the chat.
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -86,16 +90,33 @@ class Dispatcher(object):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None, persistence=None):
         self.bot = bot
         self.update_queue = update_queue
-        self.job_queue = job_queue
         self.workers = workers
+        if persistence:
+            if not isinstance(persistence, BasePersistence):
+                self.logger.warning("persistence should be based on Telegram.ext.BasePersistence")
+            self.persistence = persistence
+        else:
+            self.persistence = None
 
-        self.user_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the user."""
-        self.chat_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the chat."""
+        if self.persistence:
+            if self.persistence.store_user_data:
+                self.user_data = self.persistence.get_user_data()
+                if not isinstance(self.user_data, defaultdict):
+                    raise ValueError("user_data must be of type defaultdict")
+            else:
+                self.user_data = defaultdict(dict)
+            if self.persistence.store_chat_data:
+                self.chat_data = self.persistence.get_chat_data()
+                if not isinstance(self.chat_data, defaultdict):
+                    raise ValueError("`chat_data must be of type defaultdict")
+            else:
+                self.chat_data = defaultdict(dict)
+
+        self.job_queue = job_queue
+
         self.handlers = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
@@ -324,11 +345,17 @@ class Dispatcher(object):
             group (:obj:`int`, optional): The group identifier. Default is 0.
 
         """
+        # Unfortunately due to circular imports this has to be here
+        from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
             raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
+        if isinstance(handler, ConversationHandler) and handler.persistent:
+            if not self.persistence:
+                raise ValueError("Conversationhandler {} can not be persistent if logger has no persistence", handler.name)
+            handler.conversations = self.persistence.get_conversations(handler.name)
 
         if group not in self.handlers:
             self.handlers[group] = list()

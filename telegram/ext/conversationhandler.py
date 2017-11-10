@@ -124,7 +124,9 @@ class ConversationHandler(Handler):
                  timed_out_behavior=None,
                  per_chat=True,
                  per_user=True,
-                 per_message=False):
+                 per_message=False,
+                 name=None,
+                 persistent=False):
 
         self.entry_points = entry_points
         self.states = states
@@ -136,6 +138,10 @@ class ConversationHandler(Handler):
         self.per_user = per_user
         self.per_chat = per_chat
         self.per_message = per_message
+        self.name = name
+        if persistent and not self.name:
+            raise ValueError("Conversations can't be persistent when handler is unnamed.")
+        self.persistent = persistent
 
         self.conversations = dict()
         self.current_conversation = None

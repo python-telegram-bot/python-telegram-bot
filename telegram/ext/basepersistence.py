@@ -19,16 +19,21 @@
 """This module contains the BasePersistence class."""
 
 class BasePersistence(object):
-    def __init__(self):
-        pass
+    def __init__(self, store_job_queue=False, store_user_data=False, store_chat_data=False):
+        self.store_job_queue = store_job_queue
+        self.store_user_data = store_user_data
+        self.store_chat_data = store_chat_data
 
     def get_job_queue(self):
         raise NotImplemented
 
-    def get_datas(self):
+    def get_user_data(self):
         raise NotImplemented
 
-    def get_conversation(self):
+    def get_chat_data(self):
+        raise NotImplemented
+
+    def get_conversations(self):
         raise NotImplemented
 
     def change_conversation(self):
