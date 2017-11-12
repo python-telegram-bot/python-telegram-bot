@@ -242,6 +242,7 @@ class Request(object):
 
     def post(self, url, data, timeout=None):
         """Request an URL.
+
         Args:
             url (:obj:`str`): The web location we want to retrieve.
             data (dict[str, str|int]): A dict of key/value pairs. Note: On py2.7 value is unicode.
@@ -291,6 +292,7 @@ class Request(object):
 
     def download(self, url, filename, timeout=None):
         """Download a file by its URL.
+
         Args:
             url (str): The web location we want to retrieve.
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
