@@ -3,8 +3,8 @@ telegram package
 
 .. toctree::
 
-   telegram.utils.helpers
    telegram.ext
+   telegram.utils
    telegram.audio
    telegram.bot
    telegram.callbackquery
