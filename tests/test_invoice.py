@@ -32,6 +32,7 @@ def invoice():
 class TestInvoice(object):
     payload = 'payload'
     prices = [LabeledPrice('Fish', 100), LabeledPrice('Fish Tax', 1000)]
+    provider_data = """{"test":"test"}"""
     title = 'title'
     description = 'description'
     start_parameter = 'start_parameter'
@@ -88,6 +89,7 @@ class TestInvoice(object):
             self.start_parameter,
             self.currency,
             self.prices,
+            provider_data=self.provider_data,
             photo_url='https://raw.githubusercontent.com/'
                       'python-telegram-bot/logos/master/'
                       'logo/png/ptb-logo_240.png',

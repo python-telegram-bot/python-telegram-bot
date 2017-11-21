@@ -104,8 +104,8 @@ class TestBot(object):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
-    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice
-    # and send_video_note are tested in their respective test modules. No need to duplicate here.
+    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note
+    # and send_media_group are tested in their respective test modules. No need to duplicate here.
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

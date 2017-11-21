@@ -1,0 +1,116 @@
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2017
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pytest
+
+from telegram import InputMediaVideo, InputMediaPhoto, Message
+
+
+@pytest.fixture(scope='class')
+def input_media_video():
+    return InputMediaVideo(media=TestInputMediaVideo.media,
+                           caption=TestInputMediaVideo.caption,
+                           width=TestInputMediaVideo.width,
+                           height=TestInputMediaVideo.height,
+                           duration=TestInputMediaVideo.duration)
+
+
+@pytest.fixture(scope='class')
+def input_media_photo():
+    return InputMediaPhoto(media=TestInputMediaPhoto.media,
+                           caption=TestInputMediaPhoto.caption)
+
+
+class TestInputMediaVideo(object):
+    type = "video"
+    media = "NOTAREALFILEID"
+    caption = "My Caption"
+    width = 3
+    height = 4
+    duration = 5
+
+    def test_expected_values(self, input_media_video):
+        assert input_media_video.type == self.type
+        assert input_media_video.media == self.media
+        assert input_media_video.caption == self.caption
+        assert input_media_video.width == self.width
+        assert input_media_video.height == self.height
+        assert input_media_video.duration == self.duration
+
+    def test_to_dict(self, input_media_video):
+        input_media_video_dict = input_media_video.to_dict()
+        assert input_media_video_dict['type'] == input_media_video.type
+        assert input_media_video_dict['media'] == input_media_video.media
+        assert input_media_video_dict['caption'] == input_media_video.caption
+        assert input_media_video_dict['width'] == input_media_video.width
+        assert input_media_video_dict['height'] == input_media_video.height
+        assert input_media_video_dict['duration'] == input_media_video.duration
+
+    def test_with_video(self, video):
+        # fixture found in test_video
+        imv = InputMediaVideo(video, caption="test 3")
+        assert imv.type == self.type
+        assert imv.media == video.file_id
+        assert imv.width == video.width
+        assert imv.height == video.height
+        assert imv.duration == video.duration
+        assert imv.caption == "test 3"
+
+    def test_error_with_file(self, video_file):
+        # fixture found in test_video
+        with pytest.raises(ValueError, match="only support file_id or url as a valid media"):
+            InputMediaPhoto(video_file)
+
+
+class TestInputMediaPhoto(object):
+    type = "photo"
+    media = "NOTAREALFILEID"
+    caption = "My Caption"
+
+    def test_expected_values(self, input_media_photo):
+        assert input_media_photo.type == self.type
+        assert input_media_photo.media == self.media
+        assert input_media_photo.caption == self.caption
+
+    def test_to_dict(self, input_media_photo):
+        input_media_photo_dict = input_media_photo.to_dict()
+        assert input_media_photo_dict['type'] == input_media_photo.type
+        assert input_media_photo_dict['media'] == input_media_photo.media
+        assert input_media_photo_dict['caption'] == input_media_photo.caption
+
+    def test_with_photo(self, photo):
+        # fixture found in test_photo
+        imp = InputMediaPhoto(photo, caption="test 2")
+        assert imp.type == self.type
+        assert imp.media == photo.file_id
+        assert imp.caption == "test 2"
+
+    def test_error_with_file(self, photo_file):
+        # fixture found in test_photo
+        with pytest.raises(ValueError, match="only support file_id or url as a valid media"):
+            InputMediaPhoto(photo_file)
+
+
+class TestSendMediaGroup(object):
+    def test_send_media_group_photo(self, bot, chat_id, photo, video, thumb):
+        media = [InputMediaPhoto(photo), InputMediaPhoto(thumb)]
+        messages = bot.send_media_group(chat_id, media)
+        assert isinstance(messages, list)
+        assert len(messages) == 2
+        assert all([isinstance(mes, Message) for mes in messages])
+        assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
