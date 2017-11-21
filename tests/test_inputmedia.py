@@ -19,6 +19,8 @@
 import pytest
 
 from telegram import InputMediaVideo, InputMediaPhoto, Message
+from .test_video import video, video_file
+from .test_photo import _photo, photo_file, photo, thumb
 
 
 @pytest.fixture(scope='class')
@@ -107,7 +109,7 @@ class TestInputMediaPhoto(object):
 
 
 class TestSendMediaGroup(object):
-    def test_send_media_group_photo(self, bot, chat_id, photo, video, thumb):
+    def test_send_media_group_photo(self, bot, chat_id, photo, thumb):
         media = [InputMediaPhoto(photo), InputMediaPhoto(thumb)]
         messages = bot.send_media_group(chat_id, media)
         assert isinstance(messages, list)
