@@ -107,6 +107,8 @@ def check_object(h4):
             field = 'from_user'
         elif name.startswith('InlineQueryResult') and field == 'type':
             continue
+        elif name.startswith('InputMedia') and field == 'type':
+            continue
         elif field == 'remove_keyboard':
             continue
 
