@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
+from flaky import flaky
 
 from telegram import InputMediaVideo, InputMediaPhoto, Message
 from .test_video import video, video_file
@@ -108,10 +109,27 @@ class TestInputMediaPhoto(object):
             InputMediaPhoto(photo_file)
 
 
+@pytest.fixture(scope='function')
+def media_group(photo, thumb):
+    return [InputMediaPhoto(photo), InputMediaPhoto(thumb)]
+
+
 class TestSendMediaGroup(object):
-    def test_send_media_group_photo(self, bot, chat_id, photo, thumb):
-        media = [InputMediaPhoto(photo), InputMediaPhoto(thumb)]
-        messages = bot.send_media_group(chat_id, media)
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_media_group_photo(self, bot, chat_id, media_group):
+        messages = bot.send_media_group(chat_id, media_group)
+        assert isinstance(messages, list)
+        assert len(messages) == 2
+        assert all([isinstance(mes, Message) for mes in messages])
+        assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_media_group_all_args(self, bot, chat_id, media_group):
+        m1 = bot.send_message(chat_id, text="test")
+        messages = bot.send_media_group(chat_id, media_group, disable_notification=True,
+                                        reply_to_message_id=m1.message_id)
         assert isinstance(messages, list)
         assert len(messages) == 2
         assert all([isinstance(mes, Message) for mes in messages])
