@@ -135,6 +135,6 @@ class TestSendMediaGroup(object):
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
-    @pytest.makr.skip(reason="Needs a rework to send new files")
+    @pytest.mark.skip(reason="Needs a rework to send new files")
     def test_send_media_group_new_files(self):
         pass
