@@ -5,5 +5,5 @@ flaky
 yapf
 pre-commit
 beautifulsoup4
-pytest
+pytest<3.3
 pytest-timeout
