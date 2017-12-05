@@ -786,7 +786,7 @@ class Bot(TelegramObject):
             :class:`telegram.TelegramError`
         """
         # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
-        
+
         url = '{0}/sendMediaGroup'.format(self.base_url)
 
         media = [med.to_dict() for med in media]
