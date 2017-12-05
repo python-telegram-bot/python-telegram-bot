@@ -40,6 +40,8 @@ class InputMediaPhoto(InputMedia):
         At the moment using a new file is not yet supported.
     """
 
+    # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
+
     def __init__(self, media, caption=None):
         self.type = 'photo'
 

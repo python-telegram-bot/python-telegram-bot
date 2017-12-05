@@ -66,13 +66,13 @@ class TestInputMediaVideo(object):
 
     def test_with_video(self, video):
         # fixture found in test_video
-        imv = InputMediaVideo(video, caption="test 3")
-        assert imv.type == self.type
-        assert imv.media == video.file_id
-        assert imv.width == video.width
-        assert imv.height == video.height
-        assert imv.duration == video.duration
-        assert imv.caption == "test 3"
+        input_media_video = InputMediaVideo(video, caption="test 3")
+        assert input_media_video.type == self.type
+        assert input_media_video.media == video.file_id
+        assert input_media_video.width == video.width
+        assert input_media_video.height == video.height
+        assert input_media_video.duration == video.duration
+        assert input_media_video.caption == "test 3"
 
     def test_error_with_file(self, video_file):
         # fixture found in test_video
@@ -134,3 +134,7 @@ class TestSendMediaGroup(object):
         assert len(messages) == 2
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
+
+    @pytest.makr.skip(reason="Needs a rework to send new files")
+    def test_send_media_group_new_files(self):
+        pass
