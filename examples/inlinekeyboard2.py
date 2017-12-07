@@ -64,6 +64,7 @@ def second(bot, update):
         message_id=query.message.message_id,
         text="Second CallbackQueryHandler"
     )
+    return ConversationHandler.END
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"', (update, error))    
