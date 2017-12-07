@@ -340,7 +340,7 @@ class Bot(TelegramObject):
         """Use this method to send photos.
 
         Note:
-            The video argument can be either a file_id, an URL or a file from disk
+            The photo argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
         Args:
