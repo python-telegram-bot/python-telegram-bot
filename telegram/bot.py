@@ -21,6 +21,7 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+import json
 import logging
 import warnings
 from datetime import datetime
@@ -2215,9 +2216,10 @@ class Bot(TelegramObject):
             currency (:obj:`str`): Three-letter ISO 4217 currency code.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list of components
                 (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.).
-            provider_data (:obj:`str`, optional): JSON-encoded data about the invoice, which will
-                be shared with the payment provider. A detailed description of required fields
-                should be provided by the payment provider.
+            provider_data (:obj:`str` | :obj:`object`, optional): JSON-encoded data about the
+                invoice, which will be shared with the payment provider. A detailed description of
+                required fields should be provided by the payment provider. When an object is
+                passed, it will be encoded as JSON.
             photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a
                 photo of the goods or a marketing image for a service. People like it better when
                 they see what they are paying for.
@@ -2266,7 +2268,10 @@ class Bot(TelegramObject):
             'prices': [p.to_dict() for p in prices]
         }
         if provider_data is not None:
-            data['provider_data'] = provider_data
+            if isinstance(provider_data, str):
+                data['provider_data'] = provider_data
+            else:
+                data['provider_data'] = json.dumps(provider_data)
         if photo_url is not None:
             data['photo_url'] = photo_url
         if photo_size is not None:
