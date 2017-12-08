@@ -26,6 +26,8 @@ import logging
 import warnings
 from datetime import datetime
 
+from future.utils import string_types
+
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Voice, VideoNote, Location,
@@ -2268,7 +2270,7 @@ class Bot(TelegramObject):
             'prices': [p.to_dict() for p in prices]
         }
         if provider_data is not None:
-            if isinstance(provider_data, str):
+            if isinstance(provider_data, string_types):
                 data['provider_data'] = provider_data
             else:
                 data['provider_data'] = json.dumps(provider_data)
