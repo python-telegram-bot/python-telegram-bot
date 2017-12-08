@@ -142,6 +142,9 @@ class ConversationHandler(Handler):
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
         self.persistent = persistent
+        self.persistence = None
+        """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
+        Set by dispatcher"""
 
         self.conversations = dict()
         self.current_conversation = None
@@ -315,3 +318,6 @@ class ConversationHandler(Handler):
 
         elif new_state is not None:
             self.conversations[key] = new_state
+
+        if self.persistent:
+            self.persistence.update_conversation(self.conversations)

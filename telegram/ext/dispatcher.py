@@ -35,7 +35,6 @@ from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
 from telegram.ext import BasePersistence
 
-
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 DEFAULT_GROUP = 0
 
@@ -50,6 +49,7 @@ def run_async(func):
     Note: Use this decorator to run handlers asynchronously.
 
     """
+
     @wraps(func)
     def async_func(*args, **kwargs):
         return Dispatcher.get_instance().run_async(func, *args, **kwargs)
@@ -90,7 +90,8 @@ class Dispatcher(object):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None, persistence=None):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None,
+                 persistence=None):
         self.bot = bot
         self.update_queue = update_queue
         self.workers = workers
@@ -298,6 +299,11 @@ class Dispatcher(object):
             try:
                 for handler in (x for x in self.handlers[group] if x.check_update(update)):
                     handler.handle_update(update, self)
+                    if self.persistence:
+                        if self.persistence.store_chat_data:
+                            self.persistence.update_chat_data(self.chat_data)
+                        if self.persistence.store_user_data:
+                            self.persistence.update_user_data(self.user_data)
                     break
 
             # Stop processing with any other handler.
@@ -354,8 +360,11 @@ class Dispatcher(object):
             raise TypeError('group is not int')
         if isinstance(handler, ConversationHandler) and handler.persistent:
             if not self.persistence:
-                raise ValueError("Conversationhandler {} can not be persistent if logger has no persistence", handler.name)
+                raise ValueError(
+                    "Conversationhandler {} can not be persistent if logger has no persistence",
+                    handler.name)
             handler.conversations = self.persistence.get_conversations(handler.name)
+            handler.persistence = self.persistence
 
         if group not in self.handlers:
             self.handlers[group] = list()
