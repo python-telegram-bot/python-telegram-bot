@@ -48,6 +48,8 @@ class Message(TelegramObject):
         forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
         reply_to_message (:class:`telegram.Message`): Optional. The original message.
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited.
+        media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
+            message belongs to.
         text (:obj:`str`): Optional. The actual UTF-8 text of the message.
         entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
             usernames, URLs, bot commands, etc. that appear in the text. See
@@ -117,6 +119,8 @@ class Message(TelegramObject):
             ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
+        media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
+            message belongs to.
         text (str, optional): For text messages, the actual UTF-8 text of the message, 0-4096
             characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
@@ -232,6 +236,7 @@ class Message(TelegramObject):
                  successful_payment=None,
                  forward_signature=None,
                  author_signature=None,
+                 media_group_id=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -277,6 +282,7 @@ class Message(TelegramObject):
         self.successful_payment = successful_payment
         self.forward_signature = forward_signature
         self.author_signature = author_signature
+        self.media_group_id = media_group_id
 
         self.bot = bot
 

@@ -32,6 +32,7 @@ def invoice():
 class TestInvoice(object):
     payload = 'payload'
     prices = [LabeledPrice('Fish', 100), LabeledPrice('Fish Tax', 1000)]
+    provider_data = """{"test":"test"}"""
     title = 'title'
     description = 'description'
     start_parameter = 'start_parameter'
@@ -88,6 +89,7 @@ class TestInvoice(object):
             self.start_parameter,
             self.currency,
             self.prices,
+            provider_data=self.provider_data,
             photo_url='https://raw.githubusercontent.com/'
                       'python-telegram-bot/logos/master/'
                       'logo/png/ptb-logo_240.png',
@@ -105,3 +107,24 @@ class TestInvoice(object):
         assert message.invoice.description == self.description
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
+
+    def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
+        def test(_, url, data, **kwargs):
+            return data['provider_data'] == '{"test_data": 123456789}'
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
+                                provider_token, self.start_parameter, self.currency,
+                                self.prices, provider_data={'test_data': 123456789})
+
+    def test_send_nonesense_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
+        def test(_, url, data, **kwargs):
+            return True
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        with pytest.raises(TypeError):
+            assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
+                                provider_token, self.start_parameter, self.currency,
+                                self.prices, provider_data={'a', 'b', 'c'})

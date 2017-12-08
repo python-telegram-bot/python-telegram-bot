@@ -79,7 +79,10 @@ def message(bot):
                                                              'charge_id', 'provider_id',
                                                              order_info={})},
                     {'forward_signature': 'some_forward_sign'},
-                    {'author_signature': 'some_author_sign'}
+                    {'author_signature': 'some_author_sign'},
+                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                     'caption': 'photo_file',
+                     'media_group_id': 1234443322222}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
@@ -87,7 +90,7 @@ def message(bot):
                      'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
                      'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
                      'pinned', 'invoice', 'successful_payment', 'forward_signature',
-                     'author_signature'])
+                     'author_signature', 'photo_from_media_group'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,

@@ -21,9 +21,12 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+import json
 import logging
 import warnings
 from datetime import datetime
+
+from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
@@ -335,7 +338,7 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   timeout=20.,
+                   timeout=20,
                    **kwargs):
         """Use this method to send photos.
 
@@ -394,7 +397,7 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   timeout=20.,
+                   timeout=20,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -465,7 +468,7 @@ class Bot(TelegramObject):
                       disable_notification=False,
                       reply_to_message_id=None,
                       reply_markup=None,
-                      timeout=20.,
+                      timeout=20,
                       **kwargs):
         """Use this method to send general files.
 
@@ -576,7 +579,7 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   timeout=20.,
+                   timeout=20,
                    width=None,
                    height=None,
                    **kwargs):
@@ -646,7 +649,7 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   timeout=20.,
+                   timeout=20,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -708,7 +711,7 @@ class Bot(TelegramObject):
                         disable_notification=False,
                         reply_to_message_id=None,
                         reply_markup=None,
-                        timeout=20.,
+                        timeout=20,
                         **kwargs):
         """Use this method to send video messages.
 
@@ -756,6 +759,51 @@ class Bot(TelegramObject):
             data['length'] = length
 
         return url, data
+
+    @log
+    def send_media_group(self,
+                         chat_id,
+                         media,
+                         disable_notification=None,
+                         reply_to_message_id=None,
+                         timeout=20,
+                         **kwargs):
+        """Use this method to send a group of photos or videos as an album.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            media (List[:class:`telegram.InputMedia`]): An array describing photos and videos to be
+                sent, must include 2–10 items.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            List[:class:`telegram.Message`]: An array of the sent Messages.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
+
+        url = '{0}/sendMediaGroup'.format(self.base_url)
+
+        media = [med.to_dict() for med in media]
+
+        data = {'chat_id': chat_id, 'media': media}
+
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
+        if disable_notification:
+            data['disable_notification'] = disable_notification
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return [Message.de_json(res, self) for res in result]
 
     @log
     @message
@@ -2153,6 +2201,7 @@ class Bot(TelegramObject):
                      disable_notification=False,
                      reply_to_message_id=None,
                      reply_markup=None,
+                     provider_data=None,
                      timeout=None,
                      **kwargs):
         """Use this method to send invoices.
@@ -2169,6 +2218,10 @@ class Bot(TelegramObject):
             currency (:obj:`str`): Three-letter ISO 4217 currency code.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list of components
                 (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.).
+            provider_data (:obj:`str` | :obj:`object`, optional): JSON-encoded data about the
+                invoice, which will be shared with the payment provider. A detailed description of
+                required fields should be provided by the payment provider. When an object is
+                passed, it will be encoded as JSON.
             photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a
                 photo of the goods or a marketing image for a service. People like it better when
                 they see what they are paying for.
@@ -2216,7 +2269,11 @@ class Bot(TelegramObject):
             'currency': currency,
             'prices': [p.to_dict() for p in prices]
         }
-
+        if provider_data is not None:
+            if isinstance(provider_data, string_types):
+                data['provider_data'] = provider_data
+            else:
+                data['provider_data'] = json.dumps(provider_data)
         if photo_url is not None:
             data['photo_url'] = photo_url
         if photo_size is not None:
@@ -2965,6 +3022,7 @@ class Bot(TelegramObject):
     sendVideo = send_video
     sendVoice = send_voice
     sendVideoNote = send_video_note
+    sendMediaGroup = send_media_group
     sendLocation = send_location
     editMessageLiveLocation = edit_message_live_location
     stopMessageLiveLocation = stop_message_live_location
