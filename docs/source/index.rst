@@ -12,6 +12,10 @@ objects in the package reflect the types as defined by the `telegram bot api <ht
 .. toctree::
    telegram
 
+Changelog
+---------
+
+.. include:: ..\\..\\CHANGES.rst
 
 Indices and tables
 ==================
