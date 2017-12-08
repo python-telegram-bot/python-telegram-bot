@@ -1,6 +1,32 @@
 =======
 Changes
 =======
+**2017-12-08**
+*Released 9.0.0*
+
+Breaking changes (possibly)
+
+- Drop support for python 3.3 (PR `#930`_)
+
+
+New Features
+
+- Support Bot API 3.5 (PR `#920`_)
+
+
+Changes
+
+- Fix race condition in dispatcher start/stop (`#887`_)
+- Log error trace if there is no error handler registered (`#694`_)
+- Update examples with consistent string formatting (`#870`_)
+- Various changes and improvements to the docs.
+
+.. _`#920`: https://github.com/python-telegram-bot/python-telegram-bot/pull/920
+.. _`#930`: https://github.com/python-telegram-bot/python-telegram-bot/pull/930
+.. _`#887`: https://github.com/python-telegram-bot/python-telegram-bot/pull/887
+.. _`#694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/694
+.. _`#870`: https://github.com/python-telegram-bot/python-telegram-bot/pull/870
+
 **2017-10-15**
 *Released 8.1.1*
 
