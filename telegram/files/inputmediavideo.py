@@ -60,8 +60,7 @@ class InputMediaVideo(InputMedia):
             self.height = media.height
             self.duration = media.duration
         elif hasattr(media, 'read'):
-            raise ValueError('We only support file_id or url as a valid media. Sending files is '
-                             'not supported (yet).')
+            raise ValueError('Sending files is not supported (yet).  Use file_id, url or Video')
         else:
             self.media = media
 

@@ -76,8 +76,8 @@ class TestInputMediaVideo(object):
 
     def test_error_with_file(self, video_file):
         # fixture found in test_video
-        with pytest.raises(ValueError, match="only support file_id or url as a valid media"):
-            InputMediaPhoto(video_file)
+        with pytest.raises(ValueError, match="file_id, url or Video"):
+            InputMediaVideo(video_file)
 
 
 class TestInputMediaPhoto(object):
@@ -105,7 +105,7 @@ class TestInputMediaPhoto(object):
 
     def test_error_with_file(self, photo_file):
         # fixture found in test_photo
-        with pytest.raises(ValueError, match="only support file_id or url as a valid media"):
+        with pytest.raises(ValueError, match="file_id, url or PhotoSize"):
             InputMediaPhoto(photo_file)
 
 

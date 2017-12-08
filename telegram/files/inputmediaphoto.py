@@ -48,8 +48,8 @@ class InputMediaPhoto(InputMedia):
         if isinstance(media, PhotoSize):
             self.media = media.file_id
         elif hasattr(media, 'read'):
-            raise ValueError('We only support file_id or url as a valid media. Sending files is '
-                             'not supported (yet).')
+            raise ValueError(
+                'Sending files is not supported (yet).  Use file_id, url or PhotoSize')
         else:
             self.media = media
 
