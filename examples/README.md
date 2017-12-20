@@ -22,7 +22,7 @@ This example sheds some light on inline keyboards, callback queries and message 
 ### [`inlinebot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py)
 A basic example of an [inline bot](https://core.telegram.org/bots/inline). Don't forget to enable inline mode with [@BotFather](https://telegram.me/BotFather).
 
-### [`paymentbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/examples/inlinebot.py)
+### [`paymentbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/examples/paymentbot.py)
 A basic example of a bot that can accept payments. Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather).
 
 ## Pure API
