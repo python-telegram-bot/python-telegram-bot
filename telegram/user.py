@@ -83,6 +83,17 @@ class User(TelegramObject):
             return '%s %s' % (self.first_name, self.last_name)
         return self.first_name
 
+    @property
+    def full_name(self):
+        """
+        :obj:`str`: The users :attr:`first_name` and if present :attr:`last_name`.
+
+        """
+
+        if self.last_name:
+            return '%s %s' % (self.first_name, self.last_name)
+        return self.first_name
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
