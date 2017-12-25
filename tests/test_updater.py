@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import os
 import signal
 import sys
@@ -34,6 +35,7 @@ except ImportError:
 
 import pytest
 from future.builtins import bytes
+from testfixtures import LogCapture
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken
@@ -246,7 +248,16 @@ class TestUpdater(object):
     def test_idle(self, updater):
         updater.start_polling(0.01)
         Thread(target=self.signal_sender).start()
-        updater.idle()
+        with LogCapture(level=logging.INFO) as capture:
+            updater.idle()
+
+        capture.check(
+            ('telegram.ext.updater',
+             'INFO',
+             'Received signal {} (SIGTERM), stopping...'.format(
+                 signal.SIGTERM))
+        )
+
         # If we get this far, idle() ran through
         sleep(.5)
         assert updater.running is False

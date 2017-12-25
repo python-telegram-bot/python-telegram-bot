@@ -19,12 +19,25 @@
 """This module contains helper functions."""
 
 import re
+import signal
 from datetime import datetime
 
 try:
     from html import escape as escape_html  # noqa: F401
 except ImportError:
     from cgi import escape as escape_html  # noqa: F401
+
+
+# From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
+_signames = {v: k
+             for k, v in reversed(sorted(vars(signal).items()))
+             if k.startswith('SIG') and not k.startswith('SIG_')}
+
+
+def get_signal_name(signum):
+    """Returns the signal name of the given signal number."""
+    return _signames[signum]
+
 
 # Not using future.backports.datetime here as datetime value might be an input from the user,
 # making every isinstace() call more delicate. So we just use our own compat layer.

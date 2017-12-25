@@ -31,6 +31,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter
+from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
@@ -449,6 +450,8 @@ class Updater(object):
     def signal_handler(self, signum, frame):
         self.is_idle = False
         if self.running:
+            self.logger.info('Received signal {} ({}), stopping...'.format(
+                signum, get_signal_name(signum)))
             self.stop()
             if self.user_sig_handler:
                 self.user_sig_handler(signum, frame)
