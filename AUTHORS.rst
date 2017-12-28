@@ -29,6 +29,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
+- `Herrick Fang <https://github.com/fangherk>`_
 - `ihoru <https://github.com/ihoru>`_
 - `Jacob Bom <https://github.com/bomjacob>`_
 - `JASON0916 <https://github.com/JASON0916>`_
