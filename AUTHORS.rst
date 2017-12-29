@@ -22,6 +22,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
+- `Daniel Reed <https://github.com/nmlorg>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
