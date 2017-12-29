@@ -87,7 +87,7 @@ class PreCheckoutQuery(TelegramObject):
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
 
-        return cls(**data)
+        return cls(bot=bot, **data)
 
     def to_dict(self):
         data = super(PreCheckoutQuery, self).to_dict()

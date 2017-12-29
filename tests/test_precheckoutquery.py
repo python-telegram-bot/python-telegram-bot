@@ -55,6 +55,7 @@ class TestPreCheckoutQuery(object):
         }
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
 
+        assert pre_checkout_query.bot is bot
         assert pre_checkout_query.id == self.id
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id
