@@ -72,26 +72,27 @@ class User(TelegramObject):
     @property
     def name(self):
         """
-        :obj:`str`: The users :attr:`username` if available, if not it returns the first name and
-            if present :attr:`first_name` and :attr:`last_name`.
+        :obj:`str`: The user's :attr:`username` if available, otherwise returns :attr:`full_name`.
+
+        NOTE: This is a convenience property, not part of the official Telegram Bot API.
 
         """
 
         if self.username:
-            return '@%s' % self.username
-        if self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
-        return self.first_name
+            return '@{}'.format(self.username)
+        return self.full_name
 
     @property
     def full_name(self):
         """
-        :obj:`str`: The users :attr:`first_name` and if present :attr:`last_name`.
+        :obj:`str`: The user's :attr:`first_name`, followed by (if present) :attr:`last_name`.
+
+        NOTE: This is a convenience property, not part of the official Telegram Bot API.
 
         """
 
         if self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
+            return '{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
     @classmethod
