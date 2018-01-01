@@ -20,7 +20,8 @@ from time import sleep
 
 import pytest
 
-from telegram import Update, Message, User, Chat, CallbackQuery
+from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
+                      PreCheckoutQuery, ShippingQuery, Update, User)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler)
 
 
@@ -277,3 +278,19 @@ class TestConversationHandler(object):
         message = Message(0, None, None, Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
         update = Update(0, message=message)
         assert not handler.check_update(update)
+
+    def test_all_update_types(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)],
+                                      states={}, fallbacks=[])
+        message = Message(0, user1, None, self.group, text='ignore', bot=bot)
+        callback_query = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
+        chosen_inline_result = ChosenInlineResult(0, user1, 'query', bot=bot)
+        inline_query = InlineQuery(0, user1, 'query', 0, bot=bot)
+        pre_checkout_query = PreCheckoutQuery(0, user1, 'USD', 100, [], bot=bot)
+        shipping_query = ShippingQuery(0, user1, [], None, bot=bot)
+        assert not handler.check_update(Update(0, callback_query=callback_query))
+        assert not handler.check_update(Update(0, chosen_inline_result=chosen_inline_result))
+        assert not handler.check_update(Update(0, inline_query=inline_query))
+        assert not handler.check_update(Update(0, message=message))
+        assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
+        assert not handler.check_update(Update(0, shipping_query=shipping_query))
