@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
+# flake8: noqa E501
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
@@ -1305,7 +1306,7 @@ class Bot(TelegramObject):
         return UserProfilePhotos.de_json(result, self)
 
     @log
-    def get_file(self, file_id, timeout=None, **kwargs):
+    def get_file(self, file_or_file_id, timeout=None, **kwargs):
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
         moment, bots can download files of up to 20MB in size. The file can then be downloaded
@@ -1314,7 +1315,9 @@ class Bot(TelegramObject):
         calling getFile again.
 
         Args:
-            file_id (:obj:`str`): File identifier to get info about.
+            file_or_file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` | :class:`telegram.PhotoSize` | :class:`telegram.Sticker` | :class:`telegram.Video` | :class:`telegram.VideoNote` | :class:`telegram.Voice`):
+                Either the file identifier or an object that has a file_id attribute
+                to get file information about.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1329,7 +1332,12 @@ class Bot(TelegramObject):
         """
         url = '{0}/getFile'.format(self.base_url)
 
-        data = {'file_id': file_id}
+        try:
+            file_or_file_id = file_or_file_id.file_id
+        except AttributeError:
+            pass
+
+        data = {'file_id': file_or_file_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
