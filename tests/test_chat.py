@@ -124,6 +124,55 @@ class TestChat(object):
         monkeypatch.setattr('telegram.Bot.unban_chat_member', test)
         assert chat.unban_member(42)
 
+    def test_instance_method_send_message(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and args[1] == 'test'
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert chat.send_message('test')
+
+    def test_instance_method_send_audio(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['audio'] == 'test_audio'
+
+        monkeypatch.setattr('telegram.Bot.send_audio', test)
+        assert chat.send_audio(audio='test_audio')
+
+    def test_instance_method_send_document(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['document'] == 'test_document'
+
+        monkeypatch.setattr('telegram.Bot.send_document', test)
+        assert chat.send_document(document='test_document')
+
+    def test_instance_method_send_sticker(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['sticker'] == 'test_sticker'
+
+        monkeypatch.setattr('telegram.Bot.send_sticker', test)
+        assert chat.send_sticker(sticker='test_sticker')
+
+    def test_instance_method_send_video(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['video'] == 'test_video'
+
+        monkeypatch.setattr('telegram.Bot.send_video', test)
+        assert chat.send_video(video='test_video')
+
+    def test_instance_method_send_video_note(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['video_note'] == 'test_video_note'
+
+        monkeypatch.setattr('telegram.Bot.send_video_note', test)
+        assert chat.send_video_note(video_note='test_video_note')
+
+    def test_instance_method_send_voice(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['voice'] == 'test_voice'
+
+        monkeypatch.setattr('telegram.Bot.send_voice', test)
+        assert chat.send_voice(voice='test_voice')
+
     def test_equality(self):
         a = Chat(self.id, self.title, self.type)
         b = Chat(self.id, self.title, self.type)
