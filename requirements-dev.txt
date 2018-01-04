@@ -6,5 +6,5 @@ yapf
 pre-commit
 beautifulsoup4
 pytest
+pytest-capturelog
 pytest-timeout
-testfixtures

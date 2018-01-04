@@ -245,18 +245,16 @@ class TestUpdater(object):
         os.kill(os.getpid(), signal.SIGTERM)
 
     @signalskip
-    def test_idle(self, updater):
+    def test_idle(self, updater, caplog):
         updater.start_polling(0.01)
         Thread(target=self.signal_sender).start()
-        with LogCapture(level=logging.INFO) as capture:
+
+        with caplog.at_level(logging.INFO):
             updater.idle()
 
-        capture.check(
-            ('telegram.ext.updater',
-             'INFO',
-             'Received signal {} (SIGTERM), stopping...'.format(
-                 signal.SIGTERM))
-        )
+        assert caplog.record_tuples == [(
+            'telegram.ext.updater', 'INFO', 'Received signal {} (SIGTERM), '
+            'stopping...'.format(signal.SIGTERM))]
 
         # If we get this far, idle() ran through
         sleep(.5)
