@@ -20,6 +20,7 @@ import logging
 import os
 import signal
 import sys
+from functools import partial
 from queue import Queue
 from random import randrange
 from threading import Thread
@@ -35,7 +36,6 @@ except ImportError:
 
 import pytest
 from future.builtins import bytes
-from testfixtures import LogCapture
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken
@@ -240,21 +240,24 @@ class TestUpdater(object):
 
         return urlopen(req)
 
-    def signal_sender(self):
+    def signal_sender(self, updater):
         sleep(0.2)
+        while not updater.running:
+            sleep(0.2)
+
         os.kill(os.getpid(), signal.SIGTERM)
 
     @signalskip
     def test_idle(self, updater, caplog):
         updater.start_polling(0.01)
-        Thread(target=self.signal_sender).start()
+        Thread(target=partial(self.signal_sender, updater=updater)).start()
 
-        with caplog.at_level(logging.INFO):
+        with caplog.atLevel(logging.INFO):
             updater.idle()
 
-        assert caplog.record_tuples == [(
-            'telegram.ext.updater', 'INFO', 'Received signal {} (SIGTERM), '
-            'stopping...'.format(signal.SIGTERM))]
+        rec = caplog.records()[-1]
+        assert rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
+        assert rec.levelname == 'INFO'
 
         # If we get this far, idle() ran through
         sleep(.5)
@@ -269,7 +272,7 @@ class TestUpdater(object):
 
         updater.user_sig_handler = user_signal_inc
         updater.start_polling(0.01)
-        Thread(target=self.signal_sender).start()
+        Thread(target=partial(self.signal_sender, updater=updater)).start()
         updater.idle()
         # If we get this far, idle() ran through
         sleep(.5)
