@@ -252,10 +252,10 @@ class TestUpdater(object):
         updater.start_polling(0.01)
         Thread(target=partial(self.signal_sender, updater=updater)).start()
 
-        with caplog.atLevel(logging.INFO):
+        with caplog.at_level(logging.INFO):
             updater.idle()
 
-        rec = caplog.records()[-1]
+        rec = caplog.records[-1]
         assert rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
         assert rec.levelname == 'INFO'
 
