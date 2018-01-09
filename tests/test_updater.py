@@ -16,9 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 import os
 import signal
 import sys
+from functools import partial
 from queue import Queue
 from random import randrange
 from threading import Thread
@@ -238,15 +240,25 @@ class TestUpdater(object):
 
         return urlopen(req)
 
-    def signal_sender(self):
+    def signal_sender(self, updater):
         sleep(0.2)
+        while not updater.running:
+            sleep(0.2)
+
         os.kill(os.getpid(), signal.SIGTERM)
 
     @signalskip
-    def test_idle(self, updater):
+    def test_idle(self, updater, caplog):
         updater.start_polling(0.01)
-        Thread(target=self.signal_sender).start()
-        updater.idle()
+        Thread(target=partial(self.signal_sender, updater=updater)).start()
+
+        with caplog.at_level(logging.INFO):
+            updater.idle()
+
+        rec = caplog.records[-1]
+        assert rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
+        assert rec.levelname == 'INFO'
+
         # If we get this far, idle() ran through
         sleep(.5)
         assert updater.running is False
@@ -260,7 +272,7 @@ class TestUpdater(object):
 
         updater.user_sig_handler = user_signal_inc
         updater.start_polling(0.01)
-        Thread(target=self.signal_sender).start()
+        Thread(target=partial(self.signal_sender, updater=updater)).start()
         updater.idle()
         # If we get this far, idle() ran through
         sleep(.5)
