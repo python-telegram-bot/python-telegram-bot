@@ -145,7 +145,6 @@ class ConversationHandler(Handler):
         self.per_message = per_message
         self.conversation_timeout = conversation_timeout
 
-        # self.timeout_job = None
         self.timeout_jobs = dict()
         self.conversations = dict()
         self.current_conversation = None
