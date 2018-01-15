@@ -112,7 +112,7 @@ class ConversationHandler(Handler):
             ID. Default is ``False``.
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`, optional): When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 (default), there will be no timeout.
+            this value is 0 or None (default), there will be no timeout.
 
     Raises:
         ValueError
@@ -131,7 +131,7 @@ class ConversationHandler(Handler):
                  per_chat=True,
                  per_user=True,
                  per_message=False,
-                 conversation_timeout=0):
+                 conversation_timeout=None):
 
         self.entry_points = entry_points
         self.states = states
@@ -145,7 +145,8 @@ class ConversationHandler(Handler):
         self.per_message = per_message
         self.conversation_timeout = conversation_timeout
 
-        self.timeout_job = None
+        # self.timeout_job = None
+        self.timeout_jobs = dict()
         self.conversations = dict()
         self.current_conversation = None
         self.current_handler = None
@@ -302,14 +303,16 @@ class ConversationHandler(Handler):
 
         """
         new_state = self.current_handler.handle_update(update, dispatcher)
+        timeout_job = self.timeout_jobs.get(self.current_conversation)
 
-        if self.timeout_job is not None:
-            self.timeout_job.schedule_removal()
-            self.timeout_job = None
+        if timeout_job is not None or new_state == self.END:
+            timeout_job.schedule_removal()
+            del self.timeout_jobs[self.current_conversation]
         if self.conversation_timeout and new_state != self.END:
-            self.timeout_job = dispatcher.job_queue.run_once(self._conversation_timeout,
-                                                             self.conversation_timeout,
-                                                             context=self.current_conversation)
+            self.timeout_jobs[self.current_conversation] = dispatcher.job_queue.run_once(
+                self._trigger_timeout, self.conversation_timeout,
+                context=self.current_conversation
+            )
 
         self.update_state(new_state, self.current_conversation)
 
@@ -326,5 +329,5 @@ class ConversationHandler(Handler):
         elif new_state is not None:
             self.conversations[key] = new_state
 
-    def _conversation_timeout(self, bot, job):
+    def _trigger_timeout(self, bot, job):
         self.update_state(self.END, job.context)
