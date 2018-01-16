@@ -41,6 +41,8 @@ class CommandHandler(Handler):
             edited messages.
         pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
             ``args``.
+        pass_uargs (:obj:`bool`): Optional. Determines whether the handler should be passed
+            ``args``. 
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -72,6 +74,10 @@ class CommandHandler(Handler):
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
             consecutive whitespace characters. Default is ``False``
+        pass_uargs (:obj:`bool`, optional): Determines whether the handler should be passed the
+            arguments passed to the command as a keyword argument called ``args``. It will contain
+            a list of strings, which is the text following the command split on single or
+            consecutive underscore characters. Default is ``False``
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -93,6 +99,7 @@ class CommandHandler(Handler):
                  filters=None,
                  allow_edited=False,
                  pass_args=False,
+                 pass_uargs=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
@@ -111,6 +118,7 @@ class CommandHandler(Handler):
         self.filters = filters
         self.allow_edited = allow_edited
         self.pass_args = pass_args
+        self.pass_uargs = pass_uargs
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -134,7 +142,10 @@ class CommandHandler(Handler):
             message = update.message or update.edited_message
 
             if message.text and message.text.startswith('/') and len(message.text) > 1:
-                command = message.text[1:].split(None, 1)[0].split('@')
+                if self.pass_uargs:
+                    command = message.text[1:].split('_', 1)[0].split('@')
+                else:
+                    command = message.text[1:].split(None, 1)[0].split('@')
                 command.append(
                     message.bot.username)  # in case the command was send without a username
 
@@ -167,5 +178,7 @@ class CommandHandler(Handler):
 
         if self.pass_args:
             optional_args['args'] = message.text.split()[1:]
+        if self.pass_uargs:
+            optional_args['args'] = message.text.split('_')[1:]                                                     
 
         return self.callback(dispatcher.bot, update, **optional_args)
