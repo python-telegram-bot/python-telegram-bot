@@ -8,3 +8,4 @@ beautifulsoup4
 pytest
 pytest-catchlog
 pytest-timeout
+PySocks>=1.6.8
