@@ -202,7 +202,7 @@ class TestJobQueue(object):
         expected_time = time.time() + delta + 60 * 60 * 24
 
         job_queue.run_once(self.job_datetime_tests, when)
-        assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
+        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
 
     def test_run_daily(self, job_queue):
         delta = 0.5
@@ -212,7 +212,7 @@ class TestJobQueue(object):
         job_queue.run_daily(self.job_run_once, time_of_day)
         sleep(0.6)
         assert self.result == 1
-        assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
+        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)
