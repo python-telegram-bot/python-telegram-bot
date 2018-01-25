@@ -100,6 +100,8 @@ class TestInvoice(object):
             need_phone_number=True,
             need_email=True,
             need_shipping_address=True,
+            send_phone_number_to_provider=True,
+            send_email_to_provider=True,
             is_flexible=True)
 
         assert message.invoice.currency == self.currency
