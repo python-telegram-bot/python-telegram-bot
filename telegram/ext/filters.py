@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -265,7 +265,7 @@ class Filters(object):
         """Subset for messages containing a status update.
 
         Examples:
-            Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+            Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
             ``Filters.status_update`` for all status update messages.
 
         """

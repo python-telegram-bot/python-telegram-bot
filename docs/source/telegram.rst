@@ -21,6 +21,9 @@ telegram package
    telegram.inlinekeyboardbutton
    telegram.inlinekeyboardmarkup
    telegram.inputfile
+   telegram.inputmedia
+   telegram.inputmediaphoto
+   telegram.inputmediavideo
    telegram.keyboardbutton
    telegram.location
    telegram.message

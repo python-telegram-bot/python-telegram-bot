@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 import re
 from collections import OrderedDict
+import signal
 from datetime import datetime
 
 try:
@@ -31,6 +32,18 @@ try:
     from html import escape as escape_html  # noqa: F401
 except ImportError:
     from cgi import escape as escape_html  # noqa: F401
+
+
+# From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
+_signames = {v: k
+             for k, v in reversed(sorted(vars(signal).items()))
+             if k.startswith('SIG') and not k.startswith('SIG_')}
+
+
+def get_signal_name(signum):
+    """Returns the signal name of the given signal number."""
+    return _signames[signum]
+
 
 # Not using future.backports.datetime here as datetime value might be an input from the user,
 # making every isinstace() call more delicate. So we just use our own compat layer.

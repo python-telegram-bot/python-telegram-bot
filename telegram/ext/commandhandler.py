@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -133,8 +133,8 @@ class CommandHandler(Handler):
                 and (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
-            if message.text:
-                command = message.text[1:].split(' ')[0].split('@')
+            if message.text and message.text.startswith('/') and len(message.text) > 1:
+                command = message.text[1:].split(None, 1)[0].split('@')
                 command.append(
                     message.bot.username)  # in case the command was send without a username
 
@@ -145,7 +145,7 @@ class CommandHandler(Handler):
                 else:
                     res = self.filters(message)
 
-                return res and (message.text.startswith('/') and command[0].lower() in self.command
+                return res and (command[0].lower() in self.command
                                 and command[1].lower() == message.bot.username.lower())
             else:
                 return False

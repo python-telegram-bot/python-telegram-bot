@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -55,6 +55,7 @@ class TestPreCheckoutQuery(object):
         }
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
 
+        assert pre_checkout_query.bot is bot
         assert pre_checkout_query.id == self.id
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id
