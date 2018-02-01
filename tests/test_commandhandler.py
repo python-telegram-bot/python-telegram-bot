@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -164,6 +164,31 @@ class TestCommandHandler(object):
         message.text = '/test@{} one two'.format(message.bot.username)
         dp.process_update(Update(0, message=message))
         assert self.test_flag
+
+    def test_newline(self, dp, message):
+        handler = CommandHandler('test', self.callback_basic)
+        dp.add_handler(handler)
+
+        message.text = '/test\nfoobar'
+        assert handler.check_update(Update(0, message))
+        dp.process_update(Update(0, message))
+        assert self.test_flag
+
+    def test_single_char(self, dp, message):
+        # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
+        handler = CommandHandler('test', self.callback_basic)
+        dp.add_handler(handler)
+
+        message.text = 'a'
+        assert not handler.check_update(Update(0, message))
+
+    def test_single_slash(self, dp, message):
+        # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
+        handler = CommandHandler('test', self.callback_basic)
+        dp.add_handler(handler)
+
+        message.text = '/'
+        assert not handler.check_update(Update(0, message))
 
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -90,6 +90,11 @@ class TestUser(object):
         assert user.name == 'first_name'
         user.username = self.username
         assert user.name == '@username'
+    
+    def test_full_name(self, user):
+        assert user.full_name == 'first_name last_name'
+        user.last_name = None
+        assert user.full_name == 'first_name'
 
     def test_get_profile_photos(self, monkeypatch, user):
         def test(_, *args, **kwargs):

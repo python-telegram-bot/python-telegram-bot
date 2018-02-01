@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -104,17 +104,8 @@ class TestBot(object):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
-    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice
-    # and send_video_note are tested in their respective test modules. No need to duplicate here.
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_location(self, bot, chat_id):
-        message = bot.send_location(chat_id=chat_id, latitude=-23.691288, longitude=-46.788279)
-
-        assert message.location
-        assert message.location.longitude == -46.788279
-        assert message.location.latitude == -23.691288
+    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note
+    # and send_media_group are tested in their respective test modules. No need to duplicate here.
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -197,14 +188,14 @@ class TestBot(object):
         chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
-        assert user_profile_photos.photos[0][0].file_size == 12421
+        assert user_profile_photos.photos[0][0].file_size == 9999
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_one_user_profile_photo(self, bot):
         chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
-        assert user_profile_photos.photos[0][0].file_size == 12421
+        assert user_profile_photos.photos[0][0].file_size == 9999
 
     # get_file is tested multiple times in the test_*media* modules.
 
@@ -367,6 +358,14 @@ class TestBot(object):
 
         assert chat_member.status == 'administrator'
         assert chat_member.user.username == 'EchteEldin'
+
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_set_chat_sticker_set(self):
+        pass
+
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_delete_chat_sticker_set(self):
+        pass
 
     @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
