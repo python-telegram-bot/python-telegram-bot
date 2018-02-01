@@ -161,8 +161,5 @@ def extract_urls(message):
     # Strip trailing slash from URL so we can compare them for equality
     stripped_urls = [x[:-1] if x[-1] == '/' else x for x in all_urls]
 
-    sorted_urls = sorted(stripped_urls)
-
-    # Remove exact duplicates
-    urls = OrderedDict({k: None for k in sorted_urls})
-    return list(urls.keys())
+    urls = set(stripped_urls)
+    return sorted(list(urls))
