@@ -138,8 +138,7 @@ def _extract_urls_from_text(text):
 def extract_urls(message):
     """
     Extracts all Hyperlinks that are contained in a message. This includes
-    message entities and the media caption. The links are returned in lexicographically
-    ascending order.
+    message entities and the media caption. Distinct links are returned in order of appearance.
 
     Note: Exact duplicates are removed, but there may still be URLs that link
     to the same resource.
@@ -152,14 +151,14 @@ def extract_urls(message):
     """
     from telegram import MessageEntity
 
-    results = message.parse_entities(types=[MessageEntity.URL, MessageEntity.TEXT_LINK])
+    types = [MessageEntity.URL, MessageEntity.TEXT_LINK]
+    results = message.parse_entities(types=types)
+    results.update(message.parse_caption_entities(types=types))
     all_urls = [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
-
-    if message.caption:
-        all_urls += _extract_urls_from_text(message.caption)
 
     # Strip trailing slash from URL so we can compare them for equality
     stripped_urls = [x[:-1] if x[-1] == '/' else x for x in all_urls]
 
-    urls = set(stripped_urls)
-    return sorted(list(urls))
+    # Remove exact duplicates, compliant with legacy python
+    urls = OrderedDict({k: None for k in stripped_urls})
+    return list(urls.keys())
