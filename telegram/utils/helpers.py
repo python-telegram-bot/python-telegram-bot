@@ -121,13 +121,13 @@ def effective_message_type(entity):
     :class:`telegram.Update`.
 
     Args:
-        entity (:obj:`Update` or :obj:`Message`) The ``update`` or ``message`` to extract from
+        entity (:obj:`Update` | :obj:`Message`) The ``update`` or ``message`` to extract from
 
     Returns:
         str: One of ``Message.MESSAGE_TYPES``
     """
 
-    # TODO: Importing on file-level yields cyclic Import Errors
+    # Importing on file-level yields cyclic Import Errors
     from telegram import Message
     from telegram import Update
 
