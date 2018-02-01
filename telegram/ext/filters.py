@@ -171,6 +171,34 @@ class Filters(object):
     command = _Command()
     """:obj:`Filter`: Messages starting with ``/``."""
 
+
+    class argument_equals(BaseFilter):
+        """
+        Filters /commands with a specific argument value. Useful for deep-linking.
+
+        Examples:
+            Example ``CommandHandler("start", deep_linked_callback,
+            Filters.argument_equals('parameter'))``
+
+        Args:
+            argument(:obj:`str`): String to compare with command arguments
+
+        """
+        """:obj:`Filter`: 
+        """
+
+        def __init__(self, argument):
+            self.argument = argument
+            self.name = 'Filters.argument_equals({})'.format(self.argument)
+
+        def filter(self, message):
+            if ' ' in message.text:
+                return bool(message.text and message.text.startswith('/') and
+                            message.text.split(' ', 1)[1] == self.argument)
+            else:
+                return False
+
+
     class _Reply(BaseFilter):
         name = 'Filters.reply'
 

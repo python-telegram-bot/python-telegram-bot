@@ -51,6 +51,22 @@ class TestFilters(object):
         message.text = '/test'
         assert Filters.command(message)
 
+    def test_filters_argument_equals(self, message):
+        message.text = 'test'
+        assert not Filters.argument_equals('abc')(message)
+        message.text = '/test'
+        assert not Filters.argument_equals('abc')(message)
+        message.text = '/test-abc'
+        assert not Filters.argument_equals('abc')(message)
+        message.text = '/test abc'
+        assert Filters.argument_equals('abc')(message)
+        message.text = '/test abc def'
+        assert Filters.argument_equals('abc def')(message)
+        message.text = '/test abc-def'
+        assert Filters.argument_equals('abc-def')(message)
+        message.text = '/test abc/def'
+        assert Filters.argument_equals('abc/def')(message)
+
     def test_filters_reply(self, message):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
                                   Chat(0, 'private'))
