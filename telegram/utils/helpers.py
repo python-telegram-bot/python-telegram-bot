@@ -138,7 +138,8 @@ def _extract_urls_from_text(text):
 def extract_urls(message):
     """
     Extracts all Hyperlinks that are contained in a message. This includes
-    message entities and the media caption.
+    message entities and the media caption. The links are returned in lexicographically
+    ascending order.
 
     Note: Exact duplicates are removed, but there may still be URLs that link
     to the same resource.
