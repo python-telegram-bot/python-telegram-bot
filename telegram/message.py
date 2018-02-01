@@ -432,16 +432,10 @@ class Message(TelegramObject):
             bot.reply_media_group(update.message.chat_id, *args, **kwargs)
 
         Keyword Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
-            media (List[:class:`telegram.InputMedia`]): An array describing photos and videos to be
-                sent, must include 2-10 items.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+            quote (:obj:`bool`, optional): If set to ``True``, the media group is sent as an
+                actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
