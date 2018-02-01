@@ -5,7 +5,7 @@
 
 This program is dedicated to the public domain under the CC0 license.
 """
-
+from examples.settings import TOKEN
 from telegram import (LabeledPrice, ShippingOption)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, PreCheckoutQueryHandler, ShippingQueryHandler)
@@ -112,8 +112,8 @@ def successful_payment_callback(bot, update):
 
 
 def main():
-    # Create the EventHandler and pass it your bot's token.
-    updater = Updater(token="BOT_TOKEN")
+    # Create the Updater and pass it your bot's token as a string.
+    updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

@@ -18,7 +18,7 @@ Basic Alarm Bot example, sends a message after a set time.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
-
+from examples.settings import TOKEN
 from telegram.ext import Updater, CommandHandler
 import logging
 
@@ -79,8 +79,8 @@ def error(bot, update, error):
 
 
 def main():
-    """Run bot."""
-    updater = Updater("TOKEN")
+    # Create the Updater and pass it your bot's token as a string.
+    updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

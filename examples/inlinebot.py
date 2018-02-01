@@ -20,6 +20,7 @@ from uuid import uuid4
 
 import re
 
+from examples.settings import TOKEN
 from telegram.utils.helpers import escape_markdown
 
 from telegram import InlineQueryResultArticle, ParseMode, \
@@ -77,8 +78,8 @@ def error(bot, update, error):
 
 
 def main():
-    # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    # Create the Updater and pass it your bot's token as a string.
+    updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

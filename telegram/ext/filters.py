@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
+
+import re
 from telegram import Chat
 from future.utils import string_types
 
@@ -171,32 +173,31 @@ class Filters(object):
     command = _Command()
     """:obj:`Filter`: Messages starting with ``/``."""
 
-
-    class argument_equals(BaseFilter):
+    class regex(BaseFilter):
         """
-        Filters /commands with a specific argument value. Useful for deep-linking.
+        Filters updates by searching for an occurence of ``pattern`` in the message text.
+        The ``re.search`` function is used to determine whether an update should be filtered.
+        Refer to the documentation of the ``re`` module for more information.
+
+        Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
+        but this will probably be implemented in a future update, gradually phasing out the
+        RegexHandler (see https://github.com/python-telegram-bot/python-telegram-bot/issues/835).
 
         Examples:
-            Example ``CommandHandler("start", deep_linked_callback,
-            Filters.argument_equals('parameter'))``
+            Example ``CommandHandler("start", deep_linked_callback, Filters.regex('parameter'))``
 
         Args:
-            argument(:obj:`str`): String to compare with command arguments
-
-        """
-        """:obj:`Filter`: 
+            pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
-        def __init__(self, argument):
-            self.argument = argument
-            self.name = 'Filters.argument_equals({})'.format(self.argument)
+        def __init__(self, pattern):
+            if isinstance(pattern, string_types):
+                pattern = re.compile(pattern)
+            self.pattern = pattern
+            self.name = 'Filters.regex({})'.format(self.pattern)
 
         def filter(self, message):
-            if ' ' in message.text:
-                return bool(message.text and message.text.startswith('/') and
-                            message.text.split(' ', 1)[1] == self.argument)
-            else:
-                return False
+            return bool(re.search(self.pattern, message.text))
 
 
     class _Reply(BaseFilter):
