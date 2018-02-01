@@ -1,6 +1,57 @@
 =======
 Changes
 =======
+**2017-12-08**
+*Released 9.0.0*
+
+Breaking changes (possibly)
+
+- Drop support for python 3.3 (PR `#930`_)
+
+
+New Features
+
+- Support Bot API 3.5 (PR `#920`_)
+
+
+Changes
+
+- Fix race condition in dispatcher start/stop (`#887`_)
+- Log error trace if there is no error handler registered (`#694`_)
+- Update examples with consistent string formatting (`#870`_)
+- Various changes and improvements to the docs.
+
+.. _`#920`: https://github.com/python-telegram-bot/python-telegram-bot/pull/920
+.. _`#930`: https://github.com/python-telegram-bot/python-telegram-bot/pull/930
+.. _`#887`: https://github.com/python-telegram-bot/python-telegram-bot/pull/887
+.. _`#694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/694
+.. _`#870`: https://github.com/python-telegram-bot/python-telegram-bot/pull/870
+
+**2017-10-15**
+*Released 8.1.1*
+
+- Fix Commandhandler crashing on single character messages (PR `#873`_).
+
+.. _`#873`: https://github.com/python-telegram-bot/python-telegram-bot/pull/871
+
+**2017-10-14**
+*Released 8.1.0*
+
+New features
+- Support Bot API 3.4 (PR `#865`_).
+
+Changes
+- MessageHandler & RegexHandler now consider channel_updates.
+- Fix command not recognized if it is directly followed by a newline (PR `#869`_).
+- Removed Bot._message_wrapper (PR `#822`_).
+- Unitests are now also running on AppVeyor (Windows VM).
+- Various unitest improvements.
+- Documentation fixes.
+
+.. _`#822`: https://github.com/python-telegram-bot/python-telegram-bot/pull/822
+.. _`#865`: https://github.com/python-telegram-bot/python-telegram-bot/pull/865
+.. _`#869`: https://github.com/python-telegram-bot/python-telegram-bot/pull/869
+
 **2017-09-01**
 *Released 8.0.0*
 
@@ -26,7 +77,7 @@ Changes
 - Warn on small con_pool_size during custom initalization of Updater (PR `#793`_).
 - Catch exceptions in error handlerfor errors that happen during polling (PR `#810`_).
 - For testing we switched to pytest (PR `#788`_).
-- Lot's of small improvements to our tests and documentation.
+- Lots of small improvements to our tests and documentation.
 
 
 .. _`see docs`: http://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler

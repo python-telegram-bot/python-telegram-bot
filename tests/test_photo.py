@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -174,9 +174,9 @@ class TestPhoto(object):
         assert isinstance(photo.file_id, str)
         assert photo.file_id != ''
         assert isinstance(photo, PhotoSize)
-        assert photo.width == 1920
-        assert photo.height == 1080
-        assert photo.file_size == 30907
+        assert photo.width == 1280
+        assert photo.height == 720
+        assert photo.file_size == 33372
 
     def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
         def test(_, url, data, **kwargs):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,52 +34,37 @@ def message(bot):
 
 @pytest.fixture(scope='function',
                 params=[
-                    {
-                        'forward_from': User(99, 'forward_user', False),
-                        'forward_date': datetime.now()
-                    },
-                    {
-                        'forward_from_chat': Chat(-23, 'channel'),
-                        'forward_from_message_id': 101,
-                        'forward_date': datetime.now()
-                    },
+                    {'forward_from': User(99, 'forward_user', False),
+                     'forward_date': datetime.now()},
+                    {'forward_from_chat': Chat(-23, 'channel'),
+                     'forward_from_message_id': 101,
+                     'forward_date': datetime.now()},
                     {'reply_to_message': Message(50, None, None, None)},
                     {'edit_date': datetime.now()},
-                    {
-                        'test': 'a text message',
-                        'enitites': [MessageEntity('bold', 10, 4),
-                                     MessageEntity('italic', 16, 7)]
-                    },
-                    {
-                        'audio': Audio('audio_id', 12),
-                        'caption': 'audio_file'
-                    },
-                    {
-                        'document': Document('document_id'),
-                        'caption': 'document_file'
-                    },
-                    {
-                        'game': Game('my_game', 'just my game',
-                                     [PhotoSize('game_photo_id', 30, 30), ])
-                    },
-                    {
-                        'photo': [PhotoSize('photo_id', 50, 50)],
-                        'caption': 'photo_file'
-                    },
+                    {'text': 'a text message',
+                     'enitites': [MessageEntity('bold', 10, 4),
+                                  MessageEntity('italic', 16, 7)]},
+                    {'caption': 'A message caption',
+                     'caption_entities': [MessageEntity('bold', 1, 1),
+                                          MessageEntity('text_link', 4, 3)]},
+                    {'audio': Audio('audio_id', 12),
+                     'caption': 'audio_file'},
+                    {'document': Document('document_id'),
+                     'caption': 'document_file'},
+                    {'game': Game('my_game', 'just my game',
+                                  [PhotoSize('game_photo_id', 30, 30), ])},
+                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                     'caption': 'photo_file'},
                     {'sticker': Sticker('sticker_id', 50, 50)},
-                    {
-                        'video': Video('video_id', 12, 12, 12),
-                        'caption': 'video_file'
-                    },
+                    {'video': Video('video_id', 12, 12, 12),
+                     'caption': 'video_file'},
                     {'voice': Voice('voice_id', 5)},
                     {'video_note': VideoNote('video_note_id', 20, 12)},
                     {'new_chat_members': [User(55, 'new_user', False)]},
                     {'contact': Contact('phone_numner', 'contact_name')},
                     {'location': Location(-23.691288, 46.788279)},
-                    {
-                        'venue': Venue(Location(-23.691288, 46.788279),
-                                       'some place', 'right here')
-                    },
+                    {'venue': Venue(Location(-23.691288, 46.788279),
+                                    'some place', 'right here')},
                     {'left_chat_member': User(33, 'kicked', False)},
                     {'new_chat_title': 'new title'},
                     {'new_chat_photo': [PhotoSize('photo_id', 50, 50)]},
@@ -91,20 +76,22 @@ def message(bot):
                     {'migrate_from_chat_id': -54321},
                     {'pinned_message': Message(7, None, None, None)},
                     {'invoice': Invoice('my invoice', 'invoice', 'start', 'EUR', 243)},
-                    {
-                        'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
-                                                                'charge_id', 'provider_id',
-                                                                order_info={})
-                    },
+                    {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
+                                                             'charge_id', 'provider_id',
+                                                             order_info={})},
                     {'forward_signature': 'some_forward_sign'},
-                    {'author_signature': 'some_author_sign'}
+                    {'author_signature': 'some_author_sign'},
+                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                     'caption': 'photo_file',
+                     'media_group_id': 1234443322222}
                 ],
-                ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text', 'audio',
-                     'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
-                     'new_members', 'contact', 'location', 'venue', 'left_member', 'new_title',
-                     'new_photo', 'delete_photo', 'group_created', 'supergroup_created',
-                     'channel_created', 'migrated_to', 'migrated_from', 'pinned', 'invoice',
-                     'successful_payment', 'forward_signature', 'author_signature'])
+                ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
+                     'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
+                     'voice', 'video_note', 'new_members', 'contact', 'location', 'venue',
+                     'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
+                     'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
+                     'pinned', 'invoice', 'successful_payment', 'forward_signature',
+                     'author_signature', 'photo_from_media_group'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -148,6 +135,14 @@ class TestMessage(object):
         message = Message(1, self.from_user, self.date, self.chat, text=text, entities=[entity])
         assert message.parse_entity(entity) == 'http://google.com'
 
+    def test_parse_caption_entity(self):
+        caption = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                   b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        message = Message(1, self.from_user, self.date, self.chat, caption=caption,
+                          caption_entities=[entity])
+        assert message.parse_caption_entity(entity) == 'http://google.com'
+
     def test_parse_entities(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
@@ -157,6 +152,16 @@ class TestMessage(object):
                           text=text, entities=[entity_2, entity])
         assert message.parse_entities(MessageEntity.URL) == {entity: 'http://google.com'}
         assert message.parse_entities() == {entity: 'http://google.com', entity_2: 'h'}
+
+    def test_parse_caption_entities(self):
+        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+                b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
+        message = Message(1, self.from_user, self.date, self.chat,
+                          caption=text, caption_entities=[entity_2, entity])
+        assert message.parse_caption_entities(MessageEntity.URL) == {entity: 'http://google.com'}
+        assert message.parse_caption_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_text_html_simple(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '

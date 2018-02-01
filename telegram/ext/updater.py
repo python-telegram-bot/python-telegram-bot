@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter
+from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
 
@@ -69,8 +70,10 @@ class Updater(object):
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) setable with :attr:`idle`.
-        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a request
-            object (ignored if `bot` argument is used).
+        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
+            `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
+            request_kwargs are very useful for the advanced users who would like to control the
+            default timeouts and/or control the proxy used for http communication.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -197,9 +200,12 @@ class Updater(object):
 
                 # Create & start threads
                 self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher")
+                dispatcher_ready = Event()
+                self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
                 self._init_thread(self._start_polling, "updater", poll_interval, timeout,
                                   read_latency, bootstrap_retries, clean, allowed_updates)
+
+                dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -444,6 +450,8 @@ class Updater(object):
     def signal_handler(self, signum, frame):
         self.is_idle = False
         if self.running:
+            self.logger.info('Received signal {} ({}), stopping...'.format(
+                signum, get_signal_name(signum)))
             self.stop()
             if self.user_sig_handler:
                 self.user_sig_handler(signum, frame)

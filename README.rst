@@ -31,6 +31,10 @@ We have made you a wrapper you can't refuse
    :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
    :alt: Travis CI Status
 
+.. image:: https://img.shields.io/appveyor/ci/Eldinnie/python-telegram-bot/master.svg?logo=appveyor
+   :target: https://ci.appveyor.com/project/Eldinnie/python-telegram-bot
+   :alt: AppVeyor CI Status
+
 .. image:: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot/badges/gpa.svg
    :target: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot
    :alt: Code Climate
@@ -46,6 +50,10 @@ We have made you a wrapper you can't refuse
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group
+
+.. image:: https://img.shields.io/badge/IRC-Channel-blue.svg
+   :target: https://webchat.freenode.net/?channels=##python-telegram-bot
+   :alt: IRC Bridge
 
 =================
 Table of contents
@@ -88,7 +96,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-As of **23. July 2017**, all types and methods of the Telegram Bot API 3.2 are supported.
+All types and methods of the Telegram Bot API 3.4 are supported.
 
 ==========
 Installing

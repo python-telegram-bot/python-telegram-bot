@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Basic example for a bot that can receive payment from user.
-# This program is dedicated to the public domain under the CC0 license.
+"""Basic example for a bot that can receive payment from user.
+
+This program is dedicated to the public domain under the CC0 license.
+"""
 
 from telegram import (LabeledPrice, ShippingOption)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
@@ -10,13 +12,15 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler,
 import logging
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def start_callback(bot, update):
@@ -31,7 +35,7 @@ def start_with_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # get your provider_token at @botfather, see https://core.telegram.org/bots/payments#getting-a-token
+    # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"
@@ -55,7 +59,7 @@ def start_without_shipping_callback(bot, update):
     description = "Payment Example using python-telegram-bot"
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
-    # get your provider_token at @botfather, see https://core.telegram.org/bots/payments#getting-a-token
+    # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
     provider_token = "PROVIDER_TOKEN"
     start_parameter = "test-payment"
     currency = "USD"
