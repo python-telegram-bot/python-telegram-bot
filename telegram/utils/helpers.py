@@ -137,7 +137,7 @@ def effective_message_type(entity):
     elif isinstance(entity, Update):
         message = entity.effective_message
     else:
-        raise AttributeError("The argument `entity` must be either of type `Message` or `Update`.")
+        raise TypeError("entity is not Message or Update (got: {})".format(type(entity)))
 
     for i in Message.MESSAGE_TYPES:
         if getattr(message, i, None):
