@@ -117,7 +117,7 @@ def mention_markdown(user_id, name):
 
 def effective_message_type(entity):
     """
-    Extracts the type of message as a string identifier from a :class:`telegram.Message` or an
+    Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
     :class:`telegram.Update`.
 
     Args:
@@ -125,6 +125,7 @@ def effective_message_type(entity):
 
     Returns:
         str: One of ``Message.MESSAGE_TYPES``
+
     """
 
     # Importing on file-level yields cyclic Import Errors
