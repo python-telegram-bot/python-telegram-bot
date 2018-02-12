@@ -52,3 +52,42 @@ MAX_MESSAGES_PER_SECOND = 30
 MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
 MAX_MESSAGE_ENTITIES = 100
 MAX_INLINE_QUERY_RESULTS = 50
+
+
+class MediaCategory:
+    """This are the mime categories of media you can send via telegram. 
+    
+       They are used in `Telegram.ext.filters.Filters.document.`"""
+    application = "application/"
+    audio = "audio/"
+    image = "image/"
+    video = "video/"
+    text = "text/"
+
+
+class Document:
+    """These strings are the mime-types of the most common file-types. 
+    
+    They are used in `Telegram.ext.filters.Filters.document.`
+    
+    Note:
+        This are only some of the most common mime_types. 
+        There are about 130 different types registered at the moment, 
+        so we didn't add all of them.
+        Simply use `Filters.document.FileType(mime_type)` to add filters 
+        for other file types"""
+    apk = "application/vnd.android.package-archive"
+    docx = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    exe = "application/x-ms-dos-executable"
+    gif = "video/mp4"
+    jpg = "image/jpeg"
+    mp3 = "audio/mpeg"
+    pdf = "application/pdf"
+    png = "image/png"
+    py = "text/x-python"
+    svg = "image/svg+xml"
+    txt = "text/plain"
+    targz = "application/x-compressed-tar"
+    wav = "audio/x-wav"
+    xml = "application/xml"
+    zip = "application/zip"
