@@ -468,6 +468,26 @@ class Message(TelegramObject):
 
         return self.bot.send_message(self.chat_id, *args, **kwargs)
 
+    def reply_media_group(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.reply_media_group(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the media group is sent as an
+                actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
+
+        Returns:
+            List[:class:`telegram.Message`]: An array of the sent Messages.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        self._quote(kwargs)
+        return self.bot.send_media_group(self.chat_id, *args, **kwargs)
+
     def reply_photo(self, *args, **kwargs):
         """Shortcut for::
 

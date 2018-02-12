@@ -291,6 +291,20 @@ class TestMessage(object):
                                   reply_to_message_id=message.message_id,
                                   quote=True)
 
+    def test_reply_media_group(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            media = kwargs['media'] == 'reply_media_group'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and media and reply
+
+        monkeypatch.setattr('telegram.Bot.send_media_group', test)
+        assert message.reply_media_group(media='reply_media_group')
+        assert message.reply_media_group(media='reply_media_group', quote=True)
+
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):
             id = args[1] == message.chat_id
