@@ -30,6 +30,7 @@ def inline_query_result_cached_photo():
                                         title=TestInlineQueryResultCachedPhoto.title,
                                         description=TestInlineQueryResultCachedPhoto.description,
                                         caption=TestInlineQueryResultCachedPhoto.caption,
+                                        parse_mode=TestInlineQueryResultCachedPhoto.parse_mode,
                                         input_message_content=TestInlineQueryResultCachedPhoto.input_message_content,
                                         reply_markup=TestInlineQueryResultCachedPhoto.reply_markup)
 
@@ -41,6 +42,7 @@ class TestInlineQueryResultCachedPhoto(object):
     title = 'title'
     description = 'description'
     caption = 'caption'
+    parse_mode = 'HTML'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -51,6 +53,7 @@ class TestInlineQueryResultCachedPhoto(object):
         assert inline_query_result_cached_photo.title == self.title
         assert inline_query_result_cached_photo.description == self.description
         assert inline_query_result_cached_photo.caption == self.caption
+        assert inline_query_result_cached_photo.parse_mode == self.parse_mode
         assert inline_query_result_cached_photo.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_cached_photo.reply_markup.to_dict() == \
@@ -71,6 +74,8 @@ class TestInlineQueryResultCachedPhoto(object):
                inline_query_result_cached_photo.description
         assert inline_query_result_cached_photo_dict['caption'] == \
                inline_query_result_cached_photo.caption
+        assert inline_query_result_cached_photo_dict['parse_mode'] == \
+               inline_query_result_cached_photo.parse_mode
         assert inline_query_result_cached_photo_dict['input_message_content'] == \
                inline_query_result_cached_photo.input_message_content.to_dict()
         assert inline_query_result_cached_photo_dict['reply_markup'] == \

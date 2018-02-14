@@ -33,6 +33,7 @@ def inline_query_result_photo():
                                   title=TestInlineQueryResultPhoto.title,
                                   description=TestInlineQueryResultPhoto.description,
                                   caption=TestInlineQueryResultPhoto.caption,
+                                  parse_mode=TestInlineQueryResultPhoto.parse_mode,
                                   input_message_content=TestInlineQueryResultPhoto.input_message_content,
                                   reply_markup=TestInlineQueryResultPhoto.reply_markup)
 
@@ -47,6 +48,7 @@ class TestInlineQueryResultPhoto(object):
     title = 'title'
     description = 'description'
     caption = 'caption'
+    parse_mode = 'HTML'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -60,6 +62,7 @@ class TestInlineQueryResultPhoto(object):
         assert inline_query_result_photo.title == self.title
         assert inline_query_result_photo.description == self.description
         assert inline_query_result_photo.caption == self.caption
+        assert inline_query_result_photo.parse_mode == self.parse_mode
         assert inline_query_result_photo.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
@@ -80,6 +83,7 @@ class TestInlineQueryResultPhoto(object):
         assert inline_query_result_photo_dict['description'] == \
                inline_query_result_photo.description
         assert inline_query_result_photo_dict['caption'] == inline_query_result_photo.caption
+        assert inline_query_result_photo_dict['parse_mode'] == inline_query_result_photo.parse_mode
         assert inline_query_result_photo_dict['input_message_content'] == \
                inline_query_result_photo.input_message_content.to_dict()
         assert inline_query_result_photo_dict['reply_markup'] == \

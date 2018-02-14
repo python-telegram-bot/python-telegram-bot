@@ -33,6 +33,8 @@ class InlineQueryResultDocument(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption, 0-200 characters
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
@@ -49,6 +51,8 @@ class InlineQueryResultDocument(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption, 0-200 characters
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
@@ -70,6 +74,7 @@ class InlineQueryResultDocument(InlineQueryResult):
                  title,
                  mime_type,
                  caption=None,
+                 parse_mode=None,
                  description=None,
                  reply_markup=None,
                  input_message_content=None,
@@ -86,6 +91,8 @@ class InlineQueryResultDocument(InlineQueryResult):
         # Optionals
         if caption:
             self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode
         if description:
             self.description = description
         if reply_markup:

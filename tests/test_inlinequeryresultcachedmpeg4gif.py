@@ -29,6 +29,7 @@ def inline_query_result_cached_mpeg4_gif():
                                            TestInlineQueryResultCachedMpeg4Gif.mpeg4_file_id,
                                            title=TestInlineQueryResultCachedMpeg4Gif.title,
                                            caption=TestInlineQueryResultCachedMpeg4Gif.caption,
+                                           parse_mode=TestInlineQueryResultCachedMpeg4Gif.parse_mode,
                                            input_message_content=TestInlineQueryResultCachedMpeg4Gif.input_message_content,
                                            reply_markup=TestInlineQueryResultCachedMpeg4Gif.reply_markup)
 
@@ -39,6 +40,7 @@ class TestInlineQueryResultCachedMpeg4Gif(object):
     mpeg4_file_id = 'mpeg4 file id'
     title = 'title'
     caption = 'caption'
+    parse_mode = 'Markdown'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -48,6 +50,7 @@ class TestInlineQueryResultCachedMpeg4Gif(object):
         assert inline_query_result_cached_mpeg4_gif.mpeg4_file_id == self.mpeg4_file_id
         assert inline_query_result_cached_mpeg4_gif.title == self.title
         assert inline_query_result_cached_mpeg4_gif.caption == self.caption
+        assert inline_query_result_cached_mpeg4_gif.parse_mode == self.parse_mode
         assert inline_query_result_cached_mpeg4_gif.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_cached_mpeg4_gif.reply_markup.to_dict() == \
@@ -67,6 +70,8 @@ class TestInlineQueryResultCachedMpeg4Gif(object):
                inline_query_result_cached_mpeg4_gif.title
         assert inline_query_result_cached_mpeg4_gif_dict['caption'] == \
                inline_query_result_cached_mpeg4_gif.caption
+        assert inline_query_result_cached_mpeg4_gif_dict['parse_mode'] == \
+               inline_query_result_cached_mpeg4_gif.parse_mode
         assert inline_query_result_cached_mpeg4_gif_dict['input_message_content'] == \
                inline_query_result_cached_mpeg4_gif.input_message_content.to_dict()
         assert inline_query_result_cached_mpeg4_gif_dict['reply_markup'] == \
