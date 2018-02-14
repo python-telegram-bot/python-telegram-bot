@@ -97,6 +97,48 @@ class TestPhoto(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
+        message = bot.send_photo(chat_id, photo_file, caption=self.caption,
+                                 parse_mode='Markdown')
+        assert isinstance(message.photo[0], PhotoSize)
+        assert isinstance(message.photo[0].file_id, str)
+        assert message.photo[0].file_id != ''
+        assert message.photo[0].width == thumb.width
+        assert message.photo[0].height == thumb.height
+        assert message.photo[0].file_size == thumb.file_size
+
+        assert isinstance(message.photo[1], PhotoSize)
+        assert isinstance(message.photo[1].file_id, str)
+        assert message.photo[1].file_id != ''
+        assert message.photo[1].width == photo.width
+        assert message.photo[1].height == photo.height
+        assert message.photo[1].file_size == photo.file_size
+
+        assert message.caption == TestPhoto.caption
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
+        message = bot.send_photo(chat_id, photo_file, caption=self.caption,
+                                 parse_mode='HTML')
+        assert isinstance(message.photo[0], PhotoSize)
+        assert isinstance(message.photo[0].file_id, str)
+        assert message.photo[0].file_id != ''
+        assert message.photo[0].width == thumb.width
+        assert message.photo[0].height == thumb.height
+        assert message.photo[0].file_size == thumb.file_size
+
+        assert isinstance(message.photo[1], PhotoSize)
+        assert isinstance(message.photo[1].file_id, str)
+        assert message.photo[1].file_id != ''
+        assert message.photo[1].width == photo.width
+        assert message.photo[1].height == photo.height
+        assert message.photo[1].file_size == photo.file_size
+
+        assert message.caption == TestPhoto.caption
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_get_and_download(self, bot, photo):
         new_file = bot.getFile(photo.file_id)
 
