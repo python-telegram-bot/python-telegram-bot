@@ -30,7 +30,8 @@ def input_media_video():
                            caption=TestInputMediaVideo.caption,
                            width=TestInputMediaVideo.width,
                            height=TestInputMediaVideo.height,
-                           duration=TestInputMediaVideo.duration)
+                           duration=TestInputMediaVideo.duration,
+                           supports_streaming=TestInputMediaVideo.supports_streaming)
 
 
 @pytest.fixture(scope='class')
@@ -46,6 +47,7 @@ class TestInputMediaVideo(object):
     width = 3
     height = 4
     duration = 5
+    supports_streaming = True
 
     def test_expected_values(self, input_media_video):
         assert input_media_video.type == self.type
