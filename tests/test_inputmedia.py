@@ -30,13 +30,16 @@ def input_media_video():
                            caption=TestInputMediaVideo.caption,
                            width=TestInputMediaVideo.width,
                            height=TestInputMediaVideo.height,
-                           duration=TestInputMediaVideo.duration)
+                           duration=TestInputMediaVideo.duration,
+                           parse_mode=TestInputMediaVideo.parse_mode,
+                           supports_streaming=TestInputMediaVideo.supports_streaming)
 
 
 @pytest.fixture(scope='class')
 def input_media_photo():
     return InputMediaPhoto(media=TestInputMediaPhoto.media,
-                           caption=TestInputMediaPhoto.caption)
+                           caption=TestInputMediaPhoto.caption,
+                           parse_mode=TestInputMediaPhoto.parse_mode)
 
 
 class TestInputMediaVideo(object):
@@ -46,6 +49,8 @@ class TestInputMediaVideo(object):
     width = 3
     height = 4
     duration = 5
+    parse_mode = 'HTML'
+    supports_streaming = True
 
     def test_expected_values(self, input_media_video):
         assert input_media_video.type == self.type
@@ -54,6 +59,8 @@ class TestInputMediaVideo(object):
         assert input_media_video.width == self.width
         assert input_media_video.height == self.height
         assert input_media_video.duration == self.duration
+        assert input_media_video.parse_mode == self.parse_mode
+        assert input_media_video.supports_streaming == self.supports_streaming
 
     def test_to_dict(self, input_media_video):
         input_media_video_dict = input_media_video.to_dict()
@@ -63,6 +70,8 @@ class TestInputMediaVideo(object):
         assert input_media_video_dict['width'] == input_media_video.width
         assert input_media_video_dict['height'] == input_media_video.height
         assert input_media_video_dict['duration'] == input_media_video.duration
+        assert input_media_video_dict['parse_mode'] == input_media_video.parse_mode
+        assert input_media_video_dict['supports_streaming'] == input_media_video.supports_streaming
 
     def test_with_video(self, video):
         # fixture found in test_video
@@ -84,17 +93,20 @@ class TestInputMediaPhoto(object):
     type = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
+    parse_mode = 'Markdown'
 
     def test_expected_values(self, input_media_photo):
         assert input_media_photo.type == self.type
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
+        assert input_media_photo.parse_mode == self.parse_mode
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
         assert input_media_photo_dict['type'] == input_media_photo.type
         assert input_media_photo_dict['media'] == input_media_photo.media
         assert input_media_photo_dict['caption'] == input_media_photo.caption
+        assert input_media_photo_dict['parse_mode'] == input_media_photo.parse_mode
 
     def test_with_photo(self, photo):
         # fixture found in test_photo
@@ -111,7 +123,8 @@ class TestInputMediaPhoto(object):
 
 @pytest.fixture(scope='function')
 def media_group(photo, thumb):
-    return [InputMediaPhoto(photo), InputMediaPhoto(thumb)]
+    return [InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
+            InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]
 
 
 class TestSendMediaGroup(object):

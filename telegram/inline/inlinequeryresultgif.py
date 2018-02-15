@@ -37,6 +37,9 @@ class InlineQueryResultGif(InlineQueryResult):
         thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption, 0-200 characters
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -51,6 +54,9 @@ class InlineQueryResultGif(InlineQueryResult):
         thumb_url (:obj:`str`): URL of the static thumbnail for the result (jpeg or gif).
         title (:obj:`str`, optional): Title for the result.caption (:obj:`str`, optional):
         caption (:obj:`str`, optional): Caption, 0-200 characters
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -70,6 +76,7 @@ class InlineQueryResultGif(InlineQueryResult):
                  reply_markup=None,
                  input_message_content=None,
                  gif_duration=None,
+                 parse_mode=None,
                  **kwargs):
 
         # Required
@@ -88,6 +95,8 @@ class InlineQueryResultGif(InlineQueryResult):
             self.title = title
         if caption:
             self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

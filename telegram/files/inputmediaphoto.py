@@ -29,12 +29,18 @@ class InputMediaPhoto(InputMedia):
             Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the
             Internet. Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
         caption (:obj:`str`): Optional. Caption of the photo to be sent, 0-200 characters.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
 
     Args:
         media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the
             Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the
             Internet. Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
         caption (:obj:`str`, optional ): Caption of the photo to be sent, 0-200 characters.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
 
     Note:
         At the moment using a new file is not yet supported.
@@ -42,7 +48,7 @@ class InputMediaPhoto(InputMedia):
 
     # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
 
-    def __init__(self, media, caption=None):
+    def __init__(self, media, caption=None, parse_mode=None):
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
@@ -55,3 +61,5 @@ class InputMediaPhoto(InputMedia):
 
         if caption:
             self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode

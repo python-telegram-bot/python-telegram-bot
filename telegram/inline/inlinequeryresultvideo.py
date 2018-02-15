@@ -36,6 +36,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption, 0-200 characters
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         video_width (:obj:`int`): Optional. Video width.
         video_height (:obj:`int`): Optional. Video height.
         video_duration (:obj:`int`): Optional. Video duration in seconds.
@@ -52,6 +55,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption, 0-200 characters.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.
         video_duration (:obj:`int`, optional): Video duration in seconds.
@@ -77,6 +83,7 @@ class InlineQueryResultVideo(InlineQueryResult):
                  description=None,
                  reply_markup=None,
                  input_message_content=None,
+                 parse_mode=None,
                  **kwargs):
 
         # Required
@@ -89,6 +96,8 @@ class InlineQueryResultVideo(InlineQueryResult):
         # Optional
         if caption:
             self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode
         if video_width:
             self.video_width = video_width
         if video_height:

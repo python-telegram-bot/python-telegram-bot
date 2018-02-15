@@ -31,6 +31,7 @@ def inline_query_result_voice():
                                   title=TestInlineQueryResultVoice.title,
                                   voice_duration=TestInlineQueryResultVoice.voice_duration,
                                   caption=TestInlineQueryResultVoice.caption,
+                                  parse_mode=TestInlineQueryResultVoice.parse_mode,
                                   input_message_content=TestInlineQueryResultVoice.input_message_content,
                                   reply_markup=TestInlineQueryResultVoice.reply_markup)
 
@@ -42,6 +43,7 @@ class TestInlineQueryResultVoice(object):
     title = 'title'
     voice_duration = 'voice_duration'
     caption = 'caption'
+    parse_mode = 'HTML'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -52,6 +54,7 @@ class TestInlineQueryResultVoice(object):
         assert inline_query_result_voice.title == self.title
         assert inline_query_result_voice.voice_duration == self.voice_duration
         assert inline_query_result_voice.caption == self.caption
+        assert inline_query_result_voice.parse_mode == self.parse_mode
         assert inline_query_result_voice.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_voice.reply_markup.to_dict() == self.reply_markup.to_dict()
@@ -67,6 +70,7 @@ class TestInlineQueryResultVoice(object):
         assert inline_query_result_voice_dict['voice_duration'] == \
                inline_query_result_voice.voice_duration
         assert inline_query_result_voice_dict['caption'] == inline_query_result_voice.caption
+        assert inline_query_result_voice_dict['parse_mode'] == inline_query_result_voice.parse_mode
         assert inline_query_result_voice_dict['input_message_content'] == \
                inline_query_result_voice.input_message_content.to_dict()
         assert inline_query_result_voice_dict['reply_markup'] == \

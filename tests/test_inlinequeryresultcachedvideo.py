@@ -29,6 +29,7 @@ def inline_query_result_cached_video():
                                         TestInlineQueryResultCachedVideo.video_file_id,
                                         TestInlineQueryResultCachedVideo.title,
                                         caption=TestInlineQueryResultCachedVideo.caption,
+                                        parse_mode=TestInlineQueryResultCachedVideo.parse_mode,
                                         description=TestInlineQueryResultCachedVideo.description,
                                         input_message_content=TestInlineQueryResultCachedVideo.input_message_content,
                                         reply_markup=TestInlineQueryResultCachedVideo.reply_markup)
@@ -40,6 +41,7 @@ class TestInlineQueryResultCachedVideo(object):
     video_file_id = 'video file id'
     title = 'title'
     caption = 'caption'
+    parse_mode = 'Markdown'
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -51,6 +53,7 @@ class TestInlineQueryResultCachedVideo(object):
         assert inline_query_result_cached_video.title == self.title
         assert inline_query_result_cached_video.description == self.description
         assert inline_query_result_cached_video.caption == self.caption
+        assert inline_query_result_cached_video.parse_mode == self.parse_mode
         assert inline_query_result_cached_video.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_cached_video.reply_markup.to_dict() == \
@@ -71,6 +74,8 @@ class TestInlineQueryResultCachedVideo(object):
                inline_query_result_cached_video.description
         assert inline_query_result_cached_video_dict['caption'] == \
                inline_query_result_cached_video.caption
+        assert inline_query_result_cached_video_dict['parse_mode'] == \
+               inline_query_result_cached_video.parse_mode
         assert inline_query_result_cached_video_dict['input_message_content'] == \
                inline_query_result_cached_video.input_message_content.to_dict()
         assert inline_query_result_cached_video_dict['reply_markup'] == \

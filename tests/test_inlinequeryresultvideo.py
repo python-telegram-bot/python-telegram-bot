@@ -34,6 +34,7 @@ def inline_query_result_video():
                                   video_height=TestInlineQueryResultVideo.video_height,
                                   video_duration=TestInlineQueryResultVideo.video_duration,
                                   caption=TestInlineQueryResultVideo.caption,
+                                  parse_mode=TestInlineQueryResultVideo.parse_mode,
                                   description=TestInlineQueryResultVideo.description,
                                   input_message_content=TestInlineQueryResultVideo.input_message_content,
                                   reply_markup=TestInlineQueryResultVideo.reply_markup)
@@ -50,6 +51,7 @@ class TestInlineQueryResultVideo(object):
     thumb_url = 'thumb url'
     title = 'title'
     caption = 'caption'
+    parse_mode = 'Markdown'
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -66,6 +68,7 @@ class TestInlineQueryResultVideo(object):
         assert inline_query_result_video.title == self.title
         assert inline_query_result_video.description == self.description
         assert inline_query_result_video.caption == self.caption
+        assert inline_query_result_video.parse_mode == self.parse_mode
         assert inline_query_result_video.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_video.reply_markup.to_dict() == self.reply_markup.to_dict()
@@ -89,6 +92,7 @@ class TestInlineQueryResultVideo(object):
         assert inline_query_result_video_dict['description'] == \
                inline_query_result_video.description
         assert inline_query_result_video_dict['caption'] == inline_query_result_video.caption
+        assert inline_query_result_video_dict['parse_mode'] == inline_query_result_video.parse_mode
         assert inline_query_result_video_dict['input_message_content'] == \
                inline_query_result_video.input_message_content.to_dict()
         assert inline_query_result_video_dict['reply_markup'] == \

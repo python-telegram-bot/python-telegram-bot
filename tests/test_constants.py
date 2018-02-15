@@ -42,7 +42,6 @@ class TestConstants(object):
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + 'Z'
-        with open('tests/data/telegram.png', 'rb') as f:
-            bad_message = bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
-        assert bad_message.caption != bad_caption
-        assert len(bad_message.caption) == constants.MAX_CAPTION_LENGTH
+        with pytest.raises(BadRequest, message="Media_caption_too_long"):
+            with open('tests/data/telegram.png', 'rb') as f:
+                bad_message = bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)

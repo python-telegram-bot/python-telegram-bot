@@ -79,6 +79,7 @@ def message(bot):
                     {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
                                                              'charge_id', 'provider_id',
                                                              order_info={})},
+                    {'connected_website': 'http://example.com/'},
                     {'forward_signature': 'some_forward_sign'},
                     {'author_signature': 'some_author_sign'},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
@@ -90,8 +91,8 @@ def message(bot):
                      'voice', 'video_note', 'new_members', 'contact', 'location', 'venue',
                      'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
                      'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
-                     'pinned', 'invoice', 'successful_payment', 'forward_signature',
-                     'author_signature', 'photo_from_media_group'])
+                     'pinned', 'invoice', 'successful_payment', 'connected_website',
+                     'forward_signature', 'author_signature', 'photo_from_media_group'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
