@@ -32,6 +32,8 @@ class InputMediaVideo(InputMedia):
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration.
+        supports_streaming (:obj:`bool`): Optional. Pass True, if the uploaded video is suitable for
+            streaming
 
     Args:
         media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
@@ -41,6 +43,8 @@ class InputMediaVideo(InputMedia):
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration.
+        supports_streaming (:obj:`bool`, optional): Pass True, if the uploaded video is suitable for
+            streaming
 
     Note:
         When using a :class:`telegram.Video` for the :attr:`media` attribute. It will take the
@@ -51,7 +55,8 @@ class InputMediaVideo(InputMedia):
 
     # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
 
-    def __init__(self, media, caption=None, width=None, height=None, duration=None):
+    def __init__(self, media, caption=None, width=None, height=None, duration=None,
+                 supports_streaming=None):
         self.type = 'video'
 
         if isinstance(media, Video):
@@ -72,3 +77,5 @@ class InputMediaVideo(InputMedia):
             self.height = height
         if duration:
             self.duration = duration
+        if supports_streaming:
+            self.supports_streaming = supports_streaming
