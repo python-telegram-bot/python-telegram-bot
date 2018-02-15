@@ -335,10 +335,10 @@ class Bot(TelegramObject):
                    chat_id,
                    photo,
                    caption=None,
-                   parse_mode=None,
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
+                   parse_mode=None,
                    timeout=20,
                    **kwargs):
         """Use this method to send photos.
@@ -400,10 +400,10 @@ class Bot(TelegramObject):
                    performer=None,
                    title=None,
                    caption=None,
-                   parse_mode=None,
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
+                   parse_mode=None,
                    timeout=20,
                    **kwargs):
         """
@@ -477,11 +477,11 @@ class Bot(TelegramObject):
                       document,
                       filename=None,
                       caption=None,
-                      parse_mode=None,
                       disable_notification=False,
                       reply_to_message_id=None,
                       reply_markup=None,
                       timeout=20,
+                      parse_mode=None,
                       **kwargs):
         """Use this method to send general files.
 
@@ -594,14 +594,14 @@ class Bot(TelegramObject):
                    video,
                    duration=None,
                    caption=None,
-                   parse_mode=None,
-                   supports_streaming=None,
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
                    timeout=20,
                    width=None,
                    height=None,
+                   parse_mode=None,
+                   supports_streaming=None,
                    **kwargs):
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -627,8 +627,8 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
-            supports_streaming (:obj:`bool`, optional): Pass True, if the uploaded video is suitable
-                for streaming
+            supports_streaming (:obj:`bool`, optional): Pass True, if the uploaded video is
+                suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -675,10 +675,10 @@ class Bot(TelegramObject):
                    voice,
                    duration=None,
                    caption=None,
-                   parse_mode=None,
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
+                   parse_mode=None,
                    timeout=20,
                    **kwargs):
         """
@@ -1581,8 +1581,8 @@ class Bot(TelegramObject):
                              message_id=None,
                              inline_message_id=None,
                              caption=None,
-                             parse_mode=None,
                              reply_markup=None,
+                             parse_mode=None,
                              timeout=None,
                              **kwargs):
         """

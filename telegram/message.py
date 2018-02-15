@@ -189,7 +189,7 @@ class Message(TelegramObject):
             information about the invoice.
         successful_payment (:class:`telegram.SuccessfulPayment`, optional): Message is a service
             message about a successful payment, information about the payment.
-        connected_website (:obj:`str`): Optional. The domain name of the website on which the user
+        connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
         forward_signature (:obj:`str`, optional): Signature of the post author for messages
             forwarded from channels.
@@ -239,10 +239,10 @@ class Message(TelegramObject):
                  pinned_message=None,
                  invoice=None,
                  successful_payment=None,
-                 connected_website=None,
                  forward_signature=None,
                  author_signature=None,
                  media_group_id=None,
+                 connected_website=None,
                  bot=None,
                  **kwargs):
         # Required
