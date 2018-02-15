@@ -195,6 +195,14 @@ class Message(TelegramObject):
 
     _effective_attachment = _UNDEFINED
 
+    ATTACHMENT_TYPES = ['audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice',
+                        'video_note', 'contact', 'location', 'venue', 'invoice',
+                        'successful_payment']
+    MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
+                     'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
+                     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id',
+                     'pinned_message'] + ATTACHMENT_TYPES
+
     def __init__(self,
                  message_id,
                  from_user,
@@ -354,11 +362,9 @@ class Message(TelegramObject):
         if self._effective_attachment is not _UNDEFINED:
             return self._effective_attachment
 
-        for i in (self.audio, self.game, self.document, self.photo, self.sticker,
-                  self.video, self.voice, self.video_note, self.contact, self.location,
-                  self.venue, self.invoice, self.successful_payment):
-            if i:
-                self._effective_attachment = i
+        for i in Message.ATTACHMENT_TYPES:
+            if getattr(self, i, None):
+                self._effective_attachment = getattr(self, i)
                 break
         else:
             self._effective_attachment = None

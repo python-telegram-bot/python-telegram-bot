@@ -113,3 +113,34 @@ def mention_markdown(user_id, name):
     """
     if isinstance(user_id, int):
         return '[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
+
+
+def effective_message_type(entity):
+    """
+    Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
+    :class:`telegram.Update`.
+
+    Args:
+        entity (:obj:`Update` | :obj:`Message`) The ``update`` or ``message`` to extract from
+
+    Returns:
+        str: One of ``Message.MESSAGE_TYPES``
+
+    """
+
+    # Importing on file-level yields cyclic Import Errors
+    from telegram import Message
+    from telegram import Update
+
+    if isinstance(entity, Message):
+        message = entity
+    elif isinstance(entity, Update):
+        message = entity.effective_message
+    else:
+        raise TypeError("entity is not Message or Update (got: {})".format(type(entity)))
+
+    for i in Message.MESSAGE_TYPES:
+        if getattr(message, i, None):
+            return i
+
+    return None

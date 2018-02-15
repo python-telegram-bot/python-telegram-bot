@@ -16,7 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from telegram import Update
 
+from telegram import Sticker
+from telegram import User
+from telegram.message import Message
 from telegram.utils import helpers
 
 
@@ -26,3 +30,28 @@ class TestHelpers(object):
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
 
         assert expected_str == helpers.escape_markdown(test_str)
+
+    def test_effective_message_type(self):
+        test_message = Message(message_id=1,
+                               from_user=None,
+                               date=None,
+                               chat=None)
+
+        test_message.text = 'Test'
+        assert helpers.effective_message_type(test_message) == 'text'
+        test_message.text = None
+
+        test_message.sticker = Sticker('sticker_id', 50, 50)
+        assert helpers.effective_message_type(test_message) == 'sticker'
+        test_message.sticker = None
+
+        test_message.new_chat_members = [User(55, 'new_user', False)]
+        assert helpers.effective_message_type(test_message) == 'new_chat_members'
+
+        test_update = Update(1)
+        test_message.text = 'Test'
+        test_update.message = test_message
+        assert helpers.effective_message_type(test_update) == 'text'
+
+        empty_update = Update(2)
+        assert helpers.effective_message_type(empty_update) is None
