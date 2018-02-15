@@ -43,9 +43,9 @@ class TestVideo(object):
     duration = 5
     file_size = 326534
     mime_type = 'video/mp4'
-    supports_streaming = True
+    supports_streaming = False
 
-    caption = u'VideoTest - Caption'
+    caption = u'<b>VideoTest</b> - *Caption*'
     video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
 
     def test_creation(self, video):
@@ -70,7 +70,8 @@ class TestVideo(object):
     def test_send_all_args(self, bot, chat_id, video_file, video):
         message = bot.send_video(chat_id, video_file, duration=self.duration,
                                  caption=self.caption, supports_streaming=self.supports_streaming,
-                                 disable_notification=False, width=video.width, height=video.height)
+                                 disable_notification=False, width=video.width,
+                                 height=video.height)
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)

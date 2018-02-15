@@ -51,7 +51,7 @@ def photo(_photo):
 class TestPhoto(object):
     width = 300
     height = 300
-    caption = u'PhotoTest - Caption'
+    caption = u'<b>PhotoTest</b> - *Caption*'
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
     file_size = 10209
 
@@ -114,7 +114,8 @@ class TestPhoto(object):
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
 
-        assert message.caption == TestPhoto.caption
+        assert message.caption == TestPhoto.caption.replace('*', '')
+        assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -135,7 +136,8 @@ class TestPhoto(object):
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
 
-        assert message.caption == TestPhoto.caption
+        assert message.caption == TestPhoto.caption.replace('<b>', '').replace('</b>', '')
+        assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
