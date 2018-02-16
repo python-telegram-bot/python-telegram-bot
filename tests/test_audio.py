@@ -38,7 +38,7 @@ def audio(bot, chat_id):
 
 
 class TestAudio(object):
-    caption = 'Test audio'
+    caption = 'Test *audio*'
     performer = 'Leandro Toledo'
     title = 'Teste'
     duration = 3
@@ -66,9 +66,10 @@ class TestAudio(object):
     def test_send_all_args(self, bot, chat_id, audio_file):
         message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
                                  duration=self.duration, performer=self.performer,
-                                 title=self.title, disable_notification=False)
+                                 title=self.title, disable_notification=False,
+                                 parse_mode='Markdown')
 
-        assert message.caption == self.caption
+        assert message.caption == self.caption.replace('*', '')
 
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)

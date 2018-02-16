@@ -42,7 +42,7 @@ class TestVoice(object):
     mime_type = 'audio/ogg'
     file_size = 9199
 
-    caption = u'Test voice'
+    caption = u'Test *voice*'
     voice_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
 
     def test_creation(self, voice):
@@ -60,7 +60,8 @@ class TestVoice(object):
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = bot.send_voice(chat_id, voice_file, duration=self.duration,
-                                 caption=self.caption, disable_notification=False)
+                                 caption=self.caption, disable_notification=False,
+                                 parse_mode='Markdown')
 
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)
@@ -68,7 +69,7 @@ class TestVoice(object):
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
-        assert message.caption == self.caption
+        assert message.caption == self.caption.replace('*', '')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

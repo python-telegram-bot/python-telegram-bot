@@ -43,7 +43,7 @@ class TestVideo(object):
     duration = 5
     file_size = 326534
     mime_type = 'video/mp4'
-    supports_streaming = False
+    supports_streaming = True
 
     caption = u'<b>VideoTest</b> - *Caption*'
     video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'

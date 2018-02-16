@@ -253,11 +253,19 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_edit_message_caption(self, bot, media_message):
-        message = bot.edit_message_caption(caption='new_caption', parse_mode='HTML',
-                                           chat_id=media_message.chat_id,
+        message = bot.edit_message_caption(caption='new_caption', chat_id=media_message.chat_id,
                                            message_id=media_message.message_id)
 
         assert message.caption == 'new_caption'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_caption_with_parse_mode(self, bot, media_message):
+        message = bot.edit_message_caption(caption='new *caption*', parse_mode='Markdown',
+                                           chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id)
+
+        assert message.caption == 'new caption'
 
     @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_caption_without_required(self, bot):

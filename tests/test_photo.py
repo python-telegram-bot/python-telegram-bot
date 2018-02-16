@@ -77,7 +77,7 @@ class TestPhoto(object):
     @pytest.mark.timeout(10)
     def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption,
-                                 disable_notification=False)
+                                 disable_notification=False, parse_mode='Markdown')
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
@@ -93,7 +93,7 @@ class TestPhoto(object):
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
 
-        assert message.caption == TestPhoto.caption
+        assert message.caption == TestPhoto.caption.replace('*', '')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
