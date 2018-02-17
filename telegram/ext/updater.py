@@ -288,7 +288,7 @@ class Updater(object):
                 cur_interval = 0.5 + e.retry_after
             except TimedOut as toe:
                 self.logger.debug('Timed out getting Updates: %s', toe)
-                # If getUpdates() failed due to timeout, we should retry asap.
+                # If get_updates() failed due to timeout, we should retry asap.
                 cur_interval = 0
             except TelegramError as te:
                 self.logger.error('Error while getting Updates: %s', te)
