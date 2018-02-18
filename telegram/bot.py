@@ -338,8 +338,8 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   parse_mode=None,
                    timeout=20,
+                   parse_mode=None,
                    **kwargs):
         """Use this method to send photos.
 
@@ -403,8 +403,8 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   parse_mode=None,
                    timeout=20,
+                   parse_mode=None,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -678,8 +678,8 @@ class Bot(TelegramObject):
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
-                   parse_mode=None,
                    timeout=20,
+                   parse_mode=None,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1582,8 +1582,8 @@ class Bot(TelegramObject):
                              inline_message_id=None,
                              caption=None,
                              reply_markup=None,
-                             parse_mode=None,
                              timeout=None,
+                             parse_mode=None,
                              **kwargs):
         """
         Use this method to edit captions of messages sent by the bot or via the bot
