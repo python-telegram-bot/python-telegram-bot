@@ -99,12 +99,7 @@ class Sticker(TelegramObject):
         return [cls.de_json(d, bot) for d in data]
 
     def get_file(self, timeout=None, **kwargs):
-        """
-        Use this method to get basic info about the sticker file and prepare it for downloading.
-        For the moment, bots can download files of up to 20MB in size. The file can then be
-        downloaded with :attr:`telegram.File.download`. It is guaranteed that the link will be
-        valid for at least 1 hour. When the link expires, a new one can be requested by
-        calling get_file again.
+        """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
