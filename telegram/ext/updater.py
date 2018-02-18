@@ -30,7 +30,7 @@ from queue import Queue
 
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
-from telegram.error import Unauthorized, InvalidToken, RetryAfter
+from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
@@ -267,11 +267,9 @@ class Updater(object):
 
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
                        allowed_updates):  # pragma: no cover
-        # """
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
         # Dispatcher.
-        # """
 
         cur_interval = poll_interval
         self.logger.debug('Updater thread started')
@@ -288,8 +286,12 @@ class Updater(object):
             except RetryAfter as e:
                 self.logger.info(str(e))
                 cur_interval = 0.5 + e.retry_after
+            except TimedOut as toe:
+                self.logger.debug('Timed out getting Updates: %s', toe)
+                # If get_updates() failed due to timeout, we should retry asap.
+                cur_interval = 0
             except TelegramError as te:
-                self.logger.error("Error while getting Updates: {0}".format(te))
+                self.logger.error('Error while getting Updates: %s', te)
 
                 # Put the error into the update queue and let the Dispatcher
                 # broadcast it
@@ -310,7 +312,8 @@ class Updater(object):
 
                 cur_interval = poll_interval
 
-            sleep(cur_interval)
+            if cur_interval:
+                sleep(cur_interval)
 
     @staticmethod
     def _increase_poll_interval(current_interval):
