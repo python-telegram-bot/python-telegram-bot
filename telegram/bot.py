@@ -1305,7 +1305,7 @@ class Bot(TelegramObject):
         return UserProfilePhotos.de_json(result, self)
 
     @log
-    def get_file(self, file_or_file_id, timeout=None, **kwargs):
+    def get_file(self, file_id, timeout=None, **kwargs):
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
         moment, bots can download files of up to 20MB in size. The file can then be downloaded
@@ -1314,10 +1314,10 @@ class Bot(TelegramObject):
         calling get_file again.
 
         Args:
-            file_or_file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` | \
-                             :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |           \
-                             :class:`telegram.Video` | :class:`telegram.VideoNote` |             \
-                             :class:`telegram.Voice`):
+            file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` |          \
+                     :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |                    \
+                     :class:`telegram.Video` | :class:`telegram.VideoNote` |                      \
+                     :class:`telegram.Voice`):
                 Either the file identifier or an object that has a file_id attribute
                 to get file information about.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -1335,11 +1335,11 @@ class Bot(TelegramObject):
         url = '{0}/getFile'.format(self.base_url)
 
         try:
-            file_or_file_id = file_or_file_id.file_id
+            file_id = file_id.file_id
         except AttributeError:
             pass
 
-        data = {'file_id': file_or_file_id}
+        data = {'file_id': file_id}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
