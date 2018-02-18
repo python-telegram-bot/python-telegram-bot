@@ -2,7 +2,7 @@
 # pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -72,15 +72,23 @@ class User(TelegramObject):
     @property
     def name(self):
         """
-        :obj:`str`: The users :attr:`username` if available, if not it returns the first name and
-            if present :attr:`first_name` and :attr:`last_name`.
+        :obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+            prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
 
         """
-
         if self.username:
-            return '@%s' % self.username
+            return '@{}'.format(self.username)
+        return self.full_name
+
+    @property
+    def full_name(self):
+        """
+        :obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if available)
+            :attr:`last_name`.
+
+        """
         if self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
+            return '{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
     @classmethod

@@ -2,7 +2,7 @@
 # pylint: disable=R0902,R0912,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import sys
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
+from telegram import ParseMode
 from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
@@ -194,6 +195,14 @@ class Message(TelegramObject):
 
     _effective_attachment = _UNDEFINED
 
+    ATTACHMENT_TYPES = ['audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice',
+                        'video_note', 'contact', 'location', 'venue', 'invoice',
+                        'successful_payment']
+    MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
+                     'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
+                     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id',
+                     'pinned_message'] + ATTACHMENT_TYPES
+
     def __init__(self,
                  message_id,
                  from_user,
@@ -353,11 +362,9 @@ class Message(TelegramObject):
         if self._effective_attachment is not _UNDEFINED:
             return self._effective_attachment
 
-        for i in (self.audio, self.game, self.document, self.photo, self.sticker,
-                  self.video, self.voice, self.video_note, self.contact, self.location,
-                  self.venue, self.invoice, self.successful_payment):
-            if i:
-                self._effective_attachment = i
+        for i in Message.ATTACHMENT_TYPES:
+            if getattr(self, i, None):
+                self._effective_attachment = getattr(self, i)
                 break
         else:
             self._effective_attachment = None
@@ -425,6 +432,67 @@ class Message(TelegramObject):
         """
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
+
+    def reply_markdown(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args,
+            **kwargs)
+
+        Sends a message with markdown formatting.
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
+        """
+
+        kwargs['parse_mode'] = ParseMode.MARKDOWN
+
+        self._quote(kwargs)
+
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
+
+    def reply_html(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_message(update.message.chat_id, parse_mode=ParseMode.HTML, *args, **kwargs)
+
+        Sends a message with HTML formatting.
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
+        """
+
+        kwargs['parse_mode'] = ParseMode.HTML
+
+        self._quote(kwargs)
+
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
+
+    def reply_media_group(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.reply_media_group(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the media group is sent as an
+                actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
+                this parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
+
+        Returns:
+            List[:class:`telegram.Message`]: An array of the sent Messages.
+
+        Raises:
+            :class:`telegram.TelegramError`
+        """
+        self._quote(kwargs)
+        return self.bot.send_media_group(self.chat_id, *args, **kwargs)
 
     def reply_photo(self, *args, **kwargs):
         """Shortcut for::

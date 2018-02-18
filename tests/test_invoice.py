@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -100,6 +100,8 @@ class TestInvoice(object):
             need_phone_number=True,
             need_email=True,
             need_shipping_address=True,
+            send_phone_number_to_provider=True,
+            send_email_to_provider=True,
             is_flexible=True)
 
         assert message.invoice.currency == self.currency

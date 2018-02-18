@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -188,14 +188,14 @@ class TestBot(object):
         chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
-        assert user_profile_photos.photos[0][0].file_size == 12421
+        assert user_profile_photos.photos[0][0].file_size == 9999
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_one_user_profile_photo(self, bot):
         chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
-        assert user_profile_photos.photos[0][0].file_size == 12421
+        assert user_profile_photos.photos[0][0].file_size == 9999
 
     # get_file is tested multiple times in the test_*media* modules.
 

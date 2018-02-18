@@ -3,7 +3,7 @@
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -2202,6 +2202,8 @@ class Bot(TelegramObject):
                      reply_to_message_id=None,
                      reply_markup=None,
                      provider_data=None,
+                     send_phone_number_to_provider=None,
+                     send_email_to_provider=None,
                      timeout=None,
                      **kwargs):
         """Use this method to send invoices.
@@ -2236,6 +2238,10 @@ class Bot(TelegramObject):
                 complete the order.
             need_shipping_address (:obj:`bool`, optional): Pass True, if you require the user's
                 shipping address to complete the order.
+            send_phone_number_to_provider (:obj:`bool`, optional): Pass True, if user's phone
+                number should be sent to provider.
+            send_email_to_provider (:obj:`bool`, optional): Pass True, if user's email address
+                should be sent to provider.
             is_flexible (:obj:`bool`, optional): Pass True, if the final price depends on the
                 shipping method.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -2292,6 +2298,10 @@ class Bot(TelegramObject):
             data['need_shipping_address'] = need_shipping_address
         if is_flexible is not None:
             data['is_flexible'] = is_flexible
+        if send_phone_number_to_provider is not None:
+            data['send_phone_number_to_provider'] = send_email_to_provider
+        if send_email_to_provider is not None:
+            data['send_email_to_provider'] = send_email_to_provider
 
         return url, data
 

@@ -1,3 +1,21 @@
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2018
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
 import logging
 
 from telegram import Update
@@ -44,11 +62,16 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
     def shutdown(self):
         with self.shutdown_lock:
             if not self.is_running:
-                self.logger.warn('Webhook Server already stopped.')
+                self.logger.warning('Webhook Server already stopped.')
                 return
             else:
                 super(WebhookServer, self).shutdown()
                 self.is_running = False
+
+    def handle_error(self, request, client_address):
+        """Handle an error gracefully."""
+        self.logger.debug('Exception happened during processing of request from %s',
+                          client_address, exc_info=True)
 
 
 # WebhookHandler, process webhook calls

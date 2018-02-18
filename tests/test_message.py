@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ from datetime import datetime
 
 import pytest
 
+from telegram import ParseMode
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment)
@@ -240,6 +241,69 @@ class TestMessage(object):
         assert message.reply_text('test')
         assert message.reply_text('test', quote=True)
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
+
+    def test_reply_markdown(self, monkeypatch, message):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. http://google.com')
+
+        def test(*args, **kwargs):
+            cid = args[1] == message.chat_id
+            markdown_text = args[2] == test_md_string
+            markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, markdown_text, reply, markdown_enabled])
+
+        text_markdown = self.test_message.text_markdown
+        assert text_markdown == test_md_string
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_markdown(self.test_message.text_markdown)
+        assert message.reply_markdown(self.test_message.text_markdown, quote=True)
+        assert message.reply_markdown(self.test_message.text_markdown,
+                                      reply_to_message_id=message.message_id,
+                                      quote=True)
+
+    def test_reply_html(self, monkeypatch, message):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            'http://google.com')
+
+        def test(*args, **kwargs):
+            cid = args[1] == message.chat_id
+            html_text = args[2] == test_html_string
+            html_enabled = kwargs['parse_mode'] == ParseMode.HTML
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, html_text, reply, html_enabled])
+
+        text_html = self.test_message.text_html
+        assert text_html == test_html_string
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_html(self.test_message.text_html)
+        assert message.reply_html(self.test_message.text_html, quote=True)
+        assert message.reply_html(self.test_message.text_html,
+                                  reply_to_message_id=message.message_id,
+                                  quote=True)
+
+    def test_reply_media_group(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            media = kwargs['media'] == 'reply_media_group'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and media and reply
+
+        monkeypatch.setattr('telegram.Bot.send_media_group', test)
+        assert message.reply_media_group(media='reply_media_group')
+        assert message.reply_media_group(media='reply_media_group', quote=True)
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):
