@@ -29,6 +29,7 @@ def inline_query_result_cached_voice():
                                         TestInlineQueryResultCachedVoice.voice_file_id,
                                         TestInlineQueryResultCachedVoice.title,
                                         caption=TestInlineQueryResultCachedVoice.caption,
+                                        parse_mode=TestInlineQueryResultCachedVoice.parse_mode,
                                         input_message_content=TestInlineQueryResultCachedVoice.input_message_content,
                                         reply_markup=TestInlineQueryResultCachedVoice.reply_markup)
 
@@ -39,6 +40,7 @@ class TestInlineQueryResultCachedVoice(object):
     voice_file_id = 'voice file id'
     title = 'title'
     caption = 'caption'
+    parse_mode = 'HTML'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -48,6 +50,7 @@ class TestInlineQueryResultCachedVoice(object):
         assert inline_query_result_cached_voice.voice_file_id == self.voice_file_id
         assert inline_query_result_cached_voice.title == self.title
         assert inline_query_result_cached_voice.caption == self.caption
+        assert inline_query_result_cached_voice.parse_mode == self.parse_mode
         assert inline_query_result_cached_voice.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_cached_voice.reply_markup.to_dict() == \
@@ -66,6 +69,8 @@ class TestInlineQueryResultCachedVoice(object):
                inline_query_result_cached_voice.title
         assert inline_query_result_cached_voice_dict['caption'] == \
                inline_query_result_cached_voice.caption
+        assert inline_query_result_cached_voice_dict['parse_mode'] == \
+               inline_query_result_cached_voice.parse_mode
         assert inline_query_result_cached_voice_dict['input_message_content'] == \
                inline_query_result_cached_voice.input_message_content.to_dict()
         assert inline_query_result_cached_voice_dict['reply_markup'] == \

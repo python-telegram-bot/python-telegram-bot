@@ -33,6 +33,7 @@ def inline_query_result_gif():
                                 gif_duration=TestInlineQueryResultGif.gif_duration,
                                 title=TestInlineQueryResultGif.title,
                                 caption=TestInlineQueryResultGif.caption,
+                                parse_mode=TestInlineQueryResultGif.parse_mode,
                                 input_message_content=TestInlineQueryResultGif.input_message_content,
                                 reply_markup=TestInlineQueryResultGif.reply_markup)
 
@@ -47,6 +48,7 @@ class TestInlineQueryResultGif(object):
     thumb_url = 'thumb url'
     title = 'title'
     caption = 'caption'
+    parse_mode = 'HTML'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
@@ -60,6 +62,7 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif.thumb_url == self.thumb_url
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
+        assert inline_query_result_gif.parse_mode == self.parse_mode
         assert inline_query_result_gif.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
         assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
@@ -77,6 +80,7 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif_dict['thumb_url'] == inline_query_result_gif.thumb_url
         assert inline_query_result_gif_dict['title'] == inline_query_result_gif.title
         assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
+        assert inline_query_result_gif_dict['parse_mode'] == inline_query_result_gif.parse_mode
         assert inline_query_result_gif_dict['input_message_content'] == \
                inline_query_result_gif.input_message_content.to_dict()
         assert inline_query_result_gif_dict['reply_markup'] == \

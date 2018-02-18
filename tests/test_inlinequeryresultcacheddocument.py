@@ -29,6 +29,7 @@ def inline_query_result_cached_document():
                                            TestInlineQueryResultCachedDocument.title,
                                            TestInlineQueryResultCachedDocument.document_file_id,
                                            caption=TestInlineQueryResultCachedDocument.caption,
+                                           parse_mode=TestInlineQueryResultCachedDocument.parse_mode,
                                            description=TestInlineQueryResultCachedDocument.description,
                                            input_message_content=TestInlineQueryResultCachedDocument.input_message_content,
                                            reply_markup=TestInlineQueryResultCachedDocument.reply_markup)
@@ -40,6 +41,7 @@ class TestInlineQueryResultCachedDocument(object):
     document_file_id = 'document file id'
     title = 'title'
     caption = 'caption'
+    parse_mode = 'Markdown'
     description = 'description'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -50,6 +52,7 @@ class TestInlineQueryResultCachedDocument(object):
         assert inline_query_result_cached_document.document_file_id == self.document_file_id
         assert inline_query_result_cached_document.title == self.title
         assert inline_query_result_cached_document.caption == self.caption
+        assert inline_query_result_cached_document.parse_mode == self.parse_mode
         assert inline_query_result_cached_document.description == self.description
         assert inline_query_result_cached_document.input_message_content.to_dict() == \
                self.input_message_content.to_dict()
@@ -70,6 +73,8 @@ class TestInlineQueryResultCachedDocument(object):
                inline_query_result_cached_document.title
         assert inline_query_result_cached_document_dict['caption'] == \
                inline_query_result_cached_document.caption
+        assert inline_query_result_cached_document_dict['parse_mode'] == \
+               inline_query_result_cached_document.parse_mode
         assert inline_query_result_cached_document_dict['description'] == \
                inline_query_result_cached_document.description
         assert inline_query_result_cached_document_dict['input_message_content'] == \
