@@ -29,23 +29,26 @@ class PhotoSize(TelegramObject):
         width (:obj:`int`): Photo width.
         height (:obj:`int`): Photo height.
         file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         file_id (:obj:`str`): Unique identifier for this file.
         width (:obj:`int`): Photo width.
         height (:obj:`int`): Photo height.
         file_size (:obj:`int`, optional): File size.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, file_id, width, height, file_size=None, **kwargs):
+    def __init__(self, file_id, width, height, file_size=None, bot=None, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
         # Optionals
         self.file_size = file_size
+        self.bot = bot
 
         self._id_attrs = (self.file_id,)
 
@@ -54,7 +57,7 @@ class PhotoSize(TelegramObject):
         if not data:
             return None
 
-        return cls(**data)
+        return cls(bot=bot, **data)
 
     @classmethod
     def de_list(cls, data, bot):
@@ -66,3 +69,21 @@ class PhotoSize(TelegramObject):
             photos.append(cls.de_json(photo, bot))
 
         return photos
+
+    def get_file(self, timeout=None, **kwargs):
+        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)

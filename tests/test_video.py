@@ -185,6 +185,13 @@ class TestVideo(object):
         with pytest.raises(TypeError):
             bot.send_video(chat_id=chat_id)
 
+    def test_get_file_instance_method(self, monkeypatch, video):
+        def test(*args, **kwargs):
+            return args[1] == video.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert video.get_file()
+
     def test_equality(self, video):
         a = Video(video.file_id, self.width, self.height, self.duration)
         b = Video(video.file_id, self.width, self.height, self.duration)

@@ -146,6 +146,13 @@ class TestVideoNote(object):
         with pytest.raises(TypeError):
             bot.send_video_note(chat_id=chat_id)
 
+    def test_get_file_instance_method(self, monkeypatch, video_note):
+        def test(*args, **kwargs):
+            return args[1] == video_note.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert video_note.get_file()
+
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, self.length, self.duration)
         b = VideoNote(video_note.file_id, self.length, self.duration)

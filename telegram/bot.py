@@ -1346,10 +1346,15 @@ class Bot(TelegramObject):
         moment, bots can download files of up to 20MB in size. The file can then be downloaded
         with :attr:`telegram.File.download`. It is guaranteed that the link will be
         valid for at least 1 hour. When the link expires, a new one can be requested by
-        calling getFile again.
+        calling get_file again.
 
         Args:
-            file_id (:obj:`str`): File identifier to get info about.
+            file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` |          \
+                     :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |                    \
+                     :class:`telegram.Video` | :class:`telegram.VideoNote` |                      \
+                     :class:`telegram.Voice`):
+                Either the file identifier or an object that has a file_id attribute
+                to get file information about.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1363,6 +1368,11 @@ class Bot(TelegramObject):
 
         """
         url = '{0}/getFile'.format(self.base_url)
+
+        try:
+            file_id = file_id.file_id
+        except AttributeError:
+            pass
 
         data = {'file_id': file_id}
         data.update(kwargs)

@@ -166,6 +166,13 @@ class TestAudio(object):
         with pytest.raises(TypeError):
             bot.send_audio(chat_id=chat_id)
 
+    def test_get_file_instance_method(self, monkeypatch, audio):
+        def test(*args, **kwargs):
+            return args[1] == audio.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert audio.get_file()
+
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.duration)
         b = Audio(audio.file_id, audio.duration)

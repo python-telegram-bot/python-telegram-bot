@@ -151,6 +151,13 @@ class TestVoice(object):
         with pytest.raises(TypeError):
             bot.sendVoice(chat_id)
 
+    def test_get_file_instance_method(self, monkeypatch, voice):
+        def test(*args, **kwargs):
+            return args[1] == voice.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert voice.get_file()
+
     def test_equality(self, voice):
         a = Voice(voice.file_id, self.duration)
         b = Voice(voice.file_id, self.duration)

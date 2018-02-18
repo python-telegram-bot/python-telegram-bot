@@ -163,6 +163,13 @@ class TestDocument(object):
         with pytest.raises(TypeError):
             bot.send_document(chat_id=chat_id)
 
+    def test_get_file_instance_method(self, monkeypatch, document):
+        def test(*args, **kwargs):
+            return args[1] == document.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert document.get_file()
+
     def test_equality(self, document):
         a = Document(document.file_id)
         b = Document(document.file_id)

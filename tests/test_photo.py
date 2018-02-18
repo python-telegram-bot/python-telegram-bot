@@ -290,6 +290,13 @@ class TestPhoto(object):
         with pytest.raises(TypeError):
             bot.send_photo(chat_id=chat_id)
 
+    def test_get_file_instance_method(self, monkeypatch, photo):
+        def test(*args, **kwargs):
+            return args[1] == photo.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert photo.get_file()
+
     def test_equality(self, photo):
         a = PhotoSize(photo.file_id, self.width, self.height)
         b = PhotoSize(photo.file_id, self.width, self.height)
