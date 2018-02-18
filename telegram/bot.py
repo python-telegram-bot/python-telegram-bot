@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
-# flake8: noqa E501
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
@@ -1315,7 +1314,10 @@ class Bot(TelegramObject):
         calling get_file again.
 
         Args:
-            file_or_file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` | :class:`telegram.PhotoSize` | :class:`telegram.Sticker` | :class:`telegram.Video` | :class:`telegram.VideoNote` | :class:`telegram.Voice`):
+            file_or_file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` | \
+                             :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |           \
+                             :class:`telegram.Video` | :class:`telegram.VideoNote` |             \
+                             :class:`telegram.Voice`):
                 Either the file identifier or an object that has a file_id attribute
                 to get file information about.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
