@@ -72,7 +72,7 @@ class Document(TelegramObject):
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
-        return cls(**data, bot=bot)
+        return cls(bot=bot, **data)
 
     def get_file(self, timeout=None, **kwargs):
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
