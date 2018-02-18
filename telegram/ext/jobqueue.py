@@ -342,10 +342,10 @@ class JobQueue(object):
         with self._queue.mutex:
             return tuple(job[1] for job in self._queue.queue if job)
 
-    def select_job(self, name):
+    def get_jobs_by_name(self, name):
         """Returns a tuple of jobs with the given name that are currently in the ``JobQueue``"""
-
-        return tuple(job[1] for job in self.queue.queue if job and job[1].name == name)
+        with self._queue.mutex:
+            return tuple(job[1] for job in self._queue.queue if job and job[1].name == name)
 
 
 class Job(object):
