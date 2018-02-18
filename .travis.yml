@@ -5,7 +5,7 @@ python:
   - "3.5"
   - "3.6"
   - "pypy-5.7.1"
-  - "pypy3.5-5.8.0"
+  - "pypy3.5-5.10.0"
 
 dist: trusty
 sudo: false
