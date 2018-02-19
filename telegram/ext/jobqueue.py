@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# flake8: noqa E501
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
@@ -73,7 +72,8 @@ class JobQueue(object):
 
         Args:
             job (:class:`telegram.ext.Job`): The ``Job`` instance representing the new job.
-            next_t (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+            next_t (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                       \
+                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Time in or at which the job should run for the first time. This parameter will
                 be interpreted depending on its type.
 
@@ -131,7 +131,8 @@ class JobQueue(object):
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
                 :class:`telegram.ext.Job` instance. It can be used to access it's
                 ``job.context`` or change it to a repeating job.
-            when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`):
+            when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
+                  :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
                 depending on its type.
 
@@ -170,7 +171,8 @@ class JobQueue(object):
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
-            first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` | :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+            first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
+                   :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Time in or at which the job should run. This parameter will be interpreted
                 depending on its type.
 
@@ -341,6 +343,11 @@ class JobQueue(object):
         """Returns a tuple of all jobs that are currently in the ``JobQueue``."""
         with self._queue.mutex:
             return tuple(job[1] for job in self._queue.queue if job)
+
+    def get_jobs_by_name(self, name):
+        """Returns a tuple of jobs with the given name that are currently in the ``JobQueue``"""
+        with self._queue.mutex:
+            return tuple(job[1] for job in self._queue.queue if job and job[1].name == name)
 
 
 class Job(object):

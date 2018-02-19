@@ -238,3 +238,12 @@ class TestJobQueue(object):
             j.days = ('mon', 'wed')
         with pytest.raises(ValueError, match='from 0 up to and'):
             j.days = (0, 6, 12, 14)
+
+    def test_get_jobs(self, job_queue):
+        job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
+        job2 = job_queue.run_once(self.job_run_once, 10, name='name1')
+        job3 = job_queue.run_once(self.job_run_once, 10, name='name2')
+
+        assert job_queue.jobs() == (job1, job2, job3)
+        assert job_queue.get_jobs_by_name('name1') == (job1, job2)
+        assert job_queue.get_jobs_by_name('name2') == (job3,)
