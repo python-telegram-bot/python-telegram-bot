@@ -35,9 +35,6 @@ We have made you a wrapper you can't refuse
    :target: https://ci.appveyor.com/project/Eldinnie/python-telegram-bot
    :alt: AppVeyor CI Status
 
-.. image:: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot/badges/gpa.svg
-   :target: https://codeclimate.com/github/python-telegram-bot/python-telegram-bot
-   :alt: Code Climate
 
 .. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot
