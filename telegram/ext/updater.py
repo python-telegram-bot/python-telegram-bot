@@ -21,7 +21,6 @@
 import logging
 import os
 import ssl
-import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
@@ -157,7 +156,6 @@ class Updater(object):
     def start_polling(self,
                       poll_interval=0.0,
                       timeout=10,
-                      network_delay=None,
                       clean=False,
                       bootstrap_retries=0,
                       read_latency=2.,
@@ -182,18 +180,11 @@ class Updater(object):
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
                 the reply from server. Will be added to the `timeout` value and used as the read
                 timeout from server (Default: 2).
-            network_delay: Deprecated. Will be honoured as :attr:`read_latency` for a while but
-                will be removed in the future.
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-
-        if network_delay is not None:
-            warnings.warn('network_delay is deprecated, use read_latency instead')
-            read_latency = network_delay
-
         with self.__lock:
             if not self.running:
                 self.running = True
