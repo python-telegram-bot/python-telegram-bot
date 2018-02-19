@@ -24,7 +24,6 @@ from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Stick
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
 from telegram import ParseMode
-from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
 
 _UNDEFINED = object()
@@ -98,9 +97,6 @@ class Message(TelegramObject):
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
-    Deprecated: 6.0
-        new_chat_member (:class:`telegram.User`): Replaced with :attr:`new_chat_members`
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -234,7 +230,6 @@ class Message(TelegramObject):
                  contact=None,
                  location=None,
                  venue=None,
-                 new_chat_member=None,
                  left_chat_member=None,
                  new_chat_title=None,
                  new_chat_photo=None,
@@ -279,7 +274,6 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self._new_chat_member = new_chat_member
         self.new_chat_members = new_chat_members or list()
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
@@ -336,7 +330,6 @@ class Message(TelegramObject):
         data['contact'] = Contact.de_json(data.get('contact'), bot)
         data['location'] = Location.de_json(data.get('location'), bot)
         data['venue'] = Venue.de_json(data.get('venue'), bot)
-        data['new_chat_member'] = User.de_json(data.get('new_chat_member'), bot)
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
@@ -401,7 +394,6 @@ class Message(TelegramObject):
             data['caption_entities'] = [e.to_dict() for e in self.caption_entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
-        data['new_chat_member'] = data.pop('_new_chat_member', None)
         if self.new_chat_members:
             data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
@@ -1005,9 +997,3 @@ class Message(TelegramObject):
 
         """
         return self._text_markdown(urled=True)
-
-    @property
-    def new_chat_member(self):
-        """Deprecated"""
-        warn_deprecate_obj('new_chat_member', 'new_chat_members')
-        return self._new_chat_member

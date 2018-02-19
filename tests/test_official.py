@@ -28,11 +28,7 @@ from telegram.vendor.ptb_urllib3 import urllib3
 import telegram
 
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
-IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot',
-                      'new_chat_member'}
-
-
-# TODO: New_chat_member is still in our lib but already removed from TG's docs.
+IGNORED_PARAMETERS = {'self', 'args', 'kwargs', 'read_latency', 'network_delay', 'timeout', 'bot'}
 
 
 def find_next_sibling_until(tag, name, until):
