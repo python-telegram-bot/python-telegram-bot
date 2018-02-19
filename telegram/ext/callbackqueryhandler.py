@@ -33,6 +33,8 @@ class CallbackQueryHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -58,6 +60,10 @@ class CallbackQueryHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -79,11 +85,11 @@ class CallbackQueryHandler(Handler):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
-
     """
 
     def __init__(self,
                  callback,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pattern=None,
@@ -93,6 +99,7 @@ class CallbackQueryHandler(Handler):
                  pass_chat_data=False):
         super(CallbackQueryHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
@@ -104,6 +111,10 @@ class CallbackQueryHandler(Handler):
         self.pattern = pattern
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
+
+        if self.autowire:
+            self.set_autowired_flags(passable={'groups', 'groupdict', 'user_data',
+                                               'chat_data', 'update_queue', 'job_queue'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -131,7 +142,9 @@ class CallbackQueryHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
+
         if self.pattern:
             match = re.match(self.pattern, update.callback_query.data)
 
@@ -140,4 +153,4 @@ class CallbackQueryHandler(Handler):
             if self.pass_groupdict:
                 optional_args['groupdict'] = match.groupdict()
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

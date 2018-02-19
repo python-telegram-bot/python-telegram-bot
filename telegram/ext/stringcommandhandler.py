@@ -33,6 +33,8 @@ class StringCommandHandler(Handler):
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
             ``args``.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
@@ -46,6 +48,10 @@ class StringCommandHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that a command should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield a warning.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -64,13 +70,19 @@ class StringCommandHandler(Handler):
     def __init__(self,
                  command,
                  callback,
+                 autowire=False,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
         super(StringCommandHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            autowire=autowire,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue)
         self.command = command
         self.pass_args = pass_args
+        if self.autowire:
+            self.set_autowired_flags(passable={'update_queue', 'job_queue', 'args'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -94,10 +106,10 @@ class StringCommandHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
 
         """
-
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher)
 
         if self.pass_args:
             optional_args['args'] = update.split()[1:]
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

@@ -49,7 +49,8 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def pre_checkout_query():
-    return Update(1, pre_checkout_query=PreCheckoutQuery('id', User(1, 'test user', False), 'EUR', 223,
+    return Update(1, pre_checkout_query=PreCheckoutQuery('id', User(1, 'test user', False), 'EUR',
+                                                         223,
                                                          'invoice_payload'))
 
 
@@ -76,6 +77,10 @@ class TestPreCheckoutQueryHandler(object):
 
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
+
+    def callback_autowire(self, update, job_queue, update_queue, chat_data, user_data):
+        self.test_flag = all(x is not None for x in (update, job_queue,
+                                                     update_queue, chat_data, user_data))
 
     def test_basic(self, dp, pre_checkout_query):
         handler = PreCheckoutQueryHandler(self.callback_basic)
@@ -130,6 +135,13 @@ class TestPreCheckoutQueryHandler(object):
         dp.add_handler(handler)
 
         self.test_flag = False
+        dp.process_update(pre_checkout_query)
+        assert self.test_flag
+
+    def test_autowire(self, dp, pre_checkout_query):
+        handler = PreCheckoutQueryHandler(self.callback_autowire, autowire=True)
+        dp.add_handler(handler)
+
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 

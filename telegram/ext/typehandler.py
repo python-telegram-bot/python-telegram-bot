@@ -29,6 +29,8 @@ class TypeHandler(Handler):
         callback (:obj:`callable`): The callback function for this handler.
         strict (:obj:`bool`): Optional. Use ``type`` instead of ``isinstance``.
             Default is ``False``
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -42,6 +44,10 @@ class TypeHandler(Handler):
             processed by this handler.
         strict (:obj:`bool`, optional): Use ``type`` instead of ``isinstance``.
             Default is ``False``
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -53,12 +59,22 @@ class TypeHandler(Handler):
 
     """
 
-    def __init__(self, type, callback, strict=False, pass_update_queue=False,
+    def __init__(self,
+                 type,
+                 callback,
+                 strict=False,
+                 autowire=False,
+                 pass_update_queue=False,
                  pass_job_queue=False):
         super(TypeHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            autowire=autowire,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue)
         self.type = type
         self.strict = strict
+        if self.autowire:
+            self.set_autowired_flags({'update_queue', 'job_queue'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -84,6 +100,7 @@ class TypeHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher)
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

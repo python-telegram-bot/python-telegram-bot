@@ -118,6 +118,25 @@ class TestStringCommandHandler(object):
         dp.process_update('/test')
         assert self.test_flag
 
+    def test_autowire(self, dp):
+        handler = StringCommandHandler('test', self.callback_queue_2, autowire=True)
+        dp.add_handler(handler)
+
+        self.test_flag = False
+        dp.process_update('/test')
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        handler = StringCommandHandler('test', self.sch_callback_args, autowire=True)
+        dp.add_handler(handler)
+
+        dp.process_update('/test')
+        assert self.test_flag
+
+        self.test_flag = False
+        dp.process_update('/test one two')
+        assert self.test_flag
+
     def test_other_update_types(self, false_update):
         handler = StringCommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)

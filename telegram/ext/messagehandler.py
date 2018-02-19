@@ -31,6 +31,8 @@ class MessageHandler(Handler):
         filters (:obj:`Filter`): Only allow updates with these Filters. See
             :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
@@ -62,6 +64,11 @@ class MessageHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield
+            a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -92,6 +99,7 @@ class MessageHandler(Handler):
                  filters,
                  callback,
                  allow_edited=False,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
@@ -108,6 +116,7 @@ class MessageHandler(Handler):
 
         super(MessageHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
@@ -116,6 +125,9 @@ class MessageHandler(Handler):
         self.message_updates = message_updates
         self.channel_post_updates = channel_post_updates
         self.edited_updates = edited_updates
+
+        if self.autowire:
+            self.set_autowired_flags()
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -164,6 +176,7 @@ class MessageHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

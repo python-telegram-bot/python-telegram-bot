@@ -78,6 +78,10 @@ class TestChosenInlineResultHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
+    def autowire_callback(self, update, job_queue, update_queue, chat_data, user_data):
+        self.test_flag = all(x is not None for x in (update, job_queue,
+                                                     update_queue, chat_data, user_data))
+
     def test_basic(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_basic)
         dp.add_handler(handler)
@@ -131,6 +135,13 @@ class TestChosenInlineResultHandler(object):
         dp.add_handler(handler)
 
         self.test_flag = False
+        dp.process_update(chosen_inline_result)
+        assert self.test_flag
+
+    def test_autowire(self, dp, chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.autowire_callback, autowire=True)
+        dp.add_handler(handler)
+
         dp.process_update(chosen_inline_result)
         assert self.test_flag
 

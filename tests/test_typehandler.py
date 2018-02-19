@@ -80,3 +80,10 @@ class TestTypeHandler(object):
         self.test_flag = False
         dp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
+
+    def autowire_job_update(self, dp):
+        handler = TypeHandler(dict, self.callback_queue_2, autowire=True)
+        dp.add_handler(handler)
+
+        dp.process_update({'a': 1, 'b': 2})
+        assert self.test_flag

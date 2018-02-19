@@ -74,6 +74,13 @@ class TestCallbackQueryHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
+    def autowire_callback_1(self, update, job_queue, update_queue, chat_data, user_data):
+        self.test_flag = all(x is not None for x in (update, job_queue,
+                                                     update_queue, chat_data, user_data))
+
+    def autowire_callback_2(self, bot, update, job_queue):
+        self.test_flag = all(x is not None for x in (bot, update, job_queue))
+
     def callback_group(self, bot, update, groups=None, groupdict=None):
         if groups is not None:
             self.test_flag = groups == ('t', ' data')
@@ -161,6 +168,30 @@ class TestCallbackQueryHandler(object):
         dp.add_handler(handler)
 
         self.test_flag = False
+        dp.process_update(callback_query)
+        assert self.test_flag
+
+    def test_autowire(self, dp, callback_query):
+        handler = CallbackQueryHandler(self.autowire_callback_1, autowire=True)
+        dp.add_handler(handler)
+
+        dp.process_update(callback_query)
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        handler = CallbackQueryHandler(self.autowire_callback_2, autowire=True)
+        dp.add_handler(handler)
+
+        self.test_flag = False
+        dp.process_update(callback_query)
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        handler = CallbackQueryHandler(self.callback_group,
+                                       pattern='(?P<begin>.*)est(?P<end>.*)',
+                                       pass_groups=True)
+        dp.add_handler(handler)
+
         dp.process_update(callback_query)
         assert self.test_flag
 

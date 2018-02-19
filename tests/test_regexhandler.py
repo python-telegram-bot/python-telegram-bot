@@ -72,6 +72,10 @@ class TestRegexHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
+    def callback_autowire(self, update, job_queue, update_queue, chat_data, user_data):
+        self.test_flag = all(x is not None for x in (update, job_queue,
+                                                     update_queue, chat_data, user_data))
+
     def callback_group(self, bot, update, groups=None, groupdict=None):
         if groups is not None:
             self.test_flag = groups == ('t', ' message')
@@ -199,6 +203,30 @@ class TestRegexHandler(object):
 
         self.test_flag = False
         dp.process_update(Update(0, message=message))
+        assert self.test_flag
+
+    def test_autowire(self, dp, message):
+        handler = RegexHandler('.*', self.callback_autowire, autowire=True)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=message))
+        assert self.test_flag
+
+    def test_autowire_group_dict(self, dp, message):
+        handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
+                               autowire=True)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message))
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
+                               autowire=True)
+        dp.add_handler(handler)
+
+        self.test_flag = False
+        dp.process_update(Update(0, message))
         assert self.test_flag
 
     def test_other_update_types(self, false_update):

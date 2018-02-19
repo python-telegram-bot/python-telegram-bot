@@ -49,9 +49,10 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def shiping_query():
-    return Update(1, shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
-                                                  ShippingAddress('EN', 'my_state', 'my_city',
-                                                                  'steer_1', '', 'post_code')))
+    return Update(1,
+                  shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
+                                               ShippingAddress('EN', 'my_state', 'my_city',
+                                                               'steer_1', '', 'post_code')))
 
 
 class TestShippingQueryHandler(object):
@@ -77,6 +78,10 @@ class TestShippingQueryHandler(object):
 
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
+
+    def callback_autowire(self, update, job_queue, update_queue, chat_data, user_data):
+        self.test_flag = all(x is not None for x in (update, job_queue,
+                                                     update_queue, chat_data, user_data))
 
     def test_basic(self, dp, shiping_query):
         handler = ShippingQueryHandler(self.callback_basic)
@@ -131,6 +136,13 @@ class TestShippingQueryHandler(object):
         dp.add_handler(handler)
 
         self.test_flag = False
+        dp.process_update(shiping_query)
+        assert self.test_flag
+
+    def test_autowire(self, dp, shiping_query):
+        handler = ShippingQueryHandler(self.callback_autowire, autowire=True)
+        dp.add_handler(handler)
+
         dp.process_update(shiping_query)
         assert self.test_flag
 

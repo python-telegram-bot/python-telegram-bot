@@ -72,12 +72,16 @@ class StringRegexHandler(Handler):
     def __init__(self,
                  pattern,
                  callback,
+                 autowire=False,
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
         super(StringRegexHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            autowire=autowire,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
@@ -85,6 +89,8 @@ class StringRegexHandler(Handler):
         self.pattern = pattern
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
+        if self.autowire:
+            self.set_autowired_flags({'groups', 'groupdict', 'update_queue', 'job_queue'})
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -106,6 +112,7 @@ class StringRegexHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher)
         match = re.match(self.pattern, update)
 
@@ -114,4 +121,4 @@ class StringRegexHandler(Handler):
         if self.pass_groupdict:
             optional_args['groupdict'] = match.groupdict()
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

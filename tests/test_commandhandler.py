@@ -75,6 +75,10 @@ class TestCommandHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
+    def autowire_callback(self, update, args, job_queue, update_queue, chat_data, user_data):
+        self.test_flag = all(x is not None for x in (update, args, job_queue,
+                                                     update_queue, chat_data, user_data))
+
     def ch_callback_args(self, bot, update, args):
         if update.message.text == '/test':
             self.test_flag = len(args) == 0
@@ -237,6 +241,14 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         self.test_flag = False
+        dp.process_update(Update(0, message=message))
+        assert self.test_flag
+
+    def test_autowire(self, dp, message):
+        handler = CommandHandler('test', self.autowire_callback, autowire=True)
+        dp.add_handler(handler)
+
+        message.text = '/test abc'
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 

@@ -21,8 +21,8 @@ import warnings
 
 from future.utils import string_types
 
-from .handler import Handler
 from telegram import Update
+from .handler import Handler
 
 
 class CommandHandler(Handler):
@@ -39,6 +39,8 @@ class CommandHandler(Handler):
             Filters.
         allow_edited (:obj:`bool`): Optional. Determines Whether the handler should also accept
             edited messages.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
             ``args``.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
@@ -68,6 +70,10 @@ class CommandHandler(Handler):
             operators (& for and, | for or, ~ for not).
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield a warning.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -92,6 +98,7 @@ class CommandHandler(Handler):
                  callback,
                  filters=None,
                  allow_edited=False,
+                 autowire=False,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
@@ -99,10 +106,16 @@ class CommandHandler(Handler):
                  pass_chat_data=False):
         super(CommandHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
+
+        self.pass_args = pass_args
+        if self.autowire:
+            self.set_autowired_flags(
+                {'update_queue', 'job_queue', 'user_data', 'chat_data', 'args'})
 
         if isinstance(command, string_types):
             self.command = [command.lower()]
@@ -110,7 +123,6 @@ class CommandHandler(Handler):
             self.command = [x.lower() for x in command]
         self.filters = filters
         self.allow_edited = allow_edited
-        self.pass_args = pass_args
 
         # We put this up here instead of with the rest of checking code
         # in check_update since we don't wanna spam a ton
@@ -129,8 +141,8 @@ class CommandHandler(Handler):
             :obj:`bool`
 
         """
-        if (isinstance(update, Update)
-                and (update.message or update.edited_message and self.allow_edited)):
+        if (isinstance(update, Update) and
+                (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
             if message.text and message.text.startswith('/') and len(message.text) > 1:
@@ -161,6 +173,7 @@ class CommandHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
 
         message = update.message or update.edited_message
@@ -168,4 +181,4 @@ class CommandHandler(Handler):
         if self.pass_args:
             optional_args['args'] = message.text.split()[1:]
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)

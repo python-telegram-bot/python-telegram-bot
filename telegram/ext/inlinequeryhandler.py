@@ -33,12 +33,14 @@ class InlineQueryHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
+            :attr:`telegram.InlineQuery.query` against.
+        autowire (:obj:`bool`): Optional. Determines whether objects will be passed to the
+            callback function automatically.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
             the callback function.
-        pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
-            :attr:`telegram.InlineQuery.query` against.
         pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
@@ -58,6 +60,14 @@ class InlineQueryHandler(Handler):
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
             It will be called when the :attr:`check_update` has determined that an update should be
             processed by this handler.
+        pattern (:obj:`str` | :obj:`Pattern`, optional): Regex pattern. If not ``None``,
+            ``re.match`` is used on :attr:`telegram.InlineQuery.query` to determine if an update
+            should be handled by this handler.
+        autowire (:obj:`bool`, optional): If set to ``True``, your callback handler will be
+            inspected for positional arguments and be passed objects whose names match any of the
+            ``pass_*`` flags of this Handler. Using any ``pass_*`` argument in conjunction with
+            ``autowire`` will yield
+            a warning.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -66,9 +76,6 @@ class InlineQueryHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
-        pattern (:obj:`str` | :obj:`Pattern`, optional): Regex pattern. If not ``None``,
-            ``re.match`` is used on :attr:`telegram.InlineQuery.query` to determine if an update
-            should be handled by this handler.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -83,15 +90,17 @@ class InlineQueryHandler(Handler):
 
     def __init__(self,
                  callback,
+                 pattern=None,
+                 autowire=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
-                 pattern=None,
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_user_data=False,
                  pass_chat_data=False):
         super(InlineQueryHandler, self).__init__(
             callback,
+            autowire=autowire,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
@@ -103,6 +112,9 @@ class InlineQueryHandler(Handler):
         self.pattern = pattern
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
+        if self.autowire:
+            self.set_autowired_flags(passable={'update_queue', 'job_queue', 'user_data',
+                                               'chat_data', 'groups', 'groupdict'})
 
     def check_update(self, update):
         """
@@ -131,8 +143,9 @@ class InlineQueryHandler(Handler):
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
         """
-
+        positional_args = self.collect_bot_update_args(dispatcher, update)
         optional_args = self.collect_optional_args(dispatcher, update)
+
         if self.pattern:
             match = re.match(self.pattern, update.inline_query.query)
 
@@ -141,7 +154,7 @@ class InlineQueryHandler(Handler):
             if self.pass_groupdict:
                 optional_args['groupdict'] = match.groupdict()
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+        return self.callback(*positional_args, **optional_args)
 
     # old non-PEP8 Handler methods
     m = "telegram.InlineQueryHandler."
