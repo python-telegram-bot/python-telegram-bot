@@ -25,17 +25,18 @@ from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQuery
 
 @pytest.fixture(scope='class')
 def inline_query_result_gif():
-    return InlineQueryResultGif(TestInlineQueryResultGif.id,
-                                TestInlineQueryResultGif.gif_url,
-                                TestInlineQueryResultGif.thumb_url,
-                                gif_width=TestInlineQueryResultGif.gif_width,
-                                gif_height=TestInlineQueryResultGif.gif_height,
-                                gif_duration=TestInlineQueryResultGif.gif_duration,
-                                title=TestInlineQueryResultGif.title,
-                                caption=TestInlineQueryResultGif.caption,
-                                parse_mode=TestInlineQueryResultGif.parse_mode,
-                                input_message_content=TestInlineQueryResultGif.input_message_content,
-                                reply_markup=TestInlineQueryResultGif.reply_markup)
+    return InlineQueryResultGif(
+        TestInlineQueryResultGif.id,
+        TestInlineQueryResultGif.gif_url,
+        TestInlineQueryResultGif.thumb_url,
+        gif_width=TestInlineQueryResultGif.gif_width,
+        gif_height=TestInlineQueryResultGif.gif_height,
+        gif_duration=TestInlineQueryResultGif.gif_duration,
+        title=TestInlineQueryResultGif.title,
+        caption=TestInlineQueryResultGif.caption,
+        parse_mode=TestInlineQueryResultGif.parse_mode,
+        input_message_content=TestInlineQueryResultGif.input_message_content,
+        reply_markup=TestInlineQueryResultGif.reply_markup)
 
 
 class TestInlineQueryResultGif(object):
@@ -63,8 +64,8 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
-        assert inline_query_result_gif.input_message_content.to_dict() == \
-               self.input_message_content.to_dict()
+        assert (inline_query_result_gif.input_message_content.to_dict() ==
+                self.input_message_content.to_dict())
         assert inline_query_result_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_gif):
@@ -81,10 +82,10 @@ class TestInlineQueryResultGif(object):
         assert inline_query_result_gif_dict['title'] == inline_query_result_gif.title
         assert inline_query_result_gif_dict['caption'] == inline_query_result_gif.caption
         assert inline_query_result_gif_dict['parse_mode'] == inline_query_result_gif.parse_mode
-        assert inline_query_result_gif_dict['input_message_content'] == \
-               inline_query_result_gif.input_message_content.to_dict()
-        assert inline_query_result_gif_dict['reply_markup'] == \
-               inline_query_result_gif.reply_markup.to_dict()
+        assert (inline_query_result_gif_dict['input_message_content'] ==
+                inline_query_result_gif.input_message_content.to_dict())
+        assert (inline_query_result_gif_dict['reply_markup'] ==
+                inline_query_result_gif.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultGif(self.id, self.gif_url, self.thumb_url)

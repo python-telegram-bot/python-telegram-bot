@@ -88,8 +88,8 @@ class TestConversationHandler(object):
     # Tests
     def test_per_all_false(self):
         with pytest.raises(ValueError, match="can't all be 'False'"):
-            handler = ConversationHandler(self.entry_points, self.states, self.fallbacks,
-                                          per_chat=False, per_user=False, per_message=False)
+            ConversationHandler(self.entry_points, self.states, self.fallbacks,
+                                per_chat=False, per_user=False, per_message=False)
 
     def test_conversation_handler(self, dp, bot, user1, user2):
         handler = ConversationHandler(entry_points=self.entry_points, states=self.states,

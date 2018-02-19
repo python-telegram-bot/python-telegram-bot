@@ -25,13 +25,14 @@ from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQuery
 
 @pytest.fixture(scope='class')
 def inline_query_result_cached_gif():
-    return InlineQueryResultCachedGif(TestInlineQueryResultCachedGif.id,
-                                      TestInlineQueryResultCachedGif.gif_file_id,
-                                      title=TestInlineQueryResultCachedGif.title,
-                                      caption=TestInlineQueryResultCachedGif.caption,
-                                      parse_mode=TestInlineQueryResultCachedGif.parse_mode,
-                                      input_message_content=TestInlineQueryResultCachedGif.input_message_content,
-                                      reply_markup=TestInlineQueryResultCachedGif.reply_markup)
+    return InlineQueryResultCachedGif(
+        TestInlineQueryResultCachedGif.id,
+        TestInlineQueryResultCachedGif.gif_file_id,
+        title=TestInlineQueryResultCachedGif.title,
+        caption=TestInlineQueryResultCachedGif.caption,
+        parse_mode=TestInlineQueryResultCachedGif.parse_mode,
+        input_message_content=TestInlineQueryResultCachedGif.input_message_content,
+        reply_markup=TestInlineQueryResultCachedGif.reply_markup)
 
 
 class TestInlineQueryResultCachedGif(object):
@@ -51,8 +52,8 @@ class TestInlineQueryResultCachedGif(object):
         assert inline_query_result_cached_gif.title == self.title
         assert inline_query_result_cached_gif.caption == self.caption
         assert inline_query_result_cached_gif.parse_mode == self.parse_mode
-        assert inline_query_result_cached_gif.input_message_content.to_dict() == \
-               self.input_message_content.to_dict()
+        assert (inline_query_result_cached_gif.input_message_content.to_dict() ==
+                self.input_message_content.to_dict())
         assert inline_query_result_cached_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_cached_gif):
@@ -61,17 +62,17 @@ class TestInlineQueryResultCachedGif(object):
         assert isinstance(inline_query_result_cached_gif_dict, dict)
         assert inline_query_result_cached_gif_dict['type'] == inline_query_result_cached_gif.type
         assert inline_query_result_cached_gif_dict['id'] == inline_query_result_cached_gif.id
-        assert inline_query_result_cached_gif_dict['gif_file_id'] == \
-               inline_query_result_cached_gif.gif_file_id
+        assert (inline_query_result_cached_gif_dict['gif_file_id'] ==
+                inline_query_result_cached_gif.gif_file_id)
         assert inline_query_result_cached_gif_dict['title'] == inline_query_result_cached_gif.title
-        assert inline_query_result_cached_gif_dict['caption'] == \
-               inline_query_result_cached_gif.caption
-        assert inline_query_result_cached_gif_dict['parse_mode'] == \
-               inline_query_result_cached_gif.parse_mode
-        assert inline_query_result_cached_gif_dict['input_message_content'] == \
-               inline_query_result_cached_gif.input_message_content.to_dict()
-        assert inline_query_result_cached_gif_dict['reply_markup'] == \
-               inline_query_result_cached_gif.reply_markup.to_dict()
+        assert (inline_query_result_cached_gif_dict['caption'] ==
+                inline_query_result_cached_gif.caption)
+        assert (inline_query_result_cached_gif_dict['parse_mode'] ==
+                inline_query_result_cached_gif.parse_mode)
+        assert (inline_query_result_cached_gif_dict['input_message_content'] ==
+                inline_query_result_cached_gif.input_message_content.to_dict())
+        assert (inline_query_result_cached_gif_dict['reply_markup'] ==
+                inline_query_result_cached_gif.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultCachedGif(self.id, self.gif_file_id)

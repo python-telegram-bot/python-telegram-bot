@@ -18,14 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import inspect
 import sys
-from collections import namedtuple
 from platform import python_implementation
 
 import certifi
 import pytest
 from bs4 import BeautifulSoup
-
-sys.path.append('.')
 
 from telegram.vendor.ptb_urllib3 import urllib3
 import telegram
@@ -50,8 +47,6 @@ def parse_table(h4):
     table = find_next_sibling_until(h4, 'table', h4.find_next_sibling('h4'))
     if not table:
         return []
-    head = [td.text for td in table.tr.find_all('td')]
-    # row = namedtuple('{}TableRow'.format(h4.text), ','.join(head))
     t = []
     for tr in table.find_all('tr')[1:]:
         t.append([td.text for td in tr.find_all('td')])

@@ -20,8 +20,8 @@ import pytest
 from flaky import flaky
 
 from telegram import InputMediaVideo, InputMediaPhoto, Message
-from .test_video import video, video_file
-from .test_photo import _photo, photo_file, photo, thumb
+from .test_video import video, video_file  # noqa: F401
+from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 
 
 @pytest.fixture(scope='class')
@@ -73,7 +73,7 @@ class TestInputMediaVideo(object):
         assert input_media_video_dict['parse_mode'] == input_media_video.parse_mode
         assert input_media_video_dict['supports_streaming'] == input_media_video.supports_streaming
 
-    def test_with_video(self, video):
+    def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
         input_media_video = InputMediaVideo(video, caption="test 3")
         assert input_media_video.type == self.type
@@ -83,7 +83,7 @@ class TestInputMediaVideo(object):
         assert input_media_video.duration == video.duration
         assert input_media_video.caption == "test 3"
 
-    def test_error_with_file(self, video_file):
+    def test_error_with_file(self, video_file):  # noqa: F811
         # fixture found in test_video
         with pytest.raises(ValueError, match="file_id, url or Video"):
             InputMediaVideo(video_file)
@@ -108,20 +108,20 @@ class TestInputMediaPhoto(object):
         assert input_media_photo_dict['caption'] == input_media_photo.caption
         assert input_media_photo_dict['parse_mode'] == input_media_photo.parse_mode
 
-    def test_with_photo(self, photo):
+    def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
         imp = InputMediaPhoto(photo, caption="test 2")
         assert imp.type == self.type
         assert imp.media == photo.file_id
         assert imp.caption == "test 2"
 
-    def test_error_with_file(self, photo_file):
+    def test_error_with_file(self, photo_file):  # noqa: F811
         # fixture found in test_photo
         with pytest.raises(ValueError, match="file_id, url or PhotoSize"):
             InputMediaPhoto(photo_file)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='function')  # noqa: F811
 def media_group(photo, thumb):
     return [InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
             InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]

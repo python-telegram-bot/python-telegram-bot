@@ -128,5 +128,5 @@ class TestInvoice(object):
 
         with pytest.raises(TypeError):
             assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
-                                provider_token, self.start_parameter, self.currency,
-                                self.prices, provider_data={'a', 'b', 'c'})
+                                    provider_token, self.start_parameter, self.currency,
+                                    self.prices, provider_data={'a', 'b', 'c'})

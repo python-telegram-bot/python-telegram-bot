@@ -43,6 +43,6 @@ class TestReplyKeyboardRemove(object):
     def test_to_dict(self, reply_keyboard_remove):
         reply_keyboard_remove_dict = reply_keyboard_remove.to_dict()
 
-        assert reply_keyboard_remove_dict['remove_keyboard'] == \
-               reply_keyboard_remove.remove_keyboard
+        assert (reply_keyboard_remove_dict['remove_keyboard'] ==
+                reply_keyboard_remove.remove_keyboard)
         assert reply_keyboard_remove_dict['selective'] == reply_keyboard_remove.selective

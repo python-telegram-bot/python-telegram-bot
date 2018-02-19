@@ -283,7 +283,7 @@ class JobQueue(object):
                         self.logger.debug('Running job %s', job.name)
                         job.run(self.bot)
 
-                except:
+                except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
                                           job.name)
             else:

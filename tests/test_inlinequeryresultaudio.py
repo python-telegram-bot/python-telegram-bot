@@ -25,15 +25,16 @@ from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryRes
 
 @pytest.fixture(scope='class')
 def inline_query_result_audio():
-    return InlineQueryResultAudio(TestInlineQueryResultAudio.id,
-                                  TestInlineQueryResultAudio.audio_url,
-                                  TestInlineQueryResultAudio.title,
-                                  performer=TestInlineQueryResultAudio.performer,
-                                  audio_duration=TestInlineQueryResultAudio.audio_duration,
-                                  caption=TestInlineQueryResultAudio.caption,
-                                  parse_mode=TestInlineQueryResultAudio.parse_mode,
-                                  input_message_content=TestInlineQueryResultAudio.input_message_content,
-                                  reply_markup=TestInlineQueryResultAudio.reply_markup)
+    return InlineQueryResultAudio(
+        TestInlineQueryResultAudio.id,
+        TestInlineQueryResultAudio.audio_url,
+        TestInlineQueryResultAudio.title,
+        performer=TestInlineQueryResultAudio.performer,
+        audio_duration=TestInlineQueryResultAudio.audio_duration,
+        caption=TestInlineQueryResultAudio.caption,
+        parse_mode=TestInlineQueryResultAudio.parse_mode,
+        input_message_content=TestInlineQueryResultAudio.input_message_content,
+        reply_markup=TestInlineQueryResultAudio.reply_markup)
 
 
 class TestInlineQueryResultAudio(object):
@@ -57,8 +58,8 @@ class TestInlineQueryResultAudio(object):
         assert inline_query_result_audio.audio_duration == self.audio_duration
         assert inline_query_result_audio.caption == self.caption
         assert inline_query_result_audio.parse_mode == self.parse_mode
-        assert inline_query_result_audio.input_message_content.to_dict() == \
-               self.input_message_content.to_dict()
+        assert (inline_query_result_audio.input_message_content.to_dict() ==
+                self.input_message_content.to_dict())
         assert inline_query_result_audio.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_audio):
@@ -70,14 +71,14 @@ class TestInlineQueryResultAudio(object):
         assert inline_query_result_audio_dict['audio_url'] == inline_query_result_audio.audio_url
         assert inline_query_result_audio_dict['title'] == inline_query_result_audio.title
         assert inline_query_result_audio_dict['performer'] == inline_query_result_audio.performer
-        assert inline_query_result_audio_dict['audio_duration'] == \
-               inline_query_result_audio.audio_duration
+        assert (inline_query_result_audio_dict['audio_duration'] ==
+                inline_query_result_audio.audio_duration)
         assert inline_query_result_audio_dict['caption'] == inline_query_result_audio.caption
         assert inline_query_result_audio_dict['parse_mode'] == inline_query_result_audio.parse_mode
-        assert inline_query_result_audio_dict['input_message_content'] == \
-               inline_query_result_audio.input_message_content.to_dict()
-        assert inline_query_result_audio_dict['reply_markup'] == \
-               inline_query_result_audio.reply_markup.to_dict()
+        assert (inline_query_result_audio_dict['input_message_content'] ==
+                inline_query_result_audio.input_message_content.to_dict())
+        assert (inline_query_result_audio_dict['reply_markup'] ==
+                inline_query_result_audio.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultAudio(self.id, self.audio_url, self.title)

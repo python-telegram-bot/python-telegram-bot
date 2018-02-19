@@ -43,9 +43,9 @@ class TestInputContactMessageContent(object):
         input_contact_message_content_dict = input_contact_message_content.to_dict()
 
         assert isinstance(input_contact_message_content_dict, dict)
-        assert input_contact_message_content_dict['phone_number'] == \
-               input_contact_message_content.phone_number
-        assert input_contact_message_content_dict['first_name'] == \
-               input_contact_message_content.first_name
-        assert input_contact_message_content_dict['last_name'] == \
-               input_contact_message_content.last_name
+        assert (input_contact_message_content_dict['phone_number'] ==
+                input_contact_message_content.phone_number)
+        assert (input_contact_message_content_dict['first_name'] ==
+                input_contact_message_content.first_name)
+        assert (input_contact_message_content_dict['last_name'] ==
+                input_contact_message_content.last_name)

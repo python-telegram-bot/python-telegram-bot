@@ -43,9 +43,9 @@ class TestInputLocationMessageContent(object):
         input_location_message_content_dict = input_location_message_content.to_dict()
 
         assert isinstance(input_location_message_content_dict, dict)
-        assert input_location_message_content_dict['latitude'] == \
-               input_location_message_content.latitude
-        assert input_location_message_content_dict['longitude'] == \
-               input_location_message_content.longitude
-        assert input_location_message_content_dict[
-                   'live_period'] == input_location_message_content.live_period
+        assert (input_location_message_content_dict['latitude'] ==
+                input_location_message_content.latitude)
+        assert (input_location_message_content_dict['longitude'] ==
+                input_location_message_content.longitude)
+        assert (input_location_message_content_dict['live_period'] ==
+                input_location_message_content.live_period)

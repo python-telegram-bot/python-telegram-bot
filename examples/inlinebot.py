@@ -18,8 +18,6 @@ bot.
 """
 from uuid import uuid4
 
-import re
-
 from telegram.utils.helpers import escape_markdown
 
 from telegram import InlineQueryResultArticle, ParseMode, \

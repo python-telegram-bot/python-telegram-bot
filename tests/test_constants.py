@@ -44,4 +44,4 @@ class TestConstants(object):
         bad_caption = good_caption + 'Z'
         with pytest.raises(BadRequest, message="Media_caption_too_long"):
             with open('tests/data/telegram.png', 'rb') as f:
-                bad_message = bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
+                bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
