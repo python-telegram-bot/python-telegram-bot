@@ -387,7 +387,6 @@ class Message(TelegramObject):
         data = super(Message, self).to_dict()
 
         # Required
-        data['from'] = data.pop('from_user', None)
         data['date'] = to_timestamp(self.date)
         # Optionals
         if self.forward_date:

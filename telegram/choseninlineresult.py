@@ -79,11 +79,3 @@ class ChosenInlineResult(TelegramObject):
         data['location'] = Location.de_json(data.get('location'), bot)
 
         return cls(**data)
-
-    def to_dict(self):
-        data = super(ChosenInlineResult, self).to_dict()
-
-        # Required
-        data['from'] = data.pop('from_user', None)
-
-        return data
