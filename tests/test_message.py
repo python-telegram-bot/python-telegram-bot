@@ -117,7 +117,9 @@ class TestMessage(object):
                            date=None,
                            chat=None,
                            text=test_text,
-                           entities=[MessageEntity(**e) for e in test_entities])
+                           entities=[MessageEntity(**e) for e in test_entities],
+                           caption=test_text,
+                           caption_entities=[MessageEntity(**e) for e in test_entities])
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -205,6 +207,48 @@ class TestMessage(object):
         message = Message(1, self.from_user, self.date, self.chat,
                           text=text, entities=[bold_entity])
         assert expected == message.text_markdown
+
+    def test_caption_html_simple(self):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            'http://google.com')
+        caption_html = self.test_message.caption_html
+        assert caption_html == test_html_string
+
+    def test_caption_html_urled(self):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            '<a href="http://google.com">http://google.com</a>')
+        caption_html = self.test_message.caption_html_urled
+        assert caption_html == test_html_string
+
+    def test_caption_markdown_simple(self):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. http://google.com')
+        caption_markdown = self.test_message.caption_markdown
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_urled(self):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. [http://google.com](http://google.com)')
+        caption_markdown = self.test_message.caption_markdown_urled
+        assert caption_markdown == test_md_string
+
+    def test_caption_html_emoji(self):
+        caption = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
+        expected = b'\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>'.decode('unicode-escape')
+        bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
+        message = Message(1, self.from_user, self.date, self.chat,
+                          caption=caption, caption_entities=[bold_entity])
+        assert expected == message.caption_html
+
+    def test_caption_markdown_emoji(self):
+        caption = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
+        expected = b'\\U0001f469\\u200d\\U0001f469\\u200d *ABC*'.decode('unicode-escape')
+        bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
+        message = Message(1, self.from_user, self.date, self.chat,
+                          caption=caption, caption_entities=[bold_entity])
+        assert expected == message.caption_markdown
 
     def test_parse_entities_url_emoji(self):
         url = b'http://github.com/?unicode=\\u2713\\U0001f469'.decode('unicode-escape')
