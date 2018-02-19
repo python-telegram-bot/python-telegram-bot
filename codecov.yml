@@ -1,4 +1,4 @@
 comment:
-  layout: "diff, files"
+  layout: "diff"
   behavior: default
   require_changes: false
