@@ -1,4 +1,12 @@
-comment:
-  layout: "diff"
-  behavior: default
-  require_changes: false
+comment: false
+
+coverage:
+  status:
+    project:
+      ext:
+        paths:
+          - telegram/ext/*
+      telegram:
+        paths:
+          - telegram/*
+          - !telegram/ext/*
