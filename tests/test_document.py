@@ -34,7 +34,7 @@ def document_file():
 @pytest.fixture(scope='class')
 def document(bot, chat_id):
     with open('tests/data/telegram.png', 'rb') as f:
-        return bot.send_document(chat_id, document=f).document
+        return bot.send_document(chat_id, document=f, timeout=50).document
 
 
 class TestDocument(object):

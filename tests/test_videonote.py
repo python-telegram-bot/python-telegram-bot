@@ -34,7 +34,7 @@ def video_note_file():
 @pytest.fixture(scope='class')
 def video_note(bot, chat_id):
     with open('tests/data/telegram2.mp4', 'rb') as f:
-        return bot.send_video_note(chat_id, video_note=f, timeout=10).video_note
+        return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
 class TestVideoNote(object):

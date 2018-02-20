@@ -35,7 +35,7 @@ def photo_file():
 @pytest.fixture(scope='class')
 def _photo(bot, chat_id):
     with open('tests/data/telegram.jpg', 'rb') as f:
-        return bot.send_photo(chat_id, photo=f, timeout=10).photo
+        return bot.send_photo(chat_id, photo=f, timeout=50).photo
 
 
 @pytest.fixture(scope='class')
