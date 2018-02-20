@@ -58,6 +58,8 @@ class Updater(object):
         dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
             dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -74,6 +76,8 @@ class Updater(object):
             `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
             request_kwargs are very useful for the advanced users who would like to control the
             default timeouts and/or control the proxy used for http communication.
+        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
+            store data that should be persistent over restarts
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -124,17 +128,9 @@ class Updater(object):
             self.bot = Bot(token, base_url, request=self._request)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
-        self.persistence = persistence
-        self.job_queue = None
-        if self.persistence:
-            if self.persistence.store_job_queue:
-                self.job_queue = self.persistence.get_job_queue()
-                if not isinstance(self.job_queue, JobQueue):
-                    raise ValueError("job_queue must be of type JobQueue")
-
-        if not self.job_queue:
-            self.job_queue = JobQueue(self.bot)
+        self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
+        self.persistence = persistence
         self.dispatcher = Dispatcher(
             self.bot,
             self.update_queue,

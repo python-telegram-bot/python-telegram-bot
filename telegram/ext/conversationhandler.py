@@ -76,6 +76,10 @@ class ConversationHandler(Handler):
         per_user (:obj:`bool`): Optional. If the conversationkey should contain the User's ID.
         per_message (:obj:`bool`): Optional. If the conversationkey should contain the Message's
             ID.
+        name (:obj:`str`): Optional. The name for this conversationhandler. Required for
+            persistence
+        persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
+            saved. Name is required and persistence has to be set in :class:`Updater`
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -107,6 +111,10 @@ class ConversationHandler(Handler):
             Default is ``True``.
         per_message (:obj:`bool`, optional): If the conversationkey should contain the Message's
             ID. Default is ``False``.
+        name (:obj:`str`, optional): The name for this conversationhandler. Required for
+            persistence
+        persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
+            saved. Name is required and persistence has to be set in :class:`Updater`
 
     Raises:
         ValueError

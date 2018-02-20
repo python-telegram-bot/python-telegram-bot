@@ -20,33 +20,63 @@
 
 
 class BasePersistence(object):
-    def __init__(self, store_job_queue=False, store_user_data=False, store_chat_data=False):
-        self.store_job_queue = store_job_queue
+    def __init__(self, store_user_data=False, store_chat_data=False):
+        """
+        Args:
+            store_user_data (:obj:`bool`): Whether user_data should be saved by this
+                persistence class.
+            store_chat_data (:obj:`bool`): Whether user_data should be saved by this
+                persistence class
+        """
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
 
-    def get_job_queue(self):
-        raise NotImplementedError
-
     def get_user_data(self):
+        """"
+        Returns:
+            :obj:'defaultdict`: The restored user data.
+        """
         raise NotImplementedError
 
     def get_chat_data(self):
+        """"
+        Returns:
+            :obj:'defaultdict`: The restored chat data.
+        """
         raise NotImplementedError
 
-    def get_conversations(self):
+    def get_conversations(self, name):
+        """"
+        Args:
+            name (:obj:`str`): The handlers name.
+
+        Returns:
+            :obj:'dict`: The restored conversations for the handler.
+        """
         raise NotImplementedError
 
     def update_conversation(self, conversations):
-        raise NotImplementedError
-
-    def update_job_queue(self):
+        """"
+        Args:
+            conversation (:obj:'dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
+                dict to store.
+        """
         raise NotImplementedError
 
     def update_user_data(self, user_data):
+        """"
+        Args:
+            user_data (:obj:'defaultdict`): The :attr:`telegram.ext.dispatcher.user_data`
+                defaultdict to store.
+        """
         raise NotImplementedError
 
     def update_chat_data(self, chat_data):
+        """"
+        Args:
+            chat_data (:obj:'defaultdict`): The :attr:`telegram.ext.dispatcher.chat_data`
+                defaultdict to store.
+        """
         raise NotImplementedError
 
     def flush(self):

@@ -74,6 +74,8 @@ class Dispatcher(object):
             decorator.
         user_data (:obj:`dict`): A dictionary handlers can use to store data for the user.
         chat_data (:obj:`dict`): A dictionary handlers can use to store data for the chat.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -82,6 +84,8 @@ class Dispatcher(object):
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator. defaults to 4.
+        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
+            store data that should be persistent over restarts
 
     """
 
@@ -301,9 +305,15 @@ class Dispatcher(object):
                     handler.handle_update(update, self)
                     if self.persistence:
                         if self.persistence.store_chat_data:
-                            self.persistence.update_chat_data(self.chat_data)
+                            try:
+                                self.persistence.update_chat_data(self.chat_data)
+                            except Exception:
+                                self.logger.exception('Saving chat data raised an error')
                         if self.persistence.store_user_data:
-                            self.persistence.update_user_data(self.user_data)
+                            try:
+                                self.persistence.update_user_data(self.user_data)
+                            except Exception:
+                                self.logger.exception('Saving user data raised an error')
                     break
 
             # Stop processing with any other handler.
@@ -361,8 +371,8 @@ class Dispatcher(object):
         if isinstance(handler, ConversationHandler) and handler.persistent:
             if not self.persistence:
                 raise ValueError(
-                    "Conversationhandler {} can not be persistent if logger has no persistence",
-                    handler.name)
+                    "Conversationhandler {} can not be persistent if dispatcher has no "
+                    "persistence".format(handler.name))
             handler.conversations = self.persistence.get_conversations(handler.name)
             handler.persistence = self.persistence
 
