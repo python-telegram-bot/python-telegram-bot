@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,19 +33,19 @@ class BasePersistence(object):
     * :attr:`flush` will be called when the bot is shutdown, and must always be overwritten.
 
     Attributes:
-        store_user_data (:obj:`bool`): Whether user_data should be saved by this
+        store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
             persistence class.
-        store_chat_data (:obj:`bool`): Whether user_data should be saved by this
-            persistence class
+        store_chat_data (:obj:`bool`): Optional. Whether user_data should be saved by this
+            persistence class.
 
     Args:
-        store_user_data (:obj:`bool`): Whether user_data should be saved by this
-            persistence class.
-        store_chat_data (:obj:`bool`): Whether user_data should be saved by this
-            persistence class
+        store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
+            persistence class. Default is ``True``.
+        store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
+            persistence class. Default is ``True`` .
     """
 
-    def __init__(self, store_user_data=False, store_chat_data=False):
+    def __init__(self, store_user_data=True, store_chat_data=True):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
 
@@ -89,7 +89,7 @@ class BasePersistence(object):
 
         Args:
             name (:obj:`str`): The handlers name.
-            conversation (:obj:'dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
+            conversations (:obj:'dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
                 dict to store.
         """
         raise NotImplementedError
