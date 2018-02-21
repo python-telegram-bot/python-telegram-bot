@@ -66,7 +66,7 @@ class TestBasePersistence(object):
         with pytest.raises(NotImplementedError):
             base_persistence.update_user_data(None)
         with pytest.raises(NotImplementedError):
-            base_persistence.update_conversation(None)
+            base_persistence.update_conversations(None)
         with pytest.raises(NotImplementedError):
             base_persistence.flush()
 
@@ -166,14 +166,28 @@ class TestBasePersistence(object):
         rec = caplog.records[-2]
         assert rec.msg == 'Saving chat data raised an error'
         assert rec.levelname == 'ERROR'
-
         m.from_user = user2
         m.chat = chat1
         u = Update(1, m)
         dp.process_update(u)
         m.chat = chat2
         u = Update(2, m)
+
+        def save_chat_data(data):
+            if -987654 not in data:
+                pytest.fail()
+
+        def save_user_data(data):
+            if 54321 not in data:
+                pytest.fail()
+
+        base_persistence.update_chat_data = save_chat_data
+        base_persistence.update_user_data = save_user_data
         dp.process_update(u)
 
         assert dp.user_data[54321][1] == 'test7'
         assert dp.chat_data[-987654][2] == 'test8'
+
+    def test_flush(self, updater):
+        with pytest.raises(NotImplementedError):
+            updater.signal_handler(None, None)

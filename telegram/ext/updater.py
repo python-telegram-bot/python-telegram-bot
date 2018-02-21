@@ -459,6 +459,8 @@ class Updater(object):
 
     def signal_handler(self, signum, frame):
         self.is_idle = False
+        if self.persistence:
+            self.persistence.flush()
         if self.running:
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))

@@ -20,33 +20,61 @@
 
 
 class BasePersistence(object):
+    """Example class for adding persistence to your bot.
+    Subclass this object for different implementations of a persistent bot.
+
+    All relevant methods must be overwritten. This means:
+    * If :attr:`store_chat_data` is ``True`` you must overwrite :attr:`get_chat_data` and
+        :attr:`update_chat_data`
+    * If :attr:`store_user_data` is ``True`` you must overwrite :attr:`get_user_data` and
+        :attr:`update_user_data`
+    * If you want to store conversation data with :class:`telegram.ext.CanversationHandler`, you
+        must overwrite :attr:`get_conversations` and :attr:`update_conversations`
+    * :attr:`flush` will be called when the bot is shutdown, and must always be overwritten.
+
+    Attributes:
+        store_user_data (:obj:`bool`): Whether user_data should be saved by this
+            persistence class.
+        store_chat_data (:obj:`bool`): Whether user_data should be saved by this
+            persistence class
+
+    Args:
+        store_user_data (:obj:`bool`): Whether user_data should be saved by this
+            persistence class.
+        store_chat_data (:obj:`bool`): Whether user_data should be saved by this
+            persistence class
+    """
+
     def __init__(self, store_user_data=False, store_chat_data=False):
-        """
-        Args:
-            store_user_data (:obj:`bool`): Whether user_data should be saved by this
-                persistence class.
-            store_chat_data (:obj:`bool`): Whether user_data should be saved by this
-                persistence class
-        """
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
 
     def get_user_data(self):
-        """"
+        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        persistence object. It should return the user_data if stored, or an empty
+        ``defaultdict(dict)``.
+
         Returns:
             :obj:'defaultdict`: The restored user data.
         """
         raise NotImplementedError
 
     def get_chat_data(self):
-        """"
+        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        persistence object. It should return the chat_data if stored, or an empty
+        ``defaultdict(dict)``.
+
         Returns:
             :obj:'defaultdict`: The restored chat data.
         """
         raise NotImplementedError
 
     def get_conversations(self, name):
-        """"
+        """"Will be called by :class:`telegram.ext.Dispatcher` when a
+        :class:`telegram.ext.CanversationHandler` is added if
+        :attr:`telegram.ext.ConversationHandler.persistent` is ``True``.
+        It should return the conversations for the handler with `name` or an empty ``dict``
+
         Args:
             name (:obj:`str`): The handlers name.
 
@@ -55,16 +83,21 @@ class BasePersistence(object):
         """
         raise NotImplementedError
 
-    def update_conversation(self, conversations):
-        """"
+    def update_conversations(self, name, conversations):
+        """"Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
+        is called. this allows the storeage of the new state in the persistence.
+
         Args:
+            name (:obj:`str`): The handlers name.
             conversation (:obj:'dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
                 dict to store.
         """
         raise NotImplementedError
 
     def update_user_data(self, user_data):
-        """"
+        """"Will be calle by the :class:`telegram.ext.Dispatcher` after a handler has
+        handled an update. It will be the :attr:`telegram.ext.Dispatcher.user_data` defaultdict.
+
         Args:
             user_data (:obj:'defaultdict`): The :attr:`telegram.ext.dispatcher.user_data`
                 defaultdict to store.
@@ -72,7 +105,9 @@ class BasePersistence(object):
         raise NotImplementedError
 
     def update_chat_data(self, chat_data):
-        """"
+        """"Will be calle by the :class:`telegram.ext.Dispatcher` after a handler has
+        handled an update. It will be the :attr:`telegram.ext.Dispatcher.chat_data` defaultdict.
+
         Args:
             chat_data (:obj:'defaultdict`): The :attr:`telegram.ext.dispatcher.chat_data`
                 defaultdict to store.
@@ -80,4 +115,8 @@ class BasePersistence(object):
         raise NotImplementedError
 
     def flush(self):
+        """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
+        persistence a chance to finish up saving or close a database connection gracefully. If this
+        is not of any importance just pass will be sufficient.
+        """
         raise NotImplementedError

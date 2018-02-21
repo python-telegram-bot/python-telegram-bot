@@ -328,4 +328,4 @@ class ConversationHandler(Handler):
             self.conversations[key] = new_state
 
         if self.persistent:
-            self.persistence.update_conversation(self.conversations)
+            self.persistence.update_conversations(self.name, self.conversations)
