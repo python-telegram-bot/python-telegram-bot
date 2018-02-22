@@ -37,7 +37,7 @@ def sticker_file():
 @pytest.fixture(scope='class')
 def sticker(bot, chat_id):
     with open('tests/data/telegram.webp', 'rb') as f:
-        return bot.send_sticker(chat_id, sticker=f, timeout=10).sticker
+        return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
 class TestSticker(object):
