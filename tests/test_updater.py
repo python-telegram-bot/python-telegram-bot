@@ -45,11 +45,6 @@ signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
                                        'whole process on windows')
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG)
-
-logger = logging.getLogger(__name__)
-
 
 @pytest.fixture(scope='function')
 def updater(bot):
@@ -143,17 +138,13 @@ class TestUpdater(object):
         updater.start_polling(0.01)
 
         # Make sure that get_updates was called, but not the error handler
-        logger.info('waiting for event')
         event.wait()
-        logger.info('making sure err handler not called')
         assert self.err_handler_called.wait(0.5) is not True
         assert self.received != error.message
 
         # Make sure that Updater polling thread keeps running
         event.clear()
-        logger.info('waiting for second event')
         event.wait()
-        logger.info('making sure err handler not called 2')
         assert self.err_handler_called.wait(0.5) is not True
 
     def test_webhook(self, monkeypatch, updater):
