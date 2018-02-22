@@ -23,7 +23,9 @@ import os
 
 import pytest
 
-from telegram.ext import PicklePersistence
+from telegram import User, Chat, Message, Update
+from telegram.ext import PicklePersistence, Updater, MessageHandler, ConversationHandler, \
+    CommandHandler
 
 
 @pytest.fixture(scope='function')
@@ -51,8 +53,8 @@ def bad_pickle_files():
 def good_pickle_files():
     user_data = {12345: {'test1': 'test2'}, 67890: {'test3': 'test4'}}
     chat_data = {-12345: {'test5': 'test6'}, -67890: {'test7': 'test8'}}
-    conversations = {'name1': {(123, 123): 1, (456, 654): 2},
-                     'name2': {(123, 321): 3, (890, 890): 4}}
+    conversations = {'name1': {(123, 123): 3, (456, 654): 4},
+                     'name2': {(123, 321): 1, (890, 890): 2}}
     all = {'user_data': user_data, 'chat_data': chat_data, 'conversations': conversations}
     with open('pickletest_user_data', 'wb') as f:
         pickle.dump(user_data, f)
@@ -66,6 +68,14 @@ def good_pickle_files():
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_conversations',
                  'pickletest']:
         os.remove(name)
+
+
+@pytest.fixture(scope='function')
+def update(bot):
+    user = User(id=321, first_name='test_user', is_bot=False)
+    chat = Chat(id=123, type='group')
+    message = Message(1, user, None, chat, text="Hi there", bot=bot)
+    return Update(0, message=message)
 
 
 class TestPickelPersistence(object):
@@ -112,14 +122,14 @@ class TestPickelPersistence(object):
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
-        assert conversation1[(123, 123)] == 1
-        assert conversation1[(456, 654)] == 2
+        assert conversation1[(123, 123)] == 3
+        assert conversation1[(456, 654)] == 4
         with pytest.raises(KeyError):
             conversation1[(890, 890)]
         conversation2 = pickle_persistence.get_conversations('name2')
         assert isinstance(conversation1, dict)
-        assert conversation2[(123, 321)] == 3
-        assert conversation2[(890, 890)] == 4
+        assert conversation2[(123, 321)] == 1
+        assert conversation2[(890, 890)] == 2
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
@@ -139,14 +149,14 @@ class TestPickelPersistence(object):
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
-        assert conversation1[(123, 123)] == 1
-        assert conversation1[(456, 654)] == 2
+        assert conversation1[(123, 123)] == 3
+        assert conversation1[(456, 654)] == 4
         with pytest.raises(KeyError):
             conversation1[(890, 890)]
         conversation2 = pickle_persistence.get_conversations('name2')
         assert isinstance(conversation1, dict)
-        assert conversation2[(123, 321)] == 3
-        assert conversation2[(890, 890)] == 4
+        assert conversation2[(123, 321)] == 1
+        assert conversation2[(890, 890)] == 2
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
@@ -300,6 +310,71 @@ class TestPickelPersistence(object):
         with open('pickletest', 'rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f)['conversations'])
         assert conversations_test['name1'] == conversation1
+
+    def test_with_handler(self, bot, update, pickle_persistence, good_pickle_files):
+        u = Updater(bot=bot, persistence=pickle_persistence)
+        dp = u.dispatcher
+
+        def first(bot, update, user_data, chat_data):
+            if not user_data == {}:
+                pytest.fail()
+            if not chat_data == {}:
+                pytest.fail()
+            user_data['test1'] = 'test2'
+            chat_data['test3'] = 'test4'
+
+        def second(bot, update, user_data, chat_data):
+            if not user_data['test1'] == 'test2':
+                pytest.fail()
+            if not chat_data['test3'] == 'test4':
+                pytest.fail()
+
+        h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
+        h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
+        dp.add_handler(h1)
+        dp.process_update(update)
+        del (dp)
+        del (u)
+        del (pickle_persistence)
+        pickle_persistence_2 = PicklePersistence(filename='pickletest',
+                                                 store_user_data=True,
+                                                 store_chat_data=True,
+                                                 singe_file=False,
+                                                 on_flush=False)
+        u = Updater(bot=bot, persistence=pickle_persistence_2)
+        dp = u.dispatcher
+        dp.add_handler(h2)
+        dp.process_update(update)
+
+    def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
+        dp.persistence = pickle_persistence
+        NEXT, NEXT2 = range(2)
+
+        def start(bot, update):
+            return NEXT
+
+        start = CommandHandler('start', start)
+
+        def next(bot, update):
+            return NEXT2
+
+        next = MessageHandler(None, next)
+
+        def next2(bot, update):
+            return ConversationHandler.END
+
+        next2 = MessageHandler(None, next2)
+
+        ch = ConversationHandler([start], {NEXT: [next], NEXT2: [next2]}, [], name='name2',
+                                 persistent=True)
+        dp.add_handler(ch)
+        assert ch.conversations[ch._get_key(update)] == 1
+        dp.process_update(update)
+        assert ch._get_key(update) not in ch.conversations
+        update.message.text = '/start'
+        dp.process_update(update)
+        assert ch.conversations[ch._get_key(update)] == 0
+        assert ch.conversations == pickle_persistence.conversations['name2']
 
     @classmethod
     def teardown_class(cls):

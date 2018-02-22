@@ -77,7 +77,7 @@ class Updater(object):
             request_kwargs are very useful for the advanced users who would like to control the
             default timeouts and/or control the proxy used for http communication.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts
+            store data that should be persistent over restarts.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.

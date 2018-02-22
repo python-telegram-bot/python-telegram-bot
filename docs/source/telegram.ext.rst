@@ -29,3 +29,11 @@ Handlers
     telegram.ext.stringcommandhandler
     telegram.ext.stringregexhandler
     telegram.ext.typehandler
+
+Persistence
+-----------
+
+.. toctree::
+
+    telegram.ext.basepersistence
+    telegram.ext.picklepersistence

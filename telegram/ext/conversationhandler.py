@@ -79,7 +79,7 @@ class ConversationHandler(Handler):
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
             persistence
         persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
-            saved. Name is required and persistence has to be set in :class:`Updater`
+            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -114,7 +114,7 @@ class ConversationHandler(Handler):
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence
         persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
-            saved. Name is required and persistence has to be set in :class:`Updater`
+            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
 
     Raises:
         ValueError

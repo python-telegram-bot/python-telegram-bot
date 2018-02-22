@@ -20,8 +20,10 @@
 import pickle
 from collections import defaultdict
 
+from telegram.ext import BasePersistence
 
-class PicklePersistence(object):
+
+class PicklePersistence(BasePersistence):
     """Using python's builtin pickle for making you bot persistent.
 
     Attributes:
@@ -34,8 +36,8 @@ class PicklePersistence(object):
         single_file (:obj:`bool`): Optional. When ``False`` will store 3 sperate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
             ``True``.
-        on_flush (:obj:`bool`): Optional. When ``True` will only save to file when :attr:`flush` is
-            called and keep data in memory until that happens. When False will store data on any
+        on_flush (:obj:`bool`): Optional. When ``True`` will only save to file when :meth:`flush`
+            is called and keep data in memory until that happens. When False will store data on any
             transaction. Default is ``False``.
 
     Args:
@@ -48,8 +50,8 @@ class PicklePersistence(object):
         single_file (:obj:`bool`, optional): When ``False`` will store 3 sperate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
             ``True``.
-        on_flush (:obj:`bool`, optional): When ``True` will only save to file when :attr:`flush` is
-            called and keep data in memory until that happens. When False will store data on any
+        on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
+            is called and keep data in memory until that happens. When False will store data on any
             transaction. Default is ``False``.
     """
 
@@ -99,10 +101,10 @@ class PicklePersistence(object):
             pickle.dump(data, f)
 
     def get_user_data(self):
-        """"Returns the user_data from the pickle file if it exsists or an empty defaultdict.
+        """Returns the user_data from the pickle file if it exsists or an empty defaultdict.
 
         Returns:
-            :obj:'defaultdict`: The restored user data.
+            :obj:`defaultdict`: The restored user data.
         """
         if self.user_data:
             pass
@@ -119,10 +121,10 @@ class PicklePersistence(object):
         return self.user_data.copy()
 
     def get_chat_data(self):
-        """"Returns the chat_data from the pickle file if it exsists or an empty defaultdict.
+        """Returns the chat_data from the pickle file if it exsists or an empty defaultdict.
 
         Returns:
-            :obj:'defaultdict`: The restored chat data.
+            :obj:`defaultdict`: The restored chat data.
         """
         if self.chat_data:
             pass
@@ -139,13 +141,13 @@ class PicklePersistence(object):
         return self.chat_data.copy()
 
     def get_conversations(self, name):
-        """"Returns the conversations from the pickle file if it exsists or an empty defaultdict.
+        """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
 
         Args:
             name (:obj:`str`): The handlers name.
 
         Returns:
-            :obj:'dict`: The restored conversations for the handler.
+            :obj:`dict`: The restored conversations for the handler.
         """
         if self.conversations:
             pass
@@ -165,7 +167,7 @@ class PicklePersistence(object):
 
         Args:
             name (:obj:`str`): The handlers name.
-            conversations (:obj:'dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
+            conversations (:obj:`dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
                 dict to store.
         """
         if self.conversations[name] == conversations:
@@ -179,11 +181,11 @@ class PicklePersistence(object):
                 self.dump_singlefile()
 
     def update_user_data(self, user_data):
-        """"Will update the user_data (if changed) and depending on :attr:`on_flush` save the
+        """Will update the user_data (if changed) and depending on :attr:`on_flush` save the
         pickle file.
 
         Args:
-            user_data (:obj:'defaultdict`): The :attr:`telegram.ext.dispatcher.user_data`
+            user_data (:obj:`defaultdict`): The :attr:`telegram.ext.Dispatcher.user_data`
                 defaultdict to store.
         """
         if self.user_data == user_data:
@@ -197,11 +199,11 @@ class PicklePersistence(object):
                 self.dump_singlefile()
 
     def update_chat_data(self, chat_data):
-        """"Will update the chat_data (if changed) and depending on :attr:`on_flush` save the
+        """Will update the chat_data (if changed) and depending on :attr:`on_flush` save the
         pickle file.
 
         Args:
-            chat_data (:obj:'defaultdict`): The :attr:`telegram.ext.dispatcher.chat_data`
+            chat_data (:obj:`defaultdict`): The :attr:`telegram.ext.Dispatcher.chat_data`
                 defaultdict to store.
         """
         if self.chat_data == chat_data:
