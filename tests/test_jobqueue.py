@@ -216,9 +216,6 @@ class TestJobQueue(object):
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)
-        with pytest.warns(UserWarning):
-            job_queue.put(j, next_t=0)
-        j.schedule_removal()
         with pytest.raises(ValueError, match='can not be set to'):
             j.repeat = True
         j.interval = 15
