@@ -160,7 +160,7 @@ class TestPickelPersistence(object):
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    def test_updating_multi_file(self, pickle_persistence: PicklePersistence, good_pickle_files):
+    def test_updating_multi_file(self, pickle_persistence, good_pickle_files):
         user_data = pickle_persistence.get_user_data()
         user_data[54321]['test9'] = 'test 10'
         assert not pickle_persistence.user_data == user_data
@@ -188,7 +188,7 @@ class TestPickelPersistence(object):
             conversations_test = defaultdict(dict, pickle.load(f))
         assert conversations_test['name1'] == conversation1
 
-    def test_updating_single_file(self, pickle_persistence: PicklePersistence, good_pickle_files):
+    def test_updating_single_file(self, pickle_persistence, good_pickle_files):
         pickle_persistence.single_file = True
 
         user_data = pickle_persistence.get_user_data()

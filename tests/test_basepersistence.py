@@ -112,7 +112,7 @@ class TestBasePersistence(object):
         u.dispatcher.chat_data[442233]['test5'] = 'test6'
         assert u.dispatcher.chat_data[442233]['test5'] == 'test6'
 
-    def test_dispatcher_integration_handlers(self, caplog, bot, base_persistence: BasePersistence,
+    def test_dispatcher_integration_handlers(self, caplog, bot, base_persistence,
                                              chat_data, user_data):
         def get_user_data():
             return user_data
