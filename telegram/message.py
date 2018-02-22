@@ -25,7 +25,6 @@ from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Stick
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
 from telegram import ParseMode
-from telegram.utils.deprecate import warn_deprecate_obj
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
 _UNDEFINED = object()
