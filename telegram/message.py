@@ -19,12 +19,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import sys
+from html import escape
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
 from telegram import ParseMode
-from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
+from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
 _UNDEFINED = object()
 
@@ -865,9 +866,8 @@ class Message(TelegramObject):
             for entity in self.caption_entities if entity.type in types
         }
 
-    def _text_html(self, urled=False):
-        entities = self.parse_entities()
-        message_text = self.text
+    @staticmethod
+    def _parse_html(message_text, entities, urled=False):
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -875,7 +875,7 @@ class Message(TelegramObject):
         last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            text = escape_html(text)
+            text = escape(text)
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
@@ -893,17 +893,17 @@ class Message(TelegramObject):
                 insert = text
 
             if sys.maxunicode == 0xffff:
-                html_text += escape_html(message_text[last_offset:entity.offset]) + insert
+                html_text += escape(message_text[last_offset:entity.offset]) + insert
             else:
-                html_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
-                                         .decode('utf-16-le')) + insert
+                html_text += escape(message_text[last_offset * 2:entity.offset * 2]
+                                    .decode('utf-16-le')) + insert
 
             last_offset = entity.offset + entity.length
 
         if sys.maxunicode == 0xffff:
-            html_text += escape_html(message_text[last_offset:])
+            html_text += escape(message_text[last_offset:])
         else:
-            html_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
+            html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
         return html_text
 
     @property
@@ -917,7 +917,7 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as HTML.
 
         """
-        return self._text_html(urled=False)
+        return self._parse_html(self.text, self.parse_entities(), urled=False)
 
     @property
     def text_html_urled(self):
@@ -930,11 +930,38 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as HTML.
 
         """
-        return self._text_html(urled=True)
+        return self._parse_html(self.text, self.parse_entities(), urled=True)
 
-    def _text_markdown(self, urled=False):
-        entities = self.parse_entities()
-        message_text = self.text
+    @property
+    def caption_html(self):
+        """Creates an HTML-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        HTML in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message caption with captionentities formatted as HTML.
+
+        """
+        return self._parse_html(self.caption, self.parse_caption_entities(), urled=False)
+
+    @property
+    def caption_html_urled(self):
+        """Creates an HTML-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as HTML.
+
+        """
+        return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
+
+    @staticmethod
+    def _parse_markdown(message_text, entities, urled=False):
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -983,7 +1010,7 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as Markdown.
 
         """
-        return self._text_markdown(urled=False)
+        return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
     @property
     def text_markdown_urled(self):
@@ -996,4 +1023,32 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as Markdown.
 
         """
-        return self._text_markdown(urled=True)
+        return self._parse_markdown(self.text, self.parse_entities(), urled=True)
+
+    @property
+    def caption_markdown(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
+
+    @property
+    def caption_markdown_urled(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
