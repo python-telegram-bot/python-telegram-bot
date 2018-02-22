@@ -81,7 +81,10 @@ def update(bot):
 class TestPickelPersistence(object):
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
+        assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_chat_data() == defaultdict(dict)
+        assert pickle_persistence.get_chat_data() == defaultdict(dict)
+        assert pickle_persistence.get_conversations('noname') == {}
         assert pickle_persistence.get_conversations('noname') == {}
 
     def test_no_files_present_single_file(self, pickle_persistence):
@@ -219,6 +222,8 @@ class TestPickelPersistence(object):
         assert conversations_test['name1'] == conversation1
 
     def test_save_on_flush_multi_files(self, pickle_persistence, good_pickle_files):
+        # Should run without error
+        pickle_persistence.flush()
         pickle_persistence.on_flush = True
 
         user_data = pickle_persistence.get_user_data()
@@ -268,6 +273,9 @@ class TestPickelPersistence(object):
         assert conversations_test['name1'] == conversation1
 
     def test_save_on_flush_single_files(self, pickle_persistence, good_pickle_files):
+        # Should run without error
+        pickle_persistence.flush()
+
         pickle_persistence.on_flush = True
         pickle_persistence.single_file = True
 
