@@ -41,8 +41,8 @@ def pickle_persistence():
 def bad_pickle_files():
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_conversations',
                  'pickletest']:
-        with open(name, 'wb') as f:
-            f.write(bytes('nonesense', 'utf8'))
+        with open(name, 'w') as f:
+            f.write('(())')
     yield True
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_conversations',
                  'pickletest']:

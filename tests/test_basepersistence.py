@@ -66,7 +66,7 @@ class TestBasePersistence(object):
         with pytest.raises(NotImplementedError):
             base_persistence.update_user_data(None)
         with pytest.raises(NotImplementedError):
-            base_persistence.update_conversations(None)
+            base_persistence.update_conversations(None, None)
         with pytest.raises(NotImplementedError):
             base_persistence.flush()
 

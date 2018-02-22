@@ -74,21 +74,25 @@ class PicklePersistence(BasePersistence):
                 self.user_data = defaultdict(dict, all['user_data'])
                 self.chat_data = defaultdict(dict, all['chat_data'])
                 self.conversations = all['conversations']
-        except FileNotFoundError:
+        except IOError:
             self.conversations = {}
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
         except pickle.UnpicklingError:
             raise TypeError("File {} does not contain valid pickle data".format(filename))
+        except Exception:
+            raise TypeError("Something went wrong unpickling {}".format(filename))
 
     def load_file(self, filename):
         try:
             with open(filename, "rb") as f:
                 return pickle.load(f)
-        except FileNotFoundError:
+        except IOError:
             return None
         except pickle.UnpicklingError:
             raise TypeError("File {} does not contain valid pickle data".format(filename))
+        except Exception:
+            raise TypeError("Something went wrong unpickling {}".format(filename))
 
     def dump_singlefile(self):
         with open(self.filename, "wb") as f:
