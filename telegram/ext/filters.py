@@ -277,7 +277,7 @@ class Filters(object):
                 return bool(message.new_chat_members)
 
         new_chat_members = _NewChatMembers()
-        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_member`."""
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_members`."""
 
         class _LeftChatMember(BaseFilter):
             name = 'Filters.status_update.left_chat_member'
@@ -368,7 +368,7 @@ class Filters(object):
     """Subset for messages containing a status update.
 
     Examples:
-        Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+        Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
         ``Filters.status_update`` for all status update messages.
 
     Attributes:
@@ -384,7 +384,7 @@ class Filters(object):
             :attr:`telegram.Message.migrate_from_chat_id` or
             :attr: `telegram.Message.migrate_from_chat_id`.
         new_chat_members (:obj:`Filter`): Messages that contain
-            :attr:`telegram.Message.new_chat_member`.
+            :attr:`telegram.Message.new_chat_members`.
         new_chat_photo (:obj:`Filter`): Messages that contain
             :attr:`telegram.Message.new_chat_photo`.
         new_chat_title (:obj:`Filter`): Messages that contain

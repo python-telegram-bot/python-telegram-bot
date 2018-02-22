@@ -1707,7 +1707,6 @@ class Bot(TelegramObject):
                     offset=None,
                     limit=100,
                     timeout=0,
-                    network_delay=None,
                     read_latency=2.,
                     allowed_updates=None,
                     **kwargs):
@@ -1750,10 +1749,6 @@ class Bot(TelegramObject):
 
         """
         url = '{0}/getUpdates'.format(self.base_url)
-
-        if network_delay is not None:
-            warnings.warn('network_delay is deprecated, use read_latency instead')
-            read_latency = network_delay
 
         data = {'timeout': timeout}
 
