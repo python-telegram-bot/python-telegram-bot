@@ -874,8 +874,8 @@ class Message(TelegramObject):
             for entity in self.caption_entities if entity.type in types
         }
 
-    def _parse_html(self, text, entities, urled=False):
-        message_text = text
+    @staticmethod
+    def _parse_html(message_text, entities, urled=False):
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -968,8 +968,8 @@ class Message(TelegramObject):
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
-    def _parse_markdown(self, text, entities, urled=False):
-        message_text = text
+    @staticmethod
+    def _parse_markdown(message_text, entities, urled=False):
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
