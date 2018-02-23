@@ -122,6 +122,7 @@ class TestFile(object):
         buf3 = file.download_as_bytearray(buf=buf2)
         assert buf3 is buf2
         assert buf2[len(buf):] == buf
+        assert buf2[:len(buf)] == buf
 
     def test_equality(self, bot):
         a = File(self.file_id, bot)
