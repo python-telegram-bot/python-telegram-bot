@@ -92,9 +92,7 @@ class File(TelegramObject):
             raise ValueError('custom_path and out are mutually exclusive')
 
         # Convert any UTF-8 char into a url encoded ASCII string.
-        sres = urllib_parse.urlsplit(self.file_path)
-        url = urllib_parse.urlunsplit(urllib_parse.SplitResult(
-            sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
+        url = self._get_encoded_url()
 
         if out:
             buf = self.bot.request.retrieve(url)
@@ -107,3 +105,27 @@ class File(TelegramObject):
                 filename = basename(self.file_path)
 
             self.bot.request.download(url, filename, timeout=timeout)
+
+    def _get_encoded_url(self):
+        """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
+        sres = urllib_parse.urlsplit(self.file_path)
+        url = urllib_parse.urlunsplit(urllib_parse.SplitResult(
+            sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
+        return url
+
+    def download_as_bytearray(self, buf=None):
+        """Download this file and return it as a bytearray.
+
+        Args:
+            buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.
+
+        Returns:
+            :obj:`bytearray`: The same object as `buf` if it was specified. Otherwise a new
+                `bytearray` will be allocated.
+
+        """
+        if buf is None:
+            buf = bytearray()
+
+        buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
+        return buf
