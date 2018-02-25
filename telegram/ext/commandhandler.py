@@ -134,9 +134,9 @@ class CommandHandler(Handler):
             message = update.message or update.edited_message
 
             if message.text and message.text.startswith('/') and len(message.text) > 1:
-                fst_word = message.text_markdown.split(None, 1)[0]
-                if len(fst_word) > 1 and fst_word.startswith('/'):
-                    command = fst_word[1:].split('@')
+                first_word = message.text_html.split(None, 1)[0]
+                if len(first_word) > 1 and first_word.startswith('/'):
+                    command = first_word[1:].split('@')
                     command.append(
                         message.bot.username)  # in case the command was sent without a username
 
