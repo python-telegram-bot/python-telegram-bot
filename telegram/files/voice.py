@@ -29,23 +29,26 @@ class Voice(TelegramObject):
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         file_id (:obj:`str`): Unique identifier for this file.
         duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, file_id, duration, mime_type=None, file_size=None, **kwargs):
+    def __init__(self, file_id, duration, mime_type=None, file_size=None, bot=None, **kwargs):
         # Required
         self.file_id = str(file_id)
         self.duration = int(duration)
         # Optionals
         self.mime_type = mime_type
         self.file_size = file_size
+        self.bot = bot
 
         self._id_attrs = (self.file_id,)
 
@@ -56,4 +59,22 @@ class Voice(TelegramObject):
 
         data = super(Voice, cls).de_json(data, bot)
 
-        return cls(**data)
+        return cls(bot=bot, **data)
+
+    def get_file(self, timeout=None, **kwargs):
+        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)

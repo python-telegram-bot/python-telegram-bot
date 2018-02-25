@@ -105,7 +105,8 @@ class TestUpdater(object):
 
         try:
             # Now, we send an update to the server via urlopen
-            update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''), text='Webhook'))
+            update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                               text='Webhook'))
             self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
             sleep(.2)
             assert q.get(False) == update
@@ -138,7 +139,8 @@ class TestUpdater(object):
         sleep(.2)
 
         # Now, we send an update to the server via urlopen
-        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''), text='Webhook 2'))
+        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                           text='Webhook 2'))
         self._send_webhook_msg(ip, port, update.to_json())
         sleep(.2)
         assert q.get(False) == update
@@ -157,11 +159,9 @@ class TestUpdater(object):
         assert self.attempts == retries
 
     @pytest.mark.parametrize(('error', 'attempts'),
-                             argvalues=[
-                                 (TelegramError(''), 2),
-                                 (Unauthorized(''), 1),
-                                 (InvalidToken(), 1)
-                             ],
+                             argvalues=[(TelegramError(''), 2),
+                                        (Unauthorized(''), 1),
+                                        (InvalidToken(), 1)],
                              ids=('TelegramError', 'Unauthorized', 'InvalidToken'))
     def test_bootstrap_retries_error(self, monkeypatch, updater, error, attempts):
         retries = 1
@@ -201,7 +201,7 @@ class TestUpdater(object):
             #     self._send_webhook_msg(ip, port, 'dummy-payload', content_len=None)
             # assert excinfo.value.code == 411
 
-            with pytest.raises(HTTPError) as ctx:
+            with pytest.raises(HTTPError):
                 self._send_webhook_msg(ip, port, 'dummy-payload', content_len='not-a-number')
             assert excinfo.value.code == 403
 

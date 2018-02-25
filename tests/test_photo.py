@@ -35,7 +35,7 @@ def photo_file():
 @pytest.fixture(scope='class')
 def _photo(bot, chat_id):
     with open('tests/data/telegram.jpg', 'rb') as f:
-        return bot.send_photo(chat_id, photo=f, timeout=10).photo
+        return bot.send_photo(chat_id, photo=f, timeout=50).photo
 
 
 @pytest.fixture(scope='class')
@@ -51,7 +51,7 @@ def photo(_photo):
 class TestPhoto(object):
     width = 300
     height = 300
-    caption = u'PhotoTest - Caption'
+    caption = u'<b>PhotoTest</b> - *Caption*'
     photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
     file_size = 10209
 
@@ -77,7 +77,7 @@ class TestPhoto(object):
     @pytest.mark.timeout(10)
     def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
         message = bot.send_photo(chat_id, photo_file, caption=self.caption,
-                                 disable_notification=False)
+                                 disable_notification=False, parse_mode='Markdown')
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
@@ -93,7 +93,51 @@ class TestPhoto(object):
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
 
-        assert message.caption == TestPhoto.caption
+        assert message.caption == TestPhoto.caption.replace('*', '')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
+        message = bot.send_photo(chat_id, photo_file, caption=self.caption,
+                                 parse_mode='Markdown')
+        assert isinstance(message.photo[0], PhotoSize)
+        assert isinstance(message.photo[0].file_id, str)
+        assert message.photo[0].file_id != ''
+        assert message.photo[0].width == thumb.width
+        assert message.photo[0].height == thumb.height
+        assert message.photo[0].file_size == thumb.file_size
+
+        assert isinstance(message.photo[1], PhotoSize)
+        assert isinstance(message.photo[1].file_id, str)
+        assert message.photo[1].file_id != ''
+        assert message.photo[1].width == photo.width
+        assert message.photo[1].height == photo.height
+        assert message.photo[1].file_size == photo.file_size
+
+        assert message.caption == TestPhoto.caption.replace('*', '')
+        assert len(message.caption_entities) == 1
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
+        message = bot.send_photo(chat_id, photo_file, caption=self.caption,
+                                 parse_mode='HTML')
+        assert isinstance(message.photo[0], PhotoSize)
+        assert isinstance(message.photo[0].file_id, str)
+        assert message.photo[0].file_id != ''
+        assert message.photo[0].width == thumb.width
+        assert message.photo[0].height == thumb.height
+        assert message.photo[0].file_size == thumb.file_size
+
+        assert isinstance(message.photo[1], PhotoSize)
+        assert isinstance(message.photo[1].file_id, str)
+        assert message.photo[1].file_id != ''
+        assert message.photo[1].width == photo.width
+        assert message.photo[1].height == photo.height
+        assert message.photo[1].file_size == photo.file_size
+
+        assert message.caption == TestPhoto.caption.replace('<b>', '').replace('</b>', '')
+        assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -245,6 +289,13 @@ class TestPhoto(object):
     def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_photo(chat_id=chat_id)
+
+    def test_get_file_instance_method(self, monkeypatch, photo):
+        def test(*args, **kwargs):
+            return args[1] == photo.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert photo.get_file()
 
     def test_equality(self, photo):
         a = PhotoSize(photo.file_id, self.width, self.height)

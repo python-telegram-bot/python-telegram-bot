@@ -89,13 +89,6 @@ class PreCheckoutQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
-        data = super(PreCheckoutQuery, self).to_dict()
-
-        data['from'] = data.pop('from_user', None)
-
-        return data
-
     def answer(self, *args, **kwargs):
         """Shortcut for::
 

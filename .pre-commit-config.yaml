@@ -6,10 +6,10 @@
         args:
         - --diff
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 78818b90cd694c29333ba54d38f9e60b6359ccfc
+    sha: v1.2.0
     hooks:
     -   id: flake8
-        files: ^telegram/.*\.py$
+        exclude: ^(setup.py|docs/source/conf.py)$
 -   repo: git://github.com/pre-commit/mirrors-pylint
     sha: v1.7.1
     hooks:

@@ -40,8 +40,8 @@ class TestInlineQueryResultGame(object):
         assert inline_query_result_game.type == self.type
         assert inline_query_result_game.id == self.id
         assert inline_query_result_game.game_short_name == self.game_short_name
-        assert inline_query_result_game.reply_markup.to_dict() == \
-               self.reply_markup.to_dict()
+        assert (inline_query_result_game.reply_markup.to_dict() ==
+                self.reply_markup.to_dict())
 
     def test_to_dict(self, inline_query_result_game):
         inline_query_result_game_dict = inline_query_result_game.to_dict()
@@ -49,10 +49,10 @@ class TestInlineQueryResultGame(object):
         assert isinstance(inline_query_result_game_dict, dict)
         assert inline_query_result_game_dict['type'] == inline_query_result_game.type
         assert inline_query_result_game_dict['id'] == inline_query_result_game.id
-        assert inline_query_result_game_dict['game_short_name'] == \
-               inline_query_result_game.game_short_name
-        assert inline_query_result_game_dict['reply_markup'] == \
-               inline_query_result_game.reply_markup.to_dict()
+        assert (inline_query_result_game_dict['game_short_name'] ==
+                inline_query_result_game.game_short_name)
+        assert (inline_query_result_game_dict['reply_markup'] ==
+                inline_query_result_game.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultGame(self.id, self.game_short_name)

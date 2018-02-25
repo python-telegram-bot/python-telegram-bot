@@ -100,6 +100,8 @@ class TestInvoice(object):
             need_phone_number=True,
             need_email=True,
             need_shipping_address=True,
+            send_phone_number_to_provider=True,
+            send_email_to_provider=True,
             is_flexible=True)
 
         assert message.invoice.currency == self.currency
@@ -126,5 +128,5 @@ class TestInvoice(object):
 
         with pytest.raises(TypeError):
             assert bot.send_invoice(chat_id, self.title, self.description, self.payload,
-                                provider_token, self.start_parameter, self.currency,
-                                self.prices, provider_data={'a', 'b', 'c'})
+                                    provider_token, self.start_parameter, self.currency,
+                                    self.prices, provider_data={'a', 'b', 'c'})

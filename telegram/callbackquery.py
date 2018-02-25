@@ -105,13 +105,6 @@ class CallbackQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
-        data = super(CallbackQuery, self).to_dict()
-
-        # Required
-        data['from'] = data.pop('from_user', None)
-        return data
-
     def answer(self, *args, **kwargs):
         """Shortcut for::
 

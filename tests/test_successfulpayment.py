@@ -66,14 +66,14 @@ class TestSuccessfulPayment(object):
 
         assert isinstance(successful_payment_dict, dict)
         assert successful_payment_dict['invoice_payload'] == successful_payment.invoice_payload
-        assert successful_payment_dict['shipping_option_id'] == \
-               successful_payment.shipping_option_id
+        assert (successful_payment_dict['shipping_option_id'] ==
+                successful_payment.shipping_option_id)
         assert successful_payment_dict['currency'] == successful_payment.currency
         assert successful_payment_dict['order_info'] == successful_payment.order_info.to_dict()
-        assert successful_payment_dict['telegram_payment_charge_id'] == \
-               successful_payment.telegram_payment_charge_id
-        assert successful_payment_dict['provider_payment_charge_id'] == \
-               successful_payment.provider_payment_charge_id
+        assert (successful_payment_dict['telegram_payment_charge_id'] ==
+                successful_payment.telegram_payment_charge_id)
+        assert (successful_payment_dict['provider_payment_charge_id'] ==
+                successful_payment.provider_payment_charge_id)
 
     def test_equality(self):
         a = SuccessfulPayment(self.currency, self.total_amount, self.invoice_payload,

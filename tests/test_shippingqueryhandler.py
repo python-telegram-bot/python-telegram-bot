@@ -49,9 +49,10 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def shiping_query():
-    return Update(1, shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
-                                                  ShippingAddress('EN', 'my_state', 'my_city',
-                                                                  'steer_1', '', 'post_code')))
+    return Update(1,
+                  shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
+                                               ShippingAddress('EN', 'my_state', 'my_city',
+                                                               'steer_1', '', 'post_code')))
 
 
 class TestShippingQueryHandler(object):

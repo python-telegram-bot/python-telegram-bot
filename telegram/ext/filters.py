@@ -306,7 +306,7 @@ class Filters(object):
                 return bool(message.new_chat_members)
 
         new_chat_members = _NewChatMembers()
-        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_member`."""
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_members`."""
 
         class _LeftChatMember(BaseFilter):
             name = 'Filters.status_update.left_chat_member'
@@ -375,19 +375,29 @@ class Filters(object):
         pinned_message = _PinnedMessage()
         """:obj:`Filter`: Messages that contain :attr:`telegram.Message.pinned_message`."""
 
+        class _ConnectedWebsite(BaseFilter):
+            name = 'Filters.status_update.connected_website'
+
+            def filter(self, message):
+                return bool(message.connected_website)
+
+        connected_website = _ConnectedWebsite()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.connected_website`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message):
             return bool(self.new_chat_members(message) or self.left_chat_member(message) or
                         self.new_chat_title(message) or self.new_chat_photo(message) or
                         self.delete_chat_photo(message) or self.chat_created(message) or
-                        self.migrate(message) or self.pinned_message(message))
+                        self.migrate(message) or self.pinned_message(message) or
+                        self.connected_website(message))
 
     status_update = _StatusUpdate()
     """Subset for messages containing a status update.
 
     Examples:
-        Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+        Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
         ``Filters.status_update`` for all status update messages.
 
     Attributes:
@@ -403,7 +413,7 @@ class Filters(object):
             :attr:`telegram.Message.migrate_from_chat_id` or
             :attr: `telegram.Message.migrate_from_chat_id`.
         new_chat_members (:obj:`Filter`): Messages that contain
-            :attr:`telegram.Message.new_chat_member`.
+            :attr:`telegram.Message.new_chat_members`.
         new_chat_photo (:obj:`Filter`): Messages that contain
             :attr:`telegram.Message.new_chat_photo`.
         new_chat_title (:obj:`Filter`): Messages that contain
