@@ -85,7 +85,7 @@ class TestFile(object):
             return self.file_content
 
         monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
-        custom_path = mkstemp()[1]
+        file_handle, custom_path = mkstemp()
         try:
             out_file = file.download(custom_path)
             assert out_file == custom_path
@@ -93,6 +93,7 @@ class TestFile(object):
             with open(out_file, 'rb') as fobj:
                 assert fobj.read() == self.file_content
         finally:
+            os.close(file_handle)
             os.unlink(custom_path)
 
     def test_download_file_obj(self, monkeypatch, file):
