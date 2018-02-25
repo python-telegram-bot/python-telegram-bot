@@ -19,7 +19,6 @@ bot.
 
 import logging
 
-from examples.settings import TOKEN
 from telegram import ParseMode
 from telegram.ext import Updater, CommandHandler, Filters
 # Enable logging
@@ -72,8 +71,8 @@ def error(bot, update, error):
 
 def main():
     """Start the bot."""
-    # Create the Updater and pass it your bot's token as a string.
-    updater = Updater(TOKEN)
+    # Create the Updater and pass it your bot's token.
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

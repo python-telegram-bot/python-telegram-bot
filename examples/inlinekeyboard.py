@@ -5,8 +5,6 @@
 # This program is dedicated to the public domain under the CC0 license.
 """
 import logging
-
-from examples.settings import TOKEN
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
@@ -44,8 +42,8 @@ def error(bot, update, error):
 
 
 def main():
-    # Create the Updater and pass it your bot's token as a string.
-    updater = Updater(TOKEN)
+    # Create the Updater and pass it your bot's token.
+    updater = Updater("TOKEN")
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))

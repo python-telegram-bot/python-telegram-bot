@@ -7,11 +7,10 @@ on the telegram.ext bot framework.
 This program is dedicated to the public domain under the CC0 license.
 """
 import logging
+import telegram
+from telegram.error import NetworkError, Unauthorized
 from time import sleep
 
-import telegram
-from examples.settings import TOKEN
-from telegram.error import NetworkError, Unauthorized
 
 update_id = None
 
@@ -19,8 +18,8 @@ update_id = None
 def main():
     """Run the bot."""
     global update_id
-    # Telegram Bot Authorization Token as string
-    bot = telegram.Bot(TOKEN)
+    # Telegram Bot Authorization Token
+    bot = telegram.Bot('TOKEN')
 
     # get the first pending update_id, this is so we can skip over it in case
     # we get an "Unauthorized" exception.

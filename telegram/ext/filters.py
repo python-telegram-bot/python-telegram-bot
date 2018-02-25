@@ -199,7 +199,6 @@ class Filters(object):
         def filter(self, message):
             return bool(re.search(self.pattern, message.text))
 
-
     class _Reply(BaseFilter):
         name = 'Filters.reply'
 

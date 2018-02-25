@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from telegram import Update
 import pytest
 
 from telegram import Sticker
+from telegram import Update
 from telegram import User
 from telegram.message import Message
 from telegram.utils import helpers
@@ -45,19 +45,11 @@ class TestHelpers(object):
         assert expected == helpers.create_deep_linked_url(username, payload)
         assert expected == helpers.create_deep_linked_url(username)
 
-        try:
-            # Invalid characters
+        with pytest.raises(ValueError):
             helpers.create_deep_linked_url(username, 'text with spaces')
-            pytest.fail()
-        except Exception as e:
-            assert isinstance(e, ValueError)
 
-        try:
-            # Too long payload
+        with pytest.raises(ValueError):
             helpers.create_deep_linked_url(username, '0' * 65)
-            pytest.fail()
-        except Exception as e:
-            assert isinstance(e, ValueError)
 
     def test_effective_message_type(self):
         test_message = Message(message_id=1,
