@@ -149,14 +149,8 @@ class CommandHandler(Handler):
 
                     return res and (command[0].lower() in self.command
                                     and command[1].lower() == message.bot.username.lower())
-                else:
-                    return False
 
-            else:
-                return False
-
-        else:
-            return False
+        return False
 
     def handle_update(self, update, dispatcher):
         """Send the update to the :attr:`callback`.
