@@ -21,7 +21,6 @@
 import logging
 import os
 import ssl
-import warnings
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
@@ -30,7 +29,7 @@ from queue import Queue
 
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
-from telegram.error import Unauthorized, InvalidToken, RetryAfter
+from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
@@ -157,7 +156,6 @@ class Updater(object):
     def start_polling(self,
                       poll_interval=0.0,
                       timeout=10,
-                      network_delay=None,
                       clean=False,
                       bootstrap_retries=0,
                       read_latency=2.,
@@ -182,18 +180,11 @@ class Updater(object):
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
                 the reply from server. Will be added to the `timeout` value and used as the read
                 timeout from server (Default: 2).
-            network_delay: Deprecated. Will be honoured as :attr:`read_latency` for a while but
-                will be removed in the future.
 
         Returns:
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-
-        if network_delay is not None:
-            warnings.warn('network_delay is deprecated, use read_latency instead')
-            read_latency = network_delay
-
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -267,11 +258,9 @@ class Updater(object):
 
     def _start_polling(self, poll_interval, timeout, read_latency, bootstrap_retries, clean,
                        allowed_updates):  # pragma: no cover
-        # """
         # Thread target of thread 'updater'. Runs in background, pulls
         # updates from Telegram and inserts them in the update queue of the
         # Dispatcher.
-        # """
 
         cur_interval = poll_interval
         self.logger.debug('Updater thread started')
@@ -288,8 +277,12 @@ class Updater(object):
             except RetryAfter as e:
                 self.logger.info(str(e))
                 cur_interval = 0.5 + e.retry_after
+            except TimedOut as toe:
+                self.logger.debug('Timed out getting Updates: %s', toe)
+                # If get_updates() failed due to timeout, we should retry asap.
+                cur_interval = 0
             except TelegramError as te:
-                self.logger.error("Error while getting Updates: {0}".format(te))
+                self.logger.error('Error while getting Updates: %s', te)
 
                 # Put the error into the update queue and let the Dispatcher
                 # broadcast it
@@ -310,7 +303,8 @@ class Updater(object):
 
                 cur_interval = poll_interval
 
-            sleep(cur_interval)
+            if cur_interval:
+                sleep(cur_interval)
 
     @staticmethod
     def _increase_poll_interval(current_interval):

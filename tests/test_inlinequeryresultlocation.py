@@ -25,16 +25,17 @@ from telegram import (InputTextMessageContent, InlineQueryResultLocation, Inline
 
 @pytest.fixture(scope='class')
 def inline_query_result_location():
-    return InlineQueryResultLocation(TestInlineQueryResultLocation.id,
-                                     TestInlineQueryResultLocation.latitude,
-                                     TestInlineQueryResultLocation.longitude,
-                                     TestInlineQueryResultLocation.title,
-                                     live_period=TestInlineQueryResultLocation.live_period,
-                                     thumb_url=TestInlineQueryResultLocation.thumb_url,
-                                     thumb_width=TestInlineQueryResultLocation.thumb_width,
-                                     thumb_height=TestInlineQueryResultLocation.thumb_height,
-                                     input_message_content=TestInlineQueryResultLocation.input_message_content,
-                                     reply_markup=TestInlineQueryResultLocation.reply_markup)
+    return InlineQueryResultLocation(
+        TestInlineQueryResultLocation.id,
+        TestInlineQueryResultLocation.latitude,
+        TestInlineQueryResultLocation.longitude,
+        TestInlineQueryResultLocation.title,
+        live_period=TestInlineQueryResultLocation.live_period,
+        thumb_url=TestInlineQueryResultLocation.thumb_url,
+        thumb_width=TestInlineQueryResultLocation.thumb_width,
+        thumb_height=TestInlineQueryResultLocation.thumb_height,
+        input_message_content=TestInlineQueryResultLocation.input_message_content,
+        reply_markup=TestInlineQueryResultLocation.reply_markup)
 
 
 class TestInlineQueryResultLocation(object):
@@ -60,8 +61,8 @@ class TestInlineQueryResultLocation(object):
         assert inline_query_result_location.thumb_url == self.thumb_url
         assert inline_query_result_location.thumb_width == self.thumb_width
         assert inline_query_result_location.thumb_height == self.thumb_height
-        assert inline_query_result_location.input_message_content.to_dict() == \
-               self.input_message_content.to_dict()
+        assert (inline_query_result_location.input_message_content.to_dict() ==
+                self.input_message_content.to_dict())
         assert inline_query_result_location.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_location):
@@ -70,23 +71,23 @@ class TestInlineQueryResultLocation(object):
         assert isinstance(inline_query_result_location_dict, dict)
         assert inline_query_result_location_dict['id'] == inline_query_result_location.id
         assert inline_query_result_location_dict['type'] == inline_query_result_location.type
-        assert inline_query_result_location_dict['latitude'] == \
-               inline_query_result_location.latitude
-        assert inline_query_result_location_dict['longitude'] == \
-               inline_query_result_location.longitude
+        assert (inline_query_result_location_dict['latitude'] ==
+                inline_query_result_location.latitude)
+        assert (inline_query_result_location_dict['longitude'] ==
+                inline_query_result_location.longitude)
         assert inline_query_result_location_dict['title'] == inline_query_result_location.title
-        assert inline_query_result_location_dict[
-                   'live_period'] == inline_query_result_location.live_period
-        assert inline_query_result_location_dict['thumb_url'] == \
-               inline_query_result_location.thumb_url
-        assert inline_query_result_location_dict['thumb_width'] == \
-               inline_query_result_location.thumb_width
-        assert inline_query_result_location_dict['thumb_height'] == \
-               inline_query_result_location.thumb_height
-        assert inline_query_result_location_dict['input_message_content'] == \
-               inline_query_result_location.input_message_content.to_dict()
-        assert inline_query_result_location_dict['reply_markup'] == \
-               inline_query_result_location.reply_markup.to_dict()
+        assert (inline_query_result_location_dict['live_period'] ==
+                inline_query_result_location.live_period)
+        assert (inline_query_result_location_dict['thumb_url'] ==
+                inline_query_result_location.thumb_url)
+        assert (inline_query_result_location_dict['thumb_width'] ==
+                inline_query_result_location.thumb_width)
+        assert (inline_query_result_location_dict['thumb_height'] ==
+                inline_query_result_location.thumb_height)
+        assert (inline_query_result_location_dict['input_message_content'] ==
+                inline_query_result_location.input_message_content.to_dict())
+        assert (inline_query_result_location_dict['reply_markup'] ==
+                inline_query_result_location.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultLocation(self.id, self.longitude, self.latitude, self.title)

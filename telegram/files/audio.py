@@ -32,6 +32,7 @@ class Audio(TelegramObject):
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -41,6 +42,7 @@ class Audio(TelegramObject):
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -52,6 +54,7 @@ class Audio(TelegramObject):
                  title=None,
                  mime_type=None,
                  file_size=None,
+                 bot=None,
                  **kwargs):
         # Required
         self.file_id = str(file_id)
@@ -61,6 +64,7 @@ class Audio(TelegramObject):
         self.title = title
         self.mime_type = mime_type
         self.file_size = file_size
+        self.bot = bot
 
         self._id_attrs = (self.file_id,)
 
@@ -69,4 +73,22 @@ class Audio(TelegramObject):
         if not data:
             return None
 
-        return cls(**data)
+        return cls(bot=bot, **data)
+
+    def get_file(self, timeout=None, **kwargs):
+        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)

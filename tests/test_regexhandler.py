@@ -150,8 +150,8 @@ class TestRegexHandler(object):
 
     def test_none_allowed(self):
         with pytest.raises(ValueError, match='are all False'):
-            handler = RegexHandler('.*', self.callback_basic, message_updates=False,
-                                   channel_post_updates=False, edited_updates=False)
+            RegexHandler('.*', self.callback_basic, message_updates=False,
+                         channel_post_updates=False, edited_updates=False)
 
     def test_pass_user_or_chat_data(self, dp, message):
         handler = RegexHandler('.*', self.callback_data_1, pass_user_data=True)

@@ -119,8 +119,8 @@ class TestMessageHandler(object):
 
     def test_none_allowed(self):
         with pytest.raises(ValueError, match='are all False'):
-            handler = MessageHandler(None, self.callback_basic, message_updates=False,
-                                     channel_post_updates=False, edited_updates=False)
+            MessageHandler(None, self.callback_basic, message_updates=False,
+                           channel_post_updates=False, edited_updates=False)
 
     def test_with_filter(self, message):
         handler = MessageHandler(Filters.command, self.callback_basic)

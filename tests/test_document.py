@@ -34,11 +34,11 @@ def document_file():
 @pytest.fixture(scope='class')
 def document(bot, chat_id):
     with open('tests/data/telegram.png', 'rb') as f:
-        return bot.send_document(chat_id, document=f).document
+        return bot.send_document(chat_id, document=f, timeout=50).document
 
 
 class TestDocument(object):
-    caption = 'DocumentTest - Caption'
+    caption = 'DocumentTest - *Caption*'
     document_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
     file_size = 12948
     mime_type = 'image/png'
@@ -64,7 +64,8 @@ class TestDocument(object):
     @pytest.mark.timeout(10)
     def test_send_all_args(self, bot, chat_id, document_file, document):
         message = bot.send_document(chat_id, document=document_file, caption=self.caption,
-                                    disable_notification=False, filename='telegram_custom.png')
+                                    disable_notification=False, filename='telegram_custom.png',
+                                    parse_mode='Markdown')
 
         assert isinstance(message.document, Document)
         assert isinstance(message.document.file_id, str)
@@ -74,7 +75,7 @@ class TestDocument(object):
         assert message.document.mime_type == document.mime_type
         assert message.document.file_size == document.file_size
         assert message.document.thumb == document.thumb
-        assert message.caption == self.caption
+        assert message.caption == self.caption.replace('*', '')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -161,6 +162,13 @@ class TestDocument(object):
     def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_document(chat_id=chat_id)
+
+    def test_get_file_instance_method(self, monkeypatch, document):
+        def test(*args, **kwargs):
+            return args[1] == document.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert document.get_file()
 
     def test_equality(self, document):
         a = Document(document.file_id)

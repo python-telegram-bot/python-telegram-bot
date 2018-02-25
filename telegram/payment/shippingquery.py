@@ -66,13 +66,6 @@ class ShippingQuery(TelegramObject):
 
         return cls(**data)
 
-    def to_dict(self):
-        data = super(ShippingQuery, self).to_dict()
-
-        data['from'] = data.pop('from_user', None)
-
-        return data
-
     def answer(self, *args, **kwargs):
         """Shortcut for::
 
