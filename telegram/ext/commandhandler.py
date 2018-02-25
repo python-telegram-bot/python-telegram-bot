@@ -39,7 +39,7 @@ class CommandHandler(Handler):
             Filters.
         allow_edited (:obj:`bool`): Optional. Determines Whether the handler should also accept
             edited messages.
-        prefix (:obj:`bool`): Optional. Denotes the leading character of commands with this
+        prefix (:obj:`bool`): Optional. Denotes the leading character to commands with this
             handler.
         pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
             ``args``.
