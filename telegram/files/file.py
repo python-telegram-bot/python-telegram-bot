@@ -74,7 +74,7 @@ class File(TelegramObject):
         that object using the ``out.write`` method.
 
         Note:
-            `custom_path` and `out` are mutually exclusive.
+            :attr:`custom_path` and :attr:`out` are mutually exclusive.
 
         Args:
             custom_path (:obj:`str`, optional): Custom path.
@@ -85,11 +85,11 @@ class File(TelegramObject):
                 the connection pool).
 
         Returns:
-            :obj:`str` | :obj:`io.BufferedWriter`: The same object as ``out`` if specified.       \
-                Otherwise, returns the filename downloaded to.
+            :obj:`str` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if specified.
+            Otherwise, returns the filename downloaded to.
 
         Raises:
-            ValueError: If both ``custom_path`` and ``out`` are passed.
+            ValueError: If both :attr:`custom_path` and :attr:`out` are passed.
 
         """
         if custom_path is not None and out is not None:
@@ -124,8 +124,8 @@ class File(TelegramObject):
             buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.
 
         Returns:
-            :obj:`bytearray`: The same object as ``buf`` if it was specified. Otherwise a newly   \
-                allocated `bytearray`.
+            :obj:`bytearray`: The same object as :attr:`buf` if it was specified. Otherwise a newly
+            allocated ``bytearray``.
 
         """
         if buf is None:
