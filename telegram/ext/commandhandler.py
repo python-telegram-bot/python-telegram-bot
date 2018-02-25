@@ -21,8 +21,8 @@ import warnings
 
 from future.utils import string_types
 
-from .handler import Handler
 from telegram import Update
+from .handler import Handler
 
 
 class CommandHandler(Handler):
@@ -39,6 +39,8 @@ class CommandHandler(Handler):
             Filters.
         allow_edited (:obj:`bool`): Optional. Determines Whether the handler should also accept
             edited messages.
+        prefix (:obj:`bool`): Optional. Denotes the leading character to commands with this
+            handler.
         pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
             ``args``.
         pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
@@ -68,6 +70,8 @@ class CommandHandler(Handler):
             operators (& for and, | for or, ~ for not).
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
+        prefix (:obj:`str`, optional): Denotes the leading character to commands with this handler.
+            Must be exactly one character or an empty string. Default is ``/``.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -92,6 +96,7 @@ class CommandHandler(Handler):
                  callback,
                  filters=None,
                  allow_edited=False,
+                 prefix='/',
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
@@ -110,6 +115,15 @@ class CommandHandler(Handler):
             self.command = [x.lower() for x in command]
         self.filters = filters
         self.allow_edited = allow_edited
+        if prefix is None or not isinstance(prefix, string_types) or len(prefix) > 1:
+            raise ValueError("The prefix argument to CommandHandler must be a single character or "
+                             "an empty string.")
+        if prefix == ' ':
+            # A leading space character is stripped away in Telegram messages, so we can consider
+            # it as an empty string prefix.
+            self.prefix = ''
+        else:
+            self.prefix = prefix
         self.pass_args = pass_args
 
         # We put this up here instead of with the rest of checking code
@@ -133,10 +147,16 @@ class CommandHandler(Handler):
                 and (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
-            if message.text and message.text.startswith('/') and len(message.text) > 1:
-                command = message.text[1:].split(None, 1)[0].split('@')
-                command.append(
-                    message.bot.username)  # in case the command was send without a username
+            empty_leader = self.prefix == ''
+            command_text_nonempty = message.text and len(message.text) > 1
+            is_valid_command = command_text_nonempty and (empty_leader or
+                                                          message.text.startswith(self.prefix))
+            if is_valid_command:
+                leader_stripped = message.text if empty_leader else message.text[1:]
+                command = leader_stripped.split(None, 1)[0].split('@')
+
+                # Append the bot's username in any case
+                command.append(message.bot.username)
 
                 if self.filters is None:
                     res = True

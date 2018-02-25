@@ -51,6 +51,11 @@ def message(bot):
     return Message(1, None, None, None, bot=bot)
 
 
+@pytest.fixture(scope='function')
+def prefixes():
+    return ['/', '#', '', ' ']
+
+
 class TestCommandHandler(object):
     test_flag = False
 
@@ -75,62 +80,72 @@ class TestCommandHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def ch_callback_args(self, bot, update, args):
-        if update.message.text == '/test':
+    def ch_callback_args(self, bot, update, args, prefix):
+        if update.message.text == '{}test'.format(prefix):
             self.test_flag = len(args) == 0
-        elif update.message.text == '/test@{}'.format(bot.username):
+        elif update.message.text == '{}test@{}'.format(prefix, bot.username):
             self.test_flag = len(args) == 0
         else:
             self.test_flag = args == ['one', 'two']
 
-    def test_basic(self, dp, message):
-        handler = CommandHandler('test', self.callback_basic)
-        dp.add_handler(handler)
+    def test_basic(self, dp, message, prefixes):
+        for p in prefixes:
+            handler = CommandHandler('test', self.callback_basic, prefix=p)
+            dp.add_handler(handler)
 
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-        dp.process_update(Update(0, message))
-        assert self.test_flag
+            message.text = '{}test'.format(p)
+            assert handler.check_update(Update(0, message))
+            dp.process_update(Update(0, message))
+            assert self.test_flag
 
-        message.text = '/nottest'
-        assert not handler.check_update(Update(0, message))
+            message.text = '{}nottest'.format(p)
+            assert not handler.check_update(Update(0, message))
 
-        message.text = 'test'
-        assert not handler.check_update(Update(0, message))
+            message.text = 'test'
+            result = handler.check_update(Update(0, message))
+            if p in ['', ' ']:
+                assert result
+            else:
+                assert not result
 
-        message.text = 'not /test at start'
-        assert not handler.check_update(Update(0, message))
+            message.text = 'not {}test at start'.format(p)
+            assert not handler.check_update(Update(0, message))
 
-    def test_command_list(self, message):
-        handler = CommandHandler(['test', 'start'], self.callback_basic)
+            dp.remove_handler(handler)
 
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
+    def test_command_list(self, message, prefixes):
+        for p in prefixes:
+            handler = CommandHandler(['test', 'start'], self.callback_basic, prefix=p)
 
-        message.text = '/start'
-        assert handler.check_update(Update(0, message))
+            message.text = '{}test'.format(p)
+            assert handler.check_update(Update(0, message))
 
-        message.text = '/stop'
-        assert not handler.check_update(Update(0, message))
+            message.text = '{}start'.format(p)
+            assert handler.check_update(Update(0, message))
 
-    def test_edited(self, message):
-        handler = CommandHandler('test', self.callback_basic, allow_edited=False)
+            message.text = '{}stop'.format(p)
+            assert not handler.check_update(Update(0, message))
 
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-        assert not handler.check_update(Update(0, edited_message=message))
-        handler.allow_edited = True
-        assert handler.check_update(Update(0, message))
-        assert handler.check_update(Update(0, edited_message=message))
+    def test_edited(self, message, prefixes):
+        for p in prefixes:
+            handler = CommandHandler('test', self.callback_basic, allow_edited=False, prefix=p)
 
-    def test_directed_commands(self, message):
-        handler = CommandHandler('test', self.callback_basic)
+            message.text = '{}test'.format(p)
+            assert handler.check_update(Update(0, message))
+            assert not handler.check_update(Update(0, edited_message=message))
+            handler.allow_edited = True
+            assert handler.check_update(Update(0, message))
+            assert handler.check_update(Update(0, edited_message=message))
 
-        message.text = '/test@{}'.format(message.bot.username)
-        assert handler.check_update(Update(0, message))
+    def test_directed_commands(self, message, prefixes):
+        for p in prefixes:
+            handler = CommandHandler('test', self.callback_basic, prefix=p)
 
-        message.text = '/test@otherbot'
-        assert not handler.check_update(Update(0, message))
+            message.text = '{}test@{}'.format(p, message.bot.username)
+            assert handler.check_update(Update(0, message))
+
+            message.text = '{}test@otherbot'.format(p)
+            assert not handler.check_update(Update(0, message))
 
     def test_with_filter(self, message):
         handler = CommandHandler('test', self.callback_basic, Filters.group)
@@ -142,53 +157,74 @@ class TestCommandHandler(object):
         message.chat = Chat(23, 'private')
         assert not handler.check_update(Update(0, message))
 
-    def test_pass_args(self, dp, message):
-        handler = CommandHandler('test', self.ch_callback_args, pass_args=True)
-        dp.add_handler(handler)
+    def test_pass_args(self, dp, message, prefixes):
+        for p in prefixes:
+            handler = CommandHandler(
+                'test',
+                lambda bot, update, args: self.ch_callback_args(bot, update, args, p),
+                pass_args=True,
+                prefix=p
+            )
+            dp.add_handler(handler)
 
-        message.text = '/test'
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
+            self.test_flag = False
+            message.text = '{}test'.format(p)
+            dp.process_update(Update(0, message=message))
+            assert self.test_flag
 
-        self.test_flag = False
-        message.text = '/test@{}'.format(message.bot.username)
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
+            self.test_flag = False
+            message.text = '{}test@{}'.format(p, message.bot.username)
+            dp.process_update(Update(0, message=message))
+            assert self.test_flag
 
-        self.test_flag = False
-        message.text = '/test one two'
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
+            self.test_flag = False
+            message.text = '{}test one two'.format(p)
+            dp.process_update(Update(0, message=message))
+            assert self.test_flag
 
-        self.test_flag = False
-        message.text = '/test@{} one two'.format(message.bot.username)
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
+            self.test_flag = False
+            message.text = '{}test@{} one two'.format(p, message.bot.username)
+            dp.process_update(Update(0, message=message))
+            assert self.test_flag
 
-    def test_newline(self, dp, message):
-        handler = CommandHandler('test', self.callback_basic)
-        dp.add_handler(handler)
+            dp.remove_handler(handler)
 
-        message.text = '/test\nfoobar'
-        assert handler.check_update(Update(0, message))
-        dp.process_update(Update(0, message))
-        assert self.test_flag
+    def test_newline(self, dp, message, prefixes):
+        for p in prefixes:
+            handler = CommandHandler('test', self.callback_basic, prefix=p)
+            dp.add_handler(handler)
 
-    def test_single_char(self, dp, message):
-        # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
-        handler = CommandHandler('test', self.callback_basic)
-        dp.add_handler(handler)
+            message.text = '{}test\nfoobar'.format(p)
+            assert handler.check_update(Update(0, message))
+            dp.process_update(Update(0, message))
+            assert self.test_flag
+
+            dp.remove_handler(handler)
+
+    def test_single_char(self, message):
+        # Regression test for
+        # https://github.com/python-telegram-bot/python-telegram-bot/issues/871
 
         message.text = 'a'
-        assert not handler.check_update(Update(0, message))
 
-    def test_single_slash(self, dp, message):
-        # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
-        handler = CommandHandler('test', self.callback_basic)
-        dp.add_handler(handler)
+        normal_handler = CommandHandler('test', self.callback_basic)
+        assert not normal_handler.check_update(Update(0, message))
 
-        message.text = '/'
-        assert not handler.check_update(Update(0, message))
+        empty_prefix_handler = CommandHandler('test', self.callback_basic, prefix='')
+        assert not empty_prefix_handler.check_update(Update(0, message))
+
+    def test_single_prefix(self, dp, message, prefixes):
+        for p in prefixes:
+            # Regression test for
+            # https://github.com/python-telegram-bot/python-telegram-bot/issues/871
+            handler = CommandHandler('test', self.callback_basic, prefix=p)
+            dp.add_handler(handler)
+
+            # Note: In praxis, it is not possible to send empty messages.
+            #       We will test this case nonetheless
+            message.text = p
+            assert not handler.check_update(Update(0, message))
+            dp.remove_handler(handler)
 
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
