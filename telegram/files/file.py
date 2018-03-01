@@ -74,32 +74,34 @@ class File(TelegramObject):
         that object using the ``out.write`` method.
 
         Note:
-            `custom_path` and `out` are mutually exclusive.
+            :attr:`custom_path` and :attr:`out` are mutually exclusive.
 
         Args:
             custom_path (:obj:`str`, optional): Custom path.
-            out (:obj:`object`, optional): A file-like object. Must be opened in binary mode, if
-                applicable.
+            out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
+                writing in binary mode, if applicable.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
 
+        Returns:
+            :obj:`str` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if specified.
+            Otherwise, returns the filename downloaded to.
+
         Raises:
-            ValueError: If both ``custom_path`` and ``out`` are passed.
+            ValueError: If both :attr:`custom_path` and :attr:`out` are passed.
 
         """
         if custom_path is not None and out is not None:
             raise ValueError('custom_path and out are mutually exclusive')
 
         # Convert any UTF-8 char into a url encoded ASCII string.
-        sres = urllib_parse.urlsplit(self.file_path)
-        url = urllib_parse.urlunsplit(urllib_parse.SplitResult(
-            sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
+        url = self._get_encoded_url()
 
         if out:
             buf = self.bot.request.retrieve(url)
             out.write(buf)
-
+            return out
         else:
             if custom_path:
                 filename = custom_path
@@ -107,3 +109,27 @@ class File(TelegramObject):
                 filename = basename(self.file_path)
 
             self.bot.request.download(url, filename, timeout=timeout)
+            return filename
+
+    def _get_encoded_url(self):
+        """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
+        sres = urllib_parse.urlsplit(self.file_path)
+        return urllib_parse.urlunsplit(urllib_parse.SplitResult(
+            sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment))
+
+    def download_as_bytearray(self, buf=None):
+        """Download this file and return it as a bytearray.
+
+        Args:
+            buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.
+
+        Returns:
+            :obj:`bytearray`: The same object as :attr:`buf` if it was specified. Otherwise a newly
+            allocated :obj:`bytearray`.
+
+        """
+        if buf is None:
+            buf = bytearray()
+
+        buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
+        return buf
