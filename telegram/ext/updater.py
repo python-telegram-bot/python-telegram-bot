@@ -169,10 +169,10 @@ class Updater(object):
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
                 before actually starting to poll. Default is False.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
-                `Updater` will retry on failures on the Telegram server. Default is -1.
+                `Updater` will retry on failures on the Telegram server.
 
-                * < 0 - retry indefinitely
-                *   0 - no retries (default)
+                * < 0 - retry indefinitely (default)
+                *   0 - no retries
                 * > 0 - retry up to X times
 
             allowed_updates (List[:obj:`str`], optional): Passed to
@@ -229,8 +229,8 @@ class Updater(object):
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 `Updater` will retry on failures on the Telegram server.
 
-                * < 0 - retry indefinitely
-                *   0 - no retries (default)
+                * < 0 - retry indefinitely (default)
+                *   0 - no retries
                 * > 0 - retry up to X times
 
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
