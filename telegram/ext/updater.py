@@ -169,7 +169,7 @@ class Updater(object):
             clean (:obj:`bool`, optional): Whether to clean any pending updates on Telegram servers
                 before actually starting to poll. Default is False.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
-                `Updater` will retry on failures on the Telegram server.
+                `Updater` will retry on failures on the Telegram server. Default is -1.
 
                 * < 0 - retry indefinitely
                 *   0 - no retries (default)
