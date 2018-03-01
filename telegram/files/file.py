@@ -125,7 +125,7 @@ class File(TelegramObject):
 
         Returns:
             :obj:`bytearray`: The same object as :attr:`buf` if it was specified. Otherwise a newly
-            allocated ``bytearray``.
+            allocated :obj:`bytearray`.
 
         """
         if buf is None:
