@@ -405,7 +405,10 @@ class Updater(object):
             return False
 
         def bootstrap_clean_updates():
-            self._clean_updates()
+            self.logger.debug('Cleaning updates from Telegram server')
+            updates = self.bot.get_updates()
+            while updates:
+                updates = self.bot.get_updates(updates[-1].update_id + 1)
             return False
 
         def bootstrap_set_webhook():
@@ -433,12 +436,6 @@ class Updater(object):
 
         self._network_loop_retry(bootstrap_set_webhook, bootstrap_onerr_cb,
                                  'bootstrap set webhook', bootstrap_interval)
-
-    def _clean_updates(self):
-        self.logger.debug('Cleaning updates from Telegram server')
-        updates = self.bot.get_updates()
-        while updates:
-            updates = self.bot.get_updates(updates[-1].update_id + 1)
 
     def stop(self):
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
