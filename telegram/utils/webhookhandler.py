@@ -62,11 +62,16 @@ class WebhookServer(BaseHTTPServer.HTTPServer, object):
     def shutdown(self):
         with self.shutdown_lock:
             if not self.is_running:
-                self.logger.warn('Webhook Server already stopped.')
+                self.logger.warning('Webhook Server already stopped.')
                 return
             else:
                 super(WebhookServer, self).shutdown()
                 self.is_running = False
+
+    def handle_error(self, request, client_address):
+        """Handle an error gracefully."""
+        self.logger.debug('Exception happened during processing of request from %s',
+                          client_address, exc_info=True)
 
 
 # WebhookHandler, process webhook calls

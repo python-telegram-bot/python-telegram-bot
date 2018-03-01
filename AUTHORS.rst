@@ -51,8 +51,10 @@ The following wonderful people contributed directly or indirectly to this projec
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
+- `Oleg Sushchenko <https://github.com/feuillemorte>`_
 - `overquota <https://github.com/overquota>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
+- `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Sascha <https://github.com/saschalalala>`_

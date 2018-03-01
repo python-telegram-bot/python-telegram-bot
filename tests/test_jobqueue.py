@@ -202,7 +202,7 @@ class TestJobQueue(object):
         expected_time = time.time() + delta + 60 * 60 * 24
 
         job_queue.run_once(self.job_datetime_tests, when)
-        assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
+        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
 
     def test_run_daily(self, job_queue):
         delta = 0.5
@@ -212,13 +212,10 @@ class TestJobQueue(object):
         job_queue.run_daily(self.job_run_once, time_of_day)
         sleep(0.6)
         assert self.result == 1
-        assert pytest.approx(job_queue.queue.get(False)[0]) == expected_time
+        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)
-        with pytest.warns(UserWarning):
-            job_queue.put(j, next_t=0)
-        j.schedule_removal()
         with pytest.raises(ValueError, match='can not be set to'):
             j.repeat = True
         j.interval = 15
@@ -238,3 +235,12 @@ class TestJobQueue(object):
             j.days = ('mon', 'wed')
         with pytest.raises(ValueError, match='from 0 up to and'):
             j.days = (0, 6, 12, 14)
+
+    def test_get_jobs(self, job_queue):
+        job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
+        job2 = job_queue.run_once(self.job_run_once, 10, name='name1')
+        job3 = job_queue.run_once(self.job_run_once, 10, name='name2')
+
+        assert job_queue.jobs() == (job1, job2, job3)
+        assert job_queue.get_jobs_by_name('name1') == (job1, job2)
+        assert job_queue.get_jobs_by_name('name2') == (job3,)

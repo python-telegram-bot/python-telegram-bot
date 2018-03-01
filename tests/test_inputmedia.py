@@ -20,8 +20,8 @@ import pytest
 from flaky import flaky
 
 from telegram import InputMediaVideo, InputMediaPhoto, Message
-from .test_video import video, video_file
-from .test_photo import _photo, photo_file, photo, thumb
+from .test_video import video, video_file  # noqa: F401
+from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 
 
 @pytest.fixture(scope='class')
@@ -30,13 +30,16 @@ def input_media_video():
                            caption=TestInputMediaVideo.caption,
                            width=TestInputMediaVideo.width,
                            height=TestInputMediaVideo.height,
-                           duration=TestInputMediaVideo.duration)
+                           duration=TestInputMediaVideo.duration,
+                           parse_mode=TestInputMediaVideo.parse_mode,
+                           supports_streaming=TestInputMediaVideo.supports_streaming)
 
 
 @pytest.fixture(scope='class')
 def input_media_photo():
     return InputMediaPhoto(media=TestInputMediaPhoto.media,
-                           caption=TestInputMediaPhoto.caption)
+                           caption=TestInputMediaPhoto.caption,
+                           parse_mode=TestInputMediaPhoto.parse_mode)
 
 
 class TestInputMediaVideo(object):
@@ -46,6 +49,8 @@ class TestInputMediaVideo(object):
     width = 3
     height = 4
     duration = 5
+    parse_mode = 'HTML'
+    supports_streaming = True
 
     def test_expected_values(self, input_media_video):
         assert input_media_video.type == self.type
@@ -54,6 +59,8 @@ class TestInputMediaVideo(object):
         assert input_media_video.width == self.width
         assert input_media_video.height == self.height
         assert input_media_video.duration == self.duration
+        assert input_media_video.parse_mode == self.parse_mode
+        assert input_media_video.supports_streaming == self.supports_streaming
 
     def test_to_dict(self, input_media_video):
         input_media_video_dict = input_media_video.to_dict()
@@ -63,8 +70,10 @@ class TestInputMediaVideo(object):
         assert input_media_video_dict['width'] == input_media_video.width
         assert input_media_video_dict['height'] == input_media_video.height
         assert input_media_video_dict['duration'] == input_media_video.duration
+        assert input_media_video_dict['parse_mode'] == input_media_video.parse_mode
+        assert input_media_video_dict['supports_streaming'] == input_media_video.supports_streaming
 
-    def test_with_video(self, video):
+    def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
         input_media_video = InputMediaVideo(video, caption="test 3")
         assert input_media_video.type == self.type
@@ -74,7 +83,7 @@ class TestInputMediaVideo(object):
         assert input_media_video.duration == video.duration
         assert input_media_video.caption == "test 3"
 
-    def test_error_with_file(self, video_file):
+    def test_error_with_file(self, video_file):  # noqa: F811
         # fixture found in test_video
         with pytest.raises(ValueError, match="file_id, url or Video"):
             InputMediaVideo(video_file)
@@ -84,34 +93,38 @@ class TestInputMediaPhoto(object):
     type = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
+    parse_mode = 'Markdown'
 
     def test_expected_values(self, input_media_photo):
         assert input_media_photo.type == self.type
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
+        assert input_media_photo.parse_mode == self.parse_mode
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
         assert input_media_photo_dict['type'] == input_media_photo.type
         assert input_media_photo_dict['media'] == input_media_photo.media
         assert input_media_photo_dict['caption'] == input_media_photo.caption
+        assert input_media_photo_dict['parse_mode'] == input_media_photo.parse_mode
 
-    def test_with_photo(self, photo):
+    def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
         imp = InputMediaPhoto(photo, caption="test 2")
         assert imp.type == self.type
         assert imp.media == photo.file_id
         assert imp.caption == "test 2"
 
-    def test_error_with_file(self, photo_file):
+    def test_error_with_file(self, photo_file):  # noqa: F811
         # fixture found in test_photo
         with pytest.raises(ValueError, match="file_id, url or PhotoSize"):
             InputMediaPhoto(photo_file)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='function')  # noqa: F811
 def media_group(photo, thumb):
-    return [InputMediaPhoto(photo), InputMediaPhoto(thumb)]
+    return [InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
+            InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]
 
 
 class TestSendMediaGroup(object):

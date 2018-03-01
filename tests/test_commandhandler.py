@@ -190,6 +190,9 @@ class TestCommandHandler(object):
         message.text = '/'
         assert not handler.check_update(Update(0, message))
 
+        message.text = '/ test'
+        assert not handler.check_update(Update(0, message))
+
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)

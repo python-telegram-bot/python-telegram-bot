@@ -35,6 +35,7 @@ class Sticker(TelegramObject):
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -48,7 +49,8 @@ class Sticker(TelegramObject):
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size.
-        **kwargs (obj:`dict`): Arbitrary keyword arguments.
+        **kwargs (obj:`dict`): Arbitrary keyword arguments.7
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     """
 
@@ -61,6 +63,7 @@ class Sticker(TelegramObject):
                  file_size=None,
                  set_name=None,
                  mask_position=None,
+                 bot=None,
                  **kwargs):
         # Required
         self.file_id = str(file_id)
@@ -72,6 +75,7 @@ class Sticker(TelegramObject):
         self.file_size = file_size
         self.set_name = set_name
         self.mask_position = mask_position
+        self.bot = bot
 
         self._id_attrs = (self.file_id,)
 
@@ -85,7 +89,7 @@ class Sticker(TelegramObject):
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
-        return cls(**data)
+        return cls(bot=bot, **data)
 
     @classmethod
     def de_list(cls, data, bot):
@@ -93,6 +97,24 @@ class Sticker(TelegramObject):
             return list()
 
         return [cls.de_json(d, bot) for d in data]
+
+    def get_file(self, timeout=None, **kwargs):
+        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        return self.bot.get_file(self.file_id, timeout=timeout, **kwargs)
 
 
 class StickerSet(TelegramObject):

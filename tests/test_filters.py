@@ -162,6 +162,11 @@ class TestFilters(object):
         assert Filters.status_update.pinned_message(message)
         message.pinned_message = None
 
+        message.connected_website = 'http://example.com/'
+        assert Filters.status_update(message)
+        assert Filters.status_update.connected_website(message)
+        message.connected_website = None
+
     def test_filters_forwarded(self, message):
         assert not Filters.forwarded(message)
         message.forward_date = 'test'

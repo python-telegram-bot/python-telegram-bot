@@ -29,18 +29,28 @@ class InputMediaVideo(InputMedia):
             servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
             Lastly you can pass an existing :class:`telegram.Video` object to send.
         caption (:obj:`str`): Optional. Caption of the video to be sent, 0-200 characters.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration.
+        supports_streaming (:obj:`bool`): Optional. Pass True, if the uploaded video is suitable
+            for streaming.
 
     Args:
         media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
             servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
             Lastly you can pass an existing :class:`telegram.Video` object to send.
         caption (:obj:`str`, optional): Caption of the video to be sent, 0-200 characters.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
         duration (:obj:`int`, optional): Video duration.
+        supports_streaming (:obj:`bool`, optional): Pass True, if the uploaded video is suitable
+            for streaming.
 
     Note:
         When using a :class:`telegram.Video` for the :attr:`media` attribute. It will take the
@@ -51,7 +61,8 @@ class InputMediaVideo(InputMedia):
 
     # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
 
-    def __init__(self, media, caption=None, width=None, height=None, duration=None):
+    def __init__(self, media, caption=None, width=None, height=None, duration=None,
+                 supports_streaming=None, parse_mode=None):
         self.type = 'video'
 
         if isinstance(media, Video):
@@ -66,9 +77,13 @@ class InputMediaVideo(InputMedia):
 
         if caption:
             self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode
         if width:
             self.width = width
         if height:
             self.height = height
         if duration:
             self.duration = duration
+        if supports_streaming:
+            self.supports_streaming = supports_streaming
