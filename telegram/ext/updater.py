@@ -242,7 +242,6 @@ class Updater(object):
             :obj:`Queue`: The update queue that can be filled from the main thread.
 
         """
-
         with self.__lock:
             if not self.running:
                 self.running = True
@@ -425,17 +424,27 @@ class Updater(object):
                 self.logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
                 raise exc
 
-        if clean:
+        # Cleaning pending messages is done by polling for them - so we need to delete webhook if
+        # one is configured.
+        # We also take this chance to delete pre-configured webhook if this is a polling Updater.
+        # NOTE: We don't know ahead if a webhook is configured, so we just delete.
+        if clean or not webhook_url:
             self._network_loop_retry(bootstrap_del_webhook, bootstrap_onerr_cb,
                                      'bootstrap del webhook', bootstrap_interval)
             retries[0] = 0
+
+        # Clean pending messages, if requested.
+        if clean:
             self._network_loop_retry(bootstrap_clean_updates, bootstrap_onerr_cb,
                                      'bootstrap clean updates', bootstrap_interval)
             retries[0] = 0
             sleep(1)
 
-        self._network_loop_retry(bootstrap_set_webhook, bootstrap_onerr_cb,
-                                 'bootstrap set webhook', bootstrap_interval)
+        # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
+        # so we set it anyhow.
+        if webhook_url:
+            self._network_loop_retry(bootstrap_set_webhook, bootstrap_onerr_cb,
+                                     'bootstrap set webhook', bootstrap_interval)
 
     def stop(self):
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
