@@ -15,7 +15,7 @@ objects in the package reflect the types as defined by the `telegram bot api <ht
 Changelog
 ---------
 
-.. include:: ..\\..\\CHANGES.rst
+.. include:: ../../CHANGES.rst
 
 Indices and tables
 ==================
