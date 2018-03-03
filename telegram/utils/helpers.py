@@ -17,23 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions."""
-from html import escape
-
 import re
-from collections import OrderedDict
 import signal
+from collections import OrderedDict
 from datetime import datetime
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 try:
     from html import escape as escape_html  # noqa: F401
 except ImportError:
     from cgi import escape as escape_html  # noqa: F401
-
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
 _signames = {v: k
@@ -55,7 +47,6 @@ if hasattr(datetime, 'timestamp'):
 else:
     # Python < 3.3 (incl 2.7)
     from time import mktime
-
 
     def _timestamp(dt_obj):
         return mktime(dt_obj.timetuple())
@@ -107,7 +98,7 @@ def mention_html(user_id, name):
         :obj:`str`: The inline mention for the user as html.
     """
     if isinstance(user_id, int):
-        return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
+        return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape_html(name))
 
 
 def mention_markdown(user_id, name):
@@ -154,23 +145,11 @@ def effective_message_type(entity):
     return None
 
 
-def _extract_urls_from_text(text):
-    """
-    Returns a list of urls from a text string.
-    URLs without a leading `http://` or `www.` won't be found.
-    """
-    out = []
-    for word in text.split(' '):
-        thing = urlparse(word.strip())
-        if thing.scheme:
-            out.append(word)
-    return out
-
-
 def extract_urls(message):
     """
     Extracts all Hyperlinks that are contained in a message. This includes
-    message entities and the media caption. Distinct links are returned in order of appearance.
+    message entities and the media caption. Distinct links are returned in order of appearance,
+    while links in the text take precedence over ones in the media caption.
 
     Note: Exact duplicates are removed, but there may still be URLs that link
     to the same resource.
@@ -186,11 +165,12 @@ def extract_urls(message):
     types = [MessageEntity.URL, MessageEntity.TEXT_LINK]
     results = message.parse_entities(types=types)
     results.update(message.parse_caption_entities(types=types))
-    all_urls = [v if k.type == MessageEntity.URL else k.url for k, v in results.items()]
+
+    all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in results.items())
 
     # Strip trailing slash from URL so we can compare them for equality
-    stripped_urls = [x[:-1] if x[-1] == '/' else x for x in all_urls]
+    stripped_urls = (x.rstrip('/') for x in all_urls)
 
-    # Remove exact duplicates, compliant with legacy python
+    # Remove exact duplicates, in a way that is compliant with legacy python
     urls = OrderedDict({k: None for k in stripped_urls})
     return list(urls.keys())

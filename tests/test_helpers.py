@@ -16,11 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from telegram import Update
-
-from telegram import Message
 from telegram import MessageEntity
 from telegram import Sticker
+from telegram import Update
 from telegram import User
 from telegram.message import Message
 from telegram.utils import helpers
@@ -32,14 +30,6 @@ class TestHelpers(object):
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
 
         assert expected_str == helpers.escape_markdown(test_str)
-
-    def test_extract_urls_from_text(self):
-        urls = "http://google.com and http://github.com/ and " \
-               "python-telegram-bot.readthedocs.io/en/latest/"
-        result = helpers._extract_urls_from_text(urls)
-        assert len(result) == 2
-        assert result[0] == 'http://google.com'
-        assert result[1] == 'http://github.com/'
 
     def test_extract_urls_entities(self):
         test_entities = [{
@@ -65,17 +55,23 @@ class TestHelpers(object):
         assert (test_entities[2]['url'] == result[1])
 
     def test_extract_urls_caption(self):
+        test_entities = [{
+            'length': 109, 'offset': 11, 'type': 'url'
+        }]
         caption = "Taken from https://stackoverflow.com/questions/520031/whats" \
-                  "-the-cleanest-way-to-extract-urls-from-a-string-using-python"
+                  "-the-cleanest-way-to-extract-urls-from-a-string-using-python/"
         test_message = Message(message_id=1,
                                from_user=None,
                                date=None,
                                chat=None,
-                               caption=caption)
-        result = helpers.extract_urls(test_message)
+                               caption=caption,
+                               caption_entities=[MessageEntity(**e) for e in test_entities]
+                               )
+        results = helpers.extract_urls(test_message)
 
-        assert result[0] == 'https://stackoverflow.com/questions/520031/whats-the-' \
-                            'cleanest-way-to-extract-urls-from-a-string-using-python'
+        assert len(results) == 1
+        assert results[0] == 'https://stackoverflow.com/questions/520031/whats-the-' \
+                             'cleanest-way-to-extract-urls-from-a-string-using-python'
 
     def test_effective_message_type(self):
         test_message = Message(message_id=1,
