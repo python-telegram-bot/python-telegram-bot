@@ -294,3 +294,50 @@ class TestConversationHandler(object):
         assert not handler.check_update(Update(0, message=message))
         assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
         assert not handler.check_update(Update(0, shipping_query=shipping_query))
+
+    def test_conversation_timeout(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, then reach timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+        # Start state machine, do something, then reach timeout
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+    def test_conversation_timeout_two_users(self, dp, bot, user1, user2):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, do something as second user, then reach timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        message.from_user = user2
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user2.id)) is None
+        message.text = '/start'
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert handler.conversations.get((self.group.id, user2.id)) is None

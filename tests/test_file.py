@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
@@ -16,6 +17,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
+from tempfile import TemporaryFile, mkstemp
 
 import pytest
 from flaky import flaky
@@ -36,6 +39,7 @@ class TestFile(object):
     file_path = (
         u'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3')
     file_size = 28232
+    file_content = u'Saint-Saëns'.encode('utf-8')  # Intentionally contains unicode chars.
 
     def test_de_json(self, bot):
         json_dict = {
@@ -65,11 +69,61 @@ class TestFile(object):
 
     def test_download(self, monkeypatch, file):
         def test(*args, **kwargs):
-            raise TelegramError('test worked')
+            return self.file_content
 
-        monkeypatch.setattr('telegram.utils.request.Request.download', test)
-        with pytest.raises(TelegramError, match='test worked'):
-            file.download()
+        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        out_file = file.download()
+
+        try:
+            with open(out_file, 'rb') as fobj:
+                assert fobj.read() == self.file_content
+        finally:
+            os.unlink(out_file)
+
+    def test_download_custom_path(self, monkeypatch, file):
+        def test(*args, **kwargs):
+            return self.file_content
+
+        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        file_handle, custom_path = mkstemp()
+        try:
+            out_file = file.download(custom_path)
+            assert out_file == custom_path
+
+            with open(out_file, 'rb') as fobj:
+                assert fobj.read() == self.file_content
+        finally:
+            os.close(file_handle)
+            os.unlink(custom_path)
+
+    def test_download_file_obj(self, monkeypatch, file):
+        def test(*args, **kwargs):
+            return self.file_content
+
+        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        with TemporaryFile() as custom_fobj:
+            out_fobj = file.download(out=custom_fobj)
+            assert out_fobj is custom_fobj
+
+            out_fobj.seek(0)
+            assert out_fobj.read() == self.file_content
+
+    def test_download_bytearray(self, monkeypatch, file):
+        def test(*args, **kwargs):
+            return self.file_content
+
+        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+
+        # Check that a download to a newly allocated bytearray works.
+        buf = file.download_as_bytearray()
+        assert buf == bytearray(self.file_content)
+
+        # Check that a download to a given bytearray works (extends the bytearray).
+        buf2 = buf[:]
+        buf3 = file.download_as_bytearray(buf=buf2)
+        assert buf3 is buf2
+        assert buf2[len(buf):] == buf
+        assert buf2[:len(buf)] == buf
 
     def test_equality(self, bot):
         a = File(self.file_id, bot)
