@@ -191,13 +191,14 @@ class Filters(object):
         """
 
         def __init__(self, pattern):
-            if isinstance(pattern, string_types):
-                pattern = re.compile(pattern)
-            self.pattern = pattern
+            self.pattern = re.compile(pattern)
             self.name = 'Filters.regex({})'.format(self.pattern)
 
+        # TODO: Once the callback revamp (#1026) is done, the regex filter should be able to pass
+        # the matched groups and groupdict to the context object.
+
         def filter(self, message):
-            return bool(re.search(self.pattern, message.text))
+            return bool(self.pattern.search(message.text))
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
