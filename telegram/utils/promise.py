@@ -30,15 +30,15 @@ class Promise(object):
     """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
 
     Args:
-        pooled_function (callable): The callable that will be called concurrently.
-        args (list|tuple): Positional arguments for ``pooled_function``
-        kwargs (dict): Keyword arguments for ``pooled_function``
+        pooled_function (:obj:`callable`): The callable that will be called concurrently.
+        args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
+        kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
 
     Attributes:
-        pooled_function (callable): The callable that will be called concurrently.
-        args (list|tuple): Positional arguments for ``pooled_function``
-        kwargs (dict): Keyword arguments for ``pooled_function``
-        done (:obj:`Event`): Is set when the result is available.
+        pooled_function (:obj:`callable`): The callable that will be called concurrently.
+        args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
+        kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
+        done (:obj:`threading.Event`): Is set when the result is available.
 
     """
 
@@ -51,7 +51,7 @@ class Promise(object):
         self._exception = None
 
     def run(self):
-        """Calls the ``pooled_function`` callable."""
+        """Calls the :attr:`pooled_function` callable."""
 
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
@@ -64,7 +64,6 @@ class Promise(object):
             self.done.set()
 
     def __call__(self):
-        """Calls run()"""
         self.run()
 
     def result(self, timeout=None):
@@ -75,10 +74,11 @@ class Promise(object):
                 calculated. ``None`` means indefinite. Default is ``None``.
 
         Returns:
-            Returns the return value of ``pooled_function`` or ``None`` if the ``timeout`` expires.
+            Returns the return value of :attr:`pooled_function` or ``None`` if the ``timeout``
+            expires.
 
         Raises:
-            Any exception raised by ``pooled_function``.
+            Any exception raised by :attr:`pooled_function`.
         """
         self.done.wait(timeout=timeout)
         if self._exception is not None:
@@ -87,6 +87,6 @@ class Promise(object):
 
     @property
     def exception(self):
-        """The exception raised by ``pooled_function`` or ``None`` if no exception has been raised
-        (yet)."""
+        """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
+        raised (yet)."""
         return self._exception

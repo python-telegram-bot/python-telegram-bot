@@ -1,6 +1,6 @@
-telegram.utils.promise Module
-=============================
+telegram.utils.promise.Promise
+==============================
 
-.. automodule:: telegram.utils.promise
+.. autoclass:: telegram.utils.promise.Promise
     :members:
     :show-inheritance:

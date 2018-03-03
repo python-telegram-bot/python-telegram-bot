@@ -1,6 +1,6 @@
-telegram.utils.request Module
-=============================
+telegram.utils.request.Request
+==============================
 
-.. automodule:: telegram.utils.request
+.. autoclass:: telegram.utils.request.Request
     :members:
     :show-inheritance:
