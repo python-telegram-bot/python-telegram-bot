@@ -305,7 +305,7 @@ class ConversationHandler(Handler):
         new_state = self.current_handler.handle_update(update, dispatcher)
         timeout_job = self.timeout_jobs.get(self.current_conversation)
 
-        if timeout_job is not None or new_state == self.END:
+        if timeout_job is not None and new_state == self.END:
             timeout_job.schedule_removal()
             del self.timeout_jobs[self.current_conversation]
         if self.conversation_timeout and new_state != self.END:
