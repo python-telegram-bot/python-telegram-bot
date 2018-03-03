@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -188,6 +188,9 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/'
+        assert not handler.check_update(Update(0, message))
+
+        message.text = '/ test'
         assert not handler.check_update(Update(0, message))
 
     def test_pass_user_or_chat_data(self, dp, message):

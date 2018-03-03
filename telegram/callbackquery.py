@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -104,13 +104,6 @@ class CallbackQuery(TelegramObject):
         data['message'] = Message.de_json(data.get('message'), bot)
 
         return cls(bot=bot, **data)
-
-    def to_dict(self):
-        data = super(CallbackQuery, self).to_dict()
-
-        # Required
-        data['from'] = data.pop('from_user', None)
-        return data
 
     def answer(self, *args, **kwargs):
         """Shortcut for::

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -49,8 +49,9 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def pre_checkout_query():
-    return Update(1, pre_checkout_query=PreCheckoutQuery('id', User(1, 'test user', False), 'EUR', 223,
-                                                         'invoice_payload'))
+    return Update(1,
+                  pre_checkout_query=PreCheckoutQuery('id', User(1, 'test user', False),
+                                                      'EUR', 223, 'invoice_payload'))
 
 
 class TestPreCheckoutQueryHandler(object):

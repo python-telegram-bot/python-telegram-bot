@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ from datetime import datetime
 
 import pytest
 
+from telegram import ParseMode
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment)
@@ -78,16 +79,20 @@ def message(bot):
                     {'successful_payment': SuccessfulPayment('EUR', 243, 'payload',
                                                              'charge_id', 'provider_id',
                                                              order_info={})},
+                    {'connected_website': 'http://example.com/'},
                     {'forward_signature': 'some_forward_sign'},
-                    {'author_signature': 'some_author_sign'}
+                    {'author_signature': 'some_author_sign'},
+                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                     'caption': 'photo_file',
+                     'media_group_id': 1234443322222}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
                      'voice', 'video_note', 'new_members', 'contact', 'location', 'venue',
                      'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
                      'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
-                     'pinned', 'invoice', 'successful_payment', 'forward_signature',
-                     'author_signature'])
+                     'pinned', 'invoice', 'successful_payment', 'connected_website',
+                     'forward_signature', 'author_signature', 'photo_from_media_group'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -112,7 +117,9 @@ class TestMessage(object):
                            date=None,
                            chat=None,
                            text=test_text,
-                           entities=[MessageEntity(**e) for e in test_entities])
+                           entities=[MessageEntity(**e) for e in test_entities],
+                           caption=test_text,
+                           caption_entities=[MessageEntity(**e) for e in test_entities])
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -201,6 +208,48 @@ class TestMessage(object):
                           text=text, entities=[bold_entity])
         assert expected == message.text_markdown
 
+    def test_caption_html_simple(self):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            'http://google.com')
+        caption_html = self.test_message.caption_html
+        assert caption_html == test_html_string
+
+    def test_caption_html_urled(self):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            '<a href="http://google.com">http://google.com</a>')
+        caption_html = self.test_message.caption_html_urled
+        assert caption_html == test_html_string
+
+    def test_caption_markdown_simple(self):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. http://google.com')
+        caption_markdown = self.test_message.caption_markdown
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_urled(self):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. [http://google.com](http://google.com)')
+        caption_markdown = self.test_message.caption_markdown_urled
+        assert caption_markdown == test_md_string
+
+    def test_caption_html_emoji(self):
+        caption = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
+        expected = b'\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>'.decode('unicode-escape')
+        bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
+        message = Message(1, self.from_user, self.date, self.chat,
+                          caption=caption, caption_entities=[bold_entity])
+        assert expected == message.caption_html
+
+    def test_caption_markdown_emoji(self):
+        caption = b'\\U0001f469\\u200d\\U0001f469\\u200d ABC'.decode('unicode-escape')
+        expected = b'\\U0001f469\\u200d\\U0001f469\\u200d *ABC*'.decode('unicode-escape')
+        bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
+        message = Message(1, self.from_user, self.date, self.chat,
+                          caption=caption, caption_entities=[bold_entity])
+        assert expected == message.caption_markdown
+
     def test_parse_entities_url_emoji(self):
         url = b'http://github.com/?unicode=\\u2713\\U0001f469'.decode('unicode-escape')
         text = 'some url'
@@ -237,6 +286,69 @@ class TestMessage(object):
         assert message.reply_text('test')
         assert message.reply_text('test', quote=True)
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
+
+    def test_reply_markdown(self, monkeypatch, message):
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
+                          '```pre```. http://google.com')
+
+        def test(*args, **kwargs):
+            cid = args[1] == message.chat_id
+            markdown_text = args[2] == test_md_string
+            markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, markdown_text, reply, markdown_enabled])
+
+        text_markdown = self.test_message.text_markdown
+        assert text_markdown == test_md_string
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_markdown(self.test_message.text_markdown)
+        assert message.reply_markdown(self.test_message.text_markdown, quote=True)
+        assert message.reply_markdown(self.test_message.text_markdown,
+                                      reply_to_message_id=message.message_id,
+                                      quote=True)
+
+    def test_reply_html(self, monkeypatch, message):
+        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
+                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
+                            'http://google.com')
+
+        def test(*args, **kwargs):
+            cid = args[1] == message.chat_id
+            html_text = args[2] == test_html_string
+            html_enabled = kwargs['parse_mode'] == ParseMode.HTML
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, html_text, reply, html_enabled])
+
+        text_html = self.test_message.text_html
+        assert text_html == test_html_string
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_html(self.test_message.text_html)
+        assert message.reply_html(self.test_message.text_html, quote=True)
+        assert message.reply_html(self.test_message.text_html,
+                                  reply_to_message_id=message.message_id,
+                                  quote=True)
+
+    def test_reply_media_group(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            media = kwargs['media'] == 'reply_media_group'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and media and reply
+
+        monkeypatch.setattr('telegram.Bot.send_media_group', test)
+        assert message.reply_media_group(media='reply_media_group')
+        assert message.reply_media_group(media='reply_media_group', quote=True)
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):

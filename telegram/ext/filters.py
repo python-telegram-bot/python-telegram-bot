@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -346,13 +346,23 @@ class Filters(object):
         pinned_message = _PinnedMessage()
         """:obj:`Filter`: Messages that contain :attr:`telegram.Message.pinned_message`."""
 
+        class _ConnectedWebsite(BaseFilter):
+            name = 'Filters.status_update.connected_website'
+
+            def filter(self, message):
+                return bool(message.connected_website)
+
+        connected_website = _ConnectedWebsite()
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.connected_website`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message):
             return bool(self.new_chat_members(message) or self.left_chat_member(message) or
                         self.new_chat_title(message) or self.new_chat_photo(message) or
                         self.delete_chat_photo(message) or self.chat_created(message) or
-                        self.migrate(message) or self.pinned_message(message))
+                        self.migrate(message) or self.pinned_message(message) or
+                        self.connected_website(message))
 
     status_update = _StatusUpdate()
     """Subset for messages containing a status update.

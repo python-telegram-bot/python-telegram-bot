@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,11 +34,11 @@ def audio_file():
 @pytest.fixture(scope='class')
 def audio(bot, chat_id):
     with open('tests/data/telegram.mp3', 'rb') as f:
-        return bot.send_audio(chat_id, audio=f, timeout=10).audio
+        return bot.send_audio(chat_id, audio=f, timeout=50).audio
 
 
 class TestAudio(object):
-    caption = 'Test audio'
+    caption = 'Test *audio*'
     performer = 'Leandro Toledo'
     title = 'Teste'
     duration = 3
@@ -66,9 +66,10 @@ class TestAudio(object):
     def test_send_all_args(self, bot, chat_id, audio_file):
         message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
                                  duration=self.duration, performer=self.performer,
-                                 title=self.title, disable_notification=False)
+                                 title=self.title, disable_notification=False,
+                                 parse_mode='Markdown')
 
-        assert message.caption == self.caption
+        assert message.caption == self.caption.replace('*', '')
 
         assert isinstance(message.audio, Audio)
         assert isinstance(message.audio.file_id, str)
@@ -164,6 +165,13 @@ class TestAudio(object):
     def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_audio(chat_id=chat_id)
+
+    def test_get_file_instance_method(self, monkeypatch, audio):
+        def test(*args, **kwargs):
+            return args[1] == audio.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert audio.get_file()
 
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.duration)

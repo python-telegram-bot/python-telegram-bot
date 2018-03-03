@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ class ConversationHandler(Handler):
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. To end the conversation, the callback function must
-    return :attr`END` or ``-1``.
+    return :attr:`END` or ``-1``.
 
     Attributes:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -76,6 +76,9 @@ class ConversationHandler(Handler):
         per_user (:obj:`bool`): Optional. If the conversationkey should contain the User's ID.
         per_message (:obj:`bool`): Optional. If the conversationkey should contain the Message's
             ID.
+        conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
+            is inactive more than this timeout (in seconds), it will be automatically ended. If
+            this value is 0 (default), there will be no timeout.
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -107,6 +110,9 @@ class ConversationHandler(Handler):
             Default is ``True``.
         per_message (:obj:`bool`, optional): If the conversationkey should contain the Message's
             ID. Default is ``False``.
+        conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`, optional): When this handler
+            is inactive more than this timeout (in seconds), it will be automatically ended. If
+            this value is 0 or None (default), there will be no timeout.
 
     Raises:
         ValueError
@@ -124,7 +130,8 @@ class ConversationHandler(Handler):
                  timed_out_behavior=None,
                  per_chat=True,
                  per_user=True,
-                 per_message=False):
+                 per_message=False,
+                 conversation_timeout=None):
 
         self.entry_points = entry_points
         self.states = states
@@ -136,7 +143,9 @@ class ConversationHandler(Handler):
         self.per_user = per_user
         self.per_chat = per_chat
         self.per_message = per_message
+        self.conversation_timeout = conversation_timeout
 
+        self.timeout_jobs = dict()
         self.conversations = dict()
         self.current_conversation = None
         self.current_handler = None
@@ -206,10 +215,11 @@ class ConversationHandler(Handler):
 
         """
         # Ignore messages in channels
-        if (not isinstance(update, Update) or update.channel_post or self.per_chat
-                and (update.inline_query or update.chosen_inline_result) or self.per_message
-                and not update.callback_query or update.callback_query and self.per_chat
-                and not update.callback_query.message):
+        if (not isinstance(update, Update) or
+                update.channel_post or
+                self.per_chat and not update.effective_chat or
+                self.per_message and not update.callback_query or
+                update.callback_query and self.per_chat and not update.callback_query.message):
             return False
 
         key = self._get_key(update)
@@ -293,6 +303,16 @@ class ConversationHandler(Handler):
 
         """
         new_state = self.current_handler.handle_update(update, dispatcher)
+        timeout_job = self.timeout_jobs.get(self.current_conversation)
+
+        if timeout_job is not None or new_state == self.END:
+            timeout_job.schedule_removal()
+            del self.timeout_jobs[self.current_conversation]
+        if self.conversation_timeout and new_state != self.END:
+            self.timeout_jobs[self.current_conversation] = dispatcher.job_queue.run_once(
+                self._trigger_timeout, self.conversation_timeout,
+                context=self.current_conversation
+            )
 
         self.update_state(new_state, self.current_conversation)
 
@@ -308,3 +328,6 @@ class ConversationHandler(Handler):
 
         elif new_state is not None:
             self.conversations[key] = new_state
+
+    def _trigger_timeout(self, bot, job):
+        self.update_state(self.END, job.context)

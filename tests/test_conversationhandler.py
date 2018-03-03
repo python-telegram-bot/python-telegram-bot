@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,8 @@ from time import sleep
 
 import pytest
 
-from telegram import Update, Message, User, Chat, CallbackQuery
+from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
+                      PreCheckoutQuery, ShippingQuery, Update, User)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler)
 
 
@@ -87,8 +88,8 @@ class TestConversationHandler(object):
     # Tests
     def test_per_all_false(self):
         with pytest.raises(ValueError, match="can't all be 'False'"):
-            handler = ConversationHandler(self.entry_points, self.states, self.fallbacks,
-                                          per_chat=False, per_user=False, per_message=False)
+            ConversationHandler(self.entry_points, self.states, self.fallbacks,
+                                per_chat=False, per_user=False, per_message=False)
 
     def test_conversation_handler(self, dp, bot, user1, user2):
         handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
@@ -277,3 +278,66 @@ class TestConversationHandler(object):
         message = Message(0, None, None, Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
         update = Update(0, message=message)
         assert not handler.check_update(update)
+
+    def test_all_update_types(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)],
+                                      states={}, fallbacks=[])
+        message = Message(0, user1, None, self.group, text='ignore', bot=bot)
+        callback_query = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
+        chosen_inline_result = ChosenInlineResult(0, user1, 'query', bot=bot)
+        inline_query = InlineQuery(0, user1, 'query', 0, bot=bot)
+        pre_checkout_query = PreCheckoutQuery(0, user1, 'USD', 100, [], bot=bot)
+        shipping_query = ShippingQuery(0, user1, [], None, bot=bot)
+        assert not handler.check_update(Update(0, callback_query=callback_query))
+        assert not handler.check_update(Update(0, chosen_inline_result=chosen_inline_result))
+        assert not handler.check_update(Update(0, inline_query=inline_query))
+        assert not handler.check_update(Update(0, message=message))
+        assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
+        assert not handler.check_update(Update(0, shipping_query=shipping_query))
+
+    def test_conversation_timeout(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, then reach timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+        # Start state machine, do something, then reach timeout
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+    def test_conversation_timeout_two_users(self, dp, bot, user1, user2):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, do something as second user, then reach timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        message.from_user = user2
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user2.id)) is None
+        message.text = '/start'
+        dp.job_queue.tick()
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert handler.conversations.get((self.group.id, user2.id)) is None
