@@ -333,13 +333,47 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
         # Start state machine, do something, then reach timeout
-        dp.process_update(Update(update_id=0, message=message))
+        dp.process_update(Update(update_id=1, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
         message.text = '/brew'
         dp.job_queue.tick()
-        dp.process_update(Update(update_id=0, message=message))
+        dp.process_update(Update(update_id=2, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+    def test_conversation_timeout_keeps_extending(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, wait, do something, verify the timeout is extended.
+        # t=0 /start (timeout=.5)
+        # t=.25 /brew (timeout=.75)
+        # t=.5 original timeout
+        # t=.6 /pourCoffee (timeout=1.1)
+        # t=.75 second timeout
+        # t=1.1 actual timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        sleep(0.25)  # t=.25
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        sleep(0.35)  # t=.6
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        message.text = '/pourCoffee'
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
+        sleep(.4)  # t=1
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
+        sleep(.1)  # t=1.1
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
