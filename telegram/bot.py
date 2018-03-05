@@ -2639,7 +2639,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target`channel (in the format @channelusername).
-            photo (`telegram.InputFile`): New chat photo.
+            photo (`filelike object`): New chat photo.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
