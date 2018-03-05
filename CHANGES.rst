@@ -5,6 +5,7 @@ Changes
 *Released 10.0.1*
 
 Fixes:
+
 - Fix conversationhandler timeout (PR `#1032`_)
 - Add missing docs utils (PR `#912`_)
 
