@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import logging
 from time import sleep
 
 import pytest
@@ -55,7 +56,8 @@ class TestConversationHandler(object):
             self.BREWING: [CommandHandler('pourCoffee', self.drink)],
             self.DRINKING:
                 [CommandHandler('startCoding', self.code),
-                 CommandHandler('drinkMore', self.drink)],
+                 CommandHandler('drinkMore', self.drink),
+                 CommandHandler('end', self.end)],
             self.CODING: [
                 CommandHandler('keepCoding', self.code),
                 CommandHandler('gettingThirsty', self.start),
@@ -72,6 +74,9 @@ class TestConversationHandler(object):
     # Actions
     def start(self, bot, update):
         return self._set_state(update, self.THIRSTY)
+
+    def end(self, bot, update):
+        return self._set_state(update, self.END)
 
     def start_end(self, bot, update):
         return self._set_state(update, self.END)
@@ -122,6 +127,25 @@ class TestConversationHandler(object):
         dp.process_update(Update(update_id=0, message=message))
         with pytest.raises(KeyError):
             self.current_state[user2.id]
+
+    def test_conversation_handler_end(self, caplog, dp, bot, user1):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks)
+        dp.add_handler(handler)
+
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        message.text = '/brew'
+        dp.process_update(Update(update_id=0, message=message))
+        message.text = '/pourCoffee'
+        dp.process_update(Update(update_id=0, message=message))
+        message.text = '/end'
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(Update(update_id=0, message=message))
+        assert len(caplog.records) == 0
+        assert self.current_state[user1.id] == self.END
+        with pytest.raises(KeyError):
+            print(handler.conversations[(self.group.id, user1.id)])
 
     def test_conversation_handler_fallback(self, dp, bot, user1, user2):
         handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
@@ -309,13 +333,47 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
         # Start state machine, do something, then reach timeout
-        dp.process_update(Update(update_id=0, message=message))
+        dp.process_update(Update(update_id=1, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
         message.text = '/brew'
         dp.job_queue.tick()
-        dp.process_update(Update(update_id=0, message=message))
+        dp.process_update(Update(update_id=2, message=message))
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+
+    def test_conversation_timeout_keeps_extending(self, dp, bot, user1):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # Start state machine, wait, do something, verify the timeout is extended.
+        # t=0 /start (timeout=.5)
+        # t=.25 /brew (timeout=.75)
+        # t=.5 original timeout
+        # t=.6 /pourCoffee (timeout=1.1)
+        # t=.75 second timeout
+        # t=1.1 actual timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        sleep(0.25)  # t=.25
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+        message.text = '/brew'
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        sleep(0.35)  # t=.6
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+        message.text = '/pourCoffee'
+        dp.process_update(Update(update_id=0, message=message))
+        assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
+        sleep(.4)  # t=1
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
+        sleep(.1)  # t=1.1
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
 

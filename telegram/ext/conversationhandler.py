@@ -303,11 +303,10 @@ class ConversationHandler(Handler):
 
         """
         new_state = self.current_handler.handle_update(update, dispatcher)
-        timeout_job = self.timeout_jobs.get(self.current_conversation)
+        timeout_job = self.timeout_jobs.pop(self.current_conversation, None)
 
-        if timeout_job is not None or new_state == self.END:
+        if timeout_job is not None:
             timeout_job.schedule_removal()
-            del self.timeout_jobs[self.current_conversation]
         if self.conversation_timeout and new_state != self.END:
             self.timeout_jobs[self.current_conversation] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
@@ -330,4 +329,5 @@ class ConversationHandler(Handler):
             self.conversations[key] = new_state
 
     def _trigger_timeout(self, bot, job):
+        del self.timeout_jobs[job.context]
         self.update_state(self.END, job.context)
