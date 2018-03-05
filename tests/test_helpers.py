@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from telegram import Update
+import pytest
 
 from telegram import Sticker
+from telegram import Update
 from telegram import User
 from telegram.message import Message
 from telegram.utils import helpers
@@ -30,6 +31,25 @@ class TestHelpers(object):
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
 
         assert expected_str == helpers.escape_markdown(test_str)
+
+    def test_create_deep_linked_url(self):
+        username = 'JamesTheMock'
+
+        payload = "hello"
+        expected = "https://t.me/{}?start={}".format(username, payload)
+        actual = helpers.create_deep_linked_url(username, payload)
+        assert expected == actual
+
+        payload = ""
+        expected = "https://t.me/{}".format(username)
+        assert expected == helpers.create_deep_linked_url(username, payload)
+        assert expected == helpers.create_deep_linked_url(username)
+
+        with pytest.raises(ValueError):
+            helpers.create_deep_linked_url(username, 'text with spaces')
+
+        with pytest.raises(ValueError):
+            helpers.create_deep_linked_url(username, '0' * 65)
 
     def test_effective_message_type(self):
         test_message = Message(message_id=1,
