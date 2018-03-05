@@ -1,6 +1,16 @@
 =======
 Changes
 =======
+**2018-03-05**
+*Released 10.0.1*
+
+Fixes:
+- Fix conversationhandler timeout (PR `#1032`_)
+- Add missing docs utils (PR `#912`_)
+
+.. _`#1032`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
+.. _`#912`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
+
 **2018-03-02**
 *Released 10.0.0*
 
