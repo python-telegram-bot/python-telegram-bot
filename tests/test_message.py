@@ -176,7 +176,7 @@ class TestMessage(object):
     def test_text_html_empty(self, message):
         message.text = None
         message.caption = "test"
-        assert not message.text_html
+        assert message.text_html is None
 
     def test_text_html_urled(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
@@ -194,7 +194,7 @@ class TestMessage(object):
     def test_text_markdown_empty(self, message):
         message.text = None
         message.caption = "test"
-        assert not message.text_markdown
+        assert message.text_markdown is None
 
     def test_text_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
@@ -228,7 +228,7 @@ class TestMessage(object):
     def test_caption_html_empty(self, message):
         message.text = "test"
         message.caption = None
-        assert not message.caption_html
+        assert message.caption_html is None
 
     def test_caption_html_urled(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
@@ -246,7 +246,7 @@ class TestMessage(object):
     def test_caption_markdown_empty(self, message):
         message.text = "test"
         message.caption = None
-        assert not message.caption_markdown
+        assert message.caption_markdown is None
 
     def test_caption_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '

@@ -868,7 +868,7 @@ class Message(TelegramObject):
 
     @staticmethod
     def _parse_html(message_text, entities, urled=False):
-        if not message_text:
+        if message_text is None:
             return None
 
         if not sys.maxunicode == 0xffff:
@@ -965,7 +965,7 @@ class Message(TelegramObject):
 
     @staticmethod
     def _parse_markdown(message_text, entities, urled=False):
-        if not message_text:
+        if message_text is None:
             return None
 
         if not sys.maxunicode == 0xffff:
