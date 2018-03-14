@@ -69,6 +69,16 @@ class TestFilters(object):
         message.document = 'test'
         assert Filters.document(message)
 
+    def test_filters_document_category(self, message):
+        assert not Filters.document.application(message)
+        message.document.mime_type = 'application/pdf'
+        assert Filters.document(message)
+
+    def test_filters_document_file_type(self, message):
+        assert not Filters.document.gif(message)
+        message.document.mime_type = 'video/mp4'
+        assert Filters.document.gif(message)
+
     def test_filters_photo(self, message):
         assert not Filters.photo(message)
         message.photo = 'test'
