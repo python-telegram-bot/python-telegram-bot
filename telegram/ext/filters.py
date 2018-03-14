@@ -243,7 +243,7 @@ class Filters(object):
                 Args:
                     filetype (str, optional): mime_type of the media you want to filter"""
                 self.filetype = filetype
-                self.name = 'Filters.document.Filetype(\'{}\')'.format(self.filetype)
+                self.name = 'Filters.document.file_type(\'{}\')'.format(self.filetype)
 
             def filter(self, message):
                 if message.document:
