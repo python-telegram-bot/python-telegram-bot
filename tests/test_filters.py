@@ -22,6 +22,7 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity
 from telegram.ext import Filters, BaseFilter
+import re
 
 
 @pytest.fixture(scope='function')
@@ -50,6 +51,22 @@ class TestFilters(object):
         assert not Filters.command(message)
         message.text = '/test'
         assert Filters.command(message)
+
+    def test_filters_regex(self, message):
+        message.text = '/start deep-linked param'
+        assert Filters.regex(r'deep-linked param')(message)
+        message.text = '/help'
+        assert Filters.regex(r'help')(message)
+        message.text = '/help'
+        assert Filters.regex('help')(message)
+
+        message.text = 'test'
+        assert not Filters.regex(r'fail')(message)
+        assert Filters.regex(r'test')(message)
+        assert Filters.regex(re.compile(r'test'))(message)
+
+        message.text = 'i love python'
+        assert Filters.regex(r'.\b[lo]{2}ve python')(message)
 
     def test_filters_reply(self, message):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),

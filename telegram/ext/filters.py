@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
+
+import re
 from telegram import Chat
 from future.utils import string_types
 
@@ -170,6 +172,33 @@ class Filters(object):
 
     command = _Command()
     """:obj:`Filter`: Messages starting with ``/``."""
+
+    class regex(BaseFilter):
+        """
+        Filters updates by searching for an occurence of ``pattern`` in the message text.
+        The ``re.search`` function is used to determine whether an update should be filtered.
+        Refer to the documentation of the ``re`` module for more information.
+
+        Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
+        but this will probably be implemented in a future update, gradually phasing out the
+        RegexHandler (see https://github.com/python-telegram-bot/python-telegram-bot/issues/835).
+
+        Examples:
+            Example ``CommandHandler("start", deep_linked_callback, Filters.regex('parameter'))``
+
+        Args:
+            pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        """
+
+        def __init__(self, pattern):
+            self.pattern = re.compile(pattern)
+            self.name = 'Filters.regex({})'.format(self.pattern)
+
+        # TODO: Once the callback revamp (#1026) is done, the regex filter should be able to pass
+        # the matched groups and groupdict to the context object.
+
+        def filter(self, message):
+            return bool(self.pattern.search(message.text))
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
