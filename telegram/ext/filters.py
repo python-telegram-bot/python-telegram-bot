@@ -35,7 +35,7 @@ class BaseFilter(object):
         >>> (Filters.audio | Filters.video)
 
     Not:
-:
+
         >>> ~ Filters.command
 
     Also works with more than two filters:
