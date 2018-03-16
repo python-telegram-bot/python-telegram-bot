@@ -24,6 +24,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
 - `Eli Gao <https://github.com/eligao>`_
+- `Emilio Molinari <https://github.com/xates>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
 - `Eugenio Panadero <https://github.com/azogue>`_
