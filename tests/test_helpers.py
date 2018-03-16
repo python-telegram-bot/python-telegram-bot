@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update
-
 from telegram import Sticker
+from telegram import Update
 from telegram import User
 from telegram.message import Message
 from telegram.utils import helpers
@@ -43,14 +42,21 @@ class TestHelpers(object):
 
         payload = ""
         expected = "https://t.me/{}".format(username)
-        assert expected == helpers.create_deep_linked_url(username, payload)
         assert expected == helpers.create_deep_linked_url(username)
+        assert expected == helpers.create_deep_linked_url(username, payload)
+        payload = None
+        assert expected == helpers.create_deep_linked_url(username, payload)
 
         with pytest.raises(ValueError):
             helpers.create_deep_linked_url(username, 'text with spaces')
 
         with pytest.raises(ValueError):
             helpers.create_deep_linked_url(username, '0' * 65)
+
+        with pytest.raises(ValueError):
+            helpers.create_deep_linked_url(None, None)
+        with pytest.raises(ValueError):  # too short username (4 is minimum)
+            helpers.create_deep_linked_url("abc", None)
 
     def test_effective_message_type(self):
         test_message = Message(message_id=1,

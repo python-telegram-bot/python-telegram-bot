@@ -161,6 +161,9 @@ def create_deep_linked_url(bot_username, payload=None):
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters
     """
+    if bot_username is None or len(bot_username) <= 3:
+        raise ValueError("You must provide a valid bot_username.")
+
     base_url = 'https://t.me/{}'.format(bot_username)
     if not payload:
         return base_url
