@@ -105,52 +105,59 @@ class TestUser(object):
 
     def test_instance_method_send_message(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and args[1] == 'test'
+            return args[1] == user.id and args[2] == 'test'
 
         monkeypatch.setattr('telegram.Bot.send_message', test)
         assert user.send_message('test')
 
+    def test_instance_method_send_photo(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[1] == user.id and args[2] == 'test_photo'
+
+        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        assert user.send_photo('test_photo')
+
     def test_instance_method_send_audio(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and kwargs['audio'] == 'test_audio'
+            return args[1] == user.id and args[2] == 'test_audio'
 
         monkeypatch.setattr('telegram.Bot.send_audio', test)
-        assert user.send_audio(audio='test_audio')
+        assert user.send_audio('test_audio')
 
     def test_instance_method_send_document(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and kwargs['document'] == 'test_document'
+            return args[1] == user.id and args[2] == 'test_document'
 
         monkeypatch.setattr('telegram.Bot.send_document', test)
-        assert user.send_document(document='test_document')
+        assert user.send_document('test_document')
 
     def test_instance_method_send_sticker(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and kwargs['sticker'] == 'test_sticker'
+            return args[1] == user.id and args[2] == 'test_sticker'
 
         monkeypatch.setattr('telegram.Bot.send_sticker', test)
-        assert user.send_sticker(sticker='test_sticker')
+        assert user.send_sticker('test_sticker')
 
     def test_instance_method_send_video(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and kwargs['video'] == 'test_video'
+            return args[1] == user.id and args[2] == 'test_video'
 
         monkeypatch.setattr('telegram.Bot.send_video', test)
-        assert user.send_video(video='test_video')
+        assert user.send_video('test_video')
 
     def test_instance_method_send_video_note(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and kwargs['video_note'] == 'test_video_note'
+            return args[1] == user.id and args[2] == 'test_video_note'
 
         monkeypatch.setattr('telegram.Bot.send_video_note', test)
-        assert user.send_video_note(video_note='test_video_note')
+        assert user.send_video_note('test_video_note')
 
     def test_instance_method_send_voice(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == user.id and kwargs['voice'] == 'test_voice'
+            return args[1] == user.id and args[2] == 'test_voice'
 
         monkeypatch.setattr('telegram.Bot.send_voice', test)
-        assert user.send_voice(voice='test_voice')
+        assert user.send_voice('test_voice')
 
     def test_equality(self):
         a = User(self.id, self.first_name, self.is_bot, self.last_name)
