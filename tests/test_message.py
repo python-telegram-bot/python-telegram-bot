@@ -173,6 +173,11 @@ class TestMessage(object):
         text_html = self.test_message.text_html
         assert text_html == test_html_string
 
+    def test_text_html_empty(self, message):
+        message.text = None
+        message.caption = "test"
+        assert message.text_html is None
+
     def test_text_html_urled(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
                             '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
@@ -185,6 +190,11 @@ class TestMessage(object):
                           '```pre```. http://google.com')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
+
+    def test_text_markdown_empty(self, message):
+        message.text = None
+        message.caption = "test"
+        assert message.text_markdown is None
 
     def test_text_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
@@ -215,6 +225,11 @@ class TestMessage(object):
         caption_html = self.test_message.caption_html
         assert caption_html == test_html_string
 
+    def test_caption_html_empty(self, message):
+        message.text = "test"
+        message.caption = None
+        assert message.caption_html is None
+
     def test_caption_html_urled(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
                             '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
@@ -227,6 +242,11 @@ class TestMessage(object):
                           '```pre```. http://google.com')
         caption_markdown = self.test_message.caption_markdown
         assert caption_markdown == test_md_string
+
+    def test_caption_markdown_empty(self, message):
+        message.text = "test"
+        message.caption = None
+        assert message.caption_markdown is None
 
     def test_caption_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
