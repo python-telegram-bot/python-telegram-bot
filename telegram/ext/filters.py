@@ -224,7 +224,7 @@ class Filters(object):
         video = category('video/')
         text = category('text/')
 
-        class file_type(BaseFilter):
+        class mime_type(BaseFilter):
             """This Filter filters documents by their mime-type attribute
 
             Note:
@@ -234,36 +234,36 @@ class Filters(object):
                     send media with wrong types that don't fit to this handler.
 
             Examples:
-                Filters.documents.file_type('audio/mpeg') filters all audio in mp3 format.
+                Filters.documents.mime_type('audio/mpeg') filters all audio in mp3 format.
             """
 
-            def __init__(self, filetype):
+            def __init__(self, mimetype):
                 """Initialize the category you want to filter
 
                 Args:
                     filetype (str, optional): mime_type of the media you want to filter"""
-                self.filetype = filetype
-                self.name = "Filters.document.file_type('{}')".format(self.filetype)
+                self.mimetype = mimetype
+                self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
 
             def filter(self, message):
                 if message.document:
-                    return message.document.mime_type == self.filetype
+                    return message.document.mime_type == self.mimetype
 
-        apk = file_type('application/vnd.android.package-archive')
-        doc = file_type('application/msword')
-        docx = file_type('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        exe = file_type('application/x-ms-dos-executable')
-        gif = file_type('video/mp4')
-        jpg = file_type('image/jpeg')
-        mp3 = file_type('audio/mpeg')
-        pdf = file_type('application/pdf')
-        py = file_type('text/x-python')
-        svg = file_type('image/svg+xml')
-        txt = file_type('text/plain')
-        targz = file_type('application/x-compressed-tar')
-        wav = file_type('audio/x-wav')
-        xml = file_type('application/xml')
-        zip = file_type('application/zip')
+        apk = mime_type('application/vnd.android.package-archive')
+        doc = mime_type('application/msword')
+        docx = mime_type('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        exe = mime_type('application/x-ms-dos-executable')
+        gif = mime_type('video/mp4')
+        jpg = mime_type('image/jpeg')
+        mp3 = mime_type('audio/mpeg')
+        pdf = mime_type('application/pdf')
+        py = mime_type('text/x-python')
+        svg = mime_type('image/svg+xml')
+        txt = mime_type('text/plain')
+        targz = mime_type('application/x-compressed-tar')
+        wav = mime_type('audio/x-wav')
+        xml = mime_type('application/xml')
+        zip = mime_type('application/zip')
 
         def filter(self, message):
             return bool(message.document)
