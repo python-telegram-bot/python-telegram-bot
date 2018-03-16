@@ -163,10 +163,10 @@ class TestFilters(object):
 
         message.document.mime_type = "image/x-rgb"
         assert not Filters.document.category("application/")(message)
-        assert not Filters.document.file_type("application/x-sh")(message)
+        assert not Filters.document.mime_type("application/x-sh")(message)
         message.document.mime_type = "application/x-sh"
         assert Filters.document.category("application/")(message)
-        assert Filters.document.file_type("application/x-sh")(message)
+        assert Filters.document.mime_type("application/x-sh")(message)
 
     def test_filters_photo(self, message):
         assert not Filters.photo(message)
