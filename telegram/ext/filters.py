@@ -212,7 +212,7 @@ class Filters(object):
                 Args:
                     category (str, optional): category of the media you want to filter"""
                 self.category = category
-                self.name = 'Filters.document.category(\'{}\')'.format(self.category)
+                self.name = "Filters.document.category('{}')".format(self.category)
 
             def filter(self, message):
                 if message.document:
@@ -243,7 +243,7 @@ class Filters(object):
                 Args:
                     filetype (str, optional): mime_type of the media you want to filter"""
                 self.filetype = filetype
-                self.name = 'Filters.document.file_type(\'{}\')'.format(self.filetype)
+                self.name = "Filters.document.file_type('{}')".format(self.filetype)
 
             def filter(self, message):
                 if message.document:
