@@ -42,8 +42,8 @@ def user(bot):
 class TestUser(object):
     id = 1
     is_bot = True
-    first_name = 'first_name'
-    last_name = 'last_name'
+    first_name = u'first\u2022name'
+    last_name = u'last\u2022name'
     username = 'username'
     language_code = 'en_us'
 
@@ -85,16 +85,16 @@ class TestUser(object):
     def test_name(self, user):
         assert user.name == '@username'
         user.username = None
-        assert user.name == 'first_name last_name'
+        assert user.name == u'first\u2022name last\u2022name'
         user.last_name = None
-        assert user.name == 'first_name'
+        assert user.name == u'first\u2022name'
         user.username = self.username
         assert user.name == '@username'
 
     def test_full_name(self, user):
-        assert user.full_name == 'first_name last_name'
+        assert user.full_name == u'first\u2022name last\u2022name'
         user.last_name = None
-        assert user.full_name == 'first_name'
+        assert user.full_name == u'first\u2022name'
 
     def test_get_profile_photos(self, monkeypatch, user):
         def test(_, *args, **kwargs):

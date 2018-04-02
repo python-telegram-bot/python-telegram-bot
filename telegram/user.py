@@ -88,7 +88,7 @@ class User(TelegramObject):
 
         """
         if self.last_name:
-            return '{} {}'.format(self.first_name, self.last_name)
+            return u'{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
     @classmethod
