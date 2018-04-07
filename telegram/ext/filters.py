@@ -336,6 +336,15 @@ class Filters(object):
     voice = _Voice()
     """:obj:`Filter`: Messages that contain :class:`telegram.Voice`."""
 
+    class _VideoNote(BaseFilter):
+        name = 'Filters.video_note'
+
+        def filter(self, message):
+            return bool(message.video_note)
+
+    video_note = _VideoNote()
+    """:obj:`Filter`: Messages that contain :class:`telegram.VideoNote`."""
+
     class _Contact(BaseFilter):
         name = 'Filters.contact'
 

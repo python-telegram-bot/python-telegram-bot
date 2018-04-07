@@ -205,6 +205,11 @@ class TestFilters(object):
         message.voice = 'test'
         assert Filters.voice(message)
 
+    def test_filters_video_note(self, message):
+        assert not Filters.video_note(message)
+        message.video_note = 'test'
+        assert Filters.video_note(message)
+
     def test_filters_contact(self, message):
         assert not Filters.contact(message)
         message.contact = 'test'
