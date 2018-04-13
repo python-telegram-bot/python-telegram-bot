@@ -145,8 +145,8 @@ class Request(object):
             dict: A JSON parsed as Python dict with results - on error this dict will be empty.
 
         """
-        decoded_s = json_data.decode('utf-8')
         try:
+            decoded_s = json_data.decode('utf-8')
             data = json.loads(decoded_s)
         except ValueError:
             raise TelegramError('Invalid server response')
