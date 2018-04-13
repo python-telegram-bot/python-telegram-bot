@@ -140,6 +140,10 @@ class CommandHandler(Handler):
                     command.append(
                         message.bot.username)  # in case the command was sent without a username
 
+                    if not (command[0].lower() in self.command
+                            and command[1].lower() == message.bot.username.lower()):
+                        return False
+
                     if self.filters is None:
                         res = True
                     elif isinstance(self.filters, list):
@@ -147,8 +151,7 @@ class CommandHandler(Handler):
                     else:
                         res = self.filters(message)
 
-                    return res and (command[0].lower() in self.command
-                                    and command[1].lower() == message.bot.username.lower())
+                    return res
 
         return False
 
