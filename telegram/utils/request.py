@@ -148,7 +148,7 @@ class Request(object):
         try:
             decoded_s = json_data.decode('utf-8')
             data = json.loads(decoded_s)
-        except ValueError:
+        except (ValueError, UnicodeDecodeError):
             raise TelegramError('Invalid server response')
 
         if not data.get('ok'):  # pragma: no cover
