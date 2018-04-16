@@ -21,7 +21,7 @@ import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import CommandHandler, Filters
+from telegram.ext import CommandHandler, Filters, BaseFilter
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='test')
 
