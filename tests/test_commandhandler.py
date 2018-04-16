@@ -265,4 +265,3 @@ class TestCommandHandler(object):
         handler.check_update(Update(0, message=message))
 
         assert not test_filter.tested
-
