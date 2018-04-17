@@ -66,6 +66,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `thodnev <https://github.com/thodnev>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
+- `Wagner Macedo <https://github.com/wagnerluis1982>`_
 - `wjt <https://github.com/wjt>`_
 
 Please add yourself here alphabetically when you submit your first pull request.
