@@ -8,12 +8,12 @@ We have made you a wrapper you can't refuse
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
+   :target: https://pypi.org/project/python-telegram-bot/
    :alt: PyPi Package Version
 
 .. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
-   :alt: Supported python versions
+   :target: https://pypi.org/project/python-telegram-bot/
+   :alt: Supported Python versions
 
 .. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
    :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
