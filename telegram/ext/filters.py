@@ -532,7 +532,7 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
-            return any([entity.type == self.entity_type for entity in message.entities])
+            return any(entity.type == self.entity_type for entity in message.entities)
 
     class caption_entity(BaseFilter):
         """
@@ -553,7 +553,7 @@ class Filters(object):
             self.name = 'Filters.caption_entity({})'.format(self.entity_type)
 
         def filter(self, message):
-            return any([entity.type == self.entity_type for entity in message.caption_entities])
+            return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
         name = 'Filters.private'
