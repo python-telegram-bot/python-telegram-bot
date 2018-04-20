@@ -70,7 +70,9 @@ class InputFile(object):
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
-            elif hasattr(self.input_file, 'name'):
+            elif (hasattr(self.input_file, 'name') and
+                  not isinstance(self.input_file.name, int) and  # py3
+                  self.input_file.name != '<fdopen>'):  # py2
                 # on py2.7, pylint fails to understand this properly
                 # pylint: disable=E1101
                 self.filename = os.path.basename(self.input_file.name)
