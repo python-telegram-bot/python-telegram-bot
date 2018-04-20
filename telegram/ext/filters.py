@@ -541,7 +541,28 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
-            return any([entity.type == self.entity_type for entity in message.entities])
+            return any(entity.type == self.entity_type for entity in message.entities)
+
+    class caption_entity(BaseFilter):
+        """
+        Filters media messages to only allow those which have a :class:`telegram.MessageEntity`
+        where their `type` matches `entity_type`.
+
+        Examples:
+            Example ``MessageHandler(Filters.caption_entity("hashtag"), callback_method)``
+
+        Args:
+            entity_type: Caption Entity type to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        """
+
+        def __init__(self, entity_type):
+            self.entity_type = entity_type
+            self.name = 'Filters.caption_entity({})'.format(self.entity_type)
+
+        def filter(self, message):
+            return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
         name = 'Filters.private'

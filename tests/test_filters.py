@@ -310,6 +310,21 @@ class TestFilters(object):
         second = MessageEntity.de_json(second, None)
         message.entities = [message_entity, second]
         assert Filters.entity(message_entity.type)(message)
+        assert not Filters.caption_entity(message_entity.type)(message)
+
+    def test_caption_entities_filter(self, message, message_entity):
+        message.caption_entities = [message_entity]
+        assert Filters.caption_entity(message_entity.type)(message)
+
+        message.caption_entities = []
+        assert not Filters.caption_entity(MessageEntity.MENTION)(message)
+
+        second = message_entity.to_dict()
+        second['type'] = 'bold'
+        second = MessageEntity.de_json(second, None)
+        message.caption_entities = [message_entity, second]
+        assert Filters.caption_entity(message_entity.type)(message)
+        assert not Filters.entity(message_entity.type)(message)
 
     def test_private_filter(self, message):
         assert Filters.private(message)
