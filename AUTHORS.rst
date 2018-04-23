@@ -64,6 +64,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `thodnev <https://github.com/thodnev>`_
+- `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
 - `Wagner Macedo <https://github.com/wagnerluis1982>`_
