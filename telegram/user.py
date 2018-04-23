@@ -150,7 +150,7 @@ class User(TelegramObject):
     def send_message(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_message(User.chat_id, *args, **kwargs)
+            bot.send_message(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -163,7 +163,7 @@ class User(TelegramObject):
     def send_photo(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_photo(User.chat_id, *args, **kwargs)
+            bot.send_photo(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -176,7 +176,7 @@ class User(TelegramObject):
     def send_audio(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_audio(User.chat_id, *args, **kwargs)
+            bot.send_audio(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -189,7 +189,7 @@ class User(TelegramObject):
     def send_document(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_document(User.chat_id, *args, **kwargs)
+            bot.send_document(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -202,7 +202,7 @@ class User(TelegramObject):
     def send_sticker(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_sticker(User.chat_id, *args, **kwargs)
+            bot.send_sticker(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -215,7 +215,7 @@ class User(TelegramObject):
     def send_video(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video(User.chat_id, *args, **kwargs)
+            bot.send_video(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -228,7 +228,7 @@ class User(TelegramObject):
     def send_video_note(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video_note(User.chat_id, *args, **kwargs)
+            bot.send_video_note(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -241,7 +241,7 @@ class User(TelegramObject):
     def send_voice(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_voice(User.chat_id, *args, **kwargs)
+            bot.send_voice(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
