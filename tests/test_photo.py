@@ -27,7 +27,7 @@ from telegram import Sticker, TelegramError, PhotoSize, InputFile
 
 @pytest.fixture(scope='function')
 def photo_file():
-    f = open('tests/data/telegram.jpg', 'rb')
+    f = open(u'tests/data/telegram.jpg', 'rb')
     yield f
     f.close()
 
