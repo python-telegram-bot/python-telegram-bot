@@ -198,6 +198,7 @@ class Filters(object):
         # the matched groups and groupdict to the context object.
 
         def filter(self, message):
+            """"""
             return bool(self.pattern.search(message.text))
 
     class _Reply(BaseFilter):
@@ -219,82 +220,114 @@ class Filters(object):
     """:obj:`Filter`: Messages that contain :class:`telegram.Audio`."""
 
     class _Document(BaseFilter):
+        """
+        Private inner class for filtering documents
+
+        Note:
+            This class should not be instantiated by the user. It's instantiated as
+            ``Filters.document``, so its members can be used like this: ``Filters.document.apk``
+        """
         name = 'Filters.document'
 
         class category(BaseFilter):
-            """This Filter filters documents by their category in the mime-type attribute
+            """
+            This Filter filters documents by their category in the mime-type attribute.
+            Matching is performed using ``mime_type.startswith(category)``
 
             Note:
-                This Filter only filters by the mime_type of the document,
-                    it doesn't check the validity of the document.
+                This Filter only filters by the ``mime_type`` of the document,
+                it doesn't check the validity of the document.
                 The user can manipulate the mime-type of a message and
-                    send media with wrong types that don't fit to this handler.
+                send media with wrong types that doesn't fit to this handler.
+
+            Args:
+                category (:obj:`str`, optional): category of the media you want to filter
 
             Examples:
-                Filters.documents.category('audio/') returnes `True` for all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
+                ``Filters.document.category('audio/')`` returns ``True`` for all types
+                of audio sent as file, for example ``'audio/mpeg'`` or ``'audio/x-wav'``
             """
 
             def __init__(self, category):
-                """Initialize the category you want to filter
-
-                Args:
-                    category (str, optional): category of the media you want to filter"""
+                """Initialize the category you want to filter"""
                 self.category = category
                 self.name = "Filters.document.category('{}')".format(self.category)
 
             def filter(self, message):
+                """"""
                 if message.document:
                     return message.document.mime_type.startswith(self.category)
 
         application = category('application/')
+        """:obj:`Filter`: Filters `application` documents"""
         audio = category('audio/')
+        """:obj:`Filter`: Filters `audio` documents"""
         image = category('image/')
+        """:obj:`Filter`: Filters `image` documents"""
         video = category('video/')
+        """:obj:`Filter`: Filters `video` documents"""
         text = category('text/')
+        """:obj:`Filter`: Filters `text` documents"""
 
         class mime_type(BaseFilter):
             """This Filter filters documents by their mime-type attribute
 
             Note:
-                This Filter only filters by the mime_type of the document,
-                    it doesn't check the validity of document.
+                This Filter only filters by the ``mime_type`` of the document,
+                it doesn't check the validity of document.
                 The user can manipulate the mime-type of a message and
-                    send media with wrong types that don't fit to this handler.
+                send media with wrong types that doesn't fit to this handler.
+
+            Args:
+                mimetype (:obj:`str`, optional): ``mime_type`` of the media you want to filter
 
             Examples:
-                Filters.documents.mime_type('audio/mpeg') filters all audio in mp3 format.
+                ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
             """
 
             def __init__(self, mimetype):
-                """Initialize the category you want to filter
-
-                Args:
-                    filetype (str, optional): mime_type of the media you want to filter"""
+                """Initialize the category you want to filter"""
                 self.mimetype = mimetype
                 self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
 
             def filter(self, message):
+                """"""
                 if message.document:
                     return message.document.mime_type == self.mimetype
 
         apk = mime_type('application/vnd.android.package-archive')
+        """:obj:`Filter`: Filters `apk` documents"""
         doc = mime_type('application/msword')
+        """:obj:`Filter`: Filters `doc` documents"""
         docx = mime_type('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        """:obj:`Filter`: Filters `docx` documents"""
         exe = mime_type('application/x-ms-dos-executable')
+        """:obj:`Filter`: Filters `exe` documents"""
         gif = mime_type('video/mp4')
+        """:obj:`Filter`: Filters `gif` documents"""
         jpg = mime_type('image/jpeg')
+        """:obj:`Filter`: Filters `jpg` documents"""
         mp3 = mime_type('audio/mpeg')
+        """:obj:`Filter`: Filters `mp3` documents"""
         pdf = mime_type('application/pdf')
+        """:obj:`Filter`: Filters `pdf` documents"""
         py = mime_type('text/x-python')
+        """:obj:`Filter`: Filters `py` documents"""
         svg = mime_type('image/svg+xml')
+        """:obj:`Filter`: Filters `svg` documents"""
         txt = mime_type('text/plain')
+        """:obj:`Filter`: Filters `txt` documents"""
         targz = mime_type('application/x-compressed-tar')
+        """:obj:`Filter`: Filters `targz` documents"""
         wav = mime_type('audio/x-wav')
+        """:obj:`Filter`: Filters `wav` documents"""
         xml = mime_type('application/xml')
+        """:obj:`Filter`: Filters `xml` documents"""
         zip = mime_type('application/zip')
+        """:obj:`Filter`: Filters `zip` documents"""
 
         def filter(self, message):
+            """"""
             return bool(message.document)
 
     document = _Document()
@@ -541,6 +574,7 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
+            """"""
             return any(entity.type == self.entity_type for entity in message.entities)
 
     class caption_entity(BaseFilter):
@@ -562,6 +596,7 @@ class Filters(object):
             self.name = 'Filters.caption_entity({})'.format(self.entity_type)
 
         def filter(self, message):
+            """"""
             return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
@@ -613,6 +648,7 @@ class Filters(object):
                 self.usernames = [user.replace('@', '') for user in username]
 
         def filter(self, message):
+            """"""
             if self.user_ids is not None:
                 return bool(message.from_user and message.from_user.id in self.user_ids)
             else:
@@ -651,6 +687,7 @@ class Filters(object):
                 self.usernames = [chat.replace('@', '') for chat in username]
 
         def filter(self, message):
+            """"""
             if self.chat_ids is not None:
                 return bool(message.chat_id in self.chat_ids)
             else:
@@ -699,5 +736,6 @@ class Filters(object):
             self.name = 'Filters.language({})'.format(self.lang)
 
         def filter(self, message):
+            """"""
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
