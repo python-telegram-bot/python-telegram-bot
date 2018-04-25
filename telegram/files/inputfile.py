@@ -86,6 +86,10 @@ class InputFile(object):
                 else:
                     self.mimetype = DEFAULT_MIME_TYPE
 
+        if sys.version_info < (3,):
+            if isinstance(self.filename, unicode):  # flake8: noqa  pylint: disable=E0602
+                self.filename = self.filename.encode('utf-8', 'replace')
+
     @property
     def headers(self):
         """:obj:`dict`: Headers."""
