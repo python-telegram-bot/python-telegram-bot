@@ -303,6 +303,15 @@ class Message(TelegramObject):
         """:obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`."""
         return self.chat.id
 
+    @property
+    def link(self):
+        """
+        :obj:`str`: Convenience property. If the chat of the message is a supergroup and has a 
+        :attr:`username`, returns a t.me link of the message.
+        """
+        if self.chat.type = "supergroup" and self.chat.username:
+            return "t.me/{}".format(self.usermame)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
