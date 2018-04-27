@@ -140,7 +140,7 @@ class User(TelegramObject):
             return util_mention_markdown(self.id, name)
         return util_mention_markdown(self.id, self.full_name)
 
-    def mention_html(self, name=self.full_name):
+    def mention_html(self, name=None):
         """
         Args:
             name (:obj:`str`): If provided, will overwrite the user's full name.
@@ -148,8 +148,8 @@ class User(TelegramObject):
             :obj:`str`: The inline mention for the user as HTML.
         """
         if name:
-            return util_mention_markdown(self.id, name)
-        return util_mention_markdown(self.id, self.full_name)
+            return util_mention_html(self.id, name)
+        return util_mention_html(self.id, self.full_name)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
