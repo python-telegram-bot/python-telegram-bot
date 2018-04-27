@@ -91,6 +91,14 @@ class User(TelegramObject):
             return u'{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
+    @property
+    def link(self):
+        """
+        :obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link of the user.
+        """
+        if self.username:
+            return "t.me/{}".format(self.username)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
@@ -104,7 +112,7 @@ class User(TelegramObject):
         """
         Shortcut for::
 
-                bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
+            bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
 
         """
 
@@ -121,31 +129,23 @@ class User(TelegramObject):
 
         return users
 
-    def mention_markdown(self, name=None):
+    def mention_markdown(self, name=self.full_name):
         """
         Args:
-            name (:obj:`str`): If provided, will overwrite the user's name.
-
+            name (:obj:`str`): If provided, will overwrite the user's full name.
         Returns:
             :obj:`str`: The inline mention for the user as markdown.
         """
-        if not name:
-            return util_mention_markdown(self.id, self.name)
-        else:
-            return util_mention_markdown(self.id, name)
+        return util_mention_markdown(self.id, name)
 
-    def mention_html(self, name=None):
+    def mention_html(self, name=self.full_name):
         """
         Args:
-            name (:obj:`str`): If provided, will overwrite the user's name.
-
+            name (:obj:`str`): If provided, will overwrite the user's full name.
         Returns:
             :obj:`str`: The inline mention for the user as HTML.
         """
-        if not name:
-            return util_mention_html(self.id, self.name)
-        else:
-            return util_mention_html(self.id, name)
+        return util_mention_html(self.id, name)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
