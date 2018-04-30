@@ -5,95 +5,85 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultCachedGif"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultCachedVoice,
+                      InlineKeyboardMarkup, InlineQueryResultCachedGif)
 
 
-class InlineQueryResultCachedGifTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultCachedGif."""
+@pytest.fixture(scope='class')
+def inline_query_result_cached_gif():
+    return InlineQueryResultCachedGif(TestInlineQueryResultCachedGif.id,
+                                      TestInlineQueryResultCachedGif.gif_file_id,
+                                      title=TestInlineQueryResultCachedGif.title,
+                                      caption=TestInlineQueryResultCachedGif.caption,
+                                      input_message_content=TestInlineQueryResultCachedGif.input_message_content,
+                                      reply_markup=TestInlineQueryResultCachedGif.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'gif'
-        self.gif_file_id = 'gif file id'
-        self.title = 'title'
-        self.caption = 'caption'
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
 
-        self.json_dict = {
-            'type': self.type,
-            'id': self._id,
-            'gif_file_id': self.gif_file_id,
-            'title': self.title,
-            'caption': self.caption,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
+class TestInlineQueryResultCachedGif(object):
+    id = 'id'
+    type = 'gif'
+    gif_file_id = 'gif file id'
+    title = 'title'
+    caption = 'caption'
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-    def test_gif_de_json(self):
-        gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict, self._bot)
+    def test_expected_values(self, inline_query_result_cached_gif):
+        assert inline_query_result_cached_gif.type == self.type
+        assert inline_query_result_cached_gif.id == self.id
+        assert inline_query_result_cached_gif.gif_file_id == self.gif_file_id
+        assert inline_query_result_cached_gif.title == self.title
+        assert inline_query_result_cached_gif.caption == self.caption
+        assert inline_query_result_cached_gif.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_cached_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-        self.assertEqual(gif.type, self.type)
-        self.assertEqual(gif.id, self._id)
-        self.assertEqual(gif.gif_file_id, self.gif_file_id)
-        self.assertEqual(gif.title, self.title)
-        self.assertEqual(gif.caption, self.caption)
-        self.assertDictEqual(gif.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(gif.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_to_dict(self, inline_query_result_cached_gif):
+        inline_query_result_cached_gif_dict = inline_query_result_cached_gif.to_dict()
 
-    def test_gif_to_json(self):
-        gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict, self._bot)
-
-        self.assertTrue(self.is_json(gif.to_json()))
-
-    def test_gif_to_dict(self):
-        gif = telegram.InlineQueryResultCachedGif.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(gif))
-        self.assertDictEqual(self.json_dict, gif)
+        assert isinstance(inline_query_result_cached_gif_dict, dict)
+        assert inline_query_result_cached_gif_dict['type'] == inline_query_result_cached_gif.type
+        assert inline_query_result_cached_gif_dict['id'] == inline_query_result_cached_gif.id
+        assert inline_query_result_cached_gif_dict['gif_file_id'] == \
+               inline_query_result_cached_gif.gif_file_id
+        assert inline_query_result_cached_gif_dict['title'] == inline_query_result_cached_gif.title
+        assert inline_query_result_cached_gif_dict['caption'] == \
+               inline_query_result_cached_gif.caption
+        assert inline_query_result_cached_gif_dict['input_message_content'] == \
+               inline_query_result_cached_gif.input_message_content.to_dict()
+        assert inline_query_result_cached_gif_dict['reply_markup'] == \
+               inline_query_result_cached_gif.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultCachedGif(self._id, self.gif_file_id)
-        b = telegram.InlineQueryResultCachedGif(self._id, self.gif_file_id)
-        c = telegram.InlineQueryResultCachedGif(self._id, "")
-        d = telegram.InlineQueryResultCachedGif("", self.gif_file_id)
-        e = telegram.InlineQueryResultCachedVoice(self._id, "", "")
+        a = InlineQueryResultCachedGif(self.id, self.gif_file_id)
+        b = InlineQueryResultCachedGif(self.id, self.gif_file_id)
+        c = InlineQueryResultCachedGif(self.id, '')
+        d = InlineQueryResultCachedGif('', self.gif_file_id)
+        e = InlineQueryResultCachedVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

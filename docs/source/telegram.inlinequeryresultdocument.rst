@@ -1,7 +1,6 @@
-telegram.inlinequeryresultdocument module
-=========================================
+telegram.InlineQueryResultDocument
+==================================
 
-.. automodule:: telegram.inlinequeryresultdocument
+.. autoclass:: telegram.InlineQueryResultDocument
     :members:
-    :undoc-members:
     :show-inheritance:

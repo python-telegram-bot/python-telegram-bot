@@ -1,7 +1,6 @@
-telegram.webhookinfo module
-===========================
+telegram.WebhookInfo
+====================
 
-.. automodule:: telegram.webhookinfo
+.. autoclass:: telegram.WebhookInfo
     :members:
-    :undoc-members:
     :show-inheritance:

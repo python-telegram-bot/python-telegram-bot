@@ -1,0 +1,39 @@
+environment:
+
+  matrix:
+    # For Python versions available on Appveyor, see
+    # http://www.appveyor.com/docs/installed-software#python
+    # The list here is complete (excluding Python 2.6, which
+    # isn't covered by this document) at the time of writing.
+
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python34"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python36"
+
+branches:
+  only:
+  - master
+
+skip_branch_with_pr: true
+
+max_jobs: 1
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "git submodule update --init --recursive"
+  # Check that we have the expected version and architecture for Python
+  - "python --version"
+  # We need wheel installed to build wheels
+  - "pip install -U codecov pytest-cov"
+  - "pip install -U wheel"
+  - "pip install -r requirements.txt"
+  - "pip install -r requirements-dev.txt"
+
+build: off
+
+test_script:
+  - "pytest -m \"not nocoverage\" --cov --cov-report xml:coverage.xml"
+
+after_test:
+ - "codecov -f coverage.xml -F Appveyor"

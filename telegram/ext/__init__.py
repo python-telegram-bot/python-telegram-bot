@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
-from .dispatcher import Dispatcher
+from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
@@ -33,8 +33,14 @@ from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
 from .typehandler import TypeHandler
 from .conversationhandler import ConversationHandler
+from .precheckoutqueryhandler import PreCheckoutQueryHandler
+from .shippingqueryhandler import ShippingQueryHandler
+from .messagequeue import MessageQueue
+from .messagequeue import DelayQueue
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
            'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
-           'StringRegexHandler', 'TypeHandler', 'ConversationHandler')
+           'StringRegexHandler', 'TypeHandler', 'ConversationHandler',
+           'PreCheckoutQueryHandler', 'ShippingQueryHandler', 'MessageQueue', 'DelayQueue',
+           'DispatcherHandlerStop', 'run_async')

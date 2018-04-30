@@ -120,6 +120,6 @@ class WebhookHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         arguments (it's just like printf!).
 
         The client ip is prefixed to every message.
-        """
 
+        """
         self.logger.debug("%s - - %s" % (self.address_string(), format % args))

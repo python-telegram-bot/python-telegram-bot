@@ -1,7 +1,6 @@
-telegram.inputtextmessagecontent module
-=======================================
+telegram.InputTextMessageContent
+================================
 
-.. automodule:: telegram.inputtextmessagecontent
+.. autoclass:: telegram.InputTextMessageContent
     :members:
-    :undoc-members:
     :show-inheritance:

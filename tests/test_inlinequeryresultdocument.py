@@ -5,111 +5,111 @@
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram
-InlineQueryResultDocument"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQueryResultDocument,
+                      InlineKeyboardMarkup, InlineQueryResultVoice)
 
 
-class InlineQueryResultDocumentTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram InlineQueryResultDocument."""
+@pytest.fixture(scope='class')
+def inline_query_result_document():
+    return InlineQueryResultDocument(TestInlineQueryResultDocument.id,
+                                     TestInlineQueryResultDocument.document_url,
+                                     TestInlineQueryResultDocument.title,
+                                     TestInlineQueryResultDocument.mime_type,
+                                     caption=TestInlineQueryResultDocument.caption,
+                                     description=TestInlineQueryResultDocument.description,
+                                     thumb_url=TestInlineQueryResultDocument.thumb_url,
+                                     thumb_width=TestInlineQueryResultDocument.thumb_width,
+                                     thumb_height=TestInlineQueryResultDocument.thumb_height,
+                                     input_message_content=TestInlineQueryResultDocument.input_message_content,
+                                     reply_markup=TestInlineQueryResultDocument.reply_markup)
 
-    def setUp(self):
-        self._id = 'id'
-        self.type = 'document'
-        self.document_url = 'document url'
-        self.title = 'title'
-        self.caption = 'caption'
-        self.mime_type = 'mime type'
-        self.description = 'description'
-        self.thumb_url = 'thumb url'
-        self.thumb_width = 10
-        self.thumb_height = 15
-        self.input_message_content = telegram.InputTextMessageContent('input_message_content')
-        self.reply_markup = telegram.InlineKeyboardMarkup(
-            [[telegram.InlineKeyboardButton('reply_markup')]])
-        self.json_dict = {
-            'id': self._id,
-            'type': self.type,
-            'document_url': self.document_url,
-            'title': self.title,
-            'caption': self.caption,
-            'mime_type': self.mime_type,
-            'description': self.description,
-            'thumb_url': self.thumb_url,
-            'thumb_width': self.thumb_width,
-            'thumb_height': self.thumb_height,
-            'input_message_content': self.input_message_content.to_dict(),
-            'reply_markup': self.reply_markup.to_dict(),
-        }
 
-    def test_document_de_json(self):
-        document = telegram.InlineQueryResultDocument.de_json(self.json_dict, self._bot)
+class TestInlineQueryResultDocument(object):
+    id = 'id'
+    type = 'document'
+    document_url = 'document url'
+    title = 'title'
+    caption = 'caption'
+    mime_type = 'mime type'
+    description = 'description'
+    thumb_url = 'thumb url'
+    thumb_width = 10
+    thumb_height = 15
+    input_message_content = InputTextMessageContent('input_message_content')
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
-        self.assertEqual(document.id, self._id)
-        self.assertEqual(document.type, self.type)
-        self.assertEqual(document.document_url, self.document_url)
-        self.assertEqual(document.title, self.title)
-        self.assertEqual(document.caption, self.caption)
-        self.assertEqual(document.mime_type, self.mime_type)
-        self.assertEqual(document.description, self.description)
-        self.assertEqual(document.thumb_url, self.thumb_url)
-        self.assertEqual(document.thumb_width, self.thumb_width)
-        self.assertEqual(document.thumb_height, self.thumb_height)
-        self.assertDictEqual(document.input_message_content.to_dict(),
-                             self.input_message_content.to_dict())
-        self.assertDictEqual(document.reply_markup.to_dict(), self.reply_markup.to_dict())
+    def test_expected_values(self, inline_query_result_document):
+        assert inline_query_result_document.id == self.id
+        assert inline_query_result_document.type == self.type
+        assert inline_query_result_document.document_url == self.document_url
+        assert inline_query_result_document.title == self.title
+        assert inline_query_result_document.caption == self.caption
+        assert inline_query_result_document.mime_type == self.mime_type
+        assert inline_query_result_document.description == self.description
+        assert inline_query_result_document.thumb_url == self.thumb_url
+        assert inline_query_result_document.thumb_width == self.thumb_width
+        assert inline_query_result_document.thumb_height == self.thumb_height
+        assert inline_query_result_document.input_message_content.to_dict() == \
+               self.input_message_content.to_dict()
+        assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
 
-    def test_document_to_json(self):
-        document = telegram.InlineQueryResultDocument.de_json(self.json_dict, self._bot)
+    def test_to_dict(self, inline_query_result_document):
+        inline_query_result_document_dict = inline_query_result_document.to_dict()
 
-        self.assertTrue(self.is_json(document.to_json()))
-
-    def test_document_to_dict(self):
-        document = telegram.InlineQueryResultDocument.de_json(self.json_dict, self._bot).to_dict()
-
-        self.assertTrue(self.is_dict(document))
-        self.assertDictEqual(self.json_dict, document)
+        assert isinstance(inline_query_result_document_dict, dict)
+        assert inline_query_result_document_dict['id'] == inline_query_result_document.id
+        assert inline_query_result_document_dict['type'] == inline_query_result_document.type
+        assert inline_query_result_document_dict['document_url'] == \
+               inline_query_result_document.document_url
+        assert inline_query_result_document_dict['title'] == inline_query_result_document.title
+        assert inline_query_result_document_dict['caption'] == inline_query_result_document.caption
+        assert inline_query_result_document_dict['mime_type'] == \
+               inline_query_result_document.mime_type
+        assert inline_query_result_document_dict['description'] == \
+               inline_query_result_document.description
+        assert inline_query_result_document_dict['thumb_url'] == \
+               inline_query_result_document.thumb_url
+        assert inline_query_result_document_dict['thumb_width'] == \
+               inline_query_result_document.thumb_width
+        assert inline_query_result_document_dict['thumb_height'] == \
+               inline_query_result_document.thumb_height
+        assert inline_query_result_document_dict['input_message_content'] == \
+               inline_query_result_document.input_message_content.to_dict()
+        assert inline_query_result_document_dict['reply_markup'] == \
+               inline_query_result_document.reply_markup.to_dict()
 
     def test_equality(self):
-        a = telegram.InlineQueryResultDocument(self._id, self.document_url, self.title,
-                                               self.mime_type)
-        b = telegram.InlineQueryResultDocument(self._id, self.document_url, self.title,
-                                               self.mime_type)
-        c = telegram.InlineQueryResultDocument(self._id, "", self.title, self.mime_type)
-        d = telegram.InlineQueryResultDocument("", self.document_url, self.title, self.mime_type)
-        e = telegram.InlineQueryResultArticle(self._id, "", "")
+        a = InlineQueryResultDocument(self.id, self.document_url, self.title,
+                                      self.mime_type)
+        b = InlineQueryResultDocument(self.id, self.document_url, self.title,
+                                      self.mime_type)
+        c = InlineQueryResultDocument(self.id, '', self.title, self.mime_type)
+        d = InlineQueryResultDocument('', self.document_url, self.title, self.mime_type)
+        e = InlineQueryResultVoice(self.id, '', '')
 
-        self.assertEqual(a, b)
-        self.assertEqual(hash(a), hash(b))
-        self.assertIsNot(a, b)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
 
-        self.assertEqual(a, c)
-        self.assertEqual(hash(a), hash(c))
+        assert a == c
+        assert hash(a) == hash(c)
 
-        self.assertNotEqual(a, d)
-        self.assertNotEqual(hash(a), hash(d))
+        assert a != d
+        assert hash(a) != hash(d)
 
-        self.assertNotEqual(a, e)
-        self.assertNotEqual(hash(a), hash(e))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert a != e
+        assert hash(a) != hash(e)

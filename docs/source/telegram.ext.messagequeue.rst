@@ -1,7 +1,7 @@
-telegram.ext.messagequeue module
-================================
+telegram.ext.MessageQueue
+=========================
 
-.. automodule:: telegram.ext.messagequeue
+.. autoclass:: telegram.ext.MessageQueue
     :members:
-    :undoc-members:
     :show-inheritance:
+    :special-members:

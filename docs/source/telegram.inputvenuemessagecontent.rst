@@ -1,7 +1,6 @@
-telegram.inputvenuemessagecontent module
-========================================
+telegram.InputVenueMessageContent
+=================================
 
-.. automodule:: telegram.inputvenuemessagecontent
+.. autoclass:: telegram.InputVenueMessageContent
     :members:
-    :undoc-members:
     :show-inheritance:

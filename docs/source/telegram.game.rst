@@ -1,7 +1,6 @@
-telegram.game module
-====================
+telegram.Game
+=============
 
-.. automodule:: telegram.game
+.. autoclass:: telegram.Game
     :members:
-    :undoc-members:
     :show-inheritance:

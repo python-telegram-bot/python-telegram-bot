@@ -1,5 +1,20 @@
-languages:
-  Python: true
 exclude_paths:
-- "telegram/emoji.py"
 - "tests/*"
+- "examples/*"
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python:
+    checks:
+      Similar code:
+        enabled: false
+
+  radon:
+    enabled: true
+    config:
+      threshold: "C"
+ratings:
+  paths:
+    - "**.py"

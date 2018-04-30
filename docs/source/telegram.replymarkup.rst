@@ -1,7 +1,6 @@
-telegram.replymarkup module
-===========================
+telegram.ReplyMarkup
+====================
 
-.. automodule:: telegram.replymarkup
+.. autoclass:: telegram.ReplyMarkup
     :members:
-    :undoc-members:
     :show-inheritance:

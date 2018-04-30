@@ -1,101 +1,97 @@
 #!/usr/bin/env python
-# encoding: utf-8
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2017
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU Lesser Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# GNU Lesser Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents Tests for Telegram Games"""
 
-import sys
-import unittest
+import pytest
 
-sys.path.append('.')
-
-import telegram
-from tests.base import BaseTest
+from telegram import MessageEntity, Game, PhotoSize, Animation
 
 
-class GameTest(BaseTest, unittest.TestCase):
-    """This object represents Tests for Telegram Game."""
+@pytest.fixture(scope='function')
+def game():
+    return Game(TestGame.title,
+                TestGame.description,
+                TestGame.photo,
+                text=TestGame.text,
+                text_entities=TestGame.text_entities,
+                animation=TestGame.animation)
 
-    def setUp(self):
-        self.title = 'Python-telegram-bot Test Game'
-        self.description = 'description'
-        self.photo = [{'width': 640, 'height': 360, 'file_id': 'Blah', 'file_size': 0}]
-        self.text = 'Other description'
-        self.text_entities = [{'offset': 13, 'length': 17, 'type': telegram.MessageEntity.URL}]
-        self.animation = {'file_id': 'Blah'}
 
-        self.json_dict = {
+class TestGame(object):
+    title = 'Python-telegram-bot Test Game'
+    description = 'description'
+    photo = [PhotoSize('Blah', 640, 360, file_size=0)]
+    text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
+            b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
+    text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
+    animation = Animation('blah')
+
+    def test_de_json_required(self, bot):
+        json_dict = {
             'title': self.title,
             'description': self.description,
-            'photo': self.photo,
-            'text': self.text,
-            'text_entities': self.text_entities,
-            'animation': self.animation
+            'photo': [self.photo[0].to_dict()],
         }
+        game = Game.de_json(json_dict, bot)
 
-    def test_game_de_json(self):
-        game = telegram.Game.de_json(self.json_dict, self._bot)
+        assert game.title == self.title
+        assert game.description == self.description
+        assert game.photo == self.photo
 
-        self.assertEqual(game.title, self.title)
-        self.assertEqual(game.description, self.description)
-        self.assertTrue(isinstance(game.photo[0], telegram.PhotoSize))
-        self.assertEqual(game.text, self.text)
-        self.assertTrue(isinstance(game.text_entities[0], telegram.MessageEntity))
-        self.assertTrue(isinstance(game.animation, telegram.Animation))
+    def test_de_json_all(self, bot):
+        json_dict = {
+            'title': self.title,
+            'description': self.description,
+            'photo': [self.photo[0].to_dict()],
+            'text': self.text,
+            'text_entities': [self.text_entities[0].to_dict()],
+            'animation': self.animation.to_dict()
+        }
+        game = Game.de_json(json_dict, bot)
 
-    def test_game_to_json(self):
-        game = telegram.Game.de_json(self.json_dict, self._bot)
+        assert game.title == self.title
+        assert game.description == self.description
+        assert game.photo == self.photo
+        assert game.text == self.text
+        assert game.text_entities == self.text_entities
+        assert game.animation == self.animation
 
-        self.assertTrue(self.is_json(game.to_json()))
+    def test_to_dict(self, game):
+        game_dict = game.to_dict()
 
-    def test_game_all_args(self):
-        game = telegram.Game(
-            title=self.title,
-            description=self.description,
-            photo=self.photo,
-            text=self.text,
-            text_entities=self.text_entities,
-            animation=self.animation)
+        assert isinstance(game_dict, dict)
+        assert game_dict['title'] == game.title
+        assert game_dict['description'] == game.description
+        assert game_dict['photo'] == [game.photo[0].to_dict()]
+        assert game_dict['text'] == game.text
+        assert game_dict['text_entities'] == [game.text_entities[0].to_dict()]
+        assert game_dict['animation'] == game.animation.to_dict()
 
-        self.assertEqual(game.title, self.title)
-        self.assertEqual(game.description, self.description)
-        self.assertEqual(game.photo, self.photo)
-        self.assertEqual(game.text, self.text)
-        self.assertEqual(game.text_entities, self.text_entities)
-        self.assertEqual(game.animation, self.animation)
+    def test_parse_entity(self, game):
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        game.text_entities = [entity]
 
-    def test_parse_entity(self):
-        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
-                b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
-        entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
-        game = telegram.Game(
-            self.title, self.description, self.photo, text=text, text_entities=[entity])
-        self.assertEqual(game.parse_text_entity(entity), 'http://google.com')
+        assert game.parse_text_entity(entity) == 'http://google.com'
 
-    def test_parse_entities(self):
-        text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
-                b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')
-        entity = telegram.MessageEntity(type=telegram.MessageEntity.URL, offset=13, length=17)
-        entity_2 = telegram.MessageEntity(type=telegram.MessageEntity.BOLD, offset=13, length=1)
-        game = telegram.Game(
-            self.title, self.description, self.photo, text=text, text_entities=[entity_2, entity])
-        self.assertDictEqual(
-            game.parse_text_entities(telegram.MessageEntity.URL), {entity: 'http://google.com'})
-        self.assertDictEqual(game.parse_text_entities(),
-                             {entity: 'http://google.com',
-                              entity_2: 'h'})
+    def test_parse_entities(self, game):
+        entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
+        entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
+        game.text_entities = [entity_2, entity]
+
+        assert game.parse_text_entities(MessageEntity.URL) == {entity: 'http://google.com'}
+        assert game.parse_text_entities() == {entity: 'http://google.com', entity_2: 'h'}

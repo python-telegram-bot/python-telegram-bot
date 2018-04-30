@@ -41,7 +41,7 @@ def facts_to_str(user_data):
     facts = list()
 
     for key, value in user_data.items():
-        facts.append('%s - %s' % (key, value))
+        facts.append('{} - {}'.format(key, value))
 
     return "\n".join(facts).join(['\n', '\n'])
 
@@ -58,7 +58,8 @@ def start(bot, update):
 def regular_choice(bot, update, user_data):
     text = update.message.text
     user_data['choice'] = text
-    update.message.reply_text('Your %s? Yes, I would love to hear about that!' % text.lower())
+    update.message.reply_text(
+        'Your {}? Yes, I would love to hear about that!'.format(text.lower()))
 
     return TYPING_REPLY
 
@@ -77,10 +78,9 @@ def received_information(bot, update, user_data):
     del user_data['choice']
 
     update.message.reply_text("Neat! Just so you know, this is what you already told me:"
-                              "%s"
-                              "You can tell me more, or change your opinion on something."
-                              % facts_to_str(user_data),
-                              reply_markup=markup)
+                              "{}"
+                              "You can tell me more, or change your opinion on something.".format(
+                                  facts_to_str(user_data)), reply_markup=markup)
 
     return CHOOSING
 
@@ -90,15 +90,16 @@ def done(bot, update, user_data):
         del user_data['choice']
 
     update.message.reply_text("I learned these facts about you:"
-                              "%s"
-                              "Until next time!" % facts_to_str(user_data))
+                              "{}"
+                              "Until next time!".format(facts_to_str(user_data)))
 
     user_data.clear()
     return ConversationHandler.END
 
 
 def error(bot, update, error):
-    logger.warn('Update "%s" caused error "%s"' % (update, error))
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():

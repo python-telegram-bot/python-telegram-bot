@@ -1,8 +1,145 @@
 =======
 Changes
 =======
+**2017-12-08**
+*Released 9.0.0*
 
-**2017-05-21**
+Breaking changes (possibly)
+
+- Drop support for python 3.3 (PR `#930`_)
+
+
+New Features
+
+- Support Bot API 3.5 (PR `#920`_)
+
+
+Changes
+
+- Fix race condition in dispatcher start/stop (`#887`_)
+- Log error trace if there is no error handler registered (`#694`_)
+- Update examples with consistent string formatting (`#870`_)
+- Various changes and improvements to the docs.
+
+.. _`#920`: https://github.com/python-telegram-bot/python-telegram-bot/pull/920
+.. _`#930`: https://github.com/python-telegram-bot/python-telegram-bot/pull/930
+.. _`#887`: https://github.com/python-telegram-bot/python-telegram-bot/pull/887
+.. _`#694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/694
+.. _`#870`: https://github.com/python-telegram-bot/python-telegram-bot/pull/870
+
+**2017-10-15**
+*Released 8.1.1*
+
+- Fix Commandhandler crashing on single character messages (PR `#873`_).
+
+.. _`#873`: https://github.com/python-telegram-bot/python-telegram-bot/pull/871
+
+**2017-10-14**
+*Released 8.1.0*
+
+New features
+- Support Bot API 3.4 (PR `#865`_).
+
+Changes
+- MessageHandler & RegexHandler now consider channel_updates.
+- Fix command not recognized if it is directly followed by a newline (PR `#869`_).
+- Removed Bot._message_wrapper (PR `#822`_).
+- Unitests are now also running on AppVeyor (Windows VM).
+- Various unitest improvements.
+- Documentation fixes.
+
+.. _`#822`: https://github.com/python-telegram-bot/python-telegram-bot/pull/822
+.. _`#865`: https://github.com/python-telegram-bot/python-telegram-bot/pull/865
+.. _`#869`: https://github.com/python-telegram-bot/python-telegram-bot/pull/869
+
+**2017-09-01**
+*Released 8.0.0*
+
+New features
+
+- Fully support Bot Api 3.3 (PR `#806`_).
+- DispatcherHandlerStop (`see docs`_).
+- Regression fix for text_html & text_markdown (PR `#777`_).
+- Added effective_attachment to message (PR `#766`_).
+
+Non backward compatible changes
+
+- Removed Botan support from the library  (PR `#776`_).
+- Fully support Bot Api 3.3 (PR `#806`_).
+- Remove de_json() (PR `#789`_).
+
+Changes
+
+- Sane defaults for tcp socket options on linux (PR `#754`_).
+- Add RESTRICTED as constant to ChatMember (PR `#761`_).
+- Add rich comparison to CallbackQuery (PR `#764`_).
+- Fix get_game_high_scores (PR `#771`_).
+- Warn on small con_pool_size during custom initalization of Updater (PR `#793`_).
+- Catch exceptions in error handlerfor errors that happen during polling (PR `#810`_).
+- For testing we switched to pytest (PR `#788`_).
+- Lots of small improvements to our tests and documentation.
+
+
+.. _`see docs`: http://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler
+.. _`#777`: https://github.com/python-telegram-bot/python-telegram-bot/pull/777
+.. _`#806`: https://github.com/python-telegram-bot/python-telegram-bot/pull/806
+.. _`#766`: https://github.com/python-telegram-bot/python-telegram-bot/pull/766
+.. _`#776`: https://github.com/python-telegram-bot/python-telegram-bot/pull/776
+.. _`#789`: https://github.com/python-telegram-bot/python-telegram-bot/pull/789
+.. _`#754`: https://github.com/python-telegram-bot/python-telegram-bot/pull/754
+.. _`#761`: https://github.com/python-telegram-bot/python-telegram-bot/pull/761
+.. _`#764`: https://github.com/python-telegram-bot/python-telegram-bot/pull/764
+.. _`#771`: https://github.com/python-telegram-bot/python-telegram-bot/pull/771
+.. _`#788`: https://github.com/python-telegram-bot/python-telegram-bot/pull/788
+.. _`#793`: https://github.com/python-telegram-bot/python-telegram-bot/pull/793
+.. _`#810`: https://github.com/python-telegram-bot/python-telegram-bot/pull/810
+
+**2017-07-28**
+*Released 7.0.1*
+
+- Fix TypeError exception in RegexHandler (PR #751).
+- Small documentation fix (PR #749).
+
+**2017-07-25**
+*Released 7.0.0*
+
+- Fully support Bot API 3.2.
+- New filters for handling messages from specific chat/user id (PR #677).
+- Add the possibility to add objects as arguments to send_* methods (PR #742).
+- Fixed download of URLs with UTF-8 chars in path (PR #688).
+- Fixed URL parsing for ``Message`` text properties (PR #689).
+- Fixed args dispatching in ``MessageQueue``'s decorator (PR #705).
+- Fixed regression preventing IPv6 only hosts from connnecting to Telegram servers (Issue #720).
+- ConvesationHandler - check if a user exist before using it (PR #699).
+- Removed deprecated ``telegram.Emoji``.
+- Removed deprecated ``Botan`` import from ``utils`` (``Botan`` is still available through ``contrib``).
+- Removed deprecated ``ReplyKeyboardHide``.
+- Removed deprecated ``edit_message`` argument of ``bot.set_game_score``.
+- Internal restructure of files.
+- Improved documentation.
+- Improved unitests.
+
+**2017-06-18**
+
+*Released 6.1.0*
+
+- Fully support Bot API 3.0
+- Add more fine-grained filters for status updates
+- Bug fixes and other improvements
+
+**2017-05-29**
+
+*Released 6.0.3*
+
+- Faulty PyPI release
+
+**2017-05-29**
+
+*Released 6.0.2*
+
+- Avoid confusion with user's ``urllib3`` by renaming vendored ``urllib3`` to ``ptb_urllib3``
+
+**2017-05-19**
 
 *Released 6.0.1*
 
@@ -80,6 +217,7 @@ Changes
 
 - Rework ``JobQueue``
 - Introduce ``ConversationHandler``
+- Introduce ``telegram.constants`` - https://github.com/python-telegram-bot/python-telegram-bot/pull/342
 
 **2016-07-12**
 

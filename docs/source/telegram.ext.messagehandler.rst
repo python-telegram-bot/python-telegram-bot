@@ -1,7 +1,6 @@
-telegram.ext.messagehandler module
-==================================
+telegram.ext.MessageHandler
+===========================
 
-.. automodule:: telegram.ext.messagehandler
+.. autoclass:: telegram.ext.MessageHandler
     :members:
-    :undoc-members:
     :show-inheritance:

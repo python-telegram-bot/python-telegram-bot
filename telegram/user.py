@@ -20,36 +20,37 @@
 """This module contains an object that represents a Telegram User."""
 
 from telegram import TelegramObject
+from telegram.utils.helpers import mention_markdown as util_mention_markdown
+from telegram.utils.helpers import mention_html as util_mention_html
 
 
 class User(TelegramObject):
-    """This object represents a Telegram User.
+    """This object represents a Telegram user or bot.
 
     Attributes:
-        id (int): Unique identifier for this user or bot
-        first_name (str): User's or bot's first name
-        last_name (str): User's or bot's last name
-        username (str): User's or bot's username
-        language_code (str): IETF language tag of the user's language
-        type (str): Deprecated
+        id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): True, if this user is a bot
+        first_name (:obj:`str`): User's or bot's first name.
+        last_name (:obj:`str`): Optional. User's or bot's last name.
+        username (:obj:`str`): Optional. User's or bot's username.
+        language_code (:obj:`str`): Optional. IETF language tag of the user's language.
+        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        id (int): Unique identifier for this user or bot
-        first_name (str): User's or bot's first name
-        **kwargs: Arbitrary keyword arguments.
+        id (:obj:`int`): Unique identifier for this user or bot.
+        is_bot (:obj:`bool`): True, if this user is a bot
+        first_name (:obj:`str`): User's or bot's first name.
+        last_name (:obj:`str`, optional): User's or bot's last name.
+        username (:obj:`str`, optional): User's or bot's username.
+        language_code (:obj:`str`, optional): IETF language tag of the user's language.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
-    Keyword Args:
-        type (Optional[str]): Deprecated
-        last_name (Optional[str]): User's or bot's last name
-        username (Optional[str]): User's or bot's username
-        language_code (Optional[str]): IETF language tag of the user's language
-        bot (Optional[Bot]): The Bot to use for instance methods
     """
 
     def __init__(self,
                  id,
                  first_name,
-                 type=None,
+                 is_bot,
                  last_name=None,
                  username=None,
                  language_code=None,
@@ -58,8 +59,8 @@ class User(TelegramObject):
         # Required
         self.id = int(id)
         self.first_name = first_name
+        self.is_bot = is_bot
         # Optionals
-        self.type = type
         self.last_name = last_name
         self.username = username
         self.language_code = language_code
@@ -70,32 +71,78 @@ class User(TelegramObject):
 
     @property
     def name(self):
-        """str: """
+        """
+        :obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+            prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
+
+        """
         if self.username:
-            return '@%s' % self.username
+            return '@{}'.format(self.username)
+        return self.full_name
+
+    @property
+    def full_name(self):
+        """
+        :obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if available)
+            :attr:`last_name`.
+
+        """
         if self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
+            return '{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
-    @staticmethod
-    def de_json(data, bot):
-        """
-        Args:
-            data (dict):
-            bot (telegram.Bot):
-
-        Returns:
-            telegram.User:
-        """
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
-        data = super(User, User).de_json(data, bot)
+        data = super(User, cls).de_json(data, bot)
 
-        return User(bot=bot, **data)
+        return cls(bot=bot, **data)
 
     def get_profile_photos(self, *args, **kwargs):
         """
-        Shortcut for ``bot.getUserProfilePhotos(update.message.from_user.id, *args, **kwargs)``
+        Shortcut for::
+
+                bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
+
         """
-        return self.bot.getUserProfilePhotos(self.id, *args, **kwargs)
+
+        return self.bot.get_user_profile_photos(self.id, *args, **kwargs)
+
+    @classmethod
+    def de_list(cls, data, bot):
+        if not data:
+            return []
+
+        users = list()
+        for user in data:
+            users.append(cls.de_json(user, bot))
+
+        return users
+
+    def mention_markdown(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): If provided, will overwrite the user's name.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as markdown.
+        """
+        if not name:
+            return util_mention_markdown(self.id, self.name)
+        else:
+            return util_mention_markdown(self.id, name)
+
+    def mention_html(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): If provided, will overwrite the user's name.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as HTML.
+        """
+        if not name:
+            return util_mention_html(self.id, self.name)
+        else:
+            return util_mention_html(self.id, name)

@@ -16,13 +16,18 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-""" This module contains the Promise class """
+"""This module contains the Promise class."""
 
+import logging
 from threading import Event
 
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+
 class Promise(object):
-    """A simple Promise implementation for the run_async decorator"""
+    """A simple Promise implementation for the run_async decorator."""
 
     def __init__(self, pooled_function, args, kwargs):
         self.pooled_function = pooled_function
@@ -37,6 +42,7 @@ class Promise(object):
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
         except Exception as exc:
+            logger.exception('An uncaught error was raised while running the promise')
             self._exception = exc
 
         finally:
@@ -50,3 +56,7 @@ class Promise(object):
         if self._exception is not None:
             raise self._exception  # pylint: disable=raising-bad-type
         return self._result
+
+    @property
+    def exception(self):
+        return self._exception

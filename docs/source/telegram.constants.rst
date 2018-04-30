@@ -1,7 +1,6 @@
-telegram.constants module
+telegram.constants Module
 =========================
 
 .. automodule:: telegram.constants
     :members:
-    :undoc-members:
     :show-inheritance:
