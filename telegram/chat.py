@@ -124,8 +124,7 @@ class Chat(TelegramObject):
         """
         if self.type == self.SUPERGROUP and self.username:
             return "t.me/{}".format(self.usermame)
-        else:
-            return None
+        return None
 
     @classmethod
     def de_json(cls, data, bot):
