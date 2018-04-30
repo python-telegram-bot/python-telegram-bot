@@ -137,6 +137,7 @@ class User(TelegramObject):
             name (:obj:`str`): If provided, will overwrite the user's full name.
         Returns:
             :obj:`str`: The inline mention for the user as markdown.
+
         """
         if name:
             return util_mention_markdown(self.id, name)
@@ -148,6 +149,7 @@ class User(TelegramObject):
             name (:obj:`str`): If provided, will overwrite the user's full name.
         Returns:
             :obj:`str`: The inline mention for the user as HTML.
+
         """
         if name:
             return util_mention_html(self.id, name)
