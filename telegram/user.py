@@ -113,7 +113,7 @@ class User(TelegramObject):
         """
         Shortcut for::
 
-            bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
+                bot.get_user_profile_photos(update.message.from_user.id, *args, **kwargs)
 
         """
 
