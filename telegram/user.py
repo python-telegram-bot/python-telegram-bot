@@ -98,6 +98,7 @@ class User(TelegramObject):
         """
         if self.username:
             return "t.me/{}".format(self.username)
+        return None
 
     @classmethod
     def de_json(cls, data, bot):
