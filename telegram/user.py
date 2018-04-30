@@ -95,6 +95,7 @@ class User(TelegramObject):
     def link(self):
         """
         :obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link of the user.
+
         """
         if self.username:
             return "t.me/{}".format(self.username)
