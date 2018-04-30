@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects helps with creating menus for telegram bots."""
-
-from uuid import uuid4
 from collections import defaultdict, OrderedDict
 from itertools import chain
+from uuid import uuid4
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest
@@ -44,8 +43,8 @@ class Menu(object):
     buttons = None
     data = None
     default_data = None
-    root_menu = None  # populated in menuhandler
-    stack = None  # Only used in root menu assigned in menuhandler
+    root_menu = None  # Populated in MenuHandler
+    stack = None  # Only used in root menu assigned in MenuHandler
 
     def callback(self, bot, update, add_to_stack=True):
         if add_to_stack:
@@ -67,12 +66,12 @@ class Menu(object):
 
     def keyboard(self, update):
         return InlineKeyboardMarkup([[x.keyboard_button(update) for x in y] for y in
-                                     self.get_buttons()])  # noqa
+                                     self.get_buttons(update)])  # noqa
 
-    def get_buttons(self):
+    def get_buttons(self, update):
         if self._buttons is None:
             if callable(self.buttons):
-                self._buttons = self.buttons()  # noqa pylint: disable=not-callable
+                self._buttons = self.buttons(update)  # noqa pylint: disable=not-callable
             else:
                 self._buttons = self.buttons
         return self._buttons
@@ -265,7 +264,7 @@ class MenuHandler(Handler):
 
     def collect_buttons(self, menu):
         menu.root_menu = self.menu
-        for button in chain.from_iterable(menu.get_buttons()):
+        for button in chain.from_iterable(menu.get_buttons(None)):
             button.parent_menu = menu
             button.post_init()
             if button.uuid not in self.buttons and (button.callback is not None or
@@ -280,3 +279,17 @@ class MenuHandler(Handler):
     def handle_update(self, update, dispatcher):
         # Let the button handle it
         return self.buttons[update.callback_query.data].handle_update(update, dispatcher)
+
+
+def make_menu(name, text, buttons):
+    if callable(text):
+        def _text(self, update):
+            return text(update)
+    else:
+        _text = text
+    if callable(buttons):
+        def _buttons(self, update):
+            return buttons(update)
+    else:
+        _buttons = buttons
+    return type(name, (Menu,), dict(text=_text, buttons=_buttons))()
