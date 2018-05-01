@@ -545,7 +545,7 @@ class Bot(TelegramObject):
                      disable_notification=False,
                      reply_to_message_id=None,
                      reply_markup=None,
-                     timeout=None,
+                     timeout=20,
                      **kwargs):
         """Use this method to send .webp stickers.
 
