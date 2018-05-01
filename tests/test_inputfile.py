@@ -17,6 +17,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import subprocess
 import sys
 
@@ -24,7 +25,7 @@ from telegram import InputFile
 
 
 class TestInputFile(object):
-    png = 'tests/data/game.png'
+    png = os.path.join('tests', 'data', 'game.png')
 
     def test_subprocess_pipe(self):
         if sys.platform == 'win32':
