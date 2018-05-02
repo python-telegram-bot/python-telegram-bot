@@ -40,6 +40,4 @@ class TestInputFile(object):
         assert in_file.mimetype == 'image/png'
         assert in_file.filename == 'image.png'
 
-        proc.terminate()
-
-        assert proc.poll() == 0
+        proc.kill()
