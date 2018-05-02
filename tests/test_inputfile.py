@@ -33,11 +33,13 @@ class TestInputFile(object):
         else:
             cmd = ['cat', self.png]
 
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == 'win32'))
         in_file = InputFile({'photo': proc.stdout})
 
         assert in_file.input_file_content == open(self.png, 'rb').read()
         assert in_file.mimetype == 'image/png'
         assert in_file.filename == 'image.png'
+
+        proc.terminate()
 
         assert proc.poll() == 0
