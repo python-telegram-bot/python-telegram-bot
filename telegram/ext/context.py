@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from telegram import Update
 
 
 class Context(object):
@@ -74,9 +75,21 @@ class Context(object):
     def __init__(self, update, dispatcher):
         self.update = update
         self.bot = dispatcher.bot
+
         self.chat_data = None
         self.user_data = None
-        if update is not None:
+
+        self.message = None
+        self.edited_message = None
+        self.inline_query = None
+        self.chosen_inline_result = None
+        self.callback_query = None
+        self.shipping_query = None
+        self.pre_checkout_query = None
+        self.channel_post = None
+        self.edited_channel_post = None
+
+        if update is not None and isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user
 
@@ -85,18 +98,18 @@ class Context(object):
             if user:
                 self.user_data = dispatcher.user_data[user.id]
 
+            self.message = self.update.message
+            self.edited_message = self.update.edited_message
+            self.inline_query = self.update.inline_query
+            self.chosen_inline_result = self.update.chosen_inline_result
+            self.callback_query = self.update.callback_query
+            self.shipping_query = self.update.shipping_query
+            self.pre_checkout_query = self.update.pre_checkout_query
+            self.channel_post = self.update.channel_post
+            self.edited_channel_post = self.update.edited_channel_post
+
         self.job_queue = dispatcher.job_queue
         self.update_queue = dispatcher.update_queue
-
-        self.message = self.update.message
-        self.edited_message = self.update.edited_message
-        self.inline_query = self.update.inline_query
-        self.chosen_inline_result = self.update.chosen_inline_result
-        self.callback_query = self.update.callback_query
-        self.shipping_query = self.update.shipping_query
-        self.pre_checkout_query = self.update.pre_checkout_query
-        self.channel_post = self.update.channel_post
-        self.edited_channel_post = self.update.edited_channel_post
 
         self.args = None
         self.groups = None

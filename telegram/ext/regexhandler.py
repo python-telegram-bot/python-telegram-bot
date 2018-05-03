@@ -132,7 +132,7 @@ class RegexHandler(Handler):
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data,
-            use_context=None)
+            use_context=use_context)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
@@ -167,20 +167,16 @@ class RegexHandler(Handler):
 
     def collect_optional_args(self, dispatcher, update=None):
         optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update)
-        if self.pattern:
-            match = re.match(self.pattern, update.effective_message.text)
+        match = re.match(self.pattern, update.effective_message.text)
 
-            if self.pass_groups:
-                optional_args['groups'] = match.groups()
-            if self.pass_groupdict:
-                optional_args['groupdict'] = match.groupdict()
+        if self.pass_groups:
+            optional_args['groups'] = match.groups()
+        if self.pass_groupdict:
+            optional_args['groupdict'] = match.groupdict()
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher):
-        if self.pattern:
-            match = re.match(self.pattern, update.effective_message.text)
+        match = re.match(self.pattern, update.effective_message.text)
 
-            if self.pass_groups:
-                context.groups = match.groups()
-            if self.pass_groupdict:
-                context.groupdict = match.groupdict()
+        context.groups = match.groups()
+        context.groupdict = match.groupdict()

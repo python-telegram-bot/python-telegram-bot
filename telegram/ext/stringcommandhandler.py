@@ -108,5 +108,4 @@ class StringCommandHandler(Handler):
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher):
-        if self.pass_args:
-            context.args = update.split()[1:]
+        context.args = update.split()[1:]

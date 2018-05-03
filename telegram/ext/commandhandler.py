@@ -176,6 +176,5 @@ class CommandHandler(Handler):
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher):
-        if self.pass_args:
-            message = update.message or update.edited_message
-            context.args = message.text.split()[1:]
+        message = update.message or update.edited_message
+        context.args = message.text.split()[1:]

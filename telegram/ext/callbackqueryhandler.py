@@ -151,7 +151,5 @@ class CallbackQueryHandler(Handler):
         if self.pattern:
             match = re.match(self.pattern, update.callback_query.data)
 
-            if self.pass_groups:
-                context.groups = match.groups()
-            if self.pass_groupdict:
-                context.groupdict = match.groupdict()
+            context.groups = match.groups()
+            context.groupdict = match.groupdict()
