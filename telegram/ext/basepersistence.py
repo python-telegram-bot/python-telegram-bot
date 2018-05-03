@@ -36,13 +36,13 @@ class BasePersistence(object):
     Attributes:
         store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
             persistence class.
-        store_chat_data (:obj:`bool`): Optional. Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
             persistence class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is ``True``.
-        store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is ``True`` .
     """
 
@@ -120,4 +120,4 @@ class BasePersistence(object):
         persistence a chance to finish up saving or close a database connection gracefully. If this
         is not of any importance just pass will be sufficient.
         """
-        raise NotImplementedError
+        pass

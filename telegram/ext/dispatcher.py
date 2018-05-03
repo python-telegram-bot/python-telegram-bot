@@ -116,7 +116,7 @@ class Dispatcher(object):
             if self.persistence.store_chat_data:
                 self.chat_data = self.persistence.get_chat_data()
                 if not isinstance(self.chat_data, defaultdict):
-                    raise ValueError("`chat_data must be of type defaultdict")
+                    raise ValueError("chat_data must be of type defaultdict")
             else:
                 self.chat_data = defaultdict(dict)
 
