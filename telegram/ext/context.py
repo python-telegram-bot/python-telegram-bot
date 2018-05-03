@@ -20,33 +20,55 @@
 
 class Context(object):
     """
+    This object represents an incoming update from a telegram bot.
+    It operates like a supercharged :class:`telegram.Update`, in that it includes
+    data that the handler passed along.
+    To use it set :attr:`use_context` to ``True`` when creating your handlers, and use the
+    following signature for your callback functions ``def callbackname(context):``.
+    Note that setting :attr:`use_context` may not be required unless using old versions of
+    python or decorators on the callback.
 
     Attributes:
-        bot:
-        update:
-        chat_data:
-        user_data:
-        groups:
-        groupdict:
-        job_queue:
-        update_queue:
-        args:
+        bot (:class:`telegram.Bot`): The bot associated with this context.
+        update (:class:`telegram.Update`): The update that spawned this context.
+        chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update from the same chat it will be the same ``dict``.
+        user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update from the same user it will be the same ``dict``.
+        groups (:obj:`tuple`, optional): If the associated update originated from a
+            regex-supported handler, this will contain the ``re.match(pattern, data).groups()``.
+        groupdict (:obj:`dict`, optional): If the associated update originated from a
+            regex-supported handler, this will contain the ``re.match(pattern, data).groupdict()``.
+        job_queue (:class:`telegram.ext.JobQueue`): The JobQueue created by the
+            :class:`telegram.ext.Updater` which can be used to schedule new jobs.
+        update_queue (:class:`queue.Queue`): The ``Queue`` instance used by the
+            :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
+            which contains new updates and can be used to insert updates.
+        args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
+            originated from a :class:`telegram.ext.CommandHandler` or a
+            :class:`telegram.ext.StringCommandHandler`. It will contain a list of strings,
+            which is the text following the command split on single or consecutive whitespace
+            characters.
         message (:class:`telegram.Message`, optional): New incoming message of any kind - text,
-            photo, sticker, etc.
+            photo, sticker, etc. Extracted from :attr:`update`.
         edited_message (:class:`telegram.Message`, optional): New version of a message that is
-            known to the bot and was edited.
+            known to the bot and was edited. Extracted from :attr:`update`.
         channel_post (:class:`telegram.Message`, optional): New incoming channel post of any kind
-            - text, photo, sticker, etc.
+            - text, photo, sticker, etc. Extracted from :attr:`update`.
         edited_channel_post (:class:`telegram.Message`, optional): New version of a channel post
-            that is known to the bot and was edited.
+            that is known to the bot and was edited. Extracted from :attr:`update`.
         inline_query (:class:`telegram.InlineQuery`, optional): New incoming inline query.
+            Extracted from :attr:`update`.
         chosen_inline_result (:class:`telegram.ChosenInlineResult`, optional): The result of an
-            inline query that was chosen by a user and sent to their chat partner.
+            inline query that was chosen by a user and sent to their chat partner. Extracted
+            from :attr:`update`.
         callback_query (:class:`telegram.CallbackQuery`, optional): New incoming callback query.
+            Extracted from :attr:`update`.
         shipping_query (:class:`telegram.ShippingQuery`, optional): New incoming shipping query.
-            Only for invoices with flexible price.
+            Only for invoices with flexible price. Extracted from :attr:`update`.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`, optional): New incoming
-            pre-checkout query. Contains full information about checkout
+            pre-checkout query. Contains full information about checkout. Extracted from
+            :attr:`update`.
     """
 
     def __init__(self, update, dispatcher):
