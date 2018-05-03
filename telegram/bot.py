@@ -102,6 +102,9 @@ class Bot(TelegramObject):
         request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.request.Request`.
 
+    Note:
+        Although not documented separately here, the ``Bot`` class also supports the original
+        camelCase named methods for all API methods. So :attr:`get_me` is equal to ``getMe``.
     """
 
     def __init__(self, token, base_url=None, base_file_url=None, request=None):
@@ -3070,61 +3073,120 @@ class Bot(TelegramObject):
 
     # camelCase aliases
     getMe = get_me
+    """Alias for :attr:`get_me`"""
     sendMessage = send_message
+    """Alias for :attr:`send_message`"""
     deleteMessage = delete_message
+    """Alias for :attr:`delete_message`"""
     forwardMessage = forward_message
+    """Alias for :attr:`forward_message`"""
     sendPhoto = send_photo
+    """Alias for :attr:`send_photo`"""
     sendAudio = send_audio
+    """Alias for :attr:`send_audio`"""
     sendDocument = send_document
+    """Alias for :attr:`send_document`"""
     sendSticker = send_sticker
+    """Alias for :attr:`send_sticker`"""
     sendVideo = send_video
+    """Alias for :attr:`send_video`"""
     sendVoice = send_voice
+    """Alias for :attr:`send_voice`"""
     sendVideoNote = send_video_note
+    """Alias for :attr:`send_video_note`"""
     sendMediaGroup = send_media_group
+    """Alias for :attr:`send_media_group`"""
     sendLocation = send_location
+    """Alias for :attr:`send_location`"""
     editMessageLiveLocation = edit_message_live_location
+    """Alias for :attr:`edit_message_live_location`"""
     stopMessageLiveLocation = stop_message_live_location
+    """Alias for :attr:`stop_message_live_location`"""
     sendVenue = send_venue
+    """Alias for :attr:`send_venue`"""
     sendContact = send_contact
+    """Alias for :attr:`send_contact`"""
     sendGame = send_game
+    """Alias for :attr:`send_game`"""
     sendChatAction = send_chat_action
+    """Alias for :attr:`send_chat_action`"""
     answerInlineQuery = answer_inline_query
+    """Alias for :attr:`answer_inline_query`"""
     getUserProfilePhotos = get_user_profile_photos
+    """Alias for :attr:`get_user_profile_photos`"""
     getFile = get_file
+    """Alias for :attr:`get_file`"""
     kickChatMember = kick_chat_member
+    """Alias for :attr:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
+    """Alias for :attr:`unban_chat_member`"""
     answerCallbackQuery = answer_callback_query
+    """Alias for :attr:`answer_callback_query`"""
     editMessageText = edit_message_text
+    """Alias for :attr:`edit_message_text`"""
     editMessageCaption = edit_message_caption
+    """Alias for :attr:`edit_message_caption`"""
     editMessageReplyMarkup = edit_message_reply_markup
+    """Alias for :attr:`edit_message_reply_markup`"""
     getUpdates = get_updates
+    """Alias for :attr:`get_updates`"""
     setWebhook = set_webhook
+    """Alias for :attr:`set_webhook`"""
     deleteWebhook = delete_webhook
+    """Alias for :attr:`delete_webhook`"""
     leaveChat = leave_chat
+    """Alias for :attr:`leave_chat`"""
     getChat = get_chat
+    """Alias for :attr:`get_chat`"""
     getChatAdministrators = get_chat_administrators
+    """Alias for :attr:`get_chat_administrators`"""
     getChatMember = get_chat_member
+    """Alias for :attr:`get_chat_member`"""
     setChatStickerSet = set_chat_sticker_set
+    """Alias for :attr:`set_chat_sticker_set`"""
     deleteChatStickerSet = delete_chat_sticker_set
+    """Alias for :attr:`delete_chat_sticker_set`"""
     getChatMembersCount = get_chat_members_count
+    """Alias for :attr:`get_chat_members_count`"""
     getWebhookInfo = get_webhook_info
+    """Alias for :attr:`get_webhook_info`"""
     setGameScore = set_game_score
+    """Alias for :attr:`set_game_score`"""
     getGameHighScores = get_game_high_scores
+    """Alias for :attr:`get_game_high_scores`"""
     sendInvoice = send_invoice
+    """Alias for :attr:`send_invoice`"""
     answerShippingQuery = answer_shipping_query
+    """Alias for :attr:`answer_shipping_query`"""
     answerPreCheckoutQuery = answer_pre_checkout_query
+    """Alias for :attr:`answer_pre_checkout_query`"""
     restrictChatMember = restrict_chat_member
+    """Alias for :attr:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member
+    """Alias for :attr:`promote_chat_member`"""
     exportChatInviteLink = export_chat_invite_link
+    """Alias for :attr:`export_chat_invite_link`"""
     setChatPhoto = set_chat_photo
+    """Alias for :attr:`set_chat_photo`"""
     deleteChatPhoto = delete_chat_photo
+    """Alias for :attr:`delete_chat_photo`"""
     setChatTitle = set_chat_title
+    """Alias for :attr:`set_chat_title`"""
     setChatDescription = set_chat_description
+    """Alias for :attr:`set_chat_description`"""
     pinChatMessage = pin_chat_message
+    """Alias for :attr:`pin_chat_message`"""
     unpinChatMessage = unpin_chat_message
+    """Alias for :attr:`unpin_chat_message`"""
     getStickerSet = get_sticker_set
+    """Alias for :attr:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file
+    """Alias for :attr:`upload_sticker_file`"""
     createNewStickerSet = create_new_sticker_set
+    """Alias for :attr:`create_new_sticker_set`"""
     addStickerToSet = add_sticker_to_set
+    """Alias for :attr:`add_sticker_to_set`"""
     setStickerPositionInSet = set_sticker_position_in_set
+    """Alias for :attr:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
+    """Alias for :attr:`delete_sticker_from_set`"""

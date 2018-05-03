@@ -291,17 +291,9 @@ texinfo_documents = [
 
 # -- script stuff --------------------------------------------------------
 
-import inspect
-
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
-    try:
-        if inspect.getmodule(obj).__name__.startswith('telegram') and inspect.isfunction(obj):
-            if name.lower() != name:
-                return True
-    except AttributeError:
-        pass
-    # Return None so napoleon can handle it
+    pass
 
 
 def setup(app):
