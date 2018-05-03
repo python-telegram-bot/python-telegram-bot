@@ -66,13 +66,15 @@ class ShippingQueryHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 use_context=None):
         super(ShippingQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            use_context=use_context)
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -85,14 +87,3 @@ class ShippingQueryHandler(Handler):
 
         """
         return isinstance(update, Update) and update.shipping_query
-
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-
-        """
-        optional_args = self.collect_optional_args(dispatcher, update)
-        return self.callback(dispatcher.bot, update, **optional_args)

@@ -21,8 +21,8 @@ import warnings
 
 from future.utils import string_types
 
-from .handler import Handler
 from telegram import Update
+from .handler import Handler
 
 
 class CommandHandler(Handler):
@@ -96,13 +96,15 @@ class CommandHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 use_context=None):
         super(CommandHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            use_context=use_context)
 
         if isinstance(command, string_types):
             self.command = [command.lower()]
@@ -129,8 +131,8 @@ class CommandHandler(Handler):
             :obj:`bool`
 
         """
-        if (isinstance(update, Update)
-                and (update.message or update.edited_message and self.allow_edited)):
+        if (isinstance(update, Update) and
+                (update.message or update.edited_message and self.allow_edited)):
             message = update.message or update.edited_message
 
             if message.text and message.text.startswith('/') and len(message.text) > 1:
@@ -155,19 +157,14 @@ class CommandHandler(Handler):
 
         return False
 
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-
-        """
-        optional_args = self.collect_optional_args(dispatcher, update)
-
-        message = update.message or update.edited_message
-
+    def collect_optional_args(self, dispatcher, update=None):
+        optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
         if self.pass_args:
+            message = update.message or update.edited_message
             optional_args['args'] = message.text.split()[1:]
+        return optional_args
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+    def collect_additional_context(self, context, update, dispatcher):
+        if self.pass_args:
+            message = update.message or update.edited_message
+            context.args = message.text.split()[1:]

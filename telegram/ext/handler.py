@@ -17,6 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
+import inspect
+import sys
+
+from telegram.ext import Context
+
+has_follow_wrapped = sys.version_info >= (3, 5)
 
 
 class Handler(object):
@@ -63,12 +69,24 @@ class Handler(object):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 use_context=None):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self.use_context = use_context
+
+        if use_context is None:
+            if has_follow_wrapped:
+                sig = inspect.signature(callback, follow_wrapped=True)
+                parameters = [p for p in sig.parameters.values() if p.kind ==
+                              inspect.Parameter.POSITIONAL_OR_KEYWORD or
+                              p.kind == inspect.Parameter.POSITIONAL_ONLY]
+                self.use_context = len(parameters) == 1
+            else:
+                pass
 
     def check_update(self, update):
         """
@@ -87,24 +105,43 @@ class Handler(object):
     def handle_update(self, update, dispatcher):
         """
         This method is called if it was determined that an update should indeed
-        be handled by this instance. It should also be overridden, but in most
-        cases call ``self.callback(dispatcher.bot, update)``, possibly along with
-        optional arguments. To work with the ``ConversationHandler``, this method should return the
-        value returned from ``self.callback``
+        be handled by this instance. Calls ``self.callback(dispatcher.bot, update)``,
+        along with optional arguments. To work with the ``ConversationHandler``, this method
+        returns the value returned from ``self.callback``.
+        Note that it can be overridden if needed by the subclassing handler.
 
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher to collect optional args.
 
         """
-        raise NotImplementedError
+
+        if self.use_context:
+            context = Context(update, dispatcher)
+            self.collect_additional_context(context, update, dispatcher)
+            return self.callback(context)
+        else:
+            optional_args = self.collect_optional_args(dispatcher, update)
+
+            return self.callback(dispatcher.bot, update, **optional_args)
+
+    def collect_additional_context(self, context, update, dispatcher):
+        """Prepares additional arguments for the context. Override if handler needs.
+
+        Args:
+            context (:class:`telegram.ext.Context`): The context.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
+            update (:class:`telegram.Update`): The update to gather chat/user id from.
+        """
+        pass
 
     def collect_optional_args(self, dispatcher, update=None):
-        """Prepares the optional arguments that are the same for all types of handlers.
+        """Prepares the optional arguments. If the handler has additional optional args,
+        it should subclass this method, but remember to call this super method.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
-
+            update (:class:`telegram.Update`): The update to gather chat/user id from.
         """
         optional_args = dict()
 

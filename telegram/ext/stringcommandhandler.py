@@ -66,9 +66,13 @@ class StringCommandHandler(Handler):
                  callback,
                  pass_args=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_job_queue=False,
+                 use_context=None):
         super(StringCommandHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            use_context=use_context)
         self.command = command
         self.pass_args = pass_args
 
@@ -76,7 +80,7 @@ class StringCommandHandler(Handler):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:obj:`str`): An incomming command.
+            update (:obj:`str`): An incoming command.
 
         Returns:
             :obj:`bool`
@@ -86,18 +90,12 @@ class StringCommandHandler(Handler):
         return (isinstance(update, string_types) and update.startswith('/')
                 and update[1:].split(' ')[0] == self.command)
 
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:obj:`str`): An incomming command.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
-
-        """
-
-        optional_args = self.collect_optional_args(dispatcher)
-
+    def collect_optional_args(self, dispatcher, update=None):
+        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher, update)
         if self.pass_args:
             optional_args['args'] = update.split()[1:]
+        return optional_args
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+    def collect_additional_context(self, context, update, dispatcher):
+        if self.pass_args:
+            context.args = update.split()[1:]

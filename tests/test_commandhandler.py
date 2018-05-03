@@ -148,6 +148,8 @@ class TestCommandHandler(object):
 
         message.text = '/test'
         dp.process_update(Update(0, message=message))
+        import time
+        time.sleep(.1)
         assert self.test_flag
 
         self.test_flag = False

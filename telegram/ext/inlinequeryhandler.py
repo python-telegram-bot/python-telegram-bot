@@ -22,7 +22,6 @@ import re
 from future.utils import string_types
 
 from telegram import Update
-from telegram.utils.deprecate import deprecate
 from .handler import Handler
 
 
@@ -89,13 +88,15 @@ class InlineQueryHandler(Handler):
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 use_context=None):
         super(InlineQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            use_context=use_context)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
@@ -123,16 +124,8 @@ class InlineQueryHandler(Handler):
             else:
                 return True
 
-    def handle_update(self, update, dispatcher):
-        """
-        Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-        """
-
-        optional_args = self.collect_optional_args(dispatcher, update)
+    def collect_optional_args(self, dispatcher, update=None):
+        optional_args = super(InlineQueryHandler, self).collect_optional_args(dispatcher, update)
         if self.pattern:
             match = re.match(self.pattern, update.inline_query.query)
 
@@ -140,10 +133,13 @@ class InlineQueryHandler(Handler):
                 optional_args['groups'] = match.groups()
             if self.pass_groupdict:
                 optional_args['groupdict'] = match.groupdict()
+        return optional_args
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+    def collect_additional_context(self, context, update, dispatcher):
+        if self.pattern:
+            match = re.match(self.pattern, update.inline_query.query)
 
-    # old non-PEP8 Handler methods
-    m = "telegram.InlineQueryHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
+            if self.pass_groups:
+                context.groups = match.groups()
+            if self.pass_groupdict:
+                context.groupdict = match.groupdict()

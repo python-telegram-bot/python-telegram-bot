@@ -106,8 +106,8 @@ class RegexHandler(Handler):
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
-                 edited_updates=False
-                 ):
+                 edited_updates=False,
+                 use_context=None):
         if not message_updates and not channel_post_updates and not edited_updates:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')
@@ -120,7 +120,8 @@ class RegexHandler(Handler):
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            use_context=None)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
@@ -153,21 +154,22 @@ class RegexHandler(Handler):
             return bool(match)
         return False
 
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
+    def collect_optional_args(self, dispatcher, update=None):
+        optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update)
+        if self.pattern:
+            match = re.match(self.pattern, update.effective_message.text)
 
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+            if self.pass_groups:
+                optional_args['groups'] = match.groups()
+            if self.pass_groupdict:
+                optional_args['groupdict'] = match.groupdict()
+        return optional_args
 
-        """
+    def collect_additional_context(self, context, update, dispatcher):
+        if self.pattern:
+            match = re.match(self.pattern, update.effective_message.text)
 
-        optional_args = self.collect_optional_args(dispatcher, update)
-        match = re.match(self.pattern, update.effective_message.text)
-
-        if self.pass_groups:
-            optional_args['groups'] = match.groups()
-        if self.pass_groupdict:
-            optional_args['groupdict'] = match.groupdict()
-
-        return self.callback(dispatcher.bot, update, **optional_args)
+            if self.pass_groups:
+                context.groups = match.groups()
+            if self.pass_groupdict:
+                context.groupdict = match.groupdict()

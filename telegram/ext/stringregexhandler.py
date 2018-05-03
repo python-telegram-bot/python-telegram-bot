@@ -75,9 +75,13 @@ class StringRegexHandler(Handler):
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_job_queue=False,
+                 use_contet=None):
         super(StringRegexHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            use_context=use_contet)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
@@ -90,7 +94,7 @@ class StringRegexHandler(Handler):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:obj:`str`): An incomming command.
+            update (:obj:`str`): An incoming command.
 
         Returns:
             :obj:`bool`
@@ -98,20 +102,22 @@ class StringRegexHandler(Handler):
         """
         return isinstance(update, string_types) and bool(re.match(self.pattern, update))
 
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
+    def collect_optional_args(self, dispatcher, update=None):
+        optional_args = super(StringRegexHandler, self).collect_optional_args(dispatcher, update)
+        if self.pattern:
+            match = re.match(self.pattern, update)
 
-        Args:
-            update (:obj:`str`): An incomming command.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
+            if self.pass_groups:
+                optional_args['groups'] = match.groups()
+            if self.pass_groupdict:
+                optional_args['groupdict'] = match.groupdict()
+        return optional_args
 
-        """
-        optional_args = self.collect_optional_args(dispatcher)
-        match = re.match(self.pattern, update)
+    def collect_additional_context(self, context, update, dispatcher):
+        if self.pattern:
+            match = re.match(self.pattern, update)
 
-        if self.pass_groups:
-            optional_args['groups'] = match.groups()
-        if self.pass_groupdict:
-            optional_args['groupdict'] = match.groupdict()
-
-        return self.callback(dispatcher.bot, update, **optional_args)
+            if self.pass_groups:
+                context.groups = match.groups()
+            if self.pass_groupdict:
+                context.groupdict = match.groupdict()

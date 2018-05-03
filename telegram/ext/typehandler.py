@@ -53,10 +53,18 @@ class TypeHandler(Handler):
 
     """
 
-    def __init__(self, type, callback, strict=False, pass_update_queue=False,
-                 pass_job_queue=False):
+    def __init__(self,
+                 type,
+                 callback,
+                 strict=False,
+                 pass_update_queue=False,
+                 pass_job_queue=False,
+                 use_context=None):
         super(TypeHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            use_context=use_context)
         self.type = type
         self.strict = strict
 
@@ -75,15 +83,3 @@ class TypeHandler(Handler):
             return isinstance(update, self.type)
         else:
             return type(update) is self.type
-
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-
-        """
-        optional_args = self.collect_optional_args(dispatcher)
-
-        return self.callback(dispatcher.bot, update, **optional_args)

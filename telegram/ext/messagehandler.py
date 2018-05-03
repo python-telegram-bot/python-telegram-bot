@@ -98,7 +98,8 @@ class MessageHandler(Handler):
                  pass_chat_data=False,
                  message_updates=True,
                  channel_post_updates=True,
-                 edited_updates=False):
+                 edited_updates=False,
+                 use_context=None):
         if not message_updates and not channel_post_updates and not edited_updates:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')
@@ -111,7 +112,8 @@ class MessageHandler(Handler):
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            use_context=use_context)
         self.filters = filters
         self.message_updates = message_updates
         self.channel_post_updates = channel_post_updates
@@ -155,15 +157,3 @@ class MessageHandler(Handler):
             res = False
 
         return res
-
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-
-        """
-        optional_args = self.collect_optional_args(dispatcher, update)
-
-        return self.callback(dispatcher.bot, update, **optional_args)
