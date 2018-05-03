@@ -17,11 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from collections import OrderedDict
+from queue import Queue
 
 import pytest
 
 from telegram import Bot
-from telegram.ext import TypeHandler
+from telegram.ext import TypeHandler, Context, JobQueue
 
 
 class TestTypeHandler(object):
@@ -41,6 +42,15 @@ class TestTypeHandler(object):
 
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
+
+    def callback_context(self, context):
+        self.test_flag = (isinstance(context, Context) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(context.update, dict) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          context.user_data is None and
+                          context.chat_data is None)
 
     def test_basic(self, dp):
         handler = TypeHandler(dict, self.callback_basic)
@@ -80,3 +90,17 @@ class TestTypeHandler(object):
         self.test_flag = False
         dp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
+
+    def test_context(self, dp):
+        handler = TypeHandler(dict, self.callback_context)
+        dp.add_handler(handler)
+
+        dp.process_update({'a': 1, 'b': 2})
+        assert self.test_flag
+
+    def test_not_context(self, dp):
+        handler = TypeHandler(dict, self.callback_context, use_context=False)
+        dp.add_handler(handler)
+
+        dp.process_update({'a': 1, 'b': 2})
+        assert not self.test_flag

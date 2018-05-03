@@ -16,12 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from queue import Queue
 
 import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import RegexHandler
+from telegram.ext import RegexHandler, Context, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -45,7 +46,7 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def message(bot):
-    return Message(1, None, None, None, text='test message', bot=bot)
+    return Message(1, User(1, '', False), None, Chat(1, ''), text='test message', bot=bot)
 
 
 class TestRegexHandler(object):
@@ -77,6 +78,22 @@ class TestRegexHandler(object):
             self.test_flag = groups == ('t', ' message')
         if groupdict is not None:
             self.test_flag = groupdict == {'begin': 't', 'end': ' message'}
+
+    def callback_context(self, context):
+        self.test_flag = (isinstance(context, Context) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(context.update, Update) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          isinstance(context.user_data, dict) and
+                          isinstance(context.chat_data, dict) and
+                          isinstance(context.message, Message))
+
+    def callback_context_pattern(self, context):
+        if context.groups:
+            self.test_flag = context.groups == ('t', ' message')
+        if context.groupdict:
+            self.test_flag = context.groupdict == {'begin': 't', 'end': ' message'}
 
     def test_basic(self, dp, message):
         handler = RegexHandler('.*', self.callback_basic)
@@ -204,3 +221,31 @@ class TestRegexHandler(object):
     def test_other_update_types(self, false_update):
         handler = RegexHandler('.*', self.callback_basic, edited_updates=True)
         assert not handler.check_update(false_update)
+
+    def test_context(self, dp, message):
+        handler = RegexHandler(r'(t)est(.*)', self.callback_context)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=message))
+        assert self.test_flag
+
+    def test_not_context(self, dp, message):
+        handler = RegexHandler(r'(t)est(.*)', self.callback_context, use_context=False)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=message))
+        assert not self.test_flag
+
+    def test_context_pattern(self, dp, message):
+        handler = RegexHandler(r'(t)est(.*)', self.callback_context_pattern)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=message))
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        handler = RegexHandler(r'(t)est(.*)', self.callback_context_pattern)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=message))
+        assert self.test_flag

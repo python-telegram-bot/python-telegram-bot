@@ -16,12 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from queue import Queue
 
 import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import CommandHandler, Filters, BaseFilter
+from telegram.ext import CommandHandler, Filters, BaseFilter, Context, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='test')
 
@@ -48,7 +49,7 @@ def false_update(request):
 
 @pytest.fixture(scope='function')
 def message(bot):
-    return Message(1, None, None, None, bot=bot)
+    return Message(1, User(1, '', False), None, Chat(1, ''), bot=bot)
 
 
 class TestCommandHandler(object):
@@ -82,6 +83,19 @@ class TestCommandHandler(object):
             self.test_flag = len(args) == 0
         else:
             self.test_flag = args == ['one', 'two']
+
+    def callback_context(self, context):
+        self.test_flag = (isinstance(context, Context) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(context.update, Update) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          isinstance(context.user_data, dict) and
+                          isinstance(context.chat_data, dict) and
+                          isinstance(context.message, Message))
+
+    def callback_context_args(self, context):
+        self.test_flag = context.args == ['one', 'two']
 
     def test_basic(self, dp, message):
         handler = CommandHandler('test', self.callback_basic)
@@ -148,8 +162,6 @@ class TestCommandHandler(object):
 
         message.text = '/test'
         dp.process_update(Update(0, message=message))
-        import time
-        time.sleep(.1)
         assert self.test_flag
 
         self.test_flag = False
@@ -267,3 +279,35 @@ class TestCommandHandler(object):
         handler.check_update(Update(0, message=message))
 
         assert not test_filter.tested
+
+    def test_context(self, dp, message):
+        handler = CommandHandler('test', self.callback_context)
+        dp.add_handler(handler)
+
+        message.text = '/test'
+        assert handler.check_update(Update(0, message))
+        dp.process_update(Update(0, message))
+        assert self.test_flag
+
+    def test_not_context(self, dp, message):
+        handler = CommandHandler('test', self.callback_context, use_context=False)
+        dp.add_handler(handler)
+
+        message.text = '/test'
+        assert handler.check_update(Update(0, message))
+        dp.process_update(Update(0, message))
+        assert not self.test_flag
+
+    def test_context_args(self, dp, message):
+        handler = CommandHandler('test', self.callback_context_args)
+        dp.add_handler(handler)
+
+        message.text = '/test'
+        assert handler.check_update(Update(0, message))
+        dp.process_update(Update(0, message))
+        assert not self.test_flag
+
+        message.text = '/test one two'
+        assert handler.check_update(Update(0, message))
+        dp.process_update(Update(0, message))
+        assert self.test_flag

@@ -16,12 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from queue import Queue
 
 import pytest
 
 from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, CallbackQuery,
                       InlineQuery, ShippingQuery, PreCheckoutQuery, ShippingAddress)
-from telegram.ext import ShippingQueryHandler
+from telegram.ext import ShippingQueryHandler, Context, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -78,6 +79,16 @@ class TestShippingQueryHandler(object):
 
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
+
+    def callback_context(self, context):
+        self.test_flag = (isinstance(context, Context) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(context.update, Update) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          isinstance(context.user_data, dict) and
+                          context.chat_data is None and
+                          isinstance(context.shipping_query, ShippingQuery))
 
     def test_basic(self, dp, shiping_query):
         handler = ShippingQueryHandler(self.callback_basic)
@@ -138,3 +149,17 @@ class TestShippingQueryHandler(object):
     def test_other_update_types(self, false_update):
         handler = ShippingQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)
+
+    def test_context(self, dp, shiping_query):
+        handler = ShippingQueryHandler(self.callback_context)
+        dp.add_handler(handler)
+
+        dp.process_update(shiping_query)
+        assert self.test_flag
+
+    def test_not_context(self, dp, shiping_query):
+        handler = ShippingQueryHandler(self.callback_context, use_context=False)
+        dp.add_handler(handler)
+
+        dp.process_update(shiping_query)
+        assert not self.test_flag

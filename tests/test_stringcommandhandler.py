@@ -16,11 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from queue import Queue
+
 import pytest
 
 from telegram import (Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import StringCommandHandler
+from telegram.ext import StringCommandHandler, Context, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -70,6 +72,18 @@ class TestStringCommandHandler(object):
             self.test_flag = len(args) == 0
         else:
             self.test_flag = args == ['one', 'two']
+
+    def callback_context(self, context):
+        self.test_flag = (isinstance(context, Context) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(context.update, str) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          context.user_data is None and
+                          context.chat_data is None)
+
+    def callback_context_args(self, context):
+        self.test_flag = context.args == ['one', 'two']
 
     def test_basic(self, dp):
         handler = StringCommandHandler('test', self.callback_basic)
@@ -121,3 +135,27 @@ class TestStringCommandHandler(object):
     def test_other_update_types(self, false_update):
         handler = StringCommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)
+
+    def test_context(self, dp):
+        handler = StringCommandHandler('test', self.callback_context)
+        dp.add_handler(handler)
+
+        dp.process_update('/test')
+        assert self.test_flag
+
+    def test_not_context(self, dp):
+        handler = StringCommandHandler('test', self.callback_context, use_context=False)
+        dp.add_handler(handler)
+
+        dp.process_update('/test')
+        assert not self.test_flag
+
+    def test_context_args(self, dp):
+        handler = StringCommandHandler('test', self.callback_context_args)
+        dp.add_handler(handler)
+
+        dp.process_update('/test')
+        assert not self.test_flag
+
+        dp.process_update('/test one two')
+        assert self.test_flag
