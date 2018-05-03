@@ -23,7 +23,7 @@ import sys
 from functools import partial
 from queue import Queue
 from random import randrange
-from threading import Thread
+from threading import Thread, Event
 from time import sleep
 
 try:
@@ -38,7 +38,7 @@ import pytest
 from future.builtins import bytes
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
-from telegram.error import Unauthorized, InvalidToken
+from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
 from telegram.ext import Updater
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
@@ -58,31 +58,94 @@ class TestUpdater(object):
     message_count = 0
     received = None
     attempts = 0
+    err_handler_called = Event()
+    cb_handler_called = Event()
 
     @pytest.fixture(autouse=True)
     def reset(self):
         self.message_count = 0
         self.received = None
         self.attempts = 0
+        self.err_handler_called.clear()
+        self.cb_handler_called.clear()
 
     def error_handler(self, bot, update, error):
         self.received = error.message
+        self.err_handler_called.set()
 
     def callback(self, bot, update):
         self.received = update.message.text
+        self.cb_handler_called.set()
 
-    # TODO: test clean= argument
+    # TODO: test clean= argument of Updater._bootstrap
 
-    def test_error_on_get_updates(self, monkeypatch, updater):
+    @pytest.mark.parametrize(('error',),
+                             argvalues=[(TelegramError('Test Error 2'),),
+                                        (Unauthorized('Test Unauthorized'),)],
+                             ids=('TelegramError', 'Unauthorized'))
+    def test_get_updates_normal_err(self, monkeypatch, updater, error):
         def test(*args, **kwargs):
-            raise TelegramError('Test Error 2')
+            raise error
 
         monkeypatch.setattr('telegram.Bot.get_updates', test)
         monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
         updater.dispatcher.add_error_handler(self.error_handler)
         updater.start_polling(0.01)
-        sleep(.1)
-        assert self.received == 'Test Error 2'
+
+        # Make sure that the error handler was called
+        self.err_handler_called.wait()
+        assert self.received == error.message
+
+        # Make sure that Updater polling thread keeps running
+        self.err_handler_called.clear()
+        self.err_handler_called.wait()
+
+    def test_get_updates_bailout_err(self, monkeypatch, updater, caplog):
+        error = InvalidToken()
+
+        def test(*args, **kwargs):
+            raise error
+
+        with caplog.at_level(logging.DEBUG):
+            monkeypatch.setattr('telegram.Bot.get_updates', test)
+            monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+            updater.dispatcher.add_error_handler(self.error_handler)
+            updater.start_polling(0.01)
+            assert self.err_handler_called.wait(0.5) is not True
+
+        # NOTE: This test might hit a race condition and fail (though the 0.5 seconds delay above
+        #       should work around it).
+        # NOTE: Checking Updater.running is problematic because it is not set to False when there's
+        #       an unhandled exception.
+        # TODO: We should have a way to poll Updater status and decide if it's running or not.
+        assert any('unhandled exception in updater' in rec.getMessage() for rec in
+                   caplog.get_records('call'))
+
+    @pytest.mark.parametrize(('error',),
+                             argvalues=[(RetryAfter(0.01),),
+                                        (TimedOut(),)],
+                             ids=('RetryAfter', 'TimedOut'))
+    def test_get_updates_retries(self, monkeypatch, updater, error):
+        event = Event()
+
+        def test(*args, **kwargs):
+            event.set()
+            raise error
+
+        monkeypatch.setattr('telegram.Bot.get_updates', test)
+        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        updater.dispatcher.add_error_handler(self.error_handler)
+        updater.start_polling(0.01)
+
+        # Make sure that get_updates was called, but not the error handler
+        event.wait()
+        assert self.err_handler_called.wait(0.5) is not True
+        assert self.received != error.message
+
+        # Make sure that Updater polling thread keeps running
+        event.clear()
+        event.wait()
+        assert self.err_handler_called.wait(0.5) is not True
 
     def test_webhook(self, monkeypatch, updater):
         q = Queue()
@@ -145,17 +208,21 @@ class TestUpdater(object):
         sleep(.2)
         assert q.get(False) == update
 
-    def test_bootstrap_retries_success(self, monkeypatch, updater):
+    @pytest.mark.parametrize(('error',),
+                             argvalues=[(TelegramError(''),)],
+                             ids=('TelegramError',))
+    def test_bootstrap_retries_success(self, monkeypatch, updater, error):
         retries = 2
 
         def attempt(_, *args, **kwargs):
             if self.attempts < retries:
                 self.attempts += 1
-                raise TelegramError('')
+                raise error
 
         monkeypatch.setattr('telegram.Bot.set_webhook', attempt)
 
-        updater._bootstrap(retries, False, 'path', None)
+        updater.running = True
+        updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == retries
 
     @pytest.mark.parametrize(('error', 'attempts'),
@@ -172,8 +239,9 @@ class TestUpdater(object):
 
         monkeypatch.setattr('telegram.Bot.set_webhook', attempt)
 
+        updater.running = True
         with pytest.raises(type(error)):
-            updater._bootstrap(retries, False, 'path', None)
+            updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
     def test_webhook_invalid_posts(self, updater):

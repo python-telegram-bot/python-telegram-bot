@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Filters for use with the MessageHandler class."""
+
+import re
 from telegram import Chat
 from future.utils import string_types
 
@@ -171,6 +173,33 @@ class Filters(object):
     command = _Command()
     """:obj:`Filter`: Messages starting with ``/``."""
 
+    class regex(BaseFilter):
+        """
+        Filters updates by searching for an occurence of ``pattern`` in the message text.
+        The ``re.search`` function is used to determine whether an update should be filtered.
+        Refer to the documentation of the ``re`` module for more information.
+
+        Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
+        but this will probably be implemented in a future update, gradually phasing out the
+        RegexHandler (see https://github.com/python-telegram-bot/python-telegram-bot/issues/835).
+
+        Examples:
+            Example ``CommandHandler("start", deep_linked_callback, Filters.regex('parameter'))``
+
+        Args:
+            pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        """
+
+        def __init__(self, pattern):
+            self.pattern = re.compile(pattern)
+            self.name = 'Filters.regex({})'.format(self.pattern)
+
+        # TODO: Once the callback revamp (#1026) is done, the regex filter should be able to pass
+        # the matched groups and groupdict to the context object.
+
+        def filter(self, message):
+            return bool(self.pattern.search(message.text))
+
     class _Reply(BaseFilter):
         name = 'Filters.reply'
 
@@ -191,6 +220,79 @@ class Filters(object):
 
     class _Document(BaseFilter):
         name = 'Filters.document'
+
+        class category(BaseFilter):
+            """This Filter filters documents by their category in the mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of the document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.category('audio/') returnes `True` for all types
+                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
+            """
+
+            def __init__(self, category):
+                """Initialize the category you want to filter
+
+                Args:
+                    category (str, optional): category of the media you want to filter"""
+                self.category = category
+                self.name = "Filters.document.category('{}')".format(self.category)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type.startswith(self.category)
+
+        application = category('application/')
+        audio = category('audio/')
+        image = category('image/')
+        video = category('video/')
+        text = category('text/')
+
+        class mime_type(BaseFilter):
+            """This Filter filters documents by their mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.mime_type('audio/mpeg') filters all audio in mp3 format.
+            """
+
+            def __init__(self, mimetype):
+                """Initialize the category you want to filter
+
+                Args:
+                    filetype (str, optional): mime_type of the media you want to filter"""
+                self.mimetype = mimetype
+                self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type == self.mimetype
+
+        apk = mime_type('application/vnd.android.package-archive')
+        doc = mime_type('application/msword')
+        docx = mime_type('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        exe = mime_type('application/x-ms-dos-executable')
+        gif = mime_type('video/mp4')
+        jpg = mime_type('image/jpeg')
+        mp3 = mime_type('audio/mpeg')
+        pdf = mime_type('application/pdf')
+        py = mime_type('text/x-python')
+        svg = mime_type('image/svg+xml')
+        txt = mime_type('text/plain')
+        targz = mime_type('application/x-compressed-tar')
+        wav = mime_type('audio/x-wav')
+        xml = mime_type('application/xml')
+        zip = mime_type('application/zip')
 
         def filter(self, message):
             return bool(message.document)
@@ -233,6 +335,15 @@ class Filters(object):
 
     voice = _Voice()
     """:obj:`Filter`: Messages that contain :class:`telegram.Voice`."""
+
+    class _VideoNote(BaseFilter):
+        name = 'Filters.video_note'
+
+        def filter(self, message):
+            return bool(message.video_note)
+
+    video_note = _VideoNote()
+    """:obj:`Filter`: Messages that contain :class:`telegram.VideoNote`."""
 
     class _Contact(BaseFilter):
         name = 'Filters.contact'
@@ -277,7 +388,7 @@ class Filters(object):
                 return bool(message.new_chat_members)
 
         new_chat_members = _NewChatMembers()
-        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_member`."""
+        """:obj:`Filter`: Messages that contain :attr:`telegram.Message.new_chat_members`."""
 
         class _LeftChatMember(BaseFilter):
             name = 'Filters.status_update.left_chat_member'
@@ -368,7 +479,7 @@ class Filters(object):
     """Subset for messages containing a status update.
 
     Examples:
-        Use these filters like: ``Filters.status_update.new_chat_member`` etc. Or use just
+        Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
         ``Filters.status_update`` for all status update messages.
 
     Attributes:
@@ -384,7 +495,7 @@ class Filters(object):
             :attr:`telegram.Message.migrate_from_chat_id` or
             :attr: `telegram.Message.migrate_from_chat_id`.
         new_chat_members (:obj:`Filter`): Messages that contain
-            :attr:`telegram.Message.new_chat_member`.
+            :attr:`telegram.Message.new_chat_members`.
         new_chat_photo (:obj:`Filter`): Messages that contain
             :attr:`telegram.Message.new_chat_photo`.
         new_chat_title (:obj:`Filter`): Messages that contain
@@ -430,7 +541,28 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
-            return any([entity.type == self.entity_type for entity in message.entities])
+            return any(entity.type == self.entity_type for entity in message.entities)
+
+    class caption_entity(BaseFilter):
+        """
+        Filters media messages to only allow those which have a :class:`telegram.MessageEntity`
+        where their `type` matches `entity_type`.
+
+        Examples:
+            Example ``MessageHandler(Filters.caption_entity("hashtag"), callback_method)``
+
+        Args:
+            entity_type: Caption Entity type to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        """
+
+        def __init__(self, entity_type):
+            self.entity_type = entity_type
+            self.name = 'Filters.caption_entity({})'.format(self.entity_type)
+
+        def filter(self, message):
+            return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
         name = 'Filters.private'

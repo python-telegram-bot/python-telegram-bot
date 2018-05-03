@@ -19,13 +19,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Message."""
 import sys
+from html import escape
 
 from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
                       User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
                       VideoNote)
 from telegram import ParseMode
-from telegram.utils.deprecate import warn_deprecate_obj
-from telegram.utils.helpers import escape_html, escape_markdown, to_timestamp, from_timestamp
+from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
 _UNDEFINED = object()
 
@@ -98,9 +98,6 @@ class Message(TelegramObject):
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-
-    Deprecated: 6.0
-        new_chat_member (:class:`telegram.User`): Replaced with :attr:`new_chat_members`
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -234,7 +231,6 @@ class Message(TelegramObject):
                  contact=None,
                  location=None,
                  venue=None,
-                 new_chat_member=None,
                  left_chat_member=None,
                  new_chat_title=None,
                  new_chat_photo=None,
@@ -279,7 +275,6 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self._new_chat_member = new_chat_member
         self.new_chat_members = new_chat_members or list()
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
@@ -336,7 +331,6 @@ class Message(TelegramObject):
         data['contact'] = Contact.de_json(data.get('contact'), bot)
         data['location'] = Location.de_json(data.get('location'), bot)
         data['venue'] = Venue.de_json(data.get('venue'), bot)
-        data['new_chat_member'] = User.de_json(data.get('new_chat_member'), bot)
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
@@ -401,7 +395,6 @@ class Message(TelegramObject):
             data['caption_entities'] = [e.to_dict() for e in self.caption_entities]
         if self.new_chat_photo:
             data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
-        data['new_chat_member'] = data.pop('_new_chat_member', None)
         if self.new_chat_members:
             data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
 
@@ -873,9 +866,11 @@ class Message(TelegramObject):
             for entity in self.caption_entities if entity.type in types
         }
 
-    def _text_html(self, urled=False):
-        entities = self.parse_entities()
-        message_text = self.text
+    @staticmethod
+    def _parse_html(message_text, entities, urled=False):
+        if message_text is None:
+            return None
+
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -883,7 +878,7 @@ class Message(TelegramObject):
         last_offset = 0
 
         for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            text = escape_html(text)
+            text = escape(text)
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
@@ -901,17 +896,17 @@ class Message(TelegramObject):
                 insert = text
 
             if sys.maxunicode == 0xffff:
-                html_text += escape_html(message_text[last_offset:entity.offset]) + insert
+                html_text += escape(message_text[last_offset:entity.offset]) + insert
             else:
-                html_text += escape_html(message_text[last_offset * 2:entity.offset * 2]
-                                         .decode('utf-16-le')) + insert
+                html_text += escape(message_text[last_offset * 2:entity.offset * 2]
+                                    .decode('utf-16-le')) + insert
 
             last_offset = entity.offset + entity.length
 
         if sys.maxunicode == 0xffff:
-            html_text += escape_html(message_text[last_offset:])
+            html_text += escape(message_text[last_offset:])
         else:
-            html_text += escape_html(message_text[last_offset * 2:].decode('utf-16-le'))
+            html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
         return html_text
 
     @property
@@ -925,7 +920,7 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as HTML.
 
         """
-        return self._text_html(urled=False)
+        return self._parse_html(self.text, self.parse_entities(), urled=False)
 
     @property
     def text_html_urled(self):
@@ -938,11 +933,41 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as HTML.
 
         """
-        return self._text_html(urled=True)
+        return self._parse_html(self.text, self.parse_entities(), urled=True)
 
-    def _text_markdown(self, urled=False):
-        entities = self.parse_entities()
-        message_text = self.text
+    @property
+    def caption_html(self):
+        """Creates an HTML-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        HTML in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message caption with captionentities formatted as HTML.
+
+        """
+        return self._parse_html(self.caption, self.parse_caption_entities(), urled=False)
+
+    @property
+    def caption_html_urled(self):
+        """Creates an HTML-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as HTML.
+
+        """
+        return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
+
+    @staticmethod
+    def _parse_markdown(message_text, entities, urled=False):
+        if message_text is None:
+            return None
+
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -991,7 +1016,7 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as Markdown.
 
         """
-        return self._text_markdown(urled=False)
+        return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
     @property
     def text_markdown_urled(self):
@@ -1004,10 +1029,32 @@ class Message(TelegramObject):
             :obj:`str`: Message text with entities formatted as Markdown.
 
         """
-        return self._text_markdown(urled=True)
+        return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
     @property
-    def new_chat_member(self):
-        """Deprecated"""
-        warn_deprecate_obj('new_chat_member', 'new_chat_members')
-        return self._new_chat_member
+    def caption_markdown(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
+
+    @property
+    def caption_markdown_urled(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)

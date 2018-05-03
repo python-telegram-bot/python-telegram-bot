@@ -20,7 +20,6 @@
 
 import logging
 import time
-import warnings
 import datetime
 import weakref
 from numbers import Number
@@ -43,16 +42,9 @@ class JobQueue(object):
     Args:
         bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
 
-    Deprecated:
-        prevent_autostart (:obj:`bool`, optional): Thread does not start during initialisation.
-        Use `start` method instead.
-
     """
 
-    def __init__(self, bot, prevent_autostart=None):
-        if prevent_autostart is not None:
-            warnings.warn("prevent_autostart is being deprecated, use `start` method instead.")
-
+    def __init__(self, bot):
         self._queue = PriorityQueue()
         self.bot = bot
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -62,37 +54,6 @@ class JobQueue(object):
         self.__thread = None
         self._next_peek = None
         self._running = False
-
-    def put(self, job, next_t=None):
-        """Queue a new job.
-
-        Note:
-            This method is deprecated. Please use: :attr:`run_once`, :attr:`run_daily`
-            or :attr:`run_repeating` instead.
-
-        Args:
-            job (:class:`telegram.ext.Job`): The ``Job`` instance representing the new job.
-            next_t (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                       \
-                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
-                Time in or at which the job should run for the first time. This parameter will
-                be interpreted depending on its type.
-
-                * :obj:`int` or :obj:`float` will be interpreted as "seconds from now" in which the
-                  job should run.
-                * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
-                  job should run.
-                * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
-                * :obj:`datetime.time` will be interpreted as a specific time at which the job
-                  should run. This could be either today or, if the time has already passed,
-                  tomorrow.
-
-        """
-        warnings.warn("'JobQueue.put' is being deprecated, use 'JobQueue.run_once', "
-                      "'JobQueue.run_daily' or 'JobQueue.run_repeating' instead")
-        if job.job_queue is None:
-            job.job_queue = self
-        self._put(job, next_t=next_t)
 
     def _put(self, job, next_t=None, last_t=None):
         if next_t is None:

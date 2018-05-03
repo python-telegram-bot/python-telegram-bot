@@ -70,7 +70,9 @@ class InputFile(object):
             self.input_file_content = self.input_file.read()
             if 'filename' in data:
                 self.filename = self.data.pop('filename')
-            elif hasattr(self.input_file, 'name'):
+            elif (hasattr(self.input_file, 'name') and
+                  not isinstance(self.input_file.name, int) and  # py3
+                  self.input_file.name != '<fdopen>'):  # py2
                 # on py2.7, pylint fails to understand this properly
                 # pylint: disable=E1101
                 self.filename = os.path.basename(self.input_file.name)
@@ -85,6 +87,10 @@ class InputFile(object):
                         self.filename)[0] or DEFAULT_MIME_TYPE
                 else:
                     self.mimetype = DEFAULT_MIME_TYPE
+
+        if sys.version_info < (3,):
+            if isinstance(self.filename, unicode):  # flake8: noqa  pylint: disable=E0602
+                self.filename = self.filename.encode('utf-8', 'replace')
 
     @property
     def headers(self):

@@ -17,16 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions."""
+from html import escape
 
 import re
 import signal
 from datetime import datetime
-
-try:
-    from html import escape as escape_html  # noqa: F401
-except ImportError:
-    from cgi import escape as escape_html  # noqa: F401
-
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
 _signames = {v: k
@@ -99,7 +94,7 @@ def mention_html(user_id, name):
         :obj:`str`: The inline mention for the user as html.
     """
     if isinstance(user_id, int):
-        return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape_html(name))
+        return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
 def mention_markdown(user_id, name):

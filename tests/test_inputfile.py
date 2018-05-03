@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
@@ -16,5 +17,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
+import subprocess
+import sys
 
-__version__ = '10.0.2'
+from telegram import InputFile
+
+
+class TestInputFile(object):
+    png = os.path.join('tests', 'data', 'game.png')
+
+    def test_subprocess_pipe(self):
+        if sys.platform == 'win32':
+            cmd = ['type', self.png]
+        else:
+            cmd = ['cat', self.png]
+
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == 'win32'))
+        in_file = InputFile({'photo': proc.stdout})
+
+        assert in_file.input_file_content == open(self.png, 'rb').read()
+        assert in_file.mimetype == 'image/png'
+        assert in_file.filename == 'image.png'
+
+        proc.kill()

@@ -88,7 +88,7 @@ class User(TelegramObject):
 
         """
         if self.last_name:
-            return '{} {}'.format(self.first_name, self.last_name)
+            return u'{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
     @classmethod
@@ -150,7 +150,7 @@ class User(TelegramObject):
     def send_message(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_message(User.chat_id, *args, **kwargs)
+            bot.send_message(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -158,12 +158,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_message(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_message(self.id, *args, **kwargs)
 
     def send_photo(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_photo(User.chat_id, *args, **kwargs)
+            bot.send_photo(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -171,12 +171,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_photo(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_photo(self.id, *args, **kwargs)
 
     def send_audio(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_audio(User.chat_id, *args, **kwargs)
+            bot.send_audio(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -184,12 +184,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_audio(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_audio(self.id, *args, **kwargs)
 
     def send_document(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_document(User.chat_id, *args, **kwargs)
+            bot.send_document(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -197,12 +197,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_document(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_document(self.id, *args, **kwargs)
 
     def send_sticker(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_sticker(User.chat_id, *args, **kwargs)
+            bot.send_sticker(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -210,12 +210,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_sticker(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_sticker(self.id, *args, **kwargs)
 
     def send_video(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video(User.chat_id, *args, **kwargs)
+            bot.send_video(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -223,12 +223,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_video(self.id, *args, **kwargs)
 
     def send_video_note(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video_note(User.chat_id, *args, **kwargs)
+            bot.send_video_note(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -236,12 +236,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video_note(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_video_note(self.id, *args, **kwargs)
 
     def send_voice(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_voice(User.chat_id, *args, **kwargs)
+            bot.send_voice(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -249,4 +249,4 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_voice(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_voice(self.id, *args, **kwargs)

@@ -27,7 +27,20 @@ logger.addHandler(logging.NullHandler())
 
 
 class Promise(object):
-    """A simple Promise implementation for the run_async decorator."""
+    """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
+
+    Args:
+        pooled_function (:obj:`callable`): The callable that will be called concurrently.
+        args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
+        kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
+
+    Attributes:
+        pooled_function (:obj:`callable`): The callable that will be called concurrently.
+        args (:obj:`list` | :obj:`tuple`): Positional arguments for :attr:`pooled_function`.
+        kwargs (:obj:`dict`): Keyword arguments for :attr:`pooled_function`.
+        done (:obj:`threading.Event`): Is set when the result is available.
+
+    """
 
     def __init__(self, pooled_function, args, kwargs):
         self.pooled_function = pooled_function
@@ -38,6 +51,8 @@ class Promise(object):
         self._exception = None
 
     def run(self):
+        """Calls the :attr:`pooled_function` callable."""
+
         try:
             self._result = self.pooled_function(*self.args, **self.kwargs)
 
@@ -52,6 +67,19 @@ class Promise(object):
         self.run()
 
     def result(self, timeout=None):
+        """Return the result of the ``Promise``.
+
+        Args:
+            timeout (:obj:`float`, optional): Maximum time in seconds to wait for the result to be
+                calculated. ``None`` means indefinite. Default is ``None``.
+
+        Returns:
+            Returns the return value of :attr:`pooled_function` or ``None`` if the ``timeout``
+            expires.
+
+        Raises:
+            Any exception raised by :attr:`pooled_function`.
+        """
         self.done.wait(timeout=timeout)
         if self._exception is not None:
             raise self._exception  # pylint: disable=raising-bad-type
@@ -59,4 +87,6 @@ class Promise(object):
 
     @property
     def exception(self):
+        """The exception raised by :attr:`pooled_function` or ``None`` if no exception has been
+        raised (yet)."""
         return self._exception
