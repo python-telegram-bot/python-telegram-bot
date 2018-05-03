@@ -99,10 +99,10 @@ class Handler(object):
                 self.use_context = len(parameters) == 1
             elif has_full_argspec:
                 argspec = inspect.getfullargspec(callback)
-                self.use_context = len(argspec.args) == 2 if inspect.ismethod(callback) else 1
+                self.use_context = len(argspec.args) == (2 if inspect.ismethod(callback) else 1)
             else:
                 argspec = inspect.getargspec(callback)
-                self.use_context = len(argspec.args) == 2 if inspect.ismethod(callback) else 1
+                self.use_context = len(argspec.args) == (2 if inspect.ismethod(callback) else 1)
 
     def check_update(self, update):
         """
