@@ -49,12 +49,19 @@ class CommandHandler(Handler):
             the callback function.
         pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
             the callback function.
+        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
+
+    Note:
+        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
+        function will receive a :class:`telegram.ext.Context` object as the only parameter,
+        instead of the usual (bot, update, others...).
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -84,6 +91,10 @@ class CommandHandler(Handler):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+        use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
+            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
+            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
 
     """
 

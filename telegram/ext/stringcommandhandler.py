@@ -39,6 +39,13 @@ class StringCommandHandler(Handler):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
             the callback function.
+        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+
+    Note:
+        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
+        function will receive a :class:`telegram.ext.Context` object as the only parameter,
+        instead of the usual (bot, update, others...).
 
 
     Args:
@@ -58,6 +65,10 @@ class StringCommandHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+        use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
+            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
+            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
 
     """
 

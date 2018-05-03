@@ -47,12 +47,19 @@ class MessageHandler(Handler):
             Default is ``False``.
         allow_edited (:obj:`bool`): Optional. If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
+        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
+
+    Note:
+        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
+        function will receive a :class:`telegram.ext.Context` object as the only parameter,
+        instead of the usual (bot, update, others...).
 
     Args:
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
@@ -82,6 +89,10 @@ class MessageHandler(Handler):
             is ``False``.
         allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
+        use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
+            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
+            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
 
     Raises:
         ValueError
