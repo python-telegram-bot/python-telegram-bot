@@ -102,9 +102,6 @@ class Bot(TelegramObject):
         request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.request.Request`.
 
-    Note:
-        Although not documented separately here, the ``Bot`` class also supports the original
-        camelCase named methods for all API methods. So :attr:`get_me` is equal to ``getMe``.
     """
 
     def __init__(self, token, base_url=None, base_file_url=None, request=None):
