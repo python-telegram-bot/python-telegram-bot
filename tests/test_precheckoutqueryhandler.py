@@ -22,7 +22,8 @@ import pytest
 
 from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, CallbackQuery,
                       InlineQuery, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import PreCheckoutQueryHandler, Context, JobQueue
+from telegram.ext import PreCheckoutQueryHandler, HandlerContext, JobQueue
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -79,18 +80,18 @@ class TestPreCheckoutQueryHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def callback_context(self, context):
-        self.test_flag = (isinstance(context, Context) and
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, HandlerContext) and
                           isinstance(context.bot, Bot) and
-                          isinstance(context.update, Update) and
+                          isinstance(update, Update) and
                           isinstance(context.update_queue, Queue) and
                           isinstance(context.job_queue, JobQueue) and
                           isinstance(context.user_data, dict) and
                           context.chat_data is None and
-                          isinstance(context.pre_checkout_query, PreCheckoutQuery))
+                          isinstance(update.pre_checkout_query, PreCheckoutQuery))
 
     def test_basic(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_basic)
+        handler = PreCheckoutQueryHandler(self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         assert handler.check_update(pre_checkout_query)
@@ -98,14 +99,16 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_data_1, pass_user_data=True)
+        handler = PreCheckoutQueryHandler(self.callback_data_1, use_context=False,
+                                          pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_data_1, pass_chat_data=True)
+        handler = PreCheckoutQueryHandler(self.callback_data_1, use_context=False,
+                                          pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -113,7 +116,8 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_data_2, pass_chat_data=True,
+        handler = PreCheckoutQueryHandler(self.callback_data_2, use_context=False,
+                                          pass_chat_data=True,
                                           pass_user_data=True)
         dp.add_handler(handler)
 
@@ -122,14 +126,16 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_queue_1, pass_job_queue=True)
+        handler = PreCheckoutQueryHandler(self.callback_queue_1, use_context=False,
+                                          pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_queue_1, pass_update_queue=True)
+        handler = PreCheckoutQueryHandler(self.callback_queue_1, use_context=False,
+                                          pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -137,7 +143,8 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_queue_2, pass_job_queue=True,
+        handler = PreCheckoutQueryHandler(self.callback_queue_2, use_context=False,
+                                          pass_job_queue=True,
                                           pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -146,19 +153,16 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = PreCheckoutQueryHandler(self.callback_basic)
+        handler = PreCheckoutQueryHandler(self.callback_basic, use_context=False)
         assert not handler.check_update(false_update)
 
     def test_context(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_context)
+        handler = PreCheckoutQueryHandler(self.callback_context, use_context=True)
         dp.add_handler(handler)
 
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 
-    def test_not_context(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_context, use_context=False)
-        dp.add_handler(handler)
-
-        dp.process_update(pre_checkout_query)
-        assert not self.test_flag
+    def test_non_context_deprecation(self, dp):
+        with pytest.warns(TelegramDeprecationWarning):
+            PreCheckoutQueryHandler(self.callback_context)

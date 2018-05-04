@@ -22,7 +22,8 @@ from queue import Queue
 import pytest
 
 from telegram import Bot
-from telegram.ext import TypeHandler, Context, JobQueue
+from telegram.ext import TypeHandler, HandlerContext, JobQueue
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class TestTypeHandler(object):
@@ -43,17 +44,17 @@ class TestTypeHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def callback_context(self, context):
-        self.test_flag = (isinstance(context, Context) and
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, HandlerContext) and
                           isinstance(context.bot, Bot) and
-                          isinstance(context.update, dict) and
+                          isinstance(update, dict) and
                           isinstance(context.update_queue, Queue) and
                           isinstance(context.job_queue, JobQueue) and
                           context.user_data is None and
                           context.chat_data is None)
 
     def test_basic(self, dp):
-        handler = TypeHandler(dict, self.callback_basic)
+        handler = TypeHandler(dict, self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         assert handler.check_update({'a': 1, 'b': 2})
@@ -62,20 +63,21 @@ class TestTypeHandler(object):
         assert self.test_flag
 
     def test_strict(self):
-        handler = TypeHandler(dict, self.callback_basic, strict=True)
+        handler = TypeHandler(dict, self.callback_basic, use_context=False, strict=True)
         o = OrderedDict({'a': 1, 'b': 2})
         assert handler.check_update({'a': 1, 'b': 2})
         assert not handler.check_update(o)
 
     def test_pass_job_or_update_queue(self, dp):
-        handler = TypeHandler(dict, self.callback_queue_1, pass_job_queue=True)
+        handler = TypeHandler(dict, self.callback_queue_1, use_context=False, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.callback_queue_1, pass_update_queue=True)
+        handler = TypeHandler(dict, self.callback_queue_1, use_context=False,
+                              pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -83,7 +85,7 @@ class TestTypeHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.callback_queue_2, pass_job_queue=True,
+        handler = TypeHandler(dict, self.callback_queue_2, use_context=False, pass_job_queue=True,
                               pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -92,15 +94,12 @@ class TestTypeHandler(object):
         assert self.test_flag
 
     def test_context(self, dp):
-        handler = TypeHandler(dict, self.callback_context)
+        handler = TypeHandler(dict, self.callback_context, use_context=True)
         dp.add_handler(handler)
 
         dp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
 
-    def test_not_context(self, dp):
-        handler = TypeHandler(dict, self.callback_context, use_context=False)
-        dp.add_handler(handler)
-
-        dp.process_update({'a': 1, 'b': 2})
-        assert not self.test_flag
+    def test_non_context_deprecation(self, dp):
+        with pytest.warns(TelegramDeprecationWarning):
+            TypeHandler(dict, self.callback_context)

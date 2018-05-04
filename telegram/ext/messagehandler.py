@@ -55,11 +55,8 @@ class MessageHandler(Handler):
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
-
-    Note:
-        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
-        function will receive a :class:`telegram.ext.Context` object as the only parameter,
-        instead of the usual (bot, update, others...).
+        Note that this is deprecated, please switch to context based handlers. See
+        https://git.io/vpVe8 for more info.
 
     Args:
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
@@ -73,14 +70,18 @@ class MessageHandler(Handler):
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         message_updates (:obj:`bool`, optional): Should "normal" message updates be handled?
             Default is ``True``.
         channel_post_updates (:obj:`bool`, optional): Should channel posts updates be handled?
@@ -91,8 +92,7 @@ class MessageHandler(Handler):
             Default is ``False`` - Deprecated. use edited_updates instead.
         use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
-            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
+            Defaults to ``False`` for while the old `pass_` method is in deprecation.
 
     Raises:
         ValueError
@@ -155,16 +155,11 @@ class MessageHandler(Handler):
         if isinstance(update, Update) and self._is_allowed_update(update):
 
             if not self.filters:
-                res = True
+                return True
 
             else:
                 message = update.effective_message
                 if isinstance(self.filters, list):
-                    res = any(func(message) for func in self.filters)
+                    return any(func(message) for func in self.filters)
                 else:
-                    res = self.filters(message)
-
-        else:
-            res = False
-
-        return res
+                    return self.filters(message)

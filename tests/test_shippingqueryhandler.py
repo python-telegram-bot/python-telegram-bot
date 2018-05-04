@@ -22,7 +22,8 @@ import pytest
 
 from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, CallbackQuery,
                       InlineQuery, ShippingQuery, PreCheckoutQuery, ShippingAddress)
-from telegram.ext import ShippingQueryHandler, Context, JobQueue
+from telegram.ext import ShippingQueryHandler, HandlerContext, JobQueue
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -80,18 +81,18 @@ class TestShippingQueryHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def callback_context(self, context):
-        self.test_flag = (isinstance(context, Context) and
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, HandlerContext) and
                           isinstance(context.bot, Bot) and
-                          isinstance(context.update, Update) and
+                          isinstance(update, Update) and
                           isinstance(context.update_queue, Queue) and
                           isinstance(context.job_queue, JobQueue) and
                           isinstance(context.user_data, dict) and
                           context.chat_data is None and
-                          isinstance(context.shipping_query, ShippingQuery))
+                          isinstance(update.shipping_query, ShippingQuery))
 
     def test_basic(self, dp, shiping_query):
-        handler = ShippingQueryHandler(self.callback_basic)
+        handler = ShippingQueryHandler(self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         assert handler.check_update(shiping_query)
@@ -99,14 +100,16 @@ class TestShippingQueryHandler(object):
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, shiping_query):
-        handler = ShippingQueryHandler(self.callback_data_1, pass_user_data=True)
+        handler = ShippingQueryHandler(self.callback_data_1, use_context=False,
+                                       pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(shiping_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ShippingQueryHandler(self.callback_data_1, pass_chat_data=True)
+        handler = ShippingQueryHandler(self.callback_data_1, use_context=False,
+                                       pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -114,7 +117,8 @@ class TestShippingQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ShippingQueryHandler(self.callback_data_2, pass_chat_data=True,
+        handler = ShippingQueryHandler(self.callback_data_2, use_context=False,
+                                       pass_chat_data=True,
                                        pass_user_data=True)
         dp.add_handler(handler)
 
@@ -123,14 +127,16 @@ class TestShippingQueryHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, shiping_query):
-        handler = ShippingQueryHandler(self.callback_queue_1, pass_job_queue=True)
+        handler = ShippingQueryHandler(self.callback_queue_1, use_context=False,
+                                       pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(shiping_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ShippingQueryHandler(self.callback_queue_1, pass_update_queue=True)
+        handler = ShippingQueryHandler(self.callback_queue_1, use_context=False,
+                                       pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -138,7 +144,8 @@ class TestShippingQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ShippingQueryHandler(self.callback_queue_2, pass_job_queue=True,
+        handler = ShippingQueryHandler(self.callback_queue_2, use_context=False,
+                                       pass_job_queue=True,
                                        pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -147,19 +154,16 @@ class TestShippingQueryHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = ShippingQueryHandler(self.callback_basic)
+        handler = ShippingQueryHandler(self.callback_basic, use_context=False)
         assert not handler.check_update(false_update)
 
     def test_context(self, dp, shiping_query):
-        handler = ShippingQueryHandler(self.callback_context)
+        handler = ShippingQueryHandler(self.callback_context, use_context=True)
         dp.add_handler(handler)
 
         dp.process_update(shiping_query)
         assert self.test_flag
 
-    def test_not_context(self, dp, shiping_query):
-        handler = ShippingQueryHandler(self.callback_context, use_context=False)
-        dp.add_handler(handler)
-
-        dp.process_update(shiping_query)
-        assert not self.test_flag
+    def test_non_context_deprecation(self, dp):
+        with pytest.warns(TelegramDeprecationWarning):
+            ShippingQueryHandler(self.callback_context)

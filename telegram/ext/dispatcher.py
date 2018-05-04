@@ -275,8 +275,10 @@ class Dispatcher(object):
 
         for group in self.groups:
             try:
-                for handler in (x for x in self.handlers[group] if x.check_update(update)):
-                    handler.handle_update(update, self)
+                for handler in self.handlers[group]:
+                    check = handler.check_update(update)
+                    if check is not None and check is not False:
+                        handler.handle_update(update, self, check)
                     break
 
             # Stop processing with any other handler.

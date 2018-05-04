@@ -22,7 +22,8 @@ import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import CommandHandler, Filters, BaseFilter, Context, JobQueue
+from telegram.ext import CommandHandler, Filters, BaseFilter, HandlerContext, JobQueue
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='test')
 
@@ -84,21 +85,21 @@ class TestCommandHandler(object):
         else:
             self.test_flag = args == ['one', 'two']
 
-    def callback_context(self, context):
-        self.test_flag = (isinstance(context, Context) and
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, HandlerContext) and
                           isinstance(context.bot, Bot) and
-                          isinstance(context.update, Update) and
+                          isinstance(update, Update) and
                           isinstance(context.update_queue, Queue) and
                           isinstance(context.job_queue, JobQueue) and
                           isinstance(context.user_data, dict) and
                           isinstance(context.chat_data, dict) and
-                          isinstance(context.message, Message))
+                          isinstance(update.message, Message))
 
-    def callback_context_args(self, context):
+    def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
 
     def test_basic(self, dp, message):
-        handler = CommandHandler('test', self.callback_basic)
+        handler = CommandHandler('test', self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -116,7 +117,7 @@ class TestCommandHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_command_list(self, message):
-        handler = CommandHandler(['test', 'start'], self.callback_basic)
+        handler = CommandHandler(['test', 'start'], self.callback_basic, use_context=False)
 
         message.text = '/test'
         assert handler.check_update(Update(0, message))
@@ -128,7 +129,8 @@ class TestCommandHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_edited(self, message):
-        handler = CommandHandler('test', self.callback_basic, allow_edited=False)
+        handler = CommandHandler('test', self.callback_basic, use_context=False,
+                                 allow_edited=False)
 
         message.text = '/test'
         assert handler.check_update(Update(0, message))
@@ -138,7 +140,7 @@ class TestCommandHandler(object):
         assert handler.check_update(Update(0, edited_message=message))
 
     def test_directed_commands(self, message):
-        handler = CommandHandler('test', self.callback_basic)
+        handler = CommandHandler('test', self.callback_basic, use_context=False)
 
         message.text = '/test@{}'.format(message.bot.username)
         assert handler.check_update(Update(0, message))
@@ -147,7 +149,7 @@ class TestCommandHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_with_filter(self, message):
-        handler = CommandHandler('test', self.callback_basic, Filters.group)
+        handler = CommandHandler('test', self.callback_basic, Filters.group, use_context=False)
 
         message.chat = Chat(-23, 'group')
         message.text = '/test'
@@ -157,7 +159,7 @@ class TestCommandHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_pass_args(self, dp, message):
-        handler = CommandHandler('test', self.ch_callback_args, pass_args=True)
+        handler = CommandHandler('test', self.ch_callback_args, use_context=False, pass_args=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -180,7 +182,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
     def test_newline(self, dp, message):
-        handler = CommandHandler('test', self.callback_basic)
+        handler = CommandHandler('test', self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         message.text = '/test\nfoobar'
@@ -190,7 +192,7 @@ class TestCommandHandler(object):
 
     def test_single_char(self, dp, message):
         # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
-        handler = CommandHandler('test', self.callback_basic)
+        handler = CommandHandler('test', self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         message.text = 'a'
@@ -198,7 +200,7 @@ class TestCommandHandler(object):
 
     def test_single_slash(self, dp, message):
         # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
-        handler = CommandHandler('test', self.callback_basic)
+        handler = CommandHandler('test', self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         message.text = '/'
@@ -208,7 +210,8 @@ class TestCommandHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_pass_user_or_chat_data(self, dp, message):
-        handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
+        handler = CommandHandler('test', self.callback_data_1, use_context=False,
+                                 pass_user_data=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -216,7 +219,8 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_data_1, pass_chat_data=True)
+        handler = CommandHandler('test', self.callback_data_1, use_context=False,
+                                 pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -224,7 +228,8 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_data_2, pass_chat_data=True,
+        handler = CommandHandler('test', self.callback_data_2, use_context=False,
+                                 pass_chat_data=True,
                                  pass_user_data=True)
         dp.add_handler(handler)
 
@@ -233,7 +238,8 @@ class TestCommandHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, message):
-        handler = CommandHandler('test', self.callback_queue_1, pass_job_queue=True)
+        handler = CommandHandler('test', self.callback_queue_1, use_context=False,
+                                 pass_job_queue=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -241,7 +247,8 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_queue_1, pass_update_queue=True)
+        handler = CommandHandler('test', self.callback_queue_1, use_context=False,
+                                 pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -249,7 +256,8 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_queue_2, pass_job_queue=True,
+        handler = CommandHandler('test', self.callback_queue_2, use_context=False,
+                                 pass_job_queue=True,
                                  pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -258,7 +266,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = CommandHandler('test', self.callback_basic)
+        handler = CommandHandler('test', self.callback_basic, use_context=False)
         assert not handler.check_update(false_update)
 
     def test_filters_for_wrong_command(self, message):
@@ -273,7 +281,8 @@ class TestCommandHandler(object):
 
         test_filter = TestFilter()
 
-        handler = CommandHandler('foo', self.callback_basic, filters=test_filter)
+        handler = CommandHandler('foo', self.callback_basic, use_context=False,
+                                 filters=test_filter)
         message.text = '/bar'
 
         handler.check_update(Update(0, message=message))
@@ -281,7 +290,7 @@ class TestCommandHandler(object):
         assert not test_filter.tested
 
     def test_context(self, dp, message):
-        handler = CommandHandler('test', self.callback_context)
+        handler = CommandHandler('test', self.callback_context, use_context=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -289,17 +298,12 @@ class TestCommandHandler(object):
         dp.process_update(Update(0, message))
         assert self.test_flag
 
-    def test_not_context(self, dp, message):
-        handler = CommandHandler('test', self.callback_context, use_context=False)
-        dp.add_handler(handler)
-
-        message.text = '/test'
-        assert handler.check_update(Update(0, message))
-        dp.process_update(Update(0, message))
-        assert not self.test_flag
+    def test_non_context_deprecation(self, dp):
+        with pytest.warns(TelegramDeprecationWarning):
+            CommandHandler('test', self.callback_context)
 
     def test_context_args(self, dp, message):
-        handler = CommandHandler('test', self.callback_context_args)
+        handler = CommandHandler('test', self.callback_context_args, use_context=True)
         dp.add_handler(handler)
 
         message.text = '/test'

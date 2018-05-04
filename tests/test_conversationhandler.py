@@ -50,21 +50,22 @@ class TestConversationHandler(object):
     @pytest.fixture(autouse=True)
     def reset(self):
         self.current_state = dict()
-        self.entry_points = [CommandHandler('start', self.start)]
+        self.entry_points = [CommandHandler('start', self.start, use_context=False)]
         self.states = {
-            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
-            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+            self.THIRSTY: [CommandHandler('brew', self.brew, use_context=False),
+                           CommandHandler('wait', self.start, use_context=False)],
+            self.BREWING: [CommandHandler('pourCoffee', self.drink, use_context=False)],
             self.DRINKING:
-                [CommandHandler('startCoding', self.code),
-                 CommandHandler('drinkMore', self.drink),
-                 CommandHandler('end', self.end)],
+                [CommandHandler('startCoding', self.code, use_context=False),
+                 CommandHandler('drinkMore', self.drink, use_context=False),
+                 CommandHandler('end', self.end, use_context=False)],
             self.CODING: [
-                CommandHandler('keepCoding', self.code),
-                CommandHandler('gettingThirsty', self.start),
-                CommandHandler('drinkMore', self.drink)
+                CommandHandler('keepCoding', self.code, use_context=False),
+                CommandHandler('gettingThirsty', self.start, use_context=False),
+                CommandHandler('drinkMore', self.drink, use_context=False)
             ],
         }
-        self.fallbacks = [CommandHandler('eat', self.start)]
+        self.fallbacks = [CommandHandler('eat', self.start, use_context=False)]
 
     # State handlers
     def _set_state(self, update, state):
@@ -232,9 +233,9 @@ class TestConversationHandler(object):
             return ConversationHandler.END
 
         handler = ConversationHandler(
-            entry_points=[CallbackQueryHandler(entry)],
-            states={1: [CallbackQueryHandler(one)],
-                    2: [CallbackQueryHandler(two)]},
+            entry_points=[CallbackQueryHandler(entry, use_context=False)],
+            states={1: [CallbackQueryHandler(one, use_context=False)],
+                    2: [CallbackQueryHandler(two, use_context=False)]},
             fallbacks=[],
             per_message=True)
         dp.add_handler(handler)
@@ -260,7 +261,8 @@ class TestConversationHandler(object):
 
     def test_end_on_first_message(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
+            entry_points=[CommandHandler('start', self.start_end, use_context=False)], states={},
+            fallbacks=[])
         dp.add_handler(handler)
 
         # User starts the state machine and immediately ends it.
@@ -272,7 +274,8 @@ class TestConversationHandler(object):
         start_end_async = (lambda bot, update: dp.run_async(self.start_end, bot, update))
 
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start_end_async)], states={}, fallbacks=[])
+            entry_points=[CommandHandler('start', start_end_async, use_context=False)], states={},
+            fallbacks=[])
         dp.add_handler(handler)
 
         # User starts the state machine with an async function that immediately ends the
@@ -291,20 +294,23 @@ class TestConversationHandler(object):
 
     def test_per_chat_message_without_chat(self, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
+            entry_points=[CommandHandler('start', self.start_end, use_context=False)], states={},
+            fallbacks=[])
         cbq = CallbackQuery(0, user1, None, None, bot=bot)
         update = Update(0, callback_query=cbq)
         assert not handler.check_update(update)
 
     def test_channel_message_without_chat(self, bot):
-        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)],
+        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end,
+                                                                   use_context=False)],
                                       states={}, fallbacks=[])
         message = Message(0, None, None, Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
         update = Update(0, message=message)
         assert not handler.check_update(update)
 
     def test_all_update_types(self, dp, bot, user1):
-        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end)],
+        handler = ConversationHandler(entry_points=[CommandHandler('start', self.start_end,
+                                                                   use_context=False)],
                                       states={}, fallbacks=[])
         message = Message(0, user1, None, self.group, text='ignore', bot=bot)
         callback_query = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)

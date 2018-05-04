@@ -22,7 +22,8 @@ import pytest
 
 from telegram import (Update, CallbackQuery, Bot, Message, User, Chat, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import CallbackQueryHandler, Context, JobQueue
+from telegram.ext import CallbackQueryHandler, HandlerContext, JobQueue
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -82,24 +83,24 @@ class TestCallbackQueryHandler(object):
         if groupdict is not None:
             self.test_flag = groupdict == {'begin': 't', 'end': ' data'}
 
-    def callback_context(self, context):
-        self.test_flag = (isinstance(context, Context) and
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, HandlerContext) and
                           isinstance(context.bot, Bot) and
-                          isinstance(context.update, Update) and
+                          isinstance(update, Update) and
                           isinstance(context.update_queue, Queue) and
                           isinstance(context.job_queue, JobQueue) and
                           isinstance(context.user_data, dict) and
                           context.chat_data is None and
-                          isinstance(context.callback_query, CallbackQuery))
+                          isinstance(update.callback_query, CallbackQuery))
 
-    def callback_context_pattern(self, context):
+    def callback_context_pattern(self, update, context):
         if context.groups:
             self.test_flag = context.groups == ('t', ' data')
         if context.groupdict:
             self.test_flag = context.groupdict == {'begin': 't', 'end': ' data'}
 
     def test_basic(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_basic)
+        handler = CallbackQueryHandler(self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
         assert handler.check_update(callback_query)
@@ -108,7 +109,7 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_with_pattern(self, callback_query):
-        handler = CallbackQueryHandler(self.callback_basic, pattern='.*est.*')
+        handler = CallbackQueryHandler(self.callback_basic, use_context=False, pattern='.*est.*')
 
         assert handler.check_update(callback_query)
 
@@ -116,7 +117,7 @@ class TestCallbackQueryHandler(object):
         assert not handler.check_update(callback_query)
 
     def test_with_passing_group_dict(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_group,
+        handler = CallbackQueryHandler(self.callback_group, use_context=False,
                                        pattern='(?P<begin>.*)est(?P<end>.*)',
                                        pass_groups=True)
         dp.add_handler(handler)
@@ -125,7 +126,7 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_group,
+        handler = CallbackQueryHandler(self.callback_group, use_context=False,
                                        pattern='(?P<begin>.*)est(?P<end>.*)',
                                        pass_groupdict=True)
         dp.add_handler(handler)
@@ -135,14 +136,16 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_data_1, pass_user_data=True)
+        handler = CallbackQueryHandler(self.callback_data_1, use_context=False,
+                                       pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(callback_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_data_1, pass_chat_data=True)
+        handler = CallbackQueryHandler(self.callback_data_1, use_context=False,
+                                       pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -150,7 +153,8 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_data_2, pass_chat_data=True,
+        handler = CallbackQueryHandler(self.callback_data_2, use_context=False,
+                                       pass_chat_data=True,
                                        pass_user_data=True)
         dp.add_handler(handler)
 
@@ -159,14 +163,16 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_queue_1, pass_job_queue=True)
+        handler = CallbackQueryHandler(self.callback_queue_1, use_context=False,
+                                       pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(callback_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_queue_1, pass_update_queue=True)
+        handler = CallbackQueryHandler(self.callback_queue_1, use_context=False,
+                                       pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -174,7 +180,8 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_queue_2, pass_job_queue=True,
+        handler = CallbackQueryHandler(self.callback_queue_2, use_context=False,
+                                       pass_job_queue=True,
                                        pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -183,26 +190,24 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = CallbackQueryHandler(self.callback_basic)
+        handler = CallbackQueryHandler(self.callback_basic, use_context=False)
         assert not handler.check_update(false_update)
 
     def test_context(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_context)
+        handler = CallbackQueryHandler(self.callback_context, use_context=True)
         dp.add_handler(handler)
 
         dp.process_update(callback_query)
         assert self.test_flag
 
-    def test_not_context(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_context, use_context=False)
-        dp.add_handler(handler)
-
-        dp.process_update(callback_query)
-        assert not self.test_flag
+    def test_non_context_deprecation(self, dp):
+        with pytest.warns(TelegramDeprecationWarning):
+            CallbackQueryHandler(self.callback_context)
 
     def test_context_pattern(self, dp, callback_query):
         handler = CallbackQueryHandler(self.callback_context_pattern,
-                                       pattern=r'(?P<begin>.*)est(?P<end>.*)')
+                                       pattern=r'(?P<begin>.*)est(?P<end>.*)',
+                                       use_context=True)
         dp.add_handler(handler)
 
         dp.process_update(callback_query)
@@ -210,7 +215,8 @@ class TestCallbackQueryHandler(object):
 
         dp.remove_handler(handler)
         handler = CallbackQueryHandler(self.callback_context_pattern,
-                                       pattern=r'(t)est(.*)')
+                                       pattern=r'(t)est(.*)',
+                                       use_context=True)
         dp.add_handler(handler)
 
         dp.process_update(callback_query)

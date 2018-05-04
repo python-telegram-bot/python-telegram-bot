@@ -147,8 +147,6 @@ class ConversationHandler(Handler):
 
         self.timeout_jobs = dict()
         self.conversations = dict()
-        self.current_conversation = None
-        self.current_handler = None
 
         self.logger = logging.getLogger(__name__)
 
@@ -217,10 +215,10 @@ class ConversationHandler(Handler):
         # Ignore messages in channels
         if (not isinstance(update, Update) or
                 update.channel_post or
-                self.per_chat and not update.effective_chat or
-                self.per_message and not update.callback_query or
-                update.callback_query and self.per_chat and not update.callback_query.message):
-            return False
+                    self.per_chat and not update.effective_chat or
+                    self.per_message and not update.callback_query or
+                        update.callback_query and self.per_chat and not update.callback_query.message):
+            return None
 
         key = self._get_key(update)
         state = self.conversations.get(key)
@@ -244,15 +242,13 @@ class ConversationHandler(Handler):
 
             else:
                 for candidate in (self.timed_out_behavior or []):
-                    if candidate.check_update(update):
+                    check = candidate.check_update(update)
+                    if check is not None and check is not False:
                         # Save the current user and the selected handler for handle_update
-                        self.current_conversation = key
-                        self.current_handler = candidate
-
-                        return True
+                        return key, candidate, check
 
                 else:
-                    return False
+                    return None
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
 
@@ -261,59 +257,61 @@ class ConversationHandler(Handler):
         # Search entry points for a match
         if state is None or self.allow_reentry:
             for entry_point in self.entry_points:
-                if entry_point.check_update(update):
+                check = entry_point.check_update(update)
+                if check is not None and check is not False:
                     handler = entry_point
                     break
 
             else:
                 if state is None:
-                    return False
+                    return None
 
         # Get the handler list for current state, if we didn't find one yet and we're still here
         if state is not None and not handler:
             handlers = self.states.get(state)
 
             for candidate in (handlers or []):
-                if candidate.check_update(update):
+                check = candidate.check_update(update)
+                if check is not None and check is not False:
                     handler = candidate
                     break
 
             # Find a fallback handler if all other handlers fail
             else:
                 for fallback in self.fallbacks:
-                    if fallback.check_update(update):
+                    check = fallback.check_update(update)
+                    if check is not None and check is not False:
                         handler = fallback
                         break
 
                 else:
-                    return False
+                    return None
 
-        # Save the current user and the selected handler for handle_update
-        self.current_conversation = key
-        self.current_handler = handler
+        return key, handler, check
 
-        return True
-
-    def handle_update(self, update, dispatcher):
+    def handle_update(self, update, dispatcher, check_result):
         """Send the update to the callback for the current state and Handler
 
         Args:
+            check_result: The result from check_update. For this handler it's a tuple of key,
+                handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
-        new_state = self.current_handler.handle_update(update, dispatcher)
-        timeout_job = self.timeout_jobs.pop(self.current_conversation, None)
+        new_state = check_result[1].handle_update(update, dispatcher, check_result[2])
+        current_conversation = check_result[0]
+        timeout_job = self.timeout_jobs.pop(current_conversation, None)
 
         if timeout_job is not None:
             timeout_job.schedule_removal()
         if self.conversation_timeout and new_state != self.END:
-            self.timeout_jobs[self.current_conversation] = dispatcher.job_queue.run_once(
+            self.timeout_jobs[current_conversation] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
-                context=self.current_conversation
+                context=current_conversation
             )
 
-        self.update_state(new_state, self.current_conversation)
+        self.update_state(new_state, current_conversation)
 
     def update_state(self, new_state, key):
         if new_state == self.END:

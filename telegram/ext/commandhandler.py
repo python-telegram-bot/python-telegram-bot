@@ -57,11 +57,8 @@ class CommandHandler(Handler):
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
-
-    Note:
-        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
-        function will receive a :class:`telegram.ext.Context` object as the only parameter,
-        instead of the usual (bot, update, others...).
+        Note that this is deprecated, please switch to context based handlers. See
+        https://git.io/vpVe8 for more info.
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -79,22 +76,26 @@ class CommandHandler(Handler):
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
             consecutive whitespace characters. Default is ``False``
+            DEPRECATED: Please switch to context based handlers.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
-            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
+            Defaults to ``False`` for while the old `pass_` method is in deprecation.
 
     """
 
@@ -155,26 +156,22 @@ class CommandHandler(Handler):
 
                     if not (command[0].lower() in self.command
                             and command[1].lower() == message.bot.username.lower()):
-                        return False
+                        return None
 
                     if self.filters is None:
-                        res = True
+                        return True
                     elif isinstance(self.filters, list):
-                        res = any(func(message) for func in self.filters)
+                        return any(func(message) for func in self.filters)
                     else:
-                        res = self.filters(message)
+                        return self.filters(message)
 
-                    return res
-
-        return False
-
-    def collect_optional_args(self, dispatcher, update=None):
+    def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
         if self.pass_args:
             message = update.message or update.edited_message
             optional_args['args'] = message.text.split()[1:]
         return optional_args
 
-    def collect_additional_context(self, context, update, dispatcher):
+    def collect_additional_context(self, context, update, dispatcher, check_result):
         message = update.message or update.edited_message
         context.args = message.text.split()[1:]

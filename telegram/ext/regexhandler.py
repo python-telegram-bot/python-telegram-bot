@@ -58,11 +58,8 @@ class RegexHandler(Handler):
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
-
-    Note:
-        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
-        function will receive a :class:`telegram.ext.Context` object as the only parameter,
-        instead of the usual (bot, update, others...).
+        Note that this is deprecated, please switch to context based handlers. See
+        https://git.io/vpVe8 for more info.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -72,21 +69,27 @@ class RegexHandler(Handler):
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
+            DEPRECATED: Please switch to context based handlers.
         pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
             Default is ``False``
+            DEPRECATED: Please switch to context based handlers.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         message_updates (:obj:`bool`, optional): Should "normal" message updates be handled?
             Default is ``True``.
         channel_post_updates (:obj:`bool`, optional): Should channel posts updates be handled?
@@ -97,8 +100,7 @@ class RegexHandler(Handler):
             Default is ``False`` - Deprecated. use edited_updates instead.
         use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
-            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
+            Defaults to ``False`` for while the old `pass_` method is in deprecation.
 
     Raises:
         ValueError
@@ -156,27 +158,24 @@ class RegexHandler(Handler):
 
         """
         if not isinstance(update, Update) and not update.effective_message:
-            return False
+            return None
         if any([self.message_updates and update.message,
                 self.edited_updates and (update.edited_message or update.edited_channel_post),
                 self.channel_post_updates and update.channel_post]) and \
                 update.effective_message.text:
             match = re.match(self.pattern, update.effective_message.text)
-            return bool(match)
-        return False
+            if match:
+                return match
 
-    def collect_optional_args(self, dispatcher, update=None):
-        optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update)
-        match = re.match(self.pattern, update.effective_message.text)
-
+    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+        optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update,
+                                                                        check_result)
         if self.pass_groups:
-            optional_args['groups'] = match.groups()
+            optional_args['groups'] = check_result.groups()
         if self.pass_groupdict:
-            optional_args['groupdict'] = match.groupdict()
+            optional_args['groupdict'] = check_result.groupdict()
         return optional_args
 
-    def collect_additional_context(self, context, update, dispatcher):
-        match = re.match(self.pattern, update.effective_message.text)
-
-        context.groups = match.groups()
-        context.groupdict = match.groupdict()
+    def collect_additional_context(self, context, update, dispatcher, check_result):
+        context.groups = check_result.groups()
+        context.groupdict = check_result.groupdict()

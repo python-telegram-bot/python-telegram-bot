@@ -42,12 +42,6 @@ class StringCommandHandler(Handler):
         use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
-    Note:
-        Instead of using the individual `pass_` you can use :attr:`use_context` and your callback
-        function will receive a :class:`telegram.ext.Context` object as the only parameter,
-        instead of the usual (bot, update, others...).
-
-
     Args:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
@@ -57,18 +51,20 @@ class StringCommandHandler(Handler):
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
             consecutive whitespace characters. Default is ``False``
+            DEPRECATED: Please switch to context based handlers.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+            DEPRECATED: Please switch to context based handlers.
         use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``True`` if :attr:`callback` has only one parameter. Note that this can
-            be difficult to determine if :attr:`callback` is decorated - especially on python 2.
+            Defaults to ``False`` for while the old `pass_` method is in deprecation.
 
     """
 
@@ -101,11 +97,13 @@ class StringCommandHandler(Handler):
         return (isinstance(update, string_types) and update.startswith('/')
                 and update[1:].split(' ')[0] == self.command)
 
-    def collect_optional_args(self, dispatcher, update=None):
-        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher, update)
+    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,
+                                                                                update,
+                                                                                check_result)
         if self.pass_args:
             optional_args['args'] = update.split()[1:]
         return optional_args
 
-    def collect_additional_context(self, context, update, dispatcher):
+    def collect_additional_context(self, context, update, dispatcher, check_result):
         context.args = update.split()[1:]
