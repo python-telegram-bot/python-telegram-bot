@@ -130,13 +130,6 @@ class MessageHandler(Handler):
         self.channel_post_updates = channel_post_updates
         self.edited_updates = edited_updates
 
-        # We put this up here instead of with the rest of checking code
-        # in check_update since we don't wanna spam a ton
-        if isinstance(self.filters, list):
-            warnings.warn('Using a list of filters in MessageHandler is getting '
-                          'deprecated, please use bitwise operators (& and |) '
-                          'instead. More info: https://git.io/vPTbc.')
-
     def _is_allowed_update(self, update):
         return any([self.message_updates and update.message,
                     self.edited_updates and (update.edited_message or update.edited_channel_post),
@@ -159,7 +152,6 @@ class MessageHandler(Handler):
 
             else:
                 message = update.effective_message
-                if isinstance(self.filters, list):
-                    return any(func(message) for func in self.filters)
-                else:
-                    return self.filters(message)
+                if self.filters is None:
+                    return True
+                return self.filters(message)
