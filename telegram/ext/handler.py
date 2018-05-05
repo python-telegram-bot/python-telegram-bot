@@ -79,7 +79,7 @@ class Handler(object):
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False,
-                 use_context=None):
+                 use_context=False):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
@@ -87,7 +87,7 @@ class Handler(object):
         self.pass_chat_data = pass_chat_data
         self.use_context = use_context
 
-        if use_context is None:
+        if not use_context:
             warnings.warn('You are currently not using context based handlers. This is being '
                           'deprecated, and will soon not be possible. Please change your '
                           'callback function signatures from (bot, update, others...) to ('
