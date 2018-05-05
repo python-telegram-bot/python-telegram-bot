@@ -94,10 +94,10 @@ class TestCallbackQueryHandler(object):
                           isinstance(update.callback_query, CallbackQuery))
 
     def callback_context_pattern(self, update, context):
-        if context.groups:
-            self.test_flag = context.groups == ('t', ' data')
-        if context.groupdict:
-            self.test_flag = context.groupdict == {'begin': 't', 'end': ' data'}
+        if context.match.groups():
+            self.test_flag = context.match.groups() == ('t', ' data')
+        if context.match.groupdict():
+            self.test_flag = context.match.groupdict() == {'begin': 't', 'end': ' data'}
 
     def test_basic(self, dp, callback_query):
         handler = CallbackQueryHandler(self.callback_basic, use_context=False)

@@ -98,10 +98,10 @@ class TestCallbackQueryHandler(object):
                           isinstance(update.inline_query, InlineQuery))
 
     def callback_context_pattern(self, update, context):
-        if context.groups:
-            self.test_flag = context.groups == ('t', ' query')
-        if context.groupdict:
-            self.test_flag = context.groupdict == {'begin': 't', 'end': ' query'}
+        if context.match.groups():
+            self.test_flag = context.match.groups() == ('t', ' query')
+        if context.match.groupdict():
+            self.test_flag = context.match.groupdict() == {'begin': 't', 'end': ' query'}
 
     def test_basic(self, dp, inline_query):
         handler = InlineQueryHandler(self.callback_basic, use_context=False)

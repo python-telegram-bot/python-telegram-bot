@@ -97,7 +97,7 @@ class StringCommandHandler(Handler):
         if isinstance(update, string_types) and update.startswith('/'):
             args = update[1:].split(' ')
             if args[0] == self.command:
-                return args
+                return args[1:]
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,

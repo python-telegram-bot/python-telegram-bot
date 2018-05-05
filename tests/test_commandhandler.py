@@ -103,47 +103,55 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/test'
-        assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert self.test_flag
 
         message.text = '/nottest'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
         message.text = 'test'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
         message.text = 'not /test at start'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
     def test_command_list(self, message):
         handler = CommandHandler(['test', 'start'], self.callback_basic, use_context=False)
 
         message.text = '/test'
-        assert handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
 
         message.text = '/start'
-        assert handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
 
         message.text = '/stop'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
     def test_edited(self, message):
         handler = CommandHandler('test', self.callback_basic, use_context=False,
                                  allow_edited=False)
 
         message.text = '/test'
-        assert handler.check_update(Update(0, message))
-        assert not handler.check_update(Update(0, edited_message=message))
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
+        check = handler.check_update(Update(0, edited_message=message))
+        assert check is None or check is False
         handler.allow_edited = True
-        assert handler.check_update(Update(0, message))
-        assert handler.check_update(Update(0, edited_message=message))
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
+        check = handler.check_update(Update(0, edited_message=message))
+        assert check is not None and check is not False
 
     def test_directed_commands(self, message):
         handler = CommandHandler('test', self.callback_basic, use_context=False)
 
         message.text = '/test@{}'.format(message.bot.username)
-        assert handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
 
         message.text = '/test@otherbot'
         assert not handler.check_update(Update(0, message))
@@ -153,10 +161,12 @@ class TestCommandHandler(object):
 
         message.chat = Chat(-23, 'group')
         message.text = '/test'
-        assert handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
 
         message.chat = Chat(23, 'private')
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
     def test_pass_args(self, dp, message):
         handler = CommandHandler('test', self.ch_callback_args, use_context=False, pass_args=True)
@@ -186,7 +196,8 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/test\nfoobar'
-        assert handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
         dp.process_update(Update(0, message))
         assert self.test_flag
 
@@ -196,7 +207,8 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = 'a'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
     def test_single_slash(self, dp, message):
         # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
@@ -204,10 +216,12 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
         message.text = '/ test'
-        assert not handler.check_update(Update(0, message))
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
 
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, use_context=False,
@@ -267,7 +281,8 @@ class TestCommandHandler(object):
 
     def test_other_update_types(self, false_update):
         handler = CommandHandler('test', self.callback_basic, use_context=False)
-        assert not handler.check_update(false_update)
+        check = handler.check_update(false_update)
+        assert check is None or check is False
 
     def test_filters_for_wrong_command(self, message):
         """Filters should not be executed if the command does not match the handler"""
@@ -285,7 +300,8 @@ class TestCommandHandler(object):
                                  filters=test_filter)
         message.text = '/bar'
 
-        handler.check_update(Update(0, message=message))
+        check = handler.check_update(Update(0, message=message))
+        assert check is None or check is False
 
         assert not test_filter.tested
 
@@ -294,7 +310,6 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/test'
-        assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert self.test_flag
 
@@ -307,11 +322,9 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/test'
-        assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert not self.test_flag
 
         message.text = '/test one two'
-        assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert self.test_flag

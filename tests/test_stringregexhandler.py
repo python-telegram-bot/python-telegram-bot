@@ -82,10 +82,10 @@ class TestStringRegexHandler(object):
                           isinstance(context.job_queue, JobQueue))
 
     def callback_context_pattern(self, update, context):
-        if context.groups:
-            self.test_flag = context.groups == ('t', ' message')
-        if context.groupdict:
-            self.test_flag = context.groupdict == {'begin': 't', 'end': ' message'}
+        if context.match.groups():
+            self.test_flag = context.match.groups() == ('t', ' message')
+        if context.match.groupdict():
+            self.test_flag = context.match.groupdict() == {'begin': 't', 'end': ' message'}
 
     def test_basic(self, dp):
         handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_basic,

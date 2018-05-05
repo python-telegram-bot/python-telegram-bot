@@ -90,13 +90,17 @@ class TestStringCommandHandler(object):
         handler = StringCommandHandler('test', self.callback_basic, use_context=False)
         dp.add_handler(handler)
 
-        assert handler.check_update('/test')
+        check = handler.check_update('/test')
+        assert check is not None and check is not False
         dp.process_update('/test')
         assert self.test_flag
 
-        assert not handler.check_update('/nottest')
-        assert not handler.check_update('not /test in front')
-        assert handler.check_update('/test followed by text')
+        check = handler.check_update('/nottest')
+        assert check is None or check is False
+        check = handler.check_update('not /test in front')
+        assert check is None or check is False
+        check = handler.check_update('/test followed by text')
+        assert check is not None and check is not False
 
     def test_pass_args(self, dp):
         handler = StringCommandHandler('test', self.sch_callback_args, use_context=False,

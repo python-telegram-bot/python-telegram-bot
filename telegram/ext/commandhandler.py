@@ -149,9 +149,7 @@ class CommandHandler(Handler):
                             and command[1].lower() == message.bot.username.lower()):
                         return None
 
-                    if self.filters is None:
-                        return True
-                    if self.filters(message):
+                    if self.filters is None or self.filters(message):
                         return message.text.split()[1:]
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
