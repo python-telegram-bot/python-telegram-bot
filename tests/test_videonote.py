@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ def video_note_file():
 @pytest.fixture(scope='class')
 def video_note(bot, chat_id):
     with open('tests/data/telegram2.mp4', 'rb') as f:
-        return bot.send_video_note(chat_id, video_note=f, timeout=10).video_note
+        return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
 class TestVideoNote(object):
@@ -145,6 +145,13 @@ class TestVideoNote(object):
     def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             bot.send_video_note(chat_id=chat_id)
+
+    def test_get_file_instance_method(self, monkeypatch, video_note):
+        def test(*args, **kwargs):
+            return args[1] == video_note.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert video_note.get_file()
 
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, self.length, self.duration)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -63,12 +63,12 @@ class TestReplyKeyboardMarkup(object):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()
 
         assert isinstance(reply_keyboard_markup_dict, dict)
-        assert reply_keyboard_markup_dict['keyboard'][0][0] == \
-               reply_keyboard_markup.keyboard[0][0].to_dict()
-        assert reply_keyboard_markup_dict['keyboard'][0][1] == \
-               reply_keyboard_markup.keyboard[0][1].to_dict()
-        assert reply_keyboard_markup_dict['resize_keyboard'] == \
-               reply_keyboard_markup.resize_keyboard
-        assert reply_keyboard_markup_dict['one_time_keyboard'] == \
-               reply_keyboard_markup.one_time_keyboard
+        assert (reply_keyboard_markup_dict['keyboard'][0][0] ==
+                reply_keyboard_markup.keyboard[0][0].to_dict())
+        assert (reply_keyboard_markup_dict['keyboard'][0][1] ==
+                reply_keyboard_markup.keyboard[0][1].to_dict())
+        assert (reply_keyboard_markup_dict['resize_keyboard'] ==
+                reply_keyboard_markup.resize_keyboard)
+        assert (reply_keyboard_markup_dict['one_time_keyboard'] ==
+                reply_keyboard_markup.one_time_keyboard)
         assert reply_keyboard_markup_dict['selective'] == reply_keyboard_markup.selective

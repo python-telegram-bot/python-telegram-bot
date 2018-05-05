@@ -2,7 +2,7 @@
 # pylint: disable=R0902,R0912,R0913
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -79,11 +79,3 @@ class ChosenInlineResult(TelegramObject):
         data['location'] = Location.de_json(data.get('location'), bot)
 
         return cls(**data)
-
-    def to_dict(self):
-        data = super(ChosenInlineResult, self).to_dict()
-
-        # Required
-        data['from'] = data.pop('from_user', None)
-
-        return data

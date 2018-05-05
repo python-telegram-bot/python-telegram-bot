@@ -2,7 +2,7 @@
 # pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,8 @@
 """This module contains an object that represents a Telegram User."""
 
 from telegram import TelegramObject
-from telegram.utils.helpers import mention_markdown as util_mention_markdown
 from telegram.utils.helpers import mention_html as util_mention_html
+from telegram.utils.helpers import mention_markdown as util_mention_markdown
 
 
 class User(TelegramObject):
@@ -72,15 +72,23 @@ class User(TelegramObject):
     @property
     def name(self):
         """
-        :obj:`str`: The users :attr:`username` if available, if not it returns the first name and
-            if present :attr:`first_name` and :attr:`last_name`.
+        :obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+            prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
 
         """
-
         if self.username:
-            return '@%s' % self.username
+            return '@{}'.format(self.username)
+        return self.full_name
+
+    @property
+    def full_name(self):
+        """
+        :obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if available)
+            :attr:`last_name`.
+
+        """
         if self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
+            return u'{} {}'.format(self.first_name, self.last_name)
         return self.first_name
 
     @classmethod
@@ -138,3 +146,107 @@ class User(TelegramObject):
             return util_mention_html(self.id, self.name)
         else:
             return util_mention_html(self.id, name)
+
+    def send_message(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_message(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_message(self.id, *args, **kwargs)
+
+    def send_photo(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_photo(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_photo(self.id, *args, **kwargs)
+
+    def send_audio(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_audio(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_audio(self.id, *args, **kwargs)
+
+    def send_document(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_document(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_document(self.id, *args, **kwargs)
+
+    def send_sticker(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_sticker(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_sticker(self.id, *args, **kwargs)
+
+    def send_video(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_video(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_video(self.id, *args, **kwargs)
+
+    def send_video_note(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_video_note(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_video_note(self.id, *args, **kwargs)
+
+    def send_voice(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_voice(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_voice(self.id, *args, **kwargs)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -49,9 +49,10 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def shiping_query():
-    return Update(1, shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
-                                                  ShippingAddress('EN', 'my_state', 'my_city',
-                                                                  'steer_1', '', 'post_code')))
+    return Update(1,
+                  shipping_query=ShippingQuery(42, User(1, 'test user', False), 'invoice_payload',
+                                               ShippingAddress('EN', 'my_state', 'my_city',
+                                                               'steer_1', '', 'post_code')))
 
 
 class TestShippingQueryHandler(object):

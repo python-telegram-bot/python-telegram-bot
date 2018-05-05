@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -49,11 +49,11 @@ class TestInputVenueMessageContent(object):
         input_venue_message_content_dict = input_venue_message_content.to_dict()
 
         assert isinstance(input_venue_message_content_dict, dict)
-        assert input_venue_message_content_dict['latitude'] == \
-               input_venue_message_content.latitude
-        assert input_venue_message_content_dict['longitude'] == \
-               input_venue_message_content.longitude
+        assert (input_venue_message_content_dict['latitude'] ==
+                input_venue_message_content.latitude)
+        assert (input_venue_message_content_dict['longitude'] ==
+                input_venue_message_content.longitude)
         assert input_venue_message_content_dict['title'] == input_venue_message_content.title
         assert input_venue_message_content_dict['address'] == input_venue_message_content.address
-        assert input_venue_message_content_dict['foursquare_id'] == \
-               input_venue_message_content.foursquare_id
+        assert (input_venue_message_content_dict['foursquare_id'] ==
+                input_venue_message_content.foursquare_id)

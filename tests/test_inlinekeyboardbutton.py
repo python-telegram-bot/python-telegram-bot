@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -48,8 +48,8 @@ class TestInlineKeyboardButton(object):
         assert inline_keyboard_button.url == self.url
         assert inline_keyboard_button.callback_data == self.callback_data
         assert inline_keyboard_button.switch_inline_query == self.switch_inline_query
-        assert inline_keyboard_button.switch_inline_query_current_chat == \
-               self.switch_inline_query_current_chat
+        assert (inline_keyboard_button.switch_inline_query_current_chat ==
+                self.switch_inline_query_current_chat)
         assert inline_keyboard_button.callback_game == self.callback_game
         assert inline_keyboard_button.pay == self.pay
 
@@ -60,9 +60,9 @@ class TestInlineKeyboardButton(object):
         assert inline_keyboard_button_dict['text'] == inline_keyboard_button.text
         assert inline_keyboard_button_dict['url'] == inline_keyboard_button.url
         assert inline_keyboard_button_dict['callback_data'] == inline_keyboard_button.callback_data
-        assert inline_keyboard_button_dict['switch_inline_query'] == \
-               inline_keyboard_button.switch_inline_query
-        assert inline_keyboard_button_dict['switch_inline_query_current_chat'] == \
-               inline_keyboard_button.switch_inline_query_current_chat
+        assert (inline_keyboard_button_dict['switch_inline_query'] ==
+                inline_keyboard_button.switch_inline_query)
+        assert (inline_keyboard_button_dict['switch_inline_query_current_chat'] ==
+                inline_keyboard_button.switch_inline_query_current_chat)
         assert inline_keyboard_button_dict['callback_game'] == inline_keyboard_button.callback_game
         assert inline_keyboard_button_dict['pay'] == inline_keyboard_button.pay

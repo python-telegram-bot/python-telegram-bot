@@ -3,8 +3,8 @@ telegram package
 
 .. toctree::
 
-   telegram.utils.helpers
    telegram.ext
+   telegram.utils
    telegram.audio
    telegram.bot
    telegram.callbackquery
@@ -21,6 +21,9 @@ telegram package
    telegram.inlinekeyboardbutton
    telegram.inlinekeyboardmarkup
    telegram.inputfile
+   telegram.inputmedia
+   telegram.inputmediaphoto
+   telegram.inputmediavideo
    telegram.keyboardbutton
    telegram.location
    telegram.message

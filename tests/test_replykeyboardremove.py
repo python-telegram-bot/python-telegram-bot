@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -43,6 +43,6 @@ class TestReplyKeyboardRemove(object):
     def test_to_dict(self, reply_keyboard_remove):
         reply_keyboard_remove_dict = reply_keyboard_remove.to_dict()
 
-        assert reply_keyboard_remove_dict['remove_keyboard'] == \
-               reply_keyboard_remove.remove_keyboard
+        assert (reply_keyboard_remove_dict['remove_keyboard'] ==
+                reply_keyboard_remove.remove_keyboard)
         assert reply_keyboard_remove_dict['selective'] == reply_keyboard_remove.selective

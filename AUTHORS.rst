@@ -22,7 +22,9 @@ The following wonderful people contributed directly or indirectly to this projec
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
+- `Daniel Reed <https://github.com/nmlorg>`_
 - `Eli Gao <https://github.com/eligao>`_
+- `Emilio Molinari <https://github.com/xates>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
 - `Eugenio Panadero <https://github.com/azogue>`_
@@ -44,13 +46,17 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Li-aung Yip <https://github.com/LiaungYip>`_
 - `macrojames <https://github.com/macrojames>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
+- `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `neurrone <https://github.com/neurrone>`_
 - `njittam <https://github.com/njittam>`_
 - `Noam Meltzer <https://github.com/tsnoam>`_
 - `Oleg Shlyazhko <https://github.com/ollmer>`_
+- `Oleg Sushchenko <https://github.com/feuillemorte>`_
+- `Or Bin <https://github.com/OrBin>`_
 - `overquota <https://github.com/overquota>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
+- `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Sascha <https://github.com/saschalalala>`_
@@ -58,8 +64,10 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `thodnev <https://github.com/thodnev>`_
+- `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
+- `Wagner Macedo <https://github.com/wagnerluis1982>`_
 - `wjt <https://github.com/wjt>`_
 
 Please add yourself here alphabetically when you submit your first pull request.

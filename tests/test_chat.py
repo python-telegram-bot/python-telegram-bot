@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -123,6 +123,62 @@ class TestChat(object):
 
         monkeypatch.setattr('telegram.Bot.unban_chat_member', test)
         assert chat.unban_member(42)
+
+    def test_instance_method_send_message(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test'
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert chat.send_message('test')
+
+    def test_instance_method_send_photo(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_photo'
+
+        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        assert chat.send_photo('test_photo')
+
+    def test_instance_method_send_audio(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_audio'
+
+        monkeypatch.setattr('telegram.Bot.send_audio', test)
+        assert chat.send_audio('test_audio')
+
+    def test_instance_method_send_document(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_document'
+
+        monkeypatch.setattr('telegram.Bot.send_document', test)
+        assert chat.send_document('test_document')
+
+    def test_instance_method_send_sticker(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_sticker'
+
+        monkeypatch.setattr('telegram.Bot.send_sticker', test)
+        assert chat.send_sticker('test_sticker')
+
+    def test_instance_method_send_video(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_video'
+
+        monkeypatch.setattr('telegram.Bot.send_video', test)
+        assert chat.send_video('test_video')
+
+    def test_instance_method_send_video_note(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_video_note'
+
+        monkeypatch.setattr('telegram.Bot.send_video_note', test)
+        assert chat.send_video_note('test_video_note')
+
+    def test_instance_method_send_voice(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_voice'
+
+        monkeypatch.setattr('telegram.Bot.send_voice', test)
+        assert chat.send_voice('test_voice')
 
     def test_equality(self):
         a = Chat(self.id, self.title, self.type)

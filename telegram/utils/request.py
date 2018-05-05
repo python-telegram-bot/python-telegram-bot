@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -145,9 +145,14 @@ class Request(object):
             dict: A JSON parsed as Python dict with results - on error this dict will be empty.
 
         """
-        decoded_s = json_data.decode('utf-8')
+
         try:
+            decoded_s = json_data.decode('utf-8')
             data = json.loads(decoded_s)
+        except UnicodeDecodeError:
+            logging.getLogger(__name__).debug(
+                'Logging raw invalid UTF-8 response:\n%r', json_data)
+            raise TelegramError('Server response could not be decoded using UTF-8')
         except ValueError:
             raise TelegramError('Invalid server response')
 
@@ -242,6 +247,7 @@ class Request(object):
 
     def post(self, url, data, timeout=None):
         """Request an URL.
+
         Args:
             url (:obj:`str`): The web location we want to retrieve.
             data (dict[str, str|int]): A dict of key/value pairs. Note: On py2.7 value is unicode.
@@ -291,6 +297,7 @@ class Request(object):
 
     def download(self, url, filename, timeout=None):
         """Download a file by its URL.
+
         Args:
             url (str): The web location we want to retrieve.
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,9 +24,10 @@ from telegram import InputTextMessageContent, ParseMode
 
 @pytest.fixture(scope='class')
 def input_text_message_content():
-    return InputTextMessageContent(TestInputTextMessageContent.message_text,
-                                   parse_mode=TestInputTextMessageContent.parse_mode,
-                                   disable_web_page_preview=TestInputTextMessageContent.disable_web_page_preview)
+    return InputTextMessageContent(
+        TestInputTextMessageContent.message_text,
+        parse_mode=TestInputTextMessageContent.parse_mode,
+        disable_web_page_preview=TestInputTextMessageContent.disable_web_page_preview)
 
 
 class TestInputTextMessageContent(object):
@@ -43,9 +44,9 @@ class TestInputTextMessageContent(object):
         input_text_message_content_dict = input_text_message_content.to_dict()
 
         assert isinstance(input_text_message_content_dict, dict)
-        assert input_text_message_content_dict['message_text'] == \
-               input_text_message_content.message_text
-        assert input_text_message_content_dict['parse_mode'] == \
-               input_text_message_content.parse_mode
-        assert input_text_message_content_dict['disable_web_page_preview'] == \
-               input_text_message_content.disable_web_page_preview
+        assert (input_text_message_content_dict['message_text'] ==
+                input_text_message_content.message_text)
+        assert (input_text_message_content_dict['parse_mode'] ==
+                input_text_message_content.parse_mode)
+        assert (input_text_message_content_dict['disable_web_page_preview'] ==
+                input_text_message_content.disable_web_page_preview)

@@ -1,6 +1,168 @@
 =======
 Changes
 =======
+**2018-05-02**
+*Released 10.1.0*
+
+Fixes changing previous behaviour:
+
+- Add urllib3 fix for socks5h support (`#1085`_)
+- Fix send_sticker() timeout=20 (`#1088`_)
+
+Fixes:
+
+- Add a caption_entity filter for filtering caption entities (`#1068`_)
+- Inputfile encode filenames (`#1086`_)
+- InputFile: Fix proper naming of file when reading from subprocess.PIPE (`#1079`_)
+- Remove pytest-catchlog from requirements (`#1099`_)
+- Documentation fixes (`#1061`_, `#1078`_, `#1081`_, `#1096`_)
+
+.. _`#1061`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1061
+.. _`#1068`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1068
+.. _`#1078`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1078
+.. _`#1079`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1079
+.. _`#1081`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1081
+.. _`#1085`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1085
+.. _`#1086`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1086
+.. _`#1088`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1088
+.. _`#1096`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1096
+.. _`#1099`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1099
+
+**2018-04-17**
+*Released 10.0.2*
+
+Important fix:
+
+- Handle utf8 decoding errors (`#1076`_)
+
+New features:
+
+- Added Filter.regex (`#1028`_)
+- Filters for Category and file types (`#1046`_)
+- Added video note filter (`#1067`_)
+
+Fixes:
+
+- Fix in telegram.Message (`#1042`_)
+- Make chat_id a positional argument inside shortcut methods of Chat and User classes (`#1050`_)
+- Make Bot.full_name return a unicode object. (`#1063`_)
+- CommandHandler faster check (`#1074`_)
+- Correct documentation of Dispatcher.add_handler (`#1071`_)
+- Various small fixes to documentation.
+
+.. _`#1028`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1028
+.. _`#1042`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1042
+.. _`#1046`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1046
+.. _`#1050`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1050
+.. _`#1067`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1067
+.. _`#1063`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1063
+.. _`#1074`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1074
+.. _`#1076`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1076
+.. _`#1071`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1071
+
+**2018-03-05**
+*Released 10.0.1*
+
+Fixes:
+
+- Fix conversationhandler timeout (PR `#1032`_)
+- Add missing docs utils (PR `#912`_)
+
+.. _`#1032`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
+.. _`#912`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
+
+**2018-03-02**
+*Released 10.0.0*
+
+Non backward compatabile changes and changed defaults
+
+- JobQueue: Remove deprecated prevent_autostart & put() (PR `#1012`_)
+- Bot, Updater: Remove deprecated network_delay (PR `#1012`_)
+- Remove deprecated Message.new_chat_member (PR `#1012`_)
+- Retry bootstrap phase indefinitely (by default) on network errors (PR `#1018`_)
+
+New Features
+
+- Support v3.6 API (PR `#1006`_)
+- User.full_name convinience property (PR `#949`_)
+- Add `send_phone_number_to_provider` and `send_email_to_provider` arguments to send_invoice (PR `#986`_)
+- Bot: Add shortcut methods reply_{markdown,html} (PR `#827`_)
+- Bot: Add shortcut method reply_media_group (PR `#994`_)
+- Added utils.helpers.effective_message_type (PR `#826`_)
+- Bot.get_file now allows passing a file in addition to file_id (PR `#963`_)
+- Add .get_file() to Audio, Document, PhotoSize, Sticker, Video, VideoNote and Voice (PR `#963`_)
+- Add .send_*() methods to User and Chat (PR `#963`_)
+- Get jobs by name (PR `#1011`_)
+- Add Message caption html/markdown methods (PR `#1013`_)
+- File.download_as_bytearray - new method to get a d/led file as bytearray (PR `#1019`_)
+- File.download(): Now returns a meaningful return value (PR `#1019`_)
+- Added conversation timeout in ConversationHandler (PR `#895`_)
+
+Changes
+
+- Store bot in PreCheckoutQuery (PR `#953`_)
+- Updater: Issue INFO log upon received signal (PR `#951`_)
+- JobQueue: Thread safety fixes (PR `#977`_)
+- WebhookHandler: Fix exception thrown during error handling (PR `#985`_)
+- Explicitly check update.effective_chat in ConversationHandler.check_update (PR `#959`_)
+- Updater: Better handling of timeouts during get_updates (PR `#1007`_)
+- Remove unnecessary to_dict() (PR `#834`_)
+- CommandHandler - ignore strings in entities and "/" followed by whitespace (PR `#1020`_)
+- Documentation & style fixes (PR `#942`_, PR `#956`_, PR `#962`_, PR `#980`_, PR `#983`_)
+
+.. _`#826`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
+.. _`#827`: https://github.com/python-telegram-bot/python-telegram-bot/pull/827
+.. _`#834`: https://github.com/python-telegram-bot/python-telegram-bot/pull/834
+.. _`#895`: https://github.com/python-telegram-bot/python-telegram-bot/pull/895
+.. _`#942`: https://github.com/python-telegram-bot/python-telegram-bot/pull/942
+.. _`#949`: https://github.com/python-telegram-bot/python-telegram-bot/pull/949
+.. _`#951`: https://github.com/python-telegram-bot/python-telegram-bot/pull/951
+.. _`#956`: https://github.com/python-telegram-bot/python-telegram-bot/pull/956
+.. _`#953`: https://github.com/python-telegram-bot/python-telegram-bot/pull/953
+.. _`#962`: https://github.com/python-telegram-bot/python-telegram-bot/pull/962
+.. _`#959`: https://github.com/python-telegram-bot/python-telegram-bot/pull/959
+.. _`#963`: https://github.com/python-telegram-bot/python-telegram-bot/pull/963
+.. _`#977`: https://github.com/python-telegram-bot/python-telegram-bot/pull/977
+.. _`#980`: https://github.com/python-telegram-bot/python-telegram-bot/pull/980
+.. _`#983`: https://github.com/python-telegram-bot/python-telegram-bot/pull/983
+.. _`#985`: https://github.com/python-telegram-bot/python-telegram-bot/pull/985
+.. _`#986`: https://github.com/python-telegram-bot/python-telegram-bot/pull/986
+.. _`#994`: https://github.com/python-telegram-bot/python-telegram-bot/pull/994
+.. _`#1006`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1006
+.. _`#1007`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1007
+.. _`#1011`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1011
+.. _`#1012`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1012
+.. _`#1013`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1013
+.. _`#1018`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1018
+.. _`#1019`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1019
+.. _`#1020`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1020
+
+**2017-12-08**
+*Released 9.0.0*
+
+Breaking changes (possibly)
+
+- Drop support for python 3.3 (PR `#930`_)
+
+
+New Features
+
+- Support Bot API 3.5 (PR `#920`_)
+
+
+Changes
+
+- Fix race condition in dispatcher start/stop (`#887`_)
+- Log error trace if there is no error handler registered (`#694`_)
+- Update examples with consistent string formatting (`#870`_)
+- Various changes and improvements to the docs.
+
+.. _`#920`: https://github.com/python-telegram-bot/python-telegram-bot/pull/920
+.. _`#930`: https://github.com/python-telegram-bot/python-telegram-bot/pull/930
+.. _`#887`: https://github.com/python-telegram-bot/python-telegram-bot/pull/887
+.. _`#694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/694
+.. _`#870`: https://github.com/python-telegram-bot/python-telegram-bot/pull/870
+
 **2017-10-15**
 *Released 8.1.1*
 

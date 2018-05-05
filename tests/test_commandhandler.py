@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import CommandHandler, Filters
+from telegram.ext import CommandHandler, Filters, BaseFilter
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='test')
 
@@ -190,6 +190,9 @@ class TestCommandHandler(object):
         message.text = '/'
         assert not handler.check_update(Update(0, message))
 
+        message.text = '/ test'
+        assert not handler.check_update(Update(0, message))
+
     def test_pass_user_or_chat_data(self, dp, message):
         handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
@@ -243,3 +246,22 @@ class TestCommandHandler(object):
     def test_other_update_types(self, false_update):
         handler = CommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)
+
+    def test_filters_for_wrong_command(self, message):
+        """Filters should not be executed if the command does not match the handler"""
+
+        class TestFilter(BaseFilter):
+            def __init__(self):
+                self.tested = False
+
+            def filter(self, message):
+                self.tested = True
+
+        test_filter = TestFilter()
+
+        handler = CommandHandler('foo', self.callback_basic, filters=test_filter)
+        message.text = '/bar'
+
+        handler.check_update(Update(0, message=message))
+
+        assert not test_filter.tested

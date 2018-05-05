@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from platform import python_implementation
 
 import pytest
@@ -104,8 +104,8 @@ class TestBot(object):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
-    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice
-    # and send_video_note are tested in their respective test modules. No need to duplicate here.
+    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note
+    # and send_media_group are tested in their respective test modules. No need to duplicate here.
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -188,14 +188,14 @@ class TestBot(object):
         chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
-        assert user_profile_photos.photos[0][0].file_size == 12421
+        assert user_profile_photos.photos[0][0].file_size == 9999
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_one_user_profile_photo(self, bot):
         chat_id = 12173560  # hardcoded Leandro's chat_id
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
-        assert user_profile_photos.photos[0][0].file_size == 12421
+        assert user_profile_photos.photos[0][0].file_size == 9999
 
     # get_file is tested multiple times in the test_*media* modules.
 
@@ -257,6 +257,15 @@ class TestBot(object):
                                            message_id=media_message.message_id)
 
         assert message.caption == 'new_caption'
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_caption_with_parse_mode(self, bot, media_message):
+        message = bot.edit_message_caption(caption='new *caption*', parse_mode='Markdown',
+                                           chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id)
+
+        assert message.caption == 'new caption'
 
     @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_caption_without_required(self, bot):
@@ -543,7 +552,6 @@ class TestBot(object):
     def test_restrict_chat_member(self, bot, channel_id):
         # TODO: Add bot to supergroup so this can be tested properly
         with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            until = datetime.now() + timedelta(seconds=30)
             assert bot.restrict_chat_member(channel_id,
                                             95205500,
                                             until_date=datetime.now(),

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ def sticker_file():
 @pytest.fixture(scope='class')
 def sticker(bot, chat_id):
     with open('tests/data/telegram.webp', 'rb') as f:
-        return bot.send_sticker(chat_id, sticker=f, timeout=10).sticker
+        return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
 class TestSticker(object):
@@ -276,6 +276,13 @@ class TestStickerSet(object):
         sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert bot.delete_sticker_from_set(file_id)
+
+    def test_get_file_instance_method(self, monkeypatch, sticker):
+        def test(*args, **kwargs):
+            return args[1] == sticker.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert sticker.get_file()
 
     def test_equality(self):
         a = StickerSet(self.name, self.title, self.contains_masks, self.stickers)

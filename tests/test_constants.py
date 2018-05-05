@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2017
+# Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,6 @@ class TestConstants(object):
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + 'Z'
-        with open('tests/data/telegram.png', 'rb') as f:
-            bad_message = bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
-        assert bad_message.caption != bad_caption
-        assert len(bad_message.caption) == constants.MAX_CAPTION_LENGTH
+        with pytest.raises(BadRequest, message="Media_caption_too_long"):
+            with open('tests/data/telegram.png', 'rb') as f:
+                bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
