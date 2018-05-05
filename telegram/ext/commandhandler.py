@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler class."""
-import warnings
-
 from future.utils import string_types
 
 from telegram import Update
@@ -126,13 +124,6 @@ class CommandHandler(Handler):
         self.allow_edited = allow_edited
         self.pass_args = pass_args
 
-        # We put this up here instead of with the rest of checking code
-        # in check_update since we don't wanna spam a ton
-        if isinstance(self.filters, list):
-            warnings.warn('Using a list of filters in MessageHandler is getting '
-                          'deprecated, please use bitwise operators (& and |) '
-                          'instead. More info: https://git.io/vPTbc.')
-
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
@@ -160,18 +151,14 @@ class CommandHandler(Handler):
 
                     if self.filters is None:
                         return True
-                    elif isinstance(self.filters, list):
-                        return any(func(message) for func in self.filters)
-                    else:
-                        return self.filters(message)
+                    if self.filters(message):
+                        return message.text.split()[1:]
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
         if self.pass_args:
-            message = update.message or update.edited_message
-            optional_args['args'] = message.text.split()[1:]
+            optional_args['args'] = check_result
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
-        message = update.message or update.edited_message
-        context.args = message.text.split()[1:]
+        context.args = check_result
