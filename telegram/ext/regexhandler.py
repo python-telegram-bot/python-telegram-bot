@@ -177,5 +177,4 @@ class RegexHandler(Handler):
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.groups = check_result.groups()
-        context.groupdict = check_result.groupdict()
+        context.match = check_result

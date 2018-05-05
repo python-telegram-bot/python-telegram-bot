@@ -126,5 +126,4 @@ class StringRegexHandler(Handler):
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         if self.pattern:
-            context.groups = check_result.groups()
-            context.groupdict = check_result.groupdict()
+            context.match = check_result

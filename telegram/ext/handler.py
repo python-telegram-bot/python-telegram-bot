@@ -133,7 +133,6 @@ class Handler(object):
             return self.callback(update, context)
         else:
             optional_args = self.collect_optional_args(dispatcher, update, check_result)
-
             return self.callback(dispatcher.bot, update, **optional_args)
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
@@ -189,10 +188,9 @@ class HandlerContext(object):
             update from the same chat it will be the same ``dict``.
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
-        groups (:obj:`tuple`, optional): If the associated update originated from a
-            regex-supported handler, this will contain the ``re.match(pattern, data).groups()``.
-        groupdict (:obj:`dict`, optional): If the associated update originated from a
-            regex-supported handler, this will contain the ``re.match(pattern, data).groupdict()``.
+        match (:obj:`_sre.SRE_Match`): If the associated update originated from a
+            regex-supported handler, this will contain the object returned from ``re.match(
+            pattern, string)``.
         job_queue (:class:`telegram.ext.JobQueue`): The JobQueue created by the
             :class:`telegram.ext.Updater` which can be used to schedule new jobs.
         update_queue (:class:`queue.Queue`): The ``Queue`` instance used by the
@@ -205,12 +203,16 @@ class HandlerContext(object):
             characters.
     """
 
+    chat_data = None
+    user_data = None
+    args = None
+    match = None
+
     def __init__(self, update, dispatcher):
         self.update = update
         self.bot = dispatcher.bot
-
-        self.chat_data = None
-        self.user_data = None
+        self.job_queue = dispatcher.job_queue
+        self.update_queue = dispatcher.update_queue
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -220,10 +222,3 @@ class HandlerContext(object):
                 self.chat_data = dispatcher.chat_data[chat.id]
             if user:
                 self.user_data = dispatcher.user_data[user.id]
-
-        self.job_queue = dispatcher.job_queue
-        self.update_queue = dispatcher.update_queue
-
-        self.args = None
-        self.groups = None
-        self.groupdict = None
