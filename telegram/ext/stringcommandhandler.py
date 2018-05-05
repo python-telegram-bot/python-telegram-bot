@@ -94,16 +94,18 @@ class StringCommandHandler(Handler):
 
         """
 
-        return (isinstance(update, string_types) and update.startswith('/')
-                and update[1:].split(' ')[0] == self.command)
+        if isinstance(update, string_types) and update.startswith('/'):
+            args = update[1:].split(' ')
+            if args[0] == self.command:
+                return args
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,
                                                                                 update,
                                                                                 check_result)
         if self.pass_args:
-            optional_args['args'] = update.split()[1:]
+            optional_args['args'] = check_result
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.args = update.split()[1:]
+        context.args = check_result
