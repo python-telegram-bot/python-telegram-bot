@@ -107,7 +107,9 @@ class Handler(object):
             update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
 
         Returns:
-            :obj:`bool`
+            Either ``None`` or ``False`` if the update should not be handled. Otherwise an object
+            that will be passed to :attr:`handle_update` and :attr:`collect_additional_context`
+            when the update gets handled.
 
         """
         raise NotImplementedError
@@ -121,9 +123,9 @@ class Handler(object):
         Note that it can be overridden if needed by the subclassing handler.
 
         Args:
-            check_result: The result from check_update
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher to collect optional args.
+            check_result: The result from check_update
 
         """
 
@@ -139,10 +141,10 @@ class Handler(object):
         """Prepares additional arguments for the context. Override if handler needs.
 
         Args:
-            check_result: The result from check_update
             context (:class:`telegram.ext.HandlerContext`): The context.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
             update (:class:`telegram.Update`): The update to gather chat/user id from.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
+            check_result: The result from check_update
         """
         pass
 
@@ -153,9 +155,9 @@ class Handler(object):
         https://git.io/vpVe8 for more info.
 
         Args:
-            check_result: The result from check_update
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
             update (:class:`telegram.Update`): The update to gather chat/user id from.
+            check_result: The result from check_update
         """
         optional_args = dict()
 
@@ -184,18 +186,18 @@ class HandlerContext(object):
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot associated with this context.
-        chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
-            update from the same chat it will be the same ``dict``.
-        user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
-            update from the same user it will be the same ``dict``.
-        match (:obj:`_sre.SRE_Match`): If the associated update originated from a
-            regex-supported handler, this will contain the object returned from ``re.match(
-            pattern, string)``.
         job_queue (:class:`telegram.ext.JobQueue`): The JobQueue created by the
             :class:`telegram.ext.Updater` which can be used to schedule new jobs.
         update_queue (:class:`queue.Queue`): The ``Queue`` instance used by the
             :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             which contains new updates and can be used to insert updates.
+        chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update from the same chat it will be the same ``dict``.
+        user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update from the same user it will be the same ``dict``.
+        match (:obj:`_sre.SRE_Match`, optional): If the associated update originated from a
+            regex-supported handler, this will contain the object returned from ``re.match(
+            pattern, string)``.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
             originated from a :class:`telegram.ext.CommandHandler` or a
             :class:`telegram.ext.StringCommandHandler`. It will contain a list of strings,

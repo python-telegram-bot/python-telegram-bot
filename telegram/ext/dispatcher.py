@@ -279,7 +279,7 @@ class Dispatcher(object):
                     check = handler.check_update(update)
                     if check is not None and check is not False:
                         handler.handle_update(update, self, check)
-                    break
+                        break
 
             # Stop processing with any other handler.
             except DispatcherHandlerStop:
