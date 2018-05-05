@@ -23,7 +23,6 @@ before_cache:
 
 install:
   - pip install -U codecov pytest-cov
-  - pip install -U wheel
   - pip install -U -r requirements.txt
   - pip install -U -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
