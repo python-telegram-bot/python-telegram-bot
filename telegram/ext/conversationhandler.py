@@ -299,19 +299,19 @@ class ConversationHandler(Handler):
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
 
         """
-        new_state = check_result[1].handle_update(update, dispatcher, check_result[2])
-        current_conversation = check_result[0]
-        timeout_job = self.timeout_jobs.pop(current_conversation, None)
+        conversation_key, handler, check_result = check_result
+        new_state = handler.handle_update(update, dispatcher, check_result)
+        timeout_job = self.timeout_jobs.pop(conversation_key, None)
 
         if timeout_job is not None:
             timeout_job.schedule_removal()
         if self.conversation_timeout and new_state != self.END:
-            self.timeout_jobs[current_conversation] = dispatcher.job_queue.run_once(
+            self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
-                context=current_conversation
+                context=conversation_key
             )
 
-        self.update_state(new_state, current_conversation)
+        self.update_state(new_state, conversation_key)
 
     def update_state(self, new_state, key):
         if new_state == self.END:
