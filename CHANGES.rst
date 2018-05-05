@@ -9,6 +9,8 @@ Handler overhaul:
 - Use of `pass_` in handlers is deprecated.
 - Instead use `use_context=True` and change callback from (bot, update, others...) to (update, context) See https://git.io/vpVe8 for help.
 - Handlers should be faster due to deduped logic. For those with their own handlers subclass telegram.ext.Handler, this is backwards incompatible.
+- Remove the last CamelCase CheckUpdate methods from the handlers we missed earlier.
+- Remove the ability to use filter lists in handlers.
 
 **2018-04-17**
 *Released 10.0.2*
