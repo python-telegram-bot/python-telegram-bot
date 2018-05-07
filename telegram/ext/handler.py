@@ -181,18 +181,9 @@ class Handler(object):
 
 
 class HandlerContext(object):
-    """
-    This object represents additional data passed along with an update from telegram.
-    To use it set :attr:`use_context` to ``True`` when creating your handlers, and use the
-    following signature for your callback functions ``def callbackname(update, context):``.
+    """This is a context object passed to the callback called by :class:`telegram.ext.Handler`.
 
     Attributes:
-        bot (:class:`telegram.Bot`): The bot associated with this context.
-        job_queue (:class:`telegram.ext.JobQueue`): The JobQueue created by the
-            :class:`telegram.ext.Updater` which can be used to schedule new jobs.
-        update_queue (:class:`queue.Queue`): The ``Queue`` instance used by the
-            :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            which contains new updates and can be used to insert updates.
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same chat it will be the same ``dict``.
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
@@ -201,10 +192,10 @@ class HandlerContext(object):
             regex-supported handler, this will contain the object returned from ``re.match(
             pattern, string)``.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
-            originated from a :class:`telegram.ext.CommandHandler` or a
-            :class:`telegram.ext.StringCommandHandler`. It will contain a list of strings,
-            which is the text following the command split on single or consecutive whitespace
-            characters.
+            is handled by :class:`telegram.ext.CommandHandler` or
+            :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the text
+            after the command, using any whitespace string as a delimiter.
+
     """
 
     chat_data = None
@@ -213,10 +204,14 @@ class HandlerContext(object):
     match = None
 
     def __init__(self, update, dispatcher):
+        """
+        Args:
+            update (:class:`telegram.Update`):
+            dispatcher (:class:`telegram.ext.Dispatcher`):
+
+        """
         self.update = update
-        self.bot = dispatcher.bot
-        self.job_queue = dispatcher.job_queue
-        self.update_queue = dispatcher.update_queue
+        self._dispatcher = dispatcher
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -226,3 +221,34 @@ class HandlerContext(object):
                 self.chat_data = dispatcher.chat_data[chat.id]
             if user:
                 self.user_data = dispatcher.user_data[user.id]
+
+    @property
+    def bot(self):
+        """
+        Returns:
+            :class:`telegram.Bot`: The bot associated with this context.
+
+        """
+        return self._dispatcher.bot
+
+    @property
+    def job_queue(self):
+        """
+        Returns:
+            :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
+                :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegrm.ext.Updater`
+                associated with this :class:`HandlerContext`.
+
+        """
+        return self._dispatcher.job_queue
+
+    @property
+    def update_queue(self):
+        """
+        Returns:
+            :class:`queue.Queue`: The ``Queue`` instance used by the
+            :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegrm.ext.Updater`
+                associated with this :class:`HandlerContext`.
+
+        """
+        return self._dispatcher.update_queue
