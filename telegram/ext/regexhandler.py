@@ -38,19 +38,19 @@ class RegexHandler(Handler):
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
+        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
-        pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
+        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
             the callback function.
-        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        pass_user_data (:obj:`bool`): Optional. Determines whether ``user_data`` will be passed to
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
             the callback function.
-        pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
     Note:
@@ -58,14 +58,20 @@ class RegexHandler(Handler):
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
-        Note that this is deprecated, please switch to context based handlers. See
+
+        Note that this is DEPRECATED, and you should use Context Based Handlers. See
         https://git.io/vpVe8 for more info.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
-            It will be called when the :attr:`check_update` has determined that an update should be
-            processed by this handler.
+        callback (:obj:`callable`): The callback function for this handler. Will be called when
+            :attr:`check_update` has determined that an update should be processed by this handler.
+            Callback signature for context based API:
+
+            ``def callback(update: Update, context: HandlerContext)``
+
+            The return value of the callback is usually ignored except for the special case of
+            :class:`telegram.ext.ConversationHandler`.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -98,9 +104,9 @@ class RegexHandler(Handler):
             is ``False``.
         allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
-        use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``False`` for while the old `pass_` method is in deprecation.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
 
     Raises:
         ValueError
@@ -120,7 +126,7 @@ class RegexHandler(Handler):
                  message_updates=True,
                  channel_post_updates=False,
                  edited_updates=False,
-                 use_context=None):
+                 use_context=False):
         if not message_updates and not channel_post_updates and not edited_updates:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')

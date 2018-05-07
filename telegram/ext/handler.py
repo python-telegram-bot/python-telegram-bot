@@ -36,7 +36,7 @@ class Handler(object):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
     Note:
@@ -44,6 +44,7 @@ class Handler(object):
         can use to keep any data in will be sent to the :attr:`callback` function.. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
+
         Note that this is DEPRECATED, and you should use Context Based Handlers. See
         https://git.io/vpVe8 for more info.
 
@@ -51,7 +52,9 @@ class Handler(object):
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
-                ``def callback(update: Update, context: HandlerContext)``
+
+            ``def callback(update: Update, context: HandlerContext)``
+
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
@@ -188,21 +191,15 @@ class HandlerContext(object):
             update from the same chat it will be the same ``dict``.
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
-        match (:obj:`_sre.SRE_Match`, optional): If the associated update originated from a
-            regex-supported handler, this will contain the object returned from ``re.match(
-            pattern, string)``.
+        match (:obj:`re match object`, optional): If the associated update originated from a
+            regex-supported handler, this will contain the object returned from
+            ``re.match(pattern, string)``.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler` or
             :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the text
             after the command, using any whitespace string as a delimiter.
 
     """
-
-    chat_data = None
-    user_data = None
-    args = None
-    match = None
-
     def __init__(self, update, dispatcher):
         """
         Args:
@@ -212,6 +209,10 @@ class HandlerContext(object):
         """
         self.update = update
         self._dispatcher = dispatcher
+        self.chat_data = None
+        self.user_data = None
+        self.args = None
+        self.match = None
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -224,20 +225,15 @@ class HandlerContext(object):
 
     @property
     def bot(self):
-        """
-        Returns:
-            :class:`telegram.Bot`: The bot associated with this context.
-
-        """
+        """:class:`telegram.Bot`: The bot associated with this context."""
         return self._dispatcher.bot
 
     @property
     def job_queue(self):
         """
-        Returns:
-            :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
-                :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegrm.ext.Updater`
-                associated with this :class:`HandlerContext`.
+        :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
+            :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegrm.ext.Updater`
+            associated with this context.
 
         """
         return self._dispatcher.job_queue
@@ -245,10 +241,9 @@ class HandlerContext(object):
     @property
     def update_queue(self):
         """
-        Returns:
-            :class:`queue.Queue`: The ``Queue`` instance used by the
+        :class:`queue.Queue`: The ``Queue`` instance used by the
             :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegrm.ext.Updater`
-                associated with this :class:`HandlerContext`.
+            associated with this context.
 
         """
         return self._dispatcher.update_queue

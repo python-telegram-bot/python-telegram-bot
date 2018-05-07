@@ -38,22 +38,27 @@ class StringRegexHandler(Handler):
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
+        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
-        pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
+        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
             the callback function.
-        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
-            It will be called when the :attr:`check_update` has determined that an update should be
-            processed by this handler.
+        callback (:obj:`callable`): The callback function for this handler. Will be called when
+            :attr:`check_update` has determined that an update should be processed by this handler.
+            Callback signature for context based API:
+
+            ``def callback(update: Update, context: HandlerContext)``
+
+            The return value of the callback is usually ignored except for the special case of
+            :class:`telegram.ext.ConversationHandler`.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -72,9 +77,9 @@ class StringRegexHandler(Handler):
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
             DEPRECATED: Please switch to context based handlers.
-        use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``False`` for while the old `pass_` method is in deprecation.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
 
     """
 
@@ -85,7 +90,7 @@ class StringRegexHandler(Handler):
                  pass_groupdict=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
-                 use_context=None):
+                 use_context=False):
         super(StringRegexHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,

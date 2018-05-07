@@ -33,20 +33,24 @@ class StringCommandHandler(Handler):
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
+        pass_args (:obj:`bool`): Determines whether the handler should be passed
             ``args``.
-        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Optional. Determines whether all `pass_` arguments will be
+        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
             ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
 
     Args:
-        command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
-            It will be called when the :attr:`check_update` has determined that a command should be
-            processed by this handler.
+        callback (:obj:`callable`): The callback function for this handler. Will be called when
+            :attr:`check_update` has determined that an update should be processed by this handler.
+            Callback signature for context based API:
+
+            ``def callback(update: Update, context: HandlerContext)``
+
+            The return value of the callback is usually ignored except for the special case of
+            :class:`telegram.ext.ConversationHandler`.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -62,9 +66,9 @@ class StringCommandHandler(Handler):
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
             DEPRECATED: Please switch to context based handlers.
-        use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``False`` for while the old `pass_` method is in deprecation.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
 
     """
 
@@ -74,7 +78,7 @@ class StringCommandHandler(Handler):
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
-                 use_context=None):
+                 use_context=False):
         super(StringCommandHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
@@ -93,7 +97,6 @@ class StringCommandHandler(Handler):
             :obj:`bool`
 
         """
-
         if isinstance(update, string_types) and update.startswith('/'):
             args = update[1:].split(' ')
             if args[0] == self.command:

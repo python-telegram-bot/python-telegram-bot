@@ -66,15 +66,15 @@ class ConversationHandler(Handler):
         fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
             the user is in a conversation, but every handler for their current state returned
             ``False`` on :attr:`check_update`.
-        allow_reentry (:obj:`bool`): Optional. Determines if a user can restart a conversation with
+        allow_reentry (:obj:`bool`): Determines if a user can restart a conversation with
             an entry point.
         run_async_timeout (:obj:`float`): Optional. The time-out for ``run_async`` decorated
             Handlers.
         timed_out_behavior (List[:class:`telegram.ext.Handler`]): Optional. A list of handlers that
             might be used if the wait for ``run_async`` timed out.
-        per_chat (:obj:`bool`): Optional. If the conversationkey should contain the Chat's ID.
-        per_user (:obj:`bool`): Optional. If the conversationkey should contain the User's ID.
-        per_message (:obj:`bool`): Optional. If the conversationkey should contain the Message's
+        per_chat (:obj:`bool`): If the conversationkey should contain the Chat's ID.
+        per_user (:obj:`bool`): If the conversationkey should contain the User's ID.
+        per_message (:obj:`bool`): If the conversationkey should contain the Message's
             ID.
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
