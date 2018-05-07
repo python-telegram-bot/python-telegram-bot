@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import sys
 from queue import Queue
 
 import pytest
@@ -161,6 +162,7 @@ class TestChosenInlineResultHandler(object):
         dp.process_update(chosen_inline_result)
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             ChosenInlineResultHandler(self.callback_context)

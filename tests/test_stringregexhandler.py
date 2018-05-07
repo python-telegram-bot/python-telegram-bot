@@ -152,7 +152,7 @@ class TestStringRegexHandler(object):
         dp.process_update('test message')
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             StringRegexHandler('test', self.callback_context)
 

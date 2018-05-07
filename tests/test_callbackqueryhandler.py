@@ -200,7 +200,7 @@ class TestCallbackQueryHandler(object):
         dp.process_update(callback_query)
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             CallbackQueryHandler(self.callback_context)
 

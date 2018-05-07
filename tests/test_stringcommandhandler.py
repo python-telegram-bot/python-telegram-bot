@@ -152,7 +152,7 @@ class TestStringCommandHandler(object):
         dp.process_update('/test')
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             StringCommandHandler('test', self.callback_context)
 

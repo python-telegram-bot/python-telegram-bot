@@ -230,6 +230,6 @@ class TestMessageHandler(object):
         dp.process_update(Update(0, edited_channel_post=message))
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             MessageHandler(None, self.callback_context)

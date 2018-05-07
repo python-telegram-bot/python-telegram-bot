@@ -100,6 +100,6 @@ class TestTypeHandler(object):
         dp.process_update({'a': 1, 'b': 2})
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             TypeHandler(dict, self.callback_context)

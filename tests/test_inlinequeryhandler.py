@@ -200,7 +200,7 @@ class TestCallbackQueryHandler(object):
         dp.process_update(inline_query)
         assert self.test_flag
 
-    def test_non_context_deprecation(self, dp):
+    def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             InlineQueryHandler(self.callback_context)
 
