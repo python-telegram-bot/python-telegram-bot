@@ -165,7 +165,7 @@ class TestShippingQueryHandler(object):
         dp.process_update(shiping_query)
         assert self.test_flag
 
-    @pytest.mark.skipif(sys.version_info == (2, 7), reason='pytest fails this for no reason')
+    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_non_context_deprecation(self):
         with pytest.warns(TelegramDeprecationWarning):
             ShippingQueryHandler(self.callback_context)
