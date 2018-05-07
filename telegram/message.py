@@ -311,7 +311,7 @@ class Message(TelegramObject):
         
         """
         if self.chat.type == Chat.SUPERGROUP and self.chat.username:
-            return "t.me/{}/{}".format(self.chat.usermame, self.message_id)
+            return "https://t.me/{}/{}".format(self.chat.usermame, self.message_id)
         return None
 
     @classmethod
