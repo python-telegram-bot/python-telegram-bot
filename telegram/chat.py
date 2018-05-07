@@ -123,7 +123,7 @@ class Chat(TelegramObject):
         :attr:`username`, returns a t.me link of the chat.
         """
         if self.type == Chat.SUPERGROUP and self.username:
-            return "t.me/{}".format(self.usermame)
+            return "https://t.me/{}".format(self.usermame)
         return None
 
     @classmethod
