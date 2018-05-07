@@ -98,7 +98,7 @@ class User(TelegramObject):
 
         """
         if self.username:
-            return "t.me/{}".format(self.username)
+            return "https://t.me/{}".format(self.username)
         return None
 
     @classmethod
