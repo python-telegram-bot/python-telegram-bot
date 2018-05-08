@@ -25,7 +25,7 @@ from telegram import User
 
 @pytest.fixture(scope='class')
 def chat(bot):
-    return Chat(TestChat.id, TestChat.title, TestChat.type, username=TestChat.TestChat.username,
+    return Chat(TestChat.id, TestChat.title, TestChat.type, username=TestChat.username,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot, sticker_set_name=TestChat.sticker_set_name,
                 can_set_sticker_set=TestChat.can_set_sticker_set)
@@ -45,7 +45,7 @@ class TestChat(object):
             'id': self.id,
             'title': self.title,
             'type': self.type,
-            'username': self.username
+            'username': self.username,
             'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
             'can_set_sticker_set': self.can_set_sticker_set
