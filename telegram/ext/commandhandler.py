@@ -48,7 +48,8 @@ class CommandHandler(Handler):
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
         use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
+            callback.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you

@@ -48,7 +48,8 @@ class MessageHandler(Handler):
         allow_edited (:obj:`bool`): If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
         use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
+            callback.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -97,8 +98,8 @@ class MessageHandler(Handler):
         allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
         use_context (:obj:`bool`, optional): If set to ``True``, all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
-            Defaults to ``False`` for while the old `pass_` method is in deprecation.
+            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
+            callback.
 
     Raises:
         ValueError

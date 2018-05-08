@@ -40,7 +40,8 @@ class StringCommandHandler(Handler):
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
         use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.Context` object to the callback.
+            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
+            callback.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
