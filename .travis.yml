@@ -24,6 +24,8 @@ before_cache:
 
 install:
   - pip install -U codecov pytest-cov
+  - echo $TRAVIS_PYTHON_VERSION
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.7'* ]]; then pip install -U git+https://github.com/yaml/pyyaml.git; fi
   - pip install -U -r requirements.txt
   - pip install -U -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
