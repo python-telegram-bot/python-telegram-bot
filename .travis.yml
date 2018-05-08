@@ -4,6 +4,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7-dev"
   - "pypy-5.7.1"
 
 dist: trusty
