@@ -67,7 +67,7 @@ class TestChat(object):
         assert chat_dict['id'] == chat.id
         assert chat_dict['title'] == chat.title
         assert chat_dict['type'] == chat.type
-        assert chaf_dict['username'] == chat.username
+        assert chat_dict['username'] == chat.username
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
 
     def test_link(self, chat):
