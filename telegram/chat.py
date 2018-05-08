@@ -119,7 +119,7 @@ class Chat(TelegramObject):
     @property
     def link(self):
         """
-        :obj:`str`: Convenience property. If the chat is a supergroup and has a 
+        :obj:`str`: Convenience property. If the chat is a supergroup and has a
         :attr:`username`, returns a t.me link of the chat.
         """
         if self.type == Chat.SUPERGROUP and self.username:
