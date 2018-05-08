@@ -282,6 +282,9 @@ class TestMessage(object):
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
+    def test_link(self, message):
+        assert message.link is None
+
     def test_effective_attachment(self, message_params):
         for i in ('audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note',
                   'contact', 'location', 'venue', 'invoice', 'invoice', 'successful_payment'):
