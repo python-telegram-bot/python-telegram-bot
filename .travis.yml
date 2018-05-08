@@ -4,6 +4,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7-dev"
   - "pypy-5.7.1"
 
 dist: trusty
@@ -23,6 +24,8 @@ before_cache:
 
 install:
   - pip install -U codecov pytest-cov
+  - echo $TRAVIS_PYTHON_VERSION
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.7'* ]]; then pip install -U git+https://github.com/yaml/pyyaml.git; fi
   - pip install -U -r requirements.txt
   - pip install -U -r requirements-dev.txt
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
