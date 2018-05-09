@@ -71,25 +71,29 @@ class User(TelegramObject):
 
     @property
     def name(self):
-        """
-        :obj:`str`: Convenience property. If available, returns the user's :attr:`username`
-            prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
-
-        """
+        """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
         if self.username:
             return '@{}'.format(self.username)
         return self.full_name
 
     @property
     def full_name(self):
-        """
-        :obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if available)
-            :attr:`last_name`.
+        """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
+        available) :attr:`last_name`."""
 
-        """
         if self.last_name:
             return u'{} {}'.format(self.first_name, self.last_name)
         return self.first_name
+
+    @property
+    def link(self):
+        """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
+        of the user."""
+
+        if self.username:
+            return "https://t.me/{}".format(self.username)
+        return None
 
     @classmethod
     def de_json(cls, data, bot):
@@ -124,28 +128,28 @@ class User(TelegramObject):
     def mention_markdown(self, name=None):
         """
         Args:
-            name (:obj:`str`): If provided, will overwrite the user's name.
+            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
         Returns:
             :obj:`str`: The inline mention for the user as markdown.
+
         """
-        if not name:
-            return util_mention_markdown(self.id, self.name)
-        else:
+        if name:
             return util_mention_markdown(self.id, name)
+        return util_mention_markdown(self.id, self.full_name)
 
     def mention_html(self, name=None):
         """
         Args:
-            name (:obj:`str`): If provided, will overwrite the user's name.
+            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
         Returns:
             :obj:`str`: The inline mention for the user as HTML.
+
         """
-        if not name:
-            return util_mention_html(self.id, self.name)
-        else:
+        if name:
             return util_mention_html(self.id, name)
+        return util_mention_html(self.id, self.full_name)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
