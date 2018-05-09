@@ -71,11 +71,9 @@ class TestChat(object):
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
 
     def test_link(self, chat):
-        assert chat.link == 'https://t.me/username'
+        assert chat.link == 'https://t.me/{}'.format(chat.username)
         chat.username = None
         assert chat.link is None
-        chat.username = self.username
-        assert chat.link == 'https://t.me/username'
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):

@@ -293,8 +293,6 @@ class TestMessage(object):
                                                            message.message_id)
         message.chat.type = 'private'
         assert message.link is None
-        message.chat.username = None
-        assert message.link is None
 
     def test_effective_attachment(self, message_params):
         for i in ('audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note',

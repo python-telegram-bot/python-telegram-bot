@@ -97,7 +97,7 @@ class TestUser(object):
         assert user.full_name == u'first\u2022name'
 
     def test_link(self, user):
-        assert user.link == 'https://t.me/username'
+        assert user.link == 'https://t.me/{}'.format(user.username)
         user.username = None
         assert user.link is None
 
