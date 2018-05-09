@@ -306,12 +306,12 @@ class Message(TelegramObject):
     @property
     def link(self):
         """
-        :obj:`str`: Convenience property. If the chat of the message is a supergroup and has a
-            :attr:`username`, returns a t.me link of the message.
+        :obj:`str`: Convenience property. If the chat of the message is a supergroup
+        or a channel and has a :attr:`username`, returns a t.me link of the message.
 
         """
-        if self.chat.type == Chat.SUPERGROUP and self.chat.username:
-            return "https://t.me/{}/{}".format(self.chat.usermame, self.message_id)
+        if self.chat.type in (Chat.SUPERGROUP, Chat.CHANNEL) and self.chat.username:
+            return "https://t.me/{}/{}".format(self.chat.username, self.message_id)
         return None
 
     @classmethod
