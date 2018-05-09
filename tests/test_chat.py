@@ -25,7 +25,7 @@ from telegram import User
 
 @pytest.fixture(scope='class')
 def chat(bot):
-    return Chat(TestChat.id, TestChat.title, TestChat.type,
+    return Chat(TestChat.id, TestChat.title, TestChat.type, username=TestChat.username,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot, sticker_set_name=TestChat.sticker_set_name,
                 can_set_sticker_set=TestChat.can_set_sticker_set)
@@ -35,6 +35,7 @@ class TestChat(object):
     id = -28767330
     title = 'ToledosPalaceBot - Group'
     type = 'group'
+    username = 'username'
     all_members_are_administrators = False
     sticker_set_name = 'stickers'
     can_set_sticker_set = False
@@ -44,6 +45,7 @@ class TestChat(object):
             'id': self.id,
             'title': self.title,
             'type': self.type,
+            'username': self.username,
             'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
             'can_set_sticker_set': self.can_set_sticker_set
@@ -53,6 +55,7 @@ class TestChat(object):
         assert chat.id == self.id
         assert chat.title == self.title
         assert chat.type == self.type
+        assert chat.username == self.username
         assert chat.all_members_are_administrators == self.all_members_are_administrators
         assert chat.sticker_set_name == self.sticker_set_name
         assert chat.can_set_sticker_set == self.can_set_sticker_set
@@ -64,7 +67,13 @@ class TestChat(object):
         assert chat_dict['id'] == chat.id
         assert chat_dict['title'] == chat.title
         assert chat_dict['type'] == chat.type
+        assert chat_dict['username'] == chat.username
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
+
+    def test_link(self, chat):
+        assert chat.link == 'https://t.me/{}'.format(chat.username)
+        chat.username = None
+        assert chat.link is None
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):
