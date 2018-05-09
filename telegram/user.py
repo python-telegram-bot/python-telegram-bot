@@ -149,7 +149,7 @@ class User(TelegramObject):
         """
         Args:
             name (:obj:`str`): If provided, will overwrite the user's full name.
-            
+
         Returns:
             :obj:`str`: The inline mention for the user as HTML.
 
