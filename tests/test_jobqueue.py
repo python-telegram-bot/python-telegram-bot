@@ -22,14 +22,17 @@ import time
 from time import sleep
 
 import pytest
+import sys
 from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 @pytest.fixture(scope='function')
-def job_queue(bot):
-    jq = JobQueue(bot)
+def job_queue(bot, _dp):
+    jq = JobQueue()
+    jq.set_dispatcher(_dp)
     jq.start()
     yield jq
     jq.stop()
@@ -244,3 +247,8 @@ class TestJobQueue(object):
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
+
+    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
+    def test_bot_in_init_deprecation(self, bot):
+            with pytest.warns(TelegramDeprecationWarning):
+                JobQueue(bot)

@@ -18,15 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes JobQueue and Job."""
 
+import datetime
 import logging
 import time
-import datetime
+import warnings
 import weakref
 from numbers import Number
-from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
+from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class Days(object):
@@ -39,11 +41,22 @@ class JobQueue(object):
 
     Attributes:
         _queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
-
+        bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
+            DEPRECATED: Use set_dispatcher instead.
     """
 
-    def __init__(self):
+    def __init__(self, bot=None):
         self._queue = PriorityQueue()
+        if bot:
+            warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
+                          "instead!", TelegramDeprecationWarning, stacklevel=2)
+
+            class MockDispatcher(object):
+                def __init__(self):
+                    self.bot = bot
+                    self.use_context = False
+
+            self._dispatcher = MockDispatcher()
         self._dispatcher = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__start_lock = Lock()
