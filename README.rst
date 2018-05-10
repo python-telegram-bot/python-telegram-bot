@@ -5,15 +5,17 @@
 
 We have made you a wrapper you can't refuse
 
+We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
+
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
+   :target: https://pypi.org/project/python-telegram-bot/
    :alt: PyPi Package Version
 
 .. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
-   :alt: Supported python versions
+   :target: https://pypi.org/project/python-telegram-bot/
+   :alt: Supported Python versions
 
 .. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
    :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
@@ -31,8 +33,8 @@ We have made you a wrapper you can't refuse
    :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
    :alt: Travis CI Status
 
-.. image:: https://img.shields.io/appveyor/ci/Eldinnie/python-telegram-bot/master.svg?logo=appveyor
-   :target: https://ci.appveyor.com/project/Eldinnie/python-telegram-bot
+.. image:: https://img.shields.io/appveyor/ci/python-telegram-bot/python-telegram-bot/master.svg?logo=appveyor
+   :target: https://ci.appveyor.com/project/python-telegram-bot/python-telegram-bot
    :alt: AppVeyor CI Status
 
 
@@ -93,7 +95,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API 3.4 are supported.
+All types and methods of the Telegram Bot API 3.6 are supported.
 
 ==========
 Installing

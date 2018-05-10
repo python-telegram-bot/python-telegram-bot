@@ -17,4 +17,18 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = '10.1.0'
+import pytest
+
+from telegram import TelegramError
+from telegram.utils.request import Request
+
+
+def test_parse_illegal_callback_data():
+    """
+    Clients can send arbitrary bytes in callback data.
+    Make sure the correct error is raised in this case.
+    """
+    server_response = b'{"invalid utf-8": "\x80"}'
+
+    with pytest.raises(TelegramError, match='Server response could not be decoded using UTF-8'):
+        Request._parse(server_response)

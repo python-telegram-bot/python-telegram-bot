@@ -71,25 +71,29 @@ class User(TelegramObject):
 
     @property
     def name(self):
-        """
-        :obj:`str`: Convenience property. If available, returns the user's :attr:`username`
-            prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`.
-
-        """
+        """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`
+        prefixed with "@". If :attr:`username` is not available, returns :attr:`full_name`."""
         if self.username:
             return '@{}'.format(self.username)
         return self.full_name
 
     @property
     def full_name(self):
-        """
-        :obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if available)
-            :attr:`last_name`.
+        """:obj:`str`: Convenience property. The user's :attr:`first_name`, followed by (if
+        available) :attr:`last_name`."""
 
-        """
         if self.last_name:
-            return '{} {}'.format(self.first_name, self.last_name)
+            return u'{} {}'.format(self.first_name, self.last_name)
         return self.first_name
+
+    @property
+    def link(self):
+        """:obj:`str`: Convenience property. If :attr:`username` is available, returns a t.me link
+        of the user."""
+
+        if self.username:
+            return "https://t.me/{}".format(self.username)
+        return None
 
     @classmethod
     def de_json(cls, data, bot):
@@ -124,33 +128,33 @@ class User(TelegramObject):
     def mention_markdown(self, name=None):
         """
         Args:
-            name (:obj:`str`): If provided, will overwrite the user's name.
+            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
         Returns:
             :obj:`str`: The inline mention for the user as markdown.
+
         """
-        if not name:
-            return util_mention_markdown(self.id, self.name)
-        else:
+        if name:
             return util_mention_markdown(self.id, name)
+        return util_mention_markdown(self.id, self.full_name)
 
     def mention_html(self, name=None):
         """
         Args:
-            name (:obj:`str`): If provided, will overwrite the user's name.
+            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
         Returns:
             :obj:`str`: The inline mention for the user as HTML.
+
         """
-        if not name:
-            return util_mention_html(self.id, self.name)
-        else:
+        if name:
             return util_mention_html(self.id, name)
+        return util_mention_html(self.id, self.full_name)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_message(User.chat_id, *args, **kwargs)
+            bot.send_message(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -158,12 +162,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_message(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_message(self.id, *args, **kwargs)
 
     def send_photo(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_photo(User.chat_id, *args, **kwargs)
+            bot.send_photo(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -171,12 +175,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_photo(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_photo(self.id, *args, **kwargs)
 
     def send_audio(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_audio(User.chat_id, *args, **kwargs)
+            bot.send_audio(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -184,12 +188,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_audio(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_audio(self.id, *args, **kwargs)
 
     def send_document(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_document(User.chat_id, *args, **kwargs)
+            bot.send_document(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -197,12 +201,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_document(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_document(self.id, *args, **kwargs)
 
     def send_sticker(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_sticker(User.chat_id, *args, **kwargs)
+            bot.send_sticker(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -210,12 +214,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_sticker(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_sticker(self.id, *args, **kwargs)
 
     def send_video(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video(User.chat_id, *args, **kwargs)
+            bot.send_video(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -223,12 +227,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_video(self.id, *args, **kwargs)
 
     def send_video_note(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_video_note(User.chat_id, *args, **kwargs)
+            bot.send_video_note(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -236,12 +240,12 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video_note(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_video_note(self.id, *args, **kwargs)
 
     def send_voice(self, *args, **kwargs):
         """Shortcut for::
 
-            bot.send_voice(User.chat_id, *args, **kwargs)
+            bot.send_voice(User.id, *args, **kwargs)
 
         Where User is the current instance.
 
@@ -249,4 +253,4 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_voice(chat_id=self.id, *args, **kwargs)
+        return self.bot.send_voice(self.id, *args, **kwargs)

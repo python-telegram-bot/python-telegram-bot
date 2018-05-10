@@ -221,6 +221,79 @@ class Filters(object):
     class _Document(BaseFilter):
         name = 'Filters.document'
 
+        class category(BaseFilter):
+            """This Filter filters documents by their category in the mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of the document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.category('audio/') returnes `True` for all types
+                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'
+            """
+
+            def __init__(self, category):
+                """Initialize the category you want to filter
+
+                Args:
+                    category (str, optional): category of the media you want to filter"""
+                self.category = category
+                self.name = "Filters.document.category('{}')".format(self.category)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type.startswith(self.category)
+
+        application = category('application/')
+        audio = category('audio/')
+        image = category('image/')
+        video = category('video/')
+        text = category('text/')
+
+        class mime_type(BaseFilter):
+            """This Filter filters documents by their mime-type attribute
+
+            Note:
+                This Filter only filters by the mime_type of the document,
+                    it doesn't check the validity of document.
+                The user can manipulate the mime-type of a message and
+                    send media with wrong types that don't fit to this handler.
+
+            Examples:
+                Filters.documents.mime_type('audio/mpeg') filters all audio in mp3 format.
+            """
+
+            def __init__(self, mimetype):
+                """Initialize the category you want to filter
+
+                Args:
+                    filetype (str, optional): mime_type of the media you want to filter"""
+                self.mimetype = mimetype
+                self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
+
+            def filter(self, message):
+                if message.document:
+                    return message.document.mime_type == self.mimetype
+
+        apk = mime_type('application/vnd.android.package-archive')
+        doc = mime_type('application/msword')
+        docx = mime_type('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        exe = mime_type('application/x-ms-dos-executable')
+        gif = mime_type('video/mp4')
+        jpg = mime_type('image/jpeg')
+        mp3 = mime_type('audio/mpeg')
+        pdf = mime_type('application/pdf')
+        py = mime_type('text/x-python')
+        svg = mime_type('image/svg+xml')
+        txt = mime_type('text/plain')
+        targz = mime_type('application/x-compressed-tar')
+        wav = mime_type('audio/x-wav')
+        xml = mime_type('application/xml')
+        zip = mime_type('application/zip')
+
         def filter(self, message):
             return bool(message.document)
 
@@ -262,6 +335,15 @@ class Filters(object):
 
     voice = _Voice()
     """:obj:`Filter`: Messages that contain :class:`telegram.Voice`."""
+
+    class _VideoNote(BaseFilter):
+        name = 'Filters.video_note'
+
+        def filter(self, message):
+            return bool(message.video_note)
+
+    video_note = _VideoNote()
+    """:obj:`Filter`: Messages that contain :class:`telegram.VideoNote`."""
 
     class _Contact(BaseFilter):
         name = 'Filters.contact'
@@ -459,7 +541,28 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
-            return any([entity.type == self.entity_type for entity in message.entities])
+            return any(entity.type == self.entity_type for entity in message.entities)
+
+    class caption_entity(BaseFilter):
+        """
+        Filters media messages to only allow those which have a :class:`telegram.MessageEntity`
+        where their `type` matches `entity_type`.
+
+        Examples:
+            Example ``MessageHandler(Filters.caption_entity("hashtag"), callback_method)``
+
+        Args:
+            entity_type: Caption Entity type to check for. All types can be found as constants
+                in :class:`telegram.MessageEntity`.
+
+        """
+
+        def __init__(self, entity_type):
+            self.entity_type = entity_type
+            self.name = 'Filters.caption_entity({})'.format(self.entity_type)
+
+        def filter(self, message):
+            return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
         name = 'Filters.private'

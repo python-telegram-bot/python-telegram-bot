@@ -25,7 +25,7 @@ from telegram import User
 
 @pytest.fixture(scope='class')
 def chat(bot):
-    return Chat(TestChat.id, TestChat.title, TestChat.type,
+    return Chat(TestChat.id, TestChat.title, TestChat.type, username=TestChat.username,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot, sticker_set_name=TestChat.sticker_set_name,
                 can_set_sticker_set=TestChat.can_set_sticker_set)
@@ -35,6 +35,7 @@ class TestChat(object):
     id = -28767330
     title = 'ToledosPalaceBot - Group'
     type = 'group'
+    username = 'username'
     all_members_are_administrators = False
     sticker_set_name = 'stickers'
     can_set_sticker_set = False
@@ -44,6 +45,7 @@ class TestChat(object):
             'id': self.id,
             'title': self.title,
             'type': self.type,
+            'username': self.username,
             'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
             'can_set_sticker_set': self.can_set_sticker_set
@@ -53,6 +55,7 @@ class TestChat(object):
         assert chat.id == self.id
         assert chat.title == self.title
         assert chat.type == self.type
+        assert chat.username == self.username
         assert chat.all_members_are_administrators == self.all_members_are_administrators
         assert chat.sticker_set_name == self.sticker_set_name
         assert chat.can_set_sticker_set == self.can_set_sticker_set
@@ -64,7 +67,13 @@ class TestChat(object):
         assert chat_dict['id'] == chat.id
         assert chat_dict['title'] == chat.title
         assert chat_dict['type'] == chat.type
+        assert chat_dict['username'] == chat.username
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
+
+    def test_link(self, chat):
+        assert chat.link == 'https://t.me/{}'.format(chat.username)
+        chat.username = None
+        assert chat.link is None
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):
@@ -126,52 +135,59 @@ class TestChat(object):
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and args[1] == 'test'
+            return args[1] == chat.id and args[2] == 'test'
 
         monkeypatch.setattr('telegram.Bot.send_message', test)
         assert chat.send_message('test')
 
+    def test_instance_method_send_photo(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_photo'
+
+        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        assert chat.send_photo('test_photo')
+
     def test_instance_method_send_audio(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and kwargs['audio'] == 'test_audio'
+            return args[1] == chat.id and args[2] == 'test_audio'
 
         monkeypatch.setattr('telegram.Bot.send_audio', test)
-        assert chat.send_audio(audio='test_audio')
+        assert chat.send_audio('test_audio')
 
     def test_instance_method_send_document(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and kwargs['document'] == 'test_document'
+            return args[1] == chat.id and args[2] == 'test_document'
 
         monkeypatch.setattr('telegram.Bot.send_document', test)
-        assert chat.send_document(document='test_document')
+        assert chat.send_document('test_document')
 
     def test_instance_method_send_sticker(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and kwargs['sticker'] == 'test_sticker'
+            return args[1] == chat.id and args[2] == 'test_sticker'
 
         monkeypatch.setattr('telegram.Bot.send_sticker', test)
-        assert chat.send_sticker(sticker='test_sticker')
+        assert chat.send_sticker('test_sticker')
 
     def test_instance_method_send_video(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and kwargs['video'] == 'test_video'
+            return args[1] == chat.id and args[2] == 'test_video'
 
         monkeypatch.setattr('telegram.Bot.send_video', test)
-        assert chat.send_video(video='test_video')
+        assert chat.send_video('test_video')
 
     def test_instance_method_send_video_note(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and kwargs['video_note'] == 'test_video_note'
+            return args[1] == chat.id and args[2] == 'test_video_note'
 
         monkeypatch.setattr('telegram.Bot.send_video_note', test)
-        assert chat.send_video_note(video_note='test_video_note')
+        assert chat.send_video_note('test_video_note')
 
     def test_instance_method_send_voice(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return kwargs['chat_id'] == chat.id and kwargs['voice'] == 'test_voice'
+            return args[1] == chat.id and args[2] == 'test_voice'
 
         monkeypatch.setattr('telegram.Bot.send_voice', test)
-        assert chat.send_voice(voice='test_voice')
+        assert chat.send_voice('test_voice')
 
     def test_equality(self):
         a = Chat(self.id, self.title, self.type)
