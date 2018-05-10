@@ -22,8 +22,7 @@ import pytest
 
 from telegram import (Update, CallbackQuery, Bot, Message, User, Chat, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, Location)
-from telegram.ext import InlineQueryHandler, HandlerContext, JobQueue
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.ext import InlineQueryHandler, CallbackContext, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -88,7 +87,7 @@ class TestCallbackQueryHandler(object):
             self.test_flag = groupdict == {'begin': 't', 'end': ' query'}
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, HandlerContext) and
+        self.test_flag = (isinstance(context, CallbackContext) and
                           isinstance(context.bot, Bot) and
                           isinstance(update, Update) and
                           isinstance(context.update_queue, Queue) and
@@ -104,7 +103,7 @@ class TestCallbackQueryHandler(object):
             self.test_flag = context.match.groupdict() == {'begin': 't', 'end': ' query'}
 
     def test_basic(self, dp, inline_query):
-        handler = InlineQueryHandler(self.callback_basic, use_context=False)
+        handler = InlineQueryHandler(self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update(inline_query)
@@ -113,7 +112,7 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_with_pattern(self, inline_query):
-        handler = InlineQueryHandler(self.callback_basic, use_context=False,
+        handler = InlineQueryHandler(self.callback_basic,
                                      pattern='(?P<begin>.*)est(?P<end>.*)')
 
         assert handler.check_update(inline_query)
@@ -122,7 +121,7 @@ class TestCallbackQueryHandler(object):
         assert not handler.check_update(inline_query)
 
     def test_with_passing_group_dict(self, dp, inline_query):
-        handler = InlineQueryHandler(self.callback_group, use_context=False,
+        handler = InlineQueryHandler(self.callback_group,
                                      pattern='(?P<begin>.*)est(?P<end>.*)',
                                      pass_groups=True)
         dp.add_handler(handler)
@@ -131,7 +130,7 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.callback_group, use_context=False,
+        handler = InlineQueryHandler(self.callback_group,
                                      pattern='(?P<begin>.*)est(?P<end>.*)',
                                      pass_groupdict=True)
         dp.add_handler(handler)
@@ -141,14 +140,14 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, inline_query):
-        handler = InlineQueryHandler(self.callback_data_1, use_context=False, pass_user_data=True)
+        handler = InlineQueryHandler(self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(inline_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.callback_data_1, use_context=False, pass_chat_data=True)
+        handler = InlineQueryHandler(self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -156,7 +155,7 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.callback_data_2, use_context=False, pass_chat_data=True,
+        handler = InlineQueryHandler(self.callback_data_2, pass_chat_data=True,
                                      pass_user_data=True)
         dp.add_handler(handler)
 
@@ -165,14 +164,14 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, inline_query):
-        handler = InlineQueryHandler(self.callback_queue_1, use_context=False, pass_job_queue=True)
+        handler = InlineQueryHandler(self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(inline_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.callback_queue_1, use_context=False,
+        handler = InlineQueryHandler(self.callback_queue_1,
                                      pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -181,7 +180,7 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.callback_queue_2, use_context=False, pass_job_queue=True,
+        handler = InlineQueryHandler(self.callback_queue_2, pass_job_queue=True,
                                      pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -190,34 +189,28 @@ class TestCallbackQueryHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = InlineQueryHandler(self.callback_basic, use_context=False)
+        handler = InlineQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, inline_query):
-        handler = InlineQueryHandler(self.callback_context, use_context=True)
-        dp.add_handler(handler)
+    def test_context(self, cdp, inline_query):
+        handler = InlineQueryHandler(self.callback_context)
+        cdp.add_handler(handler)
 
-        dp.process_update(inline_query)
+        cdp.process_update(inline_query)
         assert self.test_flag
 
-    def test_non_context_deprecation(self):
-        with pytest.warns(TelegramDeprecationWarning):
-            InlineQueryHandler(self.callback_context)
-
-    def test_context_pattern(self, dp, inline_query):
+    def test_context_pattern(self, cdp, inline_query):
         handler = InlineQueryHandler(self.callback_context_pattern,
-                                     pattern=r'(?P<begin>.*)est(?P<end>.*)',
-                                     use_context=True)
-        dp.add_handler(handler)
+                                     pattern=r'(?P<begin>.*)est(?P<end>.*)')
+        cdp.add_handler(handler)
 
-        dp.process_update(inline_query)
+        cdp.process_update(inline_query)
         assert self.test_flag
 
-        dp.remove_handler(handler)
+        cdp.remove_handler(handler)
         handler = InlineQueryHandler(self.callback_context_pattern,
-                                     pattern=r'(t)est(.*)',
-                                     use_context=True)
-        dp.add_handler(handler)
+                                     pattern=r'(t)est(.*)')
+        cdp.add_handler(handler)
 
-        dp.process_update(inline_query)
+        cdp.process_update(inline_query)
         assert self.test_flag

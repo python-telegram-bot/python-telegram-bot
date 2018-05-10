@@ -5,6 +5,7 @@
 # This program is dedicated to the public domain under the CC0 license.
 """
 import logging
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 
@@ -13,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def start(bot, update):
+def start(update, context):
     keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
                  InlineKeyboardButton("Option 2", callback_data='2')],
 
@@ -24,26 +25,26 @@ def start(bot, update):
     update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
 
-def button(bot, update):
+def button(update, context):
     query = update.callback_query
 
-    bot.edit_message_text(text="Selected option: {}".format(query.data),
-                          chat_id=query.message.chat_id,
-                          message_id=query.message.message_id)
+    query.edit_message_text(text="Selected option: {}".format(query.data))
 
 
-def help(bot, update):
+def help(update, context):
     update.message.reply_text("Use /start to test this bot.")
 
 
-def error(bot, update, error):
+def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    # Make sure to set use_context=True to use the new context based callbacks
+    # Post version 12 this will no longer be necessary
+    updater = Updater("TOKEN", use_context=True)
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))

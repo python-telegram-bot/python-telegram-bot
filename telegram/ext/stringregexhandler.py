@@ -46,9 +46,6 @@ class StringRegexHandler(Handler):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
-            callback.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -56,31 +53,28 @@ class StringRegexHandler(Handler):
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
 
-            ``def callback(update: Update, context: HandlerContext)``
+            ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
             Default is ``False``
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
+            DEPRECATED: Please switch to context based callbacks.
 
     """
 
@@ -90,13 +84,11 @@ class StringRegexHandler(Handler):
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_update_queue=False,
-                 pass_job_queue=False,
-                 use_context=False):
+                 pass_job_queue=False):
         super(StringRegexHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            use_context=use_context)
+            pass_job_queue=pass_job_queue)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)

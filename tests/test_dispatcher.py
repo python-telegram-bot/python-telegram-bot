@@ -24,7 +24,7 @@ from time import sleep
 import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
-from telegram.ext import MessageHandler, Filters, CommandHandler, HandlerContext, JobQueue
+from telegram.ext import MessageHandler, Filters, CommandHandler, CallbackContext, JobQueue
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
@@ -70,7 +70,7 @@ class TestDispatcher(object):
             self.received = update.message
 
     def callback_context(self, update, context):
-        if (isinstance(context, HandlerContext) and
+        if (isinstance(context, CallbackContext) and
                 isinstance(context.bot, Bot) and
                 isinstance(context.update_queue, Queue) and
                 isinstance(context.job_queue, JobQueue) and
@@ -327,15 +327,16 @@ class TestDispatcher(object):
         assert passed == ['start1', 'error', err]
         assert passed[2] is err
 
-    def test_context(self, dp):
-        dp.add_error_handler(self.callback_context, True)
+    def test_error_handler_context(self, cdp):
+        cdp.add_error_handler(self.callback_context)
 
         error = TelegramError('Unauthorized.')
-        dp.update_queue.put(error)
+        cdp.update_queue.put(error)
         sleep(.1)
         assert self.received == 'Unauthorized.'
 
     @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_non_context_deprecation(self, dp):
         with pytest.warns(TelegramDeprecationWarning):
-            dp.add_error_handler(self.callback_context)
+            Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0,
+                       use_context=False)

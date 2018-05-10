@@ -32,7 +32,8 @@ from queue import Queue, Empty
 from future.builtins import range
 
 from telegram import TelegramError
-from telegram.ext.handler import Handler, HandlerContext
+from telegram.ext.handler import Handler
+from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 
@@ -80,6 +81,9 @@ class Dispatcher(object):
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator. defaults to 4.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
 
     """
 
@@ -88,11 +92,22 @@ class Dispatcher(object):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
+    def __init__(self,
+                 bot,
+                 update_queue,
+                 workers=4,
+                 exception_event=None,
+                 job_queue=None,
+                 use_context=False):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
+        self.use_context = use_context
+
+        if not use_context:
+            warnings.warn('Old Handler API is deprecated - see https://git.io/vp113 for details',
+                          TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
         """:obj:`dict`: A dictionary handlers can use to store data for the user."""
@@ -355,27 +370,21 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def add_error_handler(self, callback, use_context=False):
+    def add_error_handler(self, callback):
         """Registers an error handler in the Dispatcher.
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised Callback signature for context based API:
 
-                ``def callback(update: Update, context: HandlerContext)``
+                ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
-            use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback
-                API. During the deprecation period of the old API the default is ``False``.
-                **New users**: set this to ``True``.
 
         Note:
-            See https://git.io/vpVe8 for more info about switching to context based API.
+            See https://git.io/vp113 for more info about switching to context based API.
         """
-        if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/vpVe8 for details',
-                          TelegramDeprecationWarning, stacklevel=2)
-        self.error_handlers.append((callback, use_context))
+        self.error_handlers.append(callback)
 
     def remove_error_handler(self, callback):
         """Removes an error handler.
@@ -384,16 +393,8 @@ class Dispatcher(object):
             callback (:obj:`callable`): The error handler to remove.
 
         """
-        try:
-            self.error_handlers.remove((callback, True))
-            return
-        except ValueError:
-            pass
-        try:
-            self.error_handlers.remove((callback, False))
-            return
-        except ValueError:
-            pass
+        if callback in self.error_handlers:
+            self.error_handlers.remove(callback)
 
     def dispatch_error(self, update, error):
         """Dispatches an error.
@@ -404,9 +405,9 @@ class Dispatcher(object):
 
         """
         if self.error_handlers:
-            for callback, use_context in self.error_handlers:
-                if use_context:
-                    callback(update, HandlerContext.from_error(update, error, self))
+            for callback in self.error_handlers:
+                if self.use_context:
+                    callback(update, CallbackContext.from_error(update, error, self))
                 else:
                     callback(self.bot, update, error)
 

@@ -57,6 +57,7 @@ class Updater(object):
         dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
             dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
+        use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -73,6 +74,9 @@ class Updater(object):
             `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
             request_kwargs are very useful for the advanced users who would like to control the
             default timeouts and/or control the proxy used for http communication.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -90,7 +94,8 @@ class Updater(object):
                  workers=4,
                  bot=None,
                  user_sig_handler=None,
-                 request_kwargs=None):
+                 request_kwargs=None,
+                 use_context=False):
 
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
@@ -122,14 +127,16 @@ class Updater(object):
             self.bot = Bot(token, base_url, request=self._request)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
-        self.job_queue = JobQueue(self.bot)
+        self.job_queue = JobQueue()
         self.__exception_event = Event()
         self.dispatcher = Dispatcher(
             self.bot,
             self.update_queue,
             job_queue=self.job_queue,
             workers=workers,
-            exception_event=self.__exception_event)
+            exception_event=self.__exception_event,
+            use_context=use_context)
+        self.job_queue.set_dispatcher(self.dispatcher)
         self.last_update_id = 0
         self.running = False
         self.is_idle = False

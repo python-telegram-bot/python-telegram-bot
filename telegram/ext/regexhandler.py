@@ -50,9 +50,6 @@ class RegexHandler(Handler):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
-            callback.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -60,8 +57,8 @@ class RegexHandler(Handler):
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
 
-        Note that this is DEPRECATED, and you should use Context Based Handlers. See
-        https://git.io/vpVe8 for more info.
+        Note that this is DEPRECATED, and you should use context based callbacks. See
+        https://git.io/vp113 for more info.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -69,34 +66,34 @@ class RegexHandler(Handler):
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
 
-            ``def callback(update: Update, context: HandlerContext)``
+            ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_groupdict (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groupdict()`` as a keyword argument called ``groupdict``.
             Default is ``False``
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         message_updates (:obj:`bool`, optional): Should "normal" message updates be handled?
             Default is ``True``.
         channel_post_updates (:obj:`bool`, optional): Should channel posts updates be handled?
@@ -105,9 +102,6 @@ class RegexHandler(Handler):
             is ``False``.
         allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
             Default is ``False`` - Deprecated. use edited_updates instead.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
 
     Raises:
         ValueError
@@ -126,8 +120,7 @@ class RegexHandler(Handler):
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
-                 edited_updates=False,
-                 use_context=False):
+                 edited_updates=False):
         if not message_updates and not channel_post_updates and not edited_updates:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')
@@ -140,8 +133,7 @@ class RegexHandler(Handler):
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data,
-            use_context=use_context)
+            pass_chat_data=pass_chat_data)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)

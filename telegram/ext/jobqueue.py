@@ -26,6 +26,8 @@ from numbers import Number
 from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
 
+from telegram.ext.callbackcontext import CallbackContext
+
 
 class Days(object):
     MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
@@ -37,16 +39,12 @@ class JobQueue(object):
 
     Attributes:
         _queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
-        bot (:class:`telegram.Bot`): Bot that's send to the handlers.
-
-    Args:
-        bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
 
     """
 
-    def __init__(self, bot):
+    def __init__(self):
         self._queue = PriorityQueue()
-        self.bot = bot
+        self._dispatcher = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__start_lock = Lock()
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick
@@ -54,6 +52,9 @@ class JobQueue(object):
         self.__thread = None
         self._next_peek = None
         self._running = False
+
+    def set_dispatcher(self, dispatcher):
+        self._dispatcher = dispatcher
 
     def _put(self, job, next_t=None, last_t=None):
         if next_t is None:
@@ -242,7 +243,7 @@ class JobQueue(object):
                     current_week_day = datetime.datetime.now().weekday()
                     if any(day == current_week_day for day in job.days):
                         self.logger.debug('Running job %s', job.name)
-                        job.run(self.bot)
+                        job.run(self._dispatcher)
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -367,9 +368,12 @@ class Job(object):
         self._enabled = Event()
         self._enabled.set()
 
-    def run(self, bot):
+    def run(self, dispatcher):
         """Executes the callback function."""
-        self.callback(bot, self)
+        if dispatcher.use_context:
+            self.callback(CallbackContext.from_job(self, dispatcher))
+        else:
+            self.callback(dispatcher.bot, self)
 
     def schedule_removal(self):
         """

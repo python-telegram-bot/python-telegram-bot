@@ -17,10 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
-import warnings
-
-from telegram import Update
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.ext.callbackcontext import CallbackContext
 
 
 class Handler(object):
@@ -36,9 +33,6 @@ class Handler(object):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
-        use_context (:obj:`bool`): Determines whether all `pass_` arguments will be
-            ignored in favor of passing a :class:`telegram.ext.HandlerContext` object to the
-            callback.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -46,15 +40,15 @@ class Handler(object):
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
 
-        Note that this is DEPRECATED, and you should use Context Based Handlers. See
-        https://git.io/vpVe8 for more info.
+        Note that this is DEPRECATED, and you should use context based callbacks. See
+        https://git.io/vp113 for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
 
-            ``def callback(update: Update, context: HandlerContext)``
+            ``def callback(update: Update, context: CallbackContext)``
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -62,44 +56,32 @@ class Handler(object):
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
+            DEPRECATED: Please switch to context based callbacks.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based handlers.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
+            DEPRECATED: Please switch to context based callbacks.
 
     """
+
     def __init__(self,
                  callback,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False,
-                 use_context=False):
+                 pass_chat_data=False):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
-        self.use_context = use_context
-
-        if use_context and (
-                pass_update_queue or pass_job_queue or pass_user_data or pass_chat_data):
-            raise ValueError('Mix of Context Based Handler API and old Handler API is not allowed')
-
-        if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/vpVe8 for details',
-                          TelegramDeprecationWarning, stacklevel=3)
 
     def check_update(self, update):
         """
@@ -131,8 +113,8 @@ class Handler(object):
             check_result: The result from :attr:`check_update`.
 
         """
-        if self.use_context:
-            context = HandlerContext(update, dispatcher)
+        if dispatcher.use_context:
+            context = CallbackContext.from_update(update, dispatcher)
             self.collect_additional_context(context, update, dispatcher, check_result)
             return self.callback(update, context)
         else:
@@ -143,7 +125,7 @@ class Handler(object):
         """Prepares additional arguments for the context. Override if needed.
 
         Args:
-            context (:class:`telegram.ext.HandlerContext`): The context object.
+            context (:class:`telegram.ext.CallbackContext`): The context object.
             update (:class:`telegram.Update`): The update to gather chat/user id from.
             dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
             check_result: The result (return value) from :attr:`check_update`.
@@ -156,8 +138,8 @@ class Handler(object):
         Prepares the optional arguments. If the handler has additional optional args,
         it should subclass this method, but remember to call this super method.
 
-        DEPRECATED: This method is being replaced by new Context Based Handlers. Please see
-        https://git.io/vpVe8 for more info.
+        DEPRECATED: This method is being replaced by new context based callbacks. Please see
+        https://git.io/vp113 for more info.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
@@ -182,79 +164,3 @@ class Handler(object):
                 optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
 
         return optional_args
-
-
-class HandlerContext(object):
-    """This is a context object passed to the callback called by :class:`telegram.ext.Handler`.
-
-    Attributes:
-        chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
-            update from the same chat it will be the same ``dict``.
-        user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
-            update from the same user it will be the same ``dict``.
-        match (:obj:`re match object`, optional): If the associated update originated from a
-            regex-supported handler, this will contain the object returned from
-            ``re.match(pattern, string)``.
-        args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
-            is handled by :class:`telegram.ext.CommandHandler` or
-            :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the text
-            after the command, using any whitespace string as a delimiter.
-        error (:class:`telegram.TelegramError`, optional): The Telegram error that was raised.
-            Only present when passed to a error handler registered with
-            :attr:`telegram.ext.Dispatcher.add_error_handler`.
-
-    """
-    def __init__(self, update, dispatcher):
-        """
-        Args:
-            update (:class:`telegram.Update`):
-            dispatcher (:class:`telegram.ext.Dispatcher`):
-
-        """
-        self.update = update
-        self._dispatcher = dispatcher
-        self.chat_data = None
-        self.user_data = None
-        self.args = None
-        self.match = None
-        self.error = None
-
-        if update is not None and isinstance(update, Update):
-            chat = update.effective_chat
-            user = update.effective_user
-
-            if chat:
-                self.chat_data = dispatcher.chat_data[chat.id]
-            if user:
-                self.user_data = dispatcher.user_data[user.id]
-
-    @classmethod
-    def from_error(cls, update, error, dispatcher):
-        context = cls(update, dispatcher)
-        context.error = error
-        return context
-
-    @property
-    def bot(self):
-        """:class:`telegram.Bot`: The bot associated with this context."""
-        return self._dispatcher.bot
-
-    @property
-    def job_queue(self):
-        """
-        :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
-            :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegrm.ext.Updater`
-            associated with this context.
-
-        """
-        return self._dispatcher.job_queue
-
-    @property
-    def update_queue(self):
-        """
-        :class:`queue.Queue`: The ``Queue`` instance used by the
-            :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegram.ext.Updater`
-            associated with this context.
-
-        """
-        return self._dispatcher.update_queue

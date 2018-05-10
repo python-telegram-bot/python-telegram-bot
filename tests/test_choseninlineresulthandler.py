@@ -16,15 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import sys
 from queue import Queue
 
 import pytest
 
 from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, CallbackQuery,
                       InlineQuery, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import ChosenInlineResultHandler, HandlerContext, JobQueue
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.ext import ChosenInlineResultHandler, CallbackContext, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -82,7 +80,7 @@ class TestChosenInlineResultHandler(object):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, HandlerContext) and
+        self.test_flag = (isinstance(context, CallbackContext) and
                           isinstance(context.bot, Bot) and
                           isinstance(update, Update) and
                           isinstance(context.update_queue, Queue) and
@@ -92,7 +90,7 @@ class TestChosenInlineResultHandler(object):
                           isinstance(update.chosen_inline_result, ChosenInlineResult))
 
     def test_basic(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_basic, use_context=False)
+        handler = ChosenInlineResultHandler(self.callback_basic)
         dp.add_handler(handler)
 
         assert handler.check_update(chosen_inline_result)
@@ -100,7 +98,7 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_data_1, use_context=False,
+        handler = ChosenInlineResultHandler(self.callback_data_1,
                                             pass_user_data=True)
         dp.add_handler(handler)
 
@@ -108,7 +106,7 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_data_1, use_context=False,
+        handler = ChosenInlineResultHandler(self.callback_data_1,
                                             pass_chat_data=True)
         dp.add_handler(handler)
 
@@ -117,7 +115,7 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_data_2, use_context=False,
+        handler = ChosenInlineResultHandler(self.callback_data_2,
                                             pass_chat_data=True, pass_user_data=True)
         dp.add_handler(handler)
 
@@ -126,7 +124,7 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_queue_1, use_context=False,
+        handler = ChosenInlineResultHandler(self.callback_queue_1,
                                             pass_job_queue=True)
         dp.add_handler(handler)
 
@@ -134,7 +132,7 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_queue_1, use_context=False,
+        handler = ChosenInlineResultHandler(self.callback_queue_1,
                                             pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -143,7 +141,7 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_queue_2, use_context=False,
+        handler = ChosenInlineResultHandler(self.callback_queue_2,
                                             pass_job_queue=True, pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -152,17 +150,12 @@ class TestChosenInlineResultHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = ChosenInlineResultHandler(self.callback_basic, use_context=False)
+        handler = ChosenInlineResultHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_context, use_context=True)
-        dp.add_handler(handler)
+    def test_context(self, cdp, chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.callback_context)
+        cdp.add_handler(handler)
 
-        dp.process_update(chosen_inline_result)
+        cdp.process_update(chosen_inline_result)
         assert self.test_flag
-
-    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
-    def test_non_context_deprecation(self):
-        with pytest.warns(TelegramDeprecationWarning):
-            ChosenInlineResultHandler(self.callback_context)

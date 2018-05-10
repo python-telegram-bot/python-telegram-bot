@@ -22,8 +22,7 @@ import pytest
 
 from telegram import (Bot, Update, Message, User, Chat, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import StringCommandHandler, HandlerContext, JobQueue
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.ext import StringCommandHandler, CallbackContext, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -75,7 +74,7 @@ class TestStringCommandHandler(object):
             self.test_flag = args == ['one', 'two']
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, HandlerContext) and
+        self.test_flag = (isinstance(context, CallbackContext) and
                           isinstance(context.bot, Bot) and
                           isinstance(update, str) and
                           isinstance(context.update_queue, Queue) and
@@ -87,7 +86,7 @@ class TestStringCommandHandler(object):
         self.test_flag = context.args == ['one', 'two']
 
     def test_basic(self, dp):
-        handler = StringCommandHandler('test', self.callback_basic, use_context=False)
+        handler = StringCommandHandler('test', self.callback_basic)
         dp.add_handler(handler)
 
         check = handler.check_update('/test')
@@ -103,7 +102,7 @@ class TestStringCommandHandler(object):
         assert check is not None and check is not False
 
     def test_pass_args(self, dp):
-        handler = StringCommandHandler('test', self.sch_callback_args, use_context=False,
+        handler = StringCommandHandler('test', self.sch_callback_args,
                                        pass_args=True)
         dp.add_handler(handler)
 
@@ -115,7 +114,7 @@ class TestStringCommandHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp):
-        handler = StringCommandHandler('test', self.callback_queue_1, use_context=False,
+        handler = StringCommandHandler('test', self.callback_queue_1,
                                        pass_job_queue=True)
         dp.add_handler(handler)
 
@@ -123,7 +122,7 @@ class TestStringCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.callback_queue_1, use_context=False,
+        handler = StringCommandHandler('test', self.callback_queue_1,
                                        pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -132,7 +131,7 @@ class TestStringCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.callback_queue_2, use_context=False,
+        handler = StringCommandHandler('test', self.callback_queue_2,
                                        pass_job_queue=True,
                                        pass_update_queue=True)
         dp.add_handler(handler)
@@ -142,26 +141,22 @@ class TestStringCommandHandler(object):
         assert self.test_flag
 
     def test_other_update_types(self, false_update):
-        handler = StringCommandHandler('test', self.callback_basic, use_context=False)
+        handler = StringCommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp):
-        handler = StringCommandHandler('test', self.callback_context, use_context=True)
-        dp.add_handler(handler)
+    def test_context(self, cdp):
+        handler = StringCommandHandler('test', self.callback_context)
+        cdp.add_handler(handler)
 
-        dp.process_update('/test')
+        cdp.process_update('/test')
         assert self.test_flag
 
-    def test_non_context_deprecation(self):
-        with pytest.warns(TelegramDeprecationWarning):
-            StringCommandHandler('test', self.callback_context)
+    def test_context_args(self, cdp):
+        handler = StringCommandHandler('test', self.callback_context_args)
+        cdp.add_handler(handler)
 
-    def test_context_args(self, dp):
-        handler = StringCommandHandler('test', self.callback_context_args, use_context=True)
-        dp.add_handler(handler)
-
-        dp.process_update('/test')
+        cdp.process_update('/test')
         assert not self.test_flag
 
-        dp.process_update('/test one two')
+        cdp.process_update('/test one two')
         assert self.test_flag
