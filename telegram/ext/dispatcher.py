@@ -19,6 +19,7 @@
 """This module contains the Dispatcher class."""
 
 import logging
+import warnings
 import weakref
 from functools import wraps
 from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
@@ -31,7 +32,8 @@ from queue import Queue, Empty
 from future.builtins import range
 
 from telegram import TelegramError
-from telegram.ext.handler import Handler
+from telegram.ext.handler import Handler, HandlerContext
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -353,15 +355,27 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def add_error_handler(self, callback):
+    def add_error_handler(self, callback, use_context=False):
         """Registers an error handler in the Dispatcher.
 
         Args:
-            callback (:obj:`callable`): A function that takes ``Bot, Update, TelegramError`` as
-                arguments.
+            callback (:obj:`callable`): The callback function for this error handler. Will be
+                called when an error is raised Callback signature for context based API:
 
+                ``def callback(update: Update, context: HandlerContext)``
+
+                The error that happened will be present in context.error.
+            use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback
+                API. During the deprecation period of the old API the default is ``False``.
+                **New users**: set this to ``True``.
+
+        Note:
+            See https://git.io/vpVe8 for more info about switching to context based API.
         """
-        self.error_handlers.append(callback)
+        if not use_context:
+            warnings.warn('Old Handler API is deprecated - see https://git.io/vpVe8 for details',
+                          TelegramDeprecationWarning, stacklevel=2)
+        self.error_handlers.append((callback, use_context))
 
     def remove_error_handler(self, callback):
         """Removes an error handler.
@@ -370,8 +384,16 @@ class Dispatcher(object):
             callback (:obj:`callable`): The error handler to remove.
 
         """
-        if callback in self.error_handlers:
-            self.error_handlers.remove(callback)
+        try:
+            self.error_handlers.remove((callback, True))
+            return
+        except ValueError:
+            pass
+        try:
+            self.error_handlers.remove((callback, False))
+            return
+        except ValueError:
+            pass
 
     def dispatch_error(self, update, error):
         """Dispatches an error.
@@ -382,8 +404,11 @@ class Dispatcher(object):
 
         """
         if self.error_handlers:
-            for callback in self.error_handlers:
-                callback(self.bot, update, error)
+            for callback, use_context in self.error_handlers:
+                if use_context:
+                    callback(update, HandlerContext.from_error(update, error, self))
+                else:
+                    callback(self.bot, update, error)
 
         else:
             self.logger.exception(

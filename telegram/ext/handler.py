@@ -199,6 +199,9 @@ class HandlerContext(object):
             is handled by :class:`telegram.ext.CommandHandler` or
             :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the text
             after the command, using any whitespace string as a delimiter.
+        error (:class:`telegram.TelegramError`, optional): The Telegram error that was raised.
+            Only present when passed to a error handler registered with
+            :attr:`telegram.ext.Dispatcher.add_error_handler`.
 
     """
     def __init__(self, update, dispatcher):
@@ -214,6 +217,7 @@ class HandlerContext(object):
         self.user_data = None
         self.args = None
         self.match = None
+        self.error = None
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -223,6 +227,12 @@ class HandlerContext(object):
                 self.chat_data = dispatcher.chat_data[chat.id]
             if user:
                 self.user_data = dispatcher.user_data[user.id]
+
+    @classmethod
+    def from_error(cls, update, error, dispatcher):
+        context = cls(update, dispatcher)
+        context.error = error
+        return context
 
     @property
     def bot(self):
