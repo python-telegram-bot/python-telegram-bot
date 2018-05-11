@@ -18,14 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
 import os
+import sys
 import time
+from queue import Queue
 from time import sleep
 
 import pytest
-import sys
 from flaky import flaky
 
-from telegram.ext import JobQueue, Updater, Job
+from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
@@ -64,6 +65,16 @@ class TestJobQueue(object):
 
     def job_datetime_tests(self, bot, job):
         self.job_time = time.time()
+
+    def job_context_based_callback(self, context):
+        if (isinstance(context, CallbackContext) and
+                isinstance(context.job, Job) and
+                isinstance(context.update_queue, Queue) and
+                context.job.context == 2 and
+                context.chat_data is None and
+                context.user_data is None and
+                context.job_queue is context.job.job_queue):
+            self.result += 1
 
     def test_run_once(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)
@@ -250,5 +261,12 @@ class TestJobQueue(object):
 
     @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_bot_in_init_deprecation(self, bot):
-            with pytest.warns(TelegramDeprecationWarning):
-                JobQueue(bot)
+        with pytest.warns(TelegramDeprecationWarning):
+            JobQueue(bot)
+
+    def test_context_based_callback(self, job_queue):
+        job_queue.run_once(self.job_context_based_callback, 0.01, context=2)
+
+        sleep(0.03)
+
+        assert self.result == 0

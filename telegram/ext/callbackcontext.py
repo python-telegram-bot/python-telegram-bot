@@ -53,6 +53,9 @@ class CallbackContext(object):
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
         """
+        if not dispatcher.use_context:
+            raise ValueError('CallbackContext should not be used with a non context aware '
+                             'dispatcher!')
         self._dispatcher = dispatcher
         self.chat_data = None
         self.user_data = None
