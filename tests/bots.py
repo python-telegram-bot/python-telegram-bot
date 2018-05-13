@@ -23,12 +23,22 @@ import sys
 from platform import python_implementation
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
-FALLBACKS = {
+BOT_FALLBACKS = {
     'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
     'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3',
     'chat_id': '12173560',
     'group_id': '-49740850',
-    'channel_id': '@pythontelegrambottests'
+    'channel_id': '@pythontelegrambottests',
+    'username': '@PythonTelegramBot'
+}
+
+session_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'integration')
+
+USERBOT_FALLBACKS = {
+    'session_name': os.path.join(session_dir, 'userbot_account'),
+    'api_id': 269163,
+    'api_hash': '8daa79bc8d892299125b8d9b80f64976',
+    'phone_number': '+491728656978'
 }
 
 
@@ -52,4 +62,8 @@ def get(name, fallback):
 
 
 def get_bot():
-    return {k: get(k, v) for k, v in FALLBACKS.items()}
+    return {k: get(k, v) for k, v in BOT_FALLBACKS.items()}
+
+
+def get_userbot():
+    return {k: get(k, v) for k, v in USERBOT_FALLBACKS.items()}

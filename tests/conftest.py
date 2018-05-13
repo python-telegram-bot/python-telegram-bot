@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
 import sys
+import time
 from collections import defaultdict
 from queue import Queue
-from threading import Thread, Event
+from threading import Event, Thread
 from time import sleep
 
 import pytest
@@ -81,28 +82,36 @@ def create_dp(bot):
 
 @pytest.fixture(scope='session')
 def _dp(bot):
-    for dp in create_dp(bot):
-        yield dp
+    for d in create_dp(bot):
+        yield d
+
+
+# noinspection PyProtectedMember
+def reset_dispatcher(dp):
+    print('reset dispatcher')
+    while not dp.update_queue.empty():
+        dp.update_queue.get(False)
+    dp.chat_data = defaultdict(dict)
+    dp.user_data = defaultdict(dict)
+    dp.handlers = {}
+    dp.groups = []
+    dp.error_handlers = []
+    dp.__stop_event = Event()
+    dp.__exception_event = Event()
+    dp.__async_queue = Queue()
+    dp.__async_threads = set()
+    if dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
+        Dispatcher._set_singleton(dp)
+    time.sleep(2)
+    yield dp
+    # noinspection PyUnresolvedReferences
+    Dispatcher._Dispatcher__singleton_semaphore.release()
 
 
 @pytest.fixture(scope='function')
 def dp(_dp):
-    # Reset the dispatcher first
-    while not _dp.update_queue.empty():
-        _dp.update_queue.get(False)
-    _dp.chat_data = defaultdict(dict)
-    _dp.user_data = defaultdict(dict)
-    _dp.handlers = {}
-    _dp.groups = []
-    _dp.error_handlers = []
-    _dp.__stop_event = Event()
-    _dp.__exception_event = Event()
-    _dp.__async_queue = Queue()
-    _dp.__async_threads = set()
-    if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
-        Dispatcher._set_singleton(_dp)
-    yield _dp
-    Dispatcher._Dispatcher__singleton_semaphore.release()
+    for d in reset_dispatcher(_dp):
+        yield d
 
 
 def pytest_configure(config):

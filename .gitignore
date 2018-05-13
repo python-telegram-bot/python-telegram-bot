@@ -77,3 +77,8 @@ telegram.jpg
 
 # Exclude .exrc file for Vim
 .exrc
+
+# Userbot artifacts
+unknown_errors.txt
+*.session
+session*.txt
