@@ -22,7 +22,8 @@ import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, MessageEntity)
-from telegram.ext import CommandHandler, Filters, BaseFilter, CallbackContext, JobQueue
+from telegram.ext import CommandHandler, Filters, BaseFilter, CallbackContext, JobQueue, \
+    PrefixHandler
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='test')
 
@@ -329,4 +330,215 @@ class TestCommandHandler(object):
 
         message.text = '/test one two'
         cdp.process_update(Update(0, message))
+        assert self.test_flag
+
+
+par = ['!help', '!test', '#help', '#test', 'mytrig-help', 'mytrig-test']
+
+
+@pytest.fixture(scope='function', params=par)
+def prefixmessage(bot, request):
+    return Message(message_id=1,
+                   from_user=User(id=1, first_name='', is_bot=False),
+                   date=None,
+                   chat=Chat(id=1, type=''),
+                   text=request.param,
+                   bot=bot)
+
+
+class TestPrefixHandler(object):
+    test_flag = False
+
+    @pytest.fixture(autouse=True)
+    def reset(self):
+        self.test_flag = False
+
+    def callback_basic(self, bot, update):
+        test_bot = isinstance(bot, Bot)
+        test_update = isinstance(update, Update)
+        self.test_flag = test_bot and test_update
+
+    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
+        self.test_flag = (user_data is not None) or (chat_data is not None)
+
+    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
+        self.test_flag = (user_data is not None) and (chat_data is not None)
+
+    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
+        self.test_flag = (job_queue is not None) or (update_queue is not None)
+
+    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
+        self.test_flag = (job_queue is not None) and (update_queue is not None)
+
+    def ch_callback_args(self, bot, update, args):
+        if update.message.text in par:
+            self.test_flag = len(args) == 0
+        else:
+            self.test_flag = args == ['one', 'two']
+
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, CallbackContext) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(update, Update) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          isinstance(context.user_data, dict) and
+                          isinstance(context.chat_data, dict) and
+                          isinstance(update.message, Message))
+
+    def callback_context_args(self, update, context):
+        self.test_flag = context.args == ['one', 'two']
+
+    def test_basic(self, dp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, prefixmessage))
+        assert self.test_flag
+
+        prefixmessage.text = 'test'
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is None or check is False
+
+        prefixmessage.text = '#nocom'
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is None or check is False
+
+        message.text = 'not !test at start'
+        check = handler.check_update(Update(0, message))
+        assert check is None or check is False
+
+    def test_edited(self, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
+
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=prefixmessage))
+        assert check is None or check is False
+
+        handler.allow_edited = True
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=prefixmessage))
+        assert check is not None and check is not False
+
+    def test_with_filter(self, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
+                                filters=Filters.group)
+
+        prefixmessage.chat = Chat(-23, 'group')
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is not None and check is not False
+
+        prefixmessage.chat = Chat(23, 'private')
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is None or check is False
+
+    def test_pass_args(self, dp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.ch_callback_args,
+                                pass_args=True)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+        self.test_flag = False
+        prefixmessage.text += ' one two'
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+    def test_pass_user_or_chat_data(self, dp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_data_1,
+                                pass_user_data=True)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        self.test_flag = False
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_data_1,
+                                pass_chat_data=True)
+        dp.add_handler(handler)
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        self.test_flag = False
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_data_2,
+                                pass_chat_data=True, pass_user_data=True)
+        dp.add_handler(handler)
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+    def test_pass_job_or_update_queue(self, dp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_queue_1,
+                                pass_job_queue=True)
+        dp.add_handler(handler)
+
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        self.test_flag = False
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_queue_1,
+                                pass_update_queue=True)
+        dp.add_handler(handler)
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+        dp.remove_handler(handler)
+        self.test_flag = False
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_queue_2,
+                                pass_job_queue=True, pass_update_queue=True)
+        dp.add_handler(handler)
+        dp.process_update(Update(0, message=prefixmessage))
+        assert self.test_flag
+
+    def test_other_update_types(self, false_update):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
+        check = handler.check_update(false_update)
+        assert check is None or check is False
+
+    def test_filters_for_wrong_command(self, prefixmessage):
+        """Filters should not be executed if the command does not match the handler"""
+
+        class TestFilter(BaseFilter):
+            def __init__(self):
+                self.tested = False
+
+            def filter(self, message):
+                self.tested = True
+
+        test_filter = TestFilter()
+
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
+                                filters=test_filter)
+
+        prefixmessage.text = '/star'
+
+        check = handler.check_update(Update(0, message=prefixmessage))
+        assert check is None or check is False
+
+        assert not test_filter.tested
+
+    def test_context(self, cdp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_context)
+        cdp.add_handler(handler)
+
+        cdp.process_update(Update(0, prefixmessage))
+        assert self.test_flag
+
+    def test_context_args(self, cdp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'],
+                                self.callback_context_args)
+        cdp.add_handler(handler)
+
+        cdp.process_update(Update(0, prefixmessage))
+        assert not self.test_flag
+
+        prefixmessage.text += ' one two'
+        cdp.process_update(Update(0, prefixmessage))
         assert self.test_flag
