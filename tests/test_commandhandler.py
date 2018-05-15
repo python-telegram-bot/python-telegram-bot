@@ -130,6 +130,14 @@ class TestCommandHandler(object):
         check = handler.check_update(Update(0, message))
         assert check is None or check is False
 
+    @pytest.mark.parametrize('command',
+                             ['way_too_longcommand1234567yes_way_toooooooLong', 'ïñválídletters',
+                              'invalid #&* chars'],
+                             ids=['too long', 'invalid letter', 'invalid characters'])
+    def test_invalid_commands(self, command):
+        with pytest.raises(ValueError, match='not a valid bot command'):
+            CommandHandler(command, self.callback_basic)
+
     def test_command_list(self, message):
         handler = CommandHandler(['test', 'star'], self.callback_basic)
 

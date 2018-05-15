@@ -16,7 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the CommandHandler class."""
+"""This module contains the CommandHandler and PrefixHandler classes."""
+import re
+
 from future.utils import string_types
 
 from telegram import Update, MessageEntity
@@ -31,7 +33,8 @@ class CommandHandler(Handler):
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for.
+            should listen for. Limitations are the same as described here
+            https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -59,7 +62,8 @@ class CommandHandler(Handler):
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
-            should listen for.
+            should listen for. Limitations are the same as described here
+            https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -96,6 +100,8 @@ class CommandHandler(Handler):
             ``chat_data`` will be passed to the callback function. Default is ``False``.
             DEPRECATED: Please switch to context based callbacks.
 
+    Raises:
+        ValueError - when command is too long or has illegal chars.
     """
 
     def __init__(self,
@@ -119,6 +125,10 @@ class CommandHandler(Handler):
             self.command = [command.lower()]
         else:
             self.command = [x.lower() for x in command]
+        for comm in self.command:
+            if not re.match(r'^[\da-z_]{1,32}$', comm):
+                raise ValueError('Command is not a valid bot command')
+
         self.filters = filters
         self.allow_edited = allow_edited
         self.pass_args = pass_args
