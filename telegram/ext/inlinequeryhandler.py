@@ -103,8 +103,7 @@ class InlineQueryHandler(Handler):
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_user_data=False,
-                 pass_chat_data=False,
-                 use_context=False):
+                 pass_chat_data=False):
         super(InlineQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,

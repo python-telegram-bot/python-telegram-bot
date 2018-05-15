@@ -145,12 +145,7 @@ class MessageHandler(Handler):
 
         """
         if isinstance(update, Update) and self._is_allowed_update(update):
-
             if not self.filters:
                 return True
-
             else:
-                message = update.effective_message
-                if self.filters is None:
-                    return True
-                return self.filters(message)
+                return self.filters(update.effective_message)
