@@ -19,7 +19,7 @@
 """This module contains the CommandHandler class."""
 from future.utils import string_types
 
-from telegram import Update
+from telegram import Update, MessageEntity
 from .handler import Handler
 
 
@@ -135,21 +135,21 @@ class CommandHandler(Handler):
         """
         if (isinstance(update, Update) and
                 (update.message or update.edited_message and self.allow_edited)):
-            message = update.message or update.edited_message
+            message = update.effective_message
 
-            if message.text and message.text.startswith('/') and len(message.text) > 1:
-                first_word = message.text_html.split(None, 1)[0]
-                if len(first_word) > 1 and first_word.startswith('/'):
-                    command = first_word[1:].split('@')
-                    command.append(
-                        message.bot.username)  # in case the command was sent without a username
+            if message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND and \
+                    message.entities[0].offset == 0:
+                command = message.text[1:message.entities[0].length]
+                args = message.text.split()[1:]
+                command = command.split('@')
+                command.append(message.bot.username)
 
-                    if not (command[0].lower() in self.command
-                            and command[1].lower() == message.bot.username.lower()):
-                        return None
+                if not (command[0].lower() in self.command and
+                        command[1].lower() == message.bot.username.lower()):
+                    return None
 
-                    if self.filters is None or self.filters(message):
-                        return message.text.split()[1:]
+                if self.filters is None or self.filters(message):
+                    return args
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
