@@ -166,17 +166,19 @@ class TestUser(object):
         assert user.send_voice('test_voice')
 
     def test_mention_html(self, user):
-        expected = '<a href="tg://user?id={}">{}</a>'
+        expected = u'<a href="tg://user?id={}">{}</a>'
 
         assert user.mention_html() == expected.format(user.id, user.full_name)
-        assert user.mention_html('the<b>name') == expected.format(user.id, 'the&lt;b&gt;name')
+        assert user.mention_html('the<b>name\u2022') == expected.format(user.id,
+                                                                        'the&lt;b&gt;name\u2022')
         assert user.mention_html(user.username) == expected.format(user.id, user.username)
 
     def test_mention_markdown(self, user):
-        expected = '[{}](tg://user?id={})'
+        expected = u'[{}](tg://user?id={})'
 
         assert user.mention_markdown() == expected.format(user.full_name, user.id)
-        assert user.mention_markdown('the_name*') == expected.format('the\_name\*', user.id)
+        assert user.mention_markdown('the_name*\u2022') == expected.format('the\_name\*\u2022',
+                                                                           user.id)
         assert user.mention_markdown(user.username) == expected.format(user.username, user.id)
 
     def test_equality(self):
