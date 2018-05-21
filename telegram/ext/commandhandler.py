@@ -29,7 +29,9 @@ class CommandHandler(Handler):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text.
+    bot's name and/or some additional text. It will add a ``list`` to the :class:`CallbackContext`
+    named :attr:`CallbackContext.args`. It will contain a list of strings, which is the text
+    following the command split on single or consecutive whitespace characters.
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -53,7 +55,7 @@ class CommandHandler(Handler):
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function.. Related to
+        can use to keep any data in will be sent to the :attr:`callback` function. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
 
@@ -147,8 +149,8 @@ class CommandHandler(Handler):
                 (update.message or update.edited_message and self.allow_edited)):
             message = update.effective_message
 
-            if message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND and \
-                    message.entities[0].offset == 0:
+            if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND and
+                    message.entities[0].offset == 0):
                 command = message.text[1:message.entities[0].length]
                 args = message.text.split()[1:]
                 command = command.split('@')
@@ -175,8 +177,10 @@ class PrefixHandler(CommandHandler):
     """Handler class to handle custom prefix commands
 
     This is a intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
-    It supports configurable commands with the same options as commandhandler. It will respond to
-    every combination of :attr:`prefix` and :attr:`command`.
+    It supports configurable commands with the same options as CommandHandler. It will respond to
+    every combination of :attr:`prefix` and :attr:`command`. It will add a ``list`` to the
+    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
+    which is the text following the command split on single or consecutive whitespace characters.
 
     Examples::
 
@@ -216,7 +220,7 @@ class PrefixHandler(CommandHandler):
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function.. Related to
+        can use to keep any data in will be sent to the :attr:`callback` function. Related to
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
 
