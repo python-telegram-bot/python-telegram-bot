@@ -19,7 +19,6 @@
 """This module contains the Dispatcher class."""
 
 import logging
-import warnings
 import weakref
 from functools import wraps
 from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
@@ -33,8 +32,6 @@ from future.builtins import range
 
 from telegram import TelegramError
 from telegram.ext.handler import Handler
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -81,9 +78,6 @@ class Dispatcher(object):
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator. defaults to 4.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
 
     """
 
@@ -92,22 +86,11 @@ class Dispatcher(object):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self,
-                 bot,
-                 update_queue,
-                 workers=4,
-                 exception_event=None,
-                 job_queue=None,
-                 use_context=False):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
-        self.use_context = use_context
-
-        if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/vp113 for details',
-                          TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
         """:obj:`dict`: A dictionary handlers can use to store data for the user."""
@@ -292,11 +275,9 @@ class Dispatcher(object):
 
         for group in self.groups:
             try:
-                for handler in self.handlers[group]:
-                    check = handler.check_update(update)
-                    if check is not None and check is not False:
-                        handler.handle_update(update, self, check)
-                        break
+                for handler in (x for x in self.handlers[group] if x.check_update(update)):
+                    handler.handle_update(update, self)
+                    break
 
             # Stop processing with any other handler.
             except DispatcherHandlerStop:
@@ -374,15 +355,9 @@ class Dispatcher(object):
         """Registers an error handler in the Dispatcher.
 
         Args:
-            callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised Callback signature for context based API:
+            callback (:obj:`callable`): A function that takes ``Bot, Update, TelegramError`` as
+                arguments.
 
-                ``def callback(update: Update, context: CallbackContext)``
-
-                The error that happened will be present in context.error.
-
-        Note:
-            See https://git.io/vp113 for more info about switching to context based API.
         """
         self.error_handlers.append(callback)
 
@@ -406,10 +381,7 @@ class Dispatcher(object):
         """
         if self.error_handlers:
             for callback in self.error_handlers:
-                if self.use_context:
-                    callback(update, CallbackContext.from_error(update, error, self))
-                else:
-                    callback(self.bot, update, error)
+                callback(self.bot, update, error)
 
         else:
             self.logger.exception(

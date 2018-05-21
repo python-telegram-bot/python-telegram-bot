@@ -18,17 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes JobQueue and Job."""
 
-import datetime
 import logging
 import time
-import warnings
+import datetime
 import weakref
 from numbers import Number
-from queue import PriorityQueue, Empty
 from threading import Thread, Lock, Event
-
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
+from queue import PriorityQueue, Empty
 
 
 class Days(object):
@@ -41,24 +37,16 @@ class JobQueue(object):
 
     Attributes:
         _queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
+        bot (:class:`telegram.Bot`): Bot that's send to the handlers.
+
+    Args:
         bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
-            DEPRECATED: Use set_dispatcher instead.
+
     """
 
-    def __init__(self, bot=None):
+    def __init__(self, bot):
         self._queue = PriorityQueue()
-        if bot:
-            warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
-                          "instead!", TelegramDeprecationWarning, stacklevel=2)
-
-            class MockDispatcher(object):
-                def __init__(self):
-                    self.bot = bot
-                    self.use_context = False
-
-            self._dispatcher = MockDispatcher()
-        else:
-            self._dispatcher = None
+        self.bot = bot
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__start_lock = Lock()
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick
@@ -66,9 +54,6 @@ class JobQueue(object):
         self.__thread = None
         self._next_peek = None
         self._running = False
-
-    def set_dispatcher(self, dispatcher):
-        self._dispatcher = dispatcher
 
     def _put(self, job, next_t=None, last_t=None):
         if next_t is None:
@@ -257,7 +242,7 @@ class JobQueue(object):
                     current_week_day = datetime.datetime.now().weekday()
                     if any(day == current_week_day for day in job.days):
                         self.logger.debug('Running job %s', job.name)
-                        job.run(self._dispatcher)
+                        job.run(self.bot)
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -382,12 +367,9 @@ class Job(object):
         self._enabled = Event()
         self._enabled.set()
 
-    def run(self, dispatcher):
+    def run(self, bot):
         """Executes the callback function."""
-        if dispatcher.use_context:
-            self.callback(CallbackContext.from_job(self, dispatcher))
-        else:
-            self.callback(dispatcher.bot, self)
+        self.callback(bot, self)
 
     def schedule_removal(self):
         """

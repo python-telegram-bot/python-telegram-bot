@@ -6,11 +6,10 @@
 This program is dedicated to the public domain under the CC0 license.
 """
 
-import logging
-
 from telegram import (LabeledPrice, ShippingOption)
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, PreCheckoutQueryHandler, ShippingQueryHandler)
+import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -19,18 +18,18 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def error(update, context):
+def error(bot, update, error):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-def start_callback(update, context):
+def start_callback(bot, update):
     msg = "Use /shipping to get an invoice for shipping-payment, "
     msg += "or /noshipping for an invoice without shipping."
     update.message.reply_text(msg)
 
 
-def start_with_shipping_callback(update, context):
+def start_with_shipping_callback(bot, update):
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Payment Example using python-telegram-bot"
@@ -48,13 +47,13 @@ def start_with_shipping_callback(update, context):
 
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
-    context.bot.send_invoice(chat_id, title, description, payload,
-                             provider_token, start_parameter, currency, prices,
-                             need_name=True, need_phone_number=True,
-                             need_email=True, need_shipping_address=True, is_flexible=True)
+    bot.sendInvoice(chat_id, title, description, payload,
+                    provider_token, start_parameter, currency, prices,
+                    need_name=True, need_phone_number=True,
+                    need_email=True, need_shipping_address=True, is_flexible=True)
 
 
-def start_without_shipping_callback(update, context):
+def start_without_shipping_callback(bot, update):
     chat_id = update.message.chat_id
     title = "Payment Example"
     description = "Payment Example using python-telegram-bot"
@@ -71,16 +70,17 @@ def start_without_shipping_callback(update, context):
 
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
-    context.bot.send_invoice(chat_id, title, description, payload,
-                             provider_token, start_parameter, currency, prices)
+    bot.sendInvoice(chat_id, title, description, payload,
+                    provider_token, start_parameter, currency, prices)
 
 
-def shipping_callback(update, context):
+def shipping_callback(bot, update):
     query = update.shipping_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
         # answer False pre_checkout_query
-        query.answer(ok=False, error_message="Something went wrong...")
+        bot.answer_shipping_query(shipping_query_id=query.id, ok=False,
+                                  error_message="Something went wrong...")
         return
     else:
         options = list()
@@ -89,31 +89,31 @@ def shipping_callback(update, context):
         # an array of LabeledPrice objects
         price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
         options.append(ShippingOption('2', 'Shipping Option B', price_list))
-        query.answer(ok=True, shipping_options=options)
+        bot.answer_shipping_query(shipping_query_id=query.id, ok=True,
+                                  shipping_options=options)
 
 
 # after (optional) shipping, it's the pre-checkout
-def precheckout_callback(update, context):
+def precheckout_callback(bot, update):
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
         # answer False pre_checkout_query
-        query.answer(ok=False, error_message="Something went wrong...")
+        bot.answer_pre_checkout_query(pre_checkout_query_id=query.id, ok=False,
+                                      error_message="Something went wrong...")
     else:
-        query.answer(ok=True)
+        bot.answer_pre_checkout_query(pre_checkout_query_id=query.id, ok=True)
 
 
 # finally, after contacting to the payment provider...
-def successful_payment_callback(update, context):
+def successful_payment_callback(bot, update):
     # do something after successful receive of payment?
     update.message.reply_text("Thank you for your payment!")
 
 
 def main():
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    # Create the EventHandler and pass it your bot's token.
+    updater = Updater(token="BOT_TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

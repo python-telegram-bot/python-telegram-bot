@@ -17,11 +17,11 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import logging
-
 from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
+
+import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -46,7 +46,7 @@ def facts_to_str(user_data):
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update, context):
+def start(bot, update):
     update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
         "Why don't you tell me something about yourself?",
@@ -55,24 +55,23 @@ def start(update, context):
     return CHOOSING
 
 
-def regular_choice(update, context):
+def regular_choice(bot, update, user_data):
     text = update.message.text
-    context.user_data['choice'] = text
+    user_data['choice'] = text
     update.message.reply_text(
         'Your {}? Yes, I would love to hear about that!'.format(text.lower()))
 
     return TYPING_REPLY
 
 
-def custom_choice(update, context):
+def custom_choice(bot, update):
     update.message.reply_text('Alright, please send me the category first, '
                               'for example "Most impressive skill"')
 
     return TYPING_CHOICE
 
 
-def received_information(update, context):
-    user_data = context.user_data
+def received_information(bot, update, user_data):
     text = update.message.text
     category = user_data['choice']
     user_data[category] = text
@@ -86,8 +85,7 @@ def received_information(update, context):
     return CHOOSING
 
 
-def done(update, context):
-    user_data = context.user_data
+def done(bot, update, user_data):
     if 'choice' in user_data:
         del user_data['choice']
 
@@ -99,16 +97,14 @@ def done(update, context):
     return ConversationHandler.END
 
 
-def error(update, context):
+def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
     # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

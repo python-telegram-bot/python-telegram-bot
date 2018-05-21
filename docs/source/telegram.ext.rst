@@ -10,7 +10,6 @@ telegram.ext package
     telegram.ext.jobqueue
     telegram.ext.messagequeue
     telegram.ext.delayqueue
-    telegram.ext.callbackcontext
 
 Handlers
 --------

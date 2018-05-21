@@ -19,9 +19,8 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import logging
-
 from telegram.ext import Updater, CommandHandler
+import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -32,29 +31,28 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+def start(bot, update):
     update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 
-def alarm(context):
+def alarm(bot, job):
     """Send the alarm message."""
-    job = context.job
-    context.bot.send_message(job.context, text='Beep!')
+    bot.send_message(job.context, text='Beep!')
 
 
-def set_timer(update, context):
+def set_timer(bot, update, args, job_queue, chat_data):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
-        due = int(context.args[0])
+        due = int(args[0])
         if due < 0:
             update.message.reply_text('Sorry we can not go back to future!')
             return
 
         # Add job to queue
-        job = context.job_queue.run_once(alarm, due, context=chat_id)
-        context.chat_data['job'] = job
+        job = job_queue.run_once(alarm, due, context=chat_id)
+        chat_data['job'] = job
 
         update.message.reply_text('Timer successfully set!')
 
@@ -62,30 +60,27 @@ def set_timer(update, context):
         update.message.reply_text('Usage: /set <seconds>')
 
 
-def unset(update, context):
+def unset(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
-    if 'job' not in context.chat_data:
+    if 'job' not in chat_data:
         update.message.reply_text('You have no active timer')
         return
 
-    job = context.chat_data['job']
+    job = chat_data['job']
     job.schedule_removal()
-    del context.chat_data['job']
+    del chat_data['job']
 
     update.message.reply_text('Timer successfully unset!')
 
 
-def error(update, context):
+def error(bot, update, error):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
     """Run bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

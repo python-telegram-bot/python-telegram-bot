@@ -16,13 +16,14 @@ Basic inline bot example. Applies different text transformations.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
-import logging
 from uuid import uuid4
+
+from telegram.utils.helpers import escape_markdown
 
 from telegram import InlineQueryResultArticle, ParseMode, \
     InputTextMessageContent
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
-from telegram.utils.helpers import escape_markdown
+import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -33,17 +34,17 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
-def help(update, context):
+def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def inlinequery(update, context):
+def inlinequery(bot, update):
     """Handle the inline query."""
     query = update.inline_query.query
     results = [
@@ -68,16 +69,14 @@ def inlinequery(update, context):
     update.inline_query.answer(results)
 
 
-def error(update, context):
+def error(bot, update, error):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
     # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

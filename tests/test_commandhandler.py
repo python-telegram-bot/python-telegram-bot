@@ -16,13 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
 
 import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import CommandHandler, Filters, BaseFilter, CallbackContext, JobQueue
+from telegram.ext import CommandHandler, Filters, BaseFilter
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='test')
 
@@ -49,7 +48,7 @@ def false_update(request):
 
 @pytest.fixture(scope='function')
 def message(bot):
-    return Message(1, User(1, '', False), None, Chat(1, ''), bot=bot)
+    return Message(1, None, None, None, bot=bot)
 
 
 class TestCommandHandler(object):
@@ -84,73 +83,51 @@ class TestCommandHandler(object):
         else:
             self.test_flag = args == ['one', 'two']
 
-    def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          isinstance(context.chat_data, dict) and
-                          isinstance(update.message, Message))
-
-    def callback_context_args(self, update, context):
-        self.test_flag = context.args == ['one', 'two']
-
     def test_basic(self, dp, message):
         handler = CommandHandler('test', self.callback_basic)
         dp.add_handler(handler)
 
         message.text = '/test'
+        assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert self.test_flag
 
         message.text = '/nottest'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
         message.text = 'test'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
         message.text = 'not /test at start'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
     def test_command_list(self, message):
         handler = CommandHandler(['test', 'start'], self.callback_basic)
 
         message.text = '/test'
-        check = handler.check_update(Update(0, message))
+        assert handler.check_update(Update(0, message))
 
         message.text = '/start'
-        check = handler.check_update(Update(0, message))
+        assert handler.check_update(Update(0, message))
 
         message.text = '/stop'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
     def test_edited(self, message):
-        handler = CommandHandler('test', self.callback_basic,
-                                 allow_edited=False)
+        handler = CommandHandler('test', self.callback_basic, allow_edited=False)
 
         message.text = '/test'
-        check = handler.check_update(Update(0, message))
-        assert check is not None and check is not False
-        check = handler.check_update(Update(0, edited_message=message))
-        assert check is None or check is False
+        assert handler.check_update(Update(0, message))
+        assert not handler.check_update(Update(0, edited_message=message))
         handler.allow_edited = True
-        check = handler.check_update(Update(0, message))
-        assert check is not None and check is not False
-        check = handler.check_update(Update(0, edited_message=message))
-        assert check is not None and check is not False
+        assert handler.check_update(Update(0, message))
+        assert handler.check_update(Update(0, edited_message=message))
 
     def test_directed_commands(self, message):
         handler = CommandHandler('test', self.callback_basic)
 
         message.text = '/test@{}'.format(message.bot.username)
-        check = handler.check_update(Update(0, message))
-        assert check is not None and check is not False
+        assert handler.check_update(Update(0, message))
 
         message.text = '/test@otherbot'
         assert not handler.check_update(Update(0, message))
@@ -160,12 +137,10 @@ class TestCommandHandler(object):
 
         message.chat = Chat(-23, 'group')
         message.text = '/test'
-        check = handler.check_update(Update(0, message))
-        assert check is not None and check is not False
+        assert handler.check_update(Update(0, message))
 
         message.chat = Chat(23, 'private')
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
     def test_pass_args(self, dp, message):
         handler = CommandHandler('test', self.ch_callback_args, pass_args=True)
@@ -195,8 +170,7 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/test\nfoobar'
-        check = handler.check_update(Update(0, message))
-        assert check is not None and check is not False
+        assert handler.check_update(Update(0, message))
         dp.process_update(Update(0, message))
         assert self.test_flag
 
@@ -206,8 +180,7 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = 'a'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
     def test_single_slash(self, dp, message):
         # Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/871
@@ -215,16 +188,13 @@ class TestCommandHandler(object):
         dp.add_handler(handler)
 
         message.text = '/'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
         message.text = '/ test'
-        check = handler.check_update(Update(0, message))
-        assert check is None or check is False
+        assert not handler.check_update(Update(0, message))
 
     def test_pass_user_or_chat_data(self, dp, message):
-        handler = CommandHandler('test', self.callback_data_1,
-                                 pass_user_data=True)
+        handler = CommandHandler('test', self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -232,8 +202,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_data_1,
-                                 pass_chat_data=True)
+        handler = CommandHandler('test', self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -241,8 +210,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_data_2,
-                                 pass_chat_data=True,
+        handler = CommandHandler('test', self.callback_data_2, pass_chat_data=True,
                                  pass_user_data=True)
         dp.add_handler(handler)
 
@@ -251,8 +219,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, message):
-        handler = CommandHandler('test', self.callback_queue_1,
-                                 pass_job_queue=True)
+        handler = CommandHandler('test', self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         message.text = '/test'
@@ -260,8 +227,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_queue_1,
-                                 pass_update_queue=True)
+        handler = CommandHandler('test', self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -269,8 +235,7 @@ class TestCommandHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = CommandHandler('test', self.callback_queue_2,
-                                 pass_job_queue=True,
+        handler = CommandHandler('test', self.callback_queue_2, pass_job_queue=True,
                                  pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -280,8 +245,7 @@ class TestCommandHandler(object):
 
     def test_other_update_types(self, false_update):
         handler = CommandHandler('test', self.callback_basic)
-        check = handler.check_update(false_update)
-        assert check is None or check is False
+        assert not handler.check_update(false_update)
 
     def test_filters_for_wrong_command(self, message):
         """Filters should not be executed if the command does not match the handler"""
@@ -295,31 +259,9 @@ class TestCommandHandler(object):
 
         test_filter = TestFilter()
 
-        handler = CommandHandler('foo', self.callback_basic,
-                                 filters=test_filter)
+        handler = CommandHandler('foo', self.callback_basic, filters=test_filter)
         message.text = '/bar'
 
-        check = handler.check_update(Update(0, message=message))
-        assert check is None or check is False
+        handler.check_update(Update(0, message=message))
 
         assert not test_filter.tested
-
-    def test_context(self, cdp, message):
-        handler = CommandHandler('test', self.callback_context)
-        cdp.add_handler(handler)
-
-        message.text = '/test'
-        cdp.process_update(Update(0, message))
-        assert self.test_flag
-
-    def test_context_args(self, cdp, message):
-        handler = CommandHandler('test', self.callback_context_args)
-        cdp.add_handler(handler)
-
-        message.text = '/test'
-        cdp.process_update(Update(0, message))
-        assert not self.test_flag
-
-        message.text = '/test one two'
-        cdp.process_update(Update(0, message))
-        assert self.test_flag

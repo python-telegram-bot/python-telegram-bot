@@ -17,9 +17,8 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import logging
-
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import logging
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,32 +29,30 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
-def help(update, context):
+def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def echo(update, context):
+def echo(bot, update):
     """Echo the user message."""
     update.message.reply_text(update.message.text)
 
 
-def error(update, context):
+def error(bot, update, error):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
     """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    # Create the EventHandler and pass it your bot's token.
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

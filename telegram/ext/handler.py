@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
-from telegram.ext.callbackcontext import CallbackContext
 
 
 class Handler(object):
@@ -25,13 +24,13 @@ class Handler(object):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
             the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
+        pass_user_data (:obj:`bool`): Optional. Determines whether ``user_data`` will be passed to
             the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
+        pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
             the callback function.
 
     Note:
@@ -40,34 +39,22 @@ class Handler(object):
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
 
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
-
     Args:
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature for context based API:
-
-            ``def callback(update: Update, context: CallbackContext)``
-
-            The return value of the callback is usually ignored except for the special case of
-            :class:`telegram.ext.ConversationHandler`.
+        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
+            It will be called when the :attr:`check_update` has determined that an update should be
+            processed by this handler.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
 
     """
 
@@ -92,59 +79,31 @@ class Handler(object):
             update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
 
         Returns:
-            Either ``None`` or ``False`` if the update should not be handled. Otherwise an object
-            that will be passed to :attr:`handle_update` and :attr:`collect_additional_context`
-            when the update gets handled.
+            :obj:`bool`
 
         """
         raise NotImplementedError
 
-    def handle_update(self, update, dispatcher, check_result):
+    def handle_update(self, update, dispatcher):
         """
         This method is called if it was determined that an update should indeed
-        be handled by this instance. Calls :attr:`self.callback` along with its respectful
-        arguments. To work with the :class:`telegram.ext.ConversationHandler`, this method
-        returns the value returned from ``self.callback``.
-        Note that it can be overridden if needed by the subclassing handler.
+        be handled by this instance. It should also be overridden, but in most
+        cases call ``self.callback(dispatcher.bot, update)``, possibly along with
+        optional arguments. To work with the ``ConversationHandler``, this method should return the
+        value returned from ``self.callback``
 
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
-            check_result: The result from :attr:`check_update`.
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher to collect optional args.
 
         """
-        if dispatcher.use_context:
-            context = CallbackContext.from_update(update, dispatcher)
-            self.collect_additional_context(context, update, dispatcher, check_result)
-            return self.callback(update, context)
-        else:
-            optional_args = self.collect_optional_args(dispatcher, update, check_result)
-            return self.callback(dispatcher.bot, update, **optional_args)
+        raise NotImplementedError
 
-    def collect_additional_context(self, context, update, dispatcher, check_result):
-        """Prepares additional arguments for the context. Override if needed.
-
-        Args:
-            context (:class:`telegram.ext.CallbackContext`): The context object.
-            update (:class:`telegram.Update`): The update to gather chat/user id from.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
-            check_result: The result (return value) from :attr:`check_update`.
-
-        """
-        pass
-
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        """
-        Prepares the optional arguments. If the handler has additional optional args,
-        it should subclass this method, but remember to call this super method.
-
-        DEPRECATED: This method is being replaced by new context based callbacks. Please see
-        https://git.io/vp113 for more info.
+    def collect_optional_args(self, dispatcher, update=None):
+        """Prepares the optional arguments that are the same for all types of handlers.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
-            update (:class:`telegram.Update`): The update to gather chat/user id from.
-            check_result: The result from check_update
 
         """
         optional_args = dict()

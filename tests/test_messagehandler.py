@@ -16,13 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
 
 import pytest
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue
+from telegram.ext import Filters, MessageHandler
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -46,7 +45,7 @@ def false_update(request):
 
 @pytest.fixture(scope='class')
 def message(bot):
-    return Message(1, User(1, '', False), None, Chat(1, ''), bot=bot)
+    return Message(1, None, None, None, bot=bot)
 
 
 class TestMessageHandler(object):
@@ -73,25 +72,6 @@ class TestMessageHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def callback_context(self, update, context):
-        self.test_flag = (
-            isinstance(context, CallbackContext) and
-            isinstance(context.bot, Bot) and
-            isinstance(update, Update) and
-            isinstance(context.update_queue, Queue) and
-            isinstance(context.job_queue, JobQueue) and
-            isinstance(context.chat_data, dict) and
-            (
-                (isinstance(context.user_data, dict) and
-                 (isinstance(update.message, Message) or
-                  isinstance(update.edited_message, Message)))
-                or
-                (context.user_data is None and
-                 (isinstance(update.channel_post, Message) or
-                  isinstance(update.edited_channel_post, Message)))
-            )
-        )
-
     def test_basic(self, dp, message):
         handler = MessageHandler(None, self.callback_basic)
         dp.add_handler(handler)
@@ -110,9 +90,8 @@ class TestMessageHandler(object):
         assert handler.check_update(Update(0, edited_channel_post=message))
 
     def test_channel_post(self, message):
-        handler = MessageHandler(None, self.callback_basic,
-                                 edited_updates=False, message_updates=False,
-                                 channel_post_updates=True)
+        handler = MessageHandler(None, self.callback_basic, edited_updates=False,
+                                 message_updates=False, channel_post_updates=True)
 
         assert not handler.check_update(Update(0, edited_message=message))
         assert not handler.check_update(Update(0, message=message))
@@ -130,9 +109,8 @@ class TestMessageHandler(object):
 
     def test_allow_edited(self, message):
         with pytest.warns(UserWarning):
-            handler = MessageHandler(None, self.callback_basic,
-                                     message_updates=True, allow_edited=True,
-                                     channel_post_updates=False)
+            handler = MessageHandler(None, self.callback_basic, message_updates=True,
+                                     allow_edited=True, channel_post_updates=False)
 
         assert handler.check_update(Update(0, edited_message=message))
         assert handler.check_update(Update(0, message=message))
@@ -154,16 +132,14 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_pass_user_or_chat_data(self, dp, message):
-        handler = MessageHandler(None, self.callback_data_1,
-                                 pass_user_data=True)
+        handler = MessageHandler(None, self.callback_data_1, pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_data_1,
-                                 pass_chat_data=True)
+        handler = MessageHandler(None, self.callback_data_1, pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -171,8 +147,8 @@ class TestMessageHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_data_2,
-                                 pass_chat_data=True, pass_user_data=True)
+        handler = MessageHandler(None, self.callback_data_2, pass_chat_data=True,
+                                 pass_user_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -180,16 +156,14 @@ class TestMessageHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, message):
-        handler = MessageHandler(None, self.callback_queue_1,
-                                 pass_job_queue=True)
+        handler = MessageHandler(None, self.callback_queue_1, pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(Update(0, message=message))
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_queue_1,
-                                 pass_update_queue=True)
+        handler = MessageHandler(None, self.callback_queue_1, pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -197,8 +171,8 @@ class TestMessageHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_queue_2,
-                                 pass_job_queue=True, pass_update_queue=True)
+        handler = MessageHandler(None, self.callback_queue_2, pass_job_queue=True,
+                                 pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -208,23 +182,3 @@ class TestMessageHandler(object):
     def test_other_update_types(self, false_update):
         handler = MessageHandler(None, self.callback_basic, edited_updates=True)
         assert not handler.check_update(false_update)
-
-    def test_context(self, cdp, message):
-        handler = MessageHandler(None, self.callback_context,
-                                 edited_updates=True, channel_post_updates=True)
-        cdp.add_handler(handler)
-
-        cdp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        cdp.process_update(Update(0, edited_message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        cdp.process_update(Update(0, channel_post=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        cdp.process_update(Update(0, edited_channel_post=message))
-        assert self.test_flag
