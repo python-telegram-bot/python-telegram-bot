@@ -52,7 +52,8 @@ class TestConversationHandler(object):
         self.current_state = dict()
         self.entry_points = [CommandHandler('start', self.start)]
         self.states = {
-            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
+            self.THIRSTY: [CommandHandler('brew', self.brew),
+                           CommandHandler('wait', self.start)],
             self.BREWING: [CommandHandler('pourCoffee', self.drink)],
             self.DRINKING:
                 [CommandHandler('startCoding', self.code),
@@ -260,7 +261,8 @@ class TestConversationHandler(object):
 
     def test_end_on_first_message(self, dp, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
+            entry_points=[CommandHandler('start', self.start_end)], states={},
+            fallbacks=[])
         dp.add_handler(handler)
 
         # User starts the state machine and immediately ends it.
@@ -272,7 +274,8 @@ class TestConversationHandler(object):
         start_end_async = (lambda bot, update: dp.run_async(self.start_end, bot, update))
 
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start_end_async)], states={}, fallbacks=[])
+            entry_points=[CommandHandler('start', start_end_async)], states={},
+            fallbacks=[])
         dp.add_handler(handler)
 
         # User starts the state machine with an async function that immediately ends the
@@ -291,7 +294,8 @@ class TestConversationHandler(object):
 
     def test_per_chat_message_without_chat(self, bot, user1):
         handler = ConversationHandler(
-            entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[])
+            entry_points=[CommandHandler('start', self.start_end)], states={},
+            fallbacks=[])
         cbq = CallbackQuery(0, user1, None, None, bot=bot)
         update = Update(0, callback_query=cbq)
         assert not handler.check_update(update)

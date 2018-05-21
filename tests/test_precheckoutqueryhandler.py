@@ -16,12 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from queue import Queue
 
 import pytest
 
 from telegram import (Update, Chat, Bot, ChosenInlineResult, User, Message, CallbackQuery,
                       InlineQuery, ShippingQuery, PreCheckoutQuery)
-from telegram.ext import PreCheckoutQueryHandler
+from telegram.ext import PreCheckoutQueryHandler, CallbackContext, JobQueue
 
 message = Message(1, User(1, '', False), None, Chat(1, ''), text='Text')
 
@@ -78,6 +79,16 @@ class TestPreCheckoutQueryHandler(object):
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, CallbackContext) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(update, Update) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          isinstance(context.user_data, dict) and
+                          context.chat_data is None and
+                          isinstance(update.pre_checkout_query, PreCheckoutQuery))
+
     def test_basic(self, dp, pre_checkout_query):
         handler = PreCheckoutQueryHandler(self.callback_basic)
         dp.add_handler(handler)
@@ -87,14 +98,16 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
     def test_pass_user_or_chat_data(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_data_1, pass_user_data=True)
+        handler = PreCheckoutQueryHandler(self.callback_data_1,
+                                          pass_user_data=True)
         dp.add_handler(handler)
 
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_data_1, pass_chat_data=True)
+        handler = PreCheckoutQueryHandler(self.callback_data_1,
+                                          pass_chat_data=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -102,7 +115,8 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_data_2, pass_chat_data=True,
+        handler = PreCheckoutQueryHandler(self.callback_data_2,
+                                          pass_chat_data=True,
                                           pass_user_data=True)
         dp.add_handler(handler)
 
@@ -111,14 +125,16 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
     def test_pass_job_or_update_queue(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_queue_1, pass_job_queue=True)
+        handler = PreCheckoutQueryHandler(self.callback_queue_1,
+                                          pass_job_queue=True)
         dp.add_handler(handler)
 
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_queue_1, pass_update_queue=True)
+        handler = PreCheckoutQueryHandler(self.callback_queue_1,
+                                          pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -126,7 +142,8 @@ class TestPreCheckoutQueryHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = PreCheckoutQueryHandler(self.callback_queue_2, pass_job_queue=True,
+        handler = PreCheckoutQueryHandler(self.callback_queue_2,
+                                          pass_job_queue=True,
                                           pass_update_queue=True)
         dp.add_handler(handler)
 
@@ -137,3 +154,10 @@ class TestPreCheckoutQueryHandler(object):
     def test_other_update_types(self, false_update):
         handler = PreCheckoutQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)
+
+    def test_context(self, cdp, pre_checkout_query):
+        handler = PreCheckoutQueryHandler(self.callback_context)
+        cdp.add_handler(handler)
+
+        cdp.process_update(pre_checkout_query)
+        assert self.test_flag

@@ -1,6 +1,26 @@
 =======
 Changes
 =======
+**2018-??-??**
+*Released 11.0.0*
+
+Context based callbacks:
+See https://git.io/vp113 for help.
+
+- Use of `pass_` in handlers is deprecated.
+- Instead use `use_context=True` on `Updater` or `Dispatcher` and change callback from (bot, update, others...) to (update, context).
+- This also applies to error handlers `Dispatcher.add_error_handler` and JobQueue jobs (change (bot, job) to (context) here).
+- For users with custom handlers subclassing Handler, this is mostly backwards compatible, but to use the new context based callbacks you need to implement the new collect_additional_context method.
+- Passing bot to JobQueue.__init__ is deprecated. Use JobQueue.set_dispatcher with a dispatcher instead.
+
+Other:
+- Handlers should be faster due to deduped logic.
+
+Other removals:
+- Remove the ability to use filter lists in handlers.
+- Remove the last CamelCase CheckUpdate methods from the handlers we missed earlier.
+
+
 **2018-05-02**
 *Released 10.1.0*
 
