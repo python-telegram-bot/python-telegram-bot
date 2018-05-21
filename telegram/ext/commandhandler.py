@@ -29,9 +29,9 @@ class CommandHandler(Handler):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text. It will add a ``list`` to the :class:`CallbackContext`
-    named :attr:`CallbackContext.args`. It will contain a list of strings, which is the text
-    following the command split on single or consecutive whitespace characters.
+    bot's name and/or some additional text. The handler will add a ``list`` to the
+    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
+    which is the text following the command split on single or consecutive whitespace characters.
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
