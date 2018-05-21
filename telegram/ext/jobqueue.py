@@ -57,7 +57,8 @@ class JobQueue(object):
                     self.use_context = False
 
             self._dispatcher = MockDispatcher()
-        self._dispatcher = None
+        else:
+            self._dispatcher = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__start_lock = Lock()
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick

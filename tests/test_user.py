@@ -96,6 +96,11 @@ class TestUser(object):
         user.last_name = None
         assert user.full_name == u'first\u2022name'
 
+    def test_link(self, user):
+        assert user.link == 'https://t.me/{}'.format(user.username)
+        user.username = None
+        assert user.link is None
+
     def test_get_profile_photos(self, monkeypatch, user):
         def test(_, *args, **kwargs):
             return args[0] == user.id

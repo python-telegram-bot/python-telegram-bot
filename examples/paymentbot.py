@@ -80,8 +80,7 @@ def shipping_callback(update, context):
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
         # answer False pre_checkout_query
-        query.answer(shipping_query_id=query.id, ok=False,
-                     error_message="Something went wrong...")
+        query.answer(ok=False, error_message="Something went wrong...")
         return
     else:
         options = list()
@@ -90,8 +89,7 @@ def shipping_callback(update, context):
         # an array of LabeledPrice objects
         price_list = [LabeledPrice('B1', 150), LabeledPrice('B2', 200)]
         options.append(ShippingOption('2', 'Shipping Option B', price_list))
-        query.answer(shipping_query_id=query.id, ok=True,
-                     shipping_options=options)
+        query.answer(ok=True, shipping_options=options)
 
 
 # after (optional) shipping, it's the pre-checkout
@@ -100,10 +98,9 @@ def precheckout_callback(update, context):
     # check the payload, is this from your bot?
     if query.invoice_payload != 'Custom-Payload':
         # answer False pre_checkout_query
-        query.answer(pre_checkout_query_id=query.id, ok=False,
-                     error_message="Something went wrong...")
+        query.answer(ok=False, error_message="Something went wrong...")
     else:
-        query.answer(pre_checkout_query_id=query.id, ok=True)
+        query.answer(ok=True)
 
 
 # finally, after contacting to the payment provider...
