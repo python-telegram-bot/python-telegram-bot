@@ -142,12 +142,12 @@ class TestMessageHandler(object):
                            channel_post_updates=False, edited_updates=False)
 
     def test_with_filter(self, message):
-        handler = MessageHandler(Filters.command, self.callback_basic)
+        handler = MessageHandler(Filters.group, self.callback_basic)
 
-        message.text = '/test'
+        message.chat.type = 'group'
         assert handler.check_update(Update(0, message))
 
-        message.text = 'test'
+        message.chat.type = 'private'
         assert not handler.check_update(Update(0, message))
 
     def test_specific_filters(self, message):

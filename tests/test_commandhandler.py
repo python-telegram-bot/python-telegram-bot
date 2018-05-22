@@ -20,6 +20,7 @@
 from queue import Queue
 
 import pytest
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, MessageEntity)
@@ -153,10 +154,30 @@ class TestCommandHandler(object):
         check = handler.check_update(Update(0, message))
         assert check is None or check is False
 
-    def test_edited(self, message):
+    def test_deprecation_warning(self):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+            CommandHandler('test', self.callback_basic, allow_edited=True)
+
+    def test_no_edited(self, message):
+        handler = CommandHandler('test', self.callback_basic)
+        message.text = '/test'
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=message))
+        assert check is not None and check is not False
+
+        handler = CommandHandler('test', self.callback_basic,
+                                 filters=~Filters.update_type.edited_message)
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=message))
+        assert check is None or check is False
+
+    def test_edited_deprecated(self, message):
         handler = CommandHandler('test', self.callback_basic,
                                  allow_edited=False)
-
         message.text = '/test'
         check = handler.check_update(Update(0, message))
         assert check is not None and check is not False
@@ -164,7 +185,8 @@ class TestCommandHandler(object):
         check = handler.check_update(Update(0, edited_message=message))
         assert check is None or check is False
 
-        handler.allow_edited = True
+        handler = CommandHandler('test', self.callback_basic,
+                                 allow_edited=True)
         check = handler.check_update(Update(0, message))
         assert check is not None and check is not False
 
@@ -436,8 +458,25 @@ class TestPrefixHandler(object):
         else:
             assert check is None or check is False
 
-    def test_edited(self, prefixmessage):
+    def test_no_edited(self, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=prefixmessage))
+        assert check is not None and check is not False
+
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
+                                filters=~Filters.update_type.edited_message)
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=prefixmessage))
+        assert check is None or check is False
+
+    def test_edited_deprecated(self, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
+                                allow_edited=False)
 
         check = handler.check_update(Update(0, prefixmessage))
         assert check is not None and check is not False
@@ -445,7 +484,8 @@ class TestPrefixHandler(object):
         check = handler.check_update(Update(0, edited_message=prefixmessage))
         assert check is None or check is False
 
-        handler.allow_edited = True
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
+                                allow_edited=True)
         check = handler.check_update(Update(0, prefixmessage))
         assert check is not None and check is not False
 
