@@ -409,6 +409,33 @@ class TestPrefixHandler(object):
         check = handler.check_update(Update(0, message))
         assert check is None or check is False
 
+    def test_single_prefix_single_command(self, prefixmessage):
+        handler = PrefixHandler('!', 'test', self.callback_basic)
+
+        check = handler.check_update(Update(0, prefixmessage))
+        if prefixmessage.text in ['!test']:
+            assert check is not None and check is not False
+        else:
+            assert check is None or check is False
+
+    def test_single_prefix_multi_command(self, prefixmessage):
+        handler = PrefixHandler('!', ['test', 'help'], self.callback_basic)
+
+        check = handler.check_update(Update(0, prefixmessage))
+        if prefixmessage.text in ['!test', '!help']:
+            assert check is not None and check is not False
+        else:
+            assert check is None or check is False
+
+    def test_multi_prefix_single_command(self, prefixmessage):
+        handler = PrefixHandler(['!', '#'], 'test', self.callback_basic)
+
+        check = handler.check_update(Update(0, prefixmessage))
+        if prefixmessage.text in ['!test', '#test']:
+            assert check is not None and check is not False
+        else:
+            assert check is None or check is False
+
     def test_edited(self, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
 
