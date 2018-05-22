@@ -474,24 +474,6 @@ class TestPrefixHandler(object):
         check = handler.check_update(Update(0, edited_message=prefixmessage))
         assert check is None or check is False
 
-    def test_edited_deprecated(self, prefixmessage):
-        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
-                                allow_edited=False)
-
-        check = handler.check_update(Update(0, prefixmessage))
-        assert check is not None and check is not False
-
-        check = handler.check_update(Update(0, edited_message=prefixmessage))
-        assert check is None or check is False
-
-        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
-                                allow_edited=True)
-        check = handler.check_update(Update(0, prefixmessage))
-        assert check is not None and check is not False
-
-        check = handler.check_update(Update(0, edited_message=prefixmessage))
-        assert check is not None and check is not False
-
     def test_with_filter(self, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
                                 filters=Filters.group)
