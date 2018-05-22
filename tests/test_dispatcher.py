@@ -23,7 +23,7 @@ from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.ext import MessageHandler, Filters, CommandHandler, CallbackContext, JobQueue
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -227,11 +227,7 @@ class TestDispatcher(object):
             passed.append('error')
             passed.append(e)
 
-        update = Update(1, message=Message(1, None, None, None, text='/start',
-                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
-                                                                   offset=0,
-                                                                   length=len('/start'))],
-                                           bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
 
         # If Stop raised handlers in other groups should not be called.
         passed = []
@@ -258,11 +254,7 @@ class TestDispatcher(object):
             passed.append('error')
             passed.append(e)
 
-        update = Update(1, message=Message(1, None, None, None, text='/start',
-                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
-                                                                   offset=0,
-                                                                   length=len('/start'))],
-                                           bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
 
         # If an unhandled exception was caught, no further handlers from the same group should be
         # called.
@@ -292,11 +284,7 @@ class TestDispatcher(object):
             passed.append('error')
             passed.append(e)
 
-        update = Update(1, message=Message(1, None, None, None, text='/start',
-                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
-                                                                   offset=0,
-                                                                   length=len('/start'))],
-                                           bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
 
         # If a TelegramException was caught, an error handler should be called and no further
         # handlers from the same group should be called.
@@ -327,11 +315,7 @@ class TestDispatcher(object):
             passed.append(e)
             raise DispatcherHandlerStop
 
-        update = Update(1, message=Message(1, None, None, None, text='/start',
-                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
-                                                                   offset=0,
-                                                                   length=len('/start'))],
-                                           bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
 
         # If a TelegramException was caught, an error handler should be called and no further
         # handlers from the same group should be called.

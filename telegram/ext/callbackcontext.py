@@ -37,9 +37,9 @@ class CallbackContext(object):
             regex-supported handler, this will contain the object returned from
             ``re.match(pattern, string)``.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
-            is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
-            or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
-            text after the command, using any whitespace string as a delimiter.
+            is handled by :class:`telegram.ext.CommandHandler` or
+            :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the text
+            after the command, using any whitespace string as a delimiter.
         error (:class:`telegram.TelegramError`, optional): The Telegram error that was raised.
             Only present when passed to a error handler registered with
             :attr:`telegram.ext.Dispatcher.add_error_handler`.
