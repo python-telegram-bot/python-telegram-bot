@@ -60,9 +60,13 @@ class BaseFilter(object):
     """
 
     name = None
+    update_filter = False
 
-    def __call__(self, message):
-        return self.filter(message)
+    def __call__(self, update):
+        if self.update_filter:
+            return self.filter(update)
+        else:
+            return self.filter(update.effective_message)
 
     def __and__(self, other):
         return MergedFilter(self, and_filter=other)
@@ -100,12 +104,13 @@ class InvertedFilter(BaseFilter):
         f: The filter to invert.
 
     """
+    update_filter = True
 
     def __init__(self, f):
         self.f = f
 
-    def filter(self, message):
-        return not self.f(message)
+    def filter(self, update):
+        return not self.f(update)
 
     def __repr__(self):
         return "<inverted {}>".format(self.f)
@@ -120,17 +125,18 @@ class MergedFilter(BaseFilter):
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
 
     """
+    update_filter = True
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
         self.and_filter = and_filter
         self.or_filter = or_filter
 
-    def filter(self, message):
+    def filter(self, update):
         if self.and_filter:
-            return self.base_filter(message) and self.and_filter(message)
+            return self.base_filter(update) and self.and_filter(update)
         elif self.or_filter:
-            return self.base_filter(message) or self.or_filter(message)
+            return self.base_filter(update) or self.or_filter(update)
 
     def __repr__(self):
         return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
@@ -159,6 +165,7 @@ class Filters(object):
         name = 'Filters.text'
 
         def filter(self, message):
+            print('text_filter_filter {}'.format(repr(self)))
             return bool(message.text and not message.text.startswith('/'))
 
     text = _Text()
@@ -391,6 +398,7 @@ class Filters(object):
             ``Filters.status_update`` for all status update messages.
 
         """
+        update_filter = True
 
         class _NewChatMembers(BaseFilter):
             name = 'Filters.status_update.new_chat_members'
