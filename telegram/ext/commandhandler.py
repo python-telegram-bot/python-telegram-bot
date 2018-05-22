@@ -160,7 +160,7 @@ class CommandHandler(Handler):
                         command[1].lower() == message.bot.username.lower()):
                     return None
 
-                if self.filters is None or self.filters(message):
+                if self.filters is None or self.filters(update):
                     return args
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
@@ -315,5 +315,5 @@ class PrefixHandler(CommandHandler):
             text_list = message.text.split()
             if text_list[0].lower() not in self.command:
                 return None
-            if self.filters is None or self.filters(message):
+            if self.filters is None or self.filters(update):
                 return text_list[1:]

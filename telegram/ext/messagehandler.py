@@ -148,4 +148,4 @@ class MessageHandler(Handler):
             if not self.filters:
                 return True
             else:
-                return self.filters(update.effective_message)
+                return self.filters(update)
