@@ -166,7 +166,4 @@ class MessageHandler(Handler):
 
         """
         if isinstance(update, Update) and update.effective_message:
-            if not self.filters:
-                return True
-            else:
-                return self.filters(update)
+            return self.filters(update)
