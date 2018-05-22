@@ -19,6 +19,7 @@
 from queue import Queue
 
 import pytest
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
@@ -100,7 +101,15 @@ class TestMessageHandler(object):
         dp.process_update(Update(0, message))
         assert self.test_flag
 
-    def test_edited(self, message):
+    def test_deprecation_warning(self):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+            MessageHandler(None, self.callback_basic, edited_updates=True)
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+            MessageHandler(None, self.callback_basic, message_updates=False)
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+            MessageHandler(None, self.callback_basic, channel_post_updates=True)
+
+    def test_edited_deprecated(self, message):
         handler = MessageHandler(None, self.callback_basic, edited_updates=True,
                                  message_updates=False, channel_post_updates=False)
 
@@ -109,17 +118,16 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, channel_post=message))
         assert handler.check_update(Update(0, edited_channel_post=message))
 
-    def test_channel_post(self, message):
+    def test_channel_post_deprecated(self, message):
         handler = MessageHandler(None, self.callback_basic,
                                  edited_updates=False, message_updates=False,
                                  channel_post_updates=True)
-
         assert not handler.check_update(Update(0, edited_message=message))
         assert not handler.check_update(Update(0, message=message))
         assert handler.check_update(Update(0, channel_post=message))
         assert not handler.check_update(Update(0, edited_channel_post=message))
 
-    def test_multiple_flags(self, message):
+    def test_multiple_flags_deprecated(self, message):
         handler = MessageHandler(None, self.callback_basic, edited_updates=True,
                                  message_updates=True, channel_post_updates=True)
 
@@ -128,18 +136,7 @@ class TestMessageHandler(object):
         assert handler.check_update(Update(0, channel_post=message))
         assert handler.check_update(Update(0, edited_channel_post=message))
 
-    def test_allow_edited(self, message):
-        with pytest.warns(UserWarning):
-            handler = MessageHandler(None, self.callback_basic,
-                                     message_updates=True, allow_edited=True,
-                                     channel_post_updates=False)
-
-        assert handler.check_update(Update(0, edited_message=message))
-        assert handler.check_update(Update(0, message=message))
-        assert not handler.check_update(Update(0, channel_post=message))
-        assert handler.check_update(Update(0, edited_channel_post=message))
-
-    def test_none_allowed(self):
+    def test_none_allowed_deprecated(self):
         with pytest.raises(ValueError, match='are all False'):
             MessageHandler(None, self.callback_basic, message_updates=False,
                            channel_post_updates=False, edited_updates=False)
@@ -152,6 +149,17 @@ class TestMessageHandler(object):
 
         message.text = 'test'
         assert not handler.check_update(Update(0, message))
+
+    def test_specific_filters(self, message):
+        f = (~Filters.update_type.messages &
+             ~Filters.update_type.channel_post &
+             Filters.update_type.edited_channel_post)
+        handler = MessageHandler(f, self.callback_basic)
+
+        assert not handler.check_update(Update(0, edited_message=message))
+        assert not handler.check_update(Update(0, message=message))
+        assert not handler.check_update(Update(0, channel_post=message))
+        assert handler.check_update(Update(0, edited_channel_post=message))
 
     def test_pass_user_or_chat_data(self, dp, message):
         handler = MessageHandler(None, self.callback_data_1,
