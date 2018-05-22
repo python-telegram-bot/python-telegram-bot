@@ -30,8 +30,8 @@ from .callbackqueryhandler import CallbackQueryHandler
 from .choseninlineresulthandler import ChosenInlineResultHandler
 from .commandhandler import CommandHandler, PrefixHandler
 from .inlinequeryhandler import InlineQueryHandler
-from .messagehandler import MessageHandler
 from .filters import BaseFilter, Filters
+from .messagehandler import MessageHandler
 from .regexhandler import RegexHandler
 from .stringcommandhandler import StringCommandHandler
 from .stringregexhandler import StringRegexHandler
