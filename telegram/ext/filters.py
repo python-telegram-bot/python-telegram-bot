@@ -19,8 +19,10 @@
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
-from telegram import Chat
+
 from future.utils import string_types
+
+from telegram import Chat
 
 
 class BaseFilter(object):
@@ -56,7 +58,8 @@ class BaseFilter(object):
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
-
+        update_filter (:obj:`bool`): whether this filter should work on update. If ``False`` it
+            will run the filter on :attr:`update.effective_message``. Default is ``False``.
     """
 
     name = None
@@ -729,3 +732,77 @@ class Filters(object):
         def filter(self, message):
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
+
+    class _UpdateType(BaseFilter):
+        update_filter = True
+
+        class _Message(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.message is not None
+
+        message = _Message()
+
+        class _EditedMessage(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.edited_message is not None
+
+        edited_message = _EditedMessage()
+
+        class _Messages(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.message is not None or update.edited_message is not None
+
+        messages = _Messages()
+
+        class _ChannelPost(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.channel_post is not None
+
+        channel_post = _ChannelPost()
+
+        class _EditedChannelPost(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.edited_channel_post is not None
+
+        edited_channel_post = _EditedChannelPost()
+
+        class _ChannelPosts(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.channel_post is not None or update.edited_channel_post is not None
+
+        channel_posts = _ChannelPosts()
+
+        def filter(self, update):
+            return self.messages(update) or self.channel_posts(update)
+
+    update_type = _UpdateType()
+    """Subset for filtering the type of update.
+
+    Examples:
+        Use these filters like: ``Filters.update_type.message`` or
+        ``Filters.update_type.channel_posts``etc. Or use just ``Filters.update_type`` for all
+        types.
+
+    Attributes:
+        message (:obj:`Filter`): Updates with :attr:`telegram.Update.message`
+        edited_message (:obj:`Filter`): Updates with :attr:`telegram.Update.edited_message`
+        messages (:obj:`Filter`): Updates with either :attr:`telegram.Update.message` or
+            :attr:`telegram.Update.edited_message`
+        channel_post (:obj:`Filter`): Updates with :attr:`telegram.Update.channel_post`
+        edited_channel_post (:obj:`Filter`): Updates with
+            :attr:`telegram.Update.edited_channel_post`
+        channel_posts (:obj:`Filter`): Updates with either :attr:`telegram.Update.channel_post` or
+            :attr:`telegram.Update.edited_channel_post`
+    """
