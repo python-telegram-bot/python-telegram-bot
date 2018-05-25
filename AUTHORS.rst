@@ -59,6 +59,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Rick van Schijndel <https://github.com/Mindavi>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_
