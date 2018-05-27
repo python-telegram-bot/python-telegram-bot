@@ -38,7 +38,7 @@ class CommandHandler(Handler):
     which is the text following the command split on single or consecutive whitespace characters.
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~Filters.update_type.edited_message``.
+    use ``~Filters.updates.edited_message`` in the filter argument.
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -88,7 +88,7 @@ class CommandHandler(Handler):
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
             DEPRECATED: Edited is allowed by default. To change this behavior use
-            ``~Filters.update_type.edited_message``.
+            ``~Filters.updates.edited_message``.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -141,16 +141,16 @@ class CommandHandler(Handler):
                 raise ValueError('Command is not a valid bot command')
 
         if filters:
-            self.filters = Filters.update_type.messages & filters
+            self.filters = Filters.updates.messages & filters
         else:
-            self.filters = Filters.update_type.messages
+            self.filters = Filters.updates.messages
 
         if allow_edited is not None:
             warnings.warn('allow_edited is deprecated. See https://git.io/vp113 for more info',
                           TelegramDeprecationWarning,
                           stacklevel=2)
             if not allow_edited:
-                self.filters &= ~Filters.update_type.edited_message
+                self.filters &= ~Filters.updates.edited_message
         self.pass_args = pass_args
 
     def check_update(self, update):
@@ -216,7 +216,7 @@ class PrefixHandler(CommandHandler):
             '#test', '!help' and '#help'.
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~Filters.update_type.edited_message``.
+    use ``~Filters.updates.edited_message``.
 
     Attributes:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.

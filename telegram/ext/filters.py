@@ -767,12 +767,12 @@ class Filters(object):
         def filter(self, update):
             return self.messages(update) or self.channel_posts(update)
 
-    update_type = _UpdateType()
+    updates = _UpdateType()
     """Subset for filtering the type of update.
 
     Examples:
-        Use these filters like: ``Filters.update_type.message`` or
-        ``Filters.update_type.channel_posts``etc. Or use just ``Filters.update_type`` for all
+        Use these filters like: ``Filters.updates.message`` or
+        ``Filters.updates.channel_posts``etc. Or use just ``Filters.updates`` for all
         types.
 
     Attributes:
