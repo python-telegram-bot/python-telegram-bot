@@ -63,8 +63,8 @@ class MessageHandler(Handler):
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not). Default is
-            ``Filters.update_type``. If you don't want or need any of those
-            pass ``~Filters.update_type.*``
+            ``Filters.updates``. If you don't want or need any of those
+            pass ``~Filters.updates.*`` in the filter argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -126,15 +126,15 @@ class MessageHandler(Handler):
                 'message_updates, channel_post_updates and edited_updates are all False')
         self.filters = filters
         if self.filters is not None:
-            self.filters &= Filters.update_type
+            self.filters &= Filters.updates
         else:
-            self.filters = Filters.update_type
+            self.filters = Filters.updates
         if message_updates is not None:
             warnings.warn('message_updates is deprecated. See https://git.io/vp113 for more info',
                           TelegramDeprecationWarning,
                           stacklevel=2)
             if message_updates is False:
-                self.filters &= ~Filters.update_type.message
+                self.filters &= ~Filters.updates.message
 
         if channel_post_updates is not None:
             warnings.warn('channel_post_updates is deprecated. See https://git.io/vp113 '
@@ -142,18 +142,15 @@ class MessageHandler(Handler):
                           TelegramDeprecationWarning,
                           stacklevel=2)
             if channel_post_updates is False:
-                self.filters &= ~Filters.update_type.channel_post
+                self.filters &= ~Filters.updates.channel_post
 
         if edited_updates is not None:
             warnings.warn('edited_updates is deprecated. See https://git.io/vp113 for more info',
                           TelegramDeprecationWarning,
                           stacklevel=2)
-            if edited_updates:
-                self.filters |= (Filters.update_type.edited_message |
-                                 Filters.update_type.edited_channel_post)
             if edited_updates is False:
-                self.filters &= ~(Filters.update_type.edited_message |
-                                  Filters.update_type.edited_channel_post)
+                self.filters &= ~(Filters.updates.edited_message |
+                                  Filters.updates.edited_channel_post)
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.

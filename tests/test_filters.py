@@ -510,40 +510,40 @@ class TestFilters(object):
         assert str(unnamed) == Unnamed.__name__
 
     def test_update_type_message(self, update):
-        assert Filters.update_type.message(update)
-        assert not Filters.update_type.edited_message(update)
-        assert Filters.update_type.messages(update)
-        assert not Filters.update_type.channel_post(update)
-        assert not Filters.update_type.edited_channel_post(update)
-        assert not Filters.update_type.channel_posts(update)
-        assert Filters.update_type(update)
+        assert Filters.updates.message(update)
+        assert not Filters.updates.edited_message(update)
+        assert Filters.updates.messages(update)
+        assert not Filters.updates.channel_post(update)
+        assert not Filters.updates.edited_channel_post(update)
+        assert not Filters.updates.channel_posts(update)
+        assert Filters.updates(update)
 
     def test_update_type_edited_message(self, update):
         update.edited_message, update.message = update.message, update.edited_message
-        assert not Filters.update_type.message(update)
-        assert Filters.update_type.edited_message(update)
-        assert Filters.update_type.messages(update)
-        assert not Filters.update_type.channel_post(update)
-        assert not Filters.update_type.edited_channel_post(update)
-        assert not Filters.update_type.channel_posts(update)
-        assert Filters.update_type(update)
+        assert not Filters.updates.message(update)
+        assert Filters.updates.edited_message(update)
+        assert Filters.updates.messages(update)
+        assert not Filters.updates.channel_post(update)
+        assert not Filters.updates.edited_channel_post(update)
+        assert not Filters.updates.channel_posts(update)
+        assert Filters.updates(update)
 
     def test_update_type_channel_post(self, update):
         update.channel_post, update.message = update.message, update.edited_message
-        assert not Filters.update_type.message(update)
-        assert not Filters.update_type.edited_message(update)
-        assert not Filters.update_type.messages(update)
-        assert Filters.update_type.channel_post(update)
-        assert not Filters.update_type.edited_channel_post(update)
-        assert Filters.update_type.channel_posts(update)
-        assert Filters.update_type(update)
+        assert not Filters.updates.message(update)
+        assert not Filters.updates.edited_message(update)
+        assert not Filters.updates.messages(update)
+        assert Filters.updates.channel_post(update)
+        assert not Filters.updates.edited_channel_post(update)
+        assert Filters.updates.channel_posts(update)
+        assert Filters.updates(update)
 
     def test_update_type_edited_channel_post(self, update):
         update.edited_channel_post, update.message = update.message, update.edited_message
-        assert not Filters.update_type.message(update)
-        assert not Filters.update_type.edited_message(update)
-        assert not Filters.update_type.messages(update)
-        assert not Filters.update_type.channel_post(update)
-        assert Filters.update_type.edited_channel_post(update)
-        assert Filters.update_type.channel_posts(update)
-        assert Filters.update_type(update)
+        assert not Filters.updates.message(update)
+        assert not Filters.updates.edited_message(update)
+        assert not Filters.updates.messages(update)
+        assert not Filters.updates.channel_post(update)
+        assert Filters.updates.edited_channel_post(update)
+        assert Filters.updates.channel_posts(update)
+        assert Filters.updates(update)

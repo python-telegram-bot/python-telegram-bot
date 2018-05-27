@@ -168,7 +168,7 @@ class TestCommandHandler(object):
         assert check is not None and check is not False
 
         handler = CommandHandler('test', self.callback_basic,
-                                 filters=~Filters.update_type.edited_message)
+                                 filters=~Filters.updates.edited_message)
         check = handler.check_update(Update(0, message))
         assert check is not None and check is not False
 
@@ -467,7 +467,7 @@ class TestPrefixHandler(object):
         assert check is not None and check is not False
 
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
-                                filters=~Filters.update_type.edited_message)
+                                filters=~Filters.updates.edited_message)
         check = handler.check_update(Update(0, prefixmessage))
         assert check is not None and check is not False
 

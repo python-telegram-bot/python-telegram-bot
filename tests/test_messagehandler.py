@@ -151,9 +151,9 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_specific_filters(self, message):
-        f = (~Filters.update_type.messages &
-             ~Filters.update_type.channel_post &
-             Filters.update_type.edited_channel_post)
+        f = (~Filters.updates.messages &
+             ~Filters.updates.channel_post &
+             Filters.updates.edited_channel_post)
         handler = MessageHandler(f, self.callback_basic)
 
         assert not handler.check_update(Update(0, edited_message=message))
