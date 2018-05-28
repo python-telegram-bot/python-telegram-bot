@@ -94,7 +94,7 @@ def mention_html(user_id, name):
         :obj:`str`: The inline mention for the user as html.
     """
     if isinstance(user_id, int):
-        return '<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
+        return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
 def mention_markdown(user_id, name):
@@ -107,7 +107,7 @@ def mention_markdown(user_id, name):
         :obj:`str`: The inline mention for the user as markdown.
     """
     if isinstance(user_id, int):
-        return '[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
+        return u'[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
 
 
 def effective_message_type(entity):

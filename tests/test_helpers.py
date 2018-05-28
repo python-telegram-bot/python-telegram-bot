@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from telegram import Update
 
 from telegram import Sticker
+from telegram import Update
 from telegram import User
 from telegram.message import Message
 from telegram.utils import helpers
@@ -55,3 +55,13 @@ class TestHelpers(object):
 
         empty_update = Update(2)
         assert helpers.effective_message_type(empty_update) is None
+
+    def test_mention_html(self):
+        expected = '<a href="tg://user?id=1">the name</a>'
+
+        assert expected == helpers.mention_html(1, 'the name')
+
+    def test_mention_markdown(self):
+        expected = '[the name](tg://user?id=1)'
+
+        assert expected == helpers.mention_markdown(1, 'the name')
