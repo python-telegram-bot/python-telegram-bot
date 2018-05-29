@@ -34,6 +34,7 @@ try:
     import telegram.vendor.ptb_urllib3.urllib3 as urllib3
     import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
     from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
+    from telegram.vendor.ptb_urllib3.urllib3.util.retry import Retry
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
 except ImportError:  # pragma: no cover
     warnings.warn("python-telegram-bot wasn't properly installed. Please refer to README.rst on "
@@ -64,7 +65,7 @@ class Request(object):
             consecutive read operations for a response from the server. None will set an infinite
             timeout. This value is usually overridden by the various ``telegram.Bot`` methods.
             (default: 5.)
-
+        retries (int): Number of retries for each request. Use 0 to disable retrying. (default: 3)
     """
 
     def __init__(self,
@@ -72,7 +73,8 @@ class Request(object):
                  proxy_url=None,
                  urllib3_proxy_kwargs=None,
                  connect_timeout=5.,
-                 read_timeout=5.):
+                 read_timeout=5.,
+                 retries=3):
         if urllib3_proxy_kwargs is None:
             urllib3_proxy_kwargs = dict()
 
@@ -80,6 +82,8 @@ class Request(object):
 
         sockopts = HTTPConnection.default_socket_options + [
             (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)]
+
+        retries = self._parse_retries(retries)
 
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
@@ -94,6 +98,7 @@ class Request(object):
             cert_reqs='CERT_REQUIRED',
             ca_certs=certifi.where(),
             socket_options=sockopts,
+            retries=retries,
             timeout=urllib3.Timeout(
                 connect=self._connect_timeout, read=read_timeout, total=None))
 
@@ -224,7 +229,29 @@ class Request(object):
         else:
             raise NetworkError('{0} ({1})'.format(message, resp.status))
 
-    def get(self, url, timeout=None):
+    def _parse_retries(self, retries):
+        """
+        Builds a :obj:`telegram.vendor.ptb_urllib3.urllib3.util.retry.Retry object.
+        If it's a positive integer, it's used as the total amount of retries, and a new Retry
+        object with a sane default for backoff (0.1s) is created. Else, retrying is disabled.
+
+        Args:
+            retries (:obj:`int`): Retries parameter.
+
+        Returns:
+          A :obj:`telegram.vendor.ptb_urllib3.urllib3.util.retry.Retry` object, or False if
+          retrying is disabled.
+
+        """
+        # TODO: allow configuring the backoff. Ideally we would just let the programmer use the
+        # Retry class for fine-tuning, but that's inside the "private" urllib3 package.
+
+        if isinstance(retries, int) and retries > 0:
+            return Retry(total=retries, backoff_factor=0.1)
+
+        return False
+
+    def get(self, url, timeout=None, retries=None):
         """Request an URL.
 
         Args:
@@ -232,6 +259,8 @@ class Request(object):
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).
+            retries (:obj:`int`): If this value is specified, use it as the number of retries for
+                the request (instead of the one specified during creation of the connection pool).
 
         Returns:
           A JSON object.
@@ -242,10 +271,13 @@ class Request(object):
         if timeout is not None:
             urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
 
+        if retries is not None:
+            urlopen_kwargs['retries'] = self._parse_retries(retries)
+
         result = self._request_wrapper('GET', url, **urlopen_kwargs)
         return self._parse(result)
 
-    def post(self, url, data, timeout=None):
+    def post(self, url, data, timeout=None, retries=None):
         """Request an URL.
 
         Args:
@@ -254,6 +286,8 @@ class Request(object):
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).
+            retries (:obj:`int`): If this value is specified, use it as the number of retries for
+                the request (instead of the one specified during creation of the connection pool).
 
         Returns:
           A JSON object.
@@ -263,6 +297,9 @@ class Request(object):
 
         if timeout is not None:
             urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
+
+        if retries is not None:
+            urlopen_kwargs['retries'] = self._parse_retries(retries)
 
         if InputFile.is_inputfile(data):
             data = InputFile(data)
@@ -279,7 +316,7 @@ class Request(object):
 
         return self._parse(result)
 
-    def retrieve(self, url, timeout=None):
+    def retrieve(self, url, timeout=None, retries=None):
         """Retrieve the contents of a file by its URL.
 
         Args:
@@ -287,15 +324,19 @@ class Request(object):
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).
-
+            retries (:obj:`int`): If this value is specified, use it as the number of retries for
+                the request (instead of the one specified during creation of the connection pool).
         """
         urlopen_kwargs = {}
         if timeout is not None:
             urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
 
+        if retries is not None:
+            urlopen_kwargs['retries'] = self._parse_retries(retries)
+
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url, filename, timeout=None):
+    def download(self, url, filename, timeout=None, retries=None):
         """Download a file by its URL.
 
         Args:
@@ -303,11 +344,13 @@ class Request(object):
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).
+            retries (:obj:`int`): If this value is specified, use it as the number of retries for
+                the request (instead of the one specified during creation of the connection pool).
 
           filename:
             The filename within the path to download the file.
 
         """
-        buf = self.retrieve(url, timeout=timeout)
+        buf = self.retrieve(url, timeout=timeout, retries=retries)
         with open(filename, 'wb') as fobj:
             fobj.write(buf)
