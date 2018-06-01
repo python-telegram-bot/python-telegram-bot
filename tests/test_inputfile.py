@@ -40,4 +40,9 @@ class TestInputFile(object):
         assert in_file.mimetype == 'image/png'
         assert in_file.filename == 'image.png'
 
-        proc.kill()
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            # This exception may be thrown if the process has finished before we had the chance
+            # to kill it.
+            pass
