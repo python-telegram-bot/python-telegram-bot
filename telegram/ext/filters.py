@@ -709,7 +709,7 @@ class Filters(object):
             ``MessageHandler(Filters.in_list(['i love python',]), callback_method)``
 
         Args:
-            lang (List[:obj:`str`]): Which messages to allow through. Only exact matches
+            list_ (List[:obj:`str`]): Which messages to allow through. Only exact matches
                 are allowed.
 
         """
