@@ -21,6 +21,7 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+import inspect
 import json
 import logging
 import warnings
@@ -69,20 +70,23 @@ def message(func):
     @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         url, data = func(self, *args, **kwargs)
-        if kwargs.get('reply_to_message_id'):
-            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
+        argspec = inspect.getfullargspec(func)
+        positional_count = len(argspec.args) - len(argspec.defaults)
+        defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
+        if defaults.get('reply_to_message_id'):
+            data['reply_to_message_id'] = defaults.get('reply_to_message_id')
 
-        if kwargs.get('disable_notification'):
-            data['disable_notification'] = kwargs.get('disable_notification')
+        if defaults.get('disable_notification'):
+            data['disable_notification'] = defaults.get('disable_notification')
 
-        if kwargs.get('reply_markup'):
-            reply_markup = kwargs.get('reply_markup')
+        if defaults.get('reply_markup'):
+            reply_markup = defaults.get('reply_markup')
             if isinstance(reply_markup, ReplyMarkup):
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=defaults.get('timeout'))
 
         if result is True:
             return result

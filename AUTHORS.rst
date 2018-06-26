@@ -39,6 +39,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `jh0ker <https://github.com/jh0ker>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
 - `John Yong <https://github.com/whipermr5>`_
+- `Jon Besga <https://github.com/jonbesga>`_
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
