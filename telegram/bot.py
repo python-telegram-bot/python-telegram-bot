@@ -21,6 +21,7 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+import inspect
 import json
 import logging
 import warnings
@@ -69,20 +70,27 @@ def message(func):
     @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         url, data = func(self, *args, **kwargs)
-        if kwargs.get('reply_to_message_id'):
-            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
+        argspec = inspect.getfullargspec(func)
+        positional_count = len(argspec.args) - len(argspec.defaults)
+        defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
 
-        if kwargs.get('disable_notification'):
-            data['disable_notification'] = kwargs.get('disable_notification')
+        reply_to_message_id = kwargs.get('reply_to_message_id') or defaults.get('reply_to_message_id')
+        if reply_to_message_id:
+            data['reply_to_message_id'] = reply_to_message_id
 
-        if kwargs.get('reply_markup'):
-            reply_markup = kwargs.get('reply_markup')
+        disable_notification = kwargs.get('disable_notification') or defaults.get('disable_notification')
+        if disable_notification:
+            data['disable_notification'] = disable_notification
+
+        reply_markup = kwargs.get('reply_markup') or defaults.get('reply_markup')
+        if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        timeout = kwargs.get('timeout') or defaults.get('timeout')
+        result = self._request.post(url, data, timeout=timeout)
 
         if result is True:
             return result
