@@ -55,7 +55,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :alt: IRC Bridge
 
 .. image:: https://img.shields.io/badge/Python%202.7%20EOL-2020-orange.svg
-   :target: https://img.shields.io/badge/Python%202.7%20EOL-January%201%2C%202020-yellow.svg
+   :target: https://pythonclock.org/
    :alt: Python 2.7 EOL
 
 =================
