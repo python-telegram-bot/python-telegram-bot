@@ -113,6 +113,9 @@ class ConversationHandler(Handler):
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`, optional): When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
             this value is 0 or None (default), there will be no timeout.
+        map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
+            used to instruct a nested conversationhandler to transition into a mapped state on
+            its parent conversationhandler in place of a specified nested state.
 
     Raises:
         ValueError
@@ -131,7 +134,8 @@ class ConversationHandler(Handler):
                  per_chat=True,
                  per_user=True,
                  per_message=False,
-                 conversation_timeout=None):
+                 conversation_timeout=None,
+                 map_to_parent=None):
 
         self.entry_points = entry_points
         self.states = states
@@ -144,6 +148,7 @@ class ConversationHandler(Handler):
         self.per_chat = per_chat
         self.per_message = per_message
         self.conversation_timeout = conversation_timeout
+        self.map_to_parent = map_to_parent
 
         self.timeout_jobs = dict()
         self.conversations = dict()
@@ -314,6 +319,9 @@ class ConversationHandler(Handler):
             )
 
         self.update_state(new_state, self.current_conversation)
+
+        if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
+            return self.map_to_parent.get(new_state)
 
     def update_state(self, new_state, key):
         if new_state == self.END:
