@@ -42,7 +42,7 @@ except ImportError:  # pragma: no cover
 
 from telegram import (InputFile, TelegramError)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
-                            RetryAfter, InvalidToken)
+                            RetryAfter, InvalidToken, Conflict)
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
@@ -215,6 +215,8 @@ class Request(object):
             raise BadRequest(message)
         elif resp.status == 404:
             raise InvalidToken()
+        elif resp.status == 409:
+            raise Conflict(message, args[1])
         elif resp.status == 413:
             raise NetworkError('File too large. Check telegram api limits '
                                'https://core.telegram.org/bots/api#senddocument')

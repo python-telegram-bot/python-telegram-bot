@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Telegram errors."""
+import re
 
 
 def _lstrip_str(in_s, lstr):
@@ -57,7 +58,6 @@ class Unauthorized(TelegramError):
 
 
 class InvalidToken(TelegramError):
-
     def __init__(self):
         super(InvalidToken, self).__init__('Invalid token')
 
@@ -71,7 +71,6 @@ class BadRequest(NetworkError):
 
 
 class TimedOut(NetworkError):
-
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')
 
@@ -100,3 +99,12 @@ class RetryAfter(TelegramError):
         super(RetryAfter,
               self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
         self.retry_after = float(retry_after)
+
+
+class Conflict(TelegramError):
+    def __init__(self, msg, url):
+        match = re.search(r'bot(\d+):.*/', url)
+        if match:
+            msg += '. Conflicting bot id: {}'.format(match.group(1))
+
+        super(Conflict, self).__init__(msg)
