@@ -702,11 +702,11 @@ class Filters(object):
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
 
-    class in_list(BaseFilter):
+    class msg_in(BaseFilter):
         """Filters messages to only allow those which exist in a list.
 
         Examples:
-            ``MessageHandler(Filters.in_list(['i love python',]), callback_method)``
+            ``MessageHandler(Filters.msg_in(['i love python',]), callback_method)``
 
         Args:
             list_ (List[:obj:`str`]): Which messages to allow through. Only exact matches
@@ -714,9 +714,15 @@ class Filters(object):
 
         """
 
-        def __init__(self, list_):
+        def __init__(self, list_, caption=False):
             self.list_ = list_
-            self.name = 'Filters.in_list({!r})'.format(self.list_)
+            self.caption = caption
+            self.name = 'Filters.msg_in({!r})'.format(self.list_)
 
         def filter(self, message):
-            return message.text in self.list_
+            if self.caption:
+                txt = message.caption
+            else:
+                txt = message.text
+
+            return txt in self.list_
