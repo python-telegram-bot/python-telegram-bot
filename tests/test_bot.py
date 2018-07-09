@@ -619,7 +619,7 @@ class TestBot(object):
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
 
-    def test_timeout_propagation(self, monkeypatch, bot, chat_id):
+    def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
         class OkException(Exception):
             pass
 
@@ -633,3 +633,16 @@ class TestBot(object):
 
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=timeout)
+
+    def test_timeout_propagation_implicit(self, monkeypatch, bot, chat_id):
+        class OkException(Exception):
+            pass
+
+        def post(*args, **kwargs):
+            if kwargs.get('timeout') == 20:
+                raise OkException
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', post)
+
+        with pytest.raises(OkException):
+            bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
