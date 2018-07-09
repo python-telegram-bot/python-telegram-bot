@@ -92,7 +92,7 @@ class Bot(TelegramObject):
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
 
-    def message(self, url, data, **kwargs):
+    def _message(self, url, data, **kwargs):
         if kwargs.get('reply_to_message_id'):
             data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
 
@@ -239,7 +239,7 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def delete_message(self, chat_id, message_id, timeout=None, **kwargs):
@@ -319,7 +319,7 @@ class Bot(TelegramObject):
         if message_id:
             data['message_id'] = message_id
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_photo(self,
@@ -380,7 +380,7 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_audio(self,
@@ -458,7 +458,7 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_document(self,
@@ -524,7 +524,7 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_sticker(self,
@@ -573,7 +573,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'sticker': sticker}
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_video(self,
@@ -653,7 +653,7 @@ class Bot(TelegramObject):
         if height:
             data['height'] = height
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_voice(self,
@@ -720,7 +720,7 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_video_note(self,
@@ -778,7 +778,7 @@ class Bot(TelegramObject):
         if length is not None:
             data['length'] = length
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_media_group(self,
@@ -888,7 +888,7 @@ class Bot(TelegramObject):
         if live_period:
             data['live_period'] = live_period
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def edit_message_live_location(self,
@@ -951,7 +951,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def stop_message_live_location(self,
@@ -993,7 +993,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_venue(self,
@@ -1067,7 +1067,7 @@ class Bot(TelegramObject):
         if foursquare_id:
             data['foursquare_id'] = foursquare_id
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_contact(self,
@@ -1129,7 +1129,7 @@ class Bot(TelegramObject):
         if last_name:
             data['last_name'] = last_name
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_game(self,
@@ -1170,7 +1170,7 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def send_chat_action(self, chat_id, action, timeout=None, **kwargs):
@@ -1562,7 +1562,7 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def edit_message_caption(self,
@@ -1625,7 +1625,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def edit_message_reply_markup(self,
@@ -1678,7 +1678,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def get_updates(self,
@@ -2153,7 +2153,7 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def get_game_high_scores(self,
@@ -2327,7 +2327,7 @@ class Bot(TelegramObject):
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
-        return self.message(url, data, timeout=timeout, **kwargs)
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def answer_shipping_query(self,
