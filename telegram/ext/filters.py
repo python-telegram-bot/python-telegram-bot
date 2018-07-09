@@ -716,7 +716,7 @@ class Filters(object):
 
         def __init__(self, list_):
             self.list_ = list_
-            self.name = 'Filters.in_list({})'.format(repr(self.list_))
+            self.name = 'Filters.in_list({!r})'.format(self.list_)
 
         def filter(self, message):
             return message.text in self.list_
