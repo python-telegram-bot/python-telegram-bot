@@ -198,7 +198,9 @@ class Filters(object):
         # the matched groups and groupdict to the context object.
 
         def filter(self, message):
-            return bool(self.pattern.search(message.text))
+            if message.text:
+                return bool(self.pattern.search(message.text))
+            return False
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
