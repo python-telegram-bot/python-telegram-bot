@@ -68,6 +68,9 @@ class TestFilters(object):
         message.text = 'i love python'
         assert Filters.regex(r'.\b[lo]{2}ve python')(message)
 
+        message.text = None
+        assert not Filters.regex(r'fail')(message)
+
     def test_filters_reply(self, message):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
                                   Chat(0, 'private'))
