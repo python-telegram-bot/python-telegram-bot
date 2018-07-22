@@ -318,10 +318,11 @@ class ConversationHandler(Handler):
                 context=self.current_conversation
             )
 
-        self.update_state(new_state, self.current_conversation)
-
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
+            self.update_state(self.END, self.current_conversation)
             return self.map_to_parent.get(new_state)
+        else:
+            self.update_state(new_state, self.current_conversation)
 
     def update_state(self, new_state, key):
         if new_state == self.END:
