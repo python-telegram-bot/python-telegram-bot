@@ -711,13 +711,15 @@ class Filters(object):
         Args:
             list_ (List[:obj:`str`]): Which messages to allow through. Only exact matches
                 are allowed.
+            caption (:obj:`bool`): Optional. Should the caption be used instead of text?
+                Default is ``False``.
 
         """
 
         def __init__(self, list_, caption=False):
             self.list_ = list_
             self.caption = caption
-            self.name = 'Filters.msg_in({!r})'.format(self.list_)
+            self.name = 'Filters.msg_in({!r}, caption={!r})'.format(self.list_, self.caption)
 
         def filter(self, message):
             if self.caption:
