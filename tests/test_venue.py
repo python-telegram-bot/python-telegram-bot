@@ -79,7 +79,7 @@ class TestVenue(object):
         assert venue_dict['title'] == venue.title
         assert venue_dict['address'] == venue.address
         assert venue_dict['foursquare_id'] == venue.foursquare_id
-        assert venue_dict['fousquare_type'] == venue.foursquare_type
+        assert venue_dict['foursquare_type'] == venue.foursquare_type
 
     def test_equality(self):
         a = Venue(Location(0, 0), self.title, self.address)
