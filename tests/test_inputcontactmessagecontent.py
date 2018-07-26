@@ -34,13 +34,13 @@ class TestInputContactMessageContent(object):
     phone_number = 'phone number'
     first_name = 'first name'
     last_name = 'last name'
-    vCard = 'My vCard text'
+    vcard = 'My vCard text'
 
     def test_expected_values(self, input_contact_message_content):
         assert input_contact_message_content.first_name == self.first_name
         assert input_contact_message_content.phone_number == self.phone_number
         assert input_contact_message_content.last_name == self.last_name
-        assert input_contact_message_content.vCard == self.vCard
+        assert input_contact_message_content.vcard == self.vcard
 
     def test_to_dict(self, input_contact_message_content):
         input_contact_message_content_dict = input_contact_message_content.to_dict()
