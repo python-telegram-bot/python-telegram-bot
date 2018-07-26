@@ -1658,7 +1658,48 @@ class Bot(TelegramObject):
                            reply_markup=None,
                            timeout=None,
                            **kwargs):
-        pass
+        """Use this method to edit audio, document, photo, or video messages. If a message is a
+        part of a message album, then it can be edited only to a photo or a video. Otherwise,
+        message type can be changed arbitrarily. When inline message is edited, new file can't be
+        uploaded. Use previously uploaded file via its file_id or specify a URL. On success, if the
+        edited message was sent by the bot, the edited Message is returned, otherwise True is
+        returned.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`, optional): Unique identifier for the target chat or
+                username of the target`channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            media (:class:`telegram.InputMedia`): A JSON-serialized object for a new media content
+                of the message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        """
+
+        if inline_message_id is None and (chat_id is None or message_id is None):
+            raise ValueError(
+                'edit_message_caption: Both chat_id and message_id are required when '
+                'inline_message_id is not specified')
+
+        url = '{0}/editMessageMedia'.format(self.base_url)
+
+        data = {'media': media.to_dict()}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        return url, data
 
     @log
     @message

@@ -558,6 +558,16 @@ class TestMessage(object):
         monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
         assert message.edit_caption(caption='new caption')
 
+    def test_edit_media(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            media = kwargs['media'] == 'my_media'
+            return chat_id and message_id and media
+
+        monkeypatch.setattr('telegram.Bot.edit_message_media', test)
+        assert message.edit_media('my_media')
+
     def test_edit_reply_markup(self, monkeypatch, message):
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id

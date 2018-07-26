@@ -148,6 +148,15 @@ class TestSendMediaGroup(object):
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_media(self, bot, chat_id, media_group):
+        messages = bot.send_media_group(chat_id, media_group)
+        cid = messages[-1].chat.id
+        mid = messages[-1].message_id
+        new_message = bot.edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
+        assert isinstance(new_message, Message)
+
     @pytest.mark.skip(reason="Needs a rework to send new files")
     def test_send_media_group_new_files(self):
         pass
