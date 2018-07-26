@@ -132,13 +132,15 @@ class TestBot(object):
         phone_number = '+11234567890'
         first_name = 'Leandro'
         last_name = 'Toledo'
+        vcard = 'vCard'
         message = bot.send_contact(chat_id=chat_id, phone_number=phone_number,
-                                   first_name=first_name, last_name=last_name)
+                                   first_name=first_name, last_name=last_name, vcard=vcard)
 
         assert message.contact
         assert message.contact.phone_number == phone_number
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
+        assert message.contact.vcard == vcard
 
     @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
