@@ -1650,6 +1650,18 @@ class Bot(TelegramObject):
 
     @log
     @message
+    def edit_message_media(self,
+                           chat_id=None,
+                           message_id=None,
+                           inline_message_id=None,
+                           media=None,
+                           reply_markup=None,
+                           timeout=None,
+                           **kwargs):
+        pass
+
+    @log
+    @message
     def edit_message_reply_markup(self,
                                   chat_id=None,
                                   message_id=None,
@@ -3123,6 +3135,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`edit_message_text`"""
     editMessageCaption = edit_message_caption
     """Alias for :attr:`edit_message_caption`"""
+    editMessageMedia = edit_message_media
+    """Alias for :attr:`edit_message_media`"""
     editMessageReplyMarkup = edit_message_reply_markup
     """Alias for :attr:`edit_message_reply_markup`"""
     getUpdates = get_updates
