@@ -60,7 +60,7 @@ class TestContact(object):
             first = data['first_name'] == contact.first_name
             last = data['last_name'] == contact.last_name
             vcard = data['vcard'] == contact.vcard
-            return phone and first and last
+            return phone and first and last and vcard
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_contact(contact=contact, chat_id=chat_id)
