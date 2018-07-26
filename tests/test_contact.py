@@ -25,7 +25,7 @@ from telegram import Contact, Voice
 @pytest.fixture(scope='class')
 def contact():
     return Contact(TestContact.phone_number, TestContact.first_name, TestContact.last_name,
-                   TestContact.user_id)
+                   TestContact.user_id, TestContact.vcard)
 
 
 class TestContact(object):
