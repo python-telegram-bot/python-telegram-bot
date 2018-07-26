@@ -1020,6 +1020,7 @@ class Bot(TelegramObject):
                    title=None,
                    address=None,
                    foursquare_id=None,
+                   foursquare_type=None,
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
@@ -1030,7 +1031,8 @@ class Bot(TelegramObject):
 
         Note:
             you can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
-            :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id`.
+            :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and optionally
+            :obj:`foursquare_type`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1040,6 +1042,9 @@ class Bot(TelegramObject):
             title (:obj:`str`, optional): Name of the venue.
             address (:obj:`str`, optional): Address of the venue.
             foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
+            foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
+                (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or
+                “food/icecream”.)
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1072,6 +1077,7 @@ class Bot(TelegramObject):
             address = venue.address
             title = venue.title
             foursquare_id = venue.foursquare_id
+            foursquare_type = venue.foursquare_type
 
         data = {
             'chat_id': chat_id,
@@ -1083,6 +1089,8 @@ class Bot(TelegramObject):
 
         if foursquare_id:
             data['foursquare_id'] = foursquare_id
+        if foursquare_type:
+            data['foursquare_type'] = foursquare_type
 
         return url, data
 
@@ -1104,7 +1112,7 @@ class Bot(TelegramObject):
 
         Note:
             You can either supply :obj:`contact` or :obj:`phone_number` and :obj:`first_name`
-            with optionally :obj:`last_name`.
+            with optionally :obj:`last_name` and optionally :obj:`vcard`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
