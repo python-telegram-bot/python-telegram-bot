@@ -66,12 +66,12 @@ class InlineQueryResultContact(InlineQueryResult):
                  phone_number,
                  first_name,
                  last_name=None,
-                 vcard=None,
                  reply_markup=None,
                  input_message_content=None,
                  thumb_url=None,
                  thumb_width=None,
                  thumb_height=None,
+                 vcard=None,
                  **kwargs):
         # Required
         super(InlineQueryResultContact, self).__init__('contact', id)

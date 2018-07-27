@@ -1093,12 +1093,12 @@ class Bot(TelegramObject):
                      phone_number=None,
                      first_name=None,
                      last_name=None,
-                     vcard=None,
                      disable_notification=False,
                      reply_to_message_id=None,
                      reply_markup=None,
                      timeout=None,
                      contact=None,
+                     vcard=None,
                      **kwargs):
         """Use this method to send phone contacts.
 
@@ -1143,8 +1143,10 @@ class Bot(TelegramObject):
         if isinstance(contact, Contact):
             phone_number = contact.phone_number
             first_name = contact.first_name
-            last_name = contact.last_name
-            vcard = contact.vcard
+            if contact.last_name:
+                last_name = contact.last_name
+            if contact.vcard:
+                vcard = contact.vcard
 
         data = {'chat_id': chat_id, 'phone_number': phone_number, 'first_name': first_name}
 
