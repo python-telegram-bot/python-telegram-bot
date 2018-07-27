@@ -27,7 +27,7 @@ def input_contact_message_content():
     return InputContactMessageContent(TestInputContactMessageContent.phone_number,
                                       TestInputContactMessageContent.first_name,
                                       last_name=TestInputContactMessageContent.last_name,
-                                      vcard=TestInputContactMessageContent.vcard)
+                                      vcard=TestInputContactMessageContent.vCard)
 
 
 class TestInputContactMessageContent(object):
