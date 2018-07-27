@@ -1020,12 +1020,12 @@ class Bot(TelegramObject):
                    title=None,
                    address=None,
                    foursquare_id=None,
-                   foursquare_type=None,
                    disable_notification=False,
                    reply_to_message_id=None,
                    reply_markup=None,
                    timeout=None,
                    venue=None,
+                   foursquare_type=None,
                    **kwargs):
         """Use this method to send information about a venue.
 
