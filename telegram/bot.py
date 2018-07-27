@@ -1143,10 +1143,8 @@ class Bot(TelegramObject):
         if isinstance(contact, Contact):
             phone_number = contact.phone_number
             first_name = contact.first_name
-            if contact.last_name:
-                last_name = contact.last_name
-            if contact.vcard:
-                vcard = contact.vcard
+            last_name = contact.last_name
+            vcard = contact.vcard
 
         data = {'chat_id': chat_id, 'phone_number': phone_number, 'first_name': first_name}
 
