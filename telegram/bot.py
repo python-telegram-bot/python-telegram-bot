@@ -1101,7 +1101,6 @@ class Bot(TelegramObject):
                      phone_number=None,
                      first_name=None,
                      last_name=None,
-                     vcard=None,
                      disable_notification=False,
                      reply_to_message_id=None,
                      reply_markup=None,
@@ -1120,8 +1119,6 @@ class Bot(TelegramObject):
             phone_number (:obj:`str`, optional): Contact's phone number.
             first_name (:obj:`str`, optional): Contact's first name.
             last_name (:obj:`str`, optional): Contact's last name.
-            vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
-                0-2048 bytes
             contact (:class:`telegram.Contact`, optional): The contact to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1152,14 +1149,11 @@ class Bot(TelegramObject):
             phone_number = contact.phone_number
             first_name = contact.first_name
             last_name = contact.last_name
-            vcard = contact.vcard
 
         data = {'chat_id': chat_id, 'phone_number': phone_number, 'first_name': first_name}
 
         if last_name:
             data['last_name'] = last_name
-        if vcard:
-            data['vcard'] = vcard
 
         return url, data
 
