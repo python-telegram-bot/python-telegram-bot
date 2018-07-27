@@ -34,7 +34,7 @@ class TestInputContactMessageContent(object):
     phone_number = 'phone number'
     first_name = 'first name'
     last_name = 'last name'
-    vcard = 'vCard'
+    vcard = 'My vCard text'
 
     def test_expected_values(self, input_contact_message_content):
         assert input_contact_message_content.first_name == self.first_name
