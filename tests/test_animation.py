@@ -32,7 +32,7 @@ def thumb():
 @pytest.fixture(scope='class')
 def animation(thumb, bot):
     return Animation(TestAnimation.animation_file_id, TestAnimation.width, TestAnimation.height,
-                     TestAnimation.duration, thumb=thumb.to_dict(),
+                     TestAnimation.duration, thumb=thumb,
                      file_name=TestAnimation.file_name, mime_type=TestAnimation.mime_type,
                      file_size=TestAnimation.file_size, bot=bot)
 
