@@ -73,8 +73,8 @@ class InputMediaAnimation(InputMedia):
     # TODO: Make InputMediaPhoto, InputMediaVideo, InputMediaAnimation, send_media_group work with
     # new files
 
-    def __init__(self, media, caption=None, width=None, height=None, duration=None,
-                 supports_streaming=None, parse_mode=None):
+    def __init__(self, media, caption=None, parse_mode=None, width=None, height=None,
+                 duration=None):
         self.type = 'animation'
 
         if isinstance(media, Animation):
@@ -97,5 +97,3 @@ class InputMediaAnimation(InputMedia):
             self.height = height
         if duration:
             self.duration = duration
-        if supports_streaming:
-            self.supports_streaming = supports_streaming
