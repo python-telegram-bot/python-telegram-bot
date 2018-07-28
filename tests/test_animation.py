@@ -60,8 +60,8 @@ class TestAnimation(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, animation_file, animation):
-        message = bot.send_animation(chat_id, animation_file, duration=self.duration,
+    def test_send_all_args(self, bot, chat_id, animation):
+        message = bot.send_animation(chat_id, self.animation_file_id, duration=self.duration,
                                      width=self.width, height=self.height, caption=self.caption,
                                      parse_mode='Markdown', disable_notification=False,
                                      filename=self.file_name)
