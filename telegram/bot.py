@@ -30,8 +30,8 @@ from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
-                      PhotoSize, Audio, Document, Sticker, Video, Voice, VideoNote, Location,
-                      Venue, Contact)
+                      PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
+                      Location, Venue, Contact)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
@@ -665,6 +665,86 @@ class Bot(TelegramObject):
             data['width'] = width
         if height:
             data['height'] = height
+
+        return url, data
+
+    @log
+    @message
+    def send_animation(self,
+                       chat_id,
+                       animation,
+                       duration=None,
+                       width=None,
+                       height=None,
+                       thumb=None,
+                       caption=None,
+                       parse_mode=None,
+                       disable_notification=False,
+                       reply_to_message_id=None,
+                       reply_markup=None,
+                       timeout=20,
+                       **kwargs):
+        """
+        Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            animation (:obj:`str` | `filelike object` | :class:`telegram.Animation`): Animation to
+                send. Pass a file_id as String to send an animation that exists on the Telegram
+                servers (recommended), pass an HTTP URL as a String for Telegram to get an
+                animation from the Internet, or upload a new animation using multipart/form-data.
+                Lastly you can pass an existing :class:`telegram.Animation` object to send.
+            duration (:obj:`int`, optional): Duration of sent animation in seconds.
+            width (:obj:`int`, optional): Animation width.
+            height (:obj:`int`, optional): Animation height.
+            thumb (:obj:`str`, optional): Thumbnail of the file sent. The thumbnail should be in
+                JPEG format and less than 200 kB in size. A thumbnail‘s width and height should not
+                exceed 90. Ignored if the file is not uploaded using multipart/form-data. Thumbnails
+                can’t be reused and can be only uploaded as a new file, so you can pass
+                “attach://<file_attach_name>” if the thumbnail was uploaded using
+                multipart/form-data under <file_attach_name>.
+            caption (:obj:`str`, optional): Animation caption (may also be used when resending
+                animations by file_id), 0-200 characters.
+            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
+                show bold, italic, fixed-width text or inline URLs in the media caption. See the
+                constants in :class:`telegram.ParseMode` for the available modes.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendAnimation'.format(self.base_url)
+
+        if isinstance(animation, Animation):
+            animation = animation.file_id
+
+        data = {'chat_id': chat_id, 'animation': animation}
+
+        if duration:
+            data['duration'] = duration
+        if width:
+            data['width'] = width
+        if height:
+            data['height'] = height
+        if thumb:
+            data['thumb'] = thumb
+        if caption:
+            data['caption'] = caption
+        if parse_mode:
+            data['parse_mode'] = parse_mode
 
         return url, data
 
@@ -3087,6 +3167,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`send_sticker`"""
     sendVideo = send_video
     """Alias for :attr:`send_video`"""
+    sendAnimation = send_animation
+    """Alias for :attr:`send_animation`"""
     sendVoice = send_voice
     """Alias for :attr:`send_voice`"""
     sendVideoNote = send_video_note

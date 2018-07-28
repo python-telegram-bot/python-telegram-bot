@@ -21,9 +21,9 @@
 import sys
 from html import escape
 
-from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
-                      VideoNote)
+from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
+                      TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
+                      SuccessfulPayment, VideoNote)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -134,6 +134,9 @@ class Message(TelegramObject):
             about the file.
         document (:class:`telegram.Document`, optional): Message is a general file, information
             about the file.
+        animation (:class:`telegram.Animation`, optional): Message is an animation, information
+            about the animation. For backward compatibility, when this field is set, the document
+            field will also be set
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
         photo (List[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo.
@@ -196,8 +199,8 @@ class Message(TelegramObject):
 
     _effective_attachment = _UNDEFINED
 
-    ATTACHMENT_TYPES = ['audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice',
-                        'video_note', 'contact', 'location', 'venue', 'invoice',
+    ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
+                        'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
                         'successful_payment']
     MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
                      'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
@@ -247,6 +250,7 @@ class Message(TelegramObject):
                  author_signature=None,
                  media_group_id=None,
                  connected_website=None,
+                 animation=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -293,6 +297,7 @@ class Message(TelegramObject):
         self.forward_signature = forward_signature
         self.author_signature = author_signature
         self.media_group_id = media_group_id
+        self.animation = animation
 
         self.bot = bot
 
@@ -330,6 +335,7 @@ class Message(TelegramObject):
         data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
+        data['animation'] = Animation.de_json(data.get('animation'), bot)
         data['game'] = Game.de_json(data.get('game'), bot)
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
@@ -354,6 +360,7 @@ class Message(TelegramObject):
         :class:`telegram.Audio`
             or :class:`telegram.Contact`
             or :class:`telegram.Document`
+            or :class:`telegram.Animation`
             or :class:`telegram.Game`
             or :class:`telegram.Invoice`
             or :class:`telegram.Location`
@@ -550,6 +557,23 @@ class Message(TelegramObject):
         """
         self._quote(kwargs)
         return self.bot.send_document(self.chat_id, *args, **kwargs)
+
+    def reply_animation(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_animation(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        self._quote(kwargs)
+        return self.bot.send_animation(self.chat_id, *args, **kwargs)
 
     def reply_sticker(self, *args, **kwargs):
         """Shortcut for::

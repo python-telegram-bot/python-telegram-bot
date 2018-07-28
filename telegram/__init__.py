@@ -27,6 +27,7 @@ from .files.photosize import PhotoSize
 from .files.audio import Audio
 from .files.voice import Voice
 from .files.document import Document
+from .files.animation import Animation
 from .files.sticker import Sticker, StickerSet, MaskPosition
 from .files.video import Video
 from .files.contact import Contact
@@ -45,7 +46,6 @@ from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
-from .games.animation import Animation
 from .games.game import Game
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
