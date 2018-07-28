@@ -100,6 +100,7 @@ from .files.inputmedia import InputMedia
 from .files.inputmediavideo import InputMediaVideo
 from .files.inputmediaphoto import InputMediaPhoto
 from .files.inputmediaanimation import InputMediaAnimation
+from .files.inputmediadocument import InputMediaDocument
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -126,5 +127,5 @@ __all__ = [
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
     'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia', 'InputMediaPhoto',
-    'InputMediaVideo', 'InputMediaAnimation'
+    'InputMediaVideo', 'InputMediaAnimation', 'InputMediaDocument'
 ]
