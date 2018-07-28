@@ -439,8 +439,8 @@ class TestMessage(object):
             return id and animation and reply
 
         monkeypatch.setattr('telegram.Bot.send_animation', test)
-        assert message.reply_document(document='test_animation')
-        assert message.reply_document(document='test_animation', quote=True)
+        assert message.reply_document(animation='test_animation')
+        assert message.reply_document(animation='test_animation', quote=True)
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
