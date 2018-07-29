@@ -52,4 +52,5 @@ class PassportElementErrorFiles(PassportElementError):
         super(PassportElementErrorFiles, self).__init__('files', type, message)
         self.file_hashes = file_hashes
 
-        self._id_attrs = (self.source, self.type, self.file_hashes, self.message)
+        self._id_attrs = ((self.source, self.type, self.message) +
+                          tuple([file_hash for file_hash in file_hashes]))
