@@ -40,8 +40,6 @@ class TestPassportData(object):
     def test_de_json(self, bot):
         json_dict = {'data': [data.to_dict() for data in self.data],
                      'credentials': self.credentials.to_dict()}
-        print("CREDENTIALS:")
-        print(self.credentials.to_dict())
         passport_data = PassportData.de_json(json_dict, bot)
 
         assert isinstance(passport_data.data, list)
