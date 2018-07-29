@@ -39,7 +39,7 @@ class TestEncryptedPassportElement(object):
     data = 'data'
     phone_number = 'phone_number'
     email = 'email'
-    files = ['file1', 'file2']
+    files = [PassportFile('file_id', 50, 0)]
     front_side = PassportFile('file_id', 50, 0)
     reverse_side = PassportFile('file_id', 50, 0)
     selfie = PassportFile('file_id', 50, 0)

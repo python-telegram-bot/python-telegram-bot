@@ -93,7 +93,8 @@ def message(bot):
                      'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
                      'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
                      'pinned', 'invoice', 'successful_payment', 'connected_website',
-                     'forward_signature', 'author_signature', 'photo_from_media_group'])
+                     'forward_signature', 'author_signature', 'photo_from_media_group',
+                     'passport_data'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,

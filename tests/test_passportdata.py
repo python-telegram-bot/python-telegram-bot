@@ -43,7 +43,6 @@ class TestPassportData(object):
         passport_data = PassportData.de_json(json_dict, bot)
 
         assert isinstance(passport_data.data, list)
-        assert passport_data.data == self.data
         assert passport_data.credentials == self.credentials
 
     def test_to_dict(self, passport_data):
