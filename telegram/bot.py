@@ -3056,6 +3056,45 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
+    def set_passport_data_errors(self, user_id, errors, timeout=None, **kwargs):
+        """
+        Informs a user that some of the Telegram Passport elements they provided contains errors.
+        The user will not be able to re-submit their Passport to you until the errors are fixed
+        (the contents of the field for which you returned the error must change). Returns True
+        on success.
+
+        Use this if the data submitted by the user doesn't satisfy the standards your service
+        requires for any reason. For example, if a birthday date seems invalid, a submitted
+        document is blurry, a scan shows evidence of tampering, etc. Supply some details in the
+        error message to make sure the user knows how to correct the issues.
+
+        Args:
+            user_id (:obj:`int`): User identifier
+            errors (List[:class:`PassportElementError`]): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url_ = '{0}/setPassportDataErrors'.format(self.base_url)
+
+        data = {'user_id': user_id, 'errors': [error.to_dict() for error in errors]}
+        data.update(kwargs)
+
+        result = self._request.post(url_, data, timeout=timeout)
+
+        return result
+
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.username}
 
@@ -3187,3 +3226,5 @@ class Bot(TelegramObject):
     """Alias for :attr:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
     """Alias for :attr:`delete_sticker_from_set`"""
+    setPassportDataErrors = set_passport_data_errors
+    """Alias for :attr:`set_passport_data_errors`"""

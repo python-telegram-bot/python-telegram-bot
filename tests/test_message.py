@@ -23,7 +23,7 @@ import pytest
 from telegram import ParseMode
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
-                      Invoice, SuccessfulPayment)
+                      Invoice, SuccessfulPayment, PassportData)
 
 
 @pytest.fixture(scope='class')
@@ -84,7 +84,8 @@ def message(bot):
                     {'author_signature': 'some_author_sign'},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
-                     'media_group_id': 1234443322222}
+                     'media_group_id': 1234443322222},
+                    {'passport_data': PassportData('data', None)}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',

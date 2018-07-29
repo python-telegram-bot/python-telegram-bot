@@ -52,6 +52,10 @@ from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
 from .payment.successfulpayment import SuccessfulPayment
 from .payment.invoice import Invoice
+from .passport.encryptedcredentials import EncryptedCredentials
+from .passport.passportfile import PassportFile
+from .passport.encryptedpassportelement import EncryptedPassportElement
+from .passport.passportdata import PassportData
 from .message import Message
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
@@ -99,6 +103,13 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
 from .files.inputmedia import InputMedia
 from .files.inputmediavideo import InputMediaVideo
 from .files.inputmediaphoto import InputMediaPhoto
+from .passport.passportelementerror import PassportElementError
+from .passport.passportelementerrordatafield import PassportElementErrorDataField
+from .passport.passportelementerrorfrontside import PassportElementErrorFrontSide
+from .passport.passportelementerrorreveseside import PassportElementErrorReverseSide
+from .passport.passportelementerrorselfie import PassportElementErrorSelfie
+from .passport.passportelementerrorfile import PassportElementErrorFile
+from .passport.passportelementerrorfiles import PassportElementErrorFiles
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -116,7 +127,8 @@ __all__ = [
     'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
     'InlineQueryResultVoice', 'InlineQueryResultGame', 'InputContactMessageContent', 'InputFile',
     'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
-    'InputVenueMessageContent', 'KeyboardButton', 'Location', 'Message', 'MessageEntity',
+    'InputVenueMessageContent', 'KeyboardButton', 'Location', 'EncryptedCredentials',
+    'PassportFile', 'EncryptedPassportElement', 'PassportData', 'Message', 'MessageEntity',
     'ParseMode', 'PhotoSize', 'ReplyKeyboardRemove', 'ReplyKeyboardMarkup', 'ReplyMarkup',
     'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
@@ -125,5 +137,7 @@ __all__ = [
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
     'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia', 'InputMediaPhoto',
-    'InputMediaVideo'
+    'InputMediaVideo', 'PassportElementError', 'PassportElementErrorDataField',
+    'PassportElementErrorFrontSide', 'PassportElementErrorReverseSide',
+    'PassportElementErrorSelfie', 'PassportElementErrorFile', 'PassportElementErrorFiles'
 ]

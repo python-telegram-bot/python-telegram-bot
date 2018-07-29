@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2018
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains an object that represents a Encrypted Passport Credentials."""
+
+from telegram import TelegramObject
+
+
+class EncryptedCredentials(TelegramObject):
+    """Contains data required for decrypting and authenticating EncryptedPassportElement. See the
+    Telegram Passport Documentation for a complete description of the data decryption and
+    authentication processes.
+
+    Attributes:
+        data (:obj:`str`): Base64-encoded encrypted JSON-serialized data with unique user's payload,
+            data hashes and secrets required for EncryptedPassportElement decryption and
+            authentication
+        hash (:obj:`str`): Base64-encoded data hash for data authentication
+        secret (:obj:`str`): Base64-encoded secret, encrypted with the bot's public RSA key,
+            required for data decryption
+
+    Args:
+        data (:obj:`str`): Base64-encoded encrypted JSON-serialized data with unique user's payload,
+            data hashes and secrets required for EncryptedPassportElement decryption and
+            authentication
+        hash (:obj:`str`): Base64-encoded data hash for data authentication
+        secret (:obj:`str`): Base64-encoded secret, encrypted with the bot's public RSA key,
+            required for data decryption
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self, data, hash, secret, **kwargs):
+        # Required
+        self.data = data
+        self.hash = hash
+        self.secret = secret
+
+        self._id_attrs = (self.data, self.hash, self.secret)
+
+    @classmethod
+    def de_json(cls, data, bot):
+        if not data:
+            return None
+
+        return cls(**data)
