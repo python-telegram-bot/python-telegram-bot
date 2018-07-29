@@ -50,7 +50,7 @@ class TestPassportElementErrorSelfie(object):
         assert (passport_element_error_selfie_dict['type'] ==
                 passport_element_error_selfie.type)
         assert (passport_element_error_selfie_dict['file_hash'] ==
-                passport_element_error_selfie.data_hash)
+                passport_element_error_selfie.file_hash)
         assert (passport_element_error_selfie_dict['message'] ==
                 passport_element_error_selfie.message)
 

@@ -50,7 +50,7 @@ class TestPassportElementErrorFrontSide(object):
         assert (passport_element_error_front_side_dict['type'] ==
                 passport_element_error_front_side.type)
         assert (passport_element_error_front_side_dict['file_hash'] ==
-                passport_element_error_front_side.data_hash)
+                passport_element_error_front_side.file_hash)
         assert (passport_element_error_front_side_dict['message'] ==
                 passport_element_error_front_side.message)
 
