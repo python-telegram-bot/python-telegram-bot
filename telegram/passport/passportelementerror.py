@@ -38,7 +38,7 @@ class PassportElementError(TelegramObject):
 
     def __init__(self, source, type, message, **kwargs):
         # Required
-        self.source = str(type)
+        self.source = str(source)
         self.type = str(type)
         self.message = str(message)
 
