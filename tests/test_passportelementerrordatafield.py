@@ -73,7 +73,7 @@ class TestPassportElementErrorDataField(object):
         assert a is not b
 
         assert a != c
-        assert hash(a) == hash(c)
+        assert hash(a) != hash(c)
 
         assert a != d
         assert hash(a) != hash(d)

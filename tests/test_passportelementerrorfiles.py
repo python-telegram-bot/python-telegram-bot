@@ -61,7 +61,7 @@ class TestPassportElementErrorFiles(object):
         c = PassportElementErrorFiles(self.type, '', '')
         d = PassportElementErrorFiles('', self.file_hashes, '')
         e = PassportElementErrorFiles('', '', self.message)
-        f = PassportElementErrorSelfie(self.type, self.file_hashes, self.message)
+        f = PassportElementErrorSelfie(self.type, '', self.message)
 
         assert a == b
         assert hash(a) == hash(b)
