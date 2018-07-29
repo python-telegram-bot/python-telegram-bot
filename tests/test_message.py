@@ -85,7 +85,7 @@ def message(bot):
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
                      'media_group_id': 1234443322222},
-                    {'passport_data': PassportData('data', None)}
+                    {'passport_data': PassportData([], None)}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
