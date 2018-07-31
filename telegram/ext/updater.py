@@ -89,6 +89,7 @@ class Updater(object):
                  base_url=None,
                  workers=4,
                  bot=None,
+                 private_key=None,
                  user_sig_handler=None,
                  request_kwargs=None):
 
@@ -96,6 +97,8 @@ class Updater(object):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
             raise ValueError('`token` and `bot` are mutually exclusive')
+        if (private_key is not None) and (bot is not None):
+            raise ValueError('`bot` and `private_key` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
@@ -119,7 +122,7 @@ class Updater(object):
             if 'con_pool_size' not in request_kwargs:
                 request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
-            self.bot = Bot(token, base_url, request=self._request)
+            self.bot = Bot(token, base_url, request=self._request, private_key=private_key)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)

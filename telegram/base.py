@@ -60,7 +60,7 @@ class TelegramObject(object):
         data = dict()
 
         for key in iter(self.__dict__):
-            if key in ('bot', '_id_attrs'):
+            if key in ('bot', '_id_attrs', '_credentials'):
                 continue
 
             value = self.__dict__[key]
