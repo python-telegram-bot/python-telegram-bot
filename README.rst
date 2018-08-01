@@ -54,6 +54,10 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://webchat.freenode.net/?channels=##python-telegram-bot
    :alt: IRC Bridge
 
+.. image:: https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg
+   :target: https://houndci.com
+   :alt: Reviewed by Hound
+
 =================
 Table of contents
 =================
