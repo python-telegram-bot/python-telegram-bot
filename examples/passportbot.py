@@ -96,8 +96,8 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # On all messages call msg
-    dp.add_handler(MessageHandler(Filters.all, msg))
+    # On messages that include passport data call msg
+    dp.add_handler(MessageHandler(Filters.passport_data, msg))
 
     # log all errors
     dp.add_error_handler(error)
