@@ -103,13 +103,13 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
 from .files.inputmedia import InputMedia
 from .files.inputmediavideo import InputMediaVideo
 from .files.inputmediaphoto import InputMediaPhoto
-from .passport.passportelementerror import PassportElementError
-from .passport.passportelementerrordatafield import PassportElementErrorDataField
-from .passport.passportelementerrorfrontside import PassportElementErrorFrontSide
-from .passport.passportelementerrorreveseside import PassportElementErrorReverseSide
-from .passport.passportelementerrorselfie import PassportElementErrorSelfie
-from .passport.passportelementerrorfile import PassportElementErrorFile
-from .passport.passportelementerrorfiles import PassportElementErrorFiles
+from .passport.passportelementerrors import PassportElementError
+from .passport.passportelementerrors import (PassportElementErrorDataField,
+                                                     PassportElementErrorFile,
+                                                     PassportElementErrorFiles,
+                                                     PassportElementErrorFrontSide,
+                                                     PassportElementErrorReverseSide,
+                                                     PassportElementErrorSelfie)
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -137,7 +137,7 @@ __all__ = [
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
     'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia', 'InputMediaPhoto',
-    'InputMediaVideo', 'PassportElementError', 'PassportElementErrorDataField',
-    'PassportElementErrorFrontSide', 'PassportElementErrorReverseSide',
-    'PassportElementErrorSelfie', 'PassportElementErrorFile', 'PassportElementErrorFiles'
+    'InputMediaVideo', 'PassportElementError', 'PassportElementErrorFile',
+    'PassportElementErrorReverseSide', 'PassportElementErrorFrontSide',
+    'PassportElementErrorFiles', 'PassportElementErrorDataField', 'PassportElementErrorFile'
 ]
