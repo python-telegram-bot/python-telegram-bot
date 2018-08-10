@@ -18,8 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 
-from telegram import TelegramObject, PassportFile, EncryptedCredentials
-from telegram.passport.encryptedcredentials import decrypt_json
+from telegram import TelegramObject, PassportFile
+from telegram.passport.credentials import decrypt_json
 
 
 class EncryptedPassportElement(TelegramObject):
@@ -89,9 +89,17 @@ class EncryptedPassportElement(TelegramObject):
 
     """
 
-    def __init__(self, type, data=None, phone_number=None, email=None, files=None, front_side=None,
-                 reverse_side=None, selfie=None, bot=None,
-                 credentials: EncryptedCredentials = None,
+    def __init__(self,
+                 type,
+                 data=None,
+                 phone_number=None,
+                 email=None,
+                 files=None,
+                 front_side=None,
+                 reverse_side=None,
+                 selfie=None,
+                 bot=None,
+                 credentials=None,
                  **kwargs):
         # Required
         self.type = type
@@ -110,31 +118,28 @@ class EncryptedPassportElement(TelegramObject):
         self.bot = bot
         self._credentials = credentials
 
-    @property
-    def decrypted_data(self):
-        credentials_data = self._credentials['data']
-        return decrypt_json(credentials_data['secret'],
-                            credentials_data['data_hash'],
-                            self.data)
-
     # noinspection PyMethodOverriding
     @classmethod
     def de_json(cls, data, bot, credentials):
         if not data:
             return None
 
-        data = super(EncryptedPassportElement, cls).de_json(data, bot)
+        secure_data = None
+        if data['type'] not in ('phone_number', 'email'):
+            secure_data = getattr(credentials.data.secure_data, data['type'])
 
-        secure_data = credentials.secure_data.get(data['type'])
+            data['data'] = decrypt_json(secure_data.data.secret,
+                                        secure_data.data.hash,
+                                        data['data'])
 
-        if secure_data:
-            data['files'] = PassportFile.de_list(data.get('files'), bot, secure_data)
-            data['front_side'] = PassportFile.de_json(data.get('front_side'),
-                                                      bot, secure_data.get('front_side'))
-            data['reverse_side'] = PassportFile.de_json(data.get('reverse_side'),
-                                                        bot, secure_data.get('reverse_side'))
-            data['selfie'] = PassportFile.de_json(data.get('selfie'),
-                                                  bot, secure_data.get('selfie'))
+            if secure_data:
+                data['files'] = PassportFile.de_list(data.get('files'), bot, secure_data)
+                data['front_side'] = PassportFile.de_json(data.get('front_side'),
+                                                          bot, secure_data.front_side)
+                data['reverse_side'] = PassportFile.de_json(data.get('reverse_side'),
+                                                            bot, secure_data.reverse_side)
+                data['selfie'] = PassportFile.de_json(data.get('selfie'),
+                                                      bot, secure_data.selfie)
 
         return cls(bot=bot, credentials=secure_data, **data)
 

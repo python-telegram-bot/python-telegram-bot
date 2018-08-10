@@ -22,7 +22,7 @@ from os.path import basename
 from future.backports.urllib import parse as urllib_parse
 
 from telegram import TelegramObject
-from telegram.passport.encryptedcredentials import decrypt
+from telegram.passport.credentials import decrypt
 
 
 class File(TelegramObject):
@@ -103,7 +103,7 @@ class File(TelegramObject):
         if out:
             buf = self.bot.request.retrieve(url)
             if self._credentials:
-                buf = decrypt(self._credentials['secret'], self._credentials['file_hash'], buf)
+                buf = decrypt(self._credentials.secret, self._credentials.hash, buf)
             out.write(buf)
             return out
         else:
@@ -114,7 +114,7 @@ class File(TelegramObject):
 
             buf = self.bot.request.retrieve(url, timeout=timeout)
             if self._credentials:
-                buf = decrypt(self._credentials['secret'], self._credentials['file_hash'], buf)
+                buf = decrypt(self._credentials.secret, self._credentials.hash, buf)
             with open(filename, 'wb') as fobj:
                 fobj.write(buf)
             return filename

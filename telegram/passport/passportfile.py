@@ -70,7 +70,7 @@ class PassportFile(TelegramObject):
         passport_files = list()
         for passport_file in data:
             passport_files.append(cls.de_json(passport_file,
-                                              bot, credentials.get(passport_file['type'])))
+                                              bot, getattr(credentials, passport_file['type'])))
 
         return passport_files
 

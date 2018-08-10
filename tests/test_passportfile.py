@@ -24,9 +24,9 @@ from telegram import PassportFile, PassportElementError
 
 @pytest.fixture(scope='class')
 def passport_file():
-    return PassportFile(TestPassportFile.file_id,
-                        TestPassportFile.file_size,
-                        TestPassportFile.file_date)
+    return PassportFile(file_id=TestPassportFile.file_id,
+                        file_size=TestPassportFile.file_size,
+                        file_date=TestPassportFile.file_date)
 
 
 class TestPassportFile(object):

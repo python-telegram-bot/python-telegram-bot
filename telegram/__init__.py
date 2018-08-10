@@ -52,7 +52,7 @@ from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
 from .payment.successfulpayment import SuccessfulPayment
 from .payment.invoice import Invoice
-from .passport.encryptedcredentials import EncryptedCredentials
+from .passport.credentials import EncryptedCredentials
 from .passport.passportfile import PassportFile
 from .passport.encryptedpassportelement import EncryptedPassportElement
 from .passport.passportdata import PassportData
