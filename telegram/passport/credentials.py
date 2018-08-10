@@ -32,10 +32,33 @@ except ImportError:
     CRYPTO = False
 from future.utils import string_types
 
-from telegram import TelegramObject
+from telegram import TelegramObject, TelegramError
+
+
+class TelegramDecryptionError(TelegramError):
+    pass
 
 
 def decrypt(secret, hash, data):
+    """
+    Decrypt per telegram docs at https://core.telegram.org/passport.
+
+    Args:
+        secret (:obj:`str` or :obj:`bytes`): The encryption secret, either as bytes or as a
+            base64 encoded string.
+        hash (:obj:`str` or :obj:`bytes`): The hash, either as bytes or as a
+            base64 encoded string.
+        data (:obj:`str` or :obj:`bytes`): The data to decrypt, either as bytes or as a
+            base64 encoded string.
+
+    Raises:
+        :class:`TelegramDecryptionError`: Raised if the given hash does not match the hash of
+            decrypted data
+
+    Returns:
+        :obj:`bytes`: The decrypted data as bytes
+
+    """
     if isinstance(secret, string_types):
         secret = b64decode(secret)
     if isinstance(hash, string_types):
@@ -53,12 +76,12 @@ def decrypt(secret, hash, data):
     digest.update(data)
     data_hash = digest.finalize()
     if data_hash != hash:
-        raise Exception("ERROR! Hashes are not equal! "
-                        "{} != {}".format(data_hash, hash))  # TODO: Add proper exception
+        raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     return data[data[0]:]
 
 
 def decrypt_json(secret, hash, data):
+    """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
     return json.loads(decrypt(secret, hash, data).decode('utf-8'))
 
 
@@ -118,6 +141,11 @@ class EncryptedCredentials(TelegramObject):
 
 
 class Credentials(TelegramObject):
+    """
+    Attributes:
+        secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
+        payload (:obj:`str`): Bot-specified payload
+    """
     def __init__(self, secure_data, payload, bot=None, **kwargs):
         # Required
         self.secure_data = secure_data
@@ -136,6 +164,32 @@ class Credentials(TelegramObject):
 
 
 class SecureData(TelegramObject):
+    """
+    This object represents the credentials required to decrypt encrypted data.
+    All fields are optional and depend on fields that were requested.
+
+    Attributes:
+        personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            personal details
+        passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted passport
+        internal_passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            internal passport
+        driver_license (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            driver license
+        identity_card (:class:`telegram.SecureValue`, optional): Credentials for encrypted ID card
+        address (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            residential address
+        utility_bill (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            utility bill
+        bank_statement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            bank statement
+        rental_agreement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            rental agreement
+        passport_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            registration from internal passport
+        temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+            temporary registration
+    """
     def __init__(self,
                  personal_details=None,
                  passport=None,
@@ -188,6 +242,28 @@ class SecureData(TelegramObject):
 
 
 class SecureValue(TelegramObject):
+    """
+    This object represents the credentials required to decrypt encrypted value.
+    All fields are optional and depend on the type of field.
+
+    Attributes:
+        data (:class:`telegram.DataCredentials`, optional): Credentials for encrypted Telegram
+            Passport data. Available for "personal_details", "passport", "driver_license",
+            "identity_card", "identity_passport" and "address" types.
+        front_side (:class:`telegram.FileCredentials`, optional): Credentials for encrypted
+            document's front side. Available for "passport", "driver_license", "identity_card"
+            and "internal_passport".
+        reverse_side (:class:`telegram.FileCredentials`, optional): Credentials for encrypted
+            document's reverse side. Available for "driver_license" and "identity_card".
+        selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
+            of the user with a document. Can be available for "passport", "driver_license",
+            "identity_card" and "internal_passport".
+        files (:class:`telegram.Array of FileCredentials`, optional): Credentials for encrypted
+            files. Available for "utility_bill", "bank_statement", "rental_agreement",
+            "passport_registration" and "temporary_registration" types.
+
+    """
+
     def __init__(self,
                  data=None,
                  front_side=None,
@@ -219,9 +295,14 @@ class SecureValue(TelegramObject):
 
 
 class _CredentialsBase(TelegramObject):
+    """Base class for DataCredentials and FileCredentials."""
     def __init__(self, hash, secret, bot=None, **kwargs):
         self.hash = hash
         self.secret = secret
+
+        # Aliases just be be sure
+        self.file_hash = self.hash
+        self.data_hash = self.hash
 
         self.bot = bot
 
@@ -245,10 +326,34 @@ class _CredentialsBase(TelegramObject):
 
 
 class DataCredentials(_CredentialsBase):
+    """
+    These credentials can be used to decrypt encrypted data from the data field in
+    EncryptedPassportData.
+
+    Args:
+        data_hash (:obj:`str`): Checksum of encrypted data
+        secret (:obj:`str`): Secret of encrypted data
+
+    Attributes:
+        hash (:obj:`str`): Checksum of encrypted data
+        secret (:obj:`str`): Secret of encrypted data
+    """
     def __init__(self, data_hash, secret, **kwargs):
         super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
 
 
 class FileCredentials(_CredentialsBase):
+    """
+        These credentials can be used to decrypt encrypted files from the front_side,
+        reverse_side, selfie and files fields in EncryptedPassportData.
+
+        Args:
+            file_hash (:obj:`str`): Checksum of encrypted file
+            secret (:obj:`str`): Secret of encrypted file
+
+        Attributes:
+            hash (:obj:`str`): Checksum of encrypted file
+            secret (:obj:`str`): Secret of encrypted file
+        """
     def __init__(self, file_hash, secret, **kwargs):
         super(FileCredentials, self).__init__(file_hash, secret, **kwargs)

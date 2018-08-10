@@ -66,6 +66,8 @@ class Updater(object):
         bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance. If a pre-initialized
             bot is used, it is the user's responsibility to create it using a `Request`
             instance with a large enough connection pool.
+        private_key (:obj:`bytes`): Private key for decryption of telegram passport data.
+        private_key_password (:obj:`bytes`): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) setable with :attr:`idle`.

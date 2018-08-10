@@ -109,6 +109,8 @@ class Bot(TelegramObject):
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
         request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.request.Request`.
+        private_key (:obj:`bytes`): Private key for decryption of telegram passport data.
+        private_key_password (:obj:`bytes`): Password for above private key.
 
     """
 
