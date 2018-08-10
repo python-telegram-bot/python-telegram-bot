@@ -54,6 +54,7 @@ from .payment.successfulpayment import SuccessfulPayment
 from .payment.invoice import Invoice
 from .passport.credentials import EncryptedCredentials
 from .passport.passportfile import PassportFile
+from .passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
 from .passport.encryptedpassportelement import EncryptedPassportElement
 from .passport.passportdata import PassportData
 from .message import Message
@@ -114,7 +115,6 @@ from .passport.credentials import (Credentials,
                                    DataCredentials,
                                    SecureData,
                                    FileCredentials)
-from .passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
