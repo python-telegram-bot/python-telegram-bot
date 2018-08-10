@@ -130,11 +130,12 @@ class Bot(TelegramObject):
 
         if private_key:
             if not CRYPTO:
-                print('Some kind of error!')  # TODO: Add error
+                raise ValueError('private_key given, but no crypto library found. Try pip '
+                                 'install cryptography before proceeding.')
             else:
                 self.private_key = serialization.load_pem_private_key(
                     private_key,
-                    password=None,
+                    password=private_key_password,
                     backend=default_backend()
                 )
 
