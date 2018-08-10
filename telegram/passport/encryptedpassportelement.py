@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 
-from telegram import TelegramObject, PassportFile
+from telegram import (TelegramObject, PassportFile, PersonalDetails, IdDocumentData,
+                      ResidentialAddress)
 from telegram.passport.credentials import decrypt_json
 
 
@@ -131,6 +132,14 @@ class EncryptedPassportElement(TelegramObject):
             data['data'] = decrypt_json(secure_data.data.secret,
                                         secure_data.data.hash,
                                         data['data'])
+
+            if data['type'] == 'personal_details':
+                data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
+            elif data['type'] in ('passport', 'internal_passport',
+                                  'driver_license', 'identity_card'):
+                data['data'] = IdDocumentData.de_json(data['data'], bot=bot)
+            elif data['type'] == 'address':
+                data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
 
             if secure_data:
                 data['files'] = PassportFile.de_list(data.get('files'), bot, secure_data)

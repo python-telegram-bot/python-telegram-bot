@@ -103,13 +103,18 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
 from .files.inputmedia import InputMedia
 from .files.inputmediavideo import InputMediaVideo
 from .files.inputmediaphoto import InputMediaPhoto
-from .passport.passportelementerrors import PassportElementError
-from .passport.passportelementerrors import (PassportElementErrorDataField,
-                                                     PassportElementErrorFile,
-                                                     PassportElementErrorFiles,
-                                                     PassportElementErrorFrontSide,
-                                                     PassportElementErrorReverseSide,
-                                                     PassportElementErrorSelfie)
+from .passport.passportelementerrors import (PassportElementError,
+                                             PassportElementErrorDataField,
+                                             PassportElementErrorFile,
+                                             PassportElementErrorFiles,
+                                             PassportElementErrorFrontSide,
+                                             PassportElementErrorReverseSide,
+                                             PassportElementErrorSelfie)
+from .passport.credentials import (Credentials,
+                                   DataCredentials,
+                                   SecureData,
+                                   FileCredentials)
+from .passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -139,5 +144,7 @@ __all__ = [
     'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia', 'InputMediaPhoto',
     'InputMediaVideo', 'PassportElementError', 'PassportElementErrorFile',
     'PassportElementErrorReverseSide', 'PassportElementErrorFrontSide',
-    'PassportElementErrorFiles', 'PassportElementErrorDataField', 'PassportElementErrorFile'
+    'PassportElementErrorFiles', 'PassportElementErrorDataField', 'PassportElementErrorFile',
+    'Credentials', 'DataCredentials', 'SecureData', 'FileCredentials', 'IdDocumentData',
+    'PersonalDetails', 'ResidentialAddress'
 ]
