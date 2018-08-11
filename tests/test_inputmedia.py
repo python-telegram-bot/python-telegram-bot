@@ -34,47 +34,52 @@ from .test_video import video, video_file  # noqa: F401
 
 
 @pytest.fixture(scope='class')
-def input_media_video():
+def input_media_video(class_thumb_file):
     return InputMediaVideo(media=TestInputMediaVideo.media,
                            caption=TestInputMediaVideo.caption,
                            width=TestInputMediaVideo.width,
                            height=TestInputMediaVideo.height,
                            duration=TestInputMediaVideo.duration,
                            parse_mode=TestInputMediaVideo.parse_mode,
+                           thumb=class_thumb_file,
                            supports_streaming=TestInputMediaVideo.supports_streaming)
 
 
 @pytest.fixture(scope='class')
-def input_media_photo():
+def input_media_photo(class_thumb_file):
     return InputMediaPhoto(media=TestInputMediaPhoto.media,
                            caption=TestInputMediaPhoto.caption,
+                           thumb=class_thumb_file,
                            parse_mode=TestInputMediaPhoto.parse_mode)
 
 
 @pytest.fixture(scope='class')
-def input_media_animation():
+def input_media_animation(class_thumb_file):
     return InputMediaAnimation(media=TestInputMediaAnimation.media,
                                caption=TestInputMediaAnimation.caption,
                                parse_mode=TestInputMediaAnimation.parse_mode,
                                width=TestInputMediaAnimation.width,
                                height=TestInputMediaAnimation.height,
+                               thumb=class_thumb_file,
                                duration=TestInputMediaAnimation.duration)
 
 
 @pytest.fixture(scope='class')
-def input_media_audio():
+def input_media_audio(class_thumb_file):
     return InputMediaAudio(media=TestInputMediaAudio.media,
                            caption=TestInputMediaAudio.caption,
                            duration=TestInputMediaAudio.duration,
                            performer=TestInputMediaAudio.performer,
                            title=TestInputMediaAudio.title,
+                           thumb=class_thumb_file,
                            parse_mode=TestInputMediaAudio.parse_mode)
 
 
 @pytest.fixture(scope='class')
-def input_media_document():
+def input_media_document(class_thumb_file):
     return InputMediaDocument(media=TestInputMediaDocument.media,
                               caption=TestInputMediaDocument.caption,
+                              thumb=class_thumb_file,
                               parse_mode=TestInputMediaDocument.parse_mode)
 
 
@@ -97,6 +102,7 @@ class TestInputMediaVideo(object):
         assert input_media_video.duration == self.duration
         assert input_media_video.parse_mode == self.parse_mode
         assert input_media_video.supports_streaming == self.supports_streaming
+        assert isinstance(input_media_video.thumb, InputFile)
 
     def test_to_dict(self, input_media_video):
         input_media_video_dict = input_media_video.to_dict()
@@ -138,6 +144,7 @@ class TestInputMediaPhoto(object):
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
+        assert isinstance(input_media_photo.thumb, InputFile)
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
@@ -175,6 +182,7 @@ class TestInputMediaAnimation(object):
         assert input_media_animation.media == self.media
         assert input_media_animation.caption == self.caption
         assert input_media_animation.parse_mode == self.parse_mode
+        assert isinstance(input_media_animation.thumb, InputFile)
 
     def test_to_dict(self, input_media_animation):
         input_media_animation_dict = input_media_animation.to_dict()
@@ -218,6 +226,7 @@ class TestInputMediaAudio(object):
         assert input_media_audio.performer == self.performer
         assert input_media_audio.title == self.title
         assert input_media_audio.parse_mode == self.parse_mode
+        assert isinstance(input_media_audio.thumb, InputFile)
 
     def test_to_dict(self, input_media_audio):
         input_media_audio_dict = input_media_audio.to_dict()
@@ -258,6 +267,7 @@ class TestInputMediaDocument(object):
         assert input_media_document.media == self.media
         assert input_media_document.caption == self.caption
         assert input_media_document.parse_mode == self.parse_mode
+        assert isinstance(input_media_document.thumb, InputFile)
 
     def test_to_dict(self, input_media_document):
         input_media_document_dict = input_media_document.to_dict()

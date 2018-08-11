@@ -112,6 +112,13 @@ def thumb_file():
     f.close()
 
 
+@pytest.fixture(scope='class')
+def class_thumb_file():
+    f = open(u'tests/data/thumb.jpg', 'rb')
+    yield f
+    f.close()
+
+
 def pytest_configure(config):
     if sys.version_info >= (3,):
         config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
