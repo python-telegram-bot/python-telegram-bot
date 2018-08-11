@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputMediaPhoto."""
-from telegram import InputMedia, PhotoSize
+from telegram import InputMedia, PhotoSize, InputFile
 
 
 class InputMediaPhoto(InputMedia):
@@ -46,16 +46,13 @@ class InputMediaPhoto(InputMedia):
         At the moment using a new file is not yet supported.
     """
 
-    # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
-
     def __init__(self, media, caption=None, parse_mode=None):
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
             self.media = media.file_id
-        elif hasattr(media, 'read'):
-            raise ValueError(
-                'Sending files is not supported (yet).  Use file_id, url or PhotoSize')
+        elif InputFile.is_file(media):
+            self.media = InputFile(media, attach=True)
         else:
             self.media = media
 

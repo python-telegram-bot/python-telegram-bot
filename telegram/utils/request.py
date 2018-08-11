@@ -17,11 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests."""
+import logging
 import os
 import socket
 import sys
-import logging
 import warnings
+from builtins import str  # For PY2
 
 try:
     import ujson as json
@@ -45,6 +46,8 @@ from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, Ch
                             RetryAfter, InvalidToken)
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
 class Request(object):
@@ -190,6 +193,8 @@ class Request(object):
         if 'headers' not in kwargs:
             kwargs['headers'] = {}
         kwargs['headers']['connection'] = 'keep-alive'
+        # Also set our user agent
+        kwargs['headers']['user-agent'] = USER_AGENT
 
         try:
             resp = self._con_pool.request(*args, **kwargs)
@@ -264,18 +269,22 @@ class Request(object):
         if timeout is not None:
             urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
 
-        if InputFile.is_inputfile(data):
-            data = InputFile(data)
-            result = self._request_wrapper(
-                'POST', url, body=data.to_form(), headers=data.headers, **urlopen_kwargs)
-        else:
-            data = json.dumps(data)
-            result = self._request_wrapper(
-                'POST',
-                url,
-                body=data.encode(),
-                headers={'Content-Type': 'application/json'},
-                **urlopen_kwargs)
+        for key, val in data.copy().items():
+            if key == 'media':
+                media = []
+                for m in val:
+                    media.append(m.to_dict())
+                    if isinstance(m.media, InputFile):
+                        data[m.media.attach] = m.media.field_tuple
+                data[key] = json.dumps(media)
+
+            if isinstance(val, InputFile):
+                data[key] = val.field_tuple
+
+            if isinstance(val, (float, int)):
+                data[key] = str(val)
+
+        result = self._request_wrapper('POST', url, fields=data, **urlopen_kwargs)
 
         return self._parse(result)
 

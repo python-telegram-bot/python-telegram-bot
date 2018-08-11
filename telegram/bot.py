@@ -31,7 +31,7 @@ from future.utils import string_types
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Voice, VideoNote, Location,
-                      Venue, Contact)
+                      Venue, Contact, InputFile)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
@@ -381,6 +381,8 @@ class Bot(TelegramObject):
 
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
+        if InputFile.is_file(photo):
+            photo = InputFile(photo)
 
         data = {'chat_id': chat_id, 'photo': photo}
 
@@ -454,6 +456,8 @@ class Bot(TelegramObject):
 
         if isinstance(audio, Audio):
             audio = audio.file_id
+        if InputFile.is_file(audio):
+            audio = InputFile(audio)
 
         data = {'chat_id': chat_id, 'audio': audio}
 
@@ -482,6 +486,7 @@ class Bot(TelegramObject):
                       reply_markup=None,
                       timeout=20,
                       parse_mode=None,
+                      thumb=None,
                       **kwargs):
         """Use this method to send general files.
 
@@ -525,15 +530,19 @@ class Bot(TelegramObject):
 
         if isinstance(document, Document):
             document = document.file_id
+        if InputFile.is_file(document):
+            document = InputFile(document, filename=filename)
 
         data = {'chat_id': chat_id, 'document': document}
 
-        if filename:
-            data['filename'] = filename
         if caption:
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb, attach=True)
+            data['thumb'] = thumb
 
         return url, data
 
@@ -582,6 +591,8 @@ class Bot(TelegramObject):
 
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
+        if InputFile.is_file(sticker):
+            sticker = InputFile(sticker)
 
         data = {'chat_id': chat_id, 'sticker': sticker}
 
@@ -650,6 +661,8 @@ class Bot(TelegramObject):
 
         if isinstance(video, Video):
             video = video.file_id
+        if InputFile.is_file(video):
+            video = InputFile(video)
 
         data = {'chat_id': chat_id, 'video': video}
 
@@ -724,6 +737,8 @@ class Bot(TelegramObject):
 
         if isinstance(voice, Voice):
             voice = voice.file_id
+        if InputFile.is_file(voice):
+            voice = InputFile(voice)
 
         data = {'chat_id': chat_id, 'voice': voice}
 
@@ -785,6 +800,8 @@ class Bot(TelegramObject):
 
         if isinstance(video_note, VideoNote):
             video_note = video_note.file_id
+        if InputFile.is_file(video_note):
+            video_note = InputFile(video_note)
 
         data = {'chat_id': chat_id, 'video_note': video_note}
 
@@ -823,11 +840,8 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.TelegramError`
         """
-        # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
 
         url = '{0}/sendMediaGroup'.format(self.base_url)
-
-        media = [med.to_dict() for med in media]
 
         data = {'chat_id': chat_id, 'media': media}
 
