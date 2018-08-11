@@ -62,14 +62,14 @@ class InputFile(object):
 
         try:
             self.mimetype = self.is_image(self.input_file_content)
-            if not self.filename or '.' not in self.filename:
-                self.filename = self.mimetype.replace('/', '.')
         except TelegramError:
             if self.filename:
                 self.mimetype = mimetypes.guess_type(
                     self.filename)[0] or DEFAULT_MIME_TYPE
             else:
                 self.mimetype = DEFAULT_MIME_TYPE
+        if not self.filename or '.' not in self.filename:
+            self.filename = self.mimetype.replace('/', '.')
 
         if sys.version_info < (3,):
             if isinstance(self.filename, unicode):  # flake8: noqa  pylint: disable=E0602

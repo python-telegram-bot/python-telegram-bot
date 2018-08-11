@@ -19,9 +19,11 @@
 import pytest
 from flaky import flaky
 
-from telegram import InputMediaVideo, InputMediaPhoto, Message
-from .test_video import video, video_file  # noqa: F401
+from telegram import InputMediaVideo, InputMediaPhoto, Message, InputFile
+# noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
+# noinspection PyUnresolvedReferences
+from .test_video import video, video_file  # noqa: F401
 
 
 @pytest.fixture(scope='class')
@@ -83,10 +85,12 @@ class TestInputMediaVideo(object):
         assert input_media_video.duration == video.duration
         assert input_media_video.caption == "test 3"
 
-    def test_error_with_file(self, video_file):  # noqa: F811
+    def test_with_video_file(self, video_file):  # noqa: F811
         # fixture found in test_video
-        with pytest.raises(ValueError, match="file_id, url or Video"):
-            InputMediaVideo(video_file)
+        input_media_video = InputMediaVideo(video_file, caption="test 3")
+        assert input_media_video.type == self.type
+        assert isinstance(input_media_video.media, InputFile)
+        assert input_media_video.caption == "test 3"
 
 
 class TestInputMediaPhoto(object):
@@ -110,15 +114,17 @@ class TestInputMediaPhoto(object):
 
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
-        imp = InputMediaPhoto(photo, caption="test 2")
-        assert imp.type == self.type
-        assert imp.media == photo.file_id
-        assert imp.caption == "test 2"
+        input_media_photo = InputMediaPhoto(photo, caption="test 2")
+        assert input_media_photo.type == self.type
+        assert input_media_photo.media == photo.file_id
+        assert input_media_photo.caption == "test 2"
 
-    def test_error_with_file(self, photo_file):  # noqa: F811
+    def test_with_photo_file(self, photo_file):  # noqa: F811
         # fixture found in test_photo
-        with pytest.raises(ValueError, match="file_id, url or PhotoSize"):
-            InputMediaPhoto(photo_file)
+        input_media_photo = InputMediaPhoto(photo_file, caption="test 2")
+        assert input_media_photo.type == self.type
+        assert isinstance(input_media_photo.media, InputFile)
+        assert input_media_photo.caption == "test 2"
 
 
 @pytest.fixture(scope='function')  # noqa: F811
@@ -148,6 +154,12 @@ class TestSendMediaGroup(object):
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
-    @pytest.mark.skip(reason="Needs a rework to send new files")
-    def test_send_media_group_new_files(self):
-        pass
+    def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file):  # noqa: F811
+        messages = bot.send_media_group(chat_id, [
+            InputMediaVideo(video_file),
+            InputMediaPhoto(photo_file)
+        ])
+        assert isinstance(messages, list)
+        assert len(messages) == 2
+        assert all([isinstance(mes, Message) for mes in messages])
+        assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])

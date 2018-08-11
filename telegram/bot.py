@@ -407,6 +407,7 @@ class Bot(TelegramObject):
                    reply_markup=None,
                    timeout=20,
                    parse_mode=None,
+                   thumb=None,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -442,6 +443,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
+            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -471,6 +476,10 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb)
+            data['thumb'] = thumb
 
         return url, data
 
@@ -516,6 +525,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
+            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -613,6 +626,7 @@ class Bot(TelegramObject):
                    height=None,
                    parse_mode=None,
                    supports_streaming=None,
+                   thumb=None,
                    **kwargs):
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -647,6 +661,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
+            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -678,6 +696,80 @@ class Bot(TelegramObject):
             data['width'] = width
         if height:
             data['height'] = height
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb)
+            data['thumb'] = thumb
+
+        return url, data
+
+    @log
+    @message
+    def send_video_note(self,
+                        chat_id,
+                        video_note,
+                        duration=None,
+                        length=None,
+                        disable_notification=False,
+                        reply_to_message_id=None,
+                        reply_markup=None,
+                        timeout=20,
+                        thumb=None,
+                        **kwargs):
+        """Use this method to send video messages.
+
+        Note:
+            The video_note argument can be either a file_id or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            video_note (:obj:`str` | `filelike object` | :class:`telegram.VideoNote`): Video note
+                to send. Pass a file_id as String to send a video note that exists on the Telegram
+                servers (recommended) or upload a new video using multipart/form-data. Or you can
+                pass an existing :class:`telegram.VideoNote` object to send. Sending video notes by
+                a URL is currently unsupported.
+            duration (:obj:`int`, optional): Duration of sent video in seconds.
+            length (:obj:`int`, optional): Video width and height
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendVideoNote'.format(self.base_url)
+
+        if isinstance(video_note, VideoNote):
+            video_note = video_note.file_id
+        if InputFile.is_file(video_note):
+            video_note = InputFile(video_note)
+
+        data = {'chat_id': chat_id, 'video_note': video_note}
+
+        if duration is not None:
+            data['duration'] = duration
+        if length is not None:
+            data['length'] = length
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb)
+            data['thumb'] = thumb
 
         return url, data
 
@@ -748,67 +840,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-
-        return url, data
-
-    @log
-    @message
-    def send_video_note(self,
-                        chat_id,
-                        video_note,
-                        duration=None,
-                        length=None,
-                        disable_notification=False,
-                        reply_to_message_id=None,
-                        reply_markup=None,
-                        timeout=20,
-                        **kwargs):
-        """Use this method to send video messages.
-
-        Note:
-            The video_note argument can be either a file_id or a file from disk
-            ``open(filename, 'rb')``
-
-        Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
-            video_note (:obj:`str` | `filelike object` | :class:`telegram.VideoNote`): Video note
-                to send. Pass a file_id as String to send a video note that exists on the Telegram
-                servers (recommended) or upload a new video using multipart/form-data. Or you can
-                pass an existing :class:`telegram.VideoNote` object to send. Sending video notes by
-                a URL is currently unsupported.
-            duration (:obj:`int`, optional): Duration of sent video in seconds.
-            length (:obj:`int`, optional): Video width and height
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
-            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
-        Returns:
-            :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.TelegramError`
-
-        """
-        url = '{0}/sendVideoNote'.format(self.base_url)
-
-        if isinstance(video_note, VideoNote):
-            video_note = video_note.file_id
-        if InputFile.is_file(video_note):
-            video_note = InputFile(video_note)
-
-        data = {'chat_id': chat_id, 'video_note': video_note}
-
-        if duration is not None:
-            data['duration'] = duration
-        if length is not None:
-            data['length'] = length
 
         return url, data
 
