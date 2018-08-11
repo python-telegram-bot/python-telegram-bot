@@ -86,9 +86,12 @@ class Request(object):
 
         # TODO: Support other platforms like mac and windows.
         if 'linux' in sys.platform:
-            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120))
-            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30))
-            sockopts.append((socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 8))
+            sockopts.append((socket.IPPROTO_TCP,
+                             socket.TCP_KEEPIDLE, 120))  # pylint: disable=no-member
+            sockopts.append((socket.IPPROTO_TCP,
+                             socket.TCP_KEEPINTVL, 30))  # pylint: disable=no-member
+            sockopts.append((socket.IPPROTO_TCP,
+                             socket.TCP_KEEPCNT, 8))  # pylint: disable=no-member
 
         self._con_pool_size = con_pool_size
 
@@ -269,6 +272,9 @@ class Request(object):
         if timeout is not None:
             urlopen_kwargs['timeout'] = Timeout(read=timeout, connect=self._connect_timeout)
 
+        # Are we uploading files?
+        files = False
+
         for key, val in data.copy().items():
             if key == 'media':
                 media = []
@@ -277,14 +283,21 @@ class Request(object):
                     if isinstance(m.media, InputFile):
                         data[m.media.attach] = m.media.field_tuple
                 data[key] = json.dumps(media)
+                files = True
 
             if isinstance(val, InputFile):
                 data[key] = val.field_tuple
+                files = True
 
             if isinstance(val, (float, int)):
                 data[key] = str(val)
 
-        result = self._request_wrapper('POST', url, fields=data, **urlopen_kwargs)
+        if files:
+            result = self._request_wrapper('POST', url, fields=data, **urlopen_kwargs)
+        else:
+            result = self._request_wrapper('POST', url,
+                                           body=json.dumps(data).encode('utf-8'),
+                                           headers={'Content-Type': 'application/json'})
 
         return self._parse(result)
 

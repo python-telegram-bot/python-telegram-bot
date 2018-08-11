@@ -1978,6 +1978,8 @@ class Bot(TelegramObject):
         if url is not None:
             data['url'] = url
         if certificate:
+            if InputFile.is_file(certificate):
+                certificate = InputFile(certificate)
             data['certificate'] = certificate
         if max_connections is not None:
             data['max_connections'] = max_connections
@@ -2785,6 +2787,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatPhoto'.format(self.base_url)
 
+        if InputFile.is_file(photo):
+            photo = InputFile(photo)
+
         data = {'chat_id': chat_id, 'photo': photo}
         data.update(kwargs)
 
@@ -3019,6 +3024,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/uploadStickerFile'.format(self.base_url)
 
+        if InputFile.is_file(png_sticker):
+            png_sticker = InputFile(png_sticker)
+
         data = {'user_id': user_id, 'png_sticker': png_sticker}
         data.update(kwargs)
 
@@ -3070,6 +3078,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/createNewStickerSet'.format(self.base_url)
 
+        if InputFile.is_file(png_sticker):
+            png_sticker = InputFile(png_sticker)
+
         data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
                 'emojis': emojis}
 
@@ -3117,6 +3128,9 @@ class Bot(TelegramObject):
 
         """
         url = '{0}/addStickerToSet'.format(self.base_url)
+
+        if InputFile.is_file(png_sticker):
+            png_sticker = InputFile(png_sticker)
 
         data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker, 'emojis': emojis}
 
