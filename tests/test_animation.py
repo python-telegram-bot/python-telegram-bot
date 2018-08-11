@@ -23,18 +23,18 @@ from flaky import flaky
 from telegram import PhotoSize, Animation, Voice
 
 
-@pytest.fixture(scope='class')
-def thumb():
-    return PhotoSize(height=50, file_size=1613, file_id='AAQBABNnnO8vAAR_ZLw8RQpmPngTAAIC',
-                     width=90)
+@pytest.fixture(scope='function')
+def animation_file():
+    f = open('tests/data/game.gif', 'rb')
+    yield f
+    f.close()
 
 
 @pytest.fixture(scope='class')
-def animation(thumb, bot):
-    return Animation(TestAnimation.animation_file_id, TestAnimation.width, TestAnimation.height,
-                     TestAnimation.duration, thumb=thumb,
-                     file_name=TestAnimation.file_name, mime_type=TestAnimation.mime_type,
-                     file_size=TestAnimation.file_size, bot=bot)
+def animation(bot, chat_id):
+    with open('tests/data/game.gif', 'rb') as f:
+        return bot.send_animation(chat_id, animation=f, timeout=50,
+                                  thumb=open('tests/data/thumb.jpg', 'rb')).animation
 
 
 class TestAnimation(object):
@@ -44,7 +44,7 @@ class TestAnimation(object):
     duration = 1
     file_name = 'game.gif.mp4'
     mime_type = 'video/mp4'
-    file_size = 4008
+    file_size = 4135
     caption = "Test *animation*"
 
     def test_creation(self, animation):
@@ -60,39 +60,40 @@ class TestAnimation(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, animation):
-        message = bot.send_animation(chat_id, self.animation_file_id, duration=self.duration,
+    def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
+        message = bot.send_animation(chat_id, animation_file, duration=self.duration,
                                      width=self.width, height=self.height, caption=self.caption,
                                      parse_mode='Markdown', disable_notification=False,
-                                     filename=self.file_name)
+                                     filename=self.file_name, thumb=thumb_file)
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
         assert message.animation.file_id != ''
-        assert isinstance(message.animation.thumb, PhotoSize)
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
+        assert message.animation.thumb.width == 50
+        assert message.animation.thumb.height == 50
 
-    def test_de_json(self, bot, thumb):
+    def test_de_json(self, bot, animation):
         json_dict = {
             'file_id': self.animation_file_id,
             'width': self.width,
             'height': self.height,
             'duration': self.duration,
-            'thumb': thumb.to_dict(),
+            'thumb': animation.thumb.to_dict(),
             'file_name': self.file_name,
             'mime_type': self.mime_type,
             'file_size': self.file_size
         }
         animation = Animation.de_json(json_dict, bot)
         assert animation.file_id == self.animation_file_id
-        assert animation.thumb == thumb
+        assert animation.thumb == animation.thumb
         assert animation.file_name == self.file_name
         assert animation.mime_type == self.mime_type
         assert animation.file_size == self.file_size
 
-    def test_to_dict(self, animation, thumb):
+    def test_to_dict(self, animation):
         animation_dict = animation.to_dict()
 
         assert isinstance(animation_dict, dict)
@@ -100,7 +101,7 @@ class TestAnimation(object):
         assert animation_dict['width'] == animation.width
         assert animation_dict['height'] == animation.height
         assert animation_dict['duration'] == animation.duration
-        assert animation_dict['thumb'] == thumb.to_dict()
+        assert animation_dict['thumb'] == animation.thumb.to_dict()
         assert animation_dict['file_name'] == animation.file_name
         assert animation_dict['mime_type'] == animation.mime_type
         assert animation_dict['file_size'] == animation.file_size

@@ -21,6 +21,8 @@ from flaky import flaky
 
 from telegram import InputMediaVideo, InputMediaPhoto, InputMediaAnimation, Message, InputFile
 # noinspection PyUnresolvedReferences
+from .test_animation import animation, animation_file  # noqa: F401
+# noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
@@ -42,6 +44,7 @@ def input_media_photo():
     return InputMediaPhoto(media=TestInputMediaPhoto.media,
                            caption=TestInputMediaPhoto.caption,
                            parse_mode=TestInputMediaPhoto.parse_mode)
+
 
 @pytest.fixture(scope='class')
 def input_media_animation():
@@ -135,6 +138,7 @@ class TestInputMediaPhoto(object):
         assert isinstance(input_media_photo.media, InputFile)
         assert input_media_photo.caption == "test 2"
 
+
 class TestInputMediaAnimation(object):
     type = "animation"
     media = "NOTAREALFILEID"
@@ -162,15 +166,17 @@ class TestInputMediaAnimation(object):
 
     def test_with_animation(self, animation):  # noqa: F811
         # fixture found in test_animation
-        imp = InputMediaAnimation(animation, caption="test 2")
-        assert imp.type == self.type
-        assert imp.media == photo.file_id
-        assert imp.caption == "test 2"
+        input_media_animation = InputMediaAnimation(animation, caption="test 2")
+        assert input_media_animation.type == self.type
+        assert input_media_animation.media == animation.file_id
+        assert input_media_animation.caption == "test 2"
 
-    def test_error_with_file(self, animation_file):  # noqa: F811
+    def test_with_animation_file(self, animation_file):  # noqa: F811
         # fixture found in test_animation
-        with pytest.raises(ValueError, match="file_id, url or Animation"):
-            InputMediaAnimation(photo_file)
+        input_media_animation = InputMediaAnimation(animation_file, caption="test 2")
+        assert input_media_animation.type == self.type
+        assert isinstance(input_media_animation.media, InputFile)
+        assert input_media_animation.caption == "test 2"
 
 
 @pytest.fixture(scope='function')  # noqa: F811
@@ -200,7 +206,8 @@ class TestSendMediaGroup(object):
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
-    def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file):  # noqa: F811
+    def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file,  # noqa: F811
+                                        animation_file):  # noqa: F811
         messages = bot.send_media_group(chat_id, [
             InputMediaVideo(video_file),
             InputMediaPhoto(photo_file)
