@@ -19,7 +19,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import InputMediaVideo, InputMediaPhoto, Message, InputFile
+from telegram import InputMediaVideo, InputMediaPhoto, InputMediaAnimation, Message, InputFile
 # noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 # noinspection PyUnresolvedReferences
@@ -42,6 +42,15 @@ def input_media_photo():
     return InputMediaPhoto(media=TestInputMediaPhoto.media,
                            caption=TestInputMediaPhoto.caption,
                            parse_mode=TestInputMediaPhoto.parse_mode)
+
+@pytest.fixture(scope='class')
+def input_media_animation():
+    return InputMediaAnimation(media=TestInputMediaAnimation.media,
+                               caption=TestInputMediaAnimation.caption,
+                               parse_mode=TestInputMediaAnimation.parse_mode,
+                               width=TestInputMediaAnimation.width,
+                               height=TestInputMediaAnimation.height,
+                               duration=TestInputMediaAnimation.duration)
 
 
 class TestInputMediaVideo(object):
@@ -125,6 +134,43 @@ class TestInputMediaPhoto(object):
         assert input_media_photo.type == self.type
         assert isinstance(input_media_photo.media, InputFile)
         assert input_media_photo.caption == "test 2"
+
+class TestInputMediaAnimation(object):
+    type = "animation"
+    media = "NOTAREALFILEID"
+    caption = "My Caption"
+    parse_mode = 'Markdown'
+    width = 30
+    height = 30
+    duration = 1
+
+    def test_expected_values(self, input_media_animation):
+        assert input_media_animation.type == self.type
+        assert input_media_animation.media == self.media
+        assert input_media_animation.caption == self.caption
+        assert input_media_animation.parse_mode == self.parse_mode
+
+    def test_to_dict(self, input_media_animation):
+        input_media_animation_dict = input_media_animation.to_dict()
+        assert input_media_animation_dict['type'] == input_media_animation.type
+        assert input_media_animation_dict['media'] == input_media_animation.media
+        assert input_media_animation_dict['caption'] == input_media_animation.caption
+        assert input_media_animation_dict['parse_mode'] == input_media_animation.parse_mode
+        assert input_media_animation_dict['width'] == input_media_animation.width
+        assert input_media_animation_dict['height'] == input_media_animation.height
+        assert input_media_animation_dict['duration'] == input_media_animation.duration
+
+    def test_with_animation(self, animation):  # noqa: F811
+        # fixture found in test_animation
+        imp = InputMediaAnimation(animation, caption="test 2")
+        assert imp.type == self.type
+        assert imp.media == photo.file_id
+        assert imp.caption == "test 2"
+
+    def test_error_with_file(self, animation_file):  # noqa: F811
+        # fixture found in test_animation
+        with pytest.raises(ValueError, match="file_id, url or Animation"):
+            InputMediaAnimation(photo_file)
 
 
 @pytest.fixture(scope='function')  # noqa: F811
