@@ -105,6 +105,13 @@ def dp(_dp):
     Dispatcher._Dispatcher__singleton_semaphore.release()
 
 
+@pytest.fixture(scope='function')
+def thumb_file():
+    f = open(u'tests/data/thumb.jpg', 'rb')
+    yield f
+    f.close()
+
+
 def pytest_configure(config):
     if sys.version_info >= (3,):
         config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
