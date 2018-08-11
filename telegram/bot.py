@@ -443,7 +443,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+            thumb (`filelike object`): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -478,7 +478,7 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return url, data
@@ -525,7 +525,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+            thumb (`filelike object`): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -661,7 +661,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+            thumb (`filelike object`): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -698,7 +698,7 @@ class Bot(TelegramObject):
             data['height'] = height
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return url, data
@@ -739,7 +739,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+            thumb (`filelike object`): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -768,7 +768,7 @@ class Bot(TelegramObject):
             data['length'] = length
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
         return url, data
@@ -803,7 +803,7 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Thumbnail of the
+            thumb (`filelike object`): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -846,7 +846,7 @@ class Bot(TelegramObject):
             data['height'] = height
         if thumb:
             if InputFile.is_file(thumb):
-                thumb = InputFile(thumb)
+                thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
         if caption:
             data['caption'] = caption
