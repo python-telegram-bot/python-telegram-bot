@@ -19,9 +19,14 @@
 import pytest
 from flaky import flaky
 
-from telegram import InputMediaVideo, InputMediaPhoto, InputMediaAnimation, Message, InputFile
+from telegram import (InputMediaVideo, InputMediaPhoto, InputMediaAnimation, Message, InputFile,
+                      InputMediaAudio, InputMediaDocument)
 # noinspection PyUnresolvedReferences
 from .test_animation import animation, animation_file  # noqa: F401
+# noinspection PyUnresolvedReferences
+from .test_audio import audio, audio_file  # noqa: F401
+# noinspection PyUnresolvedReferences
+from .test_document import document, document_file  # noqa: F401
 # noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 # noinspection PyUnresolvedReferences
@@ -54,6 +59,23 @@ def input_media_animation():
                                width=TestInputMediaAnimation.width,
                                height=TestInputMediaAnimation.height,
                                duration=TestInputMediaAnimation.duration)
+
+
+@pytest.fixture(scope='class')
+def input_media_audio():
+    return InputMediaAudio(media=TestInputMediaAudio.media,
+                           caption=TestInputMediaAudio.caption,
+                           duration=TestInputMediaAudio.duration,
+                           performer=TestInputMediaAudio.performer,
+                           title=TestInputMediaAudio.title,
+                           parse_mode=TestInputMediaAudio.parse_mode)
+
+
+@pytest.fixture(scope='class')
+def input_media_document():
+    return InputMediaDocument(media=TestInputMediaDocument.media,
+                              caption=TestInputMediaDocument.caption,
+                              parse_mode=TestInputMediaDocument.parse_mode)
 
 
 class TestInputMediaVideo(object):
@@ -177,6 +199,86 @@ class TestInputMediaAnimation(object):
         assert input_media_animation.type == self.type
         assert isinstance(input_media_animation.media, InputFile)
         assert input_media_animation.caption == "test 2"
+
+
+class TestInputMediaAudio(object):
+    type = "audio"
+    media = "NOTAREALFILEID"
+    caption = "My Caption"
+    duration = 3
+    performer = 'performer'
+    title = 'title'
+    parse_mode = 'HTML'
+
+    def test_expected_values(self, input_media_audio):
+        assert input_media_audio.type == self.type
+        assert input_media_audio.media == self.media
+        assert input_media_audio.caption == self.caption
+        assert input_media_audio.duration == self.duration
+        assert input_media_audio.performer == self.performer
+        assert input_media_audio.title == self.title
+        assert input_media_audio.parse_mode == self.parse_mode
+
+    def test_to_dict(self, input_media_audio):
+        input_media_audio_dict = input_media_audio.to_dict()
+        assert input_media_audio_dict['type'] == input_media_audio.type
+        assert input_media_audio_dict['media'] == input_media_audio.media
+        assert input_media_audio_dict['caption'] == input_media_audio.caption
+        assert input_media_audio_dict['duration'] == input_media_audio.duration
+        assert input_media_audio_dict['performer'] == input_media_audio.performer
+        assert input_media_audio_dict['title'] == input_media_audio.title
+        assert input_media_audio_dict['parse_mode'] == input_media_audio.parse_mode
+
+    def test_with_audio(self, audio):  # noqa: F811
+        # fixture found in test_audio
+        input_media_audio = InputMediaAudio(audio, caption="test 3")
+        assert input_media_audio.type == self.type
+        assert input_media_audio.media == audio.file_id
+        assert input_media_audio.duration == audio.duration
+        assert input_media_audio.performer == audio.performer
+        assert input_media_audio.title == audio.title
+        assert input_media_audio.caption == "test 3"
+
+    def test_with_audio_file(self, audio_file):  # noqa: F811
+        # fixture found in test_audio
+        input_media_audio = InputMediaAudio(audio_file, caption="test 3")
+        assert input_media_audio.type == self.type
+        assert isinstance(input_media_audio.media, InputFile)
+        assert input_media_audio.caption == "test 3"
+
+
+class TestInputMediaDocument(object):
+    type = "document"
+    media = "NOTAREALFILEID"
+    caption = "My Caption"
+    parse_mode = 'HTML'
+
+    def test_expected_values(self, input_media_document):
+        assert input_media_document.type == self.type
+        assert input_media_document.media == self.media
+        assert input_media_document.caption == self.caption
+        assert input_media_document.parse_mode == self.parse_mode
+
+    def test_to_dict(self, input_media_document):
+        input_media_document_dict = input_media_document.to_dict()
+        assert input_media_document_dict['type'] == input_media_document.type
+        assert input_media_document_dict['media'] == input_media_document.media
+        assert input_media_document_dict['caption'] == input_media_document.caption
+        assert input_media_document_dict['parse_mode'] == input_media_document.parse_mode
+
+    def test_with_document(self, document):  # noqa: F811
+        # fixture found in test_document
+        input_media_document = InputMediaDocument(document, caption="test 3")
+        assert input_media_document.type == self.type
+        assert input_media_document.media == document.file_id
+        assert input_media_document.caption == "test 3"
+
+    def test_with_document_file(self, document_file):  # noqa: F811
+        # fixture found in test_document
+        input_media_document = InputMediaDocument(document_file, caption="test 3")
+        assert input_media_document.type == self.type
+        assert isinstance(input_media_document.media, InputFile)
+        assert input_media_document.caption == "test 3"
 
 
 @pytest.fixture(scope='function')  # noqa: F811

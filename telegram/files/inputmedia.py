@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
 
-from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video
+from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video, Audio, Document
 
 
 class InputMedia(TelegramObject):
@@ -43,7 +43,7 @@ class InputMediaAnimation(InputMedia):
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
             A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
             is passed as a string or file_id.
-        caption (:obj:`str`): Optional. Caption of the video to be sent, 0-200 characters.
+        caption (:obj:`str`): Optional. Caption of the animation to be sent, 0-200 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -55,12 +55,12 @@ class InputMediaAnimation(InputMedia):
     Args:
         media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
             servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
-            Lastly you can pass an existing :class:`telegram.Video` object to send.
+            Lastly you can pass an existing :class:`telegram.Animation` object to send.
         thumb (`filelike object`, optional): Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
             A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
             is passed as a string or file_id.
-        caption (:obj:`str`, optional): Caption of the video to be sent, 0-200 characters.
+        caption (:obj:`str`, optional): Caption of the animation to be sent, 0-200 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -201,7 +201,6 @@ class InputMediaVideo(InputMedia):
         When using a :class:`telegram.Video` for the :attr:`media` attribute. It will take the
         width, height and duration from that video, unless otherwise specified with the optional
         arguments.
-        At the moment using a new file is not yet supported.
     """
 
     def __init__(self, media, caption=None, width=None, height=None, duration=None,
@@ -235,3 +234,130 @@ class InputMediaVideo(InputMedia):
             self.duration = duration
         if supports_streaming:
             self.supports_streaming = supports_streaming
+
+
+class InputMediaAudio(InputMedia):
+    """Represents an audio file to be treated as music to be sent.
+
+    Attributes:
+        type (:obj:`str`): ``audio``.
+        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
+            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
+            Lastly you can pass an existing :class:`telegram.Audio` object to send.
+        caption (:obj:`str`): Optional. Caption of the audio to be sent, 0-200 characters.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        duration (:obj:`int`): Duration of the audio in seconds.
+        performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
+        thumb (`filelike object`): Optional. Thumbnail of the
+            file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+            A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+            is passed as a string or file_id.
+
+    Args:
+        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
+            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
+            Lastly you can pass an existing :class:`telegram.Document` object to send.
+        caption (:obj:`str`, optional): Caption of the audio to be sent, 0-200 characters.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
+        performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
+            tags.
+        title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
+        thumb (`filelike object`, optional): Thumbnail of the
+            file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+            A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+            is passed as a string or file_id.
+
+    Note:
+        When using a :class:`telegram.Audio` for the :attr:`media` attribute. It will take the
+        duration, performer and title from that video, unless otherwise specified with the
+        optional arguments.
+    """
+
+    def __init__(self, media, thumb=None, caption=None, parse_mode=None,
+                 duration=None, performer=None, title=None):
+        self.type = 'audio'
+
+        if isinstance(media, Audio):
+            self.media = media.file_id
+            self.duration = media.duration
+            self.performer = media.performer
+            self.title = media.title
+        elif InputFile.is_file(media):
+            self.media = InputFile(media, attach=True)
+        else:
+            self.media = media
+
+        if thumb:
+            self.thumb = thumb
+            if InputFile.is_file(self.thumb):
+                self.thumb = InputFile(self.thumb, attach=True)
+
+        if caption:
+            self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode
+        if duration:
+            self.duration = duration
+        if performer:
+            self.performer = performer
+        if title:
+            self.title = title
+
+
+class InputMediaDocument(InputMedia):
+    """Represents a general file to be sent.
+
+    Attributes:
+        type (:obj:`str`): ``document``.
+        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
+            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
+            Lastly you can pass an existing :class:`telegram.Document` object to send.
+        caption (:obj:`str`): Optional. Caption of the document to be sent, 0-200 characters.
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        thumb (`filelike object`): Optional. Thumbnail of the
+            file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+            A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+            is passed as a string or file_id.
+
+    Args:
+        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
+            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
+            Lastly you can pass an existing :class:`telegram.Document` object to send.
+        caption (:obj:`str`, optional): Caption of the document to be sent, 0-200 characters.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            in :class:`telegram.ParseMode` for the available modes.
+        thumb (`filelike object`, optional): Thumbnail of the
+            file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+            A thumbnail‘s width and height should not exceed 90. Ignored if the file is not
+            is passed as a string or file_id.
+    """
+
+    def __init__(self, media, thumb=None, caption=None, parse_mode=None):
+        self.type = 'document'
+
+        if isinstance(media, Document):
+            self.media = media.file_id
+        elif InputFile.is_file(media):
+            self.media = InputFile(media, attach=True)
+        else:
+            self.media = media
+
+        if thumb:
+            self.thumb = thumb
+            if InputFile.is_file(self.thumb):
+                self.thumb = InputFile(self.thumb, attach=True)
+
+        if caption:
+            self.caption = caption
+        if parse_mode:
+            self.parse_mode = parse_mode
