@@ -57,9 +57,11 @@ class Animation(TelegramObject):
                  mime_type=None,
                  file_size=None,
                  **kwargs):
-        self.file_id = file_id
-        self.width = width
-        self.height = height
+        # Required
+        self.file_id = str(file_id)
+        self.width = int(width)
+        self.height = int(height)
+
         self.duration = duration
         self.thumb = thumb
         self.file_name = file_name
