@@ -88,18 +88,20 @@ class TestCallbackQuery(object):
 
     def test_edit_message_text(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
+            print(args, kwargs)
             try:
+                text = args[1] == 'test'
                 id = kwargs['inline_message_id'] == callback_query.inline_message_id
-                text = kwargs['text'] == 'test'
                 return id and text
             except KeyError:
+                text = args[1] == 'test'
                 chat_id = kwargs['chat_id'] == callback_query.message.chat_id
                 message_id = kwargs['message_id'] == callback_query.message.message_id
-                text = kwargs['text'] == 'test'
                 return chat_id and message_id and text
 
         monkeypatch.setattr('telegram.Bot.edit_message_text', test)
         assert callback_query.edit_message_text(text='test')
+        assert callback_query.edit_message_text('test')
 
     def test_edit_message_caption(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
@@ -115,6 +117,7 @@ class TestCallbackQuery(object):
 
         monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
         assert callback_query.edit_message_caption(caption='new caption')
+        assert callback_query.edit_message_caption('new caption')
 
     def test_edit_message_reply_markup(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
@@ -130,6 +133,7 @@ class TestCallbackQuery(object):
 
         monkeypatch.setattr('telegram.Bot.edit_message_reply_markup', test)
         assert callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
+        assert callback_query.edit_message_reply_markup([['1', '2']])
 
     def test_equality(self):
         a = CallbackQuery(self.id, self.from_user, 'chat')
