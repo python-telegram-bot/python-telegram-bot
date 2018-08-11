@@ -96,10 +96,7 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
                         MAX_FILESIZE_DOWNLOAD, MAX_FILESIZE_UPLOAD,
                         MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,
                         MAX_MESSAGES_PER_MINUTE_PER_GROUP)
-from .files.inputmedia import InputMedia
-from .files.inputmediavideo import InputMediaVideo
-from .files.inputmediaphoto import InputMediaPhoto
-from .files.inputmediaanimation import InputMediaAnimation
+from .files.inputmedia import (InputMedia, InputMediaVideo, InputMediaPhoto, InputMediaAnimation)
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
