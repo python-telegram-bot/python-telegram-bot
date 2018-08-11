@@ -77,7 +77,7 @@ class TestAnimation(object):
 
     @flaky(3, 1)
     def test_resend(self, bot, chat_id, animation):
-        message = bot.send_animation(chat_id, self.animation_file_id)
+        message = bot.send_animation(chat_id, animation.file_id)
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
