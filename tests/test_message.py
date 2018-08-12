@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from copy import deepcopy
 from datetime import datetime
 
 import pytest
@@ -23,7 +24,8 @@ import pytest
 from telegram import ParseMode
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
-                      Invoice, SuccessfulPayment)
+                      Invoice, SuccessfulPayment, PassportData)
+from tests.test_passport import RAW_PASSPORT_DATA
 
 
 @pytest.fixture(scope='class')
@@ -86,7 +88,8 @@ def message(bot):
                     {'author_signature': 'some_author_sign'},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
-                     'media_group_id': 1234443322222}
+                     'media_group_id': 1234443322222},
+                    'PASSPORT'
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -95,8 +98,11 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group'])
+                     'photo_from_media_group', 'passport_data'])
 def message_params(bot, request):
+    if request.param == 'PASSPORT':  # We need a bot to decrypt stuff
+        request.param = {'passport_data': PassportData.de_json(deepcopy(RAW_PASSPORT_DATA),
+                                                               bot=bot)}
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
                    date=TestMessage.date,

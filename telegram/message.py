@@ -23,7 +23,7 @@ from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote)
+                      SuccessfulPayment, VideoNote, PassportData)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -97,6 +97,7 @@ class Message(TelegramObject):
             forwarded from channels.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
+        passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -195,6 +196,7 @@ class Message(TelegramObject):
             forwarded from channels.
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
+        passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data
     """
 
     _effective_attachment = _UNDEFINED
@@ -205,7 +207,7 @@ class Message(TelegramObject):
     MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
                      'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
                      'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id',
-                     'pinned_message'] + ATTACHMENT_TYPES
+                     'pinned_message', 'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
                  message_id,
@@ -251,6 +253,7 @@ class Message(TelegramObject):
                  media_group_id=None,
                  connected_website=None,
                  animation=None,
+                 passport_data=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -298,6 +301,7 @@ class Message(TelegramObject):
         self.author_signature = author_signature
         self.media_group_id = media_group_id
         self.animation = animation
+        self.passport_data = passport_data
 
         self.bot = bot
 
@@ -351,6 +355,7 @@ class Message(TelegramObject):
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
+        data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
 
         return cls(bot=bot, **data)
 

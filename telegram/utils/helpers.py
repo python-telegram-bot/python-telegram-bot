@@ -19,6 +19,10 @@
 """This module contains helper functions."""
 from html import escape
 
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 import re
 import signal
 from datetime import datetime
@@ -43,6 +47,7 @@ if hasattr(datetime, 'timestamp'):
 else:
     # Python < 3.3 (incl 2.7)
     from time import mktime
+
 
     def _timestamp(dt_obj):
         return mktime(dt_obj.timetuple())
@@ -139,3 +144,25 @@ def effective_message_type(entity):
             return i
 
     return None
+
+
+def passport_auth_url(bot_id, scope, public_key, payload, callback_url=None):
+    """
+    Creates a passport auth url that asks the users for the specified fields
+
+    Args:
+        bot_id (:obj:`int`): Unique identifier for the bot. Can be extracted from the bot token.
+        scope (List[:obj:`str`]): List the names of fields you want to access.
+        public_key (:obj:`str`): Public key of your bot.
+        payload (:obj:`str`): Bot-specified payload
+        callback_url (:obj:`str`, optional): URL to which the user will be redirected.
+
+    """
+    url = 'tg://resolve?domain=telegrampassport' + \
+          '&bot_id={}'.format(bot_id) + \
+          '&scope={}'.format(quote(scope)) + \
+          '&public_key={}'.format(quote(public_key)) + \
+          '&payload={}'.format(quote(payload))
+    if callback_url:
+        url += '&callback_url={}'.format(escape(callback_url))
+    return url

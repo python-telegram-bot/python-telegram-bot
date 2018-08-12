@@ -684,6 +684,15 @@ class Filters(object):
     successful_payment = _SuccessfulPayment()
     """:obj:`Filter`: Messages that confirm a :class:`telegram.SuccessfulPayment`."""
 
+    class _PassportData(BaseFilter):
+        name = 'Filters.passport_data'
+
+        def filter(self, message):
+            return bool(message.passport_data)
+
+    passport_data = _PassportData()
+    """:obj:`Filter`: Messages that contain a :class:`telegram.PassportData`"""
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 

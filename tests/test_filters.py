@@ -398,6 +398,11 @@ class TestFilters(object):
         message.successful_payment = 'test'
         assert Filters.successful_payment(message)
 
+    def test_filters_passport_data(self, message):
+        assert not Filters.passport_data(message)
+        message.passport_data = 'test'
+        assert Filters.passport_data(message)
+
     def test_language_filter_single(self, message):
         message.from_user.language_code = 'en_US'
         assert (Filters.language('en_US'))(message)
