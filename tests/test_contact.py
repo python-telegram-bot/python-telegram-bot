@@ -25,7 +25,7 @@ from telegram import Contact, Voice
 @pytest.fixture(scope='class')
 def contact():
     return Contact(TestContact.phone_number, TestContact.first_name, TestContact.last_name,
-                   TestContact.user_id)
+                   TestContact.user_id, TestContact.vcard)
 
 
 class TestContact(object):
@@ -33,6 +33,7 @@ class TestContact(object):
     first_name = 'Leandro'
     last_name = 'Toledo'
     user_id = 23
+    vcard = 'vCard'
 
     def test_de_json_required(self, bot):
         json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name}
@@ -43,20 +44,23 @@ class TestContact(object):
 
     def test_de_json_all(self, bot):
         json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name,
-                     'last_name': self.last_name, 'user_id': self.user_id}
+                     'last_name': self.last_name, 'user_id': self.user_id,
+                     'vcard': self.vcard}
         contact = Contact.de_json(json_dict, bot)
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
+        assert contact.vcard == self.vcard
 
     def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
         def test(_, url, data, **kwargs):
             phone = data['phone_number'] == contact.phone_number
             first = data['first_name'] == contact.first_name
             last = data['last_name'] == contact.last_name
-            return phone and first and last
+            vcard = data['vcard'] == contact.vcard
+            return phone and first and last and vcard
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_contact(contact=contact, chat_id=chat_id)
@@ -74,6 +78,7 @@ class TestContact(object):
         assert contact_dict['first_name'] == contact.first_name
         assert contact_dict['last_name'] == contact.last_name
         assert contact_dict['user_id'] == contact.user_id
+        assert contact_dict['vcard'] == contact.vcard
 
     def test_equality(self):
         a = Contact(self.phone_number, self.first_name)
