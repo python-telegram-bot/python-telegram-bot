@@ -1113,7 +1113,7 @@ class Bot(TelegramObject):
             first_name (:obj:`str`, optional): Contact's first name.
             last_name (:obj:`str`, optional): Contact's last name.
             vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
-                0-2048 bytes
+                0-2048 bytes.
             contact (:class:`telegram.Contact`, optional): The contact to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
