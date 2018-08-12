@@ -117,10 +117,6 @@ class InputMediaPhoto(InputMedia):
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
             in :class:`telegram.ParseMode` for the available modes.
-        thumb (`filelike object`): Optional. Thumbnail of the
-            file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
-            is passed as a string or file_id.
 
     Args:
         media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the
@@ -130,13 +126,9 @@ class InputMediaPhoto(InputMedia):
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
             in :class:`telegram.ParseMode` for the available modes.
-        thumb (`filelike object`, optional): Thumbnail of the
-            file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
-            is passed as a string or file_id.
     """
 
-    def __init__(self, media, caption=None, parse_mode=None, thumb=None):
+    def __init__(self, media, caption=None, parse_mode=None):
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
@@ -145,11 +137,6 @@ class InputMediaPhoto(InputMedia):
             self.media = InputFile(media, attach=True)
         else:
             self.media = media
-
-        if thumb:
-            self.thumb = thumb
-            if InputFile.is_file(self.thumb):
-                self.thumb = InputFile(self.thumb, attach=True)
 
         if caption:
             self.caption = caption
