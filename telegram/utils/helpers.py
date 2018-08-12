@@ -19,6 +19,10 @@
 """This module contains helper functions."""
 from html import escape
 
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 import re
 import signal
 from datetime import datetime
@@ -43,6 +47,7 @@ if hasattr(datetime, 'timestamp'):
 else:
     # Python < 3.3 (incl 2.7)
     from time import mktime
+
 
     def _timestamp(dt_obj):
         return mktime(dt_obj.timetuple())
@@ -140,6 +145,7 @@ def effective_message_type(entity):
 
     return None
 
+
 def passport_auth_url(bot_id, scope, public_key, payload, callback_url=None):
     """
     Creates a passport auth url that asks the users for the specified fields
@@ -154,9 +160,9 @@ def passport_auth_url(bot_id, scope, public_key, payload, callback_url=None):
     """
     url = 'tg://resolve?domain=telegrampassport' + \
           '&bot_id={}'.format(bot_id) + \
-          '&scope={}'.format(escape(scope)) + \
-          '&public_key={}'.format(escape(public_key)) + \
-          '&payload={}'.format(escape(payload))
+          '&scope={}'.format(quote(scope)) + \
+          '&public_key={}'.format(quote(public_key)) + \
+          '&payload={}'.format(quote(payload))
     if callback_url:
         url += '&callback_url={}'.format(escape(callback_url))
     return url
