@@ -231,9 +231,9 @@ class ConversationHandler(Handler):
 
             old_state, new_state = state
             no_result = False
-            if new_state.done.is_set():
+            if new_state.done.wait(timeout=self.run_async_timeout):
                 try:
-                    res = new_state.result(timeout=self.run_async_timeout)
+                    res = new_state.result(timeout=0)
                     res = res if res is not None else old_state
                     self.update_state(res, key)
                     state = self.conversations.get(key)
