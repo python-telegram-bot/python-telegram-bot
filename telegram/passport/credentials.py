@@ -127,15 +127,19 @@ class EncryptedCredentials(TelegramObject):
         if not data:
             return None
 
-        data['secret'] = bot.private_key.decrypt(b64decode(data.get('secret')), OAEP(
-            mgf=MGF1(algorithm=SHA1()),
-            algorithm=SHA1(),
-            label=None
-        ))
-        data['data'] = Credentials.de_json(decrypt_json(data.get('secret'),
-                                                        data.get('hash'),
-                                                        data.get('data')),
-                                           bot=bot)
+        # If already decrypted
+        if isinstance(data['data'], dict):
+            data['data'] = Credentials.de_json(data['data'], bot=bot)
+        else:
+            data['secret'] = bot.private_key.decrypt(b64decode(data.get('secret')), OAEP(
+                mgf=MGF1(algorithm=SHA1()),
+                algorithm=SHA1(),
+                label=None
+            ))
+            data['data'] = Credentials.de_json(decrypt_json(data.get('secret'),
+                                                            data.get('hash'),
+                                                            data.get('data')),
+                                               bot=bot)
 
         return cls(bot=bot, **data)
 
@@ -293,6 +297,13 @@ class SecureValue(TelegramObject):
 
         return cls(bot=bot, **data)
 
+    def to_dict(self):
+        data = super(SecureValue, self).to_dict()
+
+        data['files'] = [p.to_dict() for p in self.files]
+
+        return data
+
 
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
@@ -319,8 +330,8 @@ class _CredentialsBase(TelegramObject):
             return []
 
         credentials = list()
-        for credentials in data:
-            credentials.append(cls.de_json(credentials, bot=bot))
+        for c in data:
+            credentials.append(cls.de_json(c, bot=bot))
 
         return credentials
 
@@ -341,6 +352,14 @@ class DataCredentials(_CredentialsBase):
     def __init__(self, data_hash, secret, **kwargs):
         super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
 
+    def to_dict(self):
+        data = super(DataCredentials, self).to_dict()
+
+        del data['file_hash']
+        del data['hash']
+
+        return data
+
 
 class FileCredentials(_CredentialsBase):
     """
@@ -357,3 +376,11 @@ class FileCredentials(_CredentialsBase):
         """
     def __init__(self, file_hash, secret, **kwargs):
         super(FileCredentials, self).__init__(file_hash, secret, **kwargs)
+
+    def to_dict(self):
+        data = super(FileCredentials, self).to_dict()
+
+        del data['data_hash']
+        del data['hash']
+
+        return data

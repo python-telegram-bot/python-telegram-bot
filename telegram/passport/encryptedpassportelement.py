@@ -129,17 +129,19 @@ class EncryptedPassportElement(TelegramObject):
         if data['type'] not in ('phone_number', 'email'):
             secure_data = getattr(credentials.data.secure_data, data['type'])
 
-            data['data'] = decrypt_json(secure_data.data.secret,
-                                        secure_data.data.hash,
-                                        data['data'])
-
-            if data['type'] == 'personal_details':
-                data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
-            elif data['type'] in ('passport', 'internal_passport',
-                                  'driver_license', 'identity_card'):
-                data['data'] = IdDocumentData.de_json(data['data'], bot=bot)
-            elif data['type'] == 'address':
-                data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
+            if secure_data.data is not None:
+                # If not already decrypted
+                if not isinstance(data['data'], dict):
+                    data['data'] = decrypt_json(secure_data.data.secret,
+                                                secure_data.data.hash,
+                                                data['data'])
+                if data['type'] == 'personal_details':
+                    data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
+                elif data['type'] in ('passport', 'internal_passport',
+                                      'driver_license', 'identity_card'):
+                    data['data'] = IdDocumentData.de_json(data['data'], bot=bot)
+                elif data['type'] == 'address':
+                    data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
 
             if secure_data:
                 data['files'] = PassportFile.de_list(data.get('files'), bot, secure_data)
