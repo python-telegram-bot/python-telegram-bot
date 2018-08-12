@@ -160,3 +160,17 @@ class TestPassport(object):
             'data': all_passport_data,
             'credentials': credentials
         }, bot=bot), PassportData)
+
+    def test_equality(self, passport_data):
+        a = PassportData(passport_data.data, passport_data.credentials)
+        b = PassportData(passport_data.data, passport_data.credentials)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        passport_data.credentials.hash = 'NOTAPROPERHASH'
+        c = PassportData(passport_data.data, passport_data.credentials)
+
+        assert a != c
+        assert hash(a) != hash(c)
