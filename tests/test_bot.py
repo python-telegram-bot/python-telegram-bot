@@ -259,6 +259,8 @@ class TestBot(object):
 
         assert message.caption == 'new_caption'
 
+    # edit_message_media is tested in test_inputmedia
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_edit_message_caption_with_parse_mode(self, bot, media_message):

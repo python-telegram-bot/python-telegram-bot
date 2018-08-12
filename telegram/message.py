@@ -752,6 +752,27 @@ class Message(TelegramObject):
         return self.bot.edit_message_caption(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def edit_media(self, media, *args, **kwargs):
+        """Shortcut for::
+
+                    bot.edit_message_media(chat_id=message.chat_id,
+                                             message_id=message.message_id,
+                                             *args,
+                                             **kwargs)
+
+                Note:
+                    You can only edit messages that the bot sent itself,
+                    therefore this method can only be used on the
+                    return value of the ``bot.send_*`` family of methods.
+
+                Returns:
+                    :class:`telegram.Message`: On success, instance representing the edited
+                    message.
+
+                """
+        return self.bot.edit_message_media(
+            chat_id=self.chat_id, message_id=self.message_id, media=media, *args, **kwargs)
+
     def edit_reply_markup(self, *args, **kwargs):
         """Shortcut for::
 
