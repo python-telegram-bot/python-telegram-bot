@@ -165,6 +165,13 @@ class TestUser(object):
         monkeypatch.setattr('telegram.Bot.send_voice', test)
         assert user.send_voice('test_voice')
 
+    def test_instance_method_send_animation(self, monkeypatch, user):
+        def test(*args, **kwargs):
+            return args[1] == user.id and args[2] == 'test_animation'
+
+        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        assert user.send_animation('test_animation')
+
     def test_mention_html(self, user):
         expected = u'<a href="tg://user?id={}">{}</a>'
 

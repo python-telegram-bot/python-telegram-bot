@@ -300,6 +300,15 @@ class Filters(object):
     document = _Document()
     """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
 
+    class _Animation(BaseFilter):
+        name = 'Filters.animation'
+
+        def filter(self, message):
+            return bool(message.animation)
+
+    animation = _Animation()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Animation`."""
+
     class _Photo(BaseFilter):
         name = 'Filters.photo'
 

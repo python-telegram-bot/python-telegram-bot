@@ -27,6 +27,7 @@ from .files.photosize import PhotoSize
 from .files.audio import Audio
 from .files.voice import Voice
 from .files.document import Document
+from .files.animation import Animation
 from .files.sticker import Sticker, StickerSet, MaskPosition
 from .files.video import Video
 from .files.contact import Contact
@@ -45,7 +46,6 @@ from .files.inputfile import InputFile
 from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
-from .games.animation import Animation
 from .games.game import Game
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
@@ -96,9 +96,8 @@ from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOO
                         MAX_FILESIZE_DOWNLOAD, MAX_FILESIZE_UPLOAD,
                         MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,
                         MAX_MESSAGES_PER_MINUTE_PER_GROUP)
-from .files.inputmedia import InputMedia
-from .files.inputmediavideo import InputMediaVideo
-from .files.inputmediaphoto import InputMediaPhoto
+from .files.inputmedia import (InputMedia, InputMediaVideo, InputMediaPhoto, InputMediaAnimation,
+                               InputMediaAudio, InputMediaDocument)
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -125,5 +124,5 @@ __all__ = [
     'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
     'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
     'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia', 'InputMediaPhoto',
-    'InputMediaVideo'
+    'InputMediaVideo', 'InputMediaAnimation', 'InputMediaAudio', 'InputMediaDocument'
 ]

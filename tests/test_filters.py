@@ -185,6 +185,11 @@ class TestFilters(object):
         assert Filters.document.category("application/")(message)
         assert Filters.document.mime_type("application/x-sh")(message)
 
+    def test_filters_animation(self, message):
+        assert not Filters.animation(message)
+        message.animation = 'test'
+        assert Filters.animation(message)
+
     def test_filters_photo(self, message):
         assert not Filters.photo(message)
         message.photo = 'test'

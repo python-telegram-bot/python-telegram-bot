@@ -110,7 +110,7 @@ def check_object(h4):
 
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'InputFile':
-        ignored |= {'data'}
+        return
     elif name == 'InlineQueryResult':
         ignored |= {'id'}
     elif name == 'User':

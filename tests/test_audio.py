@@ -34,7 +34,8 @@ def audio_file():
 @pytest.fixture(scope='class')
 def audio(bot, chat_id):
     with open('tests/data/telegram.mp3', 'rb') as f:
-        return bot.send_audio(chat_id, audio=f, timeout=50).audio
+        return bot.send_audio(chat_id, audio=f, timeout=50,
+                              thumb=open('tests/data/thumb.jpg', 'rb')).audio
 
 
 class TestAudio(object):
@@ -47,6 +48,9 @@ class TestAudio(object):
     audio_file_url = 'https://goo.gl/3En24v'
     mime_type = 'audio/mpeg'
     file_size = 122920
+    thumb_file_size = 2744
+    thumb_width = 50
+    thumb_height = 50
 
     def test_creation(self, audio):
         # Make sure file has been uploaded.
@@ -60,14 +64,17 @@ class TestAudio(object):
         assert audio.title is None
         assert audio.mime_type == self.mime_type
         assert audio.file_size == self.file_size
+        assert audio.thumb.file_size == self.thumb_file_size
+        assert audio.thumb.width == self.thumb_width
+        assert audio.thumb.height == self.thumb_height
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, audio_file):
+    def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
         message = bot.send_audio(chat_id, audio=audio_file, caption=self.caption,
                                  duration=self.duration, performer=self.performer,
                                  title=self.title, disable_notification=False,
-                                 parse_mode='Markdown')
+                                 parse_mode='Markdown', thumb=thumb_file)
 
         assert message.caption == self.caption.replace('*', '')
 
@@ -79,6 +86,9 @@ class TestAudio(object):
         assert message.audio.title == self.title
         assert message.audio.mime_type == self.mime_type
         assert message.audio.file_size == self.file_size
+        assert message.audio.thumb.file_size == self.thumb_file_size
+        assert message.audio.thumb.width == self.thumb_width
+        assert message.audio.thumb.height == self.thumb_height
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -122,14 +132,15 @@ class TestAudio(object):
         message = bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
-    def test_de_json(self, bot):
+    def test_de_json(self, bot, audio):
         json_dict = {'file_id': 'not a file id',
                      'duration': self.duration,
                      'performer': self.performer,
                      'title': self.title,
                      'caption': self.caption,
                      'mime_type': self.mime_type,
-                     'file_size': self.file_size}
+                     'file_size': self.file_size,
+                     'thumb': audio.thumb.to_dict()}
         json_audio = Audio.de_json(json_dict, bot)
 
         assert json_audio.file_id == 'not a file id'
@@ -138,6 +149,7 @@ class TestAudio(object):
         assert json_audio.title == self.title
         assert json_audio.mime_type == self.mime_type
         assert json_audio.file_size == self.file_size
+        assert json_audio.thumb == audio.thumb
 
     def test_to_dict(self, audio):
         audio_dict = audio.to_dict()
