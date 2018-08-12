@@ -36,8 +36,8 @@ class InlineQueryResultVenue(InlineQueryResult):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
         foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
-            (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or
-            “food/icecream”.)
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -54,8 +54,8 @@ class InlineQueryResultVenue(InlineQueryResult):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue if known.
         foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
-            (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or
-            “food/icecream”.)
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the

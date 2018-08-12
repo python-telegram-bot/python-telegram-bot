@@ -31,8 +31,8 @@ class InputVenueMessageContent(InputMessageContent):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue, if known.
         foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
-            (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or
-            “food/icecream”.)
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
 
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -41,8 +41,8 @@ class InputVenueMessageContent(InputMessageContent):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue, if known.
         foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
-            (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or
-            “food/icecream”.)
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

@@ -30,7 +30,7 @@ class Venue(TelegramObject):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue.
         foursquare_type (:obj:`str`): Optional. Foursquare type of the venue. (For example,
-            “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+            "arts_entertainment/default", "arts_entertainment/aquarium" or "food/icecream".)
 
     Args:
         location (:class:`telegram.Location`): Venue location.
@@ -38,7 +38,7 @@ class Venue(TelegramObject):
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
         foursquare_type (:obj:`str`, optional): Foursquare type of the venue. (For example,
-            “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+            "arts_entertainment/default", "arts_entertainment/aquarium" or "food/icecream".)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

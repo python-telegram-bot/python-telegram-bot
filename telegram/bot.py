@@ -1043,8 +1043,8 @@ class Bot(TelegramObject):
             address (:obj:`str`, optional): Address of the venue.
             foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
             foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
-                (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or
-                “food/icecream”.)
+                (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+                "food/icecream".)
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
