@@ -49,7 +49,6 @@ def input_media_video(class_thumb_file):
 def input_media_photo(class_thumb_file):
     return InputMediaPhoto(media=TestInputMediaPhoto.media,
                            caption=TestInputMediaPhoto.caption,
-                           thumb=class_thumb_file,
                            parse_mode=TestInputMediaPhoto.parse_mode)
 
 
@@ -144,7 +143,6 @@ class TestInputMediaPhoto(object):
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
-        assert isinstance(input_media_photo.thumb, InputFile)
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
@@ -336,4 +334,14 @@ class TestSendMediaGroup(object):
         cid = messages[-1].chat.id
         mid = messages[-1].message_id
         new_message = bot.edit_message_media(chat_id=cid, message_id=mid, media=media_group[0])
+        assert isinstance(new_message, Message)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
+        messages = bot.send_media_group(chat_id, media_group)
+        cid = messages[-1].chat.id
+        mid = messages[-1].message_id
+        new_message = bot.edit_message_media(chat_id=cid, message_id=mid,
+                                             media=InputMediaPhoto(thumb_file))
         assert isinstance(new_message, Message)

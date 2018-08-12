@@ -91,13 +91,13 @@ from .payment.shippingquery import ShippingQuery
 from .webhookinfo import WebhookInfo
 from .games.gamehighscore import GameHighScore
 from .update import Update
+from .files.inputmedia import (InputMedia, InputMediaVideo, InputMediaPhoto, InputMediaAnimation,
+                               InputMediaAudio, InputMediaDocument)
 from .bot import Bot
 from .constants import (MAX_MESSAGE_LENGTH, MAX_CAPTION_LENGTH, SUPPORTED_WEBHOOK_PORTS,
                         MAX_FILESIZE_DOWNLOAD, MAX_FILESIZE_UPLOAD,
                         MAX_MESSAGES_PER_SECOND_PER_CHAT, MAX_MESSAGES_PER_SECOND,
                         MAX_MESSAGES_PER_MINUTE_PER_GROUP)
-from .files.inputmedia import (InputMedia, InputMediaVideo, InputMediaPhoto, InputMediaAnimation,
-                               InputMediaAudio, InputMediaDocument)
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'

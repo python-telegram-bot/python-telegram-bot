@@ -41,7 +41,7 @@ except ImportError:  # pragma: no cover
                   "how to properly install.")
     raise
 
-from telegram import (InputFile, TelegramError)
+from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken)
 
@@ -276,22 +276,31 @@ class Request(object):
         files = False
 
         for key, val in data.copy().items():
-            if key == 'media':
-                media = []
-                for m in val:
-                    media.append(m.to_dict())
-                    if isinstance(m.media, InputFile):
-                        data[m.media.attach] = m.media.field_tuple
-                data[key] = json.dumps(media)
-                files = True
-
             if isinstance(val, InputFile):
+                # Convert the InputFile to urllib3 field format
                 data[key] = val.field_tuple
                 files = True
-
-            if isinstance(val, (float, int)):
+            elif isinstance(val, (float, int)):
+                # Urllib3 doesn't like floats it seems
                 data[key] = str(val)
+            elif key == 'media':
+                # One media or multiple
+                if isinstance(val, InputMedia):
+                    # Attach and set val to attached name
+                    data[key] = val.to_json()
+                    if isinstance(val.media, InputFile):
+                        data[val.media.attach] = val.media.field_tuple
+                else:
+                    # Attach and set val to attached name for all
+                    media = []
+                    for m in val:
+                        media.append(m.to_dict())
+                        if isinstance(m.media, InputFile):
+                            data[m.media.attach] = m.media.field_tuple
+                    data[key] = json.dumps(media)
+                files = True
 
+        # Use multipart upload if we're uploading files, otherwise use JSON
         if files:
             result = self._request_wrapper('POST', url, fields=data, **urlopen_kwargs)
         else:

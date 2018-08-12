@@ -1805,7 +1805,7 @@ class Bot(TelegramObject):
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            media (:class:`telegram.InputMedia`): A JSON-serialized object for a new media content
+            media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
@@ -1823,7 +1823,7 @@ class Bot(TelegramObject):
 
         url = '{0}/editMessageMedia'.format(self.base_url)
 
-        data = {'media': media.to_dict()}
+        data = {'media': media}
 
         if chat_id:
             data['chat_id'] = chat_id
