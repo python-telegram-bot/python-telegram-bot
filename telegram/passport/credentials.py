@@ -16,8 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import binascii
 import json
 from base64 import b64decode
+
+from future.utils import bord
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -30,7 +33,6 @@ try:
     CRYPTO = True
 except ImportError:
     CRYPTO = False
-from future.utils import string_types
 
 from telegram import TelegramObject, TelegramError
 
@@ -59,12 +61,18 @@ def decrypt(secret, hash, data):
         :obj:`bytes`: The decrypted data as bytes
 
     """
-    if isinstance(secret, string_types):
+    try:
         secret = b64decode(secret)
-    if isinstance(hash, string_types):
+    except (binascii.Error, TypeError):
+        pass
+    try:
         hash = b64decode(hash)
-    if isinstance(data, string_types):
+    except (binascii.Error, TypeError):
+        pass
+    try:
         data = b64decode(data)
+    except (binascii.Error, TypeError):
+        pass
     digest = Hash(SHA512(), backend=default_backend())
     digest.update(secret + hash)
     secret_hash_hash = digest.finalize()
@@ -77,7 +85,7 @@ def decrypt(secret, hash, data):
     data_hash = digest.finalize()
     if data_hash != hash:
         raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
-    return data[data[0]:]
+    return data[bord(data[0]):]
 
 
 def decrypt_json(secret, hash, data):
