@@ -24,6 +24,9 @@ telegram package
    telegram.inputmedia
    telegram.inputmediaphoto
    telegram.inputmediavideo
+   telegram.inputmediadocument
+   telegram.inputmediaanimation
+   telegram.inputmediaaudio
    telegram.keyboardbutton
    telegram.location
    telegram.message
@@ -129,6 +132,10 @@ Passport
     telegram.iddocumentdata
     telegram.personaldetails
     telegram.residentialaddress
+    telegram.passportdata
+    telegram.passportfile
+    telegram.encryptedpassportelement
+    telegram.encryptedcredentials
 
 
 Module contents
