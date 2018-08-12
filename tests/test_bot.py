@@ -115,14 +115,19 @@ class TestBot(object):
         latitude = -23.691288
         title = 'title'
         address = 'address'
+        foursquare_id = 'foursquare id'
+        foursquare_type = 'foursquare type'
         message = bot.send_venue(chat_id=chat_id, title=title, address=address, latitude=latitude,
-                                 longitude=longitude)
+                                 longitude=longitude, foursquare_id=foursquare_id,
+                                 foursquare_type=foursquare_type)
 
         assert message.venue
         assert message.venue.title == title
         assert message.venue.address == address
         assert message.venue.location.latitude == latitude
         assert message.venue.location.longitude == longitude
+        assert message.venue.foursquare_id == foursquare_id
+        assert message.venue.foursquare_type == foursquare_type
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -133,15 +138,13 @@ class TestBot(object):
         phone_number = '+11234567890'
         first_name = 'Leandro'
         last_name = 'Toledo'
-        vcard = 'vCard'
         message = bot.send_contact(chat_id=chat_id, phone_number=phone_number,
-                                   first_name=first_name, last_name=last_name, vcard=vcard)
+                                   first_name=first_name, last_name=last_name)
 
         assert message.contact
         assert message.contact.phone_number == phone_number
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
-        assert message.contact.vcard == vcard
 
     @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)

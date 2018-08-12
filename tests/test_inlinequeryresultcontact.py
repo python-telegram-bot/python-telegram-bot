@@ -30,7 +30,6 @@ def inline_query_result_contact():
         TestInlineQueryResultContact.phone_number,
         TestInlineQueryResultContact.first_name,
         last_name=TestInlineQueryResultContact.last_name,
-        vcard=TestInlineQueryResultContact.vcard,
         thumb_url=TestInlineQueryResultContact.thumb_url,
         thumb_width=TestInlineQueryResultContact.thumb_width,
         thumb_height=TestInlineQueryResultContact.thumb_height,
@@ -44,7 +43,6 @@ class TestInlineQueryResultContact(object):
     phone_number = 'phone_number'
     first_name = 'first_name'
     last_name = 'last_name'
-    vcard = 'vCard'
     thumb_url = 'thumb url'
     thumb_width = 10
     thumb_height = 15
@@ -57,7 +55,6 @@ class TestInlineQueryResultContact(object):
         assert inline_query_result_contact.phone_number == self.phone_number
         assert inline_query_result_contact.first_name == self.first_name
         assert inline_query_result_contact.last_name == self.last_name
-        assert inline_query_result_contact.vcard == self.vcard
         assert inline_query_result_contact.thumb_url == self.thumb_url
         assert inline_query_result_contact.thumb_width == self.thumb_width
         assert inline_query_result_contact.thumb_height == self.thumb_height
@@ -77,8 +74,6 @@ class TestInlineQueryResultContact(object):
                 inline_query_result_contact.first_name)
         assert (inline_query_result_contact_dict['last_name'] ==
                 inline_query_result_contact.last_name)
-        assert (inline_query_result_contact_dict['vcard'] ==
-                inline_query_result_contact.vcard)
         assert (inline_query_result_contact_dict['thumb_url'] ==
                 inline_query_result_contact.thumb_url)
         assert (inline_query_result_contact_dict['thumb_width'] ==
