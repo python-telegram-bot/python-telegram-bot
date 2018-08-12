@@ -66,7 +66,6 @@ class InlineQueryResultContact(InlineQueryResult):
                  phone_number,
                  first_name,
                  last_name=None,
-                 vcard=None,
                  reply_markup=None,
                  input_message_content=None,
                  thumb_url=None,
