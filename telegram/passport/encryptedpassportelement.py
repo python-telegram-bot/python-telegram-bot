@@ -28,62 +28,62 @@ class EncryptedPassportElement(TelegramObject):
        by the user.
 
     Attributes:
-        type (:obj:`str`): Element type. One of “personal_details”, “passport”, “driver_license”,
-            “identity_card”, “internal_passport”, “address”, “utility_bill”, “bank_statement”,
-            “rental_agreement”, “passport_registration”, “temporary_registration”, “phone_number”,
-            “email”.
+        type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
+            "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
+            "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
+            "email".
         data (:obj:`str`): Optional. Base64-encoded encrypted Telegram Passport element data
-            provided by the user, available for “personal_details”, “passport”, “driver_license”,
-            “identity_card”, “identity_passport” and “address” types. Can be decrypted and verified
+            provided by the user, available for "personal_details", "passport", "driver_license",
+            "identity_card", "identity_passport" and "address" types. Can be decrypted and verified
             using the accompanying EncryptedCredentials.
         phone_number (:obj:`str`): Optional. User's verified phone number, available only for
-            “phone_number” type
-        email (:obj:`str`): Optional. User's verified email address, available only for “email”
+            "phone_number" type
+        email (:obj:`str`): Optional. User's verified email address, available only for "email"
             type
         files (List[:class:`telegram.PassportFile`]): Optional. Array of encrypted files with
-            documents provided by the user, available for “utility_bill”, “bank_statement”,
-            “rental_agreement”, “passport_registration” and “temporary_registration” types.
+            documents provided by the user, available for "utility_bill", "bank_statement",
+            "rental_agreement", "passport_registration" and "temporary_registration" types.
             Files can be decrypted and verified using the accompanying EncryptedCredentials.
         front_side (:class:`PassportFile`): Optional. Encrypted file with the front side of the
-            document, provided by the user. Available for “passport”, “driver_license”,
-            “identity_card” and “internal_passport”. The file can be decrypted and verified using
+            document, provided by the user. Available for "passport", "driver_license",
+            "identity_card" and "internal_passport". The file can be decrypted and verified using
             the accompanying EncryptedCredentials.
         reverse_side (:class:`PassportFile`): Optional. Encrypted file with the reverse side of the
-            document, provided by the user. Available for “driver_license” and “identity_card”.
+            document, provided by the user. Available for "driver_license" and "identity_card".
             The file can be decrypted and verified using the accompanying EncryptedCredentials.
         selfie (:class:`PassportFile`): Optional. Encrypted file with the selfie of the user
-            holding a document, provided by the user; available for “passport”, “driver_license”,
-            “identity_card” and “internal_passport”. The file can be decrypted and verified using
+            holding a document, provided by the user; available for "passport", "driver_license",
+            "identity_card" and "internal_passport". The file can be decrypted and verified using
             the accompanying EncryptedCredentials.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        type (:obj:`str`): Element type. One of “personal_details”, “passport”, “driver_license”,
-            “identity_card”, “internal_passport”, “address”, “utility_bill”, “bank_statement”,
-            “rental_agreement”, “passport_registration”, “temporary_registration”, “phone_number”,
-            “email”.
+        type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
+            "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
+            "rental_agreement", "passport_registration", "temporary_registration", "phone_number",
+            "email".
         data (:obj:`str`, optional): Base64-encoded encrypted Telegram Passport element data
-            provided by the user, available for “personal_details”, “passport”, “driver_license”,
-            “identity_card”, “identity_passport” and “address” types. Can be decrypted and verified
+            provided by the user, available for "personal_details", "passport", "driver_license",
+            "identity_card", "identity_passport" and "address" types. Can be decrypted and verified
             using the accompanying EncryptedCredentials.
         phone_number (:obj:`str`, optional): User's verified phone number, available only for
-            “phone_number” type
-        email (:obj:`str`, optional): User's verified email address, available only for “email”
+            "phone_number" type
+        email (:obj:`str`, optional): User's verified email address, available only for "email"
             type
         files (List[:class:`telegram.PassportFile`], optional): Array of encrypted files with
-            documents provided by the user, available for “utility_bill”, “bank_statement”,
-            “rental_agreement”, “passport_registration” and “temporary_registration” types.
+            documents provided by the user, available for "utility_bill", "bank_statement",
+            "rental_agreement", "passport_registration" and "temporary_registration" types.
             Files can be decrypted and verified using the accompanying EncryptedCredentials.
         front_side (:class:`PassportFile`, optional): Encrypted file with the front side of the
-            document, provided by the user. Available for “passport”, “driver_license”,
-            “identity_card” and “internal_passport”. The file can be decrypted and verified using
+            document, provided by the user. Available for "passport", "driver_license",
+            "identity_card" and "internal_passport". The file can be decrypted and verified using
             the accompanying EncryptedCredentials.
         reverse_side (:class:`PassportFile`, optional): Encrypted file with the reverse side of the
-            document, provided by the user. Available for “driver_license” and “identity_card”.
+            document, provided by the user. Available for "driver_license" and "identity_card".
             The file can be decrypted and verified using the accompanying EncryptedCredentials.
         selfie (:class:`PassportFile`, optional): Encrypted file with the selfie of the user
-            holding a document, provided by the user; available for “passport”, “driver_license”,
-            “identity_card” and “internal_passport”. The file can be decrypted and verified using
+            holding a document, provided by the user; available for "passport", "driver_license",
+            "identity_card" and "internal_passport". The file can be decrypted and verified using
             the accompanying EncryptedCredentials.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
