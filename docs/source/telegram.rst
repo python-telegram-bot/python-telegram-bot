@@ -110,6 +110,26 @@ Games
    telegram.callbackgame
    telegram.gamehighscore
 
+Passport
+--------
+
+.. toctree::
+
+    telegram.passportelementerror
+    telegram.passportelementerrorfile
+    telegram.passportelementerrorreverseside
+    telegram.passportelementerrorfrontside
+    telegram.passportelementerrorfiles
+    telegram.passportelementerrordatafield
+    telegram.passportelementerrorfile
+    telegram.credentials
+    telegram.datacredentials
+    telegram.securedata
+    telegram.filecredentials
+    telegram.iddocumentdata
+    telegram.personaldetails
+    telegram.residentialaddress
+
 
 Module contents
 ---------------

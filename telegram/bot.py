@@ -28,6 +28,14 @@ from datetime import datetime
 
 from future.utils import string_types
 
+try:
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import serialization
+
+    CRYPTO = True
+except ImportError:
+    CRYPTO = False
+
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Voice, VideoNote, Location,
@@ -101,10 +109,13 @@ class Bot(TelegramObject):
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
         request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.request.Request`.
+        private_key (:obj:`bytes`): Private key for decryption of telegram passport data.
+        private_key_password (:obj:`bytes`): Password for above private key.
 
     """
 
-    def __init__(self, token, base_url=None, base_file_url=None, request=None):
+    def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
+                 private_key_password=None):
         self.token = self._validate_token(token)
 
         if base_url is None:
@@ -118,6 +129,17 @@ class Bot(TelegramObject):
         self.bot = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
+
+        if private_key:
+            if not CRYPTO:
+                raise ValueError('private_key given, but no crypto library found. Try pip '
+                                 'install cryptography before proceeding.')
+            else:
+                self.private_key = serialization.load_pem_private_key(
+                    private_key,
+                    password=private_key_password,
+                    backend=default_backend()
+                )
 
     @property
     def request(self):

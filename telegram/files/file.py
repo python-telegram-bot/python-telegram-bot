@@ -22,6 +22,7 @@ from os.path import basename
 from future.backports.urllib import parse as urllib_parse
 
 from telegram import TelegramObject
+from telegram.passport.credentials import decrypt
 
 
 class File(TelegramObject):
@@ -56,6 +57,7 @@ class File(TelegramObject):
         self.file_path = file_path
 
         self.bot = bot
+        self._credentials = None
 
         self._id_attrs = (self.file_id,)
 
@@ -100,6 +102,8 @@ class File(TelegramObject):
 
         if out:
             buf = self.bot.request.retrieve(url)
+            if self._credentials:
+                buf = decrypt(self._credentials.secret, self._credentials.hash, buf)
             out.write(buf)
             return out
         else:
@@ -108,7 +112,11 @@ class File(TelegramObject):
             else:
                 filename = basename(self.file_path)
 
-            self.bot.request.download(url, filename, timeout=timeout)
+            buf = self.bot.request.retrieve(url, timeout=timeout)
+            if self._credentials:
+                buf = decrypt(self._credentials.secret, self._credentials.hash, buf)
+            with open(filename, 'wb') as fobj:
+                fobj.write(buf)
             return filename
 
     def _get_encoded_url(self):
@@ -133,3 +141,6 @@ class File(TelegramObject):
 
         buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
         return buf
+
+    def set_credentials(self, credentials):
+        self._credentials = credentials

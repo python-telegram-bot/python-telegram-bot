@@ -18,7 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 
-from telegram import TelegramObject, PassportFile
+from telegram import (TelegramObject, PassportFile, PersonalDetails, IdDocumentData,
+                      ResidentialAddress)
+from telegram.passport.credentials import decrypt_json
 
 
 class EncryptedPassportElement(TelegramObject):
@@ -36,7 +38,8 @@ class EncryptedPassportElement(TelegramObject):
             using the accompanying EncryptedCredentials.
         phone_number (:obj:`str`): Optional. User's verified phone number, available only for
             “phone_number” type
-        email (:obj:`str`): Optional. User's verified email address, available only for “email” type
+        email (:obj:`str`): Optional. User's verified email address, available only for “email”
+            type
         files (List[:class:`telegram.PassportFile`]): Optional. Array of encrypted files with
             documents provided by the user, available for “utility_bill”, “bank_statement”,
             “rental_agreement”, “passport_registration” and “temporary_registration” types.
@@ -65,7 +68,8 @@ class EncryptedPassportElement(TelegramObject):
             using the accompanying EncryptedCredentials.
         phone_number (:obj:`str`, optional): User's verified phone number, available only for
             “phone_number” type
-        email (:obj:`str`, optional): User's verified email address, available only for “email” type
+        email (:obj:`str`, optional): User's verified email address, available only for “email”
+            type
         files (List[:class:`telegram.PassportFile`], optional): Array of encrypted files with
             documents provided by the user, available for “utility_bill”, “bank_statement”,
             “rental_agreement”, “passport_registration” and “temporary_registration” types.
@@ -86,8 +90,18 @@ class EncryptedPassportElement(TelegramObject):
 
     """
 
-    def __init__(self, type, data=None, phone_number=None, email=None, files=None, front_side=None,
-                 reverse_side=None, selfie=None, bot=None, **kwargs):
+    def __init__(self,
+                 type,
+                 data=None,
+                 phone_number=None,
+                 email=None,
+                 files=None,
+                 front_side=None,
+                 reverse_side=None,
+                 selfie=None,
+                 bot=None,
+                 credentials=None,
+                 **kwargs):
         # Required
         self.type = type
         # Optionals
@@ -103,29 +117,49 @@ class EncryptedPassportElement(TelegramObject):
                           self.front_side, self.reverse_side, self.selfie)
 
         self.bot = bot
+        self._credentials = credentials
 
+    # noinspection PyMethodOverriding
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data, bot, credentials):
         if not data:
             return None
 
-        data = super(EncryptedPassportElement, cls).de_json(data, bot)
+        secure_data = None
+        if data['type'] not in ('phone_number', 'email'):
+            secure_data = getattr(credentials.data.secure_data, data['type'])
 
-        data['files'] = PassportFile.de_list(data.get('files'), bot)
-        data['front_side'] = PassportFile.de_json(data.get('front_side'), bot)
-        data['reverse_side'] = PassportFile.de_json(data.get('reverse_side'), bot)
-        data['selfie'] = PassportFile.de_json(data.get('selfie'), bot)
+            data['data'] = decrypt_json(secure_data.data.secret,
+                                        secure_data.data.hash,
+                                        data['data'])
 
-        return cls(bot=bot, **data)
+            if data['type'] == 'personal_details':
+                data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
+            elif data['type'] in ('passport', 'internal_passport',
+                                  'driver_license', 'identity_card'):
+                data['data'] = IdDocumentData.de_json(data['data'], bot=bot)
+            elif data['type'] == 'address':
+                data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
+
+            if secure_data:
+                data['files'] = PassportFile.de_list(data.get('files'), bot, secure_data)
+                data['front_side'] = PassportFile.de_json(data.get('front_side'),
+                                                          bot, secure_data.front_side)
+                data['reverse_side'] = PassportFile.de_json(data.get('reverse_side'),
+                                                            bot, secure_data.reverse_side)
+                data['selfie'] = PassportFile.de_json(data.get('selfie'),
+                                                      bot, secure_data.selfie)
+
+        return cls(bot=bot, credentials=secure_data, **data)
 
     @classmethod
-    def de_list(cls, data, bot):
+    def de_list(cls, data, bot, credentials):
         if not data:
             return []
 
         encrypted_passport_elements = list()
         for element in data:
-            encrypted_passport_elements.append(cls.de_json(element, bot))
+            encrypted_passport_elements.append(cls.de_json(element, bot, credentials))
 
         return encrypted_passport_elements
 
@@ -136,4 +170,3 @@ class EncryptedPassportElement(TelegramObject):
             data['files'] = [p.to_dict() for p in self.files]
 
         return data
-

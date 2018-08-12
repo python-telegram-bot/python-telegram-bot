@@ -41,30 +41,55 @@ class PassportFile(TelegramObject):
 
     """
 
-    def __init__(self, file_id, file_size, file_date, bot=None, **kwargs):
+    def __init__(self, file_id, file_date, file_size=None, bot=None, credentials=None, **kwargs):
         # Required
         self.file_id = file_id
         self.file_size = file_size
         self.file_date = file_date
         # Optionals
         self.bot = bot
+        self._credentials = credentials
 
         self._id_attrs = (self.file_id,)
 
+    # noinspection PyMethodOverriding
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data, bot, credentials):
         if not data:
             return None
 
-        return cls(**data)
+        data['credentials'] = credentials
+
+        return cls(bot=bot, **data)
 
     @classmethod
-    def de_list(cls, data, bot):
+    def de_list(cls, data, bot, credentials):
         if not data:
             return []
 
         passport_files = list()
         for passport_file in data:
-            passport_files.append(cls.de_json(passport_file, bot))
+            passport_files.append(cls.de_json(passport_file,
+                                              bot, getattr(credentials, passport_file['type'])))
 
         return passport_files
+
+    def get_file(self, timeout=None, **kwargs):
+        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.File`
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        file = self.bot.get_file(self.file_id, timeout=timeout, **kwargs)
+        file.set_credentials(self._credentials)
+        return file

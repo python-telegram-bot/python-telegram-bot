@@ -55,8 +55,10 @@ class PassportData(TelegramObject):
             return None
 
         data = super(PassportData, cls).de_json(data, bot)
-        data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot)
-        data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
+        credentials = data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'),
+                                                                         bot)
+        data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot,
+                                                        credentials=credentials)
 
         return cls(bot=bot, **data)
 
