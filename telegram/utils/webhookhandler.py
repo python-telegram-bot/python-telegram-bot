@@ -67,8 +67,6 @@ class WebhookAppClass(tornado.web.Application):
 
 
 # WebhookHandler, process webhook calls
-# Based on: https://github.com/eternnoir/pyTelegramBotAPI/blob/master/
-# examples/webhook_examples/webhook_cpython_echo_bot.py
 class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]
 
