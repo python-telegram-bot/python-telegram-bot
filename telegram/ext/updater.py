@@ -21,6 +21,7 @@
 import logging
 import os
 import ssl
+import asyncio
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 import subprocess
@@ -32,7 +33,7 @@ from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
+from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -349,9 +350,18 @@ class Updater(object):
         if not url_path.startswith('/'):
             url_path = '/{0}'.format(url_path)
 
+        # Create Tornado app instance
+        app = WebhookAppClass(url_path, self.bot, self.update_queue)
+
+        # Form SSL Context
+        ssl_ctx = None
+        if use_ssl:
+            ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            ssl_ctx.load_cert_chain(cert, key)
+
         # Create and start server
-        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path,
-                                   self.bot)
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        self.httpd = WebhookServer(port, app, ssl_ctx)
 
         if use_ssl:
             self._check_ssl_cert(cert, key)
@@ -370,26 +380,17 @@ class Updater(object):
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
 
-        self.httpd.serve_forever(poll_interval=1)
+        self.httpd.serve_forever()
 
     def _check_ssl_cert(self, cert, key):
         # Check SSL-Certificate with openssl, if possible
         try:
-            exit_code = subprocess.call(
+            subprocess.call(
                 ["openssl", "x509", "-text", "-noout", "-in", cert],
                 stdout=open(os.devnull, 'wb'),
                 stderr=subprocess.STDOUT)
         except OSError:
-            exit_code = 0
-        if exit_code is 0:
-            try:
-                self.httpd.socket = ssl.wrap_socket(
-                    self.httpd.socket, certfile=cert, keyfile=key, server_side=True)
-            except ssl.SSLError as error:
-                self.logger.exception('Failed to init SSL socket')
-                raise TelegramError(str(error))
-        else:
-            raise TelegramError('SSL Certificate invalid')
+            self.logger.error('SSL Certificate invalid')
 
     @staticmethod
     def _gen_webhook_url(listen, port, url_path):
