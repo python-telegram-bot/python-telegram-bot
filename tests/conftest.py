@@ -26,7 +26,7 @@ from time import sleep
 import pytest
 
 from telegram import Bot
-from telegram.ext import Dispatcher, JobQueue
+from telegram.ext import Dispatcher, JobQueue, Updater
 from tests.bots import get_bot
 
 TRAVIS = os.getenv('TRAVIS', False)
@@ -107,6 +107,14 @@ def dp(_dp):
         Dispatcher._set_singleton(_dp)
     yield _dp
     Dispatcher._Dispatcher__singleton_semaphore.release()
+
+
+@pytest.fixture(scope='function')
+def updater(bot):
+    up = Updater(bot=bot, workers=2)
+    yield up
+    if up.running:
+        up.stop()
 
 
 @pytest.fixture(scope='function')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#
+# flake8: noqa: E501
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -17,15 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from copy import deepcopy
+from threading import Event
 
 import pytest
 
-from telegram import PassportData, PassportFile
+from telegram import PassportData, PassportFile, Bot, Update
 
 RAW_PASSPORT_DATA = {'data': [{'type': 'personal_details',
-                               'data': 'tj3pNwOpN+ZHsyb6F3aJcNmEyPxrOtGTbu3waBlCQDNaQ9oJlkbXpw+HI3y9faq/+TCeB/WsS/2TxRXTKZw4zXvGP2UsfdRkJ2SQq6x+Ffe/oTF9/q8sWp2BwU3hHUOz7ec1/QrdPBhPJjbwSykEBNggPweiBVDZ0x/DWJ0guCkGT9smYGqog1vqlqbIWG7AWcxVy2fpUy9w/zDXjxj5WQ3lRpHJmi46s9xIHobNGGBvWw6/bGBCInMoovgqRCEu1sgz2QXF3wNiUzGFycEzLz7o+1htLys5n8Pdi9MG4RY='},  # noqa: E501
+                               'data': 'tj3pNwOpN+ZHsyb6F3aJcNmEyPxrOtGTbu3waBlCQDNaQ9oJlkbXpw+HI3y9faq/+TCeB/WsS/2TxRXTKZw4zXvGP2UsfdRkJ2SQq6x+Ffe/oTF9/q8sWp2BwU3hHUOz7ec1/QrdPBhPJjbwSykEBNggPweiBVDZ0x/DWJ0guCkGT9smYGqog1vqlqbIWG7AWcxVy2fpUy9w/zDXjxj5WQ3lRpHJmi46s9xIHobNGGBvWw6/bGBCInMoovgqRCEu1sgz2QXF3wNiUzGFycEzLz7o+1htLys5n8Pdi9MG4RY='},
                               {'type': 'driver_license',
-                               'data': 'hOXQ/iHSGRDFXqql3yETA4AiP0mdlwmo9RtGS+Qg9E5okrN/yTcPNtBKb2fLA0posk35bvevN53cyJMHZnxErEFTSw/FQjPyRFdJUyjGNPeu4yOI73uk5eRVLTAlA2G0eN2azzfS/QOBGL19N3pHk9hMTZYPCBTDt89MHhRQS7Z3YWRSzFcFiEhktHv/ezgcg3EWtsUQ8K4J2445uoZzbB8wsQ6RM4ibn08RfjV6dNyVrj8jBGUpCBlA6iY60rFQM+LZ9ByI3OeS53bnIAMQC2rHHbV/wkzS6PbufOzjZgJq26aCLmC5YDomrpcrdvk0fvi6aEuBJEI3zcteh2fh/Q==',  # noqa: E501
+                               'data': 'hOXQ/iHSGRDFXqql3yETA4AiP0mdlwmo9RtGS+Qg9E5okrN/yTcPNtBKb2fLA0posk35bvevN53cyJMHZnxErEFTSw/FQjPyRFdJUyjGNPeu4yOI73uk5eRVLTAlA2G0eN2azzfS/QOBGL19N3pHk9hMTZYPCBTDt89MHhRQS7Z3YWRSzFcFiEhktHv/ezgcg3EWtsUQ8K4J2445uoZzbB8wsQ6RM4ibn08RfjV6dNyVrj8jBGUpCBlA6iY60rFQM+LZ9ByI3OeS53bnIAMQC2rHHbV/wkzS6PbufOzjZgJq26aCLmC5YDomrpcrdvk0fvi6aEuBJEI3zcteh2fh/Q==',
                                'selfie': {'file_id': 'DgADBAADEQQAAkopgFNr6oi-wISRtAI',
                                           'file_date': 1534074942},
                                'reverse_side': {'file_id': 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI',
@@ -41,9 +42,9 @@ RAW_PASSPORT_DATA = {'data': [{'type': 'personal_details',
                                    'file_date': 1534074988}]},
                               {'type': 'email', 'email': 'fb3e3i47zt@dispostable.com'}],
                      'credentials': {
-                         'data': 'uI/g4fJLVO6132t+yuBvKExTpTubinscH8KLVc8YPuo1SiXaBg4A6AaVdv60CPViMw8n+ShVWOTL6oN5Ye0+CC2/URZ0eeTMJcKkvJYRI0Q6YJ3aeeEzslwORKho0mGk5xSWpPV5LHXhRIlgUMA32NkbNuzzoij7OhqxvuDE50/0pAUKtxy69h+heAzxFj8+jYjgnOwgwNa6FGUG59oUozgpB98XrEeWGW+JIGE9fux8dSGkFhF2SjkmdW6b2Gexuq94TVGDgFigSvqMOgZj9slZI4UEdZBIGldPHrc8/+EuqWv+WKWU8hdj1dxfY/pNvonb8MwrQLrUyNafdLq5QD4Kmg3XPnZTI9bsYUf6xO9oKU42JezDcRbaCqKkUn6UceCkV2hHMJP4aVVI9Bad1k/rXlaDh8PUV19n6tct5UH8JfkBbGlj2uASI5lPasIvnWg9s1vsZ4ynE2YAuU4iotMkgmJkj1+JCl8Ul9uqzfiK0IbYfu57V82gUEjn6c4br49pY+Cvo9od9Lx8fSJCiXq+DdmDTfIZxpeFqEYeJi6/v0CjJni4CtS6LJGo9JUR2MlqOAiyOLomadlrZyzC2eLm8X6ouIXTxtbUqzxcTiH/r23NQ44YwJpMdDiulNuPg0tEyio8TokHj9APORiW+QIw4zLZFyBEorT1DSALm4AV3A1lIg0svOncDkOqa3ZydQ0tdysoXOq5Zsu+Qu/DQZQz5IGEHb7N9QW6KZDGfBOP5Ok04OxlXO8UaTZr6mysmu8jDOlqtitLKSCGDy0LPfITzehTqfEu0KrtmxI91zJtiNyE4g+oBzQsLwQ7vSp1xl7YNViDi8ea/upZdRavh3NthVD5TxyNJedt4Xp8q5/H5kSV/EFhumONPwBwOuN4KrsCQEaNtHZfYB8SH1v0rWbiFw3/owxCrCPqgEwMGnx+JTqsAplurIZfxsNz+57O4Hq10VVt7yhroq9UpIAR8C8hW58dcZBflWyQwG8HalYAaPJ/teSLP9o6MyiqrUkADbNBOFsUhIerq6Q0BnQ941sWg10BkG8oQSU6JdnZ1Ygml2gpFabBRXeeF5ijD0Y9Bq8D3vDnHKx/GziAK0aKlwSqfTmJ+C1hm7AxBekjtDavkBeq5bIOtxYaXqrtunQFAZRCrcnQEg0DPY6dYw+jmOR0NuHRMU5KeZ0994Jn0TRGiUoJtLp1MHJ2D1MCWG3Fp9Ps7vB46a9XiGYHJUdJjHsavvQRQjhB1FvA/kxXNubCjAOPLUz1j+BEkUUgwi65l8+pViHUCIhBdLJn7S0J9HbMsc3jXOFusfvXfyvf2SZMqyhEscs/2HzYgbCWVSxQ//6eimZqvW4an1JIEfH1xUH3zS0HvS7NWChtX1Cj+jJ2vw+lyom6a84wJ2mjSRVcaV6JZa2mIf2IuXfX8EMZwKMDJagkQ7effV3MrnCNrXUXJYn8wVm6l+uP+R9mCn9qbGlvWToCID0YM8MTxJ0LgzC0n93m46OxxCI1p1hPzVrmDCcKt3OASe0zVat415/sz9TTU7Rm8oNSAVUVNo7FRg2XwEb9VupGMjlscu4cJKLCtUpImSKDKlVLH2KYy6s4NdPjOjqtjQLRoaCxbYHmNXXE+vVwPiNBK/bBVT3XJgdmbkXa/PDnMjhAmn0huuxBu8GsTOs+bBdyDCbr6mY6EzN9lCPspEoOPs7nmREpjrvGmEqEddRteyAebpVqZQhqklyT3RVl8AmfoF7QgTi0NYqFb50Lgou3hFrMg7isG5EKU+IKI5WfzyWONlHNSpvO',  # noqa: E501
+                         'data': 'uI/g4fJLVO6132t+yuBvKExTpTubinscH8KLVc8YPuo1SiXaBg4A6AaVdv60CPViMw8n+ShVWOTL6oN5Ye0+CC2/URZ0eeTMJcKkvJYRI0Q6YJ3aeeEzslwORKho0mGk5xSWpPV5LHXhRIlgUMA32NkbNuzzoij7OhqxvuDE50/0pAUKtxy69h+heAzxFj8+jYjgnOwgwNa6FGUG59oUozgpB98XrEeWGW+JIGE9fux8dSGkFhF2SjkmdW6b2Gexuq94TVGDgFigSvqMOgZj9slZI4UEdZBIGldPHrc8/+EuqWv+WKWU8hdj1dxfY/pNvonb8MwrQLrUyNafdLq5QD4Kmg3XPnZTI9bsYUf6xO9oKU42JezDcRbaCqKkUn6UceCkV2hHMJP4aVVI9Bad1k/rXlaDh8PUV19n6tct5UH8JfkBbGlj2uASI5lPasIvnWg9s1vsZ4ynE2YAuU4iotMkgmJkj1+JCl8Ul9uqzfiK0IbYfu57V82gUEjn6c4br49pY+Cvo9od9Lx8fSJCiXq+DdmDTfIZxpeFqEYeJi6/v0CjJni4CtS6LJGo9JUR2MlqOAiyOLomadlrZyzC2eLm8X6ouIXTxtbUqzxcTiH/r23NQ44YwJpMdDiulNuPg0tEyio8TokHj9APORiW+QIw4zLZFyBEorT1DSALm4AV3A1lIg0svOncDkOqa3ZydQ0tdysoXOq5Zsu+Qu/DQZQz5IGEHb7N9QW6KZDGfBOP5Ok04OxlXO8UaTZr6mysmu8jDOlqtitLKSCGDy0LPfITzehTqfEu0KrtmxI91zJtiNyE4g+oBzQsLwQ7vSp1xl7YNViDi8ea/upZdRavh3NthVD5TxyNJedt4Xp8q5/H5kSV/EFhumONPwBwOuN4KrsCQEaNtHZfYB8SH1v0rWbiFw3/owxCrCPqgEwMGnx+JTqsAplurIZfxsNz+57O4Hq10VVt7yhroq9UpIAR8C8hW58dcZBflWyQwG8HalYAaPJ/teSLP9o6MyiqrUkADbNBOFsUhIerq6Q0BnQ941sWg10BkG8oQSU6JdnZ1Ygml2gpFabBRXeeF5ijD0Y9Bq8D3vDnHKx/GziAK0aKlwSqfTmJ+C1hm7AxBekjtDavkBeq5bIOtxYaXqrtunQFAZRCrcnQEg0DPY6dYw+jmOR0NuHRMU5KeZ0994Jn0TRGiUoJtLp1MHJ2D1MCWG3Fp9Ps7vB46a9XiGYHJUdJjHsavvQRQjhB1FvA/kxXNubCjAOPLUz1j+BEkUUgwi65l8+pViHUCIhBdLJn7S0J9HbMsc3jXOFusfvXfyvf2SZMqyhEscs/2HzYgbCWVSxQ//6eimZqvW4an1JIEfH1xUH3zS0HvS7NWChtX1Cj+jJ2vw+lyom6a84wJ2mjSRVcaV6JZa2mIf2IuXfX8EMZwKMDJagkQ7effV3MrnCNrXUXJYn8wVm6l+uP+R9mCn9qbGlvWToCID0YM8MTxJ0LgzC0n93m46OxxCI1p1hPzVrmDCcKt3OASe0zVat415/sz9TTU7Rm8oNSAVUVNo7FRg2XwEb9VupGMjlscu4cJKLCtUpImSKDKlVLH2KYy6s4NdPjOjqtjQLRoaCxbYHmNXXE+vVwPiNBK/bBVT3XJgdmbkXa/PDnMjhAmn0huuxBu8GsTOs+bBdyDCbr6mY6EzN9lCPspEoOPs7nmREpjrvGmEqEddRteyAebpVqZQhqklyT3RVl8AmfoF7QgTi0NYqFb50Lgou3hFrMg7isG5EKU+IKI5WfzyWONlHNSpvO',
                          'hash': 'qyi5vQ2HCVjVMHb+l6HQ4krmvwwEkvm6Qmdf5GJcohM=',
-                         'secret': 'kgJE0VLB9enOq5fhhX8gOv0xoaMIcskmRPOG1eMbiC/Q8slr7kur12H/YIoOfd7/DQ0ggE7TAAe34PypFvtmwt5fDVtqtPl9YoCeAOCFWxHxLgTCLbzoJ0lTJXoJkdHjlvR2lKaP+rMtaU1w8WOpYOGiNXyblQoWwFRrWNTHmHnmwBfGBFCj/vp89+C1viEYHeWPPUkBhf1vT31L70BEoe8hxORJEDg+jY+80W2nFdIWNBF+o9GSmbMWFtd7UFiuLPp2JUBCy8XuHozk8xFk/PN6m6DgSu32rC4YBJv/sWGUo/MmH0nxR3gaiEkj+9rWIybCNAwgfdQpk/KH2RCF8g=='}}  # noqa: E501
+                         'secret': 'kgJE0VLB9enOq5fhhX8gOv0xoaMIcskmRPOG1eMbiC/Q8slr7kur12H/YIoOfd7/DQ0ggE7TAAe34PypFvtmwt5fDVtqtPl9YoCeAOCFWxHxLgTCLbzoJ0lTJXoJkdHjlvR2lKaP+rMtaU1w8WOpYOGiNXyblQoWwFRrWNTHmHnmwBfGBFCj/vp89+C1viEYHeWPPUkBhf1vT31L70BEoe8hxORJEDg+jY+80W2nFdIWNBF+o9GSmbMWFtd7UFiuLPp2JUBCy8XuHozk8xFk/PN6m6DgSu32rC4YBJv/sWGUo/MmH0nxR3gaiEkj+9rWIybCNAwgfdQpk/KH2RCF8g=='}}
 
 
 @pytest.fixture(scope='function')
@@ -160,6 +161,67 @@ class TestPassport(object):
             'data': all_passport_data,
             'credentials': credentials
         }, bot=bot), PassportData)
+
+    def test_bot_init_no_crypto(self, monkeypatch, bot):
+        monkeypatch.setattr('telegram.bot.CRYPTO', False)
+        with pytest.raises(ValueError):
+            Bot(bot.token, private_key='some key')
+
+    def test_bot_init_invalid_key(self, bot):
+        with pytest.raises(TypeError):
+            Bot(bot.token, private_key='Invalid key!')
+
+        with pytest.raises(ValueError):
+            Bot(bot.token, private_key=b'Invalid key!')
+
+    def test_passport_data_update_on_non_crypto_bot(self, bot):
+        b = Bot(bot.token)
+        with pytest.warns(UserWarning):
+            PassportData.de_json(deepcopy(RAW_PASSPORT_DATA), bot=b)
+
+    def test_wrong_hash(self, bot):
+        data = deepcopy(RAW_PASSPORT_DATA)
+        data['credentials']['hash'] = b'notcorrecthash'
+        with pytest.warns(UserWarning, match='Telegram passport decryption error: '
+                                             'Hashes are not equal!'):
+            PassportData.de_json(data, bot=bot)
+
+    def test_wrong_hash_in_updater(self, updater, dp, monkeypatch):
+        # Make sure first call doesn't halt the updater by requiring two calls
+        event = Event()
+        event2 = Event()
+
+        def test(*args, **kwargs):
+            if event.is_set():
+                event2.set()
+            else:
+                event.set()
+            data = deepcopy(RAW_PASSPORT_DATA)
+            data['credentials']['hash'] = b'notcorrecthash'
+            return [Update(1, passport_data=PassportData.de_json(data,
+                                                                 bot=dp.bot))]
+
+        monkeypatch.setattr('telegram.Bot.get_updates', test)
+        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        with pytest.warns(UserWarning, match='Telegram passport decryption error: '
+                                             'Hashes are not equal!'):
+            updater.start_polling(0.01)
+            event2.wait()
+
+    def test_wrong_key(self, bot):
+        short_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END RSA PRIVATE KEY-----"
+        b = Bot(bot.token, private_key=short_key)
+        data = deepcopy(RAW_PASSPORT_DATA)
+        with pytest.warns(UserWarning, match='Telegram passport decryption error: Ciphertext '
+                                             'length must be equal to key size'):
+            PassportData.de_json(data, bot=b)
+
+        wrong_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIEogIBAAKCAQB4qCFltuvHakZze86TUweU7E/SB3VLGEHAe7GJlBmrou9SSWsL\r\nH7E++157X6UqWFl54LOE9MeHZnoW7rZ+DxLKhk6NwAHTxXPnvw4CZlvUPC3OFxg3\r\nhEmNen6ojSM4sl4kYUIa7F+Q5uMEYaboxoBen9mbj4zzMGsG4aY/xBOb2ewrXQyL\r\nRh//tk1Px4ago+lUPisAvQVecz7/6KU4Xj4Lpv2z20f3cHlZX6bb7HlE1vixCMOf\r\nxvfC5SkWEGZMR/ZoWQUsoDkrDSITF/S3GtLfg083TgtCKaOF3mCT27sJ1og77npP\r\n0cH/qdlbdoFtdrRj3PvBpaj/TtXRhmdGcJBxAgMBAAECggEAYSq1Sp6XHo8dkV8B\r\nK2/QSURNu8y5zvIH8aUrgqo8Shb7OH9bryekrB3vJtgNwR5JYHdu2wHttcL3S4SO\r\nftJQxbyHgmxAjHUVNGqOM6yPA0o7cR70J7FnMoKVgdO3q68pVY7ll50IET9/T0X9\r\nDrTdKFb+/eILFsXFS1NpeSzExdsKq3zM0sP/vlJHHYVTmZDGaGEvny/eLAS+KAfG\r\nrKP96DeO4C/peXEJzALZ/mG1ReBB05Qp9Dx1xEC20yreRk5MnnBA5oiHVG5ZLOl9\r\nEEHINidqN+TMNSkxv67xMfQ6utNu5IpbklKv/4wqQOJOO50HZ+qBtSurTN573dky\r\nzslbCQKBgQDHDUBYyKN/v69VLmvNVcxTgrOcrdbqAfefJXb9C3dVXhS8/oRkCRU/\r\ndzxYWNT7hmQyWUKor/izh68rZ/M+bsTnlaa7IdAgyChzTfcZL/2pxG9pq05GF1Q4\r\nBSJ896ZEe3jEhbpJXRlWYvz7455svlxR0H8FooCTddTmkU3nsQSx0wKBgQCbLSa4\r\nyZs2QVstQQerNjxAtLi0IvV8cJkuvFoNC2Q21oqQc7BYU7NJL7uwriprZr5nwkCQ\r\nOFQXi4N3uqimNxuSng31ETfjFZPp+pjb8jf7Sce7cqU66xxR+anUzVZqBG1CJShx\r\nVxN7cWN33UZvIH34gA2Ax6AXNnJG42B5Gn1GKwKBgQCZ/oh/p4nGNXfiAK3qB6yy\r\nFvX6CwuvsqHt/8AUeKBz7PtCU+38roI/vXF0MBVmGky+HwxREQLpcdl1TVCERpIT\r\nUFXThI9OLUwOGI1IcTZf9tby+1LtKvM++8n4wGdjp9qAv6ylQV9u09pAzZItMwCd\r\nUx5SL6wlaQ2y60tIKk0lfQKBgBJS+56YmA6JGzY11qz+I5FUhfcnpauDNGOTdGLT\r\n9IqRPR2fu7RCdgpva4+KkZHLOTLReoRNUojRPb4WubGfEk93AJju5pWXR7c6k3Bt\r\novS2mrJk8GQLvXVksQxjDxBH44sLDkKMEM3j7uYJqDaZNKbyoCWT7TCwikAau5qx\r\naRevAoGAAKZV705dvrpJuyoHFZ66luANlrAwG/vNf6Q4mBEXB7guqMkokCsSkjqR\r\nhsD79E6q06zA0QzkLCavbCn5kMmDS/AbA80+B7El92iIN6d3jRdiNZiewkhlWhEG\r\nm4N0gQRfIu+rUjsS/4xk8UuQUT/Ossjn/hExi7ejpKdCc7N++bc=\r\n-----END RSA PRIVATE KEY-----"
+        b = Bot(bot.token, private_key=wrong_key)
+        data = deepcopy(RAW_PASSPORT_DATA)
+        with pytest.warns(UserWarning, match='Telegram passport decryption error: '
+                                             'Decryption failed.'):
+            PassportData.de_json(data, bot=b)
 
     def test_equality(self, passport_data):
         a = PassportData(passport_data.data, passport_data.credentials)

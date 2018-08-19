@@ -46,14 +46,6 @@ signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                        'whole process on windows')
 
 
-@pytest.fixture(scope='function')
-def updater(bot):
-    up = Updater(bot=bot, workers=2)
-    yield up
-    if up.running:
-        up.stop()
-
-
 class TestUpdater(object):
     message_count = 0
     received = None
