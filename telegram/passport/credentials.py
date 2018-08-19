@@ -34,10 +34,10 @@ try:
 except ImportError:
     CRYPTO = False
 
-from telegram import TelegramObject, TelegramError
+from telegram import TelegramObject
 
 
-class TelegramDecryptionError(TelegramError):
+class _TelegramDecryptionError(Exception):
     pass
 
 
@@ -84,7 +84,7 @@ def decrypt(secret, hash, data):
     digest.update(data)
     data_hash = digest.finalize()
     if data_hash != hash:
-        raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
+        raise _TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     return data[bord(data[0]):]
 
 
@@ -139,11 +139,15 @@ class EncryptedCredentials(TelegramObject):
         if isinstance(data['data'], dict):
             data['data'] = Credentials.de_json(data['data'], bot=bot)
         else:
-            data['secret'] = bot.private_key.decrypt(b64decode(data.get('secret')), OAEP(
-                mgf=MGF1(algorithm=SHA1()),
-                algorithm=SHA1(),
-                label=None
-            ))
+            try:
+                data['secret'] = bot.private_key.decrypt(b64decode(data.get('secret')), OAEP(
+                    mgf=MGF1(algorithm=SHA1()),
+                    algorithm=SHA1(),
+                    label=None
+                ))
+            except ValueError as e:
+                raise _TelegramDecryptionError(e)
+
             data['data'] = Credentials.de_json(decrypt_json(data.get('secret'),
                                                             data.get('hash'),
                                                             data.get('data')),
@@ -158,6 +162,7 @@ class Credentials(TelegramObject):
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         payload (:obj:`str`): Bot-specified payload
     """
+
     def __init__(self, secure_data, payload, bot=None, **kwargs):
         # Required
         self.secure_data = secure_data
@@ -202,6 +207,7 @@ class SecureData(TelegramObject):
         temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
             temporary registration
     """
+
     def __init__(self,
                  personal_details=None,
                  passport=None,
@@ -315,6 +321,7 @@ class SecureValue(TelegramObject):
 
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
+
     def __init__(self, hash, secret, bot=None, **kwargs):
         self.hash = hash
         self.secret = secret
@@ -357,6 +364,7 @@ class DataCredentials(_CredentialsBase):
         hash (:obj:`str`): Checksum of encrypted data
         secret (:obj:`str`): Secret of encrypted data
     """
+
     def __init__(self, data_hash, secret, **kwargs):
         super(DataCredentials, self).__init__(data_hash, secret, **kwargs)
 
@@ -382,6 +390,7 @@ class FileCredentials(_CredentialsBase):
             hash (:obj:`str`): Checksum of encrypted file
             secret (:obj:`str`): Secret of encrypted file
         """
+
     def __init__(self, file_hash, secret, **kwargs):
         super(FileCredentials, self).__init__(file_hash, secret, **kwargs)
 

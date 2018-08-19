@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
+import warnings
 
 from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
+from telegram.passport.credentials import _TelegramDecryptionError
 
 
 class PassportData(TelegramObject):
@@ -54,11 +56,20 @@ class PassportData(TelegramObject):
         if not data:
             return None
 
-        data = super(PassportData, cls).de_json(data, bot)
-        credentials = data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'),
-                                                                         bot)
-        data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot,
-                                                        credentials=credentials)
+        if not hasattr(bot, 'private_key'):
+            warnings.warn('Received update with PassportData but no private key is specified! '
+                          'See https://git.io/fAvYd for more info.')
+            return None
+
+        try:
+            data = super(PassportData, cls).de_json(data, bot)
+            data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
+            data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot,
+                                                            credentials=data['credentials'])
+        except _TelegramDecryptionError as e:
+            warnings.warn('Telegram passport decryption error: {} '
+                          'See https://git.io/fAvYd for more info.'.format(e))
+            return None
 
         return cls(bot=bot, **data)
 
