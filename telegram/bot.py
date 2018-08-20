@@ -109,8 +109,8 @@ class Bot(TelegramObject):
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
         request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.request.Request`.
-        private_key (:obj:`bytes`): Private key for decryption of telegram passport data.
-        private_key_password (:obj:`bytes`): Password for above private key.
+        private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
+        private_key_password (:obj:`bytes`, optional): Password for above private key.
 
     """
 
@@ -131,15 +131,10 @@ class Bot(TelegramObject):
         self.logger = logging.getLogger(__name__)
 
         if private_key:
-            if not CRYPTO:
-                raise ValueError('private_key given, but no crypto library found. Try pip '
-                                 'install cryptography before proceeding.')
-            else:
-                self.private_key = serialization.load_pem_private_key(
-                    private_key,
-                    password=private_key_password,
-                    backend=default_backend()
-                )
+            self.private_key = serialization.load_pem_private_key(private_key,
+                                                                  password=private_key_password,
+                                                                  backend=default_backend()
+                                                                  )
 
     @property
     def request(self):
@@ -403,7 +398,7 @@ class Bot(TelegramObject):
 
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
-        if InputFile.is_file(photo):
+        elif InputFile.is_file(photo):
             photo = InputFile(photo)
 
         data = {'chat_id': chat_id, 'photo': photo}
@@ -465,7 +460,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`): Thumbnail of the
+            thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail's width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -483,7 +478,7 @@ class Bot(TelegramObject):
 
         if isinstance(audio, Audio):
             audio = audio.file_id
-        if InputFile.is_file(audio):
+        elif InputFile.is_file(audio):
             audio = InputFile(audio)
 
         data = {'chat_id': chat_id, 'audio': audio}
@@ -547,7 +542,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`): Thumbnail of the
+            thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail's width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -565,7 +560,7 @@ class Bot(TelegramObject):
 
         if isinstance(document, Document):
             document = document.file_id
-        if InputFile.is_file(document):
+        elif InputFile.is_file(document):
             document = InputFile(document, filename=filename)
 
         data = {'chat_id': chat_id, 'document': document}
@@ -626,7 +621,7 @@ class Bot(TelegramObject):
 
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
-        if InputFile.is_file(sticker):
+        elif InputFile.is_file(sticker):
             sticker = InputFile(sticker)
 
         data = {'chat_id': chat_id, 'sticker': sticker}
@@ -683,7 +678,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`): Thumbnail of the
+            thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail's width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -701,7 +696,7 @@ class Bot(TelegramObject):
 
         if isinstance(video, Video):
             video = video.file_id
-        if InputFile.is_file(video):
+        elif InputFile.is_file(video):
             video = InputFile(video)
 
         data = {'chat_id': chat_id, 'video': video}
@@ -761,7 +756,7 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`): Thumbnail of the
+            thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail's width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -779,7 +774,7 @@ class Bot(TelegramObject):
 
         if isinstance(video_note, VideoNote):
             video_note = video_note.file_id
-        if InputFile.is_file(video_note):
+        elif InputFile.is_file(video_note):
             video_note = InputFile(video_note)
 
         data = {'chat_id': chat_id, 'video_note': video_note}
@@ -825,7 +820,7 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (`filelike object`): Thumbnail of the
+            thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
                 A thumbnail's width and height should not exceed 90. Ignored if the file is not
                 is passed as a string or file_id.
@@ -855,7 +850,7 @@ class Bot(TelegramObject):
 
         if isinstance(animation, Animation):
             animation = animation.file_id
-        if InputFile.is_file(animation):
+        elif InputFile.is_file(animation):
             animation = InputFile(animation)
 
         data = {'chat_id': chat_id, 'animation': animation}
@@ -933,7 +928,7 @@ class Bot(TelegramObject):
 
         if isinstance(voice, Voice):
             voice = voice.file_id
-        if InputFile.is_file(voice):
+        elif InputFile.is_file(voice):
             voice = InputFile(voice)
 
         data = {'chat_id': chat_id, 'voice': voice}
@@ -3301,9 +3296,8 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier
-            errors (List[:class:`PassportElementError`]): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during
-                creation of the connection pool).
+            errors (List[:class:`PassportElementError`]): A JSON-serialized array describing the
+                errors.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).

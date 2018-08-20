@@ -5,6 +5,7 @@ telegram package
 
    telegram.ext
    telegram.utils
+   telegram.animation
    telegram.audio
    telegram.bot
    telegram.callbackquery
@@ -22,11 +23,11 @@ telegram package
    telegram.inlinekeyboardmarkup
    telegram.inputfile
    telegram.inputmedia
-   telegram.inputmediaphoto
-   telegram.inputmediavideo
-   telegram.inputmediadocument
    telegram.inputmediaanimation
    telegram.inputmediaaudio
+   telegram.inputmediadocument
+   telegram.inputmediaphoto
+   telegram.inputmediavideo
    telegram.keyboardbutton
    telegram.location
    telegram.message
@@ -109,7 +110,6 @@ Games
 .. toctree::
 
    telegram.game
-   telegram.animation
    telegram.callbackgame
    telegram.gamehighscore
 

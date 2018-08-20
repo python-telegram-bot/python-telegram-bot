@@ -385,4 +385,4 @@ class Dispatcher(object):
 
         else:
             self.logger.exception(
-                'No error handlers are registered, logging exception...', exc_info=error)
+                'No error handlers are registered, logging exception.', exc_info=error)

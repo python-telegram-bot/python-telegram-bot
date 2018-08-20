@@ -187,25 +187,25 @@ class SecureData(TelegramObject):
 
     Attributes:
         personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            personal details
-        passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted passport
+            personal details.
+        passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted passport.
         internal_passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            internal passport
+            internal passport.
         driver_license (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            driver license
+            driver license.
         identity_card (:class:`telegram.SecureValue`, optional): Credentials for encrypted ID card
         address (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            residential address
+            residential address.
         utility_bill (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            utility bill
+            utility bill.
         bank_statement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            bank statement
+            bank statement.
         rental_agreement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            rental agreement
+            rental agreement.
         passport_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            registration from internal passport
+            registration from internal passport.
         temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
-            temporary registration
+            temporary registration.
     """
 
     def __init__(self,

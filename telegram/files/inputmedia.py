@@ -24,8 +24,9 @@ from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video, Aud
 class InputMedia(TelegramObject):
     """Base class for Telegram InputMedia Objects.
 
-    See :class:`telegram.InputMediaPhoto` and :class:`telegram.InputMediaVideo` for
-    detailed use.
+    See :class:`telegram.InputMediaAnimation`, :class:`telegram.InputMediaAudio`,
+    :class:`telegram.InputMediaDocument`, :class:`telegram.InputMediaPhoto` and
+    :class:`telegram.InputMediaVideo` for detailed use.
 
     """
     pass
@@ -45,7 +46,7 @@ class InputMediaAnimation(InputMedia):
             is passed as a string or file_id.
         caption (:obj:`str`): Optional. Caption of the animation to be sent, 0-200 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
@@ -62,7 +63,7 @@ class InputMediaAnimation(InputMedia):
             is passed as a string or file_id.
         caption (:obj:`str`, optional): Caption of the animation to be sent, 0-200 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
@@ -115,7 +116,7 @@ class InputMediaPhoto(InputMedia):
             Internet. Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
         caption (:obj:`str`): Optional. Caption of the photo to be sent, 0-200 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
 
     Args:
@@ -124,7 +125,7 @@ class InputMediaPhoto(InputMedia):
             Internet. Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
         caption (:obj:`str`, optional ): Caption of the photo to be sent, 0-200 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
     """
 
@@ -154,7 +155,7 @@ class InputMediaVideo(InputMedia):
             Lastly you can pass an existing :class:`telegram.Video` object to send.
         caption (:obj:`str`): Optional. Caption of the video to be sent, 0-200 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
@@ -172,7 +173,7 @@ class InputMediaVideo(InputMedia):
             Lastly you can pass an existing :class:`telegram.Video` object to send.
         caption (:obj:`str`, optional): Caption of the video to be sent, 0-200 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
@@ -233,7 +234,7 @@ class InputMediaAudio(InputMedia):
             Lastly you can pass an existing :class:`telegram.Audio` object to send.
         caption (:obj:`str`): Optional. Caption of the audio to be sent, 0-200 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         duration (:obj:`int`): Duration of the audio in seconds.
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
@@ -250,7 +251,7 @@ class InputMediaAudio(InputMedia):
             Lastly you can pass an existing :class:`telegram.Document` object to send.
         caption (:obj:`str`, optional): Caption of the audio to be sent, 0-200 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
@@ -308,7 +309,7 @@ class InputMediaDocument(InputMedia):
             Lastly you can pass an existing :class:`telegram.Document` object to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent, 0-200 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         thumb (`filelike object`): Optional. Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
@@ -321,7 +322,7 @@ class InputMediaDocument(InputMedia):
             Lastly you can pass an existing :class:`telegram.Document` object to send.
         caption (:obj:`str`, optional): Caption of the document to be sent, 0-200 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         thumb (`filelike object`, optional): Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.

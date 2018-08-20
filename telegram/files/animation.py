@@ -61,7 +61,6 @@ class Animation(TelegramObject):
         self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
-
         self.duration = duration
         self.thumb = thumb
         self.file_name = file_name

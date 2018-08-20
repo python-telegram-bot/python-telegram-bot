@@ -62,6 +62,9 @@ class Message(TelegramObject):
             to use properly.
         audio (:class:`telegram.Audio`): Optional. Information about the file.
         document (:class:`telegram.Document`): Optional. Information about the file.
+        animation (:class:`telegram.Animation`) Optional. Information about the file.
+            For backward compatibility, when this field is set, the document field will also be
+            set.
         game (:class:`telegram.Game`): Optional. Information about the game.
         photo (List[:class:`telegram.PhotoSize`]): Optional. Available sizes of the photo.
         sticker (:class:`telegram.Sticker`): Optional. Information about the sticker.
@@ -137,7 +140,7 @@ class Message(TelegramObject):
             about the file.
         animation (:class:`telegram.Animation`, optional): Message is an animation, information
             about the animation. For backward compatibility, when this field is set, the document
-            field will also be set
+            field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
         photo (List[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo.
@@ -728,7 +731,7 @@ class Message(TelegramObject):
         Note:
             You can only edit messages that the bot sent itself,
             therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods..
+            return value of the ``bot.send_*`` family of methods.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
