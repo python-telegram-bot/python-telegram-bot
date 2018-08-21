@@ -27,17 +27,25 @@ class PassportFile(TelegramObject):
     authentication processes.
 
     Attributes:
-        file_id (:obj:`str`): Unique identifier for this file
-        file_size (:obj:`int`): File size
-        file_date (:obj:`int`): Unix time when the file was uploaded
+        file_id (:obj:`str`): Unique identifier for this file.
+        file_size (:obj:`int`): File size.
+        file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file
-        file_size (:obj:`int`): File size
-        file_date (:obj:`int`): Unix time when the file was uploaded
+        file_id (:obj:`str`): Unique identifier for this file.
+        file_size (:obj:`int`): File size.
+        file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Note:
+        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
+        you if you set a private key when initializing :class:`telegram.Bot` or
+        :class:`telegram.Updater`, this also applies to files,
+        but only when you use :attr:`telegram.PassportFile.get_file` to get your
+        :class:`telegram.File` object (that you can then :attr:`telegram.File.download()` to
+        download the decrypted version of).
 
     """
 

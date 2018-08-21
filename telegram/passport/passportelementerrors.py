@@ -53,18 +53,18 @@ class PassportElementErrorDataField(PassportElementError):
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
             "personal_details", "passport", "driver_license", "identity_card", "internal_passport",
-            "address"
-        field_name (:obj:`str`): Name of the data field which has the error
-        data_hash (:obj:`str`): Base64-encoded data hash
-        message (:obj:`str`): Error message
+            "address".
+        field_name (:obj:`str`): Name of the data field which has the error.
+        data_hash (:obj:`str`): Base64-encoded data hash.
+        message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
             "personal_details", "passport", "driver_license", "identity_card", "internal_passport",
-            "address"
-        field_name (:obj:`str`): Name of the data field which has the error
-        data_hash (:obj:`str`): Base64-encoded data hash
-        message (:obj:`str`): Error message
+            "address".
+        field_name (:obj:`str`): Name of the data field which has the error.
+        data_hash (:obj:`str`): Base64-encoded data hash.
+        message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -91,16 +91,16 @@ class PassportElementErrorFile(PassportElementError):
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
-            "temporary_registration"
-        file_hash (:obj:`str`): Base64-encoded file hash
-        message (:obj:`str`): Error message
+            "temporary_registration".
+        file_hash (:obj:`str`): Base64-encoded file hash.
+        message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
-            "temporary_registration"
-        file_hash (:obj:`str`): Base64-encoded file hash
-        message (:obj:`str`): Error message
+            "temporary_registration".
+        file_hash (:obj:`str`): Base64-encoded file hash.
+        message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -125,16 +125,16 @@ class PassportElementErrorFiles(PassportElementError):
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
-            "temporary_registration"
-        file_hash (:obj:`str`): Base64-encoded data hash
-        message (:obj:`str`): Error message
+            "temporary_registration".
+        file_hash (:obj:`str`): Base64-encoded file hash.
+        message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
-            "temporary_registration"
-        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes
-        message (:obj:`str`): Error message
+            "temporary_registration".
+        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -159,15 +159,17 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            "passport", "driver_license", "identity_card", "internal_passport"
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the document
-        message (:obj:`str`): Error message
+            "passport", "driver_license", "identity_card", "internal_passport".
+        file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the
+            document.
+        message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            "passport", "driver_license", "identity_card", "internal_passport"
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the document
-        message (:obj:`str`): Error message
+            "passport", "driver_license", "identity_card", "internal_passport".
+        file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the
+            document.
+        message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -191,17 +193,17 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            "passport", "driver_license", "identity_card", "internal_passport"
+            "passport", "driver_license", "identity_card", "internal_passport".
         file_hash (:obj:`str`): Base64-encoded hash of the file with the reverse side of the
-            document
-        message (:obj:`str`): Error message
+            document.
+        message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            "driver_license", "identity_card"
+            "driver_license", "identity_card".
         file_hash (:obj:`str`): Base64-encoded hash of the file with the reverse side of the
-            document
-        message (:obj:`str`): Error message
+            document.
+        message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
@@ -225,15 +227,15 @@ class PassportElementErrorSelfie(PassportElementError):
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            "passport", "driver_license", "identity_card", "internal_passport"
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie
-        message (:obj:`str`): Error message
+            "passport", "driver_license", "identity_card", "internal_passport".
+        file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie.
+        message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            "passport", "driver_license", "identity_card", "internal_passport"
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie
-        message (:obj:`str`): Error message
+            "passport", "driver_license", "identity_card", "internal_passport".
+        file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie.
+        message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """

@@ -25,7 +25,7 @@ from telegram.passport.credentials import decrypt_json
 
 class EncryptedPassportElement(TelegramObject):
     """Contains information about documents or other Telegram Passport elements shared with the bot
-       by the user.
+       by the user. The data has been automatically decrypted by python-telegram-bot.
 
     Attributes:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",

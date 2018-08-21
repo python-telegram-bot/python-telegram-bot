@@ -28,19 +28,26 @@ class PassportData(TelegramObject):
 
     Attributes:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with information about
-            documents and other Telegram Passport elements that was shared with the bot
-        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials required to
-            decrypt the data
+            documents and other Telegram Passport elements that was shared with the bot.
+        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials that were
+            used to decrypt the data. This object also contains the user specified payload as
+            `data.payload`.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-
 
     Args:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with information about
-            documents and other Telegram Passport elements that was shared with the bot
-        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials required to
-            decrypt the data
+            documents and other Telegram Passport elements that was shared with the bot.
+        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials that will be
+            used to decrypt the data
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Note:
+        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
+        you if you set a private key when initializing :class:`telegram.Bot` or
+        :class:`telegram.Updater`, This means that the data in the :attr:`data`
+        attribute despite its name, :class:`telegram.EncryptedPassportElement`, is in fact
+        decrypted.
 
     """
 

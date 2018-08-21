@@ -46,6 +46,10 @@ class File(TelegramObject):
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Note:
+        If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
+        then it will automatically be decrypted as it downloads when you call :attr:`download()`.
+
     """
 
     def __init__(self, file_id, bot=None, file_size=None, file_path=None, **kwargs):

@@ -99,22 +99,27 @@ class EncryptedCredentials(TelegramObject):
     authentication processes.
 
     Attributes:
-        data (:obj:`str`): Base64-encoded encrypted JSON-serialized data with unique user's
-            payload, data hashes and secrets required for EncryptedPassportElement decryption and
-            authentication
-        hash (:obj:`str`): Base64-encoded data hash for data authentication
-        secret (:obj:`str`): Base64-encoded secret, encrypted with the bot's public RSA key,
-            required for data decryption
+        data (:class:`telegram.Credentials`): Decrypted data with unique user's payload,
+            data hashes and secrets used for EncryptedPassportElement decryption and
+            authentication.
+        hash (:obj:`str`): Base64-encoded data hash for data authentication.
+        secret (:obj:`str`): Decrypted secret used for decryption.
 
     Args:
         data (:obj:`str`): Base64-encoded encrypted JSON-serialized data with unique user's
             payload, data hashes and secrets required for EncryptedPassportElement decryption and
-            authentication
-        hash (:obj:`str`): Base64-encoded data hash for data authentication
+            authentication.
+        hash (:obj:`str`): Base64-encoded data hash for data authentication.
         secret (:obj:`str`): Base64-encoded secret, encrypted with the bot's public RSA key,
-            required for data decryption
+            required for data decryption.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
+    Note:
+        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
+        you if you set a private key when initializing :class:`telegram.Bot` or
+        :class:`telegram.Updater`, this means that you should only need
+        this class for the :attr:`telegram.Credentials.payload` attribute on the object in the
+        :attr:`data` attribute.
     """
 
     def __init__(self, data, hash, secret, bot=None, **kwargs):
@@ -161,6 +166,12 @@ class Credentials(TelegramObject):
     Attributes:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         payload (:obj:`str`): Bot-specified payload
+
+    Note:
+        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
+        you if you set a private key when initializing :class:`telegram.Bot` or
+        :class:`telegram.Updater`, this means that you should only need
+        this class for its :attr:`payload` attribute.
     """
 
     def __init__(self, secure_data, payload, bot=None, **kwargs):
@@ -182,7 +193,7 @@ class Credentials(TelegramObject):
 
 class SecureData(TelegramObject):
     """
-    This object represents the credentials required to decrypt encrypted data.
+    This object represents the credentials that were used to decrypt the encrypted data.
     All fields are optional and depend on fields that were requested.
 
     Attributes:
@@ -261,7 +272,7 @@ class SecureData(TelegramObject):
 
 class SecureValue(TelegramObject):
     """
-    This object represents the credentials required to decrypt encrypted value.
+    This object represents the credentials that were used to decrypt the encrypted value.
     All fields are optional and depend on the type of field.
 
     Attributes:
