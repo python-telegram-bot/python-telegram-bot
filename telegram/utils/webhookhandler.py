@@ -23,6 +23,7 @@ try:
     import ujson as json
 except ImportError:
     import json
+from threading import Lock
 
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -36,18 +37,29 @@ class WebhookServer(HTTPServer):
     def __init__(self, port, webhook_app, ssl_ctx):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.port = port
+        self.loop = None
         self.logger = logging.getLogger(__name__)
         self.is_running = False
+        self.server_lock = Lock()
+        self.shutdown_lock = Lock()
 
     def serve_forever(self):
-        self.is_running = True
-        self.logger.debug('Webhook Server started.')
-        self.http_server.listen(self.port)
-        IOLoop.current().start()
+        with self.server_lock:
+            self.is_running = True
+            self.logger.debug('Webhook Server started.')
+            self.http_server.listen(self.port)
+            self.loop = IOLoop.current()
+            self.loop.start()
+            self.logger.debug('Webhook Server stopped.')
+            self.is_running = False
 
     def shutdown(self):
-        IOLoop.current().stop()
-        self.is_running = False
+        with self.shutdown_lock:
+            if not self.is_running:
+                self.logger.warning('Webhook Server already stopped.')
+                return
+            else:
+                self.loop.add_callback(self.loop.stop)
 
     def handle_error(self, request, client_address):
         """Handle an error gracefully."""
@@ -62,7 +74,7 @@ class WebhookAppClass(tornado.web.Application):
         handlers = [
             (r"{0}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
-            ]
+        ]
         tornado.web.Application.__init__(self, handlers)
 
 

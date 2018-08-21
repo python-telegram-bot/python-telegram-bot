@@ -19,12 +19,13 @@
 """This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
 
 import logging
-import os
 import ssl
-import asyncio
+try:
+    import asyncio
+except ImportError:
+    asyncio = False
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
-import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
@@ -354,18 +355,21 @@ class Updater(object):
         app = WebhookAppClass(url_path, self.bot, self.update_queue)
 
         # Form SSL Context
+        # An SSLError is raised if the private key does not match with the certificate
         ssl_ctx = None
         if use_ssl:
-            ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_ctx.load_cert_chain(cert, key)
+            try:
+                ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                ssl_ctx.load_cert_chain(cert, key)
+            except ssl.SSLError:
+                raise TelegramError('SSL Certificate invalid')
 
         # Create and start server
-        asyncio.set_event_loop(asyncio.new_event_loop())
+        if asyncio:
+            asyncio.set_event_loop(asyncio.new_event_loop())
         self.httpd = WebhookServer(port, app, ssl_ctx)
 
         if use_ssl:
-            self._check_ssl_cert(cert, key)
-
             # DO NOT CHANGE: Only set webhook if SSL is handled by library
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
@@ -381,16 +385,6 @@ class Updater(object):
                                 "SSL-termination happens elsewhere; skipping")
 
         self.httpd.serve_forever()
-
-    def _check_ssl_cert(self, cert, key):
-        # Check SSL-Certificate with openssl, if possible
-        try:
-            subprocess.call(
-                ["openssl", "x509", "-text", "-noout", "-in", cert],
-                stdout=open(os.devnull, 'wb'),
-                stderr=subprocess.STDOUT)
-        except OSError:
-            self.logger.error('SSL Certificate invalid')
 
     @staticmethod
     def _gen_webhook_url(listen, port, url_path):
