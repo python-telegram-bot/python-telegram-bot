@@ -19,12 +19,11 @@
 import logging
 from telegram import Update
 from future.utils import bytes_to_native_str
+from threading import Lock
 try:
     import ujson as json
 except ImportError:
     import json
-from threading import Lock
-
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 import tornado.web
@@ -74,7 +73,7 @@ class WebhookAppClass(tornado.web.Application):
         handlers = [
             (r"{0}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
-        ]
+            ]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
 

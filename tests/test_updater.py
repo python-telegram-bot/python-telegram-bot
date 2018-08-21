@@ -169,16 +169,15 @@ class TestUpdater(object):
             assert q.get(False) == update
 
             # Returns 404 if path is incorrect
-            try:
+            with pytest.raises(HTTPError) as excinfo:
                 self._send_webhook_msg(ip, port, None, 'webookhandler.py')
-            except HTTPError as httperr:
-                assert httperr.code == 404
+            assert excinfo.value.code == 404
 
-            try:
+            with pytest.raises(HTTPError) as excinfo:
                 self._send_webhook_msg(ip, port, None, 'webookhandler.py',
                                        get_method=lambda: 'HEAD')
-            except HTTPError as httperr:
-                assert httperr.code == 404
+            assert excinfo.value.code == 404
+
             # Test multiple shutdown() calls
             updater.httpd.shutdown()
         finally:
