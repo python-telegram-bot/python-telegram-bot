@@ -1,3 +1,3 @@
 future>=0.16.0
 certifi
-tornado
+tornado>=5.1
