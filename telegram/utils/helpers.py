@@ -19,10 +19,6 @@
 """This module contains helper functions."""
 from html import escape
 
-try:
-    from urllib import quote  # noqa: F401
-except ImportError:
-    from urllib.parse import quote  # noqa: F401
 import re
 import signal
 from datetime import datetime
