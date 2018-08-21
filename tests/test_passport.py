@@ -162,11 +162,6 @@ class TestPassport(object):
             'credentials': credentials
         }, bot=bot), PassportData)
 
-    def test_bot_init_no_crypto(self, monkeypatch, bot):
-        monkeypatch.setattr('telegram.bot.CRYPTO', False)
-        with pytest.raises(ValueError):
-            Bot(bot.token, private_key='some key')
-
     def test_bot_init_invalid_key(self, bot):
         with pytest.raises(TypeError):
             Bot(bot.token, private_key=u'Invalid key!')
