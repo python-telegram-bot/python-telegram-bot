@@ -26,15 +26,9 @@ import logging
 import warnings
 from datetime import datetime
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 from future.utils import string_types
-
-try:
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives import serialization
-
-    CRYPTO = True
-except ImportError:
-    CRYPTO = False
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
@@ -133,8 +127,7 @@ class Bot(TelegramObject):
         if private_key:
             self.private_key = serialization.load_pem_private_key(private_key,
                                                                   password=private_key_password,
-                                                                  backend=default_backend()
-                                                                  )
+                                                                  backend=default_backend())
 
     @property
     def request(self):

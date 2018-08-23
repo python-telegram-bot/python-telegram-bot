@@ -21,7 +21,8 @@ from threading import Event
 
 import pytest
 
-from telegram import PassportData, PassportFile, Bot, Update
+from telegram import (PassportData, PassportFile, Bot, Update, File, PassportElementErrorSelfie,
+                      PassportElementErrorDataField)
 
 RAW_PASSPORT_DATA = {'data': [{'type': 'personal_details',
                                'data': 'tj3pNwOpN+ZHsyb6F3aJcNmEyPxrOtGTbu3waBlCQDNaQ9oJlkbXpw+HI3y9faq/+TCeB/WsS/2TxRXTKZw4zXvGP2UsfdRkJ2SQq6x+Ffe/oTF9/q8sWp2BwU3hHUOz7ec1/QrdPBhPJjbwSykEBNggPweiBVDZ0x/DWJ0guCkGT9smYGqog1vqlqbIWG7AWcxVy2fpUy9w/zDXjxj5WQ3lRpHJmi46s9xIHobNGGBvWw6/bGBCInMoovgqRCEu1sgz2QXF3wNiUzGFycEzLz7o+1htLys5n8Pdi9MG4RY='},
@@ -99,6 +100,8 @@ class TestPassport(object):
     driver_license_reverse_side_file_id = 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI'
     utility_bill_1_file_id = 'DgADBAADLAMAAhwfgVMyfGa5Nr0LvAI'
     utility_bill_2_file_id = 'DgADBAADaQQAAsFxgVNVfLZuT-_3ZQI'
+    driver_license_selfie_credentials_file_hash = 'Cila/qLXSBH7DpZFbb5bRZIRxeFW2uv/ulL0u0JNsYI='
+    driver_license_selfie_credentials_secret = 'tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E='
 
     def test_creation(self, passport_data):
         assert isinstance(passport_data, PassportData)
@@ -217,6 +220,44 @@ class TestPassport(object):
         with pytest.warns(UserWarning, match='Telegram passport decryption error: '
                                              'Decryption failed.'):
             PassportData.de_json(data, bot=b)
+
+    def test_mocked_download_passport_file(self, passport_data, monkeypatch):
+        # The files are not coming from our test bot, therefore the file id is invalid/wrong
+        # when coming from this bot, so we monkeypatch the call, to make sure that Bot.get_file
+        # at least gets called
+        # TODO: Actually download a passport file in a test
+        selfie = passport_data.data[1].selfie
+
+        def get_file(*args, **kwargs):
+            return File(args[1])
+
+        monkeypatch.setattr('telegram.Bot.get_file', get_file)
+        file = selfie.get_file()
+        assert file.file_id == selfie.file_id
+        assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash
+        assert file._credentials.secret == self.driver_license_selfie_credentials_secret
+
+    def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
+        def test(_, url, data, **kwargs):
+            return (data['user_id'] == chat_id and
+                    data['errors'][0]['file_hash'] == (passport_data.credentials.data.secure_data
+                                                       .driver_license.selfie.file_hash) and
+                    data['errors'][1]['data_hash'] == (passport_data.credentials.data.secure_data
+                                                       .driver_license.data.data_hash))
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        message = bot.set_passport_data_errors(chat_id, [
+            PassportElementErrorSelfie('driver_license',
+                                       (passport_data.credentials.data
+                                        .secure_data.driver_license.selfie.file_hash),
+                                       'You\'re not handsome enough to use this app!'),
+            PassportElementErrorDataField('driver_license',
+                                          'expiry_date',
+                                          (passport_data.credentials.data
+                                           .secure_data.driver_license.data.data_hash),
+                                          'Your driver license is expired!')
+        ])
+        assert message
 
     def test_equality(self, passport_data):
         a = PassportData(passport_data.data, passport_data.credentials)

@@ -63,17 +63,23 @@ class PassportData(TelegramObject):
         if not data:
             return None
 
+        # User did not configure any private_key, ignore PassportData (and therefore the entire
+        # Update)
         if not hasattr(bot, 'private_key'):
             warnings.warn('Received update with PassportData but no private key is specified! '
                           'See https://git.io/fAvYd for more info.')
             return None
 
         try:
+            # Try decrypting the credentials
             data = super(PassportData, cls).de_json(data, bot)
             data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
+            # Passing them to where they are needed
             data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot,
                                                             credentials=data['credentials'])
         except _TelegramDecryptionError as e:
+            # _TelegramDecryptionError is raised on a decryption error, we turn it into a
+            # warning here, since if we allowed it to propagate it might hang the Updater.
             warnings.warn('Telegram passport decryption error: {} '
                           'See https://git.io/fAvYd for more info.'.format(e))
             return None

@@ -20,24 +20,23 @@ import binascii
 import json
 from base64 import b64decode
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric.padding import OAEP, MGF1
+from cryptography.hazmat.primitives.ciphers import Cipher
+from cryptography.hazmat.primitives.ciphers.algorithms import AES
+from cryptography.hazmat.primitives.ciphers.modes import CBC
+from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
 from future.utils import bord
-
-try:
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives.asymmetric.padding import OAEP, MGF1
-    from cryptography.hazmat.primitives.ciphers import Cipher
-    from cryptography.hazmat.primitives.ciphers.algorithms import AES
-    from cryptography.hazmat.primitives.ciphers.modes import CBC
-    from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
-
-    CRYPTO = True
-except ImportError:
-    CRYPTO = False
 
 from telegram import TelegramObject
 
 
 class _TelegramDecryptionError(Exception):
+    """
+    Something went wrong with decryption. Never exposed to the user, gets turned into a
+    warning inside PassportData.
+    This is because if we raise an error during a update fetch, it might hang the Updater.
+    """
     pass
 
 
@@ -61,6 +60,7 @@ def decrypt(secret, hash, data):
         :obj:`bytes`: The decrypted data as bytes
 
     """
+    # First make sure that if secret, hash, or data was base64 encoded, to decode it into bytes
     try:
         secret = b64decode(secret)
     except (binascii.Error, TypeError):
@@ -73,18 +73,25 @@ def decrypt(secret, hash, data):
         data = b64decode(data)
     except (binascii.Error, TypeError):
         pass
+    # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
     digest.update(secret + hash)
     secret_hash_hash = digest.finalize()
+    # First 32 chars is our key, next 16 is the initialisation vector
     key, iv = secret_hash_hash[:32], secret_hash_hash[32:32 + 16]
+    # Init a AES-CBC cipher and decrypt the data
     cipher = Cipher(AES(key), CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
     data = decryptor.update(data) + decryptor.finalize()
+    # Calculate SHA256 hash of the decrypted data
     digest = Hash(SHA256(), backend=default_backend())
     digest.update(data)
     data_hash = digest.finalize()
+    # If the newly calculated hash did not match the one telegram gave us
     if data_hash != hash:
+        # Raise a error that is caught inside telegram.PassportData and transformed into a warning
         raise _TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
+    # Return data without padding
     return data[bord(data[0]):]
 
 
@@ -140,19 +147,28 @@ class EncryptedCredentials(TelegramObject):
         if not data:
             return None
 
-        # If already decrypted
+        # If already decrypted just create the data object directly
         if isinstance(data['data'], dict):
             data['data'] = Credentials.de_json(data['data'], bot=bot)
         else:
             try:
+                # Try decrypting according to step 1 at
+                # https://core.telegram.org/passport#decrypting-data
+                # We make sure to base64 decode the secret first.
+                # Telegram says to use OAEP padding so we do that. The Mask Generation Function
+                # is the default for OAEP, the algorithm is the default for PHP which is what
+                # Telegram's backend servers run.
                 data['secret'] = bot.private_key.decrypt(b64decode(data.get('secret')), OAEP(
                     mgf=MGF1(algorithm=SHA1()),
                     algorithm=SHA1(),
                     label=None
                 ))
             except ValueError as e:
+                # If decryption fails raise exception that is then caught inside PassportData
+                # and turned into a warning
                 raise _TelegramDecryptionError(e)
 
+            # Now that secret is decrypted, we can decrypt the data
             data['data'] = Credentials.de_json(decrypt_json(data.get('secret'),
                                                             data.get('hash'),
                                                             data.get('data')),

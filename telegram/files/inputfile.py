@@ -28,8 +28,6 @@ from uuid import uuid4
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
-FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate',
-              'video_note', 'png_sticker')
 
 
 class InputFile(object):
