@@ -230,7 +230,6 @@ class ConversationHandler(Handler):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
-            no_result = False
             if new_state.done.wait(timeout=self.run_async_timeout):
                 try:
                     res = new_state.result(timeout=0)
@@ -243,9 +242,6 @@ class ConversationHandler(Handler):
                     self.update_state(res, key)
                     state = self.conversations.get(key)
             else:
-                no_result = True
-
-            if no_result:
                 for candidate in (self.timed_out_behavior or []):
                     if candidate.check_update(update):
                         # Save the current user and the selected handler for handle_update
