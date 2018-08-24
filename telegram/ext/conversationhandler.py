@@ -235,12 +235,13 @@ class ConversationHandler(Handler):
                 try:
                     res = new_state.result(timeout=0)
                     res = res if res is not None else old_state
-                    self.update_state(res, key)
-                    state = self.conversations.get(key)
                 except Exception as exc:
                     self.logger.exception("Promise function raised exception")
                     self.logger.exception("{}".format(exc))
-                    no_result = True
+                    res = old_state
+                finally:
+                    self.update_state(res, key)
+                    state = self.conversations.get(key)
             else:
                 no_result = True
 
