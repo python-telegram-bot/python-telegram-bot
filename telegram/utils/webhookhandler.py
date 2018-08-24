@@ -76,6 +76,9 @@ class WebhookAppClass(tornado.web.Application):
             ]  # noqa
         tornado.web.Application.__init__(self, handlers)
 
+    def log_request(self, handler):
+        pass
+
 
 # WebhookHandler, process webhook calls
 class WebhookHandler(tornado.web.RequestHandler):
