@@ -107,7 +107,7 @@ class File(TelegramObject):
         if out:
             buf = self.bot.request.retrieve(url)
             if self._credentials:
-                buf = decrypt(self._credentials.secret, self._credentials.hash, buf)
+                buf = decrypt(self._credentials.secret, self._credentials.hash, buf, file=True)
             out.write(buf)
             return out
         else:
@@ -118,7 +118,7 @@ class File(TelegramObject):
 
             buf = self.bot.request.retrieve(url, timeout=timeout)
             if self._credentials:
-                buf = decrypt(self._credentials.secret, self._credentials.hash, buf)
+                buf = decrypt(self._credentials.secret, self._credentials.hash, buf, file=True)
             with open(filename, 'wb') as fobj:
                 fobj.write(buf)
             return filename

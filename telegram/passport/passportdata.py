@@ -17,79 +17,81 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
-import warnings
 
 from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
-from telegram.passport.credentials import _TelegramDecryptionError
 
 
 class PassportData(TelegramObject):
     """Contains information about Telegram Passport data shared with the bot by the user.
 
     Attributes:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with information about
-            documents and other Telegram Passport elements that was shared with the bot.
-        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials that were
-            used to decrypt the data. This object also contains the user specified payload as
-            `data.payload`.
+        data (:obj:`str`): Encrypted data.
+        credentials (:obj:`str`): Encrypted credentials.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Args:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with information about
-            documents and other Telegram Passport elements that was shared with the bot.
-        credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials that will be
-            used to decrypt the data
+        data (:obj:`str`): Encrypted data.
+        credentials (:obj:`str`): Encrypted credentials.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Note:
-        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
-        you if you set a private key when initializing :class:`telegram.Bot` or
-        :class:`telegram.Updater`, This means that the data in the :attr:`data`
-        attribute despite its name, :class:`telegram.EncryptedPassportElement`, is in fact
-        decrypted.
+        To be able to decrypt this object, you must pass your private_key to either
+        :class:`telegram.Updater` or :class:`telegram.Bot`. Decrypted data is then found in
+        :attr:`decrypted_data` and the payload can be found in :attr:`decrypted_credentials`'s
+        attribute :attr:`telegram.EncryptedCredentials.payload`.
 
     """
 
     def __init__(self, data, credentials, bot=None, **kwargs):
         self.data = data
         self.credentials = credentials
-        self.bot = bot
 
-        self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
+        self.bot = bot
+        self._decrypted_data = None
+        self._decrypted_credentials = None
+        self._id_attrs = (data, credentials)
 
     @classmethod
     def de_json(cls, data, bot):
         if not data:
             return None
 
-        # User did not configure any private_key, ignore PassportData (and therefore the entire
-        # Update)
-        if not hasattr(bot, 'private_key'):
-            warnings.warn('Received update with PassportData but no private key is specified! '
-                          'See https://git.io/fAvYd for more info.')
-            return None
-
-        try:
-            # Try decrypting the credentials
-            data = super(PassportData, cls).de_json(data, bot)
-            data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
-            # Passing them to where they are needed
-            data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot,
-                                                            credentials=data['credentials'])
-        except _TelegramDecryptionError as e:
-            # _TelegramDecryptionError is raised on a decryption error, we turn it into a
-            # warning here, since if we allowed it to propagate it might hang the Updater.
-            warnings.warn('Telegram passport decryption error: {} '
-                          'See https://git.io/fAvYd for more info.'.format(e))
-            return None
+        data = super(PassportData, cls).de_json(data, bot)
 
         return cls(bot=bot, **data)
 
-    def to_dict(self):
-        data = super(PassportData, self).to_dict()
+    @property
+    def decrypted_data(self):
+        """
+        List[:class:`telegram.EncryptedPassportElement`]: Array with information about documents
+        and other Telegram Passport elements that was shared with the bot. This means that despite
+        its name, :class:`telegram.EncryptedPassportElement`, is in fact decrypted.
 
-        if self.data:
-            data['data'] = [p.to_dict() for p in self.data]
+        Raises:
+            telegram.TelegramDecryptionError: If a decryption error happened while attempting
+                to decrypt the data. This is most often a wrong/missing private_key, but will
+                also happen in cases of tampered data.
+        """
+        if not self._decrypted_data:
+            self._decrypted_data = (EncryptedPassportElement
+                                    .de_list(self.data, self.bot,
+                                             credentials=self.decrypted_credentials))
+        return self._decrypted_data
 
-        return data
+    @property
+    def decrypted_credentials(self):
+        """
+        :class:`telegram.EncryptedCredentials`: Decrypted credentials that were used to decrypt
+        the data. This object also contains the user specified payload as `decrypted_data.payload`
+        after decrypted.
+
+        Raises:
+            telegram.TelegramDecryptionError: If a decryption error happened while attempting
+                to decrypt the data. This is most often a wrong/missing private_key, but will
+                also happen in cases of tampered data.
+        """
+        if not self._decrypted_credentials:
+            self._decrypted_credentials = EncryptedCredentials.de_json(self.credentials, self.bot)
+
+        return self._decrypted_credentials

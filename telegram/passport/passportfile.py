@@ -22,9 +22,9 @@ from telegram import TelegramObject
 
 
 class PassportFile(TelegramObject):
-    """Contains data required for decrypting and authenticating EncryptedPassportElement. See the
-    Telegram Passport Documentation for a complete description of the data decryption and
-    authentication processes.
+    """
+    This object represents a file uploaded to Telegram Passport. Currently all Telegram Passport
+    files are in JPEG format when decrypted and don't exceed 10MB.
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
@@ -38,14 +38,6 @@ class PassportFile(TelegramObject):
         file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
-    Note:
-        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
-        you if you set a private key when initializing :class:`telegram.Bot` or
-        :class:`telegram.Updater`, this also applies to files,
-        but only when you use :attr:`telegram.PassportFile.get_file` to get your
-        :class:`telegram.File` object (that you can then :attr:`telegram.File.download()` to
-        download the decrypted version of).
 
     """
 
@@ -83,7 +75,9 @@ class PassportFile(TelegramObject):
         return passport_files
 
     def get_file(self, timeout=None, **kwargs):
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
+        """
+        Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
+        credentials to the returned :class:`telegram.File`.
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as

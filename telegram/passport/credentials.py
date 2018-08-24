@@ -28,19 +28,19 @@ from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
 from future.utils import bord
 
-from telegram import TelegramObject
+from telegram import TelegramObject, TelegramError
 
 
-class _TelegramDecryptionError(Exception):
+class TelegramDecryptionError(TelegramError):
     """
-    Something went wrong with decryption. Never exposed to the user, gets turned into a
-    warning inside PassportData.
-    This is because if we raise an error during a update fetch, it might hang the Updater.
+    Something went wrong with decryption.
     """
-    pass
+
+    def __init__(self, message):
+        super().__init__("TelegramDecryptionError" + message)
 
 
-def decrypt(secret, hash, data):
+def decrypt(secret, hash, data, file=False):
     """
     Decrypt per telegram docs at https://core.telegram.org/passport.
 
@@ -51,6 +51,8 @@ def decrypt(secret, hash, data):
             base64 encoded string.
         data (:obj:`str` or :obj:`bytes`): The data to decrypt, either as bytes or as a
             base64 encoded string.
+        file (:obj:`bool`): Force data to be treated as raw data, instead of trying to
+            b64decode it.
 
     Raises:
         :class:`TelegramDecryptionError`: Raised if the given hash does not match the hash of
@@ -69,10 +71,11 @@ def decrypt(secret, hash, data):
         hash = b64decode(hash)
     except (binascii.Error, TypeError):
         pass
-    try:
-        data = b64decode(data)
-    except (binascii.Error, TypeError):
-        pass
+    if not file:
+        try:
+            data = b64decode(data)
+        except (binascii.Error, TypeError):
+            pass
     # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
     digest.update(secret + hash)
@@ -90,7 +93,7 @@ def decrypt(secret, hash, data):
     # If the newly calculated hash did not match the one telegram gave us
     if data_hash != hash:
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
-        raise _TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
+        raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     # Return data without padding
     return data[bord(data[0]):]
 
@@ -121,12 +124,6 @@ class EncryptedCredentials(TelegramObject):
             required for data decryption.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
-    Note:
-        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
-        you if you set a private key when initializing :class:`telegram.Bot` or
-        :class:`telegram.Updater`, this means that you should only need
-        this class for the :attr:`telegram.Credentials.payload` attribute on the object in the
-        :attr:`data` attribute.
     """
 
     def __init__(self, data, hash, secret, bot=None, **kwargs):
@@ -147,6 +144,8 @@ class EncryptedCredentials(TelegramObject):
         if not data:
             return None
 
+        data = super(EncryptedCredentials, cls).de_json(data, bot)
+
         # If already decrypted just create the data object directly
         if isinstance(data['data'], dict):
             data['data'] = Credentials.de_json(data['data'], bot=bot)
@@ -164,9 +163,8 @@ class EncryptedCredentials(TelegramObject):
                     label=None
                 ))
             except ValueError as e:
-                # If decryption fails raise exception that is then caught inside PassportData
-                # and turned into a warning
-                raise _TelegramDecryptionError(e)
+                # If decryption fails raise exception
+                raise TelegramDecryptionError(e)
 
             # Now that secret is decrypted, we can decrypt the data
             data['data'] = Credentials.de_json(decrypt_json(data.get('secret'),
@@ -182,12 +180,6 @@ class Credentials(TelegramObject):
     Attributes:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         payload (:obj:`str`): Bot-specified payload
-
-    Note:
-        Python-telegram-bot automatically decrypts your :class:`telegram.PassportData` objects for
-        you if you set a private key when initializing :class:`telegram.Bot` or
-        :class:`telegram.Updater`, this means that you should only need
-        this class for its :attr:`payload` attribute.
     """
 
     def __init__(self, secure_data, payload, bot=None, **kwargs):

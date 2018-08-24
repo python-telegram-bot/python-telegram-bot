@@ -125,6 +125,8 @@ class EncryptedPassportElement(TelegramObject):
         if not data:
             return None
 
+        data = super(EncryptedPassportElement, cls).de_json(data, bot)
+
         secure_data = None
         if data['type'] not in ('phone_number', 'email'):
             secure_data = getattr(credentials.data.secure_data, data['type'])
