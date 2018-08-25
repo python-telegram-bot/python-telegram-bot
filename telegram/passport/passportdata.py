@@ -51,7 +51,7 @@ class PassportData(TelegramObject):
 
         self.bot = bot
         self._decrypted_data = None
-        self._id_attrs = (data, credentials)
+        self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
     @classmethod
     def de_json(cls, data, bot):
@@ -64,6 +64,13 @@ class PassportData(TelegramObject):
         data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
 
         return cls(bot=bot, **data)
+
+    def to_dict(self):
+        data = super(PassportData, self).to_dict()
+
+        data['data'] = [e.to_dict() for e in self.data]
+
+        return data
 
     @property
     def decrypted_data(self):

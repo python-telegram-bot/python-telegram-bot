@@ -147,5 +147,6 @@ __all__ = [
     'PassportElementErrorFiles', 'PassportElementErrorDataField', 'PassportElementErrorFile',
     'Credentials', 'DataCredentials', 'SecureData', 'FileCredentials', 'IdDocumentData',
     'PersonalDetails', 'ResidentialAddress', 'InputMediaVideo', 'InputMediaAnimation',
-    'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError'
+    'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError',
+    'PassportElementErrorSelfie'
 ]

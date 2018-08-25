@@ -37,7 +37,7 @@ class TelegramDecryptionError(TelegramError):
     """
 
     def __init__(self, message):
-        super().__init__("TelegramDecryptionError: " + message)
+        super().__init__("TelegramDecryptionError: {}".format(message))
 
 
 def decrypt(secret, hash, data, file=False):

@@ -58,6 +58,8 @@ class PassportFile(TelegramObject):
         if not data:
             return None
 
+        data = super(PassportFile, cls).de_json(data, bot)
+
         data['credentials'] = credentials if credentials else None
 
         return cls(bot=bot, **data)

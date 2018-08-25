@@ -142,7 +142,7 @@ class EncryptedPassportElement(TelegramObject):
                         data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
 
         data['files'] = PassportFile.de_list(data.get('files'), bot,
-                                             secure_data if secure_data else None)
+                                             secure_data if secure_data else None) or None
         data['front_side'] = PassportFile.de_json(data.get('front_side'), bot,
                                                   secure_data.front_side
                                                   if secure_data else None)
