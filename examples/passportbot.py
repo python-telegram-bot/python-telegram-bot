@@ -26,7 +26,7 @@ def msg(bot, update):
     if passport_data:
         # If our payload doesn't match what we think, this Update did not originate from us
         # Ideally you would randomize the payload on the server
-        if passport_data.decrypted_credentials.data.payload != 'thisisatest':
+        if passport_data.decrypted_credentials.payload != 'thisisatest':
             return
 
         # Print the decrypted credential data

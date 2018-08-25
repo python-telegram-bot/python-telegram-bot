@@ -113,7 +113,8 @@ from .passport.passportelementerrors import (PassportElementError,
 from .passport.credentials import (Credentials,
                                    DataCredentials,
                                    SecureData,
-                                   FileCredentials)
+                                   FileCredentials,
+                                   TelegramDecryptionError)
 from .version import __version__  # flake8: noqa
 
 __author__ = 'devs@python-telegram-bot.org'
@@ -146,5 +147,5 @@ __all__ = [
     'PassportElementErrorFiles', 'PassportElementErrorDataField', 'PassportElementErrorFile',
     'Credentials', 'DataCredentials', 'SecureData', 'FileCredentials', 'IdDocumentData',
     'PersonalDetails', 'ResidentialAddress', 'InputMediaVideo', 'InputMediaAnimation',
-    'InputMediaAudio', 'InputMediaDocument'
+    'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError'
 ]

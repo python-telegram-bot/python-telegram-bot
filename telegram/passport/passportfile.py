@@ -58,7 +58,7 @@ class PassportFile(TelegramObject):
         if not data:
             return None
 
-        data['credentials'] = credentials
+        data['credentials'] = credentials if credentials else None
 
         return cls(bot=bot, **data)
 
@@ -69,15 +69,16 @@ class PassportFile(TelegramObject):
 
         passport_files = list()
         for i, passport_file in enumerate(data):
-            passport_files.append(cls.de_json(passport_file,
-                                              bot, credentials.files[i]))
+            passport_files.append(cls.de_json(passport_file, bot,
+                                              credentials.files[i] if credentials else None))
 
         return passport_files
 
     def get_file(self, timeout=None, **kwargs):
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
-        credentials to the returned :class:`telegram.File`.
+        credentials to the returned :class:`telegram.File` if originating from
+        :obj:`telegram.PassportData.decrypted_data`.
 
         Args:
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as

@@ -37,7 +37,7 @@ class TelegramDecryptionError(TelegramError):
     """
 
     def __init__(self, message):
-        super().__init__("TelegramDecryptionError" + message)
+        super().__init__("TelegramDecryptionError: " + message)
 
 
 def decrypt(secret, hash, data, file=False):
@@ -109,20 +109,23 @@ class EncryptedCredentials(TelegramObject):
     authentication processes.
 
     Attributes:
-        data (:class:`telegram.Credentials`): Decrypted data with unique user's payload,
-            data hashes and secrets used for EncryptedPassportElement decryption and
-            authentication.
+        data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
+            payload, data hashes and secrets used for EncryptedPassportElement decryption and
+            authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
-        secret (:obj:`str`): Decrypted secret used for decryption.
+        secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
 
     Args:
-        data (:obj:`str`): Base64-encoded encrypted JSON-serialized data with unique user's
-            payload, data hashes and secrets required for EncryptedPassportElement decryption and
-            authentication.
+        data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
+            payload, data hashes and secrets used for EncryptedPassportElement decryption and
+            authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
-        secret (:obj:`str`): Base64-encoded secret, encrypted with the bot's public RSA key,
-            required for data decryption.
+        secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    Note:
+        This object is decrypted only when originating from
+        :obj:`telegram.PassportData.decrypted_credentials`.
 
     """
 
@@ -135,7 +138,6 @@ class EncryptedCredentials(TelegramObject):
         self._id_attrs = (self.data, self.hash, self.secret)
 
         self.bot = bot
-
         self._decrypted_secret = None
         self._decrypted_data = None
 
@@ -146,18 +148,27 @@ class EncryptedCredentials(TelegramObject):
 
         data = super(EncryptedCredentials, cls).de_json(data, bot)
 
-        # If already decrypted just create the data object directly
-        if isinstance(data['data'], dict):
-            data['data'] = Credentials.de_json(data['data'], bot=bot)
-        else:
+        return cls(bot=bot, **data)
+
+    @property
+    def decrypted_secret(self):
+        """
+        :obj:`str`: The secret as decrypted using the bot's private key.
+
+        Raises:
+            telegram.TelegramDecryptionError: If a decryption error happened while attempting
+                to decrypt the data. This is most often a wrong/missing private_key, but will
+                also happen in cases of tampered data.
+        """
+        if not self._decrypted_secret:
+            # Try decrypting according to step 1 at
+            # https://core.telegram.org/passport#decrypting-data
+            # We make sure to base64 decode the secret first.
+            # Telegram says to use OAEP padding so we do that. The Mask Generation Function
+            # is the default for OAEP, the algorithm is the default for PHP which is what
+            # Telegram's backend servers run.
             try:
-                # Try decrypting according to step 1 at
-                # https://core.telegram.org/passport#decrypting-data
-                # We make sure to base64 decode the secret first.
-                # Telegram says to use OAEP padding so we do that. The Mask Generation Function
-                # is the default for OAEP, the algorithm is the default for PHP which is what
-                # Telegram's backend servers run.
-                data['secret'] = bot.private_key.decrypt(b64decode(data.get('secret')), OAEP(
+                self._decrypted_secret = self.bot.private_key.decrypt(b64decode(self.secret), OAEP(
                     mgf=MGF1(algorithm=SHA1()),
                     algorithm=SHA1(),
                     label=None
@@ -165,14 +176,26 @@ class EncryptedCredentials(TelegramObject):
             except ValueError as e:
                 # If decryption fails raise exception
                 raise TelegramDecryptionError(e)
+        return self._decrypted_secret
 
-            # Now that secret is decrypted, we can decrypt the data
-            data['data'] = Credentials.de_json(decrypt_json(data.get('secret'),
-                                                            data.get('hash'),
-                                                            data.get('data')),
-                                               bot=bot)
+    @property
+    def decrypted_data(self):
+        """
+        :class:`telegram.Credentials`: Decrypted credentials that were used to decrypt
+        the data. This object also contains the user specified payload as
+        `decrypted_data.payload`.
 
-        return cls(bot=bot, **data)
+        Raises:
+            telegram.TelegramDecryptionError: If a decryption error happened while attempting
+                to decrypt the data. This is most often a wrong/missing private_key, but will
+                also happen in cases of tampered data.
+        """
+        if not self._decrypted_data:
+            self._decrypted_data = Credentials.de_json(decrypt_json(self.decrypted_secret,
+                                                                    self.hash,
+                                                                    self.data),
+                                                       self.bot)
+        return self._decrypted_data
 
 
 class Credentials(TelegramObject):
