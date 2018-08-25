@@ -55,11 +55,10 @@ def decrypt(secret, hash, data, file=False):
             b64decode it.
 
     Raises:
-        :class:`TelegramDecryptionError`: Raised if the given hash does not match the hash of
-            decrypted data
+        :class:`TelegramDecryptionError`: Given hash does not match hash of decrypted data.
 
     Returns:
-        :obj:`bytes`: The decrypted data as bytes
+        :obj:`bytes`: The decrypted data as bytes.
 
     """
     # First make sure that if secret, hash, or data was base64 encoded, to decode it into bytes
@@ -153,12 +152,11 @@ class EncryptedCredentials(TelegramObject):
     @property
     def decrypted_secret(self):
         """
-        :obj:`str`: The secret as decrypted using the bot's private key.
+        :obj:`str`: Lazily decrypt and return secret.
 
         Raises:
-            telegram.TelegramDecryptionError: If a decryption error happened while attempting
-                to decrypt the data. This is most often a wrong/missing private_key, but will
-                also happen in cases of tampered data.
+            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+                private/public key but can also suggest malformed/tampered data.
         """
         if not self._decrypted_secret:
             # Try decrypting according to step 1 at
@@ -181,14 +179,13 @@ class EncryptedCredentials(TelegramObject):
     @property
     def decrypted_data(self):
         """
-        :class:`telegram.Credentials`: Decrypted credentials that were used to decrypt
-        the data. This object also contains the user specified payload as
-        `decrypted_data.payload`.
+        :class:`telegram.Credentials`: Lazily decrypt and return credentials data. This object
+            also contains the user specified payload as
+            `decrypted_data.payload`.
 
         Raises:
-            telegram.TelegramDecryptionError: If a decryption error happened while attempting
-                to decrypt the data. This is most often a wrong/missing private_key, but will
-                also happen in cases of tampered data.
+            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+                private/public key but can also suggest malformed/tampered data.
         """
         if not self._decrypted_data:
             self._decrypted_data = Credentials.de_json(decrypt_json(self.decrypted_secret,

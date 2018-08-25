@@ -75,15 +75,12 @@ class PassportData(TelegramObject):
     @property
     def decrypted_data(self):
         """
-        List[:class:`telegram.EncryptedPassportElement`]: Decrypted array with information about
-        documents and other Telegram Passport elements that was shared with the bot. This means
-        that despite its name, :class:`telegram.EncryptedPassportElement`, will in fact be
-        decrypted.
+        List[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
+            about documents and other Telegram Passport elements which were shared with the bot.
 
         Raises:
-            telegram.TelegramDecryptionError: If a decryption error happened while attempting
-                to decrypt the data. This is most often a wrong/missing private_key, but will
-                also happen in cases of tampered data.
+            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+                private/public key but can also suggest malformed/tampered data.
         """
         if not self._decrypted_data:
             self._decrypted_data = [
@@ -98,13 +95,12 @@ class PassportData(TelegramObject):
     @property
     def decrypted_credentials(self):
         """
-        :class:`telegram.Credentials`: Decrypted credentials that were used to decrypt
-        the data. This object also contains the user specified payload as
-        `decrypted_data.payload`.
+        :class:`telegram.Credentials`: Lazily decrypt and return credentials that were used
+            to decrypt the data. This object also contains the user specified payload as
+            `decrypted_data.payload`.
 
         Raises:
-            telegram.TelegramDecryptionError: If a decryption error happened while attempting
-                to decrypt the data. This is most often a wrong/missing private_key, but will
-                also happen in cases of tampered data.
+            telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
+                private/public key but can also suggest malformed/tampered data.
         """
         return self.credentials.decrypted_data
