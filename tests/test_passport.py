@@ -17,12 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from copy import deepcopy
-from threading import Event
 
 import pytest
 
-from telegram import (PassportData, PassportFile, Bot, Update, File, PassportElementErrorSelfie,
-                      PassportElementErrorDataField)
+from telegram import (PassportData, PassportFile, Bot, File, PassportElementErrorSelfie,
+                      PassportElementErrorDataField, Credentials, TelegramDecryptionError)
 
 RAW_PASSPORT_DATA = {'data': [{'type': 'personal_details',
                                'data': 'tj3pNwOpN+ZHsyb6F3aJcNmEyPxrOtGTbu3waBlCQDNaQ9oJlkbXpw+HI3y9faq/+TCeB/WsS/2TxRXTKZw4zXvGP2UsfdRkJ2SQq6x+Ffe/oTF9/q8sWp2BwU3hHUOz7ec1/QrdPBhPJjbwSykEBNggPweiBVDZ0x/DWJ0guCkGT9smYGqog1vqlqbIWG7AWcxVy2fpUy9w/zDXjxj5WQ3lRpHJmi46s9xIHobNGGBvWw6/bGBCInMoovgqRCEu1sgz2QXF3wNiUzGFycEzLz7o+1htLys5n8Pdi9MG4RY='},
@@ -35,7 +34,7 @@ RAW_PASSPORT_DATA = {'data': [{'type': 'personal_details',
                                'front_side': {'file_id': 'DgADBAADxwMAApnQgVPK2-ckL2eXVAI',
                                               'file_date': 1534074942}},
                               {'type': 'address',
-                               'data': 'j9SksVkSj128DBtZA+3aNjSFNirzv+R97guZaMgae4Gi0oDVNAF7twPR7j9VSmPedfJrEwL3O889Ei+a5F1xyLLyEI/qEBljvL70GFIhYGitS0JmNabHPHSZrjOl8b4s/0Z0Px2GpLO5siusTLQonimdUvu4UPjKquYISmlKEKhtmGATy+h+JDjNCYuOkhakeNw0Rk0BHgj0C3fCb7WZNQSyVb+2GTu6caR6eXf/AFwFp0TV3sRz3h0WIVPW8bna'},  # noqa: E501
+                               'data': 'j9SksVkSj128DBtZA+3aNjSFNirzv+R97guZaMgae4Gi0oDVNAF7twPR7j9VSmPedfJrEwL3O889Ei+a5F1xyLLyEI/qEBljvL70GFIhYGitS0JmNabHPHSZrjOl8b4s/0Z0Px2GpLO5siusTLQonimdUvu4UPjKquYISmlKEKhtmGATy+h+JDjNCYuOkhakeNw0Rk0BHgj0C3fCb7WZNQSyVb+2GTu6caR6eXf/AFwFp0TV3sRz3h0WIVPW8bna'},
                               {'type': 'utility_bill', 'files': [
                                   {'file_id': 'DgADBAADLAMAAhwfgVMyfGa5Nr0LvAI',
                                    'file_date': 1534074988},
@@ -50,39 +49,38 @@ RAW_PASSPORT_DATA = {'data': [{'type': 'personal_details',
 
 @pytest.fixture(scope='function')
 def all_passport_data():
-    raw_passport_data = deepcopy(RAW_PASSPORT_DATA)
     return [{'type': 'personal_details',
-             'data': raw_passport_data['data'][0]['data']},
+             'data': RAW_PASSPORT_DATA['data'][0]['data']},
             {'type': 'passport',
-             'data': raw_passport_data['data'][1]['data'],
-             'front_side': raw_passport_data['data'][1]['front_side'],
-             'selfie': raw_passport_data['data'][1]['selfie']},
+             'data': RAW_PASSPORT_DATA['data'][1]['data'],
+             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
+             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie']},
             {'type': 'internal_passport',
-             'data': raw_passport_data['data'][1]['data'],
-             'front_side': raw_passport_data['data'][1]['front_side'],
-             'selfie': raw_passport_data['data'][1]['selfie']},
+             'data': RAW_PASSPORT_DATA['data'][1]['data'],
+             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
+             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie']},
             {'type': 'driver_license',
-             'data': raw_passport_data['data'][1]['data'],
-             'front_side': raw_passport_data['data'][1]['front_side'],
-             'reverse_side': raw_passport_data['data'][1]['reverse_side'],
-             'selfie': raw_passport_data['data'][1]['selfie']},
+             'data': RAW_PASSPORT_DATA['data'][1]['data'],
+             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
+             'reverse_side': RAW_PASSPORT_DATA['data'][1]['reverse_side'],
+             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie']},
             {'type': 'identity_card',
-             'data': raw_passport_data['data'][1]['data'],
-             'front_side': raw_passport_data['data'][1]['front_side'],
-             'reverse_side': raw_passport_data['data'][1]['reverse_side'],
-             'selfie': raw_passport_data['data'][1]['selfie']},
+             'data': RAW_PASSPORT_DATA['data'][1]['data'],
+             'front_side': RAW_PASSPORT_DATA['data'][1]['front_side'],
+             'reverse_side': RAW_PASSPORT_DATA['data'][1]['reverse_side'],
+             'selfie': RAW_PASSPORT_DATA['data'][1]['selfie']},
             {'type': 'address',
-             'data': raw_passport_data['data'][2]['data']},
+             'data': RAW_PASSPORT_DATA['data'][2]['data']},
             {'type': 'utility_bill',
-             'files': raw_passport_data['data'][3]['files']},
+             'files': RAW_PASSPORT_DATA['data'][3]['files']},
             {'type': 'bank_statement',
-             'files': raw_passport_data['data'][3]['files']},
+             'files': RAW_PASSPORT_DATA['data'][3]['files']},
             {'type': 'rental_agreement',
-             'files': raw_passport_data['data'][3]['files']},
+             'files': RAW_PASSPORT_DATA['data'][3]['files']},
             {'type': 'passport_registration',
-             'files': raw_passport_data['data'][3]['files']},
+             'files': RAW_PASSPORT_DATA['data'][3]['files']},
             {'type': 'temporary_registration',
-             'files': raw_passport_data['data'][3]['files']},
+             'files': RAW_PASSPORT_DATA['data'][3]['files']},
             {'type': 'email',
              'email': 'fb3e3i47zt@dispostable.com'},
             {'type': 'phone_number',
@@ -91,7 +89,7 @@ def all_passport_data():
 
 @pytest.fixture(scope='function')
 def passport_data(bot):
-    return PassportData.de_json(deepcopy(RAW_PASSPORT_DATA), bot=bot)
+    return PassportData.de_json(RAW_PASSPORT_DATA, bot=bot)
 
 
 class TestPassport(object):
@@ -106,8 +104,36 @@ class TestPassport(object):
     def test_creation(self, passport_data):
         assert isinstance(passport_data, PassportData)
 
-    def test_expected_values(self, passport_data):
+    def test_expected_encrypted_values(self, passport_data):
         personal_details, driver_license, address, utility_bill, email = passport_data.data
+
+        assert personal_details.type == 'personal_details'
+        assert personal_details.data == RAW_PASSPORT_DATA['data'][0]['data']
+
+        assert driver_license.type == 'driver_license'
+        assert driver_license.data == RAW_PASSPORT_DATA['data'][1]['data']
+        assert isinstance(driver_license.selfie, PassportFile)
+        assert driver_license.selfie.file_id == self.driver_license_selfie_file_id
+        assert isinstance(driver_license.front_side, PassportFile)
+        assert driver_license.front_side.file_id == self.driver_license_front_side_file_id
+        assert isinstance(driver_license.reverse_side, PassportFile)
+        assert driver_license.reverse_side.file_id == self.driver_license_reverse_side_file_id
+
+        assert address.type == 'address'
+        assert address.data == RAW_PASSPORT_DATA['data'][2]['data']
+
+        assert utility_bill.type == 'utility_bill'
+        assert isinstance(utility_bill.files[0], PassportFile)
+        assert utility_bill.files[0].file_id == self.utility_bill_1_file_id
+        assert isinstance(utility_bill.files[1], PassportFile)
+        assert utility_bill.files[1].file_id == self.utility_bill_2_file_id
+
+        assert email.type == 'email'
+        assert email.email == 'fb3e3i47zt@dispostable.com'
+
+    def test_expected_decrypted_values(self, passport_data):
+        (personal_details, driver_license, address,
+         utility_bill, email) = passport_data.decrypted_data
 
         assert personal_details.type == 'personal_details'
         assert personal_details.data.to_dict() == {'gender': 'female',
@@ -142,11 +168,11 @@ class TestPassport(object):
         assert email.email == 'fb3e3i47zt@dispostable.com'
 
     def test_all_types(self, passport_data, bot, all_passport_data):
-        credentials = passport_data.credentials.to_dict()
+        credentials = passport_data.decrypted_credentials.to_dict()
 
         # Copy credentials from other types to all types so we can decrypt everything
-        sd = credentials['data']['secure_data']
-        credentials['data']['secure_data'] = {
+        sd = credentials['secure_data']
+        credentials['secure_data'] = {
             'personal_details': sd['personal_details'].copy(),
             'passport': sd['driver_license'].copy(),
             'internal_passport': sd['driver_license'].copy(),
@@ -160,10 +186,16 @@ class TestPassport(object):
             'temporary_registration': sd['utility_bill'].copy(),
         }
 
-        assert isinstance(PassportData.de_json({
+        new = PassportData.de_json({
             'data': all_passport_data,
-            'credentials': credentials
-        }, bot=bot), PassportData)
+            # Replaced below
+            'credentials': {'data': 'data', 'hash': 'hash', 'secret': 'secret'}
+        }, bot=bot)
+
+        new.credentials._decrypted_data = Credentials.de_json(credentials, bot)
+
+        assert isinstance(new, PassportData)
+        assert new.decrypted_data
 
     def test_bot_init_invalid_key(self, bot):
         with pytest.raises(TypeError):
@@ -172,61 +204,36 @@ class TestPassport(object):
         with pytest.raises(ValueError):
             Bot(bot.token, private_key=b'Invalid key!')
 
-    def test_passport_data_update_on_non_crypto_bot(self, bot):
+    def test_passport_data_okay_with_non_crypto_bot(self, bot):
         b = Bot(bot.token)
-        with pytest.warns(UserWarning):
-            PassportData.de_json(deepcopy(RAW_PASSPORT_DATA), bot=b)
+        assert PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
 
     def test_wrong_hash(self, bot):
         data = deepcopy(RAW_PASSPORT_DATA)
         data['credentials']['hash'] = b'notcorrecthash'
-        with pytest.warns(UserWarning, match='Telegram passport decryption error: '
-                                             'Hashes are not equal!'):
-            PassportData.de_json(data, bot=bot)
-
-    def test_wrong_hash_in_updater(self, updater, dp, monkeypatch):
-        # Make sure first call doesn't halt the updater by requiring two calls
-        event = Event()
-        event2 = Event()
-
-        def test(*args, **kwargs):
-            if event.is_set():
-                event2.set()
-            else:
-                event.set()
-            data = deepcopy(RAW_PASSPORT_DATA)
-            data['credentials']['hash'] = b'notcorrecthash'
-            return [Update(1, passport_data=PassportData.de_json(data,
-                                                                 bot=dp.bot))]
-
-        monkeypatch.setattr('telegram.Bot.get_updates', test)
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        with pytest.warns(UserWarning, match='Telegram passport decryption error: '
-                                             'Hashes are not equal!'):
-            updater.start_polling(0.01)
-            event2.wait()
+        passport_data = PassportData.de_json(data, bot=bot)
+        with pytest.raises(TelegramDecryptionError):
+            assert passport_data.decrypted_data
 
     def test_wrong_key(self, bot):
         short_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END RSA PRIVATE KEY-----"
         b = Bot(bot.token, private_key=short_key)
-        data = deepcopy(RAW_PASSPORT_DATA)
-        with pytest.warns(UserWarning, match='Telegram passport decryption error: Ciphertext '
-                                             'length must be equal to key size'):
-            PassportData.de_json(data, bot=b)
+        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
+        with pytest.raises(TelegramDecryptionError):
+            assert passport_data.decrypted_data
 
         wrong_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIEogIBAAKCAQB4qCFltuvHakZze86TUweU7E/SB3VLGEHAe7GJlBmrou9SSWsL\r\nH7E++157X6UqWFl54LOE9MeHZnoW7rZ+DxLKhk6NwAHTxXPnvw4CZlvUPC3OFxg3\r\nhEmNen6ojSM4sl4kYUIa7F+Q5uMEYaboxoBen9mbj4zzMGsG4aY/xBOb2ewrXQyL\r\nRh//tk1Px4ago+lUPisAvQVecz7/6KU4Xj4Lpv2z20f3cHlZX6bb7HlE1vixCMOf\r\nxvfC5SkWEGZMR/ZoWQUsoDkrDSITF/S3GtLfg083TgtCKaOF3mCT27sJ1og77npP\r\n0cH/qdlbdoFtdrRj3PvBpaj/TtXRhmdGcJBxAgMBAAECggEAYSq1Sp6XHo8dkV8B\r\nK2/QSURNu8y5zvIH8aUrgqo8Shb7OH9bryekrB3vJtgNwR5JYHdu2wHttcL3S4SO\r\nftJQxbyHgmxAjHUVNGqOM6yPA0o7cR70J7FnMoKVgdO3q68pVY7ll50IET9/T0X9\r\nDrTdKFb+/eILFsXFS1NpeSzExdsKq3zM0sP/vlJHHYVTmZDGaGEvny/eLAS+KAfG\r\nrKP96DeO4C/peXEJzALZ/mG1ReBB05Qp9Dx1xEC20yreRk5MnnBA5oiHVG5ZLOl9\r\nEEHINidqN+TMNSkxv67xMfQ6utNu5IpbklKv/4wqQOJOO50HZ+qBtSurTN573dky\r\nzslbCQKBgQDHDUBYyKN/v69VLmvNVcxTgrOcrdbqAfefJXb9C3dVXhS8/oRkCRU/\r\ndzxYWNT7hmQyWUKor/izh68rZ/M+bsTnlaa7IdAgyChzTfcZL/2pxG9pq05GF1Q4\r\nBSJ896ZEe3jEhbpJXRlWYvz7455svlxR0H8FooCTddTmkU3nsQSx0wKBgQCbLSa4\r\nyZs2QVstQQerNjxAtLi0IvV8cJkuvFoNC2Q21oqQc7BYU7NJL7uwriprZr5nwkCQ\r\nOFQXi4N3uqimNxuSng31ETfjFZPp+pjb8jf7Sce7cqU66xxR+anUzVZqBG1CJShx\r\nVxN7cWN33UZvIH34gA2Ax6AXNnJG42B5Gn1GKwKBgQCZ/oh/p4nGNXfiAK3qB6yy\r\nFvX6CwuvsqHt/8AUeKBz7PtCU+38roI/vXF0MBVmGky+HwxREQLpcdl1TVCERpIT\r\nUFXThI9OLUwOGI1IcTZf9tby+1LtKvM++8n4wGdjp9qAv6ylQV9u09pAzZItMwCd\r\nUx5SL6wlaQ2y60tIKk0lfQKBgBJS+56YmA6JGzY11qz+I5FUhfcnpauDNGOTdGLT\r\n9IqRPR2fu7RCdgpva4+KkZHLOTLReoRNUojRPb4WubGfEk93AJju5pWXR7c6k3Bt\r\novS2mrJk8GQLvXVksQxjDxBH44sLDkKMEM3j7uYJqDaZNKbyoCWT7TCwikAau5qx\r\naRevAoGAAKZV705dvrpJuyoHFZ66luANlrAwG/vNf6Q4mBEXB7guqMkokCsSkjqR\r\nhsD79E6q06zA0QzkLCavbCn5kMmDS/AbA80+B7El92iIN6d3jRdiNZiewkhlWhEG\r\nm4N0gQRfIu+rUjsS/4xk8UuQUT/Ossjn/hExi7ejpKdCc7N++bc=\r\n-----END RSA PRIVATE KEY-----"
         b = Bot(bot.token, private_key=wrong_key)
-        data = deepcopy(RAW_PASSPORT_DATA)
-        with pytest.warns(UserWarning, match='Telegram passport decryption error: '
-                                             'Decryption failed.'):
-            PassportData.de_json(data, bot=b)
+        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
+        with pytest.raises(TelegramDecryptionError):
+            assert passport_data.decrypted_data
 
     def test_mocked_download_passport_file(self, passport_data, monkeypatch):
         # The files are not coming from our test bot, therefore the file id is invalid/wrong
         # when coming from this bot, so we monkeypatch the call, to make sure that Bot.get_file
         # at least gets called
         # TODO: Actually download a passport file in a test
-        selfie = passport_data.data[1].selfie
+        selfie = passport_data.decrypted_data[1].selfie
 
         def get_file(*args, **kwargs):
             return File(args[1])
@@ -240,24 +247,33 @@ class TestPassport(object):
     def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
         def test(_, url, data, **kwargs):
             return (data['user_id'] == chat_id and
-                    data['errors'][0]['file_hash'] == (passport_data.credentials.data.secure_data
-                                                       .driver_license.selfie.file_hash) and
-                    data['errors'][1]['data_hash'] == (passport_data.credentials.data.secure_data
-                                                       .driver_license.data.data_hash))
+                    data['errors'][0]['file_hash'] == (passport_data.decrypted_credentials
+                                                       .secure_data.driver_license
+                                                       .selfie.file_hash) and
+                    data['errors'][1]['data_hash'] == (passport_data.decrypted_credentials
+                                                       .secure_data.driver_license
+                                                       .data.data_hash))
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.set_passport_data_errors(chat_id, [
             PassportElementErrorSelfie('driver_license',
-                                       (passport_data.credentials.data
+                                       (passport_data.decrypted_credentials
                                         .secure_data.driver_license.selfie.file_hash),
                                        'You\'re not handsome enough to use this app!'),
             PassportElementErrorDataField('driver_license',
                                           'expiry_date',
-                                          (passport_data.credentials.data
+                                          (passport_data.decrypted_credentials
                                            .secure_data.driver_license.data.data_hash),
                                           'Your driver license is expired!')
         ])
         assert message
+
+    def test_de_json_and_to_dict(self, bot):
+        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot)
+        assert passport_data.to_dict() == RAW_PASSPORT_DATA
+
+        assert passport_data.decrypted_data
+        assert passport_data.to_dict() == RAW_PASSPORT_DATA
 
     def test_equality(self, passport_data):
         a = PassportData(passport_data.data, passport_data.credentials)
