@@ -23,7 +23,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
-- `Dmitriy Grigoryev <https://github.com/icecom-dg>`_
+- `Dmitry Grigoryev <https://github.com/icecom-dg>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `Emilio Molinari <https://github.com/xates>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
