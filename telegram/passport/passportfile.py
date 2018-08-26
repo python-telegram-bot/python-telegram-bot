@@ -52,29 +52,40 @@ class PassportFile(TelegramObject):
 
         self._id_attrs = (self.file_id,)
 
-    # noinspection PyMethodOverriding
     @classmethod
-    def de_json(cls, data, bot, credentials):
+    def de_json(cls, data, bot):
         if not data:
             return None
 
         data = super(PassportFile, cls).de_json(data, bot)
 
-        data['credentials'] = credentials if credentials else None
+        return cls(bot=bot, **data)
+
+    @classmethod
+    def de_json_decrypted(cls, data, bot, credentials):
+        if not data:
+            return None
+
+        data = super(PassportFile, cls).de_json(data, bot)
+
+        data['credentials'] = credentials
 
         return cls(bot=bot, **data)
 
     @classmethod
-    def de_list(cls, data, bot, credentials):
+    def de_list(cls, data, bot):
         if not data:
             return []
 
-        passport_files = list()
-        for i, passport_file in enumerate(data):
-            passport_files.append(cls.de_json(passport_file, bot,
-                                              credentials.files[i] if credentials else None))
+        return [cls.de_json(passport_file, bot) for passport_file in data]
 
-        return passport_files
+    @classmethod
+    def de_list_decrypted(cls, data, bot, credentials):
+        if not data:
+            return []
+
+        return [cls.de_json_decrypted(passport_file, bot, credentials.files[i])
+                for i, passport_file in enumerate(data)]
 
     def get_file(self, timeout=None, **kwargs):
         """

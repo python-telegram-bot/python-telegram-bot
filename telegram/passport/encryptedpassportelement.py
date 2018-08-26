@@ -114,43 +114,52 @@ class EncryptedPassportElement(TelegramObject):
 
         self.bot = bot
 
-    # noinspection PyMethodOverriding
     @classmethod
-    def de_json(cls, data, bot, decrypt=False, credentials=None):
+    def de_json(cls, data, bot):
         if not data:
             return None
 
         data = super(EncryptedPassportElement, cls).de_json(data, bot)
 
-        secure_data = None
-        if decrypt:
-            if data['type'] not in ('phone_number', 'email'):
-                secure_data = getattr(credentials.secure_data, data['type'])
+        data['files'] = PassportFile.de_list(data.get('files'), bot) or None
+        data['front_side'] = PassportFile.de_json(data.get('front_side'), bot)
+        data['reverse_side'] = PassportFile.de_json(data.get('reverse_side'), bot)
+        data['selfie'] = PassportFile.de_json(data.get('selfie'), bot)
 
-                if secure_data.data is not None:
-                    # If not already decrypted
-                    if not isinstance(data['data'], dict):
-                        data['data'] = decrypt_json(secure_data.data.secret,
-                                                    secure_data.data.hash,
-                                                    data['data'])
-                    if data['type'] == 'personal_details':
-                        data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
-                    elif data['type'] in ('passport', 'internal_passport',
-                                          'driver_license', 'identity_card'):
-                        data['data'] = IdDocumentData.de_json(data['data'], bot=bot)
-                    elif data['type'] == 'address':
-                        data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
+        return cls(bot=bot, **data)
 
-        data['files'] = PassportFile.de_list(data.get('files'), bot,
-                                             secure_data if secure_data else None) or None
-        data['front_side'] = PassportFile.de_json(data.get('front_side'), bot,
-                                                  secure_data.front_side
-                                                  if secure_data else None)
-        data['reverse_side'] = PassportFile.de_json(data.get('reverse_side'), bot,
-                                                    secure_data.reverse_side
-                                                    if secure_data else None)
-        data['selfie'] = PassportFile.de_json(data.get('selfie'), bot,
-                                              secure_data.selfie if secure_data else None)
+    @classmethod
+    def de_json_decrypted(cls, data, bot, credentials):
+        if not data:
+            return None
+
+        data = super(EncryptedPassportElement, cls).de_json(data, bot)
+
+        if data['type'] not in ('phone_number', 'email'):
+            secure_data = getattr(credentials.secure_data, data['type'])
+
+            if secure_data.data is not None:
+                # If not already decrypted
+                if not isinstance(data['data'], dict):
+                    data['data'] = decrypt_json(secure_data.data.secret,
+                                                secure_data.data.hash,
+                                                data['data'])
+                if data['type'] == 'personal_details':
+                    data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
+                elif data['type'] in ('passport', 'internal_passport',
+                                      'driver_license', 'identity_card'):
+                    data['data'] = IdDocumentData.de_json(data['data'], bot=bot)
+                elif data['type'] == 'address':
+                    data['data'] = ResidentialAddress.de_json(data['data'], bot=bot)
+
+            data['files'] = PassportFile.de_list_decrypted(data.get('files'), bot,
+                                                           secure_data) or None
+            data['front_side'] = PassportFile.de_json_decrypted(data.get('front_side'), bot,
+                                                                secure_data.front_side)
+            data['reverse_side'] = PassportFile.de_json_decrypted(data.get('reverse_side'), bot,
+                                                                  secure_data.reverse_side)
+            data['selfie'] = PassportFile.de_json_decrypted(data.get('selfie'), bot,
+                                                            secure_data.selfie)
 
         return cls(bot=bot, **data)
 

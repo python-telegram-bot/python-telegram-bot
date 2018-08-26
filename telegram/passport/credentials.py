@@ -17,7 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import binascii
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
 from base64 import b64decode
 
 from cryptography.hazmat.backends import default_backend
@@ -37,7 +40,8 @@ class TelegramDecryptionError(TelegramError):
     """
 
     def __init__(self, message):
-        super().__init__("TelegramDecryptionError: {}".format(message))
+        super(TelegramDecryptionError, self).__init__("TelegramDecryptionError: "
+                                                      "{}".format(message))
 
 
 def decrypt(secret, hash, data, file=False):
@@ -158,7 +162,7 @@ class EncryptedCredentials(TelegramObject):
             telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
-        if not self._decrypted_secret:
+        if self._decrypted_secret is None:
             # Try decrypting according to step 1 at
             # https://core.telegram.org/passport#decrypting-data
             # We make sure to base64 decode the secret first.
@@ -187,7 +191,7 @@ class EncryptedCredentials(TelegramObject):
             telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
-        if not self._decrypted_data:
+        if self._decrypted_data is None:
             self._decrypted_data = Credentials.de_json(decrypt_json(self.decrypted_secret,
                                                                     self.hash,
                                                                     self.data),

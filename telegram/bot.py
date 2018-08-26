@@ -21,7 +21,10 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
 import logging
 import warnings
 from datetime import datetime
