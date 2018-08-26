@@ -381,7 +381,7 @@ class Updater(object):
                 stderr=subprocess.STDOUT)
         except OSError:
             exit_code = 0
-        if exit_code is 0:
+        if exit_code == 0:
             try:
                 self.httpd.socket = ssl.wrap_socket(
                     self.httpd.socket, certfile=cert, keyfile=key, server_side=True)
