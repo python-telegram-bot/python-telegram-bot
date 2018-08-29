@@ -13,7 +13,7 @@
 
         Telegram.Passport.createAuthButton('telegram_passport_auth', {
             bot_id:       BOT_ID, // YOUR BOT ID
-            scope:        ['id_document', 'phone_number', 'email'], // WHAT DATA YOU WANT TO RECEIVE
+            scope:        {data: [{type: 'id_document', selfie: true}, 'address_document', 'phone_number', 'email'], v: 1}, // WHAT DATA YOU WANT TO RECEIVE
             public_key:   '-----BEGIN PUBLIC KEY----- ...', // YOUR PUBLIC KEY
             payload:      'thisisatest', // YOUR BOT WILL RECEIVE THIS DATA WITH THE REQUEST
             callback_url: 'https://example.org' // TELEGRAM WILL SEND YOUR USER BACK TO THIS URL
