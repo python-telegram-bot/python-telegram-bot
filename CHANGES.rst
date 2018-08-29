@@ -1,6 +1,49 @@
 =======
 Changes
 =======
+
+*Released 11.0.0*
+
+Fully support Bot API version 4.0!
+
+Telegram Passport (`#1174`_):
+
+- Add full support for telegram passport.
+    - New types: PassportData, PassportFile, EncryptedPassportElement, EncryptedCredentials, PassportElementError, PassportElementErrorDataField, PassportElementErrorFrontSide, PassportElementErrorReverseSide, PassportElementErrorSelfie, PassportElementErrorFile and PassportElementErrorFiles.
+    - New bot method: set_passport_data_errors
+    - New filter: Filters.passport_data
+    - Field passport_data field on Message
+    - PassportData is automagically decrypted when you specify your private key when creating Updater or Bot.
+    - PassportFiles is also automagically decrypted as you download/retrieve them.
+- See new passportbot.py example for details on how to use, or go to `our telegram passport wiki page`_ for more info
+- NOTE: Passport decryption requires new dependency `cryptography`.
+
+Inputfile rework (`#1184`_):
+
+- Change how Inputfile is handled internally
+- This allows support for specifying the thumbnails of photos and videos using the thumb= argument in the different send\_ methods.
+- Also allows Bot.send_media_group to actually finally send more than one media.
+- Add thumb to Audio, Video and Videonote
+- Add Bot.edit_message_media together with InputMediaAnimation, InputMediaAudio, and inputMediaDocument.
+
+Other Bot API 4.0 changes:
+
+- Add forusquare_type to Venue, InlineQueryResultVenue, InputVenueMessageContent, and Bot.send_venue. (`#1170`_)
+- Add vCard support by adding vcard field to Contact, InlineQueryResultContact, InputContactMessageContent, and Bot.send_contact. (`#1166`_)
+- Support new message entities: CASHTAG and PHONE_NUMBER. (`#1179`_)
+    - Cashtag seems to be things like `$USD` and `$GBP`, but it seems telegram doesn't currently send them to bots.
+    - Phone number also seems to have limited support for now
+- Add Bot.send_animation, add width, height, and duration to Animation, and add Filters.animation. (`#1172`_)
+
+
+.. _`#1174`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1174
+.. _`#1184`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1184
+.. _`#1170`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1170
+.. _`#1166`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1166
+.. _`#1179`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1179
+.. _`#1172`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1172
+.. _`our telegram passport wiki page`: https://git.io/fAvYd
+
 **2018-05-02**
 *Released 10.1.0*
 

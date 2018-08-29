@@ -29,23 +29,29 @@ class Venue(TelegramObject):
         title (:obj:`str`): Name of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue. (For example,
+            "arts_entertainment/default", "arts_entertainment/aquarium" or "food/icecream".)
 
     Args:
         location (:class:`telegram.Location`): Venue location.
         title (:obj:`str`): Name of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
+        foursquare_type (:obj:`str`, optional): Foursquare type of the venue. (For example,
+            "arts_entertainment/default", "arts_entertainment/aquarium" or "food/icecream".)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, location, title, address, foursquare_id=None, **kwargs):
+    def __init__(self, location, title, address, foursquare_id=None, foursquare_type=None,
+                 **kwargs):
         # Required
         self.location = location
         self.title = title
         self.address = address
         # Optionals
         self.foursquare_id = foursquare_id
+        self.foursquare_type = foursquare_type
 
         self._id_attrs = (self.location, self.title)
 

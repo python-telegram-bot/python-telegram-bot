@@ -143,7 +143,7 @@ class Dispatcher(object):
 
         """
         if cls.__singleton is not None:
-            return cls.__singleton()
+            return cls.__singleton()  # pylint: disable=not-callable
         else:
             raise RuntimeError('{} not initialized or multiple instances exist'.format(
                 cls.__name__))
@@ -385,4 +385,4 @@ class Dispatcher(object):
 
         else:
             self.logger.exception(
-                'No error handlers are registered, logging exception...', exc_info=error)
+                'No error handlers are registered, logging exception.', exc_info=error)

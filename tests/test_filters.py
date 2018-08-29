@@ -188,6 +188,11 @@ class TestFilters(object):
         assert Filters.document.category("application/")(message)
         assert Filters.document.mime_type("application/x-sh")(message)
 
+    def test_filters_animation(self, message):
+        assert not Filters.animation(message)
+        message.animation = 'test'
+        assert Filters.animation(message)
+
     def test_filters_photo(self, message):
         assert not Filters.photo(message)
         message.photo = 'test'
@@ -395,6 +400,11 @@ class TestFilters(object):
         assert not Filters.successful_payment(message)
         message.successful_payment = 'test'
         assert Filters.successful_payment(message)
+
+    def test_filters_passport_data(self, message):
+        assert not Filters.passport_data(message)
+        message.passport_data = 'test'
+        assert Filters.passport_data(message)
 
     def test_language_filter_single(self, message):
         message.from_user.language_code = 'en_US'

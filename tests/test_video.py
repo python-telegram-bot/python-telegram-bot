@@ -67,11 +67,11 @@ class TestVideo(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, video_file, video):
+    def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = bot.send_video(chat_id, video_file, duration=self.duration,
                                  caption=self.caption, supports_streaming=self.supports_streaming,
                                  disable_notification=False, width=video.width,
-                                 height=video.height, parse_mode='Markdown')
+                                 height=video.height, parse_mode='Markdown', thumb=thumb_file)
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
@@ -81,14 +81,10 @@ class TestVideo(object):
         assert message.video.duration == video.duration
         assert message.video.file_size == video.file_size
 
-        assert isinstance(message.video.thumb, PhotoSize)
-        assert isinstance(message.video.thumb.file_id, str)
-        assert message.video.thumb.file_id != ''
-        assert message.video.thumb.width == video.thumb.width
-        assert message.video.thumb.height == video.thumb.height
-        assert message.video.thumb.file_size == video.thumb.file_size
-
         assert message.caption == self.caption.replace('*', '')
+
+        assert message.video.thumb.width == 50
+        assert message.video.thumb.height == 50
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

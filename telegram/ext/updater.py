@@ -66,6 +66,8 @@ class Updater(object):
         bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance. If a pre-initialized
             bot is used, it is the user's responsibility to create it using a `Request`
             instance with a large enough connection pool.
+        private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
+        private_key_password (:obj:`bytes`, optional): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) setable with :attr:`idle`.
@@ -89,6 +91,8 @@ class Updater(object):
                  base_url=None,
                  workers=4,
                  bot=None,
+                 private_key=None,
+                 private_key_password=None,
                  user_sig_handler=None,
                  request_kwargs=None):
 
@@ -96,6 +100,8 @@ class Updater(object):
             raise ValueError('`token` or `bot` must be passed')
         if (token is not None) and (bot is not None):
             raise ValueError('`token` and `bot` are mutually exclusive')
+        if (private_key is not None) and (bot is not None):
+            raise ValueError('`bot` and `private_key` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
@@ -119,7 +125,8 @@ class Updater(object):
             if 'con_pool_size' not in request_kwargs:
                 request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
-            self.bot = Bot(token, base_url, request=self._request)
+            self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
+                           private_key_password=private_key_password)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
