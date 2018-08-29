@@ -32,6 +32,7 @@ def inline_query_result_venue():
         TestInlineQueryResultVenue.title,
         TestInlineQueryResultVenue.address,
         foursquare_id=TestInlineQueryResultVenue.foursquare_id,
+        foursquare_type=TestInlineQueryResultVenue.foursquare_type,
         thumb_url=TestInlineQueryResultVenue.thumb_url,
         thumb_width=TestInlineQueryResultVenue.thumb_width,
         thumb_height=TestInlineQueryResultVenue.thumb_height,
@@ -47,6 +48,7 @@ class TestInlineQueryResultVenue(object):
     title = 'title'
     address = 'address'
     foursquare_id = 'foursquare id'
+    foursquare_type = 'foursquare type'
     thumb_url = 'thumb url'
     thumb_width = 10
     thumb_height = 15
@@ -61,6 +63,7 @@ class TestInlineQueryResultVenue(object):
         assert inline_query_result_venue.title == self.title
         assert inline_query_result_venue.address == self.address
         assert inline_query_result_venue.foursquare_id == self.foursquare_id
+        assert inline_query_result_venue.foursquare_type == self.foursquare_type
         assert inline_query_result_venue.thumb_url == self.thumb_url
         assert inline_query_result_venue.thumb_width == self.thumb_width
         assert inline_query_result_venue.thumb_height == self.thumb_height
@@ -80,6 +83,8 @@ class TestInlineQueryResultVenue(object):
         assert inline_query_result_venue_dict['address'] == inline_query_result_venue.address
         assert (inline_query_result_venue_dict['foursquare_id'] ==
                 inline_query_result_venue.foursquare_id)
+        assert (inline_query_result_venue_dict['foursquare_type'] ==
+                inline_query_result_venue.foursquare_type)
         assert inline_query_result_venue_dict['thumb_url'] == inline_query_result_venue.thumb_url
         assert (inline_query_result_venue_dict['thumb_width'] ==
                 inline_query_result_venue.thumb_width)

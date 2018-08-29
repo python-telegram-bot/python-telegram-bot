@@ -5,6 +5,7 @@ telegram package
 
    telegram.ext
    telegram.utils
+   telegram.animation
    telegram.audio
    telegram.bot
    telegram.callbackquery
@@ -22,6 +23,9 @@ telegram package
    telegram.inlinekeyboardmarkup
    telegram.inputfile
    telegram.inputmedia
+   telegram.inputmediaanimation
+   telegram.inputmediaaudio
+   telegram.inputmediadocument
    telegram.inputmediaphoto
    telegram.inputmediavideo
    telegram.keyboardbutton
@@ -106,9 +110,32 @@ Games
 .. toctree::
 
    telegram.game
-   telegram.animation
    telegram.callbackgame
    telegram.gamehighscore
+
+Passport
+--------
+
+.. toctree::
+
+    telegram.passportelementerror
+    telegram.passportelementerrorfile
+    telegram.passportelementerrorreverseside
+    telegram.passportelementerrorfrontside
+    telegram.passportelementerrorfiles
+    telegram.passportelementerrordatafield
+    telegram.passportelementerrorfile
+    telegram.credentials
+    telegram.datacredentials
+    telegram.securedata
+    telegram.filecredentials
+    telegram.iddocumentdata
+    telegram.personaldetails
+    telegram.residentialaddress
+    telegram.passportdata
+    telegram.passportfile
+    telegram.encryptedpassportelement
+    telegram.encryptedcredentials
 
 
 Module contents
