@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
+from base64 import b64decode
 
 from telegram import (TelegramObject, PassportFile, PersonalDetails, IdDocumentData,
                       ResidentialAddress)
@@ -141,9 +142,9 @@ class EncryptedPassportElement(TelegramObject):
             if secure_data.data is not None:
                 # If not already decrypted
                 if not isinstance(data['data'], dict):
-                    data['data'] = decrypt_json(secure_data.data.secret,
-                                                secure_data.data.hash,
-                                                data['data'])
+                    data['data'] = decrypt_json(b64decode(secure_data.data.secret),
+                                                b64decode(secure_data.data.hash),
+                                                b64decode(data['data']))
                 if data['type'] == 'personal_details':
                     data['data'] = PersonalDetails.de_json(data['data'], bot=bot)
                 elif data['type'] in ('passport', 'internal_passport',

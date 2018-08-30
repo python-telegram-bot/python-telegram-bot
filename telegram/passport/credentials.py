@@ -65,20 +65,6 @@ def decrypt(secret, hash, data, file=False):
         :obj:`bytes`: The decrypted data as bytes.
 
     """
-    # First make sure that if secret, hash, or data was base64 encoded, to decode it into bytes
-    try:
-        secret = b64decode(secret)
-    except (binascii.Error, TypeError):
-        pass
-    try:
-        hash = b64decode(hash)
-    except (binascii.Error, TypeError):
-        pass
-    if not file:
-        try:
-            data = b64decode(data)
-        except (binascii.Error, TypeError):
-            pass
     # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
     digest.update(secret + hash)
@@ -193,8 +179,8 @@ class EncryptedCredentials(TelegramObject):
         """
         if self._decrypted_data is None:
             self._decrypted_data = Credentials.de_json(decrypt_json(self.decrypted_secret,
-                                                                    self.hash,
-                                                                    self.data),
+                                                                    b64decode(self.hash),
+                                                                    b64decode(self.data)),
                                                        self.bot)
         return self._decrypted_data
 
