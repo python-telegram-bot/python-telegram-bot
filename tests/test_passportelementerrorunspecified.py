@@ -25,20 +25,20 @@ from telegram import PassportElementErrorUnspecified, PassportElementErrorDataFi
 @pytest.fixture(scope='class')
 def passport_element_error_unspecified():
     return PassportElementErrorUnspecified(TestPassportElementErrorUnspecified.type,
-                                           TestPassportElementErrorUnspecified.file_hash,
+                                           TestPassportElementErrorUnspecified.element_hash,
                                            TestPassportElementErrorUnspecified.message)
 
 
 class TestPassportElementErrorUnspecified(object):
     source = 'unspecified'
     type = 'test_type'
-    file_hash = 'file_hash'
+    element_hash = 'element_hash'
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_unspecified):
         assert passport_element_error_unspecified.source == self.source
         assert passport_element_error_unspecified.type == self.type
-        assert passport_element_error_unspecified.file_hash == self.file_hash
+        assert passport_element_error_unspecified.element_hash == self.element_hash
         assert passport_element_error_unspecified.message == self.message
 
     def test_to_dict(self, passport_element_error_unspecified):
@@ -49,16 +49,16 @@ class TestPassportElementErrorUnspecified(object):
                 passport_element_error_unspecified.source)
         assert (passport_element_error_unspecified_dict['type'] ==
                 passport_element_error_unspecified.type)
-        assert (passport_element_error_unspecified_dict['file_hash'] ==
-                passport_element_error_unspecified.file_hash)
+        assert (passport_element_error_unspecified_dict['element_hash'] ==
+                passport_element_error_unspecified.element_hash)
         assert (passport_element_error_unspecified_dict['message'] ==
                 passport_element_error_unspecified.message)
 
     def test_equality(self):
-        a = PassportElementErrorUnspecified(self.type, self.file_hash, self.message)
-        b = PassportElementErrorUnspecified(self.type, self.file_hash, self.message)
+        a = PassportElementErrorUnspecified(self.type, self.element_hash, self.message)
+        b = PassportElementErrorUnspecified(self.type, self.element_hash, self.message)
         c = PassportElementErrorUnspecified(self.type, '', '')
-        d = PassportElementErrorUnspecified('', self.file_hash, '')
+        d = PassportElementErrorUnspecified('', self.element_hash, '')
         e = PassportElementErrorUnspecified('', '', self.message)
         f = PassportElementErrorDataField(self.type, '', '', self.message)
 

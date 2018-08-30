@@ -55,9 +55,9 @@ class EncryptedPassportElement(TelegramObject):
             "driver_license", "identity_card" and "internal_passport".
         translation (List[:class:`telegram.PassportFile`]): Optional. Array of encrypted/decrypted
             files with translated versions of documents provided by the user. Available if
-            requested for “passport”, “driver_license”, “identity_card”, “internal_passport”,
-            “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration” and
-            “temporary_registration” types.
+            requested for "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
+            "temporary_registration" types.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -86,9 +86,9 @@ class EncryptedPassportElement(TelegramObject):
             "driver_license", "identity_card" and "internal_passport".
         translation (List[:class:`telegram.PassportFile`], optional): Array of encrypted/decrypted
             files with translated versions of documents provided by the user. Available if
-            requested for “passport”, “driver_license”, “identity_card”, “internal_passport”,
-            “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration” and
-            “temporary_registration” types.
+            requested for "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
+            "temporary_registration" types.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 

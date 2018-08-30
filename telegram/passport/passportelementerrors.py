@@ -259,17 +259,17 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
-            one of “passport”, “driver_license”, “identity_card”, “internal_passport”,
-            “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”,
-            “temporary_registration”.
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration".
         file_hash (:obj:`str`): Base64-encoded hash of the file.
         message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
-            one of “passport”, “driver_license”, “identity_card”, “internal_passport”,
-            “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”,
-            “temporary_registration”.
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration".
         file_hash (:obj:`str`): Base64-encoded hash of the file.
         message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -296,17 +296,17 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
-            one of “passport”, “driver_license”, “identity_card”, “internal_passport”,
-            “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”,
-            “temporary_registration”
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration"
         file_hash (:obj:`str`): Base64-encoded file hash.
         message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
-            one of “passport”, “driver_license”, “identity_card”, “internal_passport”,
-            “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”,
-            “temporary_registration”
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration"
         file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -334,12 +334,12 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
-        file_hash (:obj:`str`): Base64-encoded hash of the file.
+        element_hash (:obj:`str`): Base64-encoded element hash.
         message (:obj:`str`): Error message.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
-        file_hash (:obj:`str`): Base64-encoded hash of the file.
+        element_hash (:obj:`str`): Base64-encoded element hash.
         message (:obj:`str`): Error message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -347,11 +347,11 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     def __init__(self,
                  type,
-                 file_hash,
+                 element_hash,
                  message,
                  **kwargs):
         # Required
         super(PassportElementErrorUnspecified, self).__init__('unspecified', type, message)
-        self.file_hash = file_hash
+        self.element_hash = element_hash
 
-        self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+        self._id_attrs = (self.source, self.type, self.element_hash, self.message)

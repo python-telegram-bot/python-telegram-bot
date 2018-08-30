@@ -43,7 +43,7 @@ class TelegramDecryptionError(TelegramError):
                                                       "{}".format(message))
 
 
-def decrypt(secret, hash, data, file=False):
+def decrypt(secret, hash, data):
     """
     Decrypt per telegram docs at https://core.telegram.org/passport.
 
@@ -305,9 +305,9 @@ class SecureValue(TelegramObject):
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
         translation (List[:class:`telegram.FileCredentials`], optional): Credentials for an
-            encrypted translation of the document. Available for “passport”, “driver_license”,
-            “identity_card”, “internal_passport”, “utility_bill”, “bank_statement”,
-            “rental_agreement”, “passport_registration” and “temporary_registration”.
+            encrypted translation of the document. Available for "passport", "driver_license",
+            "identity_card", "internal_passport", "utility_bill", "bank_statement",
+            "rental_agreement", "passport_registration" and "temporary_registration".
         files (List[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
