@@ -58,6 +58,8 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
+        hash (:obj:`str`): Base64-encoded element hash for using in
+            :class:`telegram.PassportElementErrorUnspecified`.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -89,6 +91,8 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
+        hash (:obj:`str`): Base64-encoded element hash for using in
+            :class:`telegram.PassportElementErrorUnspecified`.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -107,6 +111,7 @@ class EncryptedPassportElement(TelegramObject):
                  reverse_side=None,
                  selfie=None,
                  translation=None,
+                 hash=None,
                  bot=None,
                  credentials=None,
                  **kwargs):
@@ -121,6 +126,7 @@ class EncryptedPassportElement(TelegramObject):
         self.reverse_side = reverse_side
         self.selfie = selfie
         self.translation = translation
+        self.hash = hash
 
         self._id_attrs = (self.type, self.data, self.phone_number, self.email, self.files,
                           self.front_side, self.reverse_side, self.selfie)
