@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import binascii
 try:
     import ujson as json
 except ImportError:
@@ -99,14 +98,14 @@ class EncryptedCredentials(TelegramObject):
 
     Attributes:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
-            payload, data hashes and secrets used for EncryptedPassportElement decryption and
+            nonce, data hashes and secrets used for EncryptedPassportElement decryption and
             authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
         secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
 
     Args:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
-            payload, data hashes and secrets used for EncryptedPassportElement decryption and
+            nonce, data hashes and secrets used for EncryptedPassportElement decryption and
             authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
         secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
@@ -170,8 +169,8 @@ class EncryptedCredentials(TelegramObject):
     def decrypted_data(self):
         """
         :class:`telegram.Credentials`: Lazily decrypt and return credentials data. This object
-            also contains the user specified payload as
-            `decrypted_data.payload`.
+            also contains the user specified nonce as
+            `decrypted_data.nonce`.
 
         Raises:
             telegram.TelegramDecryptionError: Decryption failed. Usually due to bad
@@ -189,13 +188,13 @@ class Credentials(TelegramObject):
     """
     Attributes:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
-        payload (:obj:`str`): Bot-specified payload
+        nonce (:obj:`str`): Bot-specified nonce
     """
 
-    def __init__(self, secure_data, payload, bot=None, **kwargs):
+    def __init__(self, secure_data, nonce, bot=None, **kwargs):
         # Required
         self.secure_data = secure_data
-        self.payload = payload
+        self.nonce = nonce
 
         self.bot = bot
 
@@ -305,7 +304,11 @@ class SecureValue(TelegramObject):
         selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
-        files (:class:`telegram.Array of FileCredentials`, optional): Credentials for encrypted
+        translation (List[:class:`telegram.FileCredentials`], optional): Credentials for an
+            encrypted translation of the document. Available for “passport”, “driver_license”,
+            “identity_card”, “internal_passport”, “utility_bill”, “bank_statement”,
+            “rental_agreement”, “passport_registration” and “temporary_registration”.
+        files (List[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
 
@@ -317,6 +320,7 @@ class SecureValue(TelegramObject):
                  reverse_side=None,
                  selfie=None,
                  files=None,
+                 translation=None,
                  bot=None,
                  **kwargs):
         self.data = data
@@ -324,6 +328,7 @@ class SecureValue(TelegramObject):
         self.reverse_side = reverse_side
         self.selfie = selfie
         self.files = files
+        self.translation = translation
 
         self.bot = bot
 
@@ -337,6 +342,7 @@ class SecureValue(TelegramObject):
         data['reverse_side'] = FileCredentials.de_json(data.get('reverse_side'), bot=bot)
         data['selfie'] = FileCredentials.de_json(data.get('selfie'), bot=bot)
         data['files'] = FileCredentials.de_list(data.get('files'), bot=bot)
+        data['translation'] = FileCredentials.de_list(data.get('translation'), bot=bot)
 
         return cls(bot=bot, **data)
 
@@ -344,6 +350,7 @@ class SecureValue(TelegramObject):
         data = super(SecureValue, self).to_dict()
 
         data['files'] = [p.to_dict() for p in self.files]
+        data['translation'] = [p.to_dict() for p in self.translation]
 
         return data
 
