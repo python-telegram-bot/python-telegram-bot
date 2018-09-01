@@ -250,3 +250,108 @@ class PassportElementErrorSelfie(PassportElementError):
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+
+
+class PassportElementErrorTranslationFile(PassportElementError):
+    """
+    Represents an issue with one of the files that constitute the translation of a document.
+    The error is considered resolved when the file changes.
+
+    Attributes:
+        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration".
+        file_hash (:obj:`str`): Base64-encoded hash of the file.
+        message (:obj:`str`): Error message.
+
+    Args:
+        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration".
+        file_hash (:obj:`str`): Base64-encoded hash of the file.
+        message (:obj:`str`): Error message.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self,
+                 type,
+                 file_hash,
+                 message,
+                 **kwargs):
+        # Required
+        super(PassportElementErrorTranslationFile, self).__init__('translation_file',
+                                                                  type, message)
+        self.file_hash = file_hash
+
+        self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+
+
+class PassportElementErrorTranslationFiles(PassportElementError):
+    """
+    Represents an issue with the translated version of a document. The error is considered
+    resolved when a file with the document translation change.
+
+    Attributes:
+        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration"
+        file_hash (:obj:`str`): Base64-encoded file hash.
+        message (:obj:`str`): Error message.
+
+    Args:
+        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
+            one of "passport", "driver_license", "identity_card", "internal_passport",
+            "utility_bill", "bank_statement", "rental_agreement", "passport_registration",
+            "temporary_registration"
+        file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
+        message (:obj:`str`): Error message.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self,
+                 type,
+                 file_hashes,
+                 message,
+                 **kwargs):
+        # Required
+        super(PassportElementErrorTranslationFiles, self).__init__('translation_files',
+                                                                   type, message)
+        self.file_hashes = file_hashes
+
+        self._id_attrs = ((self.source, self.type, self.message) +
+                          tuple([file_hash for file_hash in file_hashes]))
+
+
+class PassportElementErrorUnspecified(PassportElementError):
+    """
+    Represents an issue in an unspecified place. The error is considered resolved when new
+    data is added.
+
+    Attributes:
+        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
+        element_hash (:obj:`str`): Base64-encoded element hash.
+        message (:obj:`str`): Error message.
+
+    Args:
+        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
+        element_hash (:obj:`str`): Base64-encoded element hash.
+        message (:obj:`str`): Error message.
+        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+    """
+
+    def __init__(self,
+                 type,
+                 element_hash,
+                 message,
+                 **kwargs):
+        # Required
+        super(PassportElementErrorUnspecified, self).__init__('unspecified', type, message)
+        self.element_hash = element_hash
+
+        self._id_attrs = (self.source, self.type, self.element_hash, self.message)
