@@ -43,3 +43,19 @@ class ChatAction(object):
     """:obj:`str`: 'upload_video'"""
     UPLOAD_VIDEO_NOTE = 'upload_video_note'
     """:obj:`str`: 'upload_video_note'"""
+
+
+def send_action(action: ChatAction):
+    """ This decorator sends `CharAction` to `update.effective_user` before executing callback.
+    Args:
+        action (:obj: `ChatAction`): action to send.
+    """
+    def decorator(func: callable):
+        @wraps(func)
+        def wrapper(bot: Bot, update: Update, *args, **kwargs):
+            bot.send_chat_action(update.effective_user.id, action)
+            return func(bot, update, *args, **kwargs)
+
+        return wrapper
+
+    return decorator

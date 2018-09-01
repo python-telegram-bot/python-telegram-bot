@@ -34,7 +34,8 @@ from .files.contact import Contact
 from .files.location import Location
 from .files.venue import Venue
 from .files.videonote import VideoNote
-from .chataction import ChatAction
+from .chataction import (ChatAction, 
+                         send_action)
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
 from .replymarkup import ReplyMarkup
@@ -139,10 +140,10 @@ __all__ = [
     'Video', 'Voice', 'MAX_MESSAGE_LENGTH', 'MAX_CAPTION_LENGTH', 'SUPPORTED_WEBHOOK_PORTS',
     'MAX_FILESIZE_DOWNLOAD', 'MAX_FILESIZE_UPLOAD', 'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGES_PER_SECOND', 'MAX_MESSAGES_PER_MINUTE_PER_GROUP', 'WebhookInfo', 'Animation',
-    'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'SuccessfulPayment', 'ShippingOption',
-    'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 'ShippingQuery', 'ChatPhoto',
-    'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia', 'InputMediaPhoto',
-    'InputMediaVideo', 'PassportElementError', 'PassportElementErrorFile',
+    'Game', 'GameHighScore', 'VideoNote', 'LabeledPrice', 'send_action','SuccessfulPayment', 
+    'ShippingOption', 'ShippingAddress', 'PreCheckoutQuery', 'OrderInfo', 'Invoice', 
+    'ShippingQuery', 'ChatPhoto', 'StickerSet', 'MaskPosition', 'CallbackGame', 'InputMedia',
+    'InputMediaPhoto', 'InputMediaVideo', 'PassportElementError', 'PassportElementErrorFile',
     'PassportElementErrorReverseSide', 'PassportElementErrorFrontSide',
     'PassportElementErrorFiles', 'PassportElementErrorDataField', 'PassportElementErrorFile',
     'Credentials', 'DataCredentials', 'SecureData', 'FileCredentials', 'IdDocumentData',
