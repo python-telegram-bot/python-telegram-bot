@@ -2,6 +2,21 @@
 Changes
 =======
 
+**2018-09-01**
+*Released 11.1.0*
+
+Fixes and updates for Telegram Passport: (`#1198`_)
+
+- Fix passport decryption failing at random times
+- Added support for middle names.
+- Added support for translations for documents
+- Add errors for translations for documents
+- Added support for requesting names in the language of the user's country of residence
+- Replaced the payload parameter with the new parameter nonce
+- Add hash to EncryptedPassportElement
+
+.. _`#1198`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1198
+
 **2018-08-29**
 *Released 11.0.0*
 
