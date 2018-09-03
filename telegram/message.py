@@ -943,6 +943,8 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
             elif (entity.type == MessageEntity.URL) and urled:
                 insert = '<a href="{0}">{0}</a>'.format(text)
             elif entity.type == MessageEntity.BOLD:
@@ -1040,6 +1042,8 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '[{}]({})'.format(text, entity.url)
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = '[{}](tg://user?id={})'.format(text,entity.user.id)
             elif (entity.type == MessageEntity.URL) and urled:
                 insert = '[{0}]({0})'.format(text)
             elif entity.type == MessageEntity.BOLD:
