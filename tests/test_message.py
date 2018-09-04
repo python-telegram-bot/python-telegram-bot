@@ -21,9 +21,10 @@ from datetime import datetime
 import pytest
 
 from telegram import ParseMode
-from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
+from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
-                      Invoice, SuccessfulPayment)
+                      Invoice, SuccessfulPayment, PassportData)
+from tests.test_passport import RAW_PASSPORT_DATA
 
 
 @pytest.fixture(scope='class')
@@ -51,6 +52,8 @@ def message(bot):
                      'caption': 'audio_file'},
                     {'document': Document('document_id'),
                      'caption': 'document_file'},
+                    {'animation': Animation('animation_id', 30, 30, 1),
+                     'caption': 'animation_file'},
                     {'game': Game('my_game', 'just my game',
                                   [PhotoSize('game_photo_id', 30, 30), ])},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
@@ -84,15 +87,17 @@ def message(bot):
                     {'author_signature': 'some_author_sign'},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
-                     'media_group_id': 1234443322222}
+                     'media_group_id': 1234443322222},
+                    {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
-                     'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
-                     'voice', 'video_note', 'new_members', 'contact', 'location', 'venue',
-                     'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
-                     'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
-                     'pinned', 'invoice', 'successful_payment', 'connected_website',
-                     'forward_signature', 'author_signature', 'photo_from_media_group'])
+                     'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
+                     'sticker', 'video', 'voice', 'video_note', 'new_members', 'contact',
+                     'location', 'venue', 'left_member', 'new_title', 'new_photo', 'delete_photo',
+                     'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
+                     'migrated_from', 'pinned', 'invoice', 'successful_payment',
+                     'connected_website', 'forward_signature', 'author_signature',
+                     'photo_from_media_group', 'passport_data'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -295,8 +300,9 @@ class TestMessage(object):
         assert message.link is None
 
     def test_effective_attachment(self, message_params):
-        for i in ('audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note',
-                  'contact', 'location', 'venue', 'invoice', 'invoice', 'successful_payment'):
+        for i in ('audio', 'game', 'document', 'animation', 'photo', 'sticker', 'video', 'voice',
+                  'video_note', 'contact', 'location', 'venue', 'invoice', 'invoice',
+                  'successful_payment'):
             item = getattr(message_params, i, None)
             if item:
                 break
@@ -423,6 +429,20 @@ class TestMessage(object):
         monkeypatch.setattr('telegram.Bot.send_document', test)
         assert message.reply_document(document='test_document')
         assert message.reply_document(document='test_document', quote=True)
+
+    def test_reply_animation(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            animation = kwargs['animation'] == 'test_animation'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and animation and reply
+
+        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        assert message.reply_animation(animation='test_animation')
+        assert message.reply_animation(animation='test_animation', quote=True)
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -557,6 +577,16 @@ class TestMessage(object):
 
         monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
         assert message.edit_caption(caption='new caption')
+
+    def test_edit_media(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            media = kwargs['media'] == 'my_media'
+            return chat_id and message_id and media
+
+        monkeypatch.setattr('telegram.Bot.edit_message_media', test)
+        assert message.edit_media('my_media')
 
     def test_edit_reply_markup(self, monkeypatch, message):
         def test(*args, **kwargs):

@@ -27,7 +27,8 @@ def venue():
     return Venue(TestVenue.location,
                  TestVenue.title,
                  TestVenue.address,
-                 foursquare_id=TestVenue.foursquare_id)
+                 foursquare_id=TestVenue.foursquare_id,
+                 foursquare_type=TestVenue.foursquare_type)
 
 
 class TestVenue(object):
@@ -35,13 +36,15 @@ class TestVenue(object):
     title = 'title'
     address = 'address'
     foursquare_id = 'foursquare id'
+    foursquare_type = 'foursquare type'
 
     def test_de_json(self, bot):
         json_dict = {
             'location': TestVenue.location.to_dict(),
             'title': TestVenue.title,
             'address': TestVenue.address,
-            'foursquare_id': TestVenue.foursquare_id
+            'foursquare_id': TestVenue.foursquare_id,
+            'foursquare_type': TestVenue.foursquare_type
         }
         venue = Venue.de_json(json_dict, bot)
 
@@ -49,6 +52,7 @@ class TestVenue(object):
         assert venue.title == self.title
         assert venue.address == self.address
         assert venue.foursquare_id == self.foursquare_id
+        assert venue.foursquare_type == self.foursquare_type
 
     def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
         def test(_, url, data, **kwargs):
@@ -56,7 +60,8 @@ class TestVenue(object):
                     and data['latitude'] == self.location.latitude
                     and data['title'] == self.title
                     and data['address'] == self.address
-                    and data['foursquare_id'] == self.foursquare_id)
+                    and data['foursquare_id'] == self.foursquare_id
+                    and data['foursquare_type'] == self.foursquare_type)
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_venue(chat_id, venue=venue)
@@ -74,6 +79,7 @@ class TestVenue(object):
         assert venue_dict['title'] == venue.title
         assert venue_dict['address'] == venue.address
         assert venue_dict['foursquare_id'] == venue.foursquare_id
+        assert venue_dict['foursquare_type'] == venue.foursquare_type
 
     def test_equality(self):
         a = Venue(Location(0, 0), self.title, self.address)

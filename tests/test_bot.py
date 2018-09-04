@@ -104,8 +104,9 @@ class TestBot(object):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
-    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note
-    # and send_media_group are tested in their respective test modules. No need to duplicate here.
+    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note,
+    # send_media_group and send_animation are tested in their respective test modules. No need to
+    # duplicate here.
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -114,14 +115,19 @@ class TestBot(object):
         latitude = -23.691288
         title = 'title'
         address = 'address'
+        foursquare_id = 'foursquare id'
+        foursquare_type = 'foursquare type'
         message = bot.send_venue(chat_id=chat_id, title=title, address=address, latitude=latitude,
-                                 longitude=longitude)
+                                 longitude=longitude, foursquare_id=foursquare_id,
+                                 foursquare_type=foursquare_type)
 
         assert message.venue
         assert message.venue.title == title
         assert message.venue.address == address
         assert message.venue.location.latitude == latitude
         assert message.venue.location.longitude == longitude
+        assert message.venue.foursquare_id == foursquare_id
+        assert message.venue.foursquare_type == foursquare_type
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -257,6 +263,8 @@ class TestBot(object):
                                            message_id=media_message.message_id)
 
         assert message.caption == 'new_caption'
+
+    # edit_message_media is tested in test_inputmedia
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

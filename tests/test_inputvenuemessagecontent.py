@@ -28,7 +28,8 @@ def input_venue_message_content():
                                     TestInputVenueMessageContent.longitude,
                                     TestInputVenueMessageContent.title,
                                     TestInputVenueMessageContent.address,
-                                    foursquare_id=TestInputVenueMessageContent.foursquare_id)
+                                    foursquare_id=TestInputVenueMessageContent.foursquare_id,
+                                    foursquare_type=TestInputVenueMessageContent.foursquare_type)
 
 
 class TestInputVenueMessageContent(object):
@@ -37,6 +38,7 @@ class TestInputVenueMessageContent(object):
     title = 'title'
     address = 'address'
     foursquare_id = 'foursquare id'
+    foursquare_type = 'foursquare type'
 
     def test_expected_values(self, input_venue_message_content):
         assert input_venue_message_content.longitude == self.longitude
@@ -44,6 +46,7 @@ class TestInputVenueMessageContent(object):
         assert input_venue_message_content.title == self.title
         assert input_venue_message_content.address == self.address
         assert input_venue_message_content.foursquare_id == self.foursquare_id
+        assert input_venue_message_content.foursquare_type == self.foursquare_type
 
     def test_to_dict(self, input_venue_message_content):
         input_venue_message_content_dict = input_venue_message_content.to_dict()
@@ -57,3 +60,5 @@ class TestInputVenueMessageContent(object):
         assert input_venue_message_content_dict['address'] == input_venue_message_content.address
         assert (input_venue_message_content_dict['foursquare_id'] ==
                 input_venue_message_content.foursquare_id)
+        assert (input_venue_message_content_dict['foursquare_type'] ==
+                input_venue_message_content.foursquare_type)
