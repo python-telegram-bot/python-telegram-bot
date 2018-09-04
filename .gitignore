@@ -7,6 +7,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+ENV/
 env/
 build/
 develop-eggs/
@@ -62,6 +63,9 @@ target/
 
 # Sublime Text 2
 *.sublime*
+
+#Visual Studio Code
+.vscode
 
 # unitests files
 telegram.mp3
