@@ -824,8 +824,8 @@ class Message(TelegramObject):
             (That is, you can't just slice ``Message.text`` with the offset and length.)
 
         Args:
-            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-            be an entity that belongs to this message.
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. 
+            It must be an entity that belongs to this message.
 
         Returns:
             :obj:`str`: The text of the given entity
@@ -849,8 +849,8 @@ class Message(TelegramObject):
             (That is, you can't just slice ``Message.caption`` with the offset and length.)
 
         Args:
-            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-            be an entity that belongs to this message.
+            entity (:class:`telegram.MessageEntity`): The entity to extract the text from. 
+            It must be an entity that belongs to this message.
 
         Returns:
             :obj:`str`: The text of the given entity
