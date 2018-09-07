@@ -316,6 +316,8 @@ class TestSendMediaGroup(object):
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
 
+    @flaky(3, 1)  # noqa: F811
+    @pytest.mark.timeout(10)  # noqa: F811
     def test_send_media_group_new_files(self, bot, chat_id, video_file, photo_file,  # noqa: F811
                                         animation_file):  # noqa: F811
         messages = bot.send_media_group(chat_id, [
