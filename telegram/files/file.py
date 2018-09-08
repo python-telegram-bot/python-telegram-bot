@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram File."""
+from base64 import b64decode
 from os.path import basename
 
 from future.backports.urllib import parse as urllib_parse
@@ -107,7 +108,9 @@ class File(TelegramObject):
         if out:
             buf = self.bot.request.retrieve(url)
             if self._credentials:
-                buf = decrypt(self._credentials.secret, self._credentials.hash, buf, file=True)
+                buf = decrypt(b64decode(self._credentials.secret),
+                              b64decode(self._credentials.hash),
+                              buf)
             out.write(buf)
             return out
         else:
@@ -118,7 +121,9 @@ class File(TelegramObject):
 
             buf = self.bot.request.retrieve(url, timeout=timeout)
             if self._credentials:
-                buf = decrypt(self._credentials.secret, self._credentials.hash, buf, file=True)
+                buf = decrypt(b64decode(self._credentials.secret),
+                              b64decode(self._credentials.hash),
+                              buf)
             with open(filename, 'wb') as fobj:
                 fobj.write(buf)
             return filename

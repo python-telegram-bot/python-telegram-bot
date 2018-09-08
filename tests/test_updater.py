@@ -103,7 +103,7 @@ class TestUpdater(object):
             monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
             updater.dispatcher.add_error_handler(self.error_handler)
             updater.start_polling(0.01)
-            assert self.err_handler_called.wait(0.5) is not True
+            assert self.err_handler_called.wait(1) is not True
 
         # NOTE: This test might hit a race condition and fail (though the 0.5 seconds delay above
         #       should work around it).

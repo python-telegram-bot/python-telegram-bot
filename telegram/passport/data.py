@@ -25,23 +25,33 @@ class PersonalDetails(TelegramObject):
 
     Attributes:
         first_name (:obj:`str`): First Name.
+        middle_name (:obj:`str`): Optional. First Name.
         last_name (:obj:`str`): Last Name.
         birth_date (:obj:`str`): Date of birth in DD.MM.YYYY format.
         gender (:obj:`str`): Gender, male or female.
         country_code (:obj:`str`): Citizenship (ISO 3166-1 alpha-2 country code).
         residence_country_code (:obj:`str`): Country of residence (ISO 3166-1 alpha-2 country
             code).
+        first_name (:obj:`str`): First Name in the language of the user's country of residence.
+        middle_name (:obj:`str`): Optional. Middle Name in the language of the user's country of
+            residence.
+        last_name (:obj:`str`): Last Name in the language of the user's country of residence.
     """
 
     def __init__(self, first_name, last_name, birth_date, gender, country_code,
-                 residence_country_code, bot=None, **kwargs):
+                 residence_country_code, first_name_native, last_name_native, middle_name=None,
+                 middle_name_native=None, bot=None, **kwargs):
         # Required
         self.first_name = first_name
         self.last_name = last_name
+        self.middle_name = middle_name
         self.birth_date = birth_date
         self.gender = gender
         self.country_code = country_code
         self.residence_country_code = residence_country_code
+        self.first_name_native = first_name_native
+        self.last_name_native = last_name_native
+        self.middle_name_native = middle_name_native
 
         self.bot = bot
 

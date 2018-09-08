@@ -24,9 +24,9 @@ def msg(bot, update):
     # If we received any passport data
     passport_data = update.message.passport_data
     if passport_data:
-        # If our payload doesn't match what we think, this Update did not originate from us
-        # Ideally you would randomize the payload on the server
-        if passport_data.decrypted_credentials.payload != 'thisisatest':
+        # If our nonce doesn't match what we think, this Update did not originate from us
+        # Ideally you would randomize the nonce on the server
+        if passport_data.decrypted_credentials.nonce != 'thisisatest':
             return
 
         # Print the decrypted credential data
@@ -39,7 +39,7 @@ def msg(bot, update):
             elif data.type == 'email':
                 print('Email: ', data.email)
             if data.type in ('personal_details', 'passport', 'driver_license', 'identity_card',
-                             'identity_passport', 'address'):
+                             'internal_passport', 'address'):
                 print(data.type, data.data)
             if data.type in ('utility_bill', 'bank_statement', 'rental_agreement',
                              'passport_registration', 'temporary_registration'):
@@ -65,6 +65,15 @@ def msg(bot, update):
                     file = data.selfie.get_file()
                     print(data.type, file)
                     file.download()
+            if data.type in ('passport', 'driver_license', 'identity_card',
+                             'internal_passport', 'utility_bill', 'bank_statement',
+                             'rental_agreement', 'passport_registration',
+                             'temporary_registration'):
+                print(data.type, len(data.translation), 'translation')
+                for file in data.translation:
+                    actual_file = file.get_file()
+                    print(actual_file)
+                    actual_file.download()
 
 
 def error(bot, update, error):
