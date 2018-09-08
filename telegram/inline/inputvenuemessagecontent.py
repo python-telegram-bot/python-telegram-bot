@@ -30,6 +30,9 @@ class InputVenueMessageContent(InputMessageContent):
         title (:obj:`str`): Name of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue, if known.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
 
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -37,11 +40,15 @@ class InputVenueMessageContent(InputMessageContent):
         title (:obj:`str`): Name of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue, if known.
+        foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     """
 
-    def __init__(self, latitude, longitude, title, address, foursquare_id=None, **kwargs):
+    def __init__(self, latitude, longitude, title, address, foursquare_id=None,
+                 foursquare_type=None, **kwargs):
         # Required
         self.latitude = latitude
         self.longitude = longitude
@@ -49,3 +56,4 @@ class InputVenueMessageContent(InputMessageContent):
         self.address = address
         # Optionals
         self.foursquare_id = foursquare_id
+        self.foursquare_type = foursquare_type

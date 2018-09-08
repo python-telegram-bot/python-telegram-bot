@@ -1,6 +1,78 @@
 =======
 Changes
 =======
+
+**2018-09-01**
+*Released 11.1.0*
+
+Fixes and updates for Telegram Passport: (`#1198`_)
+
+- Fix passport decryption failing at random times
+- Added support for middle names.
+- Added support for translations for documents
+- Add errors for translations for documents
+- Added support for requesting names in the language of the user's country of residence
+- Replaced the payload parameter with the new parameter nonce
+- Add hash to EncryptedPassportElement
+
+.. _`#1198`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1198
+
+**2018-08-29**
+*Released 11.0.0*
+
+Fully support Bot API version 4.0!
+(also some bugfixes :))
+
+Telegram Passport (`#1174`_):
+
+- Add full support for telegram passport.
+    - New types: PassportData, PassportFile, EncryptedPassportElement, EncryptedCredentials, PassportElementError, PassportElementErrorDataField, PassportElementErrorFrontSide, PassportElementErrorReverseSide, PassportElementErrorSelfie, PassportElementErrorFile and PassportElementErrorFiles.
+    - New bot method: set_passport_data_errors
+    - New filter: Filters.passport_data
+    - Field passport_data field on Message
+    - PassportData can be easily decrypted.
+    - PassportFiles are automatically decrypted if originating from decrypted PassportData.
+- See new passportbot.py example for details on how to use, or go to `our telegram passport wiki page`_ for more info
+- NOTE: Passport decryption requires new dependency `cryptography`.
+
+Inputfile rework (`#1184`_):
+
+- Change how Inputfile is handled internally
+- This allows support for specifying the thumbnails of photos and videos using the thumb= argument in the different send\_ methods.
+- Also allows Bot.send_media_group to actually finally send more than one media.
+- Add thumb to Audio, Video and Videonote
+- Add Bot.edit_message_media together with InputMediaAnimation, InputMediaAudio, and inputMediaDocument.
+
+Other Bot API 4.0 changes:
+
+- Add forusquare_type to Venue, InlineQueryResultVenue, InputVenueMessageContent, and Bot.send_venue. (`#1170`_)
+- Add vCard support by adding vcard field to Contact, InlineQueryResultContact, InputContactMessageContent, and Bot.send_contact. (`#1166`_)
+- Support new message entities: CASHTAG and PHONE_NUMBER. (`#1179`_)
+    - Cashtag seems to be things like `$USD` and `$GBP`, but it seems telegram doesn't currently send them to bots.
+    - Phone number also seems to have limited support for now
+- Add Bot.send_animation, add width, height, and duration to Animation, and add Filters.animation. (`#1172`_)
+
+Non Bot API 4.0 changes:
+
+- Minor integer comparison fix (`#1147`_)
+- Fix Filters.regex failing on non-text message (`#1158`_)
+- Fix ProcessLookupError if process finishes before we kill it (`#1126`_)
+- Add t.me links for User, Chat and Message if available and update User.mention_* (`#1092`_)
+- Fix mention_markdown/html on py2 (`#1112`_)
+
+.. _`#1092`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1092
+.. _`#1112`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1112
+.. _`#1126`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1126
+.. _`#1147`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1147
+.. _`#1158`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1158
+.. _`#1166`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1166
+.. _`#1170`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1170
+.. _`#1174`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1174
+.. _`#1172`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1172
+.. _`#1179`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1179
+.. _`#1184`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1184
+.. _`our telegram passport wiki page`: https://git.io/fAvYd
+
 **2018-05-02**
 *Released 10.1.0*
 

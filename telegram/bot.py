@@ -21,17 +21,22 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
-import json
+try:
+    import ujson as json
+except ImportError:
+    import json
 import logging
 import warnings
 from datetime import datetime
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 from future.utils import string_types
 
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
-                      PhotoSize, Audio, Document, Sticker, Video, Voice, VideoNote, Location,
-                      Venue, Contact)
+                      PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
+                      Location, Venue, Contact, InputFile)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
@@ -101,10 +106,13 @@ class Bot(TelegramObject):
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
         request (:obj:`telegram.utils.request.Request`, optional): Pre initialized
             :obj:`telegram.utils.request.Request`.
+        private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
+        private_key_password (:obj:`bytes`, optional): Password for above private key.
 
     """
 
-    def __init__(self, token, base_url=None, base_file_url=None, request=None):
+    def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
+                 private_key_password=None):
         self.token = self._validate_token(token)
 
         if base_url is None:
@@ -118,6 +126,11 @@ class Bot(TelegramObject):
         self.bot = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
+
+        if private_key:
+            self.private_key = serialization.load_pem_private_key(private_key,
+                                                                  password=private_key_password,
+                                                                  backend=default_backend())
 
     @property
     def request(self):
@@ -381,6 +394,8 @@ class Bot(TelegramObject):
 
         if isinstance(photo, PhotoSize):
             photo = photo.file_id
+        elif InputFile.is_file(photo):
+            photo = InputFile(photo)
 
         data = {'chat_id': chat_id, 'photo': photo}
 
@@ -405,6 +420,7 @@ class Bot(TelegramObject):
                    reply_markup=None,
                    timeout=20,
                    parse_mode=None,
+                   thumb=None,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -440,6 +456,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
+            thumb (`filelike object`, optional): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -454,6 +474,8 @@ class Bot(TelegramObject):
 
         if isinstance(audio, Audio):
             audio = audio.file_id
+        elif InputFile.is_file(audio):
+            audio = InputFile(audio)
 
         data = {'chat_id': chat_id, 'audio': audio}
 
@@ -467,6 +489,10 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb, attach=True)
+            data['thumb'] = thumb
 
         return url, data
 
@@ -482,6 +508,7 @@ class Bot(TelegramObject):
                       reply_markup=None,
                       timeout=20,
                       parse_mode=None,
+                      thumb=None,
                       **kwargs):
         """Use this method to send general files.
 
@@ -511,6 +538,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
+            thumb (`filelike object`, optional): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -525,15 +556,19 @@ class Bot(TelegramObject):
 
         if isinstance(document, Document):
             document = document.file_id
+        elif InputFile.is_file(document):
+            document = InputFile(document, filename=filename)
 
         data = {'chat_id': chat_id, 'document': document}
 
-        if filename:
-            data['filename'] = filename
         if caption:
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb, attach=True)
+            data['thumb'] = thumb
 
         return url, data
 
@@ -582,6 +617,8 @@ class Bot(TelegramObject):
 
         if isinstance(sticker, Sticker):
             sticker = sticker.file_id
+        elif InputFile.is_file(sticker):
+            sticker = InputFile(sticker)
 
         data = {'chat_id': chat_id, 'sticker': sticker}
 
@@ -602,6 +639,7 @@ class Bot(TelegramObject):
                    height=None,
                    parse_mode=None,
                    supports_streaming=None,
+                   thumb=None,
                    **kwargs):
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -636,6 +674,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
+            thumb (`filelike object`, optional): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -650,6 +692,8 @@ class Bot(TelegramObject):
 
         if isinstance(video, Video):
             video = video.file_id
+        elif InputFile.is_file(video):
+            video = InputFile(video)
 
         data = {'chat_id': chat_id, 'video': video}
 
@@ -665,6 +709,162 @@ class Bot(TelegramObject):
             data['width'] = width
         if height:
             data['height'] = height
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb, attach=True)
+            data['thumb'] = thumb
+
+        return url, data
+
+    @log
+    @message
+    def send_video_note(self,
+                        chat_id,
+                        video_note,
+                        duration=None,
+                        length=None,
+                        disable_notification=False,
+                        reply_to_message_id=None,
+                        reply_markup=None,
+                        timeout=20,
+                        thumb=None,
+                        **kwargs):
+        """Use this method to send video messages.
+
+        Note:
+            The video_note argument can be either a file_id or a file from disk
+            ``open(filename, 'rb')``
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            video_note (:obj:`str` | `filelike object` | :class:`telegram.VideoNote`): Video note
+                to send. Pass a file_id as String to send a video note that exists on the Telegram
+                servers (recommended) or upload a new video using multipart/form-data. Or you can
+                pass an existing :class:`telegram.VideoNote` object to send. Sending video notes by
+                a URL is currently unsupported.
+            duration (:obj:`int`, optional): Duration of sent video in seconds.
+            length (:obj:`int`, optional): Video width and height
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard,
+                instructions to remove reply keyboard or to force a reply from the user.
+            thumb (`filelike object`, optional): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendVideoNote'.format(self.base_url)
+
+        if isinstance(video_note, VideoNote):
+            video_note = video_note.file_id
+        elif InputFile.is_file(video_note):
+            video_note = InputFile(video_note)
+
+        data = {'chat_id': chat_id, 'video_note': video_note}
+
+        if duration is not None:
+            data['duration'] = duration
+        if length is not None:
+            data['length'] = length
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb, attach=True)
+            data['thumb'] = thumb
+
+        return url, data
+
+    @log
+    @message
+    def send_animation(self,
+                       chat_id,
+                       animation,
+                       duration=None,
+                       width=None,
+                       height=None,
+                       thumb=None,
+                       caption=None,
+                       parse_mode=None,
+                       disable_notification=False,
+                       reply_to_message_id=None,
+                       reply_markup=None,
+                       timeout=20,
+                       **kwargs):
+        """
+        Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            animation (:obj:`str` | `filelike object` | :class:`telegram.Animation`): Animation to
+                send. Pass a file_id as String to send an animation that exists on the Telegram
+                servers (recommended), pass an HTTP URL as a String for Telegram to get an
+                animation from the Internet, or upload a new animation using multipart/form-data.
+                Lastly you can pass an existing :class:`telegram.Animation` object to send.
+            duration (:obj:`int`, optional): Duration of sent animation in seconds.
+            width (:obj:`int`, optional): Animation width.
+            height (:obj:`int`, optional): Animation height.
+            thumb (`filelike object`, optional): Thumbnail of the
+                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                is passed as a string or file_id.
+            caption (:obj:`str`, optional): Animation caption (may also be used when resending
+                animations by file_id), 0-200 characters.
+            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
+                show bold, italic, fixed-width text or inline URLs in the media caption. See the
+                constants in :class:`telegram.ParseMode` for the available modes.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendAnimation'.format(self.base_url)
+
+        if isinstance(animation, Animation):
+            animation = animation.file_id
+        elif InputFile.is_file(animation):
+            animation = InputFile(animation)
+
+        data = {'chat_id': chat_id, 'animation': animation}
+
+        if duration:
+            data['duration'] = duration
+        if width:
+            data['width'] = width
+        if height:
+            data['height'] = height
+        if thumb:
+            if InputFile.is_file(thumb):
+                thumb = InputFile(thumb, attach=True)
+            data['thumb'] = thumb
+        if caption:
+            data['caption'] = caption
+        if parse_mode:
+            data['parse_mode'] = parse_mode
 
         return url, data
 
@@ -724,6 +924,8 @@ class Bot(TelegramObject):
 
         if isinstance(voice, Voice):
             voice = voice.file_id
+        elif InputFile.is_file(voice):
+            voice = InputFile(voice)
 
         data = {'chat_id': chat_id, 'voice': voice}
 
@@ -733,65 +935,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-
-        return url, data
-
-    @log
-    @message
-    def send_video_note(self,
-                        chat_id,
-                        video_note,
-                        duration=None,
-                        length=None,
-                        disable_notification=False,
-                        reply_to_message_id=None,
-                        reply_markup=None,
-                        timeout=20,
-                        **kwargs):
-        """Use this method to send video messages.
-
-        Note:
-            The video_note argument can be either a file_id or a file from disk
-            ``open(filename, 'rb')``
-
-        Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
-            video_note (:obj:`str` | `filelike object` | :class:`telegram.VideoNote`): Video note
-                to send. Pass a file_id as String to send a video note that exists on the Telegram
-                servers (recommended) or upload a new video using multipart/form-data. Or you can
-                pass an existing :class:`telegram.VideoNote` object to send. Sending video notes by
-                a URL is currently unsupported.
-            duration (:obj:`int`, optional): Duration of sent video in seconds.
-            length (:obj:`int`, optional): Video width and height
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
-            timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
-        Returns:
-            :class:`telegram.Message`: On success, the sent Message is returned.
-
-        Raises:
-            :class:`telegram.TelegramError`
-
-        """
-        url = '{0}/sendVideoNote'.format(self.base_url)
-
-        if isinstance(video_note, VideoNote):
-            video_note = video_note.file_id
-
-        data = {'chat_id': chat_id, 'video_note': video_note}
-
-        if duration is not None:
-            data['duration'] = duration
-        if length is not None:
-            data['length'] = length
 
         return url, data
 
@@ -823,11 +966,8 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.TelegramError`
         """
-        # TODO: Make InputMediaPhoto, InputMediaVideo and send_media_group work with new files
 
         url = '{0}/sendMediaGroup'.format(self.base_url)
-
-        media = [med.to_dict() for med in media]
 
         data = {'chat_id': chat_id, 'media': media}
 
@@ -1025,12 +1165,14 @@ class Bot(TelegramObject):
                    reply_markup=None,
                    timeout=None,
                    venue=None,
+                   foursquare_type=None,
                    **kwargs):
         """Use this method to send information about a venue.
 
         Note:
             you can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
-            :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id`.
+            :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and optionally
+            :obj:`foursquare_type`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1040,6 +1182,9 @@ class Bot(TelegramObject):
             title (:obj:`str`, optional): Name of the venue.
             address (:obj:`str`, optional): Address of the venue.
             foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue.
+            foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
+                (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+                "food/icecream".)
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1072,6 +1217,7 @@ class Bot(TelegramObject):
             address = venue.address
             title = venue.title
             foursquare_id = venue.foursquare_id
+            foursquare_type = venue.foursquare_type
 
         data = {
             'chat_id': chat_id,
@@ -1083,6 +1229,8 @@ class Bot(TelegramObject):
 
         if foursquare_id:
             data['foursquare_id'] = foursquare_id
+        if foursquare_type:
+            data['foursquare_type'] = foursquare_type
 
         return url, data
 
@@ -1098,12 +1246,13 @@ class Bot(TelegramObject):
                      reply_markup=None,
                      timeout=None,
                      contact=None,
+                     vcard=None,
                      **kwargs):
         """Use this method to send phone contacts.
 
         Note:
             You can either supply :obj:`contact` or :obj:`phone_number` and :obj:`first_name`
-            with optionally :obj:`last_name`.
+            with optionally :obj:`last_name` and optionally :obj:`vcard`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1111,6 +1260,8 @@ class Bot(TelegramObject):
             phone_number (:obj:`str`, optional): Contact's phone number.
             first_name (:obj:`str`, optional): Contact's first name.
             last_name (:obj:`str`, optional): Contact's last name.
+            vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
+                0-2048 bytes.
             contact (:class:`telegram.Contact`, optional): The contact to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1141,11 +1292,14 @@ class Bot(TelegramObject):
             phone_number = contact.phone_number
             first_name = contact.first_name
             last_name = contact.last_name
+            vcard = contact.vcard
 
         data = {'chat_id': chat_id, 'phone_number': phone_number, 'first_name': first_name}
 
         if last_name:
             data['last_name'] = last_name
+        if vcard:
+            data['vcard'] = vcard
 
         return url, data
 
@@ -1650,6 +1804,59 @@ class Bot(TelegramObject):
 
     @log
     @message
+    def edit_message_media(self,
+                           chat_id=None,
+                           message_id=None,
+                           inline_message_id=None,
+                           media=None,
+                           reply_markup=None,
+                           timeout=None,
+                           **kwargs):
+        """Use this method to edit audio, document, photo, or video messages. If a message is a
+        part of a message album, then it can be edited only to a photo or a video. Otherwise,
+        message type can be changed arbitrarily. When inline message is edited, new file can't be
+        uploaded. Use previously uploaded file via its file_id or specify a URL. On success, if the
+        edited message was sent by the bot, the edited Message is returned, otherwise True is
+        returned.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`, optional): Unique identifier for the target chat or
+                username of the target`channel (in the format @channelusername).
+            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
+                Identifier of the sent message.
+            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
+                specified. Identifier of the inline message.
+            media (:class:`telegram.InputMedia`): An object for a new media content
+                of the message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+        """
+
+        if inline_message_id is None and (chat_id is None or message_id is None):
+            raise ValueError(
+                'edit_message_caption: Both chat_id and message_id are required when '
+                'inline_message_id is not specified')
+
+        url = '{0}/editMessageMedia'.format(self.base_url)
+
+        data = {'media': media}
+
+        if chat_id:
+            data['chat_id'] = chat_id
+        if message_id:
+            data['message_id'] = message_id
+        if inline_message_id:
+            data['inline_message_id'] = inline_message_id
+
+        return url, data
+
+    @log
+    @message
     def edit_message_reply_markup(self,
                                   chat_id=None,
                                   message_id=None,
@@ -1851,6 +2058,8 @@ class Bot(TelegramObject):
         if url is not None:
             data['url'] = url
         if certificate:
+            if InputFile.is_file(certificate):
+                certificate = InputFile(certificate)
             data['certificate'] = certificate
         if max_connections is not None:
             data['max_connections'] = max_connections
@@ -2658,6 +2867,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatPhoto'.format(self.base_url)
 
+        if InputFile.is_file(photo):
+            photo = InputFile(photo)
+
         data = {'chat_id': chat_id, 'photo': photo}
         data.update(kwargs)
 
@@ -2892,6 +3104,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/uploadStickerFile'.format(self.base_url)
 
+        if InputFile.is_file(png_sticker):
+            png_sticker = InputFile(png_sticker)
+
         data = {'user_id': user_id, 'png_sticker': png_sticker}
         data.update(kwargs)
 
@@ -2943,6 +3158,9 @@ class Bot(TelegramObject):
         """
         url = '{0}/createNewStickerSet'.format(self.base_url)
 
+        if InputFile.is_file(png_sticker):
+            png_sticker = InputFile(png_sticker)
+
         data = {'user_id': user_id, 'name': name, 'title': title, 'png_sticker': png_sticker,
                 'emojis': emojis}
 
@@ -2990,6 +3208,9 @@ class Bot(TelegramObject):
 
         """
         url = '{0}/addStickerToSet'.format(self.base_url)
+
+        if InputFile.is_file(png_sticker):
+            png_sticker = InputFile(png_sticker)
 
         data = {'user_id': user_id, 'name': name, 'png_sticker': png_sticker, 'emojis': emojis}
 
@@ -3056,6 +3277,44 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
+    def set_passport_data_errors(self, user_id, errors, timeout=None, **kwargs):
+        """
+        Informs a user that some of the Telegram Passport elements they provided contains errors.
+        The user will not be able to re-submit their Passport to you until the errors are fixed
+        (the contents of the field for which you returned the error must change). Returns True
+        on success.
+
+        Use this if the data submitted by the user doesn't satisfy the standards your service
+        requires for any reason. For example, if a birthday date seems invalid, a submitted
+        document is blurry, a scan shows evidence of tampering, etc. Supply some details in the
+        error message to make sure the user knows how to correct the issues.
+
+        Args:
+            user_id (:obj:`int`): User identifier
+            errors (List[:class:`PassportElementError`]): A JSON-serialized array describing the
+                errors.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :obj:`bool`: On success, ``True`` is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url_ = '{0}/setPassportDataErrors'.format(self.base_url)
+
+        data = {'user_id': user_id, 'errors': [error.to_dict() for error in errors]}
+        data.update(kwargs)
+
+        result = self._request.post(url_, data, timeout=timeout)
+
+        return result
+
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.username}
 
@@ -3087,6 +3346,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`send_sticker`"""
     sendVideo = send_video
     """Alias for :attr:`send_video`"""
+    sendAnimation = send_animation
+    """Alias for :attr:`send_animation`"""
     sendVoice = send_voice
     """Alias for :attr:`send_voice`"""
     sendVideoNote = send_video_note
@@ -3123,6 +3384,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`edit_message_text`"""
     editMessageCaption = edit_message_caption
     """Alias for :attr:`edit_message_caption`"""
+    editMessageMedia = edit_message_media
+    """Alias for :attr:`edit_message_media`"""
     editMessageReplyMarkup = edit_message_reply_markup
     """Alias for :attr:`edit_message_reply_markup`"""
     getUpdates = get_updates
@@ -3187,3 +3450,5 @@ class Bot(TelegramObject):
     """Alias for :attr:`set_sticker_position_in_set`"""
     deleteStickerFromSet = delete_sticker_from_set
     """Alias for :attr:`delete_sticker_from_set`"""
+    setPassportDataErrors = set_passport_data_errors
+    """Alias for :attr:`set_passport_data_errors`"""

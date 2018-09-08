@@ -46,14 +46,6 @@ signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                        'whole process on windows')
 
 
-@pytest.fixture(scope='function')
-def updater(bot):
-    up = Updater(bot=bot, workers=2)
-    yield up
-    if up.running:
-        up.stop()
-
-
 class TestUpdater(object):
     message_count = 0
     received = None
@@ -111,7 +103,7 @@ class TestUpdater(object):
             monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
             updater.dispatcher.add_error_handler(self.error_handler)
             updater.start_polling(0.01)
-            assert self.err_handler_called.wait(0.5) is not True
+            assert self.err_handler_called.wait(1) is not True
 
         # NOTE: This test might hit a race condition and fail (though the 0.5 seconds delay above
         #       should work around it).
@@ -359,3 +351,8 @@ class TestUpdater(object):
     def test_no_token_or_bot(self):
         with pytest.raises(ValueError):
             Updater()
+
+    def test_mutual_exclude_bot_private_key(self):
+        bot = Bot('123:zyxw')
+        with pytest.raises(ValueError):
+            Updater(bot=bot, private_key=b'key')

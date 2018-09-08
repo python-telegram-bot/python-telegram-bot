@@ -34,7 +34,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption, 0-200 characters
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
@@ -53,7 +53,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption, 0-200 characters
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
