@@ -150,14 +150,8 @@ class TestUpdater(object):
         updater.start_webhook(
             ip,
             port,
-            url_path='TOKEN',
-            cert='./tests/test_updater.py',
-            key='./tests/test_updater.py', )
+            url_path='TOKEN')
         sleep(.2)
-        # SSL-Wrapping will fail, so we start the server without SSL
-        thr = Thread(target=updater.httpd.serve_forever)
-        thr.start()
-
         try:
             # Now, we send an update to the server via urlopen
             update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
@@ -166,21 +160,44 @@ class TestUpdater(object):
             sleep(.2)
             assert q.get(False) == update
 
-            response = self._send_webhook_msg(ip, port, None, 'webookhandler.py')
-            assert b'' == response.read()
-            assert 200 == response.code
+            # Returns 404 if path is incorrect
+            with pytest.raises(HTTPError) as excinfo:
+                self._send_webhook_msg(ip, port, None, 'webookhandler.py')
+            assert excinfo.value.code == 404
 
-            response = self._send_webhook_msg(ip, port, None, 'webookhandler.py',
-                                              get_method=lambda: 'HEAD')
-
-            assert b'' == response.read()
-            assert 200 == response.code
+            with pytest.raises(HTTPError) as excinfo:
+                self._send_webhook_msg(ip, port, None, 'webookhandler.py',
+                                       get_method=lambda: 'HEAD')
+            assert excinfo.value.code == 404
 
             # Test multiple shutdown() calls
             updater.httpd.shutdown()
         finally:
             updater.httpd.shutdown()
-            thr.join()
+            sleep(.2)
+            assert not updater.httpd.is_running
+            updater.stop()
+
+    def test_webhook_ssl(self, monkeypatch, updater):
+        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port for travis
+        tg_err = False
+        try:
+            updater._start_webhook(
+                ip,
+                port,
+                url_path='TOKEN',
+                cert='./tests/test_updater.py',
+                key='./tests/test_updater.py',
+                bootstrap_retries=0,
+                clean=False,
+                webhook_url=None,
+                allowed_updates=None)
+        except TelegramError:
+            tg_err = True
+        assert tg_err
 
     def test_webhook_no_ssl(self, monkeypatch, updater):
         q = Queue()
@@ -199,6 +216,7 @@ class TestUpdater(object):
         self._send_webhook_msg(ip, port, update.to_json())
         sleep(.2)
         assert q.get(False) == update
+        updater.stop()
 
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError(''),)],
@@ -254,7 +272,7 @@ class TestUpdater(object):
 
             with pytest.raises(HTTPError) as excinfo:
                 self._send_webhook_msg(ip, port, 'dummy-payload', content_len=-2)
-            assert excinfo.value.code == 403
+            assert excinfo.value.code == 500
 
             # TODO: prevent urllib or the underlying from adding content-length
             # with pytest.raises(HTTPError) as excinfo:
@@ -263,7 +281,7 @@ class TestUpdater(object):
 
             with pytest.raises(HTTPError):
                 self._send_webhook_msg(ip, port, 'dummy-payload', content_len='not-a-number')
-            assert excinfo.value.code == 403
+            assert excinfo.value.code == 500
 
         finally:
             updater.httpd.shutdown()
