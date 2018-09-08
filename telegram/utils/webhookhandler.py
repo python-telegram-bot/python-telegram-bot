@@ -32,7 +32,8 @@ import tornado.iostream
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
-class WebhookServer(HTTPServer):
+class WebhookServer(object):
+
     def __init__(self, port, webhook_app, ssl_ctx):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.port = port
@@ -44,6 +45,7 @@ class WebhookServer(HTTPServer):
 
     def serve_forever(self):
         with self.server_lock:
+            IOLoop().make_current()
             self.is_running = True
             self.logger.debug('Webhook Server started.')
             self.http_server.listen(self.port)

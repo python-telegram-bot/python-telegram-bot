@@ -20,10 +20,6 @@
 
 import logging
 import ssl
-try:
-    import asyncio
-except ImportError:
-    asyncio = False
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
 from signal import signal, SIGINT, SIGTERM, SIGABRT
@@ -363,17 +359,16 @@ class Updater(object):
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate
-        ssl_ctx = None
         if use_ssl:
             try:
                 ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                 ssl_ctx.load_cert_chain(cert, key)
             except ssl.SSLError:
-                raise TelegramError('SSL Certificate invalid')
+                raise TelegramError('Invalid SSL Certificate')
+        else:
+            ssl_ctx = None
 
         # Create and start server
-        if asyncio:
-            asyncio.set_event_loop(asyncio.new_event_loop())
         self.httpd = WebhookServer(port, app, ssl_ctx)
 
         if use_ssl:
