@@ -64,8 +64,8 @@ class WebhookServer(object):
 
     def handle_error(self, request, client_address):
         """Handle an error gracefully."""
-        self.logger.info('Exception happened during processing of request from %s',
-                         client_address, exc_info=True)
+        self.logger.debug('Exception happened during processing of request from %s',
+                          client_address, exc_info=True)
 
 
 class WebhookAppClass(tornado.web.Application):
