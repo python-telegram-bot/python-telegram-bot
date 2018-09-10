@@ -230,18 +230,17 @@ class ConversationHandler(Handler):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
-            error = False
-            try:
-                res = new_state.result(timeout=self.run_async_timeout)
-            except Exception as exc:
-                self.logger.exception("Promise function raised exception")
-                self.logger.exception("{}".format(exc))
-                error = True
-
-            if not error and new_state.done.is_set():
-                self.update_state(res, key)
-                state = self.conversations.get(key)
-
+            if new_state.done.wait(timeout=self.run_async_timeout):
+                try:
+                    res = new_state.result(timeout=0)
+                    res = res if res is not None else old_state
+                except Exception as exc:
+                    self.logger.exception("Promise function raised exception")
+                    self.logger.exception("{}".format(exc))
+                    res = old_state
+                finally:
+                    self.update_state(res, key)
+                    state = self.conversations.get(key)
             else:
                 for candidate in (self.timed_out_behavior or []):
                     if candidate.check_update(update):
