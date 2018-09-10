@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#
+# -*- coding: utf-8 -*-
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -188,6 +188,21 @@ class TestPhoto(object):
     def test_send_url_gif_file(self, bot, chat_id):
         message = bot.send_photo(photo='http://dummyimage.com/600x400/000/fff.png&text=telegram',
                                  chat_id=chat_id)
+
+        photo = message.photo[-1]
+
+        assert isinstance(photo, PhotoSize)
+        assert isinstance(photo.file_id, str)
+        assert photo.file_id != ''
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_file_unicode_filename(self, bot, chat_id):
+        """
+        Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
+        """
+        with open(u'tests/data/测试.png', 'rb') as f:
+            message = bot.send_photo(photo=f, chat_id=chat_id)
 
         photo = message.photo[-1]
 
