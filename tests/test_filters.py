@@ -68,6 +68,9 @@ class TestFilters(object):
         message.text = 'i love python'
         assert Filters.regex(r'.\b[lo]{2}ve python')(message)
 
+        message.text = None
+        assert not Filters.regex(r'fail')(message)
+
     def test_filters_reply(self, message):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
                                   Chat(0, 'private'))
@@ -184,6 +187,11 @@ class TestFilters(object):
         message.document.mime_type = "application/x-sh"
         assert Filters.document.category("application/")(message)
         assert Filters.document.mime_type("application/x-sh")(message)
+
+    def test_filters_animation(self, message):
+        assert not Filters.animation(message)
+        message.animation = 'test'
+        assert Filters.animation(message)
 
     def test_filters_photo(self, message):
         assert not Filters.photo(message)
@@ -392,6 +400,11 @@ class TestFilters(object):
         assert not Filters.successful_payment(message)
         message.successful_payment = 'test'
         assert Filters.successful_payment(message)
+
+    def test_filters_passport_data(self, message):
+        assert not Filters.passport_data(message)
+        message.passport_data = 'test'
+        assert Filters.passport_data(message)
 
     def test_language_filter_single(self, message):
         message.from_user.language_code = 'en_US'

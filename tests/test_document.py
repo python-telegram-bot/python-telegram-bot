@@ -45,7 +45,7 @@ class TestDocument(object):
     file_name = 'telegram.png'
     thumb_file_size = 2364
     thumb_width = 90
-    thumb_heigth = 90
+    thumb_height = 90
 
     def test_creation(self, document):
         assert isinstance(document, Document)
@@ -58,14 +58,14 @@ class TestDocument(object):
         assert document.file_name == self.file_name
         assert document.thumb.file_size == self.thumb_file_size
         assert document.thumb.width == self.thumb_width
-        assert document.thumb.height == self.thumb_heigth
+        assert document.thumb.height == self.thumb_height
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, document_file, document):
+    def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
         message = bot.send_document(chat_id, document=document_file, caption=self.caption,
                                     disable_notification=False, filename='telegram_custom.png',
-                                    parse_mode='Markdown')
+                                    parse_mode='Markdown', thumb=thumb_file)
 
         assert isinstance(message.document, Document)
         assert isinstance(message.document.file_id, str)
@@ -74,8 +74,9 @@ class TestDocument(object):
         assert message.document.file_name == 'telegram_custom.png'
         assert message.document.mime_type == document.mime_type
         assert message.document.file_size == document.file_size
-        assert message.document.thumb == document.thumb
         assert message.caption == self.caption.replace('*', '')
+        assert message.document.thumb.width == 50
+        assert message.document.thumb.height == 50
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

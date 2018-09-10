@@ -35,6 +35,9 @@ class InlineQueryResultVenue(InlineQueryResult):
         title (:obj:`str`): Title of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`): Optional. Foursquare identifier of the venue if known.
+        foursquare_type (:obj:`str`): Optional. Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -50,6 +53,9 @@ class InlineQueryResultVenue(InlineQueryResult):
         title (:obj:`str`): Title of the venue.
         address (:obj:`str`): Address of the venue.
         foursquare_id (:obj:`str`, optional): Foursquare identifier of the venue if known.
+        foursquare_type (:obj:`str`, optional): Foursquare type of the venue, if known.
+            (For example, "arts_entertainment/default", "arts_entertainment/aquarium" or
+            "food/icecream".)
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -68,6 +74,7 @@ class InlineQueryResultVenue(InlineQueryResult):
                  title,
                  address,
                  foursquare_id=None,
+                 foursquare_type=None,
                  reply_markup=None,
                  input_message_content=None,
                  thumb_url=None,
@@ -85,6 +92,8 @@ class InlineQueryResultVenue(InlineQueryResult):
         # Optional
         if foursquare_id:
             self.foursquare_id = foursquare_id
+        if foursquare_type:
+            self.foursquare_type = foursquare_type
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

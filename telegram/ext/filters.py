@@ -198,7 +198,9 @@ class Filters(object):
         # the matched groups and groupdict to the context object.
 
         def filter(self, message):
-            return bool(self.pattern.search(message.text))
+            if message.text:
+                return bool(self.pattern.search(message.text))
+            return False
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
@@ -299,6 +301,15 @@ class Filters(object):
 
     document = _Document()
     """:obj:`Filter`: Messages that contain :class:`telegram.Document`."""
+
+    class _Animation(BaseFilter):
+        name = 'Filters.animation'
+
+        def filter(self, message):
+            return bool(message.animation)
+
+    animation = _Animation()
+    """:obj:`Filter`: Messages that contain :class:`telegram.Animation`."""
 
     class _Photo(BaseFilter):
         name = 'Filters.photo'
@@ -674,6 +685,15 @@ class Filters(object):
 
     successful_payment = _SuccessfulPayment()
     """:obj:`Filter`: Messages that confirm a :class:`telegram.SuccessfulPayment`."""
+
+    class _PassportData(BaseFilter):
+        name = 'Filters.passport_data'
+
+        def filter(self, message):
+            return bool(message.passport_data)
+
+    passport_data = _PassportData()
+    """:obj:`Filter`: Messages that contain a :class:`telegram.PassportData`"""
 
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.

@@ -19,132 +19,68 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputFile."""
 
-try:
-    # python 3
-    from email.generator import _make_boundary as choose_boundary
-except ImportError:
-    # python 2
-    from mimetools import choose_boundary
-
 import imghdr
 import mimetypes
 import os
 import sys
+from uuid import uuid4
 
 from telegram import TelegramError
 
 DEFAULT_MIME_TYPE = 'application/octet-stream'
-USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
-FILE_TYPES = ('audio', 'document', 'photo', 'sticker', 'video', 'voice', 'certificate',
-              'video_note', 'png_sticker')
 
 
 class InputFile(object):
     """This object represents a Telegram InputFile.
 
     Attributes:
-        data (:obj:`dict`): Data containing an inputfile.
+        input_file_content (:obj:`bytes`): The binaray content of the file to send.
+        filename (:obj:`str`): Optional, Filename for the file to be sent.
+        attach (:obj:`str`): Optional, attach id for sending multiple files.
 
     Args:
-        data (:obj:`dict`): Data containing an inputfile.
+        obj (:obj:`File handler`): An open file descriptor.
+        filename (:obj:`str`, optional): Filename for this InputFile.
+        attach (:obj:`bool`, optional): Whether this should be send as one file or is part of a
+            collection of files.
 
     Raises:
         TelegramError
 
     """
 
-    def __init__(self, data):
-        self.data = data
-        self.boundary = choose_boundary()
+    def __init__(self, obj, filename=None, attach=None):
+        self.filename = None
+        self.input_file_content = obj.read()
+        self.attach = 'attached' + uuid4().hex if attach else None
 
-        for t in FILE_TYPES:
-            if t in data:
-                self.input_name = t
-                self.input_file = data.pop(t)
-                break
-        else:
-            raise TelegramError('Unknown inputfile type')
+        if filename:
+            self.filename = filename
+        elif (hasattr(obj, 'name') and
+              not isinstance(obj.name, int) and  # py3
+              obj.name != '<fdopen>'):  # py2
+            # on py2.7, pylint fails to understand this properly
+            # pylint: disable=E1101
+            self.filename = os.path.basename(obj.name)
 
-        if hasattr(self.input_file, 'read'):
-            self.filename = None
-            self.input_file_content = self.input_file.read()
-            if 'filename' in data:
-                self.filename = self.data.pop('filename')
-            elif (hasattr(self.input_file, 'name') and
-                  not isinstance(self.input_file.name, int) and  # py3
-                  self.input_file.name != '<fdopen>'):  # py2
-                # on py2.7, pylint fails to understand this properly
-                # pylint: disable=E1101
-                self.filename = os.path.basename(self.input_file.name)
-
-            try:
-                self.mimetype = self.is_image(self.input_file_content)
-                if not self.filename or '.' not in self.filename:
-                    self.filename = self.mimetype.replace('/', '.')
-            except TelegramError:
-                if self.filename:
-                    self.mimetype = mimetypes.guess_type(
-                        self.filename)[0] or DEFAULT_MIME_TYPE
-                else:
-                    self.mimetype = DEFAULT_MIME_TYPE
+        try:
+            self.mimetype = self.is_image(self.input_file_content)
+        except TelegramError:
+            if self.filename:
+                self.mimetype = mimetypes.guess_type(
+                    self.filename)[0] or DEFAULT_MIME_TYPE
+            else:
+                self.mimetype = DEFAULT_MIME_TYPE
+        if not self.filename or '.' not in self.filename:
+            self.filename = self.mimetype.replace('/', '.')
 
         if sys.version_info < (3,):
             if isinstance(self.filename, unicode):  # flake8: noqa  pylint: disable=E0602
                 self.filename = self.filename.encode('utf-8', 'replace')
 
     @property
-    def headers(self):
-        """:obj:`dict`: Headers."""
-
-        return {'User-agent': USER_AGENT, 'Content-type': self.content_type}
-
-    @property
-    def content_type(self):
-        """:obj:`str`: Content type"""
-        return 'multipart/form-data; boundary=%s' % self.boundary
-
-    def to_form(self):
-        """Transform the inputfile to multipart/form data.
-
-        Returns:
-            :obj:`str`
-
-        """
-        form = []
-        form_boundary = '--' + self.boundary
-
-        # Add data fields
-        for name in iter(self.data):
-            value = self.data[name]
-            form.extend([
-                form_boundary, 'Content-Disposition: form-data; name="%s"' % name, '', str(value)
-            ])
-
-        # Add input_file to upload
-        form.extend([
-            form_boundary, 'Content-Disposition: form-data; name="%s"; filename="%s"' %
-            (self.input_name,
-             self.filename), 'Content-Type: %s' % self.mimetype, '', self.input_file_content
-        ])
-
-        form.append('--' + self.boundary + '--')
-        form.append('')
-
-        return self._parse(form)
-
-    @staticmethod
-    def _parse(form):
-        if sys.version_info > (3,):
-            # on Python 3 form needs to be byte encoded
-            encoded_form = []
-            for item in form:
-                try:
-                    encoded_form.append(item.encode())
-                except AttributeError:
-                    encoded_form.append(item)
-
-            return b'\r\n'.join(encoded_form)
-        return '\r\n'.join(form)
+    def field_tuple(self):
+        return self.filename, self.input_file_content, self.mimetype
 
     @staticmethod
     def is_image(stream):
@@ -164,22 +100,9 @@ class InputFile(object):
         raise TelegramError('Could not parse file content')
 
     @staticmethod
-    def is_inputfile(data):
-        """Check if the request is a file request.
+    def is_file(obj):
+        return hasattr(obj, 'read')
 
-        Args:
-            data (Dict[:obj:`str`, :obj:`str`]): A dict of (str, str) key/value pairs.
-
-        Returns:
-            :obj:`bool`
-
-        """
-        if data:
-            file_type = [i for i in iter(data) if i in FILE_TYPES]
-
-            if file_type:
-                file_content = data[file_type[0]]
-
-                return hasattr(file_content, 'read')
-
-        return False
+    def to_dict(self):
+        if self.attach:
+            return 'attach://' + self.attach

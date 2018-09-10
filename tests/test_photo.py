@@ -202,14 +202,14 @@ class TestPhoto(object):
 
         # raw image bytes
         raw_bytes = BytesIO(open(file_name, 'rb').read())
-        inputfile = InputFile({'photo': raw_bytes})
-        assert inputfile.mimetype == 'application/octet-stream'
+        input_file = InputFile(raw_bytes)
+        assert input_file.mimetype == 'application/octet-stream'
 
         # raw image bytes with name info
         raw_bytes = BytesIO(open(file_name, 'rb').read())
         raw_bytes.name = file_name
-        inputfile = InputFile({'photo': raw_bytes})
-        assert inputfile.mimetype == 'image/jpeg'
+        input_file = InputFile(raw_bytes)
+        assert input_file.mimetype == 'image/jpeg'
 
         # send raw photo
         raw_bytes = BytesIO(open(file_name, 'rb').read())

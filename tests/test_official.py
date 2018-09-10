@@ -23,8 +23,8 @@ from platform import python_implementation
 import certifi
 import pytest
 from bs4 import BeautifulSoup
-
 from telegram.vendor.ptb_urllib3 import urllib3
+
 import telegram
 
 IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
@@ -99,6 +99,8 @@ def check_object(h4):
         elif ((name.startswith('InlineQueryResult') or
                name.startswith('InputMedia')) and field == 'type'):
             continue
+        elif name.startswith('PassportElementError') and field == 'source':
+            continue
         elif field == 'remove_keyboard':
             continue
 
@@ -110,14 +112,15 @@ def check_object(h4):
 
     ignored = IGNORED_PARAMETERS.copy()
     if name == 'InputFile':
-        ignored |= {'data'}
+        return
     elif name == 'InlineQueryResult':
-        ignored |= {'id'}
+        ignored |= {'id', 'type'}
     elif name == 'User':
         ignored |= {'type'}  # TODO: Deprecation
-
-    if name.startswith('InlineQueryResult'):
-        ignored |= {'type'}
+    elif name in ('PassportFile', 'EncryptedPassportElement'):
+        ignored |= {'credentials'}
+    elif name == 'PassportElementError':
+        ignored |= {'message', 'type', 'source'}
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 

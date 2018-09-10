@@ -81,6 +81,10 @@ class MessageEntity(TelegramObject):
     """:obj:`str`: 'mention'"""
     HASHTAG = 'hashtag'
     """:obj:`str`: 'hashtag'"""
+    CASHTAG = 'cashtag'
+    """:obj:`str`: 'cashtag'"""
+    PHONE_NUMBER = 'phone_number'
+    """:obj:`str`: 'phone_number'"""
     BOT_COMMAND = 'bot_command'
     """:obj:`str`: 'bot_command'"""
     URL = 'url'
@@ -100,6 +104,7 @@ class MessageEntity(TelegramObject):
     TEXT_MENTION = 'text_mention'
     """:obj:`str`: 'text_mention'"""
     ALL_TYPES = [
-        MENTION, HASHTAG, BOT_COMMAND, URL, EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
+        MENTION, HASHTAG, CASHTAG, PHONE_NUMBER, BOT_COMMAND, URL,
+        EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
     ]
     """List[:obj:`str`]: List of all the types."""

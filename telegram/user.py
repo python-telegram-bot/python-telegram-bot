@@ -203,6 +203,19 @@ class User(TelegramObject):
         """
         return self.bot.send_document(self.id, *args, **kwargs)
 
+    def send_animation(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_animation(User.id, *args, **kwargs)
+
+        Where User is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_animation(self.id, *args, **kwargs)
+
     def send_sticker(self, *args, **kwargs):
         """Shortcut for::
 

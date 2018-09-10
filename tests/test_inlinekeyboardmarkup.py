@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -33,6 +34,8 @@ class TestInlineKeyboardMarkup(object):
         InlineKeyboardButton(text='button2', callback_data='data2')
     ]]
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_message_with_inline_keyboard_markup(self, bot, chat_id, inline_keyboard_markup):
         message = bot.send_message(
             chat_id,
