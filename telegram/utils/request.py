@@ -36,6 +36,7 @@ try:
     import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
     from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
+    from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
 except ImportError:  # pragma: no cover
     warnings.warn("python-telegram-bot wasn't properly installed. Please refer to README.rst on "
                   "how to properly install.")
@@ -44,6 +45,20 @@ except ImportError:  # pragma: no cover
 from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
                             RetryAfter, InvalidToken)
+
+
+def _render_part(self, name, value):
+    """
+    Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
+    Content-Disposition headers since telegram servers don't understand it. Instead just escape
+    \ and " and replace any \n and \r with a space.
+    """
+    value = value.replace(u'\\', u'\\\\').replace(u'"', u'\\"')
+    value = value.replace(u'\r', u' ').replace(u'\n', u' ')
+    return u'%s="%s"' % (name, value)
+
+
+RequestField._render_part = _render_part
 
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 

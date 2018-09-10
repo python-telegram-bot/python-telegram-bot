@@ -197,6 +197,21 @@ class TestPhoto(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_file_unicode_filename(self, bot, chat_id):
+        """
+        Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
+        """
+        with open('tests/data/测试.png', 'rb') as f:
+            message = bot.send_photo(photo=f, chat_id=chat_id)
+
+        photo = message.photo[-1]
+
+        assert isinstance(photo, PhotoSize)
+        assert isinstance(photo.file_id, str)
+        assert photo.file_id != ''
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_bytesio_jpg_file(self, bot, chat_id):
         file_name = 'tests/data/telegram_no_standard_header.jpg'
 
