@@ -102,7 +102,18 @@ class RetryAfter(TelegramError):
 
 
 class Conflict(TelegramError):
+    """
+        Raised when a long poll or webhook conflicts with another one.
+
+        Args:
+            msg (:obj:`str`): The message from telegrams server.
+            url (:obj:`str`) The url used to make the request. The bot id will be extracted from
+                it if possible.
+
+    """
     def __init__(self, msg, url):
+        # Get the bot token from the URL that was used to make the request
+        # Regex simply searches for id in https://api.telegram.org/botID:TOKEN/method
         match = re.search(r'bot(\d+):.*/', url)
         if match:
             msg += '. Conflicting bot id: {}'.format(match.group(1))
