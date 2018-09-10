@@ -8,7 +8,7 @@ matrix:
     - python: 3.7
       dist: xenial
       sudo: true
-    - python: pypy2.7-5.10.1
+    - python: pypy2.7-5.10.0
     - python: pypy3.5-5.10.1
 
 dist: trusty
