@@ -201,7 +201,7 @@ class TestPhoto(object):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
         """
-        with open('tests/data/测试.png', 'rb') as f:
+        with open(u'tests/data/测试.png', 'rb') as f:
             message = bot.send_photo(photo=f, chat_id=chat_id)
 
         photo = message.photo[-1]
