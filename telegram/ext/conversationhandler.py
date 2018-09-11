@@ -309,7 +309,9 @@ class ConversationHandler(Handler):
         if self.conversation_timeout and new_state != self.END:
             self.timeout_jobs[self.current_conversation] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
-                context=self.current_conversation
+                context={'current_conversation': self.current_conversation,
+                         'update': update,
+                         'dispatcher': dispatcher}
             )
 
         self.update_state(new_state, self.current_conversation)
@@ -328,5 +330,9 @@ class ConversationHandler(Handler):
             self.conversations[key] = new_state
 
     def _trigger_timeout(self, bot, job):
-        del self.timeout_jobs[job.context]
-        self.update_state(self.END, job.context)
+        del self.timeout_jobs[job.context['current_conversation']]
+        handlers = self.states.get(self.END)
+        for candidate in (handlers or []):
+            handler = candidate
+            handler.handle_update(job.context['update'], job.context['dispatcher'])
+        self.update_state(self.END, job.context['current_conversation'])
