@@ -63,9 +63,6 @@ target/
 # Sublime Text 2
 *.sublime*
 
-# Visual Studio Code
-.vscode
-
 # unitests files
 telegram.mp3
 telegram.mp4
