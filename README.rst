@@ -85,7 +85,6 @@ Introduction
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
 It's compatible with Python versions 2.7, 3.3+ and `PyPy <http://pypy.org/>`_.
-It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
