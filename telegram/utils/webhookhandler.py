@@ -84,7 +84,7 @@ class WebhookAppClass(tornado.web.Application):
 
 # WebhookHandler, process webhook calls
 class WebhookHandler(tornado.web.RequestHandler):
-    SUPPORTED_METHODS = ["POST"]
+    SUPPORTED_METHODS = ["GET", "POST"]
 
     def __init__(self, application, request, **kwargs):
         super(WebhookHandler, self).__init__(application, request, **kwargs)
@@ -96,6 +96,9 @@ class WebhookHandler(tornado.web.RequestHandler):
 
     def set_default_headers(self):
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
+
+    def get(self):
+        self.set_status(200)
 
     def post(self):
         self.logger.debug('Webhook triggered')
