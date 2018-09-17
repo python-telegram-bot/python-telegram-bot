@@ -63,8 +63,12 @@ class TestConversationHandler(object):
                 CommandHandler('gettingThirsty', self.start),
                 CommandHandler('drinkMore', self.drink)
             ],
+            ConversationHandler.TIMEOUT: [
+                CommandHandler('Nothing', self.passout)
+            ]
         }
         self.fallbacks = [CommandHandler('eat', self.start)]
+        self.is_timeout = False
 
     # State handlers
     def _set_state(self, update, state):
@@ -89,6 +93,10 @@ class TestConversationHandler(object):
 
     def code(self, bot, update):
         return self._set_state(update, self.CODING)
+
+    def passout(self, bot, update):
+        self.is_timeout = True
+        return self._set_state(update, self.END)
 
     # Tests
     def test_per_all_false(self):
@@ -341,6 +349,7 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.5)
         dp.job_queue.tick()
+        assert self.is_timeout is True
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
     def test_conversation_timeout_keeps_extending(self, dp, bot, user1):
@@ -375,6 +384,7 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
         sleep(.1)  # t=1.1
         dp.job_queue.tick()
+        assert self.is_timeout is True
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
     def test_conversation_timeout_two_users(self, dp, bot, user1, user2):
@@ -397,5 +407,6 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
         sleep(0.5)
         dp.job_queue.tick()
+        assert self.is_timeout is True
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert handler.conversations.get((self.group.id, user2.id)) is None

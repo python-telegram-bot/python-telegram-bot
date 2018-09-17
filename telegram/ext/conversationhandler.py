@@ -55,7 +55,8 @@ class ConversationHandler(Handler):
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. To end the conversation, the callback function must
-    return :attr:`END` or ``-1``.
+    return :attr:`END` or ``-1``. To handle the conversation timeout, use must add handler
+    for :attr:`TIMEOUT` or ``-2``.
 
     Attributes:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -79,6 +80,7 @@ class ConversationHandler(Handler):
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
             this value is 0 (default), there will be no timeout.
+            Handled in state :attr:`TIMEOUT` or ``-2``
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -120,6 +122,8 @@ class ConversationHandler(Handler):
     """
     END = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
+    TIMEOUT = -2
+    """:obj:`int`: Used as a constant to handle state when a conversation is timed out."""
 
     def __init__(self,
                  entry_points,
@@ -330,8 +334,9 @@ class ConversationHandler(Handler):
             self.conversations[key] = new_state
 
     def _trigger_timeout(self, bot, job):
+        self.logger.debug('conversation timeout was triggered!')
         del self.timeout_jobs[job.context['current_conversation']]
-        handlers = self.states.get(self.END)
+        handlers = self.states.get(self.TIMEOUT)
         for candidate in (handlers or []):
             handler = candidate
             handler.handle_update(job.context['update'], job.context['dispatcher'])
