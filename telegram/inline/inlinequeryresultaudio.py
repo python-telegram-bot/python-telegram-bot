@@ -36,7 +36,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration (:obj:`str`): Optional. Performer.
         caption (:obj:`str`): Optional. Audio duration in seconds.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
@@ -51,7 +51,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration (:obj:`str`, optional): Performer.
         caption (:obj:`str`, optional): Audio duration in seconds.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.

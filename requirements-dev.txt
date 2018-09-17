@@ -7,3 +7,4 @@ pre-commit
 beautifulsoup4
 pytest
 pytest-timeout
+wheel

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#
+# -*- coding: utf-8 -*-
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -197,19 +197,34 @@ class TestPhoto(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_file_unicode_filename(self, bot, chat_id):
+        """
+        Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
+        """
+        with open(u'tests/data/测试.png', 'rb') as f:
+            message = bot.send_photo(photo=f, chat_id=chat_id)
+
+        photo = message.photo[-1]
+
+        assert isinstance(photo, PhotoSize)
+        assert isinstance(photo.file_id, str)
+        assert photo.file_id != ''
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_bytesio_jpg_file(self, bot, chat_id):
         file_name = 'tests/data/telegram_no_standard_header.jpg'
 
         # raw image bytes
         raw_bytes = BytesIO(open(file_name, 'rb').read())
-        inputfile = InputFile({'photo': raw_bytes})
-        assert inputfile.mimetype == 'application/octet-stream'
+        input_file = InputFile(raw_bytes)
+        assert input_file.mimetype == 'application/octet-stream'
 
         # raw image bytes with name info
         raw_bytes = BytesIO(open(file_name, 'rb').read())
         raw_bytes.name = file_name
-        inputfile = InputFile({'photo': raw_bytes})
-        assert inputfile.mimetype == 'image/jpeg'
+        input_file = InputFile(raw_bytes)
+        assert input_file.mimetype == 'image/jpeg'
 
         # send raw photo
         raw_bytes = BytesIO(open(file_name, 'rb').read())

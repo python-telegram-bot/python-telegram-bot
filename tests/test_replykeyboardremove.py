@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import ReplyKeyboardRemove
 
@@ -31,6 +32,8 @@ class TestReplyKeyboardRemove(object):
     remove_keyboard = True
     selective = True
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_message_with_reply_keyboard_remove(self, bot, chat_id, reply_keyboard_remove):
         message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
 

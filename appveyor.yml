@@ -26,7 +26,6 @@ install:
   - "python --version"
   # We need wheel installed to build wheels
   - "pip install -U codecov pytest-cov"
-  - "pip install -U wheel"
   - "pip install -r requirements.txt"
   - "pip install -r requirements-dev.txt"
 

@@ -116,6 +116,14 @@ class Chat(TelegramObject):
         self.bot = bot
         self._id_attrs = (self.id,)
 
+    @property
+    def link(self):
+        """:obj:`str`: Convenience property. If the chat has a :attr:`username`, returns a t.me
+        link of the chat."""
+        if self.username:
+            return "https://t.me/{}".format(self.username)
+        return None
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
@@ -264,6 +272,19 @@ class Chat(TelegramObject):
 
         """
         return self.bot.send_document(self.id, *args, **kwargs)
+
+    def send_animation(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_animation(Chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_animation(self.id, *args, **kwargs)
 
     def send_sticker(self, *args, **kwargs):
         """Shortcut for::
