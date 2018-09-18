@@ -103,7 +103,7 @@ class Dispatcher(object):
         self.chat_data = defaultdict(dict)
         if persistence:
             if not isinstance(persistence, BasePersistence):
-                self.logger.warning("persistence should be based on telegram.ext.BasePersistence")
+                raise TypeError("persistence should be based on telegram.ext.BasePersistence")
             self.persistence = persistence
             if self.persistence.store_user_data:
                 self.user_data = self.persistence.get_user_data()

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import logging
 from queue import Queue
 from threading import current_thread
 from time import sleep
@@ -89,11 +88,9 @@ class TestDispatcher(object):
                 self.store_user_data = False
                 self.store_chat_data = False
 
-        with caplog.at_level(logging.WARNING):
+        with pytest.raises(TypeError,
+                           match='persistence should be based on telegram.ext.BasePersistence'):
             Dispatcher(bot, None, persistence=my_per())
-        rec = caplog.records[-1]
-        assert rec.msg == 'persistence should be based on telegram.ext.BasePersistence'
-        assert rec.levelname == 'WARNING'
 
     def test_error_handler_that_raises_errors(self, dp):
         """
