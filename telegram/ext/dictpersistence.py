@@ -156,39 +156,39 @@ class DictPersistence(BasePersistence):
             self._conversations = {}
         return self.conversations.get(name, {}).copy()
 
-    def update_conversations(self, name, conversations):
+    def update_conversation(self, name, key, new_state):
         """Will update the conversations for the given handler.
 
         Args:
             name (:obj:`str`): The handlers name.
-            conversations (:obj:`dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
-                dict to store.
+            key (:obj:`tuple`): The key the state is changed for.
+            new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
-        if self._conversations.get(name) == conversations:
+        if self._conversations.setdefault(name, {}).get(key) == new_state:
             return
-        self._conversations[name] = conversations
+        self._conversations[name][key] = new_state
         self._conversations_json = None
 
-    def update_user_data(self, user_data):
+    def update_user_data(self, user_id, data):
         """Will update the user_data (if changed).
 
         Args:
-            user_data (:obj:`defaultdict`): The :attr:`telegram.ext.Dispatcher.user_data`
-                defaultdict to store.
+            user_id (:obj:`int`): The user the data might have been changed for.
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
         """
-        if self._user_data == user_data:
+        if self._user_data.get(user_id) == data:
             return
-        self._user_data = user_data
+        self._user_data[user_id] = data
         self._user_data_json = None
 
-    def update_chat_data(self, chat_data):
+    def update_chat_data(self, chat_id, data):
         """Will update the chat_data (if changed).
 
         Args:
-            chat_data (:obj:`defaultdict`): The :attr:`telegram.ext.Dispatcher.chat_data`
-                defaultdict to store.
+            chat_id (:obj:`int`): The chat the data might have been changed for.
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[chat_id].
         """
-        if self._chat_data == chat_data:
+        if self._chat_data.get(chat_id) == data:
             return
-        self._chat_data = chat_data
+        self._chat_data[chat_id] = data
         self._chat_data_json = None

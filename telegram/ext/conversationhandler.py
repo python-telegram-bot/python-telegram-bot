@@ -335,17 +335,21 @@ class ConversationHandler(Handler):
         if new_state == self.END:
             if key in self.conversations:
                 del self.conversations[key]
+                if self.persistent:
+                    self.persistence.update_conversation(self.name, key, None)
             else:
                 pass
 
         elif isinstance(new_state, Promise):
             self.conversations[key] = (self.conversations.get(key), new_state)
+            if self.persistent:
+                self.persistence.update_conversation(self.name, key,
+                                                     (self.conversations.get(key), new_state))
 
         elif new_state is not None:
             self.conversations[key] = new_state
-
-        if self.persistent:
-            self.persistence.update_conversations(self.name, self.conversations)
+            if self.persistent:
+                self.persistence.update_conversation(self.name, key, new_state)
 
     def _trigger_timeout(self, bot, job):
         del self.timeout_jobs[job.context]

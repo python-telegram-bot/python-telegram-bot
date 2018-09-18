@@ -300,14 +300,16 @@ class Dispatcher(object):
                 for handler in (x for x in self.handlers[group] if x.check_update(update)):
                     handler.handle_update(update, self)
                     if self.persistence:
-                        if self.persistence.store_chat_data:
+                        if self.persistence.store_chat_data and update.effective_chat.id:
+                            chat_id = update.effective_chat.id
                             try:
-                                self.persistence.update_chat_data(self.chat_data)
+                                self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
                             except Exception:
                                 self.logger.exception('Saving chat data raised an error')
-                        if self.persistence.store_user_data:
+                        if self.persistence.store_user_data and update.effective_user.id:
+                            user_id = update.effective_user.id
                             try:
-                                self.persistence.update_user_data(self.user_data)
+                                self.persistence.update_user_data(user_id, self.user_data[user_id])
                             except Exception:
                                 self.logger.exception('Saving user data raised an error')
                     break

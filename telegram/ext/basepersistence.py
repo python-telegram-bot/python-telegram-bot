@@ -30,7 +30,7 @@ class BasePersistence(object):
     * If :attr:`store_user_data` is ``True`` you must overwrite :meth:`get_user_data` and
       :meth:`update_user_data`.
     * If you want to store conversation data with :class:`telegram.ext.ConversationHandler`, you
-      must overwrite :meth:`get_conversations` and :meth:`update_conversations`.
+      must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
     * :meth:`flush` will be called when the bot is shutdown.
 
     Attributes:
@@ -84,34 +84,34 @@ class BasePersistence(object):
         """
         raise NotImplementedError
 
-    def update_conversations(self, name, conversations):
+    def update_conversation(self, name, key, new_state):
         """Will be called when a :attr:`telegram.ext.ConversationHandler.update_state`
         is called. this allows the storeage of the new state in the persistence.
 
         Args:
             name (:obj:`str`): The handlers name.
-            conversations (:obj:`dict`): The :attr:`telegram.ext.ConversationHandler.conversations`
-                dict to store.
+            key (:obj:`tuple`): The key the state is changed for.
+            new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
         raise NotImplementedError
 
-    def update_user_data(self, user_data):
+    def update_user_data(self, user_id, data):
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
-        handled an update. It will be the :attr:`telegram.ext.Dispatcher.user_data` defaultdict.
+        handled an update.
 
         Args:
-            user_data (:obj:`defaultdict`): The :attr:`telegram.ext.dispatcher.user_data`
-                defaultdict to store.
+            user_id (:obj:`int`): The user the data might have been changed for.
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
         """
         raise NotImplementedError
 
-    def update_chat_data(self, chat_data):
+    def update_chat_data(self, chat_id, data):
         """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
-        handled an update. It will be the :attr:`telegram.ext.Dispatcher.chat_data` defaultdict.
+        handled an update.
 
         Args:
-            chat_data (:obj:`defaultdict`): The :attr:`telegram.ext.dispatcher.chat_data`
-                defaultdict to store.
+            chat_id (:obj:`int`): The chat the data might have been changed for.
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[user_id].
         """
         raise NotImplementedError
 
