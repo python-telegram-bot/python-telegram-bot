@@ -92,7 +92,7 @@ class TestDispatcher(object):
         with caplog.at_level(logging.WARNING):
             Dispatcher(bot, None, persistence=my_per())
         rec = caplog.records[-1]
-        assert rec.msg == 'persistence should be based on Telegram.ext.BasePersistence'
+        assert rec.msg == 'persistence should be based on telegram.ext.BasePersistence'
         assert rec.levelname == 'WARNING'
 
     def test_error_handler_that_raises_errors(self, dp):
