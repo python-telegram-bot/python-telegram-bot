@@ -72,8 +72,8 @@ class Dispatcher(object):
             instance to pass onto handler callbacks.
         workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
             decorator.
-        user_data (:obj:`dict`): A dictionary handlers can use to store data for the user.
-        chat_data (:obj:`dict`): A dictionary handlers can use to store data for the chat.
+        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts
 
@@ -99,26 +99,22 @@ class Dispatcher(object):
         self.bot = bot
         self.update_queue = update_queue
         self.workers = workers
+        self.user_data = defaultdict(dict)
+        self.chat_data = defaultdict(dict)
         if persistence:
             if not isinstance(persistence, BasePersistence):
-                self.logger.warning("persistence should be based on Telegram.ext.BasePersistence")
+                self.logger.warning("persistence should be based on telegram.ext.BasePersistence")
             self.persistence = persistence
-        else:
-            self.persistence = None
-
-        if self.persistence:
             if self.persistence.store_user_data:
                 self.user_data = self.persistence.get_user_data()
                 if not isinstance(self.user_data, defaultdict):
                     raise ValueError("user_data must be of type defaultdict")
-            else:
-                self.user_data = defaultdict(dict)
             if self.persistence.store_chat_data:
                 self.chat_data = self.persistence.get_chat_data()
                 if not isinstance(self.chat_data, defaultdict):
                     raise ValueError("chat_data must be of type defaultdict")
-            else:
-                self.chat_data = defaultdict(dict)
+        else:
+            self.persistence = None
 
         self.job_queue = job_queue
 

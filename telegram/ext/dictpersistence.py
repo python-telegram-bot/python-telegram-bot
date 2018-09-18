@@ -192,3 +192,6 @@ class DictPersistence(BasePersistence):
             return
         self._chat_data = chat_data
         self._chat_data_json = None
+
+    def flush(self):
+        pass
