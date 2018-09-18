@@ -16,6 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from telegram.utils.helpers import enocde_conversations_to_json
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 import logging
 import os
 import pickle
@@ -25,7 +31,7 @@ import pytest
 
 from telegram import Update, Message, User, Chat
 from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageHandler, Filters, \
-    PicklePersistence, CommandHandler
+    PicklePersistence, CommandHandler, DictPersistence
 
 
 @pytest.fixture(scope="function")
@@ -35,12 +41,18 @@ def base_persistence():
 
 @pytest.fixture(scope="function")
 def chat_data():
-    return defaultdict(dict, {-12345: {'test1': 'test2'}, -67890: {'test3': 'test4'}})
+    return defaultdict(dict, {-12345: {'test1': 'test2'}, -67890: {3: 'test4'}})
 
 
 @pytest.fixture(scope="function")
 def user_data():
-    return defaultdict(dict, {12345: {'test1': 'test2'}, 67890: {'test3': 'test4'}})
+    return defaultdict(dict, {12345: {'test1': 'test2'}, 67890: {3: 'test4'}})
+
+
+@pytest.fixture(scope='function')
+def conversations():
+    return {'name1': {(123, 123): 3, (456, 654): 4},
+            'name2': {(123, 321): 1, (890, 890): 2}}
 
 
 @pytest.fixture(scope="function")
@@ -212,9 +224,7 @@ def bad_pickle_files():
 
 
 @pytest.fixture(scope='function')
-def good_pickle_files(user_data, chat_data):
-    conversations = {'name1': {(123, 123): 3, (456, 654): 4},
-                     'name2': {(123, 321): 1, (890, 890): 2}}
+def good_pickle_files(user_data, chat_data, conversations):
     all = {'user_data': user_data, 'chat_data': chat_data, 'conversations': conversations}
     with open('pickletest_user_data', 'wb') as f:
         pickle.dump(user_data, f)
@@ -274,13 +284,13 @@ class TestPickelPersistence(object):
         user_data = pickle_persistence.get_user_data()
         assert isinstance(user_data, defaultdict)
         assert user_data[12345]['test1'] == 'test2'
-        assert user_data[67890]['test3'] == 'test4'
+        assert user_data[67890][3] == 'test4'
         assert user_data[54321] == {}
 
         chat_data = pickle_persistence.get_chat_data()
         assert isinstance(chat_data, defaultdict)
         assert chat_data[-12345]['test1'] == 'test2'
-        assert chat_data[-67890]['test3'] == 'test4'
+        assert chat_data[-67890][3] == 'test4'
         assert chat_data[-54321] == {}
 
         conversation1 = pickle_persistence.get_conversations('name1')
@@ -301,13 +311,13 @@ class TestPickelPersistence(object):
         user_data = pickle_persistence.get_user_data()
         assert isinstance(user_data, defaultdict)
         assert user_data[12345]['test1'] == 'test2'
-        assert user_data[67890]['test3'] == 'test4'
+        assert user_data[67890][3] == 'test4'
         assert user_data[54321] == {}
 
         chat_data = pickle_persistence.get_chat_data()
         assert isinstance(chat_data, defaultdict)
         assert chat_data[-12345]['test1'] == 'test2'
-        assert chat_data[-67890]['test3'] == 'test4'
+        assert chat_data[-67890][3] == 'test4'
         assert chat_data[-54321] == {}
 
         conversation1 = pickle_persistence.get_conversations('name1')
@@ -553,3 +563,189 @@ class TestPickelPersistence(object):
                 os.remove(name)
         except Exception:
             pass
+
+
+@pytest.fixture(scope='function')
+def user_data_json(user_data):
+    return json.dumps(user_data)
+
+
+@pytest.fixture(scope='function')
+def chat_data_json(chat_data):
+    return json.dumps(chat_data)
+
+
+@pytest.fixture(scope='function')
+def conversations_json(conversations):
+    return """{"name1": {"[123, 123]": 3, "[456, 654]": 4}, "name2":
+              {"[123, 321]": 1, "[890, 890]": 2}}"""
+
+
+class TestDictPersistence(object):
+    def test_no_json_given(self):
+        dict_persistence = DictPersistence()
+        assert dict_persistence.get_user_data() == defaultdict(dict)
+        assert dict_persistence.get_chat_data() == defaultdict(dict)
+        assert dict_persistence.get_conversations('noname') == {}
+
+    def test_bad_json_string_given(self):
+        bad_user_data = 'thisisnojson99900()))('
+        bad_chat_data = 'thisisnojson99900()))('
+        bad_conversations = 'thisisnojson99900()))('
+        with pytest.raises(TypeError, match='user_data'):
+            DictPersistence(user_data_json=bad_user_data)
+        with pytest.raises(TypeError, match='chat_data'):
+            DictPersistence(chat_data_json=bad_chat_data)
+        with pytest.raises(TypeError, match='conversations'):
+            DictPersistence(conversations_json=bad_conversations)
+
+    def test_invalid_json_string_given(self, pickle_persistence, bad_pickle_files):
+        bad_user_data = '["this", "is", "json"]'
+        bad_chat_data = '["this", "is", "json"]'
+        bad_conversations = '["this", "is", "json"]'
+        with pytest.raises(TypeError, match='user_data'):
+            DictPersistence(user_data_json=bad_user_data)
+        with pytest.raises(TypeError, match='chat_data'):
+            DictPersistence(chat_data_json=bad_chat_data)
+        with pytest.raises(TypeError, match='conversations'):
+            DictPersistence(conversations_json=bad_conversations)
+
+    def test_good_json_input(self, user_data_json, chat_data_json, conversations_json):
+        dict_persistence = DictPersistence(user_data_json=user_data_json,
+                                           chat_data_json=chat_data_json,
+                                           conversations_json=conversations_json)
+        user_data = dict_persistence.get_user_data()
+        assert isinstance(user_data, defaultdict)
+        assert user_data[12345]['test1'] == 'test2'
+        assert user_data[67890][3] == 'test4'
+        assert user_data[54321] == {}
+
+        chat_data = dict_persistence.get_chat_data()
+        assert isinstance(chat_data, defaultdict)
+        assert chat_data[-12345]['test1'] == 'test2'
+        assert chat_data[-67890][3] == 'test4'
+        assert chat_data[-54321] == {}
+
+        conversation1 = dict_persistence.get_conversations('name1')
+        assert isinstance(conversation1, dict)
+        assert conversation1[(123, 123)] == 3
+        assert conversation1[(456, 654)] == 4
+        with pytest.raises(KeyError):
+            conversation1[(890, 890)]
+        conversation2 = dict_persistence.get_conversations('name2')
+        assert isinstance(conversation1, dict)
+        assert conversation2[(123, 321)] == 1
+        assert conversation2[(890, 890)] == 2
+        with pytest.raises(KeyError):
+            conversation2[(123, 123)]
+
+    def test_dict_outputs(self, user_data, user_data_json, chat_data, chat_data_json,
+                          conversations, conversations_json):
+        dict_persistence = DictPersistence(user_data_json=user_data_json,
+                                           chat_data_json=chat_data_json,
+                                           conversations_json=conversations_json)
+        assert dict_persistence.user_data == user_data
+        assert dict_persistence.chat_data == chat_data
+        assert dict_persistence.conversations == conversations
+
+    def test_json_outputs(self, user_data_json, chat_data_json, conversations_json):
+        dict_persistence = DictPersistence(user_data_json=user_data_json,
+                                           chat_data_json=chat_data_json,
+                                           conversations_json=conversations_json)
+        assert dict_persistence.user_data_json == user_data_json
+        assert dict_persistence.chat_data_json == chat_data_json
+        assert dict_persistence.conversations_json == conversations_json
+
+    def test_json_changes(self, user_data, user_data_json, chat_data, chat_data_json,
+                          conversations, conversations_json):
+        dict_persistence = DictPersistence(user_data_json=user_data_json,
+                                           chat_data_json=chat_data_json,
+                                           conversations_json=conversations_json)
+        user_data_two = user_data.copy()
+        user_data_two.update({4: {5: 6}})
+        dict_persistence.update_user_data(user_data_two)
+        assert dict_persistence.user_data == user_data_two
+        assert dict_persistence.user_data_json != user_data_json
+        assert dict_persistence.user_data_json == json.dumps(user_data_two)
+
+        chat_data_two = chat_data.copy()
+        chat_data_two.update({7: {8: 9}})
+        dict_persistence.update_chat_data(chat_data_two)
+        assert dict_persistence.chat_data == chat_data_two
+        assert dict_persistence.chat_data_json != chat_data_json
+        assert dict_persistence.chat_data_json == json.dumps(chat_data_two)
+
+        conversations_two = conversations.copy()
+        conversations_two.update({'name3': {(1, 2): 3}})
+        dict_persistence.update_conversations('name3', {(1, 2): 3})
+        assert dict_persistence.conversations == conversations_two
+        assert dict_persistence.conversations_json != conversations_json
+        assert dict_persistence.conversations_json == enocde_conversations_to_json(
+            conversations_two)
+
+    def test_with_handler(self, bot, update):
+        dict_persistence = DictPersistence()
+        u = Updater(bot=bot, persistence=dict_persistence)
+        dp = u.dispatcher
+
+        def first(bot, update, user_data, chat_data):
+            if not user_data == {}:
+                pytest.fail()
+            if not chat_data == {}:
+                pytest.fail()
+            user_data['test1'] = 'test2'
+            chat_data[3] = 'test4'
+
+        def second(bot, update, user_data, chat_data):
+            if not user_data['test1'] == 'test2':
+                pytest.fail()
+            if not chat_data[3] == 'test4':
+                pytest.fail()
+
+        h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
+        h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
+        dp.add_handler(h1)
+        dp.process_update(update)
+        del (dp)
+        del (u)
+        user_data = dict_persistence.user_data_json
+        chat_data = dict_persistence.chat_data_json
+        del (dict_persistence)
+        dict_persistence_2 = DictPersistence(user_data_json=user_data,
+                                             chat_data_json=chat_data)
+
+        u = Updater(bot=bot, persistence=dict_persistence_2)
+        dp = u.dispatcher
+        dp.add_handler(h2)
+        dp.process_update(update)
+
+    def test_with_conversationHandler(self, dp, update, conversations_json):
+        dict_persistence = DictPersistence(conversations_json=conversations_json)
+        dp.persistence = dict_persistence
+        NEXT, NEXT2 = range(2)
+
+        def start(bot, update):
+            return NEXT
+
+        start = CommandHandler('start', start)
+
+        def next(bot, update):
+            return NEXT2
+
+        next = MessageHandler(None, next)
+
+        def next2(bot, update):
+            return ConversationHandler.END
+
+        next2 = MessageHandler(None, next2)
+
+        ch = ConversationHandler([start], {NEXT: [next], NEXT2: [next2]}, [], name='name2',
+                                 persistent=True)
+        dp.add_handler(ch)
+        assert ch.conversations[ch._get_key(update)] == 1
+        dp.process_update(update)
+        assert ch._get_key(update) not in ch.conversations
+        update.message.text = '/start'
+        dp.process_update(update)
+        assert ch.conversations[ch._get_key(update)] == 0
+        assert ch.conversations == dict_persistence.conversations['name2']
