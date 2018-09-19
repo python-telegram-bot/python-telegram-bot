@@ -336,8 +336,9 @@ class ConversationHandler(Handler):
     def _trigger_timeout(self, bot, job):
         self.logger.debug('conversation timeout was triggered!')
         del self.timeout_jobs[job.context['current_conversation']]
-        handlers = self.states.get(self.TIMEOUT)
-        for candidate in (handlers or []):
+        handlers = self.states.get(self.TIMEOUT, [])
+        for candidate in handlers:
             handler = candidate
-            handler.handle_update(job.context['update'], job.context['dispatcher'])
+            if handler.check_update(job.context['update']):
+                handler.handle_update(job.context['update'], job.context['dispatcher'])
         self.update_state(self.END, job.context['current_conversation'])
