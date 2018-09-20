@@ -23,7 +23,8 @@ import pytest
 
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
                       PreCheckoutQuery, ShippingQuery, Update, User)
-from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler)
+from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
+                          MessageHandler)
 
 
 @pytest.fixture(scope='class')
@@ -64,7 +65,7 @@ class TestConversationHandler(object):
                 CommandHandler('drinkMore', self.drink)
             ],
             ConversationHandler.TIMEOUT: [
-                CommandHandler('Nothing', self.passout)
+                MessageHandler(None, self.passout)
             ]
         }
         self.fallbacks = [CommandHandler('eat', self.start)]
