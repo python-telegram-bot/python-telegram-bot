@@ -55,6 +55,8 @@ class Updater(object):
         dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
             dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -73,6 +75,8 @@ class Updater(object):
             `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
             request_kwargs are very useful for the advanced users who would like to control the
             default timeouts and/or control the proxy used for http communication.
+        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
+            store data that should be persistent over restarts.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -92,7 +96,8 @@ class Updater(object):
                  private_key=None,
                  private_key_password=None,
                  user_sig_handler=None,
-                 request_kwargs=None):
+                 request_kwargs=None,
+                 persistence=None):
 
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
@@ -129,12 +134,14 @@ class Updater(object):
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
+        self.persistence = persistence
         self.dispatcher = Dispatcher(
             self.bot,
             self.update_queue,
             job_queue=self.job_queue,
             workers=workers,
-            exception_event=self.__exception_event)
+            exception_event=self.__exception_event,
+            persistence=self.persistence)
         self.last_update_id = 0
         self.running = False
         self.is_idle = False
@@ -485,6 +492,8 @@ class Updater(object):
         if self.running:
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))
+            if self.persistence:
+                self.persistence.flush()
             self.stop()
             if self.user_sig_handler:
                 self.user_sig_handler(signum, frame)

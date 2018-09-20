@@ -82,6 +82,16 @@ class TestDispatcher(object):
         sleep(.1)
         assert self.received is None
 
+    def test_construction_with_bad_persistence(self, caplog, bot):
+        class my_per:
+            def __init__(self):
+                self.store_user_data = False
+                self.store_chat_data = False
+
+        with pytest.raises(TypeError,
+                           match='persistence should be based on telegram.ext.BasePersistence'):
+            Dispatcher(bot, None, persistence=my_per())
+
     def test_error_handler_that_raises_errors(self, dp):
         """
         Make sure that errors raised in error handlers don't break the main loop of the dispatcher

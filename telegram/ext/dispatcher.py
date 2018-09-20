@@ -33,6 +33,7 @@ from future.builtins import range
 from telegram import TelegramError
 from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
+from telegram.ext import BasePersistence
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 DEFAULT_GROUP = 0
@@ -48,6 +49,7 @@ def run_async(func):
     Note: Use this decorator to run handlers asynchronously.
 
     """
+
     @wraps(func)
     def async_func(*args, **kwargs):
         return Dispatcher.get_instance().run_async(func, *args, **kwargs)
@@ -70,6 +72,10 @@ class Dispatcher(object):
             instance to pass onto handler callbacks.
         workers (:obj:`int`): Number of maximum concurrent worker threads for the ``@run_async``
             decorator.
+        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
+        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts
 
     Args:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -78,6 +84,8 @@ class Dispatcher(object):
                 instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator. defaults to 4.
+        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
+            store data that should be persistent over restarts
 
     """
 
@@ -86,16 +94,30 @@ class Dispatcher(object):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None):
+    def __init__(self, bot, update_queue, workers=4, exception_event=None, job_queue=None,
+                 persistence=None):
         self.bot = bot
         self.update_queue = update_queue
-        self.job_queue = job_queue
         self.workers = workers
-
         self.user_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the user."""
         self.chat_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the chat."""
+        if persistence:
+            if not isinstance(persistence, BasePersistence):
+                raise TypeError("persistence should be based on telegram.ext.BasePersistence")
+            self.persistence = persistence
+            if self.persistence.store_user_data:
+                self.user_data = self.persistence.get_user_data()
+                if not isinstance(self.user_data, defaultdict):
+                    raise ValueError("user_data must be of type defaultdict")
+            if self.persistence.store_chat_data:
+                self.chat_data = self.persistence.get_chat_data()
+                if not isinstance(self.chat_data, defaultdict):
+                    raise ValueError("chat_data must be of type defaultdict")
+        else:
+            self.persistence = None
+
+        self.job_queue = job_queue
+
         self.handlers = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
@@ -277,6 +299,19 @@ class Dispatcher(object):
             try:
                 for handler in (x for x in self.handlers[group] if x.check_update(update)):
                     handler.handle_update(update, self)
+                    if self.persistence:
+                        if self.persistence.store_chat_data and update.effective_chat.id:
+                            chat_id = update.effective_chat.id
+                            try:
+                                self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                            except Exception:
+                                self.logger.exception('Saving chat data raised an error')
+                        if self.persistence.store_user_data and update.effective_user.id:
+                            user_id = update.effective_user.id
+                            try:
+                                self.persistence.update_user_data(user_id, self.user_data[user_id])
+                            except Exception:
+                                self.logger.exception('Saving user data raised an error')
                     break
 
             # Stop processing with any other handler.
@@ -324,11 +359,20 @@ class Dispatcher(object):
             group (:obj:`int`, optional): The group identifier. Default is 0.
 
         """
+        # Unfortunately due to circular imports this has to be here
+        from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
             raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
+        if isinstance(handler, ConversationHandler) and handler.persistent:
+            if not self.persistence:
+                raise ValueError(
+                    "Conversationhandler {} can not be persistent if dispatcher has no "
+                    "persistence".format(handler.name))
+            handler.conversations = self.persistence.get_conversations(handler.name)
+            handler.persistence = self.persistence
 
         if group not in self.handlers:
             self.handlers[group] = list()

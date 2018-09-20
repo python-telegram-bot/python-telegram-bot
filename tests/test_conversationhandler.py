@@ -96,6 +96,12 @@ class TestConversationHandler(object):
             ConversationHandler(self.entry_points, self.states, self.fallbacks,
                                 per_chat=False, per_user=False, per_message=False)
 
+    def test_name_and_persistent(self, dp):
+        with pytest.raises(ValueError, match="when handler is unnamed"):
+            dp.add_handler(ConversationHandler([], {}, [], persistent=True))
+        c = ConversationHandler([], {}, [], name="handler", persistent=True)
+        assert c.name == "handler"
+
     def test_conversation_handler(self, dp, bot, user1, user2):
         handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
                                       fallbacks=self.fallbacks)
