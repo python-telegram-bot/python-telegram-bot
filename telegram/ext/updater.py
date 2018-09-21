@@ -57,6 +57,7 @@ class Updater(object):
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
+        use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -75,6 +76,9 @@ class Updater(object):
             `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
             request_kwargs are very useful for the advanced users who would like to control the
             default timeouts and/or control the proxy used for http communication.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
+            During the deprecation period of the old API the default is ``False``. **New users**:
+            set this to ``True``.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
 
@@ -97,7 +101,8 @@ class Updater(object):
                  private_key_password=None,
                  user_sig_handler=None,
                  request_kwargs=None,
-                 persistence=None):
+                 persistence=None,
+                 use_context=False):
 
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
@@ -132,7 +137,7 @@ class Updater(object):
                            private_key_password=private_key_password)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
-        self.job_queue = JobQueue(self.bot)
+        self.job_queue = JobQueue()
         self.__exception_event = Event()
         self.persistence = persistence
         self.dispatcher = Dispatcher(
@@ -141,7 +146,9 @@ class Updater(object):
             job_queue=self.job_queue,
             workers=workers,
             exception_event=self.__exception_event,
-            persistence=self.persistence)
+            persistence=persistence,
+            use_context=use_context)
+        self.job_queue.set_dispatcher(self.dispatcher)
         self.last_update_id = 0
         self.running = False
         self.is_idle = False

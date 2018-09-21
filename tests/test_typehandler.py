@@ -17,11 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from collections import OrderedDict
+from queue import Queue
 
 import pytest
 
 from telegram import Bot
-from telegram.ext import TypeHandler
+from telegram.ext import TypeHandler, CallbackContext, JobQueue
 
 
 class TestTypeHandler(object):
@@ -41,6 +42,15 @@ class TestTypeHandler(object):
 
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
+
+    def callback_context(self, update, context):
+        self.test_flag = (isinstance(context, CallbackContext) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(update, dict) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          context.user_data is None and
+                          context.chat_data is None)
 
     def test_basic(self, dp):
         handler = TypeHandler(dict, self.callback_basic)
@@ -65,7 +75,8 @@ class TestTypeHandler(object):
         assert self.test_flag
 
         dp.remove_handler(handler)
-        handler = TypeHandler(dict, self.callback_queue_1, pass_update_queue=True)
+        handler = TypeHandler(dict, self.callback_queue_1,
+                              pass_update_queue=True)
         dp.add_handler(handler)
 
         self.test_flag = False
@@ -79,4 +90,11 @@ class TestTypeHandler(object):
 
         self.test_flag = False
         dp.process_update({'a': 1, 'b': 2})
+        assert self.test_flag
+
+    def test_context(self, cdp):
+        handler = TypeHandler(dict, self.callback_context)
+        cdp.add_handler(handler)
+
+        cdp.process_update({'a': 1, 'b': 2})
         assert self.test_flag

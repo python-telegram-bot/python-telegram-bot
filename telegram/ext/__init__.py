@@ -21,13 +21,14 @@
 from .basepersistence import BasePersistence
 from .picklepersistence import PicklePersistence
 from .dictpersistence import DictPersistence
+from .handler import Handler
+from .callbackcontext import CallbackContext
 from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
 from .choseninlineresulthandler import ChosenInlineResultHandler
 from .commandhandler import CommandHandler
-from .handler import Handler
 from .inlinequeryhandler import InlineQueryHandler
 from .messagehandler import MessageHandler
 from .filters import BaseFilter, Filters
@@ -46,5 +47,5 @@ __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'MessageHandler', 'BaseFilter', 'Filters', 'RegexHandler', 'StringCommandHandler',
            'StringRegexHandler', 'TypeHandler', 'ConversationHandler',
            'PreCheckoutQueryHandler', 'ShippingQueryHandler', 'MessageQueue', 'DelayQueue',
-           'DispatcherHandlerStop', 'run_async', 'BasePersistence', 'PicklePersistence',
-           'DictPersistence')
+           'DispatcherHandlerStop', 'run_async', 'CallbackContext', 'BasePersistence',
+           'PicklePersistence', 'DictPersistence')
