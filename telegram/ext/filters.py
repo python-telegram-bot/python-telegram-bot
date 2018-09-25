@@ -593,6 +593,15 @@ class Filters(object):
     group = _Group()
     """:obj:`Filter`: Messages sent in a group chat."""
 
+    class _Channel(BaseFilter):
+        name = 'Filters.channel'
+
+        def filter(self, message):
+            return message.chat.type == Chat.CHANNEL
+
+    channel = _Channel()
+    """:obj:`Filter`: Messages sent in a channel."""
+
     class user(BaseFilter):
         """Filters messages to allow only those which are from specified user ID.
 
