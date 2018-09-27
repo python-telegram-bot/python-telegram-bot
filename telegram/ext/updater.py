@@ -77,6 +77,9 @@ class Updater(object):
             default timeouts and/or control the proxy used for http communication.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
+                show bold, italic, fixed-width text or inline URLs in the media caption. See the
+                constants in :class:`telegram.ParseMode` for the available modes.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -97,7 +100,8 @@ class Updater(object):
                  private_key_password=None,
                  user_sig_handler=None,
                  request_kwargs=None,
-                 persistence=None):
+                 persistence=None,
+                 parse_mode=None):
 
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
@@ -129,7 +133,7 @@ class Updater(object):
                 request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
-                           private_key_password=private_key_password)
+                           private_key_password=private_key_password, parse_mode=parse_mode)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)

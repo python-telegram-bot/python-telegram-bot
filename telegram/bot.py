@@ -108,12 +108,16 @@ class Bot(TelegramObject):
             :obj:`telegram.utils.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
+                show bold, italic, fixed-width text or inline URLs in the media caption. See the
+                constants in :class:`telegram.ParseMode` for the available modes.
 
     """
 
     def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
-                 private_key_password=None):
+                 private_key_password=None, parse_mode=None):
         self.token = self._validate_token(token)
+        self.parse_mode = parse_mode
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -256,6 +260,8 @@ class Bot(TelegramObject):
 
         if parse_mode:
             data['parse_mode'] = parse_mode
+        elif self.parse_mode:
+            data['parse_mode'] = self.parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
