@@ -63,3 +63,34 @@ class TestInputFile(object):
         assert (InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype ==
                 'application/octet-stream')
         assert InputFile(BytesIO(b'blah')).mimetype == 'application/octet-stream'
+
+    def test_filenames(self):
+        assert InputFile(open('tests/data/telegram.jpg', 'rb')).filename == 'telegram.jpg'
+        assert InputFile(open('tests/data/telegram.jpg', 'rb'),
+                         filename='blah').filename == 'blah'
+        assert InputFile(open('tests/data/telegram.jpg', 'rb'),
+                         filename='blah.jpg').filename == 'blah.jpg'
+        assert InputFile(open('tests/data/telegram', 'rb')).filename == 'telegram'
+        assert InputFile(open('tests/data/telegram', 'rb'),
+                         filename='blah').filename == 'blah'
+        assert InputFile(open('tests/data/telegram', 'rb'),
+                         filename='blah.jpg').filename == 'blah.jpg'
+
+        class MockedFileobject(object):
+            # A open(?, 'rb') without a .name
+            def __init__(self, f):
+                self.f = open(f, 'rb')
+
+            def read(self):
+                return self.f.read()
+
+        assert InputFile(MockedFileobject('tests/data/telegram.jpg')).filename == 'image.jpeg'
+        assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
+                         filename='blah').filename == 'blah'
+        assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
+                         filename='blah.jpg').filename == 'blah.jpg'
+        assert InputFile(MockedFileobject('tests/data/telegram')).filename == 'application.octet-stream' # flake8: noqa
+        assert InputFile(MockedFileobject('tests/data/telegram'),
+                         filename='blah').filename == 'blah'
+        assert InputFile(MockedFileobject('tests/data/telegram'),
+                         filename='blah.jpg').filename == 'blah.jpg'
