@@ -72,7 +72,8 @@ def provider_token(bot_info):
 def create_dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
-    dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(bot), workers=2)
+    dispatcher = Dispatcher(bot, Queue(), job_queue=JobQueue(), workers=2, use_context=False)
+    dispatcher.job_queue.set_dispatcher(dispatcher)
     thr = Thread(target=dispatcher.start)
     thr.start()
     sleep(2)
@@ -107,6 +108,13 @@ def dp(_dp):
         Dispatcher._set_singleton(_dp)
     yield _dp
     Dispatcher._Dispatcher__singleton_semaphore.release()
+
+
+@pytest.fixture(scope='function')
+def cdp(dp):
+    dp.use_context = True
+    yield dp
+    dp.use_context = False
 
 
 @pytest.fixture(scope='function')

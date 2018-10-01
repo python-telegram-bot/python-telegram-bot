@@ -10,6 +10,7 @@ telegram.ext package
     telegram.ext.jobqueue
     telegram.ext.messagequeue
     telegram.ext.delayqueue
+    telegram.ext.callbackcontext
 
 Handlers
 --------
@@ -24,6 +25,7 @@ Handlers
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
     telegram.ext.precheckoutqueryhandler
+    telegram.ext.prefixhandler
     telegram.ext.regexhandler
     telegram.ext.shippingqueryhandler
     telegram.ext.stringcommandhandler
