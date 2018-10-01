@@ -70,7 +70,7 @@ class InputFile(object):
                     self.filename)[0] or DEFAULT_MIME_TYPE
             else:
                 self.mimetype = DEFAULT_MIME_TYPE
-        if not self.filename or '.' not in self.filename:
+        if not self.filename:
             self.filename = self.mimetype.replace('/', '.')
 
     @property
