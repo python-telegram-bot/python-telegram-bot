@@ -10,6 +10,9 @@ matrix:
       sudo: true
     - python: pypy2.7-5.10.0
     - python: pypy3.5-5.10.1
+  allow_failures:
+    - python: pypy2.7-5.10.0
+    - python: pypy3.5-5.10.1
 
 dist: trusty
 sudo: false
