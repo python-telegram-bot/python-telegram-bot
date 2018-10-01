@@ -13,6 +13,7 @@ sudo: false
 branches:
   only:
     - master
+    - v12
 
 cache:
   directories:
