@@ -14,7 +14,7 @@ environment:
 branches:
   only:
   - master
-  - v12
+  - /^[vV]\d+$/
 
 skip_branch_with_pr: true
 
