@@ -217,7 +217,7 @@ class PrefixHandler(CommandHandler):
 
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``Filters.update.edited_message``.
+    use ~``Filters.update.edited_message``.
 
     Attributes:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
