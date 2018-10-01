@@ -41,7 +41,7 @@ class Handler(object):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -139,7 +139,7 @@ class Handler(object):
         it should subclass this method, but remember to call this super method.
 
         DEPRECATED: This method is being replaced by new context based callbacks. Please see
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.

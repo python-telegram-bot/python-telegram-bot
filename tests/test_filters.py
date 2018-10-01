@@ -72,7 +72,7 @@ class TestFilters(object):
         update.message.text = None
         assert not Filters.regex(r'fail')(update)
 
-    def test_filters_reply(self, message):
+    def test_filters_reply(self, update):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
                                   Chat(0, 'private'))
         update.message.text = 'test'
@@ -190,15 +190,15 @@ class TestFilters(object):
         assert Filters.document.category("application/")(update)
         assert Filters.document.mime_type("application/x-sh")(update)
 
-    def test_filters_animation(self, message):
-        assert not Filters.animation(message)
-        message.animation = 'test'
-        assert Filters.animation(message)
+    def test_filters_animation(self, update):
+        assert not Filters.animation(update)
+        update.message.animation = 'test'
+        assert Filters.animation(update)
 
-    def test_filters_photo(self, message):
-        assert not Filters.photo(message)
-        message.photo = 'test'
-        assert Filters.photo(message)
+    def test_filters_photo(self, update):
+        assert not Filters.photo(update)
+        update.message.photo = 'test'
+        assert Filters.photo(update)
 
     def test_filters_sticker(self, update):
         assert not Filters.sticker(update)
@@ -403,22 +403,22 @@ class TestFilters(object):
         update.message.successful_payment = 'test'
         assert Filters.successful_payment(update)
 
-    def test_filters_passport_data(self, message):
-        assert not Filters.passport_data(message)
-        message.passport_data = 'test'
-        assert Filters.passport_data(message)
+    def test_filters_passport_data(self, update):
+        assert not Filters.passport_data(update)
+        update.message.passport_data = 'test'
+        assert Filters.passport_data(update)
 
-    def test_language_filter_single(self, message):
-        message.from_user.language_code = 'en_US'
-        assert (Filters.language('en_US'))(message)
-        assert (Filters.language('en'))(message)
-        assert not (Filters.language('en_GB'))(message)
-        assert not (Filters.language('da'))(message)
-        message.from_user.language_code = 'da'
-        assert not (Filters.language('en_US'))(message)
-        assert not (Filters.language('en'))(message)
-        assert not (Filters.language('en_GB'))(message)
-        assert (Filters.language('da'))(message)
+    def test_language_filter_single(self, update):
+        update.message.from_user.language_code = 'en_US'
+        assert (Filters.language('en_US'))(update)
+        assert (Filters.language('en'))(update)
+        assert not (Filters.language('en_GB'))(update)
+        assert not (Filters.language('da'))(update)
+        update.message.from_user.language_code = 'da'
+        assert not (Filters.language('en_US'))(update)
+        assert not (Filters.language('en'))(update)
+        assert not (Filters.language('en_GB'))(update)
+        assert (Filters.language('da'))(update)
 
     def test_language_filter_multiple(self, update):
         f = Filters.language(['en_US', 'da'])
@@ -510,40 +510,40 @@ class TestFilters(object):
         assert str(unnamed) == Unnamed.__name__
 
     def test_update_type_message(self, update):
-        assert Filters.updates.message(update)
-        assert not Filters.updates.edited_message(update)
-        assert Filters.updates.messages(update)
-        assert not Filters.updates.channel_post(update)
-        assert not Filters.updates.edited_channel_post(update)
-        assert not Filters.updates.channel_posts(update)
-        assert Filters.updates(update)
+        assert Filters.update.message(update)
+        assert not Filters.update.edited_message(update)
+        assert Filters.update.messages(update)
+        assert not Filters.update.channel_post(update)
+        assert not Filters.update.edited_channel_post(update)
+        assert not Filters.update.channel_posts(update)
+        assert Filters.update(update)
 
     def test_update_type_edited_message(self, update):
         update.edited_message, update.message = update.message, update.edited_message
-        assert not Filters.updates.message(update)
-        assert Filters.updates.edited_message(update)
-        assert Filters.updates.messages(update)
-        assert not Filters.updates.channel_post(update)
-        assert not Filters.updates.edited_channel_post(update)
-        assert not Filters.updates.channel_posts(update)
-        assert Filters.updates(update)
+        assert not Filters.update.message(update)
+        assert Filters.update.edited_message(update)
+        assert Filters.update.messages(update)
+        assert not Filters.update.channel_post(update)
+        assert not Filters.update.edited_channel_post(update)
+        assert not Filters.update.channel_posts(update)
+        assert Filters.update(update)
 
     def test_update_type_channel_post(self, update):
         update.channel_post, update.message = update.message, update.edited_message
-        assert not Filters.updates.message(update)
-        assert not Filters.updates.edited_message(update)
-        assert not Filters.updates.messages(update)
-        assert Filters.updates.channel_post(update)
-        assert not Filters.updates.edited_channel_post(update)
-        assert Filters.updates.channel_posts(update)
-        assert Filters.updates(update)
+        assert not Filters.update.message(update)
+        assert not Filters.update.edited_message(update)
+        assert not Filters.update.messages(update)
+        assert Filters.update.channel_post(update)
+        assert not Filters.update.edited_channel_post(update)
+        assert Filters.update.channel_posts(update)
+        assert Filters.update(update)
 
     def test_update_type_edited_channel_post(self, update):
         update.edited_channel_post, update.message = update.message, update.edited_message
-        assert not Filters.updates.message(update)
-        assert not Filters.updates.edited_message(update)
-        assert not Filters.updates.messages(update)
-        assert not Filters.updates.channel_post(update)
-        assert Filters.updates.edited_channel_post(update)
-        assert Filters.updates.channel_posts(update)
-        assert Filters.updates(update)
+        assert not Filters.update.message(update)
+        assert not Filters.update.edited_message(update)
+        assert not Filters.update.messages(update)
+        assert not Filters.update.channel_post(update)
+        assert Filters.update.edited_channel_post(update)
+        assert Filters.update.channel_posts(update)
+        assert Filters.update(update)

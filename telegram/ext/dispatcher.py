@@ -115,7 +115,7 @@ class Dispatcher(object):
         self.use_context = use_context
 
         if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/vp113 for details',
+            warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
                           TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
@@ -325,13 +325,15 @@ class Dispatcher(object):
                             if self.persistence.store_chat_data and update.effective_chat.id:
                                 chat_id = update.effective_chat.id
                                 try:
-                                    self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                                    self.persistence.update_chat_data(chat_id,
+                                                                      self.chat_data[chat_id])
                                 except Exception:
                                     self.logger.exception('Saving chat data raised an error')
                             if self.persistence.store_user_data and update.effective_user.id:
                                 user_id = update.effective_user.id
                                 try:
-                                    self.persistence.update_user_data(user_id, self.user_data[user_id])
+                                    self.persistence.update_user_data(user_id,
+                                                                      self.user_data[user_id])
                                 except Exception:
                                     self.logger.exception('Saving user data raised an error')
                         break
@@ -429,7 +431,7 @@ class Dispatcher(object):
                 The error that happened will be present in context.error.
 
         Note:
-            See https://git.io/vp113 for more info about switching to context based API.
+            See https://git.io/fxJuV for more info about switching to context based API.
         """
         self.error_handlers.append(callback)
 

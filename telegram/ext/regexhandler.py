@@ -58,7 +58,7 @@ class RegexHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.

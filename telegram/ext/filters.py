@@ -168,7 +168,6 @@ class Filters(object):
         name = 'Filters.text'
 
         def filter(self, message):
-            print('text_filter_filter {}'.format(repr(self)))
             return bool(message.text and not message.text.startswith('/'))
 
     text = _Text()
@@ -787,12 +786,12 @@ class Filters(object):
         def filter(self, update):
             return self.messages(update) or self.channel_posts(update)
 
-    updates = _UpdateType()
+    update = _UpdateType()
     """Subset for filtering the type of update.
 
     Examples:
-        Use these filters like: ``Filters.updates.message`` or
-        ``Filters.updates.channel_posts``etc. Or use just ``Filters.updates`` for all
+        Use these filters like: ``Filters.update.message`` or
+        ``Filters.update.channel_posts`` etc. Or use just ``Filters.update`` for all
         types.
 
     Attributes:

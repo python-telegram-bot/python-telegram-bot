@@ -38,7 +38,7 @@ class CommandHandler(Handler):
     which is the text following the command split on single or consecutive whitespace characters.
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~Filters.updates.edited_message`` in the filter argument.
+    use ``~Filters.update.edited_message`` in the filter argument.
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -67,7 +67,7 @@ class CommandHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -88,7 +88,7 @@ class CommandHandler(Handler):
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
             DEPRECATED: Edited is allowed by default. To change this behavior use
-            ``~Filters.updates.edited_message``.
+            ``~Filters.update.edited_message``.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -141,16 +141,16 @@ class CommandHandler(Handler):
                 raise ValueError('Command is not a valid bot command')
 
         if filters:
-            self.filters = Filters.updates.messages & filters
+            self.filters = Filters.update.messages & filters
         else:
-            self.filters = Filters.updates.messages
+            self.filters = Filters.update.messages
 
         if allow_edited is not None:
-            warnings.warn('allow_edited is deprecated. See https://git.io/vp113 for more info',
+            warnings.warn('allow_edited is deprecated. See https://git.io/fxJuV for more info',
                           TelegramDeprecationWarning,
                           stacklevel=2)
             if not allow_edited:
-                self.filters &= ~Filters.updates.edited_message
+                self.filters &= ~Filters.update.edited_message
         self.pass_args = pass_args
 
     def check_update(self, update):
@@ -160,10 +160,10 @@ class CommandHandler(Handler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            :obj:`bool`
+            :obj:`list`: The list of args for the handler
 
         """
-        if (isinstance(update, Update) and update.effective_message):
+        if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
             if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND and
@@ -215,8 +215,9 @@ class PrefixHandler(CommandHandler):
             PrefixHandler(['!', '#'], ['test', 'help`], callback) will respond to '!test',
             '#test', '!help' and '#help'.
 
+
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~Filters.updates.edited_message``.
+    use ``Filters.update.edited_message``.
 
     Attributes:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
@@ -243,7 +244,7 @@ class PrefixHandler(CommandHandler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
@@ -320,7 +321,7 @@ class PrefixHandler(CommandHandler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            :obj:`bool`
+            :obj:`list`: The list of args for the handler
 
         """
         if (isinstance(update, Update) and update.effective_message):

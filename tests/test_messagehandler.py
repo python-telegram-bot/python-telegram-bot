@@ -102,11 +102,11 @@ class TestMessageHandler(object):
         assert self.test_flag
 
     def test_deprecation_warning(self):
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
             MessageHandler(None, self.callback_basic, edited_updates=True)
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
             MessageHandler(None, self.callback_basic, message_updates=False)
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
             MessageHandler(None, self.callback_basic, channel_post_updates=True)
 
     def test_edited_deprecated(self, message):
@@ -151,9 +151,9 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_specific_filters(self, message):
-        f = (~Filters.updates.messages &
-             ~Filters.updates.channel_post &
-             Filters.updates.edited_channel_post)
+        f = (~Filters.update.messages &
+             ~Filters.update.channel_post &
+             Filters.update.edited_channel_post)
         handler = MessageHandler(f, self.callback_basic)
 
         assert not handler.check_update(Update(0, edited_message=message))

@@ -155,7 +155,7 @@ class TestCommandHandler(object):
         assert check is None or check is False
 
     def test_deprecation_warning(self):
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/vp113'):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
             CommandHandler('test', self.callback_basic, allow_edited=True)
 
     def test_no_edited(self, message):
@@ -168,7 +168,7 @@ class TestCommandHandler(object):
         assert check is not None and check is not False
 
         handler = CommandHandler('test', self.callback_basic,
-                                 filters=~Filters.updates.edited_message)
+                                 filters=~Filters.update.edited_message)
         check = handler.check_update(Update(0, message))
         assert check is not None and check is not False
 
@@ -467,7 +467,7 @@ class TestPrefixHandler(object):
         assert check is not None and check is not False
 
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
-                                filters=~Filters.updates.edited_message)
+                                filters=~Filters.update.edited_message)
         check = handler.check_update(Update(0, prefixmessage))
         assert check is not None and check is not False
 

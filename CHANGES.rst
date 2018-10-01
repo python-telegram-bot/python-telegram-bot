@@ -6,7 +6,7 @@ Changes
 *Released 11.0.0*
 
 Context based callbacks:
-See https://git.io/vp113 for help.
+See https://git.io/fxJuV for help.
 
 - Use of `pass_` in handlers is deprecated.
 - Instead use `use_context=True` on `Updater` or `Dispatcher` and change callback from (bot, update, others...) to (update, context).
