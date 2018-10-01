@@ -264,10 +264,8 @@ class ConversationHandler(Handler):
                         # Save the current user and the selected handler for handle_update
                         self.current_conversation = key
                         self.current_handler = candidate
-
                         return True
-
-                else:
+                      
                     return False
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
