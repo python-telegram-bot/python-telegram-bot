@@ -39,7 +39,8 @@ class PersonalDetails(TelegramObject):
     """
 
     def __init__(self, first_name, last_name, birth_date, gender, country_code,
-                 residence_country_code, first_name_native, last_name_native, middle_name=None,
+                 residence_country_code, first_name_native=None,
+                 last_name_native=None, middle_name=None,
                  middle_name_native=None, bot=None, **kwargs):
         # Required
         self.first_name = first_name

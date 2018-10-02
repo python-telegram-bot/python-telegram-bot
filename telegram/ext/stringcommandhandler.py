@@ -33,31 +33,37 @@ class StringCommandHandler(Handler):
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_args (:obj:`bool`): Optional. Determines whether the handler should be passed
+        pass_args (:obj:`bool`): Determines whether the handler should be passed
             ``args``.
-        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
 
-
     Args:
-        command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
-            It will be called when the :attr:`check_update` has determined that a command should be
-            processed by this handler.
+        callback (:obj:`callable`): The callback function for this handler. Will be called when
+            :attr:`check_update` has determined that an update should be processed by this handler.
+            Callback signature for context based API:
+
+            ``def callback(update: Update, context: CallbackContext)``
+
+            The return value of the callback is usually ignored except for the special case of
+            :class:`telegram.ext.ConversationHandler`.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
             consecutive whitespace characters. Default is ``False``
+            DEPRECATED: Please switch to context based callbacks.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
+            DEPRECATED: Please switch to context based callbacks.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+            DEPRECATED: Please switch to context based callbacks.
 
     """
 
@@ -68,7 +74,9 @@ class StringCommandHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False):
         super(StringCommandHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue)
         self.command = command
         self.pass_args = pass_args
 
@@ -76,28 +84,24 @@ class StringCommandHandler(Handler):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
 
         Args:
-            update (:obj:`str`): An incomming command.
+            update (:obj:`str`): An incoming command.
 
         Returns:
             :obj:`bool`
 
         """
+        if isinstance(update, string_types) and update.startswith('/'):
+            args = update[1:].split(' ')
+            if args[0] == self.command:
+                return args[1:]
 
-        return (isinstance(update, string_types) and update.startswith('/')
-                and update[1:].split(' ')[0] == self.command)
-
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:obj:`str`): An incomming command.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the command.
-
-        """
-
-        optional_args = self.collect_optional_args(dispatcher)
-
+    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,
+                                                                                update,
+                                                                                check_result)
         if self.pass_args:
-            optional_args['args'] = update.split()[1:]
+            optional_args['args'] = check_result
+        return optional_args
 
-        return self.callback(dispatcher.bot, update, **optional_args)
+    def collect_additional_context(self, context, update, dispatcher, check_result):
+        context.args = check_result

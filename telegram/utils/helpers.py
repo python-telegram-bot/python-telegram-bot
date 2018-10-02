@@ -17,6 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions."""
+from collections import defaultdict
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 from html import escape
 
 import re
@@ -139,3 +145,65 @@ def effective_message_type(entity):
             return i
 
     return None
+
+
+def enocde_conversations_to_json(conversations):
+    """Helper method to encode a conversations dict (that uses tuples as keys) to a
+    JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
+
+    Args:
+        conversations (:obj:`dict`): The conversations dict to transofrm to JSON.
+
+    Returns:
+        :obj:`str`: The JSON-serialized conversations dict
+    """
+    tmp = {}
+    for handler, states in conversations.items():
+        tmp[handler] = {}
+        for key, state in states.items():
+            tmp[handler][json.dumps(key)] = state
+    return json.dumps(tmp)
+
+
+def decode_conversations_from_json(json_string):
+    """Helper method to decode a conversations dict (that uses tuples as keys) from a
+    JSON-string created with :attr:`_encode_conversations_to_json`.
+
+    Args:
+        json_string (:obj:`str`): The conversations dict as JSON string.
+
+    Returns:
+        :obj:`dict`: The conversations dict after decoding
+    """
+    tmp = json.loads(json_string)
+    conversations = {}
+    for handler, states in tmp.items():
+        conversations[handler] = {}
+        for key, state in states.items():
+            conversations[handler][tuple(json.loads(key))] = state
+    return conversations
+
+
+def decode_user_chat_data_from_json(data):
+    """Helper method to decode chat or user data (that uses ints as keys) from a
+    JSON-string.
+
+    Args:
+        data (:obj:`str`): The user/chat_data dict as JSON string.
+
+    Returns:
+        :obj:`dict`: The user/chat_data defaultdict after decoding
+    """
+
+    tmp = defaultdict(dict)
+    decoded_data = json.loads(data)
+    for user, data in decoded_data.items():
+        user = int(user)
+        tmp[user] = {}
+        for key, value in data.items():
+            try:
+                key = int(key)
+            except ValueError:
+                pass
+            tmp[user][key] = value
+    return tmp

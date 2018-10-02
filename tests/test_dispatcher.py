@@ -16,15 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import sys
 from queue import Queue
 from threading import current_thread
 from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update
-from telegram.ext import MessageHandler, Filters, CommandHandler
+from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram.ext import MessageHandler, Filters, CommandHandler, CallbackContext, JobQueue
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
+from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
 
 
@@ -67,6 +69,14 @@ class TestDispatcher(object):
         if update_queue is not None:
             self.received = update.message
 
+    def callback_context(self, update, context):
+        if (isinstance(context, CallbackContext) and
+                isinstance(context.bot, Bot) and
+                isinstance(context.update_queue, Queue) and
+                isinstance(context.job_queue, JobQueue) and
+                isinstance(context.error, TelegramError)):
+            self.received = context.error.message
+
     def test_error_handler(self, dp):
         dp.add_error_handler(self.error_handler)
         error = TelegramError('Unauthorized.')
@@ -81,6 +91,16 @@ class TestDispatcher(object):
         dp.update_queue.put(error)
         sleep(.1)
         assert self.received is None
+
+    def test_construction_with_bad_persistence(self, caplog, bot):
+        class my_per:
+            def __init__(self):
+                self.store_user_data = False
+                self.store_chat_data = False
+
+        with pytest.raises(TypeError,
+                           match='persistence should be based on telegram.ext.BasePersistence'):
+            Dispatcher(bot, None, persistence=my_per())
 
     def test_error_handler_that_raises_errors(self, dp):
         """
@@ -217,7 +237,11 @@ class TestDispatcher(object):
             passed.append('error')
             passed.append(e)
 
-        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start',
+                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                                   offset=0,
+                                                                   length=len('/start'))],
+                                           bot=bot))
 
         # If Stop raised handlers in other groups should not be called.
         passed = []
@@ -244,7 +268,11 @@ class TestDispatcher(object):
             passed.append('error')
             passed.append(e)
 
-        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start',
+                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                                   offset=0,
+                                                                   length=len('/start'))],
+                                           bot=bot))
 
         # If an unhandled exception was caught, no further handlers from the same group should be
         # called.
@@ -274,7 +302,11 @@ class TestDispatcher(object):
             passed.append('error')
             passed.append(e)
 
-        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start',
+                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                                   offset=0,
+                                                                   length=len('/start'))],
+                                           bot=bot))
 
         # If a TelegramException was caught, an error handler should be called and no further
         # handlers from the same group should be called.
@@ -305,7 +337,11 @@ class TestDispatcher(object):
             passed.append(e)
             raise DispatcherHandlerStop
 
-        update = Update(1, message=Message(1, None, None, None, text='/start', bot=bot))
+        update = Update(1, message=Message(1, None, None, None, text='/start',
+                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                                   offset=0,
+                                                                   length=len('/start'))],
+                                           bot=bot))
 
         # If a TelegramException was caught, an error handler should be called and no further
         # handlers from the same group should be called.
@@ -316,3 +352,17 @@ class TestDispatcher(object):
         dp.process_update(update)
         assert passed == ['start1', 'error', err]
         assert passed[2] is err
+
+    def test_error_handler_context(self, cdp):
+        cdp.add_error_handler(self.callback_context)
+
+        error = TelegramError('Unauthorized.')
+        cdp.update_queue.put(error)
+        sleep(.1)
+        assert self.received == 'Unauthorized.'
+
+    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
+    def test_non_context_deprecation(self, dp):
+        with pytest.warns(TelegramDeprecationWarning):
+            Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0,
+                       use_context=False)

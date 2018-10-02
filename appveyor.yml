@@ -10,10 +10,12 @@ environment:
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python37"
 
 branches:
   only:
   - master
+  - /^[vV]\d+$/
 
 skip_branch_with_pr: true
 
