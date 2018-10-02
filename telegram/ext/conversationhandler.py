@@ -331,10 +331,8 @@ class ConversationHandler(Handler):
         if self.conversation_timeout and new_state != self.END:
             self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
-                context={'current_conversation': self.current_conversation,
-                         'update': update,
-                         'dispatcher': dispatcher}
-              )
+                context={'current_conversation': conversation_key, 'update': update,
+                         'dispatcher': dispatcher})
 
         self.update_state(new_state, conversation_key)
 
@@ -363,6 +361,7 @@ class ConversationHandler(Handler):
         del self.timeout_jobs[job.context['current_conversation']]
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
-            if handler.check_update(job.context['update']):
-                handler.handle_update(job.context['update'], job.context['dispatcher'])
+            check = handler.check_update(job.context['update'])
+            if check is not None and check is not False:
+                handler.handle_update(job.context['update'], job.context['dispatcher'], check)
         self.update_state(self.END, job.context['current_conversation'])

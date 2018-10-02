@@ -22,7 +22,7 @@ from time import sleep
 import pytest
 
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
-                      PreCheckoutQuery, ShippingQuery, Update, User)
+                      PreCheckoutQuery, ShippingQuery, Update, User, MessageEntity)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
                           MessageHandler, Filters)
 
@@ -168,6 +168,7 @@ class TestConversationHandler(object):
         dp.process_update(Update(update_id=0, message=message))
         message.text = '/end'
         message.entities[0].length = len('/end')
+        caplog.clear()
         with caplog.at_level(logging.ERROR):
             dp.process_update(Update(update_id=0, message=message))
         assert len(caplog.records) == 0
@@ -479,9 +480,13 @@ class TestConversationHandler(object):
                                       fallbacks=self.fallbacks, conversation_timeout=0.5)
         dp.add_handler(handler)
         # CommandHandler timeout
-        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
+                                                  length=len('/start'))],
+                          bot=bot)
         dp.process_update(Update(update_id=0, message=message))
         message.text = '/brew'
+        message.entities[0].length = len('/brew')
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.5)
         dp.job_queue.tick()
@@ -491,6 +496,7 @@ class TestConversationHandler(object):
         # MessageHandler timeout
         self.is_timeout = False
         message.text = '/start'
+        message.entities[0].length = len('/start')
         dp.process_update(Update(update_id=1, message=message))
         sleep(0.5)
         dp.job_queue.tick()
@@ -499,11 +505,12 @@ class TestConversationHandler(object):
 
         # Timeout but no valid handler
         self.is_timeout = False
-        message.text = '/start'
         dp.process_update(Update(update_id=0, message=message))
         message.text = '/brew'
+        message.entities[0].length = len('/brew')
         dp.process_update(Update(update_id=0, message=message))
         message.text = '/startCoding'
+        message.entities[0].length = len('/startCoding')
         dp.process_update(Update(update_id=0, message=message))
         sleep(0.5)
         dp.job_queue.tick()
