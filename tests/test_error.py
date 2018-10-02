@@ -85,6 +85,5 @@ class TestErrors(object):
             raise RetryAfter(12)
 
     def test_conflict(self):
-        with pytest.raises(Conflict, match=""):
-            raise Conflict('Something something.',
-                           'https://api.telegram.org/bot1234567:ABCABCABCABC/sendMessage')
+        with pytest.raises(Conflict, match='Something something.'):
+            raise Conflict('Something something.')

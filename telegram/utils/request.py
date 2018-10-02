@@ -224,7 +224,7 @@ class Request(object):
         elif resp.status == 404:
             raise InvalidToken()
         elif resp.status == 409:
-            raise Conflict(message, args[1])
+            raise Conflict(message)
         elif resp.status == 413:
             raise NetworkError('File too large. Check telegram api limits '
                                'https://core.telegram.org/bots/api#senddocument')

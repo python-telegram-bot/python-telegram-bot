@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents Telegram errors."""
-import re
 
 
 def _lstrip_str(in_s, lstr):
@@ -107,15 +106,8 @@ class Conflict(TelegramError):
 
         Args:
             msg (:obj:`str`): The message from telegrams server.
-            url (:obj:`str`) The url used to make the request. The bot id will be extracted from
-                it if possible.
 
     """
-    def __init__(self, msg, url):
-        # Get the bot token from the URL that was used to make the request
-        # Regex simply searches for id in https://api.telegram.org/botID:TOKEN/method
-        match = re.search(r'bot(\d+):.*/', url)
-        if match:
-            msg += '. Conflicting bot id: {}'.format(match.group(1))
 
+    def __init__(self, msg):
         super(Conflict, self).__init__(msg)
