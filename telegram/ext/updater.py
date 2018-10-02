@@ -19,11 +19,9 @@
 """This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
 
 import logging
-import os
 import ssl
 from threading import Thread, Lock, current_thread, Event
 from time import sleep
-import subprocess
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
@@ -32,7 +30,7 @@ from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
-from telegram.utils.webhookhandler import (WebhookServer, WebhookHandler)
+from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -57,6 +55,8 @@ class Updater(object):
         dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
             dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
+        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+            store data that should be persistent over restarts.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -75,6 +75,8 @@ class Updater(object):
             `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
             request_kwargs are very useful for the advanced users who would like to control the
             default timeouts and/or control the proxy used for http communication.
+        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
+            store data that should be persistent over restarts.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -94,7 +96,8 @@ class Updater(object):
                  private_key=None,
                  private_key_password=None,
                  user_sig_handler=None,
-                 request_kwargs=None):
+                 request_kwargs=None,
+                 persistence=None):
 
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
@@ -131,12 +134,14 @@ class Updater(object):
         self.update_queue = Queue()
         self.job_queue = JobQueue(self.bot)
         self.__exception_event = Event()
+        self.persistence = persistence
         self.dispatcher = Dispatcher(
             self.bot,
             self.update_queue,
             job_queue=self.job_queue,
             workers=workers,
-            exception_event=self.__exception_event)
+            exception_event=self.__exception_event,
+            persistence=self.persistence)
         self.last_update_id = 0
         self.running = False
         self.is_idle = False
@@ -356,13 +361,24 @@ class Updater(object):
         if not url_path.startswith('/'):
             url_path = '/{0}'.format(url_path)
 
+        # Create Tornado app instance
+        app = WebhookAppClass(url_path, self.bot, self.update_queue)
+
+        # Form SSL Context
+        # An SSLError is raised if the private key does not match with the certificate
+        if use_ssl:
+            try:
+                ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                ssl_ctx.load_cert_chain(cert, key)
+            except ssl.SSLError:
+                raise TelegramError('Invalid SSL Certificate')
+        else:
+            ssl_ctx = None
+
         # Create and start server
-        self.httpd = WebhookServer((listen, port), WebhookHandler, self.update_queue, url_path,
-                                   self.bot)
+        self.httpd = WebhookServer(port, app, ssl_ctx)
 
         if use_ssl:
-            self._check_ssl_cert(cert, key)
-
             # DO NOT CHANGE: Only set webhook if SSL is handled by library
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
@@ -377,26 +393,7 @@ class Updater(object):
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
 
-        self.httpd.serve_forever(poll_interval=1)
-
-    def _check_ssl_cert(self, cert, key):
-        # Check SSL-Certificate with openssl, if possible
-        try:
-            exit_code = subprocess.call(
-                ["openssl", "x509", "-text", "-noout", "-in", cert],
-                stdout=open(os.devnull, 'wb'),
-                stderr=subprocess.STDOUT)
-        except OSError:
-            exit_code = 0
-        if exit_code == 0:
-            try:
-                self.httpd.socket = ssl.wrap_socket(
-                    self.httpd.socket, certfile=cert, keyfile=key, server_side=True)
-            except ssl.SSLError as error:
-                self.logger.exception('Failed to init SSL socket')
-                raise TelegramError(str(error))
-        else:
-            raise TelegramError('SSL Certificate invalid')
+        self.httpd.serve_forever()
 
     @staticmethod
     def _gen_webhook_url(listen, port, url_path):
@@ -495,6 +492,8 @@ class Updater(object):
         if self.running:
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))
+            if self.persistence:
+                self.persistence.flush()
             self.stop()
             if self.user_sig_handler:
                 self.user_sig_handler(signum, frame)

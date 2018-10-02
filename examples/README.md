@@ -25,5 +25,8 @@ A basic example of an [inline bot](https://core.telegram.org/bots/inline). Don't
 ### [`paymentbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/paymentbot.py)
 A basic example of a bot that can accept payments. Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather).
 
+### [`persistentconversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/persistentconversationbot.py)
+A basic example of a bot store conversation state and user_data over multiple restarts.
+
 ## Pure API
 The [`echobot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot.py) example uses only the pure, "bare-metal" API wrapper. 

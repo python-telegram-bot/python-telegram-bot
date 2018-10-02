@@ -79,6 +79,10 @@ class ConversationHandler(Handler):
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
             this value is 0 (default), there will be no timeout.
+        name (:obj:`str`): Optional. The name for this conversationhandler. Required for
+            persistence
+        persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
+            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -113,6 +117,10 @@ class ConversationHandler(Handler):
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`, optional): When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
             this value is 0 or None (default), there will be no timeout.
+        name (:obj:`str`, optional): The name for this conversationhandler. Required for
+            persistence
+        persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
+            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
 
     Raises:
         ValueError
@@ -131,7 +139,9 @@ class ConversationHandler(Handler):
                  per_chat=True,
                  per_user=True,
                  per_message=False,
-                 conversation_timeout=None):
+                 conversation_timeout=None,
+                 name=None,
+                 persistent=False):
 
         self.entry_points = entry_points
         self.states = states
@@ -144,6 +154,13 @@ class ConversationHandler(Handler):
         self.per_chat = per_chat
         self.per_message = per_message
         self.conversation_timeout = conversation_timeout
+        self.name = name
+        if persistent and not self.name:
+            raise ValueError("Conversations can't be persistent when handler is unnamed.")
+        self.persistent = persistent
+        self.persistence = None
+        """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
+        Set by dispatcher"""
 
         self.timeout_jobs = dict()
         self.conversations = dict()
@@ -230,18 +247,17 @@ class ConversationHandler(Handler):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
-            error = False
-            try:
-                res = new_state.result(timeout=self.run_async_timeout)
-            except Exception as exc:
-                self.logger.exception("Promise function raised exception")
-                self.logger.exception("{}".format(exc))
-                error = True
-
-            if not error and new_state.done.is_set():
-                self.update_state(res, key)
-                state = self.conversations.get(key)
-
+            if new_state.done.wait(timeout=self.run_async_timeout):
+                try:
+                    res = new_state.result(timeout=0)
+                    res = res if res is not None else old_state
+                except Exception as exc:
+                    self.logger.exception("Promise function raised exception")
+                    self.logger.exception("{}".format(exc))
+                    res = old_state
+                finally:
+                    self.update_state(res, key)
+                    state = self.conversations.get(key)
             else:
                 for candidate in (self.timed_out_behavior or []):
                     if candidate.check_update(update):
@@ -319,14 +335,21 @@ class ConversationHandler(Handler):
         if new_state == self.END:
             if key in self.conversations:
                 del self.conversations[key]
+                if self.persistent:
+                    self.persistence.update_conversation(self.name, key, None)
             else:
                 pass
 
         elif isinstance(new_state, Promise):
             self.conversations[key] = (self.conversations.get(key), new_state)
+            if self.persistent:
+                self.persistence.update_conversation(self.name, key,
+                                                     (self.conversations.get(key), new_state))
 
         elif new_state is not None:
             self.conversations[key] = new_state
+            if self.persistent:
+                self.persistence.update_conversation(self.name, key, new_state)
 
     def _trigger_timeout(self, bot, job):
         del self.timeout_jobs[job.context]
