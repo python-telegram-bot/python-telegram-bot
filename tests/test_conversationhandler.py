@@ -24,7 +24,7 @@ import pytest
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
                       PreCheckoutQuery, ShippingQuery, Update, User)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
-                          MessageHandler)
+                          MessageHandler, Filters)
 
 
 @pytest.fixture(scope='class')
@@ -63,9 +63,6 @@ class TestConversationHandler(object):
                 CommandHandler('keepCoding', self.code),
                 CommandHandler('gettingThirsty', self.start),
                 CommandHandler('drinkMore', self.drink)
-            ],
-            ConversationHandler.TIMEOUT: [
-                MessageHandler(None, self.passout)
             ]
         }
         self.fallbacks = [CommandHandler('eat', self.start)]
@@ -96,8 +93,11 @@ class TestConversationHandler(object):
         return self._set_state(update, self.CODING)
 
     def passout(self, bot, update):
+        assert update.message.text == '/brew'
         self.is_timeout = True
-        return self._set_state(update, self.END)
+
+    def passout2(self, bot, update):
+        self.is_timeout = True
 
     # Tests
     def test_per_all_false(self):
@@ -350,7 +350,6 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
         sleep(0.5)
         dp.job_queue.tick()
-        assert self.is_timeout is True
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
     def test_conversation_timeout_keeps_extending(self, dp, bot, user1):
@@ -385,7 +384,6 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
         sleep(.1)  # t=1.1
         dp.job_queue.tick()
-        assert self.is_timeout is True
         assert handler.conversations.get((self.group.id, user1.id)) is None
 
     def test_conversation_timeout_two_users(self, dp, bot, user1, user2):
@@ -408,6 +406,46 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
         sleep(0.5)
         dp.job_queue.tick()
-        assert self.is_timeout is True
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert handler.conversations.get((self.group.id, user2.id)) is None
+
+    def test_conversation_handler_timeout_state(self, dp, bot, user1):
+        states = self.states
+        states.update({ConversationHandler.TIMEOUT: [
+            CommandHandler('brew', self.passout),
+            MessageHandler(~Filters.regex('oding'), self.passout2)
+        ]})
+        handler = ConversationHandler(entry_points=self.entry_points, states=states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+        # CommandHandler timeout
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        message.text = '/brew'
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert self.is_timeout
+
+        # MessageHandler timeout
+        self.is_timeout = False
+        message.text = '/start'
+        dp.process_update(Update(update_id=1, message=message))
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert self.is_timeout
+
+        # Timeout but no valid handler
+        self.is_timeout = False
+        message.text = '/start'
+        dp.process_update(Update(update_id=0, message=message))
+        message.text = '/brew'
+        dp.process_update(Update(update_id=0, message=message))
+        message.text = '/startCoding'
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert not self.is_timeout

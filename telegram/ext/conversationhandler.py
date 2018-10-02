@@ -38,8 +38,8 @@ class ConversationHandler(Handler):
 
     The second collection, a ``dict`` named :attr:`states`, contains the different conversation
     steps and one or more associated handlers that should be used if the user sends a message when
-    the conversation with them is currently in that state. You will probably use mostly
-    :class:`telegram.ext.MessageHandler` and :class:`telegram.ext.RegexHandler` here.
+    the conversation with them is currently in that state. Here you can also define a state for
+    :attr:`TIMEOUT` to define the behavior when :attr:`conversation_timeout` is exceeded.
 
     The third collection, a ``list`` named :attr:`fallbacks`, is used if the user is currently in a
     conversation but the state has either no associated handler or the handler that is associated
@@ -79,8 +79,9 @@ class ConversationHandler(Handler):
             ID.
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 (default), there will be no timeout.
-            Handled in state :attr:`TIMEOUT` or ``-2``
+            this value is 0 (default), there will be no timeout. when it's triggered. The last
+            received update will be handled by ALL the handler's who's `check_update` method
+            returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -112,9 +113,11 @@ class ConversationHandler(Handler):
             Default is ``True``.
         per_message (:obj:`bool`, optional): If the conversationkey should contain the Message's
             ID. Default is ``False``.
-        conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`, optional): When this handler
-            is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 or None (default), there will be no timeout.
+        conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`, optional): When this
+            handler is inactive more than this timeout (in seconds), it will be automatically
+            ended. If this value is 0 or None (default), there will be no timeout. The last
+            received update will be handled by ALL the handler's who's `check_update` method
+            returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
 
     Raises:
         ValueError
@@ -337,8 +340,7 @@ class ConversationHandler(Handler):
         self.logger.debug('conversation timeout was triggered!')
         del self.timeout_jobs[job.context['current_conversation']]
         handlers = self.states.get(self.TIMEOUT, [])
-        for candidate in handlers:
-            handler = candidate
+        for handler in handlers:
             if handler.check_update(job.context['update']):
                 handler.handle_update(job.context['update'], job.context['dispatcher'])
         self.update_state(self.END, job.context['current_conversation'])
