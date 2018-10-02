@@ -336,8 +336,6 @@ class ConversationHandler(Handler):
                 del self.conversations[key]
                 if self.persistent:
                     self.persistence.update_conversation(self.name, key, None)
-            else:
-                pass
 
         elif isinstance(new_state, Promise):
             self.conversations[key] = (self.conversations.get(key), new_state)
