@@ -247,7 +247,9 @@ class ConversationHandler(Handler):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
-            if new_state.done.wait(timeout=self.run_async_timeout):
+            promise_completed = new_state.done.wait(timeout=self.run_async_timeout)
+
+            if promise_completed:
                 try:
                     res = new_state.result(timeout=0)
                     res = res if res is not None else old_state
@@ -266,9 +268,7 @@ class ConversationHandler(Handler):
                         self.current_handler = candidate
 
                         return True
-
-                else:
-                    return False
+                return False
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
 
