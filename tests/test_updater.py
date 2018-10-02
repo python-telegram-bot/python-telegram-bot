@@ -105,7 +105,8 @@ class TestUpdater(object):
             updater.start_polling(0.01)
             assert self.err_handler_called.wait(1) is not True
 
-        # NOTE: This test might hit a race condition and fail (though the 0.5 seconds delay above
+        sleep(1)
+        # NOTE: This test might hit a race condition and fail (though the 1 seconds delay above
         #       should work around it).
         # NOTE: Checking Updater.running is problematic because it is not set to False when there's
         #       an unhandled exception.
