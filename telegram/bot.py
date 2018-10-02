@@ -21,6 +21,7 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+
 try:
     import ujson as json
 except ImportError:
@@ -99,7 +100,7 @@ class Bot(TelegramObject):
         self.bot = None
         self._request = request or Request()
         self.logger = logging.getLogger(__name__)
-        
+
         if private_key:
             self.private_key = serialization.load_pem_private_key(private_key,
                                                                   password=private_key_password,
@@ -783,7 +784,9 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
     def send_animation(self,
