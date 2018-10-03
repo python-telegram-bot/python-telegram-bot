@@ -26,8 +26,8 @@ from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
 from telegram.utils.promise import Promise
 
 
-class ConversationTimeoutContext(object):
-    def __init__(self, conversation_key=None, update=None, dispatcher=None):
+class _ConversationTimeoutContext(object):
+    def __init__(self, conversation_key, update, dispatcher):
         self.conversation_key = conversation_key
         self.update = update
         self.dispatcher = dispatcher
@@ -338,9 +338,7 @@ class ConversationHandler(Handler):
         if self.conversation_timeout and new_state != self.END:
             self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
-                context=ConversationTimeoutContext(conversation_key=conversation_key,
-                                                   update=update,
-                                                   dispatcher=dispatcher))
+                context=_ConversationTimeoutContext(conversation_key, update, dispatcher))
 
         self.update_state(new_state, conversation_key)
 
@@ -366,13 +364,10 @@ class ConversationHandler(Handler):
 
     def _trigger_timeout(self, bot, job):
         self.logger.debug('conversation timeout was triggered!')
-        conversation_key = job.context.conversation_key
-        update = job.context.update
-        dispatcher = job.context.dispatcher
-        del self.timeout_jobs[conversation_key]
+        del self.timeout_jobs[job.context.conversation_key]
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
-            check = handler.check_update(update)
+            check = handler.check_update(job.context.update)
             if check is not None and check is not False:
-                handler.handle_update(update, dispatcher, check)
-        self.update_state(self.END, conversation_key)
+                handler.handle_update(job.context.update, job.context.dispatcher, check)
+        self.update_state(self.END, job.context.conversation_key)
