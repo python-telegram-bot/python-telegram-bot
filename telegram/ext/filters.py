@@ -86,11 +86,11 @@ class BaseFilter(object):
             self.name = self.__class__.__name__
         return self.name
 
-    def filter(self, message):
+    def filter(self, update):
         """This method must be overwritten.
 
         Args:
-            message (:class:`telegram.Message`): The message that is tested.
+            update (:class:`telegram.Update`): The update that is tested.
 
         Returns:
             :obj:`bool`
