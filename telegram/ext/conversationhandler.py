@@ -26,6 +26,13 @@ from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
 from telegram.utils.promise import Promise
 
 
+class _ConversationTimeoutContext(object):
+    def __init__(self, conversation_key, update, dispatcher):
+        self.conversation_key = conversation_key
+        self.update = update
+        self.dispatcher = dispatcher
+
+
 class ConversationHandler(Handler):
     """
     A handler to hold a conversation with a single user by managing four collections of other
@@ -38,8 +45,8 @@ class ConversationHandler(Handler):
 
     The second collection, a ``dict`` named :attr:`states`, contains the different conversation
     steps and one or more associated handlers that should be used if the user sends a message when
-    the conversation with them is currently in that state. You will probably use mostly
-    :class:`telegram.ext.MessageHandler` and :class:`telegram.ext.RegexHandler` here.
+    the conversation with them is currently in that state. Here you can also define a state for
+    :attr:`TIMEOUT` to define the behavior when :attr:`conversation_timeout` is exceeded.
 
     The third collection, a ``list`` named :attr:`fallbacks`, is used if the user is currently in a
     conversation but the state has either no associated handler or the handler that is associated
@@ -55,7 +62,8 @@ class ConversationHandler(Handler):
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. To end the conversation, the callback function must
-    return :attr:`END` or ``-1``.
+    return :attr:`END` or ``-1``. To handle the conversation timeout, use handler
+    :attr:`TIMEOUT` or ``-2``.
 
     Attributes:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -78,7 +86,9 @@ class ConversationHandler(Handler):
             ID.
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 (default), there will be no timeout.
+            this value is 0 (default), there will be no timeout. when it's triggered. The last
+            received update will be handled by ALL the handler's who's `check_update` method
+            returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
             persistence
         persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
@@ -114,9 +124,11 @@ class ConversationHandler(Handler):
             Default is ``True``.
         per_message (:obj:`bool`, optional): If the conversationkey should contain the Message's
             ID. Default is ``False``.
-        conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`, optional): When this handler
-            is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 or None (default), there will be no timeout.
+        conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`, optional): When this
+            handler is inactive more than this timeout (in seconds), it will be automatically
+            ended. If this value is 0 or None (default), there will be no timeout. The last
+            received update will be handled by ALL the handler's who's `check_update` method
+            returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`, optional): The name for this conversationhandler. Required for
             persistence
         persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
@@ -128,6 +140,8 @@ class ConversationHandler(Handler):
     """
     END = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
+    TIMEOUT = -2
+    """:obj:`int`: Used as a constant to handle state when a conversation is timed out."""
 
     def __init__(self,
                  entry_points,
@@ -324,8 +338,7 @@ class ConversationHandler(Handler):
         if self.conversation_timeout and new_state != self.END:
             self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
                 self._trigger_timeout, self.conversation_timeout,
-                context=conversation_key
-            )
+                context=_ConversationTimeoutContext(conversation_key, update, dispatcher))
 
         self.update_state(new_state, conversation_key)
 
@@ -350,5 +363,11 @@ class ConversationHandler(Handler):
                 self.persistence.update_conversation(self.name, key, new_state)
 
     def _trigger_timeout(self, bot, job):
-        del self.timeout_jobs[job.context]
-        self.update_state(self.END, job.context)
+        self.logger.debug('conversation timeout was triggered!')
+        del self.timeout_jobs[job.context.conversation_key]
+        handlers = self.states.get(self.TIMEOUT, [])
+        for handler in handlers:
+            check = handler.check_update(job.context.update)
+            if check is not None and check is not False:
+                handler.handle_update(job.context.update, job.context.dispatcher, check)
+        self.update_state(self.END, job.context.conversation_key)
