@@ -104,6 +104,8 @@ def dp(_dp):
     _dp.__exception_event = Event()
     _dp.__async_queue = Queue()
     _dp.__async_threads = set()
+    _dp.persistence = None
+    _dp.use_context = False
     if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
         Dispatcher._set_singleton(_dp)
     yield _dp
