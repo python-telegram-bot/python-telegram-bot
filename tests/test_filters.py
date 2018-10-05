@@ -54,12 +54,14 @@ class TestFilters(object):
         assert Filters.command(update)
 
     def test_filters_regex(self, update):
+        SRE_TYPE = type(re.match("", ""))
         update.message.text = '/start deep-linked param'
-        assert Filters.regex(r'deep-linked param')(update)
+        result = Filters.regex(r'deep-linked param')(update)
+        assert result
+        assert isinstance(result, list)
+        assert type(result[0]) is SRE_TYPE
         update.message.text = '/help'
         assert Filters.regex(r'help')(update)
-        update.message.text = '/help'
-        assert Filters.regex('help')(update)
 
         update.message.text = 'test'
         assert not Filters.regex(r'fail')(update)
@@ -71,6 +73,149 @@ class TestFilters(object):
 
         update.message.text = None
         assert not Filters.regex(r'fail')(update)
+
+    def test_filters_regex_multiple(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = '/start deep-linked param'
+        result = (Filters.regex('deep') & Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        result = (Filters.regex('deep') | Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        result = (Filters.regex('not int') | Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        result = (Filters.regex('not int') & Filters.regex(r'linked param'))(update)
+        assert not result
+
+    def test_filters_merged_with_regex(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = '/start deep-linked param'
+        result = (Filters.command & Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        result = (Filters.regex(r'linked param') & Filters.command)(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        result = (Filters.regex(r'linked param') | Filters.command)(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        result = (Filters.command | Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+
+    def test_regex_complex_merges(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = 'test it out'
+        filter = (Filters.regex('test') &
+                  ((Filters.status_update | Filters.forwarded) | Filters.regex('out')))
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert len(result) == 2
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.forward_date = datetime.datetime.now()
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.text = 'test it'
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.forward_date = False
+        result = filter(update)
+        assert not result
+        update.message.text = 'test it out'
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.pinned_message = True
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.text = 'it out'
+        result = filter(update)
+        assert not result
+
+        update.message.text = 'test it out'
+        update.message.forward_date = None
+        update.message.pinned_message = None
+        filter = ((Filters.regex('test') | Filters.command) &
+                  (Filters.regex('it') | Filters.status_update))
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert len(result) == 2
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.text = 'test'
+        result = filter(update)
+        assert not result
+        update.message.pinned_message = True
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert all([type(res) == SRE_TYPE for res in result])
+        update.message.text = 'nothing'
+        result = filter(update)
+        assert not result
+        update.message.text = '/start'
+        result = filter(update)
+        assert result
+        assert isinstance(result, bool)
+        update.message.text = '/start it'
+        result = filter(update)
+        assert result
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert all([type(res) == SRE_TYPE for res in result])
+
+    def test_regex_inverted(self, update):
+        update.message.text = '/start deep-linked param'
+        filter = ~Filters.regex(r'deep-linked param')
+        result = filter(update)
+        assert not result
+        update.message.text = 'not it'
+        result = filter(update)
+        assert result
+        assert isinstance(result, bool)
+
+        filter = (~Filters.regex('linked') & Filters.command)
+        update.message.text = "it's linked"
+        result = filter(update)
+        assert not result
+        update.message.text = '/start'
+        result = filter(update)
+        assert result
+        update.message.text = '/linked'
+        result = filter(update)
+        assert not result
+
+        filter = (~Filters.regex('linked') | Filters.command)
+        update.message.text = "it's linked"
+        result = filter(update)
+        assert not result
+        update.message.text = '/start linked'
+        result = filter(update)
+        assert result
+        update.message.text = '/start'
+        result = filter(update)
+        assert result
+        update.message.text = 'nothig'
+        result = filter(update)
+        assert result
 
     def test_filters_reply(self, update):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
@@ -456,7 +601,7 @@ class TestFilters(object):
     def test_and_or_filters(self, update):
         update.message.text = 'test'
         update.message.forward_date = datetime.datetime.now()
-        assert (Filters.text & (Filters.forwarded | Filters.status_update))(update)
+        assert (Filters.text & (Filters.status_update | Filters.forwarded))(update)
         update.message.forward_date = False
         assert not (Filters.text & (Filters.forwarded | Filters.status_update))(update)
         update.message.pinned_message = True

@@ -60,10 +60,13 @@ class BaseFilter(object):
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         update_filter (:obj:`bool`): whether this filter should work on update. If ``False`` it
             will run the filter on :attr:`update.effective_message``. Default is ``False``.
+        regex_filter (:obj:`bool`): Whether this filter is a regexfilter. Will return a list with
+            the match object instead of a bool.
     """
 
     name = None
     update_filter = False
+    regex_filter = False
 
     def __call__(self, update):
         if self.update_filter:
@@ -113,7 +116,7 @@ class InvertedFilter(BaseFilter):
         self.f = f
 
     def filter(self, update):
-        return not self.f(update)
+        return not bool(self.f(update))
 
     def __repr__(self):
         return "<inverted {}>".format(self.f)
@@ -132,14 +135,45 @@ class MergedFilter(BaseFilter):
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
+        if self.base_filter.regex_filter:
+            self.regex_filter = True
         self.and_filter = and_filter
+        if self.and_filter and not isinstance(self.and_filter,
+                                              bool) and self.and_filter.regex_filter:
+            self.regex_filter = True
         self.or_filter = or_filter
+        if self.or_filter and not isinstance(self.and_filter,
+                                             bool) and self.or_filter.regex_filter:
+            self.regex_filter = True
 
     def filter(self, update):
+        base_output = self.base_filter(update)
         if self.and_filter:
-            return self.base_filter(update) and self.and_filter(update)
+            comp_output = self.and_filter(update)
+            if base_output and comp_output:
+                if self.regex_filter:
+                    if not isinstance(base_output, list):
+                        base_output = []
+                    if isinstance(comp_output, list):
+                        base_output.extend(comp_output)
+                    if not base_output:
+                        return self.base_filter(update) and self.and_filter(update)
+                    return base_output
+                else:
+                    return self.base_filter(update) and self.and_filter(update)
         elif self.or_filter:
-            return self.base_filter(update) or self.or_filter(update)
+            comp_output = self.or_filter(update)
+            if base_output or comp_output:
+                if self.regex_filter:
+                    if not isinstance(base_output, list):
+                        base_output = []
+                    if isinstance(comp_output, list):
+                        base_output.extend(comp_output)
+                    if not base_output:
+                        return self.base_filter(update) or self.or_filter(update)
+                    return base_output
+                else:
+                    return self.base_filter(update) or self.or_filter(update)
 
     def __repr__(self):
         return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
@@ -199,17 +233,18 @@ class Filters(object):
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
+        regex_filter = True
+
         def __init__(self, pattern):
             self.pattern = re.compile(pattern)
             self.name = 'Filters.regex({})'.format(self.pattern)
 
-        # TODO: Once the callback revamp (#1026) is done, the regex filter should be able to pass
-        # the matched groups and groupdict to the context object.
-
         def filter(self, message):
             if message.text:
-                return bool(self.pattern.search(message.text))
-            return False
+                match = self.pattern.search(message.text)
+                if match:
+                    return [match]
+                return []
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
