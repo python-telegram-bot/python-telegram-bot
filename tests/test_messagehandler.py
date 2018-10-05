@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import re
 from queue import Queue
 
 import pytest
@@ -52,6 +53,7 @@ def message(bot):
 
 class TestMessageHandler(object):
     test_flag = False
+    SRE_TYPE = type(re.match("", ""))
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -75,23 +77,31 @@ class TestMessageHandler(object):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
-        self.test_flag = (
-            isinstance(context, CallbackContext) and
-            isinstance(context.bot, Bot) and
-            isinstance(update, Update) and
-            isinstance(context.update_queue, Queue) and
-            isinstance(context.job_queue, JobQueue) and
-            isinstance(context.chat_data, dict) and
-            (
-                (isinstance(context.user_data, dict) and
-                 (isinstance(update.message, Message) or
-                  isinstance(update.edited_message, Message)))
-                or
-                (context.user_data is None and
-                 (isinstance(update.channel_post, Message) or
-                  isinstance(update.edited_channel_post, Message)))
-            )
-        )
+        self.test_flag = (isinstance(context, CallbackContext) and
+                          isinstance(context.bot, Bot) and
+                          isinstance(update, Update) and
+                          isinstance(context.update_queue, Queue) and
+                          isinstance(context.job_queue, JobQueue) and
+                          isinstance(context.chat_data, dict) and
+                          ((isinstance(context.user_data, dict) and
+                            (isinstance(update.message, Message) or
+                             isinstance(update.edited_message, Message))) or
+                           (context.user_data is None and
+                            (isinstance(update.channel_post, Message) or
+                             isinstance(update.edited_channel_post, Message)))
+                           ))
+
+    def callback_context_regex1(self, update, context):
+        if context.matches:
+            types = all([type(res) == self.SRE_TYPE for res in context.matches])
+            num = len(context.matches) == 1
+            self.test_flag = types and num
+
+    def callback_context_regex2(self, update, context):
+        if context.matches:
+            types = all([type(res) == self.SRE_TYPE for res in context.matches])
+            num = len(context.matches) == 2
+            self.test_flag = types and num
 
     def test_basic(self, dp, message):
         handler = MessageHandler(None, self.callback_basic)
@@ -235,4 +245,29 @@ class TestMessageHandler(object):
 
         self.test_flag = False
         cdp.process_update(Update(0, edited_channel_post=message))
+        assert self.test_flag
+
+    def test_context_regex(self, cdp, message):
+        handler = MessageHandler(Filters.regex('one two'), self.callback_context_regex1)
+        cdp.add_handler(handler)
+
+        message.text = 'not it'
+        cdp.process_update(Update(0, message))
+        assert not self.test_flag
+
+        message.text += ' one two now it is'
+        cdp.process_update(Update(0, message))
+        assert self.test_flag
+
+    def test_context_multiple_regex(self, cdp, message):
+        handler = MessageHandler(Filters.regex('one') & Filters.regex('two'),
+                                 self.callback_context_regex2)
+        cdp.add_handler(handler)
+
+        message.text = 'not it'
+        cdp.process_update(Update(0, message))
+        assert not self.test_flag
+
+        message.text += ' one two now it is'
+        cdp.process_update(Update(0, message))
         assert self.test_flag

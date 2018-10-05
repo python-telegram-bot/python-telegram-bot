@@ -166,3 +166,7 @@ class MessageHandler(Handler):
         """
         if isinstance(update, Update) and update.effective_message:
             return self.filters(update)
+
+    def collect_additional_context(self, context, update, dispatcher, check_result):
+        if isinstance(check_result, list):
+            context.matches = check_result
