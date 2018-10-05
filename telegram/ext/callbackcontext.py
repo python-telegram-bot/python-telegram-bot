@@ -33,9 +33,9 @@ class CallbackContext(object):
             update from the same chat it will be the same ``dict``.
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
-        match (:obj:`re match object`, optional): If the associated update originated from a
-            regex-supported handler, this will contain the object returned from
-            ``re.match(pattern, string)``.
+        matches (List[:obj:`re match object`], optional): If the associated update originated from
+            a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
+            MatchObjects for every pattern where ``re.search(pattern, string)`` returned a Match.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
@@ -60,7 +60,7 @@ class CallbackContext(object):
         self.chat_data = None
         self.user_data = None
         self.args = None
-        self.match = None
+        self.matches = None
         self.error = None
         self.job = None
 
