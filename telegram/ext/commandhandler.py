@@ -177,17 +177,22 @@ class CommandHandler(Handler):
                         command[1].lower() == message.bot.username.lower()):
                     return None
 
-                if self.filters(update):
-                    return args
+                filter_result = self.filters(update)
+                if filter_result:
+                    return args, filter_result
+                else:
+                    return False
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
         if self.pass_args:
-            optional_args['args'] = check_result
+            optional_args['args'] = check_result[0]
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.args = check_result
+        context.args = check_result[0]
+        if isinstance(check_result[1], list):
+            context.matches = check_result[1]
 
 
 class PrefixHandler(CommandHandler):
@@ -330,5 +335,8 @@ class PrefixHandler(CommandHandler):
             text_list = message.text.split()
             if text_list[0].lower() not in self.command:
                 return None
-            if self.filters(update):
-                return text_list[1:]
+            filter_result = self.filters(update)
+            if filter_result:
+                return text_list[1:], filter_result
+            else:
+                return False
