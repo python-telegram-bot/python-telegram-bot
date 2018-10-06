@@ -29,6 +29,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
 - `Eugenio Panadero <https://github.com/azogue>`_
+- `Evan Haberecht <https://github.com/habereet>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
