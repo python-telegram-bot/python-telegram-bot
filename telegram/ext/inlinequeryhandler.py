@@ -151,4 +151,4 @@ class InlineQueryHandler(Handler):
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         if self.pattern:
-            context.match = check_result
+            context.matches = [check_result]
