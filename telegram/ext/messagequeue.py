@@ -247,7 +247,7 @@ class MessageQueue(object):
             is_group_msg (:obj:`bool`, optional): Defines whether ``promise`` would be processed in
                 group*+*all* ``DelayQueue``s (if set to ``True``), or only through *all*
                 ``DelayQueue`` (if set to ``False``), resulting in needed delays to avoid
-                hitting specified limits. Defaults to ``True``.
+                hitting specified limits. Defaults to ``False``.
 
         Notes:
             Method is designed to accept ``telegram.utils.promise.Promise`` as ``promise``
