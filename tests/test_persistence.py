@@ -29,7 +29,7 @@ from collections import defaultdict
 
 import pytest
 
-from telegram import Update, Message, User, Chat
+from telegram import Update, Message, User, Chat, MessageEntity
 from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageHandler, Filters, \
     PicklePersistence, CommandHandler, DictPersistence
 
@@ -137,24 +137,24 @@ class TestBasePersistence(object):
         base_persistence.get_chat_data = get_chat_data
         # base_persistence.update_chat_data = lambda x: x
         # base_persistence.update_user_data = lambda x: x
-        updater = Updater(bot=bot, persistence=base_persistence)
+        updater = Updater(bot=bot, persistence=base_persistence, use_context=True)
         dp = updater.dispatcher
 
-        def callback_known_user(bot, update, user_data, chat_data):
-            if not user_data['test1'] == 'test2':
+        def callback_known_user(update, context):
+            if not context.user_data['test1'] == 'test2':
                 pytest.fail('user_data corrupt')
 
-        def callback_known_chat(bot, update, user_data, chat_data):
-            if not chat_data['test3'] == 'test4':
+        def callback_known_chat(update, context):
+            if not context.chat_data['test3'] == 'test4':
                 pytest.fail('chat_data corrupt')
 
-        def callback_unknown_user_or_chat(bot, update, user_data, chat_data):
-            if not user_data == {}:
+        def callback_unknown_user_or_chat(update, context):
+            if not context.user_data == {}:
                 pytest.fail('user_data corrupt')
-            if not chat_data == {}:
+            if not context.chat_data == {}:
                 pytest.fail('chat_data corrupt')
-            user_data[1] = 'test7'
-            chat_data[2] = 'test8'
+            context.user_data[1] = 'test7'
+            context.chat_data[2] = 'test8'
 
         known_user = MessageHandler(Filters.user(user_id=12345), callback_known_user,
                                     pass_chat_data=True, pass_user_data=True)
@@ -490,21 +490,21 @@ class TestPickelPersistence(object):
         assert conversations_test['name1'] == conversation1
 
     def test_with_handler(self, bot, update, pickle_persistence, good_pickle_files):
-        u = Updater(bot=bot, persistence=pickle_persistence)
+        u = Updater(bot=bot, persistence=pickle_persistence, use_context=True)
         dp = u.dispatcher
 
-        def first(bot, update, user_data, chat_data):
-            if not user_data == {}:
+        def first(update, context):
+            if not context.user_data == {}:
                 pytest.fail()
-            if not chat_data == {}:
+            if not context.chat_data == {}:
                 pytest.fail()
-            user_data['test1'] = 'test2'
-            chat_data['test3'] = 'test4'
+            context.user_data['test1'] = 'test2'
+            context.chat_data['test3'] = 'test4'
 
-        def second(bot, update, user_data, chat_data):
-            if not user_data['test1'] == 'test2':
+        def second(update, context):
+            if not context.user_data['test1'] == 'test2':
                 pytest.fail()
-            if not chat_data['test3'] == 'test4':
+            if not context.chat_data['test3'] == 'test4':
                 pytest.fail()
 
         h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
@@ -526,19 +526,20 @@ class TestPickelPersistence(object):
 
     def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
         dp.persistence = pickle_persistence
+        dp.use_context = True
         NEXT, NEXT2 = range(2)
 
-        def start(bot, update):
+        def start(update, context):
             return NEXT
 
         start = CommandHandler('start', start)
 
-        def next(bot, update):
+        def next(update, context):
             return NEXT2
 
         next = MessageHandler(None, next)
 
-        def next2(bot, update):
+        def next2(update, context):
             return ConversationHandler.END
 
         next2 = MessageHandler(None, next2)
@@ -550,6 +551,7 @@ class TestPickelPersistence(object):
         dp.process_update(update)
         assert ch._get_key(update) not in ch.conversations
         update.message.text = '/start'
+        update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
         dp.process_update(update)
         assert ch.conversations[ch._get_key(update)] == 0
         assert ch.conversations == pickle_persistence.conversations['name2']
@@ -685,21 +687,21 @@ class TestDictPersistence(object):
 
     def test_with_handler(self, bot, update):
         dict_persistence = DictPersistence()
-        u = Updater(bot=bot, persistence=dict_persistence)
+        u = Updater(bot=bot, persistence=dict_persistence, use_context=True)
         dp = u.dispatcher
 
-        def first(bot, update, user_data, chat_data):
-            if not user_data == {}:
+        def first(update, context):
+            if not context.user_data == {}:
                 pytest.fail()
-            if not chat_data == {}:
+            if not context.chat_data == {}:
                 pytest.fail()
-            user_data['test1'] = 'test2'
-            chat_data[3] = 'test4'
+            context.user_data['test1'] = 'test2'
+            context.chat_data[3] = 'test4'
 
-        def second(bot, update, user_data, chat_data):
-            if not user_data['test1'] == 'test2':
+        def second(update, context):
+            if not context.user_data['test1'] == 'test2':
                 pytest.fail()
-            if not chat_data[3] == 'test4':
+            if not context.chat_data[3] == 'test4':
                 pytest.fail()
 
         h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
@@ -722,19 +724,20 @@ class TestDictPersistence(object):
     def test_with_conversationHandler(self, dp, update, conversations_json):
         dict_persistence = DictPersistence(conversations_json=conversations_json)
         dp.persistence = dict_persistence
+        dp.use_context = True
         NEXT, NEXT2 = range(2)
 
-        def start(bot, update):
+        def start(update, context):
             return NEXT
 
         start = CommandHandler('start', start)
 
-        def next(bot, update):
+        def next(update, context):
             return NEXT2
 
         next = MessageHandler(None, next)
 
-        def next2(bot, update):
+        def next2(update, context):
             return ConversationHandler.END
 
         next2 = MessageHandler(None, next2)
@@ -746,6 +749,7 @@ class TestDictPersistence(object):
         dp.process_update(update)
         assert ch._get_key(update) not in ch.conversations
         update.message.text = '/start'
+        update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
         dp.process_update(update)
         assert ch.conversations[ch._get_key(update)] == 0
         assert ch.conversations == dict_persistence.conversations['name2']

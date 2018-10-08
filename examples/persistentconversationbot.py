@@ -46,12 +46,12 @@ def facts_to_str(user_data):
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(bot, update, user_data):
+def start(update, context):
     reply_text = "Hi! My name is Doctor Botter."
-    if user_data:
+    if context.user_data:
         reply_text += " You already told me your {}. Why don't you tell me something more " \
                       "about yourself? Or change enything I " \
-                      "already know.".format(", ".join(user_data.keys()))
+                      "already know.".format(", ".join(context.user_data.keys()))
     else:
         reply_text += " I will hold a more complex conversation with you. Why don't you tell me " \
                       "something about yourself?"
@@ -60,12 +60,12 @@ def start(bot, update, user_data):
     return CHOOSING
 
 
-def regular_choice(bot, update, user_data):
+def regular_choice(update, context):
     text = update.message.text
-    user_data['choice'] = text
-    if user_data.get(text):
+    context.user_data['choice'] = text
+    if context.user_data.get(text):
         reply_text = 'Your {}, I already know the following ' \
-                     'about that: {}'.format(text.lower(), user_data[text.lower()])
+                     'about that: {}'.format(text.lower(), context.user_data[text.lower()])
     else:
         reply_text = 'Your {}? Yes, I would love to hear about that!'.format(text.lower())
     update.message.reply_text(reply_text)
@@ -73,43 +73,44 @@ def regular_choice(bot, update, user_data):
     return TYPING_REPLY
 
 
-def custom_choice(bot, update):
+def custom_choice(update, context):
     update.message.reply_text('Alright, please send me the category first, '
                               'for example "Most impressive skill"')
 
     return TYPING_CHOICE
 
 
-def received_information(bot, update, user_data):
+def received_information(update, context):
     text = update.message.text
-    category = user_data['choice']
-    user_data[category] = text.lower()
-    del user_data['choice']
+    category = context.user_data['choice']
+    context.user_data[category] = text.lower()
+    del context.user_data['choice']
 
     update.message.reply_text("Neat! Just so you know, this is what you already told me:"
                               "{}"
                               "You can tell me more, or change your opinion on "
-                              "something.".format(facts_to_str(user_data)), reply_markup=markup)
+                              "something.".format(facts_to_str(context.user_data)),
+                              reply_markup=markup)
 
     return CHOOSING
 
 
-def show_data(bot, update, user_data):
+def show_data(update, context):
     update.message.reply_text("This is what you already told me:"
-                              "{}".format(facts_to_str(user_data)))
+                              "{}".format(facts_to_str(context.user_data)))
 
 
-def done(bot, update, user_data):
-    if 'choice' in user_data:
-        del user_data['choice']
+def done(update, context):
+    if 'choice' in context.user_data:
+        del context.user_data['choice']
 
     update.message.reply_text("I learned these facts about you:"
                               "{}"
-                              "Until next time!".format(facts_to_str(user_data)))
+                              "Until next time!".format(facts_to_str(context.user_data)))
     return ConversationHandler.END
 
 
-def error(bot, update, error):
+def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
@@ -117,42 +118,39 @@ def error(bot, update, error):
 def main():
     # Create the Updater and pass it your bot's token.
     pp = PicklePersistence(filename='conversationbot')
-    updater = Updater("TOKEN", persistence=pp)
+    updater = Updater("TOKEN", persistence=pp, use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start, pass_user_data=True)],
+        entry_points=[CommandHandler('start', start)],
 
         states={
             CHOOSING: [RegexHandler('^(Age|Favourite colour|Number of siblings)$',
-                                    regular_choice,
-                                    pass_user_data=True),
+                                    regular_choice),
                        RegexHandler('^Something else...$',
                                     custom_choice),
                        ],
 
             TYPING_CHOICE: [MessageHandler(Filters.text,
-                                           regular_choice,
-                                           pass_user_data=True),
+                                           regular_choice),
                             ],
 
             TYPING_REPLY: [MessageHandler(Filters.text,
-                                          received_information,
-                                          pass_user_data=True),
+                                          received_information),
                            ],
         },
 
-        fallbacks=[RegexHandler('^Done$', done, pass_user_data=True)],
+        fallbacks=[RegexHandler('^Done$', done)],
         name="my_conversation",
         persistent=True
     )
 
     dp.add_handler(conv_handler)
 
-    show_data_handler = CommandHandler('show_data', show_data, pass_user_data=True)
+    show_data_handler = CommandHandler('show_data', show_data)
     dp.add_handler(show_data_handler)
     # log all errors
     dp.add_error_handler(error)
