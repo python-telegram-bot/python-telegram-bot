@@ -148,32 +148,35 @@ class MergedFilter(BaseFilter):
 
     def filter(self, update):
         base_output = self.base_filter(update)
+        # We need to check if the filters are regexfilters and if so return the list of matches.
+        # If it's not a regexfilter or an or_filter but no matches return bool
         if self.and_filter:
             comp_output = self.and_filter(update)
             if base_output and comp_output:
                 if self.regex_filter:
                     if not isinstance(base_output, list):
-                        base_output = []
+                        base = []
+                    else:
+                        base = base_output
                     if isinstance(comp_output, list):
-                        base_output.extend(comp_output)
-                    if not base_output:
-                        return self.base_filter(update) and self.and_filter(update)
-                    return base_output
-                else:
-                    return self.base_filter(update) and self.and_filter(update)
+                        base.extend(comp_output)
+                    if base:
+                        return base
+                return True
         elif self.or_filter:
             comp_output = self.or_filter(update)
             if base_output or comp_output:
                 if self.regex_filter:
                     if not isinstance(base_output, list):
-                        base_output = []
+                        base = []
+                    else:
+                        base = base_output
                     if isinstance(comp_output, list):
-                        base_output.extend(comp_output)
-                    if not base_output:
-                        return self.base_filter(update) or self.or_filter(update)
-                    return base_output
-                else:
-                    return self.base_filter(update) or self.or_filter(update)
+                        base.extend(comp_output)
+                    if base:
+                        return base
+                return True
+        return False
 
     def __repr__(self):
         return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
