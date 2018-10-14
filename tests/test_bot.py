@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import os
 import time
 from datetime import datetime
 from platform import python_implementation
@@ -146,16 +145,16 @@ class TestBot(object):
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_game(self, bot, chat_id):
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         message = bot.send_game(chat_id, game_short_name)
 
         assert message.game
-        assert message.game.description == 'This is a test game for python-telegram-bot.'
-        assert message.game.animation.file_id == 'CgADAQADKwIAAvjAuQABozciVqhFDO0C'
+        assert message.game.description == ('A no-op test game, for python-telegram-bot '
+                                            'bot framework testing.')
+        assert message.game.animation.file_id != ''
         assert message.game.photo[0].file_size == 851
 
     @flaky(3, 1)
@@ -190,18 +189,16 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_user_profile_photos(self, bot):
-        chat_id = 12173560  # hardcoded Leandro's chat_id
+    def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
-        assert user_profile_photos.photos[0][0].file_size == 9999
+        assert user_profile_photos.photos[0][0].file_size == 5403
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_one_user_profile_photo(self, bot):
-        chat_id = 12173560  # hardcoded Leandro's chat_id
+    def test_get_one_user_profile_photo(self, bot, chat_id):
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
-        assert user_profile_photos.photos[0][0].file_size == 9999
+        assert user_profile_photos.photos[0][0].file_size == 5403
 
     # get_file is tested multiple times in the test_*media* modules.
 
@@ -275,7 +272,6 @@ class TestBot(object):
 
         assert message.caption == 'new caption'
 
-    @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_caption_without_required(self, bot):
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
             bot.edit_message_caption(caption='new_caption')
@@ -294,7 +290,6 @@ class TestBot(object):
 
         assert message is not True
 
-    @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_reply_markup_without_required(self, bot):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text='test', callback_data='1')]])
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
@@ -349,7 +344,7 @@ class TestBot(object):
         chat = bot.get_chat(group_id)
 
         assert chat.type == 'group'
-        assert chat.title == '>>> telegram.Bot() - Developers'
+        assert chat.title == '>>> telegram.Bot(test)'
         assert chat.id == int(group_id)
 
     @flaky(3, 1)
@@ -370,11 +365,12 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_chat_member(self, bot, channel_id):
-        chat_member = bot.get_chat_member(channel_id, 103246792)  # Eldin
+    def test_get_chat_member(self, bot, channel_id, chat_id):
+        chat_member = bot.get_chat_member(channel_id, chat_id)
 
         assert chat_member.status == 'administrator'
-        assert chat_member.user.username == 'EchteEldin'
+        assert chat_member.user.first_name == 'PTB'
+        assert chat_member.user.last_name == 'Test user'
 
     @pytest.mark.skip(reason="Not implemented yet.")
     def test_set_chat_sticker_set(self):
@@ -384,12 +380,11 @@ class TestBot(object):
     def test_delete_chat_sticker_set(self):
         pass
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         message = bot.set_game_score(
@@ -403,12 +398,11 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text != game.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_2(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
@@ -425,12 +419,11 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text == game.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
@@ -442,12 +435,11 @@ class TestBot(object):
                 chat_id=game.chat_id,
                 message_id=game.message_id)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
@@ -468,24 +460,22 @@ class TestBot(object):
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_too_low_score(self, bot, chat_id):
         # We need a game to set the score for
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         with pytest.raises(BadRequest):
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
         high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
@@ -572,7 +562,7 @@ class TestBot(object):
     @pytest.mark.timeout(10)
     def test_promote_chat_member(self, bot, channel_id):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
-        with pytest.raises(BadRequest, match='Chat_admin_required'):
+        with pytest.raises(BadRequest, match='Not enough rights'):
             assert bot.promote_chat_member(channel_id,
                                            95205500,
                                            can_change_info=True,

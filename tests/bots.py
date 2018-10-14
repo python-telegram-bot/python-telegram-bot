@@ -18,26 +18,37 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provide a bot to tests"""
 import os
+import random
 import sys
 
 from platform import python_implementation
 
 # Provide some public fallbacks so it's easy for contributors to run tests on their local machine
-FALLBACKS = {
-    'token': '133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0',
-    'payment_provider_token': '284685063:TEST:ZGJlMmQxZDI3ZTc3',
-    'chat_id': '12173560',
-    'group_id': '-49740850',
-    'channel_id': '@pythontelegrambottests'
-}
+# These bots are only able to talk in our test chats, so they are quite useless for other
+# purposes than testing.
+FALLBACKS = [
+    {
+        'token': '579694714:AAHRLL5zBVy4Blx2jRFKe1HlfnXCg08WuLY',
+        'payment_provider_token': '284685063:TEST:NjQ0NjZlNzI5YjJi',
+        'chat_id': '675666224',
+        'group_id': '-269513406',
+        'channel_id': '@pythontelegrambottests'
+    }, {
+        'token': '558194066:AAEEylntuKSLXj9odiv3TnX7Z5KY2J3zY3M',
+        'payment_provider_token': '284685063:TEST:YjEwODQwMTFmNDcy',
+        'chat_id': '675666224',
+        'group_id': '-269513406',
+        'channel_id': '@pythontelegrambottests'
+    }
+]
 
 
 def get(name, fallback):
-    full_name = '{0}-{1}-{2[0]}{2[1]}'.format(name, python_implementation(),
+    full_name = '{0}_{1}_{2[0]}{2[1]}'.format(name, python_implementation(),
                                               sys.version_info).upper()
-    # First try fullnames such as
-    # TOKEN-CPYTHON-33
-    # CHAT_ID-PYPY-27
+    # First try full_names such as
+    # TOKEN_CPYTHON_33
+    # CHAT_ID_PYPY_27
     val = os.getenv(full_name)
     if val:
         return val
@@ -52,4 +63,4 @@ def get(name, fallback):
 
 
 def get_bot():
-    return {k: get(k, v) for k, v in FALLBACKS.items()}
+    return {k: get(k, v) for k, v in random.choice(FALLBACKS).items()}
