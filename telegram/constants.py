@@ -21,7 +21,7 @@ The following constants were extracted from the
 
 Attributes:
     MAX_MESSAGE_LENGTH (:obj:`int`): 4096
-    MAX_CAPTION_LENGTH (:obj:`int`): 200
+    MAX_CAPTION_LENGTH (:obj:`int`): 1024
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
     MAX_FILESIZE_DOWNLOAD (:obj:`int`): In bytes (20MB)
     MAX_FILESIZE_UPLOAD (:obj:`int`): In bytes (50MB)
@@ -40,7 +40,7 @@ Attributes:
 """
 
 MAX_MESSAGE_LENGTH = 4096
-MAX_CAPTION_LENGTH = 200
+MAX_CAPTION_LENGTH = 1024
 
 # constants above this line are tested
 

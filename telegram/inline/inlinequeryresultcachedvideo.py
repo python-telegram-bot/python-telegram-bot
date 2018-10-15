@@ -34,7 +34,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`): Optional. Short description of the result.
-        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -48,7 +48,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`, optional): Short description of the result.
-        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        caption (:obj:`str`, optional): Caption, 0-1024 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
