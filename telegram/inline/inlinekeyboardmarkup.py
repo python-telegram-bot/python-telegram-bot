@@ -48,3 +48,34 @@ class InlineKeyboardMarkup(ReplyMarkup):
             data['inline_keyboard'].append([x.to_dict() for x in inline_keyboard])
 
         return data
+
+    @classmethod
+    def from_button(cls, button, **kwargs):
+        """Shortcut for::
+
+            InlineKeyboardMarkup([[button]], **kwargs)
+
+        Return an InlineKeyboardMarkup from a single InlineKeyboardButton
+
+        Args:
+            button (:class:`telegram.InlineKeyboardButton`): The button to use in the markup
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        """
+        return cls([[button]], **kwargs)
+
+    @classmethod
+    def from_single_line(cls, button_line, **kwargs):
+        """Shortcut for::
+
+            InlineKeyboardMarkup([button_line], **kwargs)
+
+        Return an InlineKeyboardMarkup from a single InlineKeyboardButton
+
+        Args:
+            button_line (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
+                markup
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        """
+        return cls([button_line], **kwargs)
