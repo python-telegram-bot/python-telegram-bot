@@ -40,6 +40,7 @@ def job_queue(bot):
 class TestJobQueue(object):
     result = 0
     job_time = 0
+    job_ran = threading.Event()
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -48,6 +49,7 @@ class TestJobQueue(object):
 
     def job_run_once(self, bot, job):
         self.result += 1
+        self.job_ran.set()
 
     def job_with_exception(self, bot, job):
         raise Exception('Test Error')
@@ -64,7 +66,7 @@ class TestJobQueue(object):
 
     def test_run_once(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)
-        sleep(0.02)
+        assert self.job_ran.wait(10)
         assert self.result == 1
 
     def test_job_with_context(self, job_queue):
