@@ -256,6 +256,8 @@ class ConversationHandler(Handler):
                     self.logger.exception("{}".format(exc))
                     res = old_state
                 finally:
+                    if res is None and old_state is None:
+                        res = self.END
                     self.update_state(res, key)
                     state = self.conversations.get(key)
             else:
