@@ -30,7 +30,7 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import TelegramError
+from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
 from telegram.utils.promise import Promise
 from telegram.ext import BasePersistence
@@ -299,7 +299,7 @@ class Dispatcher(object):
             try:
                 for handler in (x for x in self.handlers[group] if x.check_update(update)):
                     handler.handle_update(update, self)
-                    if self.persistence:
+                    if self.persistence and isinstance(update, Update):
                         if self.persistence.store_chat_data and update.effective_chat.id:
                             chat_id = update.effective_chat.id
                             try:
