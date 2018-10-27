@@ -88,13 +88,11 @@ class TestCallbackQuery(object):
 
     def test_edit_message_text(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
-            print(args, kwargs)
+            text = args[1] == 'test'
             try:
-                text = args[1] == 'test'
                 id = kwargs['inline_message_id'] == callback_query.inline_message_id
                 return id and text
             except KeyError:
-                text = args[1] == 'test'
                 chat_id = kwargs['chat_id'] == callback_query.message.chat_id
                 message_id = kwargs['message_id'] == callback_query.message.message_id
                 return chat_id and message_id and text
@@ -105,14 +103,13 @@ class TestCallbackQuery(object):
 
     def test_edit_message_caption(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
+            caption = kwargs['caption'] == 'new caption'
             try:
                 id = kwargs['inline_message_id'] == callback_query.inline_message_id
-                caption = kwargs['caption'] == 'new caption'
                 return id and caption
             except KeyError:
                 id = kwargs['chat_id'] == callback_query.message.chat_id
                 message = kwargs['message_id'] == callback_query.message.message_id
-                caption = kwargs['caption'] == 'new caption'
                 return id and message and caption
 
         monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
@@ -121,14 +118,13 @@ class TestCallbackQuery(object):
 
     def test_edit_message_reply_markup(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
+            reply_markup = kwargs['reply_markup'] == [['1', '2']]
             try:
                 id = kwargs['inline_message_id'] == callback_query.inline_message_id
-                reply_markup = kwargs['reply_markup'] == [['1', '2']]
                 return id and reply_markup
             except KeyError:
                 id = kwargs['chat_id'] == callback_query.message.chat_id
                 message = kwargs['message_id'] == callback_query.message.message_id
-                reply_markup = kwargs['reply_markup'] == [['1', '2']]
                 return id and message and reply_markup
 
         monkeypatch.setattr('telegram.Bot.edit_message_reply_markup', test)

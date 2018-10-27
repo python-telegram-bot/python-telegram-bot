@@ -106,21 +106,21 @@ class Bot(TelegramObject):
                                                                   password=private_key_password,
                                                                   backend=default_backend())
 
-    def _message(self, url, data, **kwargs):
-        if kwargs.get('reply_to_message_id'):
-            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
+    def _message(self, url, data, reply_to_message_id=None, disable_notification=None,
+                 reply_markup=None, timeout=None, **kwargs):
+        if reply_to_message_id is not None:
+            data['reply_to_message_id'] = reply_to_message_id
 
-        if kwargs.get('disable_notification'):
-            data['disable_notification'] = kwargs.get('disable_notification')
+        if disable_notification is not None:
+            data['disable_notification'] = disable_notification
 
-        if kwargs.get('reply_markup'):
-            reply_markup = kwargs.get('reply_markup')
+        if reply_markup is not None:
             if isinstance(reply_markup, ReplyMarkup):
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
 
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
+        result = self._request.post(url, data, timeout=timeout)
 
         if result is True:
             return result
