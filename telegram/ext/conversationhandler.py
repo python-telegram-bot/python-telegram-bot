@@ -277,8 +277,7 @@ class ConversationHandler(Handler):
                         # Save the current user and the selected handler for handle_update
                         return key, candidate, check
 
-                else:
-                    return None
+                return False
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
 
@@ -345,11 +344,10 @@ class ConversationHandler(Handler):
     def update_state(self, new_state, key):
         if new_state == self.END:
             if key in self.conversations:
+                # If there is no key in conversations, nothing is done.
                 del self.conversations[key]
                 if self.persistent:
                     self.persistence.update_conversation(self.name, key, None)
-            else:
-                pass
 
         elif isinstance(new_state, Promise):
             self.conversations[key] = (self.conversations.get(key), new_state)
