@@ -57,7 +57,6 @@ class Unauthorized(TelegramError):
 
 
 class InvalidToken(TelegramError):
-
     def __init__(self):
         super(InvalidToken, self).__init__('Invalid token')
 
@@ -71,7 +70,6 @@ class BadRequest(NetworkError):
 
 
 class TimedOut(NetworkError):
-
     def __init__(self):
         super(TimedOut, self).__init__('Timed out')
 
@@ -100,3 +98,16 @@ class RetryAfter(TelegramError):
         super(RetryAfter,
               self).__init__('Flood control exceeded. Retry in {} seconds'.format(retry_after))
         self.retry_after = float(retry_after)
+
+
+class Conflict(TelegramError):
+    """
+        Raised when a long poll or webhook conflicts with another one.
+
+        Args:
+            msg (:obj:`str`): The message from telegrams server.
+
+    """
+
+    def __init__(self, msg):
+        super(Conflict, self).__init__(msg)
