@@ -45,9 +45,8 @@ class TestDelayQueue(object):
             dsp(self.call)
 
         starttime = mq.curtime()
-        app_endtime = (
-            (self.N * self.burst_limit /
-             (1000 * self.time_limit_ms)) + starttime + 20)  # wait up to 20 sec more than needed
+        # wait up to 20 sec more than needed
+        app_endtime = ((self.N * self.burst_limit / (1000 * self.time_limit_ms)) + starttime + 20)
         while not dsp._queue.empty() and mq.curtime() < app_endtime:
             sleep(1)
         assert dsp._queue.empty() is True  # check loop exit condition

@@ -10,6 +10,8 @@
     hooks:
     -   id: flake8
         exclude: ^(setup.py|docs/source/conf.py)$
+        args:
+        - --ignore=W605
 -   repo: git://github.com/pre-commit/mirrors-pylint
     sha: v1.7.1
     hooks:
