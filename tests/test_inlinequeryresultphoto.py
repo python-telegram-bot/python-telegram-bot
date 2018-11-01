@@ -64,8 +64,8 @@ class TestInlineQueryResultPhoto(object):
         assert inline_query_result_photo.description == self.description
         assert inline_query_result_photo.caption == self.caption
         assert inline_query_result_photo.parse_mode == self.parse_mode
-        assert (inline_query_result_photo.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
+        assert (inline_query_result_photo.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
         assert inline_query_result_photo.reply_markup.to_dict() == self.reply_markup.to_dict()
 
     def test_to_dict(self, inline_query_result_photo):
@@ -75,20 +75,20 @@ class TestInlineQueryResultPhoto(object):
         assert inline_query_result_photo_dict['type'] == inline_query_result_photo.type
         assert inline_query_result_photo_dict['id'] == inline_query_result_photo.id
         assert inline_query_result_photo_dict['photo_url'] == inline_query_result_photo.photo_url
-        assert (inline_query_result_photo_dict['photo_width'] ==
-                inline_query_result_photo.photo_width)
-        assert (inline_query_result_photo_dict['photo_height'] ==
-                inline_query_result_photo.photo_height)
+        assert (inline_query_result_photo_dict['photo_width']
+                == inline_query_result_photo.photo_width)
+        assert (inline_query_result_photo_dict['photo_height']
+                == inline_query_result_photo.photo_height)
         assert inline_query_result_photo_dict['thumb_url'] == inline_query_result_photo.thumb_url
         assert inline_query_result_photo_dict['title'] == inline_query_result_photo.title
-        assert (inline_query_result_photo_dict['description'] ==
-                inline_query_result_photo.description)
+        assert (inline_query_result_photo_dict['description']
+                == inline_query_result_photo.description)
         assert inline_query_result_photo_dict['caption'] == inline_query_result_photo.caption
         assert inline_query_result_photo_dict['parse_mode'] == inline_query_result_photo.parse_mode
-        assert (inline_query_result_photo_dict['input_message_content'] ==
-                inline_query_result_photo.input_message_content.to_dict())
-        assert (inline_query_result_photo_dict['reply_markup'] ==
-                inline_query_result_photo.reply_markup.to_dict())
+        assert (inline_query_result_photo_dict['input_message_content']
+                == inline_query_result_photo.input_message_content.to_dict())
+        assert (inline_query_result_photo_dict['reply_markup']
+                == inline_query_result_photo.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultPhoto(self.id, self.photo_url, self.thumb_url)

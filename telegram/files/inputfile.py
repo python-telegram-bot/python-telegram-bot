@@ -55,9 +55,9 @@ class InputFile(object):
 
         if filename:
             self.filename = filename
-        elif (hasattr(obj, 'name') and
-              not isinstance(obj.name, int) and  # py3
-              obj.name != '<fdopen>'):  # py2
+        elif (hasattr(obj, 'name')
+              and not isinstance(obj.name, int)  # py3
+              and obj.name != '<fdopen>'):  # py2
             # on py2.7, pylint fails to understand this properly
             # pylint: disable=E1101
             self.filename = os.path.basename(obj.name)
