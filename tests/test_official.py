@@ -96,8 +96,8 @@ def check_object(h4):
         field = parameter[0]
         if field == 'from':
             field = 'from_user'
-        elif ((name.startswith('InlineQueryResult') or
-               name.startswith('InputMedia')) and field == 'type'):
+        elif ((name.startswith('InlineQueryResult')
+               or name.startswith('InputMedia')) and field == 'type'):
             continue
         elif name.startswith('PassportElementError') and field == 'source':
             continue

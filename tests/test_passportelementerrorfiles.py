@@ -46,14 +46,14 @@ class TestPassportElementErrorFiles(object):
         passport_element_error_files_dict = passport_element_error_files.to_dict()
 
         assert isinstance(passport_element_error_files_dict, dict)
-        assert (passport_element_error_files_dict['source'] ==
-                passport_element_error_files.source)
-        assert (passport_element_error_files_dict['type'] ==
-                passport_element_error_files.type)
-        assert (passport_element_error_files_dict['file_hashes'] ==
-                passport_element_error_files.file_hashes)
-        assert (passport_element_error_files_dict['message'] ==
-                passport_element_error_files.message)
+        assert (passport_element_error_files_dict['source']
+                == passport_element_error_files.source)
+        assert (passport_element_error_files_dict['type']
+                == passport_element_error_files.type)
+        assert (passport_element_error_files_dict['file_hashes']
+                == passport_element_error_files.file_hashes)
+        assert (passport_element_error_files_dict['message']
+                == passport_element_error_files.message)
 
     def test_equality(self):
         a = PassportElementErrorFiles(self.type, self.file_hashes, self.message)
