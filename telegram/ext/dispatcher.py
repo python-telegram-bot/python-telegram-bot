@@ -315,12 +315,16 @@ class Dispatcher(object):
                 self.logger.exception('An uncaught error was raised while handling the error')
             return
 
+        context = None
+
         for group in self.groups:
             try:
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        handler.handle_update(update, self, check)
+                        if not context and self.use_context:
+                            context = CallbackContext.from_update(update, self)
+                        handler.handle_update(update, self, check, context)
                         if self.persistence:
                             if self.persistence.store_chat_data and update.effective_chat:
                                 chat_id = update.effective_chat.id

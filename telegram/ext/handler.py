@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
-from telegram.ext.callbackcontext import CallbackContext
 
 
 class Handler(object):
@@ -99,7 +98,7 @@ class Handler(object):
         """
         raise NotImplementedError
 
-    def handle_update(self, update, dispatcher, check_result):
+    def handle_update(self, update, dispatcher, check_result, context=None):
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. Calls :attr:`self.callback` along with its respectful
@@ -113,8 +112,7 @@ class Handler(object):
             check_result: The result from :attr:`check_update`.
 
         """
-        if dispatcher.use_context:
-            context = CallbackContext.from_update(update, dispatcher)
+        if context:
             self.collect_additional_context(context, update, dispatcher, check_result)
             return self.callback(update, context)
         else:
