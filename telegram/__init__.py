@@ -118,7 +118,7 @@ from .passport.credentials import (Credentials,
                                    SecureData,
                                    FileCredentials,
                                    TelegramDecryptionError)
-from .version import __version__  # flake8: noqa
+from .version import __version__  # noqa: F401
 
 __author__ = 'devs@python-telegram-bot.org'
 

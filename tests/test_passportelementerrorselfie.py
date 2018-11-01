@@ -45,14 +45,14 @@ class TestPassportElementErrorSelfie(object):
         passport_element_error_selfie_dict = passport_element_error_selfie.to_dict()
 
         assert isinstance(passport_element_error_selfie_dict, dict)
-        assert (passport_element_error_selfie_dict['source'] ==
-                passport_element_error_selfie.source)
-        assert (passport_element_error_selfie_dict['type'] ==
-                passport_element_error_selfie.type)
-        assert (passport_element_error_selfie_dict['file_hash'] ==
-                passport_element_error_selfie.file_hash)
-        assert (passport_element_error_selfie_dict['message'] ==
-                passport_element_error_selfie.message)
+        assert (passport_element_error_selfie_dict['source']
+                == passport_element_error_selfie.source)
+        assert (passport_element_error_selfie_dict['type']
+                == passport_element_error_selfie.type)
+        assert (passport_element_error_selfie_dict['file_hash']
+                == passport_element_error_selfie.file_hash)
+        assert (passport_element_error_selfie_dict['message']
+                == passport_element_error_selfie.message)
 
     def test_equality(self):
         a = PassportElementErrorSelfie(self.type, self.file_hash, self.message)

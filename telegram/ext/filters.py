@@ -441,8 +441,8 @@ class Filters(object):
             name = 'Filters.status_update.chat_created'
 
             def filter(self, message):
-                return bool(message.group_chat_created or message.supergroup_chat_created or
-                            message.channel_chat_created)
+                return bool(message.group_chat_created or message.supergroup_chat_created
+                            or message.channel_chat_created)
 
         chat_created = _ChatCreated()
         """:obj:`Filter`: Messages that contain :attr:`telegram.Message.group_chat_created`,
@@ -480,11 +480,11 @@ class Filters(object):
         name = 'Filters.status_update'
 
         def filter(self, message):
-            return bool(self.new_chat_members(message) or self.left_chat_member(message) or
-                        self.new_chat_title(message) or self.new_chat_photo(message) or
-                        self.delete_chat_photo(message) or self.chat_created(message) or
-                        self.migrate(message) or self.pinned_message(message) or
-                        self.connected_website(message))
+            return bool(self.new_chat_members(message) or self.left_chat_member(message)
+                        or self.new_chat_title(message) or self.new_chat_photo(message)
+                        or self.delete_chat_photo(message) or self.chat_created(message)
+                        or self.migrate(message) or self.pinned_message(message)
+                        or self.connected_website(message))
 
     status_update = _StatusUpdate()
     """Subset for messages containing a status update.
@@ -628,8 +628,8 @@ class Filters(object):
                 return bool(message.from_user and message.from_user.id in self.user_ids)
             else:
                 # self.usernames is not None
-                return bool(message.from_user and message.from_user.username and
-                            message.from_user.username in self.usernames)
+                return bool(message.from_user and message.from_user.username
+                            and message.from_user.username in self.usernames)
 
     class chat(BaseFilter):
         """Filters messages to allow only those which are from specified chat ID.

@@ -43,12 +43,12 @@ class TestPassportFile(object):
         passport_file_dict = passport_file.to_dict()
 
         assert isinstance(passport_file_dict, dict)
-        assert (passport_file_dict['file_id'] ==
-                passport_file.file_id)
-        assert (passport_file_dict['file_size'] ==
-                passport_file.file_size)
-        assert (passport_file_dict['file_date'] ==
-                passport_file.file_date)
+        assert (passport_file_dict['file_id']
+                == passport_file.file_id)
+        assert (passport_file_dict['file_size']
+                == passport_file.file_size)
+        assert (passport_file_dict['file_date']
+                == passport_file.file_date)
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_size, self.file_date)
