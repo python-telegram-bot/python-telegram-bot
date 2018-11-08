@@ -96,6 +96,7 @@ def dp(_dp):
         _dp.update_queue.get(False)
     _dp.chat_data = defaultdict(dict)
     _dp.user_data = defaultdict(dict)
+    _dp.persistence = None
     _dp.handlers = {}
     _dp.groups = []
     _dp.error_handlers = []
