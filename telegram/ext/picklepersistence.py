@@ -19,6 +19,7 @@
 """This module contains the PicklePersistence class."""
 import pickle
 from collections import defaultdict
+from copy import deepcopy
 
 from telegram.ext import BasePersistence
 
@@ -31,7 +32,7 @@ class PicklePersistence(BasePersistence):
             is false this will be used as a prefix.
         store_user_data (:obj:`bool`): Optional. Whether user_data should be saved by this
             persistence class.
-        store_chat_data (:obj:`bool`): Optional. Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
             persistence class.
         single_file (:obj:`bool`): Optional. When ``False`` will store 3 sperate files of
             `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
@@ -39,6 +40,8 @@ class PicklePersistence(BasePersistence):
         on_flush (:obj:`bool`): Optional. When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When False will store data on any
             transaction. Default is ``False``.
+        on_update (:obj:`bool`): Optional. When ``True`` will only save to file, if data has
+            changed. When ``False`` will save to file on every update. Default is ``False``.
 
     Args:
         filename (:obj:`str`): The filename for storing the pickle files. When :attr:`single_file`
@@ -53,15 +56,18 @@ class PicklePersistence(BasePersistence):
         on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When False will store data on any
             transaction. Default is ``False``.
+        on_update (:obj:`bool`): Optional. When ``True`` will only save to file, if data has
+            changed. When ``False`` will save to file on every update. Default is ``False``.
     """
 
     def __init__(self, filename, store_user_data=True, store_chat_data=True, singe_file=True,
-                 on_flush=False):
+                 on_flush=False, on_update=False):
         self.filename = filename
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.single_file = singe_file
         self.on_flush = on_flush
+        self.on_update = on_update
         self.user_data = None
         self.chat_data = None
         self.conversations = None
@@ -122,7 +128,10 @@ class PicklePersistence(BasePersistence):
             self.user_data = data
         else:
             self.load_singlefile()
-        return self.user_data.copy()
+        if self.on_update:
+            return deepcopy(self.user_data)
+        else:
+            return self.user_data.copy()
 
     def get_chat_data(self):
         """Returns the chat_data from the pickle file if it exsists or an empty defaultdict.
@@ -142,7 +151,10 @@ class PicklePersistence(BasePersistence):
             self.chat_data = data
         else:
             self.load_singlefile()
-        return self.chat_data.copy()
+        if self.on_update:
+            return deepcopy(self.chat_data)
+        else:
+            return self.chat_data.copy()
 
     def get_conversations(self, name):
         """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
@@ -163,7 +175,10 @@ class PicklePersistence(BasePersistence):
             self.conversations = data
         else:
             self.load_singlefile()
-        return self.conversations.get(name, {}).copy()
+        if self.on_update:
+            return deepcopy(self.conversations.get(name, {}))
+        else:
+            return (self.conversations.get(name, {})).copy()
 
     def update_conversation(self, name, key, new_state):
         """Will update the conversations for the given handler and depending on :attr:`on_flush`
@@ -174,8 +189,9 @@ class PicklePersistence(BasePersistence):
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
-        if self.conversations.setdefault(name, {}).get(key) == new_state:
-            return
+        if self.on_update:
+            if self.conversations.setdefault(name, {}).get(key) == new_state:
+                return
         self.conversations[name][key] = new_state
         if not self.on_flush:
             if not self.single_file:
@@ -192,9 +208,12 @@ class PicklePersistence(BasePersistence):
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
         """
-        if self.user_data.get(user_id) == data:
-            return
-        self.user_data[user_id] = data
+        if self.on_update:
+            if self.user_data.get(user_id) == data:
+                return
+            self.user_data[user_id] = deepcopy(data)
+        else:
+            self.user_data[user_id] = data
         if not self.on_flush:
             if not self.single_file:
                 filename = "{}_user_data".format(self.filename)
@@ -210,9 +229,12 @@ class PicklePersistence(BasePersistence):
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[chat_id].
         """
-        if self.chat_data.get(chat_id) == data:
-            return
-        self.chat_data[chat_id] = data
+        if self.on_update:
+            if self.chat_data.get(chat_id) == data:
+                return
+            self.chat_data[chat_id] = deepcopy(data)
+        else:
+            self.chat_data[chat_id] = data
         if not self.on_flush:
             if not self.single_file:
                 filename = "{}_chat_data".format(self.filename)

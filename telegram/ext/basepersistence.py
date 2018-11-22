@@ -33,6 +33,12 @@ class BasePersistence(object):
       must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
     * :meth:`flush` will be called when the bot is shutdown.
 
+    Note:
+        It may be benifitial to check if data has changed, before persisting it. Therefore
+        :meth:`get_chat_data`, :meth:`get_user_data` and :meth:`get_conversations` should *not*
+        return the data stored in the instance of your persistence class but rather a deep copy
+        of it.
+
     Attributes:
         store_user_data (:obj:`bool`): Optional, Whether user_data should be saved by this
             persistence class.
