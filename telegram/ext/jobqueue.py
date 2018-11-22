@@ -90,7 +90,7 @@ class JobQueue(object):
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access it's
+                :class:`telegram.ext.Job` instance. It can be used to access its
                 ``job.context`` or change it to a repeating job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
@@ -122,12 +122,12 @@ class JobQueue(object):
         return job
 
     def run_repeating(self, callback, interval, first=None, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access it's
+                :class:`telegram.ext.Job` instance. It can be used to access its
                 ``Job.context`` or change it to a repeating job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
@@ -168,12 +168,12 @@ class JobQueue(object):
         return job
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access it's ``Job.context``
+                :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
                 or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
