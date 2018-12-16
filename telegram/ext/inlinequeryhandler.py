@@ -39,6 +39,8 @@ class InlineQueryHandler(Handler):
             the callback function.
         pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
             :attr:`telegram.InlineQuery.query` against.
+        filters (:class:`telegram.ext.filters.Filters.user`): Optional. Only allow updates with
+            these Filters.
         pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
@@ -69,6 +71,9 @@ class InlineQueryHandler(Handler):
         pattern (:obj:`str` | :obj:`Pattern`, optional): Regex pattern. If not ``None``,
             ``re.match`` is used on :attr:`telegram.InlineQuery.query` to determine if an update
             should be handled by this handler.
+        filters (:class:`telegram.ext.Filters.user`, optional): A filter inheriting from
+            :class:`telegram.ext.filters.Filters.user`. Filters can be combined using bitwise
+            operators (& for and, | for or, ~ for not).
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -86,6 +91,7 @@ class InlineQueryHandler(Handler):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pattern=None,
+                 filters=None,
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_user_data=False,
@@ -101,6 +107,7 @@ class InlineQueryHandler(Handler):
             pattern = re.compile(pattern)
 
         self.pattern = pattern
+        self.filters = filters
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
@@ -121,7 +128,14 @@ class InlineQueryHandler(Handler):
                     match = re.match(self.pattern, update.inline_query.query)
                     return bool(match)
             else:
-                return True
+                if self.filters is None:
+                    res = True
+                elif isinstance(self.filters, list):
+                    res = any(func(update.inline_query) for func in self.filters)
+                else:
+                    res = self.filters(update.inline_query)
+                return res
+        return False
 
     def handle_update(self, update, dispatcher):
         """
