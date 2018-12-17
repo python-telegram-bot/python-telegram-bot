@@ -64,6 +64,7 @@ class TestFilters(object):
         assert not Filters.regex(r'fail')(message)
         assert Filters.regex(r'test')(message)
         assert Filters.regex(re.compile(r'test'))(message)
+        assert Filters.regex(re.compile(r'TEST', re.IGNORECASE))(message)
 
         message.text = 'i love python'
         assert Filters.regex(r'.\b[lo]{2}ve python')(message)
