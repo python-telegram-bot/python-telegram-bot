@@ -23,7 +23,8 @@ import pytest
 
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
                       PreCheckoutQuery, ShippingQuery, Update, User)
-from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler)
+from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
+                          InlineQueryHandler)
 
 
 @pytest.fixture(scope='class')
@@ -405,3 +406,59 @@ class TestConversationHandler(object):
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert handler.conversations.get((self.group.id, user2.id)) is None
+
+    def test_per_message_warning_is_only_shown_once(self, caplog):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [CommandHandler('pourCoffee', self.drink)],
+                self.BREWING: [CommandHandler('startCoding', self.code)]
+            },
+            fallbacks=self.fallbacks,
+            per_message=True
+        )
+        assert len(caplog.messages) == 1
+        assert caplog.messages[0] == (
+            "If 'per_message=True', all entry points and state handlers"
+            " must be 'CallbackQueryHandler', since no other handlers"
+            " have a message context."
+        )
+
+    def test_per_message_false_warning_is_only_shown_once(self, caplog):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [CallbackQueryHandler(self.drink)],
+                self.BREWING: [CallbackQueryHandler(self.code)],
+            },
+            fallbacks=self.fallbacks,
+            per_message=False
+        )
+        assert len(caplog.messages) == 1
+        assert caplog.messages[0] == (
+            "If 'per_message=False', 'CallbackQueryHandler' will not be "
+            "tracked for every message."
+        )
+
+    def test_warnings_per_chat_is_only_shown_once(self, caplog):
+        def hello(bot, update):
+            return self.BREWING
+
+        def bye(bot, update):
+            return ConversationHandler.END
+
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [InlineQueryHandler(hello)],
+                self.BREWING: [InlineQueryHandler(bye)]
+            },
+            fallbacks=self.fallbacks,
+            per_chat=True
+        )
+
+        assert len(caplog.messages) == 1
+        assert caplog.messages[0] == (
+            "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
+            " since inline queries have no chat context."
+        )
