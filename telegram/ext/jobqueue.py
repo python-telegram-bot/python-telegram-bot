@@ -62,7 +62,7 @@ class JobQueue(object):
                 raise ValueError('next_t is None')
 
         if isinstance(next_t, datetime.datetime):
-            next_t = (next_t - datetime.datetime.now()).total_seconds()
+            next_t = (next_t - datetime.datetime.now(next_t.tzinfo)).total_seconds()
 
         elif isinstance(next_t, datetime.time):
             next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
