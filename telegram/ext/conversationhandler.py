@@ -244,11 +244,11 @@ class ConversationHandler(Handler):
 
         """
         # Ignore messages in channels
-        if (not isinstance(update, Update) or
-                update.channel_post or
-                self.per_chat and not update.effective_chat or
-                self.per_message and not update.callback_query or
-                update.callback_query and self.per_chat and not update.callback_query.message):
+        if (not isinstance(update, Update)
+                or update.channel_post
+                or self.per_chat and not update.effective_chat
+                or self.per_message and not update.callback_query
+                or update.callback_query and self.per_chat and not update.callback_query.message):
             return None
 
         key = self._get_key(update)
@@ -276,7 +276,6 @@ class ConversationHandler(Handler):
                     if check is not None and check is not False:
                         # Save the current user and the selected handler for handle_update
                         return key, candidate, check
-
                 return False
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))

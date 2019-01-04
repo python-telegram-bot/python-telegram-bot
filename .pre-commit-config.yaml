@@ -6,10 +6,12 @@
         args:
         - --diff
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: v1.2.0
+    sha: v2.0.0
     hooks:
     -   id: flake8
         exclude: ^(setup.py|docs/source/conf.py)$
+        args:
+        - --ignore=W605,W503
 -   repo: git://github.com/pre-commit/mirrors-pylint
     sha: v1.7.1
     hooks:

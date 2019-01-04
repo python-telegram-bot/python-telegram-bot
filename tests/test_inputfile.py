@@ -60,8 +60,8 @@ class TestInputFile(object):
         assert InputFile(BytesIO(b'blah'), filename='tg.mp3').mimetype == 'audio/mpeg'
 
         # Test fallback
-        assert (InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype ==
-                'application/octet-stream')
+        assert (InputFile(BytesIO(b'blah'), filename='tg.notaproperext').mimetype
+                == 'application/octet-stream')
         assert InputFile(BytesIO(b'blah')).mimetype == 'application/octet-stream'
 
     def test_filenames(self):
@@ -89,7 +89,8 @@ class TestInputFile(object):
                          filename='blah').filename == 'blah'
         assert InputFile(MockedFileobject('tests/data/telegram.jpg'),
                          filename='blah.jpg').filename == 'blah.jpg'
-        assert InputFile(MockedFileobject('tests/data/telegram')).filename == 'application.octet-stream' # flake8: noqa
+        assert InputFile(
+            MockedFileobject('tests/data/telegram')).filename == 'application.octet-stream'
         assert InputFile(MockedFileobject('tests/data/telegram'),
                          filename='blah').filename == 'blah'
         assert InputFile(MockedFileobject('tests/data/telegram'),
