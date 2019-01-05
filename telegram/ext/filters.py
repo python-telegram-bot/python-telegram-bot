@@ -173,7 +173,7 @@ class Filters(object):
     command = _Command()
     """:obj:`Filter`: Messages starting with ``/``."""
 
-    class _Regex(BaseFilter):
+    class regex(BaseFilter):
         """
         Filters updates by searching for an occurrence of ``pattern`` in the message text.
         The ``re.search`` function is used to determine whether an update should be filtered.
@@ -209,7 +209,6 @@ class Filters(object):
                 return bool(self.pattern.search(message.text))
             return False
 
-    regex = _Regex
     """:obj:`Filter`: Messages that match the specified pattern."""
 
     class _Reply(BaseFilter):
