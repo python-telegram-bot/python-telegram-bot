@@ -182,14 +182,16 @@ class Filters(object):
 
         Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
         but this will probably be implemented in a future update, gradually phasing out the
-        RegexHandler (see https://github.com/python-telegram-bot/python-telegram-bot/issues/835).
+        RegexHandler (See `Github Issue
+        <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
 
         Examples:
-            Use ``MessageHandler(Filters.regex(r'help'), callback) to capture all messages that
+            Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
             contain the word help. You can also use
-            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)
-            if you want your pattern to be case insensitive. This approach is recommended
+            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
+            you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
+
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -205,11 +207,10 @@ class Filters(object):
         # the matched groups and groupdict to the context object.
 
         def filter(self, message):
+            """:obj:`Filter`: Messages that have an occurrence of ``pattern``."""
             if message.text:
                 return bool(self.pattern.search(message.text))
             return False
-
-    """:obj:`Filter`: Messages that match the specified pattern."""
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
