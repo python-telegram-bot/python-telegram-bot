@@ -180,10 +180,11 @@ class Filters(object):
 
         Refer to the documentation of the ``re`` module for more information.
 
-        Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
-        but this will probably be implemented in a future update, gradually phasing out the
-        RegexHandler (See `Github Issue
-        <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
+        Note:
+            Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
+            but this will probably be implemented in a future update, gradually phasing out the
+            RegexHandler (See `Github Issue
+            <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
 
         Examples:
             Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
