@@ -74,6 +74,7 @@ class Dispatcher(object):
             decorator.
         user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
         chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        bot_data (:obj:`defaultdict`): A dictionary handlers can user to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts
 
@@ -101,6 +102,7 @@ class Dispatcher(object):
         self.workers = workers
         self.user_data = defaultdict(dict)
         self.chat_data = defaultdict(dict)
+        self.bot_data = defaultdict(dict)
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence should be based on telegram.ext.BasePersistence")
@@ -113,6 +115,10 @@ class Dispatcher(object):
                 self.chat_data = self.persistence.get_chat_data()
                 if not isinstance(self.chat_data, defaultdict):
                     raise ValueError("chat_data must be of type defaultdict")
+            if self.persistence.store_bot_data:
+                self.bot_data = self.persistence.get_bot_data()
+                if not isinstance(self.bot_data, dict):
+                    raise ValueError("bot_data must be of type dict")
         else:
             self.persistence = None
 
@@ -299,19 +305,29 @@ class Dispatcher(object):
             try:
                 for handler in (x for x in self.handlers[group] if x.check_update(update)):
                     handler.handle_update(update, self)
-                    if self.persistence and isinstance(update, Update):
-                        if self.persistence.store_chat_data and update.effective_chat:
-                            chat_id = update.effective_chat.id
+                    if self.persistence:
+                        if self.persistence.store_bot_data:
                             try:
-                                self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                                self.persistence.update_bot_data(self.bot_data)
                             except Exception:
-                                self.logger.exception('Saving chat data raised an error')
-                        if self.persistence.store_user_data and update.effective_user:
-                            user_id = update.effective_user.id
-                            try:
-                                self.persistence.update_user_data(user_id, self.user_data[user_id])
-                            except Exception:
-                                self.logger.exception('Saving user data raised an error')
+                                self.logger.exception('Saving bot data raised an error')
+
+                        # user_data and chat_data are only available for telegram.Updates
+                        if isinstance(update, Update):
+                            if self.persistence.store_chat_data and update.effective_chat:
+                                chat_id = update.effective_chat.id
+                                try:
+                                    self.persistence.update_chat_data(chat_id,
+                                                                      self.chat_data[chat_id])
+                                except Exception:
+                                    self.logger.exception('Saving chat data raised an error')
+                            if self.persistence.store_user_data and update.effective_user:
+                                user_id = update.effective_user.id
+                                try:
+                                    self.persistence.update_user_data(user_id,
+                                                                      self.user_data[user_id])
+                                except Exception:
+                                    self.logger.exception('Saving user data raised an error')
                     break
 
             # Stop processing with any other handler.

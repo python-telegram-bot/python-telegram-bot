@@ -33,6 +33,13 @@ class TypeHandler(Handler):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
             the callback function.
+        pass_bot_data (:obj:`bool`): Optional. Determines wether ``bot_data`` will be passed to
+            the callback function.
+
+    Note:
+        :attr:`pass_bot_data` determines whether a ``dict`` you can use to keep any data in will be
+        sent to the :attr:`callback` function. :attr:`bot_data` is available independent of updates
+        and will always be the same ``dict``.
 
     Args:
         type (:obj:`type`): The ``type`` of updates this handler should process, as
@@ -50,13 +57,23 @@ class TypeHandler(Handler):
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+        pass_bot_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``bot_data`` will be passed to the callback function. Default is ``False``.
 
     """
 
-    def __init__(self, type, callback, strict=False, pass_update_queue=False,
-                 pass_job_queue=False):
+    def __init__(self,
+                 type,
+                 callback,
+                 strict=False,
+                 pass_update_queue=False,
+                 pass_job_queue=False,
+                 pass_bot_data=False):
         super(TypeHandler, self).__init__(
-            callback, pass_update_queue=pass_update_queue, pass_job_queue=pass_job_queue)
+            callback,
+            pass_update_queue=pass_update_queue,
+            pass_job_queue=pass_job_queue,
+            pass_bot_data=pass_bot_data)
         self.type = type
         self.strict = strict
 

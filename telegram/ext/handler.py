@@ -32,12 +32,16 @@ class Handler(object):
             the callback function.
         pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
             the callback function.
+        pass_bot_data (:obj:`bool`): Optional. Determines wether ``bot_data`` will be passed to
+            the callback function.
 
     Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
+        :attr:`pass_user_data`, :attr:`pass_chat_data` and :attr:`pass_bot_data` determine whether
+        a ``dict`` you can use to keep any data in will be sent to the :attr:`callback` function.
+        :attr:`pass_user_data` and :attr:`pass_chat_data` are related to either the user or the
+        chat that the update was sent in. For each update from the same user or in the same chat,
+        it will be the same ``dict``. :attr:`bot_data` is available independent of updates and will
+        always be the same ``dict``.
 
     Args:
         callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
@@ -55,6 +59,8 @@ class Handler(object):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+        pass_bot_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``bot_data`` will be passed to the callback function. Default is ``False``.
 
     """
 
@@ -63,12 +69,14 @@ class Handler(object):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 pass_bot_data=False):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self.pass_bot_data = pass_bot_data
 
     def check_update(self, update):
         """
@@ -121,5 +129,7 @@ class Handler(object):
 
             if self.pass_chat_data:
                 optional_args['chat_data'] = dispatcher.chat_data[chat.id if chat else None]
+        if self.pass_bot_data:
+            optional_args['bot_data'] = dispatcher.bot_data
 
         return optional_args

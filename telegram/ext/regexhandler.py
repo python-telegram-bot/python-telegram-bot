@@ -50,12 +50,16 @@ class RegexHandler(Handler):
             the callback function.
         pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
             the callback function.
+        pass_bot_data (:obj:`bool`): Optional. Determines wether ``bot_data`` will be passed to
+            the callback function.
 
     Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
+        :attr:`pass_user_data`, :attr:`pass_chat_data` and :attr:`pass_bot_data` determine whether
+        a ``dict`` you can use to keep any data in will be sent to the :attr:`callback` function.
+        :attr:`pass_user_data` and :attr:`pass_chat_data` are related to either the user or the
+        chat that the update was sent in. For each update from the same user or in the same chat,
+        it will be the same ``dict``. :attr:`bot_data` is available independent of updates and will
+        always be the same ``dict``.
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -80,6 +84,8 @@ class RegexHandler(Handler):
             ``user_data`` will be passed to the callback function. Default is ``False``.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+        pass_bot_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
+            ``bot_data`` will be passed to the callback function. Default is ``False``.
         message_updates (:obj:`bool`, optional): Should "normal" message updates be handled?
             Default is ``True``.
         channel_post_updates (:obj:`bool`, optional): Should channel posts updates be handled?
@@ -103,6 +109,7 @@ class RegexHandler(Handler):
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False,
+                 pass_bot_data=False,
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
@@ -120,7 +127,8 @@ class RegexHandler(Handler):
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            pass_bot_data=pass_bot_data)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)
