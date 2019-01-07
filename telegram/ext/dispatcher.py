@@ -102,7 +102,7 @@ class Dispatcher(object):
         self.workers = workers
         self.user_data = defaultdict(dict)
         self.chat_data = defaultdict(dict)
-        self.bot_data = defaultdict(dict)
+        self.bot_data = {}
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence should be based on telegram.ext.BasePersistence")
