@@ -225,7 +225,7 @@ class PicklePersistence(BasePersistence):
         print('same ' + str(self.user_data.get(user_id) is data))
         if self.user_data.get(user_id) == data:
             return
-        self.user_data[user_id] = data.copy()
+        self.user_data[user_id] = data
         if not self.on_flush:
             if not self.single_file:
                 filename = "{}_user_data".format(self.filename)
