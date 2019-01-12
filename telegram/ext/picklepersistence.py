@@ -157,7 +157,7 @@ class PicklePersistence(BasePersistence):
         return self.chat_data.copy()
 
     def get_bot_data(self):
-        """Returns the bot_data from the pickle file if it exsists or an empty defaultdict.
+        """Returns the bot_data from the pickle file if it exsists or an empty dict.
 
         Returns:
             :obj:`defaultdict`: The restored bot data.

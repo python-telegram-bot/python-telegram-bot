@@ -36,7 +36,7 @@ class DictPersistence(BasePersistence):
             persistence class.
         store_chat_data (:obj:`bool`): Whether chat_data should be saved by this
             persistence class.
-        store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
+        store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
             persistence class.
 
     Args:
@@ -180,7 +180,7 @@ class DictPersistence(BasePersistence):
         return self.chat_data.copy()
 
     def get_bot_data(self):
-        """Returns the bot_data created from the ``bot_data_json`` or an empty defaultdict.
+        """Returns the bot_data created from the ``bot_data_json`` or an empty dict.
 
         Returns:
             :obj:`defaultdict`: The restored user data.
