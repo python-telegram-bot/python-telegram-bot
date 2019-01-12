@@ -29,6 +29,8 @@ class CallbackContext(object):
     :class:`telegram.ext.Job`.
 
     Attributes:
+        bot_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update it will be the same ``dict``.
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same chat it will be the same ``dict``.
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
@@ -57,6 +59,7 @@ class CallbackContext(object):
             raise ValueError('CallbackContext should not be used with a non context aware '
                              'dispatcher!')
         self._dispatcher = dispatcher
+        self.bot_data = None
         self.chat_data = None
         self.user_data = None
         self.args = None
@@ -73,6 +76,8 @@ class CallbackContext(object):
     @classmethod
     def from_update(cls, update, dispatcher):
         self = cls(dispatcher)
+        self.bot_data = dispatcher.bot_data
+
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user
@@ -86,6 +91,7 @@ class CallbackContext(object):
     @classmethod
     def from_job(cls, job, dispatcher):
         self = cls(dispatcher)
+        self.bot_data = dispatcher.bot_data
         self.job = job
         return self
 

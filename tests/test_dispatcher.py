@@ -97,6 +97,7 @@ class TestDispatcher(object):
             def __init__(self):
                 self.store_user_data = False
                 self.store_chat_data = False
+                self.store_bot_data = False
 
         with pytest.raises(TypeError,
                            match='persistence should be based on telegram.ext.BasePersistence'):

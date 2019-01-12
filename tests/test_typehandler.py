@@ -50,7 +50,8 @@ class TestTypeHandler(object):
                           isinstance(context.update_queue, Queue) and
                           isinstance(context.job_queue, JobQueue) and
                           context.user_data is None and
-                          context.chat_data is None)
+                          context.chat_data is None and
+                          context.bot_data is not None)
 
     def test_basic(self, dp):
         handler = TypeHandler(dict, self.callback_basic)
