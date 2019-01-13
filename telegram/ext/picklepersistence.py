@@ -56,7 +56,7 @@ class PicklePersistence(BasePersistence):
         on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When False will store data on any
             transaction. Default is ``False``.
-        on_update (:obj:`bool`): Optional. When ``True`` will only save to file, if data has
+        on_update (:obj:`bool`, optional): When ``True`` will only save to file, if data has
             changed. When ``False`` will save to file on every update. Default is ``False``.
     """
 
@@ -131,7 +131,7 @@ class PicklePersistence(BasePersistence):
         if self.on_update:
             return deepcopy(self.user_data)
         else:
-            return self.user_data.copy()
+            return self.user_data
 
     def get_chat_data(self):
         """Returns the chat_data from the pickle file if it exsists or an empty defaultdict.
@@ -154,7 +154,7 @@ class PicklePersistence(BasePersistence):
         if self.on_update:
             return deepcopy(self.chat_data)
         else:
-            return self.chat_data.copy()
+            return self.chat_data
 
     def get_conversations(self, name):
         """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
@@ -178,7 +178,7 @@ class PicklePersistence(BasePersistence):
         if self.on_update:
             return deepcopy(self.conversations.get(name, {}))
         else:
-            return (self.conversations.get(name, {})).copy()
+            return (self.conversations.get(name, {}))
 
     def update_conversation(self, name, key, new_state):
         """Will update the conversations for the given handler and depending on :attr:`on_flush`
@@ -192,7 +192,9 @@ class PicklePersistence(BasePersistence):
         if self.on_update:
             if self.conversations.setdefault(name, {}).get(key) == new_state:
                 return
-        self.conversations[name][key] = new_state
+            self.conversations[name][key] = deepcopy(new_state)
+        else:
+            self.conversations[name][key] = new_state
         if not self.on_flush:
             if not self.single_file:
                 filename = "{}_conversations".format(self.filename)

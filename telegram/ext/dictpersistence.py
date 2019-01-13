@@ -25,6 +25,7 @@ try:
 except ImportError:
     import json
 from collections import defaultdict
+from copy import deepcopy
 from telegram.ext import BasePersistence
 
 
@@ -36,11 +37,13 @@ class DictPersistence(BasePersistence):
             persistence class.
         store_chat_data (:obj:`bool`): Whether chat_data should be saved by this
             persistence class.
+        on_update (:obj:`bool`): Optional. When ``True`` will only save to file, if data has
+            changed. When ``False`` will save to file on every update. Default is ``False``.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is ``True``.
-        store_chat_data (:obj:`bool`, optional): Whether user_data should be saved by this
+        store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is ``True``.
         user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
@@ -48,10 +51,12 @@ class DictPersistence(BasePersistence):
             chat_data on creating this persistence. Default is ``""``.
         conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
+        on_update (:obj:`bool`, optional): When ``True`` will only save to file, if data has
+            changed. When ``False`` will save to file on every update. Default is ``False``.
     """
 
     def __init__(self, store_user_data=True, store_chat_data=True, user_data_json='',
-                 chat_data_json='', conversations_json=''):
+                 chat_data_json='', conversations_json='', on_update=False):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self._user_data = None
@@ -60,6 +65,7 @@ class DictPersistence(BasePersistence):
         self._user_data_json = None
         self._chat_data_json = None
         self._conversations_json = None
+        self.on_update = on_update
         if user_data_json:
             try:
                 self._user_data = decode_user_chat_data_from_json(user_data_json)
@@ -129,7 +135,10 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._user_data = defaultdict(dict)
-        return self.user_data.copy()
+        if self.on_update:
+            return deepcopy(self.user_data)
+        else:
+            return self.user_data
 
     def get_chat_data(self):
         """Returns the chat_data created from the ``chat_data_json`` or an empty defaultdict.
@@ -141,7 +150,10 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._chat_data = defaultdict(dict)
-        return self.chat_data.copy()
+        if self.on_update:
+            return deepcopy(self.chat_data)
+        else:
+            return self.chat_data
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -154,7 +166,10 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._conversations = {}
-        return self.conversations.get(name, {}).copy()
+        if self.on_update:
+            return deepcopy(self.conversations.get(name, {}))
+        else:
+            return (self.conversations.get(name, {}))
 
     def update_conversation(self, name, key, new_state):
         """Will update the conversations for the given handler.
@@ -164,9 +179,12 @@ class DictPersistence(BasePersistence):
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
         """
-        if self._conversations.setdefault(name, {}).get(key) == new_state:
-            return
-        self._conversations[name][key] = new_state
+        if self.on_update:
+            if self._conversations.setdefault(name, {}).get(key) == new_state:
+                return
+            self._conversations[name][key] = deepcopy(new_state)
+        else:
+            self._conversations[name][key] = new_state
         self._conversations_json = None
 
     def update_user_data(self, user_id, data):
@@ -176,8 +194,12 @@ class DictPersistence(BasePersistence):
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
         """
-        if self._user_data.get(user_id) == data:
-            return
+        if self.on_update:
+            if self._user_data.get(user_id) == data:
+                return
+            self._user_data[user_id] = deepcopy(data)
+        else:
+            self._user_data[user_id] = data
         self._user_data[user_id] = data
         self._user_data_json = None
 
@@ -188,7 +210,11 @@ class DictPersistence(BasePersistence):
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[chat_id].
         """
-        if self._chat_data.get(chat_id) == data:
-            return
+        if self.on_update:
+            if self._chat_data.get(chat_id) == data:
+                return
+            self._chat_data[chat_id] = deepcopy(data)
+        else:
+            self._chat_data[chat_id] = data
         self._chat_data[chat_id] = data
         self._chat_data_json = None
