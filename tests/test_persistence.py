@@ -223,7 +223,8 @@ def pickle_persistence():
                              store_user_data=True,
                              store_chat_data=True,
                              singe_file=False,
-                             on_flush=False)
+                             on_flush=False,
+                             on_update=True)
 
 
 @pytest.fixture(scope='function')
@@ -598,7 +599,7 @@ def conversations_json(conversations):
 
 class TestDictPersistence(object):
     def test_no_json_given(self):
-        dict_persistence = DictPersistence()
+        dict_persistence = DictPersistence(on_update=True)
         assert dict_persistence.get_user_data() == defaultdict(dict)
         assert dict_persistence.get_chat_data() == defaultdict(dict)
         assert dict_persistence.get_conversations('noname') == {}
@@ -608,27 +609,28 @@ class TestDictPersistence(object):
         bad_chat_data = 'thisisnojson99900()))('
         bad_conversations = 'thisisnojson99900()))('
         with pytest.raises(TypeError, match='user_data'):
-            DictPersistence(user_data_json=bad_user_data)
+            DictPersistence(user_data_json=bad_user_data, on_update=True)
         with pytest.raises(TypeError, match='chat_data'):
-            DictPersistence(chat_data_json=bad_chat_data)
+            DictPersistence(chat_data_json=bad_chat_data, on_update=True)
         with pytest.raises(TypeError, match='conversations'):
-            DictPersistence(conversations_json=bad_conversations)
+            DictPersistence(conversations_json=bad_conversations, on_update=True)
 
     def test_invalid_json_string_given(self, pickle_persistence, bad_pickle_files):
         bad_user_data = '["this", "is", "json"]'
         bad_chat_data = '["this", "is", "json"]'
         bad_conversations = '["this", "is", "json"]'
         with pytest.raises(TypeError, match='user_data'):
-            DictPersistence(user_data_json=bad_user_data)
+            DictPersistence(user_data_json=bad_user_data, on_update=True)
         with pytest.raises(TypeError, match='chat_data'):
-            DictPersistence(chat_data_json=bad_chat_data)
+            DictPersistence(chat_data_json=bad_chat_data, on_update=True)
         with pytest.raises(TypeError, match='conversations'):
-            DictPersistence(conversations_json=bad_conversations)
+            DictPersistence(conversations_json=bad_conversations, on_update=True)
 
     def test_good_json_input(self, user_data_json, chat_data_json, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
-                                           conversations_json=conversations_json)
+                                           conversations_json=conversations_json,
+                                           on_update=True)
         user_data = dict_persistence.get_user_data()
         assert isinstance(user_data, defaultdict)
         assert user_data[12345]['test1'] == 'test2'
@@ -658,7 +660,8 @@ class TestDictPersistence(object):
                           conversations, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
-                                           conversations_json=conversations_json)
+                                           conversations_json=conversations_json,
+                                           on_update=True)
         assert dict_persistence.user_data == user_data
         assert dict_persistence.chat_data == chat_data
         assert dict_persistence.conversations == conversations
@@ -666,7 +669,8 @@ class TestDictPersistence(object):
     def test_json_outputs(self, user_data_json, chat_data_json, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
-                                           conversations_json=conversations_json)
+                                           conversations_json=conversations_json,
+                                           on_update=True)
         assert dict_persistence.user_data_json == user_data_json
         assert dict_persistence.chat_data_json == chat_data_json
         assert dict_persistence.conversations_json == conversations_json
@@ -675,7 +679,8 @@ class TestDictPersistence(object):
                           conversations, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
-                                           conversations_json=conversations_json)
+                                           conversations_json=conversations_json,
+                                           on_update=True)
         user_data_two = user_data.copy()
         user_data_two.update({4: {5: 6}})
         dict_persistence.update_user_data(4, {5: 6})
@@ -699,7 +704,7 @@ class TestDictPersistence(object):
             conversations_two)
 
     def test_with_handler(self, bot, update):
-        dict_persistence = DictPersistence()
+        dict_persistence = DictPersistence(on_update=True)
         u = Updater(bot=bot, persistence=dict_persistence)
         dp = u.dispatcher
 
@@ -727,7 +732,8 @@ class TestDictPersistence(object):
         chat_data = dict_persistence.chat_data_json
         del (dict_persistence)
         dict_persistence_2 = DictPersistence(user_data_json=user_data,
-                                             chat_data_json=chat_data)
+                                             chat_data_json=chat_data,
+                                             on_update=True)
 
         u = Updater(bot=bot, persistence=dict_persistence_2)
         dp = u.dispatcher
@@ -735,7 +741,8 @@ class TestDictPersistence(object):
         dp.process_update(update)
 
     def test_with_conversationHandler(self, dp, update, conversations_json):
-        dict_persistence = DictPersistence(conversations_json=conversations_json)
+        dict_persistence = DictPersistence(conversations_json=conversations_json,
+                                           on_update=True)
         dp.persistence = dict_persistence
         NEXT, NEXT2 = range(2)
 
