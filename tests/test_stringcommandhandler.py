@@ -74,14 +74,14 @@ class TestStringCommandHandler(object):
             self.test_flag = args == ['one', 'two']
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, str) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          context.user_data is None and
-                          context.chat_data is None and
-                          isinstance(context.bot_data, dict))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, str)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and context.user_data is None
+                          and context.chat_data is None
+                          and isinstance(context.bot_data, dict))
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']

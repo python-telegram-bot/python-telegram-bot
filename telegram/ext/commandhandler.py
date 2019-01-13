@@ -145,19 +145,19 @@ class CommandHandler(Handler):
             :obj:`bool`
 
         """
-        if (isinstance(update, Update) and
-                (update.message or update.edited_message and self.allow_edited)):
+        if (isinstance(update, Update)
+                and (update.message or update.edited_message and self.allow_edited)):
             message = update.effective_message
 
-            if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND and
-                    message.entities[0].offset == 0):
+            if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
+                    and message.entities[0].offset == 0):
                 command = message.text[1:message.entities[0].length]
                 args = message.text.split()[1:]
                 command = command.split('@')
                 command.append(message.bot.username)
 
-                if not (command[0].lower() in self.command and
-                        command[1].lower() == message.bot.username.lower()):
+                if not (command[0].lower() in self.command
+                        and command[1].lower() == message.bot.username.lower()):
                     return None
 
                 if self.filters is None or self.filters(message):
@@ -308,8 +308,8 @@ class PrefixHandler(CommandHandler):
             :obj:`bool`
 
         """
-        if (isinstance(update, Update) and
-                (update.message or update.edited_message and self.allow_edited)):
+        if (isinstance(update, Update)
+                and (update.message or update.edited_message and self.allow_edited)):
             message = update.effective_message
 
             text_list = message.text.split()
