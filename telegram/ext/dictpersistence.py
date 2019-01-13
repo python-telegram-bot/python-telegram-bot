@@ -169,7 +169,7 @@ class DictPersistence(BasePersistence):
         if self.on_update:
             return deepcopy(self.conversations.get(name, {}))
         else:
-            return (self.conversations.get(name, {}))
+            return self.conversations.get(name, {})
 
     def update_conversation(self, name, key, new_state):
         """Will update the conversations for the given handler.
