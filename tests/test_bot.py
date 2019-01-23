@@ -620,7 +620,6 @@ class TestBot(object):
     def test_timeout_propagation(self, monkeypatch, bot, chat_id):
 
         from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
-        import json
 
         class OkException(Exception):
             pass
