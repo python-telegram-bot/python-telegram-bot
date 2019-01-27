@@ -54,7 +54,9 @@ class ConversationHandler(Handler):
 
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
-    default), the state will not change. To end the conversation, the callback function must
+    default), the state will not change. If an entry point callback function returns None,
+    the conversation ends immediately after the execution of this callback function.
+    To end the conversation, the callback function must
     return :attr:`END` or ``-1``.
 
     Attributes:
