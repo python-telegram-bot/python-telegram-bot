@@ -82,8 +82,7 @@ class TestConversationHandler(object):
         return self._set_state(update, self.END)
 
     def start_none(self, bot, update):
-        self.current_state[update.message.from_user.id] = self.END
-        return None
+        return self._set_state(update, None)
 
     def brew(self, bot, update):
         return self._set_state(update, self.BREWING)
@@ -297,6 +296,16 @@ class TestConversationHandler(object):
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(.1)
         # Assert that the Promise has been resolved and the conversation ended.
+        assert len(handler.conversations) == 0
+
+    def test_none_on_first_message(self, dp, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_none)], states={}, fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine and a callback function returns None
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
         assert len(handler.conversations) == 0
 
     def test_none_on_first_message_async(self, dp, bot, user1):
