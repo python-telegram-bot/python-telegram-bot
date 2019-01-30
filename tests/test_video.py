@@ -52,11 +52,11 @@ class TestVideo(object):
         # Make sure file has been uploaded.
         assert isinstance(video, Video)
         assert isinstance(video.file_id, str)
-        assert video.file_id is not ''
+        assert video.file_id != ''
 
         assert isinstance(video.thumb, PhotoSize)
         assert isinstance(video.thumb.file_id, str)
-        assert video.thumb.file_id is not ''
+        assert video.thumb.file_id != ''
 
     def test_expected_values(self, video):
         assert video.width == self.width

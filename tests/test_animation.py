@@ -50,7 +50,7 @@ class TestAnimation(object):
     def test_creation(self, animation):
         assert isinstance(animation, Animation)
         assert isinstance(animation.file_id, str)
-        assert animation.file_id is not ''
+        assert animation.file_id != ''
 
     def test_expected_values(self, animation):
         assert animation.file_size == self.file_size

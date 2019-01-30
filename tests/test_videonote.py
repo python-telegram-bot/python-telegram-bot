@@ -48,11 +48,11 @@ class TestVideoNote(object):
         # Make sure file has been uploaded.
         assert isinstance(video_note, VideoNote)
         assert isinstance(video_note.file_id, str)
-        assert video_note.file_id is not ''
+        assert video_note.file_id != ''
 
         assert isinstance(video_note.thumb, PhotoSize)
         assert isinstance(video_note.thumb.file_id, str)
-        assert video_note.thumb.file_id is not ''
+        assert video_note.thumb.file_id != ''
 
     def test_expected_values(self, video_note):
         assert video_note.length == self.length

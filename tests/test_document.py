@@ -50,7 +50,7 @@ class TestDocument(object):
     def test_creation(self, document):
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)
-        assert document.file_id is not ''
+        assert document.file_id != ''
 
     def test_expected_values(self, document):
         assert document.file_size == self.file_size

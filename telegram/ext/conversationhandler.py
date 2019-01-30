@@ -243,7 +243,7 @@ class ConversationHandler(Handler):
         state = self.conversations.get(key)
 
         # Resolve promises
-        if isinstance(state, tuple) and len(state) is 2 and isinstance(state[1], Promise):
+        if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], Promise):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state

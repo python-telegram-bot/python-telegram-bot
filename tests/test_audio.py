@@ -56,7 +56,7 @@ class TestAudio(object):
         # Make sure file has been uploaded.
         assert isinstance(audio, Audio)
         assert isinstance(audio.file_id, str)
-        assert audio.file_id is not ''
+        assert audio.file_id != ''
 
     def test_expected_values(self, audio):
         assert audio.duration == self.duration
