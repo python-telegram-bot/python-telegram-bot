@@ -50,9 +50,9 @@ class TestSticker(object):
     width = 510
     height = 512
     file_size = 39518
-    thumb_width = 90
-    thumb_heigth = 90
-    thumb_file_size = 3672
+    thumb_width = 319
+    thumb_height = 320
+    thumb_file_size = 21472
 
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
@@ -68,7 +68,7 @@ class TestSticker(object):
         assert sticker.height == self.height
         assert sticker.file_size == self.file_size
         assert sticker.thumb.width == self.thumb_width
-        assert sticker.thumb.height == self.thumb_heigth
+        assert sticker.thumb.height == self.thumb_height
         assert sticker.thumb.file_size == self.thumb_file_size
 
     @flaky(3, 1)

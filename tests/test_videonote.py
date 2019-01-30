@@ -42,6 +42,10 @@ class TestVideoNote(object):
     duration = 3
     file_size = 132084
 
+    thumb_width = 240
+    thumb_height = 240
+    thumb_file_size = 11547
+
     caption = u'VideoNoteTest - Caption'
 
     def test_creation(self, video_note):
@@ -73,8 +77,9 @@ class TestVideoNote(object):
         assert message.video_note.duration == video_note.duration
         assert message.video_note.file_size == video_note.file_size
 
-        assert message.video_note.thumb.width == 50
-        assert message.video_note.thumb.height == 50
+        assert message.video_note.thumb.file_size == self.thumb_file_size
+        assert message.video_note.thumb.width == self.thumb_width
+        assert message.video_note.thumb.height == self.thumb_height
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

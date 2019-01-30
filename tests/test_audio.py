@@ -48,7 +48,7 @@ class TestAudio(object):
     audio_file_url = 'https://goo.gl/3En24v'
     mime_type = 'audio/mpeg'
     file_size = 122920
-    thumb_file_size = 2744
+    thumb_file_size = 1427
     thumb_width = 50
     thumb_height = 50
 

@@ -72,8 +72,8 @@ class TestAnimation(object):
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
-        assert message.animation.thumb.width == 50
-        assert message.animation.thumb.height == 50
+        assert message.animation.thumb.width == 320
+        assert message.animation.thumb.height == 180
 
     @flaky(3, 1)
     def test_resend(self, bot, chat_id, animation):
