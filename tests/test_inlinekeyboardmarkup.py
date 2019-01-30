@@ -44,6 +44,27 @@ class TestInlineKeyboardMarkup(object):
 
         assert message.text == 'Testing InlineKeyboardMarkup'
 
+    def test_from_button(self):
+        inline_keyboard_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='button1', callback_data='data1')).inline_keyboard
+        assert len(inline_keyboard_markup) == 1
+        assert len(inline_keyboard_markup[0]) == 1
+
+    def test_from_row(self):
+        inline_keyboard_markup = InlineKeyboardMarkup.from_row([
+            InlineKeyboardButton(text='button1', callback_data='data1'),
+            InlineKeyboardButton(text='button1', callback_data='data1')]).inline_keyboard
+        assert len(inline_keyboard_markup) == 1
+        assert len(inline_keyboard_markup[0]) == 2
+
+    def test_from_column(self):
+        inline_keyboard_markup = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(text='button1', callback_data='data1'),
+            InlineKeyboardButton(text='button1', callback_data='data1')]).inline_keyboard
+        assert len(inline_keyboard_markup) == 2
+        assert len(inline_keyboard_markup[0]) == 1
+        assert len(inline_keyboard_markup[1]) == 1
+
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
 
