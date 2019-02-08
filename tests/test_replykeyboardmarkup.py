@@ -51,6 +51,40 @@ class TestReplyKeyboardMarkup(object):
 
         assert message.text == 'text 2'
 
+    def test_from_button(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_button(
+            KeyboardButton(text='button1')).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 1
+
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_button('button1').keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 1
+
+    def test_from_row(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_row([
+            KeyboardButton(text='button1'),
+            KeyboardButton(text='button2')]).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 2
+
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_row(['button1', 'button2']).keyboard
+        assert len(reply_keyboard_markup) == 1
+        assert len(reply_keyboard_markup[0]) == 2
+
+    def test_from_column(self):
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_column([
+            KeyboardButton(text='button1'),
+            KeyboardButton(text='button2')]).keyboard
+        assert len(reply_keyboard_markup) == 2
+        assert len(reply_keyboard_markup[0]) == 1
+        assert len(reply_keyboard_markup[1]) == 1
+
+        reply_keyboard_markup = ReplyKeyboardMarkup.from_column(['button1', 'button2']).keyboard
+        assert len(reply_keyboard_markup) == 2
+        assert len(reply_keyboard_markup[0]) == 1
+        assert len(reply_keyboard_markup[1]) == 1
+
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, list)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)

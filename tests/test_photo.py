@@ -59,11 +59,11 @@ class TestPhoto(object):
         # Make sure file has been uploaded.
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
-        assert photo.file_id is not ''
+        assert photo.file_id != ''
 
         assert isinstance(thumb, PhotoSize)
         assert isinstance(thumb.file_id, str)
-        assert thumb.file_id is not ''
+        assert thumb.file_id != ''
 
     def test_expected_values(self, photo, thumb):
         assert photo.width == self.width

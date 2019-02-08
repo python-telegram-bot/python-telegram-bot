@@ -22,6 +22,7 @@ import pytest
 
 from telegram import (PassportData, PassportFile, Bot, File, PassportElementErrorSelfie,
                       PassportElementErrorDataField, Credentials, TelegramDecryptionError)
+
 # Generated using the scope:
 # {
 #   data: [
@@ -305,13 +306,13 @@ class TestPassport(object):
 
     def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
         def test(_, url, data, **kwargs):
-            return (data['user_id'] == chat_id and
-                    data['errors'][0]['file_hash'] == (passport_data.decrypted_credentials
-                                                       .secure_data.driver_license
-                                                       .selfie.file_hash) and
-                    data['errors'][1]['data_hash'] == (passport_data.decrypted_credentials
-                                                       .secure_data.driver_license
-                                                       .data.data_hash))
+            return (data['user_id'] == chat_id
+                    and data['errors'][0]['file_hash'] == (passport_data.decrypted_credentials
+                                                           .secure_data.driver_license
+                                                           .selfie.file_hash)
+                    and data['errors'][1]['data_hash'] == (passport_data.decrypted_credentials
+                                                           .secure_data.driver_license
+                                                           .data.data_hash))
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.set_passport_data_errors(chat_id, [

@@ -31,7 +31,7 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import TelegramError
+from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -325,7 +325,7 @@ class Dispatcher(object):
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
                         handler.handle_update(update, self, check, context)
-                        if self.persistence:
+                        if self.persistence and isinstance(update, Update):
                             if self.persistence.store_chat_data and update.effective_chat:
                                 chat_id = update.effective_chat.id
                                 try:
