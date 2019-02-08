@@ -151,8 +151,8 @@ class MessageHandler(Handler):
                           TelegramDeprecationWarning,
                           stacklevel=2)
             if edited_updates is False:
-                self.filters &= ~(Filters.update.edited_message |
-                                  Filters.update.edited_channel_post)
+                self.filters &= ~(Filters.update.edited_message
+                                  | Filters.update.edited_channel_post)
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.

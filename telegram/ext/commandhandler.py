@@ -166,15 +166,15 @@ class CommandHandler(Handler):
         if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
-            if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND and
-                    message.entities[0].offset == 0):
+            if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
+                    and message.entities[0].offset == 0):
                 command = message.text[1:message.entities[0].length]
                 args = message.text.split()[1:]
                 command = command.split('@')
                 command.append(message.bot.username)
 
-                if not (command[0].lower() in self.command and
-                        command[1].lower() == message.bot.username.lower()):
+                if not (command[0].lower() in self.command
+                        and command[1].lower() == message.bot.username.lower()):
                     return None
 
                 filter_result = self.filters(update)

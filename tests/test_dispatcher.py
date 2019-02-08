@@ -73,11 +73,11 @@ class TestDispatcher(object):
             self.received = update.message
 
     def callback_context(self, update, context):
-        if (isinstance(context, CallbackContext) and
-                isinstance(context.bot, Bot) and
-                isinstance(context.update_queue, Queue) and
-                isinstance(context.job_queue, JobQueue) and
-                isinstance(context.error, TelegramError)):
+        if (isinstance(context, CallbackContext)
+                and isinstance(context.bot, Bot)
+                and isinstance(context.update_queue, Queue)
+                and isinstance(context.job_queue, JobQueue)
+                and isinstance(context.error, TelegramError)):
             self.received = context.error.message
 
     def test_error_handler(self, dp):

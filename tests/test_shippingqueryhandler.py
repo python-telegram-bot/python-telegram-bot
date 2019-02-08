@@ -81,14 +81,14 @@ class TestShippingQueryHandler(object):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          context.chat_data is None and
-                          isinstance(update.shipping_query, ShippingQuery))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and context.chat_data is None
+                          and isinstance(update.shipping_query, ShippingQuery))
 
     def test_basic(self, dp, shiping_query):
         handler = ShippingQueryHandler(self.callback_basic)

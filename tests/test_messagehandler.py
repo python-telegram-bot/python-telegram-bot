@@ -77,19 +77,19 @@ class TestMessageHandler(object):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.chat_data, dict) and
-                          ((isinstance(context.user_data, dict) and
-                            (isinstance(update.message, Message) or
-                             isinstance(update.edited_message, Message))) or
-                           (context.user_data is None and
-                            (isinstance(update.channel_post, Message) or
-                             isinstance(update.edited_channel_post, Message)))
-                           ))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.chat_data, dict)
+                          and ((isinstance(context.user_data, dict)
+                                and (isinstance(update.message, Message)
+                                     or isinstance(update.edited_message, Message)))
+                               or (context.user_data is None
+                                   and (isinstance(update.channel_post, Message)
+                                        or isinstance(update.edited_channel_post, Message)))
+                               ))
 
     def callback_context_regex1(self, update, context):
         if context.matches:
@@ -161,9 +161,9 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, message))
 
     def test_specific_filters(self, message):
-        f = (~Filters.update.messages &
-             ~Filters.update.channel_post &
-             Filters.update.edited_channel_post)
+        f = (~Filters.update.messages
+             & ~Filters.update.channel_post
+             & Filters.update.edited_channel_post)
         handler = MessageHandler(f, self.callback_basic)
 
         assert not handler.check_update(Update(0, edited_message=message))

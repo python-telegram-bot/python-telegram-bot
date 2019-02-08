@@ -132,8 +132,8 @@ class TestFilters(object):
     def test_regex_complex_merges(self, update):
         SRE_TYPE = type(re.match("", ""))
         update.message.text = 'test it out'
-        filter = (Filters.regex('test') &
-                  ((Filters.status_update | Filters.forwarded) | Filters.regex('out')))
+        filter = (Filters.regex('test')
+                  & ((Filters.status_update | Filters.forwarded) | Filters.regex('out')))
         result = filter(update)
         assert result
         assert isinstance(result, dict)
@@ -179,8 +179,8 @@ class TestFilters(object):
         update.message.text = 'test it out'
         update.message.forward_date = None
         update.message.pinned_message = None
-        filter = ((Filters.regex('test') | Filters.command) &
-                  (Filters.regex('it') | Filters.status_update))
+        filter = ((Filters.regex('test') | Filters.command)
+                  & (Filters.regex('it') | Filters.status_update))
         result = filter(update)
         assert result
         assert isinstance(result, dict)
