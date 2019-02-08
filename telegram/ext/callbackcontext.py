@@ -125,6 +125,6 @@ class CallbackContext(object):
             Returns `None` of matches is empty.
         """
         try:
-            return self.matches[0]
-        except IndexError:
+            return self.matches[0]  # pylint: disable=unsubscriptable-object
+        except (IndexError, TypeError):
             return None
