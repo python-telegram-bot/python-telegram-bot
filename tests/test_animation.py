@@ -44,7 +44,7 @@ class TestAnimation(object):
     duration = 1
     file_name = 'game.gif.mp4'
     mime_type = 'video/mp4'
-    file_size = 4135
+    file_size = 4127
     caption = "Test *animation*"
 
     def test_creation(self, animation):
