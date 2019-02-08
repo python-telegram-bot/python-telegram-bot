@@ -67,13 +67,13 @@ class TestJobQueue(object):
         self.job_time = time.time()
 
     def job_context_based_callback(self, context):
-        if (isinstance(context, CallbackContext) and
-                isinstance(context.job, Job) and
-                isinstance(context.update_queue, Queue) and
-                context.job.context == 2 and
-                context.chat_data is None and
-                context.user_data is None and
-                context.job_queue is context.job.job_queue):
+        if (isinstance(context, CallbackContext)
+                and isinstance(context.job, Job)
+                and isinstance(context.update_queue, Queue)
+                and context.job.context == 2
+                and context.chat_data is None
+                and context.user_data is None
+                and context.job_queue is context.job.job_queue):
             self.result += 1
 
     def test_run_once(self, job_queue):

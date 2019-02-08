@@ -95,14 +95,14 @@ class TestCommandHandler(object):
             self.test_flag = args == ['one', 'two']
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          isinstance(context.chat_data, dict) and
-                          isinstance(update.message, Message))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and isinstance(context.chat_data, dict)
+                          and isinstance(update.message, Message))
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
@@ -378,14 +378,14 @@ class TestPrefixHandler(object):
             self.test_flag = args == ['one', 'two']
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          isinstance(context.chat_data, dict) and
-                          isinstance(update.message, Message))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and isinstance(context.chat_data, dict)
+                          and isinstance(update.message, Message))
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']

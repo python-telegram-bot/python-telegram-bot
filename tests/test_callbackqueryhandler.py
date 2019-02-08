@@ -83,14 +83,14 @@ class TestCallbackQueryHandler(object):
             self.test_flag = groupdict == {'begin': 't', 'end': ' data'}
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          context.chat_data is None and
-                          isinstance(update.callback_query, CallbackQuery))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and context.chat_data is None
+                          and isinstance(update.callback_query, CallbackQuery))
 
     def callback_context_pattern(self, update, context):
         if context.match.groups():
