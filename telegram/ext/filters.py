@@ -221,16 +221,24 @@ class Filters(object):
 
     class regex(BaseFilter):
         """
-        Filters updates by searching for an occurence of ``pattern`` in the message text.
+        Filters updates by searching for an occurrence of ``pattern`` in the message text.
         The ``re.search`` function is used to determine whether an update should be filtered.
+
         Refer to the documentation of the ``re`` module for more information.
 
-        Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
-        but this will probably be implemented in a future update, gradually phasing out the
-        RegexHandler (see https://github.com/python-telegram-bot/python-telegram-bot/issues/835).
+        Note:
+            Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
+            but this will probably be implemented in a future update, gradually phasing out the
+            RegexHandler (See `Github Issue
+            <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
 
         Examples:
-            Example ``CommandHandler("start", deep_linked_callback, Filters.regex('parameter'))``
+            Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
+            contain the word help. You can also use
+            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
+            you want your pattern to be case insensitive. This approach is recommended
+            if you need to specify flags on your pattern.
+
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -239,10 +247,13 @@ class Filters(object):
         regex_filter = True
 
         def __init__(self, pattern):
-            self.pattern = re.compile(pattern)
+            if isinstance(pattern, string_types):
+                pattern = re.compile(pattern)
+            self.pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
 
         def filter(self, message):
+            """:obj:`Filter`: Messages that have an occurrence of ``pattern``."""
             if message.text:
                 match = self.pattern.search(message.text)
                 if match:
@@ -489,8 +500,8 @@ class Filters(object):
             name = 'Filters.status_update.chat_created'
 
             def filter(self, message):
-                return bool(message.group_chat_created or message.supergroup_chat_created or
-                            message.channel_chat_created)
+                return bool(message.group_chat_created or message.supergroup_chat_created
+                            or message.channel_chat_created)
 
         chat_created = _ChatCreated()
         """:obj:`Filter`: Messages that contain :attr:`telegram.Message.group_chat_created`,
@@ -528,11 +539,11 @@ class Filters(object):
         name = 'Filters.status_update'
 
         def filter(self, message):
-            return bool(self.new_chat_members(message) or self.left_chat_member(message) or
-                        self.new_chat_title(message) or self.new_chat_photo(message) or
-                        self.delete_chat_photo(message) or self.chat_created(message) or
-                        self.migrate(message) or self.pinned_message(message) or
-                        self.connected_website(message))
+            return bool(self.new_chat_members(message) or self.left_chat_member(message)
+                        or self.new_chat_title(message) or self.new_chat_photo(message)
+                        or self.delete_chat_photo(message) or self.chat_created(message)
+                        or self.migrate(message) or self.pinned_message(message)
+                        or self.connected_website(message))
 
     status_update = _StatusUpdate()
     """Subset for messages containing a status update.
@@ -676,8 +687,8 @@ class Filters(object):
                 return bool(message.from_user and message.from_user.id in self.user_ids)
             else:
                 # self.usernames is not None
-                return bool(message.from_user and message.from_user.username and
-                            message.from_user.username in self.usernames)
+                return bool(message.from_user and message.from_user.username
+                            and message.from_user.username in self.usernames)
 
     class chat(BaseFilter):
         """Filters messages to allow only those which are from specified chat ID.

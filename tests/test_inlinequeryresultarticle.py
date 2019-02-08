@@ -55,8 +55,8 @@ class TestInlineQueryResultArticle(object):
         assert inline_query_result_article.type == self.type
         assert inline_query_result_article.id == self.id
         assert inline_query_result_article.title == self.title
-        assert (inline_query_result_article.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
+        assert (inline_query_result_article.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
         assert inline_query_result_article.reply_markup.to_dict() == self.reply_markup.to_dict()
         assert inline_query_result_article.url == self.url
         assert inline_query_result_article.hide_url == self.hide_url
@@ -72,20 +72,20 @@ class TestInlineQueryResultArticle(object):
         assert inline_query_result_article_dict['type'] == inline_query_result_article.type
         assert inline_query_result_article_dict['id'] == inline_query_result_article.id
         assert inline_query_result_article_dict['title'] == inline_query_result_article.title
-        assert (inline_query_result_article_dict['input_message_content'] ==
-                inline_query_result_article.input_message_content.to_dict())
-        assert (inline_query_result_article_dict['reply_markup'] ==
-                inline_query_result_article.reply_markup.to_dict())
+        assert (inline_query_result_article_dict['input_message_content']
+                == inline_query_result_article.input_message_content.to_dict())
+        assert (inline_query_result_article_dict['reply_markup']
+                == inline_query_result_article.reply_markup.to_dict())
         assert inline_query_result_article_dict['url'] == inline_query_result_article.url
         assert inline_query_result_article_dict['hide_url'] == inline_query_result_article.hide_url
-        assert (inline_query_result_article_dict['description'] ==
-                inline_query_result_article.description)
-        assert (inline_query_result_article_dict['thumb_url'] ==
-                inline_query_result_article.thumb_url)
-        assert (inline_query_result_article_dict['thumb_height'] ==
-                inline_query_result_article.thumb_height)
-        assert (inline_query_result_article_dict['thumb_width'] ==
-                inline_query_result_article.thumb_width)
+        assert (inline_query_result_article_dict['description']
+                == inline_query_result_article.description)
+        assert (inline_query_result_article_dict['thumb_url']
+                == inline_query_result_article.thumb_url)
+        assert (inline_query_result_article_dict['thumb_height']
+                == inline_query_result_article.thumb_height)
+        assert (inline_query_result_article_dict['thumb_width']
+                == inline_query_result_article.thumb_width)
 
     def test_equality(self):
         a = InlineQueryResultArticle(self.id, self.title, self.input_message_content)

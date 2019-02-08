@@ -16,9 +16,11 @@ Contributors
 The following wonderful people contributed directly or indirectly to this project:
 
 - `Alateas <https://github.com/alateas>`_
+- `Ambro17 <https://github.com/Ambro17>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
+- `Bibo-Joshi <https://github.com/Bibo-Joshi>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
@@ -29,6 +31,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
 - `Eugene Lisitsky <https://github.com/lisitsky>`_
 - `Eugenio Panadero <https://github.com/azogue>`_
+- `Evan Haberecht <https://github.com/habereet>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_

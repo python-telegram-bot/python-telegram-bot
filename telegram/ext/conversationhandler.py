@@ -244,18 +244,18 @@ class ConversationHandler(Handler):
 
         """
         # Ignore messages in channels
-        if (not isinstance(update, Update) or
-                update.channel_post or
-                self.per_chat and not update.effective_chat or
-                self.per_message and not update.callback_query or
-                update.callback_query and self.per_chat and not update.callback_query.message):
+        if (not isinstance(update, Update)
+                or update.channel_post
+                or self.per_chat and not update.effective_chat
+                or self.per_message and not update.callback_query
+                or update.callback_query and self.per_chat and not update.callback_query.message):
             return None
 
         key = self._get_key(update)
         state = self.conversations.get(key)
 
         # Resolve promises
-        if isinstance(state, tuple) and len(state) is 2 and isinstance(state[1], Promise):
+        if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], Promise):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
@@ -345,11 +345,10 @@ class ConversationHandler(Handler):
     def update_state(self, new_state, key):
         if new_state == self.END:
             if key in self.conversations:
+                # If there is no key in conversations, nothing is done.
                 del self.conversations[key]
                 if self.persistent:
                     self.persistence.update_conversation(self.name, key, None)
-            else:
-                pass
 
         elif isinstance(new_state, Promise):
             self.conversations[key] = (self.conversations.get(key), new_state)

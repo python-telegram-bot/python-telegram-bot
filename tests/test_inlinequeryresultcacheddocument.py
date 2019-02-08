@@ -55,33 +55,33 @@ class TestInlineQueryResultCachedDocument(object):
         assert inline_query_result_cached_document.caption == self.caption
         assert inline_query_result_cached_document.parse_mode == self.parse_mode
         assert inline_query_result_cached_document.description == self.description
-        assert (inline_query_result_cached_document.input_message_content.to_dict() ==
-                self.input_message_content.to_dict())
-        assert (inline_query_result_cached_document.reply_markup.to_dict() ==
-                self.reply_markup.to_dict())
+        assert (inline_query_result_cached_document.input_message_content.to_dict()
+                == self.input_message_content.to_dict())
+        assert (inline_query_result_cached_document.reply_markup.to_dict()
+                == self.reply_markup.to_dict())
 
     def test_to_dict(self, inline_query_result_cached_document):
         inline_query_result_cached_document_dict = inline_query_result_cached_document.to_dict()
 
         assert isinstance(inline_query_result_cached_document_dict, dict)
-        assert (inline_query_result_cached_document_dict['id'] ==
-                inline_query_result_cached_document.id)
-        assert (inline_query_result_cached_document_dict['type'] ==
-                inline_query_result_cached_document.type)
-        assert (inline_query_result_cached_document_dict['document_file_id'] ==
-                inline_query_result_cached_document.document_file_id)
-        assert (inline_query_result_cached_document_dict['title'] ==
-                inline_query_result_cached_document.title)
-        assert (inline_query_result_cached_document_dict['caption'] ==
-                inline_query_result_cached_document.caption)
-        assert (inline_query_result_cached_document_dict['parse_mode'] ==
-                inline_query_result_cached_document.parse_mode)
-        assert (inline_query_result_cached_document_dict['description'] ==
-                inline_query_result_cached_document.description)
-        assert (inline_query_result_cached_document_dict['input_message_content'] ==
-                inline_query_result_cached_document.input_message_content.to_dict())
-        assert (inline_query_result_cached_document_dict['reply_markup'] ==
-                inline_query_result_cached_document.reply_markup.to_dict())
+        assert (inline_query_result_cached_document_dict['id']
+                == inline_query_result_cached_document.id)
+        assert (inline_query_result_cached_document_dict['type']
+                == inline_query_result_cached_document.type)
+        assert (inline_query_result_cached_document_dict['document_file_id']
+                == inline_query_result_cached_document.document_file_id)
+        assert (inline_query_result_cached_document_dict['title']
+                == inline_query_result_cached_document.title)
+        assert (inline_query_result_cached_document_dict['caption']
+                == inline_query_result_cached_document.caption)
+        assert (inline_query_result_cached_document_dict['parse_mode']
+                == inline_query_result_cached_document.parse_mode)
+        assert (inline_query_result_cached_document_dict['description']
+                == inline_query_result_cached_document.description)
+        assert (inline_query_result_cached_document_dict['input_message_content']
+                == inline_query_result_cached_document.input_message_content.to_dict())
+        assert (inline_query_result_cached_document_dict['reply_markup']
+                == inline_query_result_cached_document.reply_markup.to_dict())
 
     def test_equality(self):
         a = InlineQueryResultCachedDocument(self.id, self.title, self.document_file_id)

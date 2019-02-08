@@ -43,14 +43,14 @@ class TestDocument(object):
     file_size = 12948
     mime_type = 'image/png'
     file_name = 'telegram.png'
-    thumb_file_size = 2364
-    thumb_width = 90
-    thumb_height = 90
+    thumb_file_size = 8090
+    thumb_width = 300
+    thumb_height = 300
 
     def test_creation(self, document):
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)
-        assert document.file_id is not ''
+        assert document.file_id != ''
 
     def test_expected_values(self, document):
         assert document.file_size == self.file_size
@@ -75,8 +75,8 @@ class TestDocument(object):
         assert message.document.mime_type == document.mime_type
         assert message.document.file_size == document.file_size
         assert message.caption == self.caption.replace('*', '')
-        assert message.document.thumb.width == 50
-        assert message.document.thumb.height == 50
+        assert message.document.thumb.width == self.thumb_width
+        assert message.document.thumb.height == self.thumb_height
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

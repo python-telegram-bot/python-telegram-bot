@@ -46,6 +46,10 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
    :alt: Median time to resolve an issue
 
+.. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
+   :target: https://www.codacy.com/app/python-telegram-bot/python-telegram-bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=python-telegram-bot/python-telegram-bot&amp;utm_campaign=Badge_Grade
+   :alt: Code quality
+
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group

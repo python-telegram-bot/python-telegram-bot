@@ -50,7 +50,7 @@ class TestAnimation(object):
     def test_creation(self, animation):
         assert isinstance(animation, Animation)
         assert isinstance(animation.file_id, str)
-        assert animation.file_id is not ''
+        assert animation.file_id != ''
 
     def test_expected_values(self, animation):
         assert animation.file_size == self.file_size
@@ -72,8 +72,8 @@ class TestAnimation(object):
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
-        assert message.animation.thumb.width == 50
-        assert message.animation.thumb.height == 50
+        assert message.animation.thumb.width == 320
+        assert message.animation.thumb.height == 180
 
     @flaky(3, 1)
     def test_resend(self, bot, chat_id, animation):
