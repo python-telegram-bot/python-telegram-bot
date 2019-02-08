@@ -175,29 +175,40 @@ class Filters(object):
 
     class regex(BaseFilter):
         """
-        Filters updates by searching for an occurence of ``pattern`` in the message text.
+        Filters updates by searching for an occurrence of ``pattern`` in the message text.
         The ``re.search`` function is used to determine whether an update should be filtered.
+
         Refer to the documentation of the ``re`` module for more information.
 
-        Note: Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
-        but this will probably be implemented in a future update, gradually phasing out the
-        RegexHandler (see https://github.com/python-telegram-bot/python-telegram-bot/issues/835).
+        Note:
+            Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
+            but this will probably be implemented in a future update, gradually phasing out the
+            RegexHandler (See `Github Issue
+            <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
 
         Examples:
-            Example ``CommandHandler("start", deep_linked_callback, Filters.regex('parameter'))``
+            Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
+            contain the word help. You can also use
+            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
+            you want your pattern to be case insensitive. This approach is recommended
+            if you need to specify flags on your pattern.
+
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
         def __init__(self, pattern):
-            self.pattern = re.compile(pattern)
+            if isinstance(pattern, string_types):
+                pattern = re.compile(pattern)
+            self.pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
 
         # TODO: Once the callback revamp (#1026) is done, the regex filter should be able to pass
         # the matched groups and groupdict to the context object.
 
         def filter(self, message):
+            """:obj:`Filter`: Messages that have an occurrence of ``pattern``."""
             if message.text:
                 return bool(self.pattern.search(message.text))
             return False
