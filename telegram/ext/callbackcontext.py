@@ -89,6 +89,9 @@ class CallbackContext(object):
         self.job = job
         return self
 
+    def update(self, data):
+        self.__dict__.update(data)
+
     @property
     def bot(self):
         """:class:`telegram.Bot`: The bot associated with this context."""
@@ -113,3 +116,15 @@ class CallbackContext(object):
 
         """
         return self._dispatcher.update_queue
+
+    @property
+    def match(self):
+        """
+        `Regex match type`: The first match from :attr:`matches`.
+            Useful if you are only filtering using a single regex filter.
+            Returns `None` of matches is empty.
+        """
+        try:
+            return self.matches[0]
+        except IndexError:
+            return None

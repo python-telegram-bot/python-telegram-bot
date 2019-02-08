@@ -58,8 +58,10 @@ class TestFilters(object):
         update.message.text = '/start deep-linked param'
         result = Filters.regex(r'deep-linked param')(update)
         assert result
-        assert isinstance(result, list)
-        assert type(result[0]) is SRE_TYPE
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert type(matches[0]) is SRE_TYPE
         update.message.text = '/help'
         assert Filters.regex(r'help')(update)
 
@@ -80,16 +82,22 @@ class TestFilters(object):
         update.message.text = '/start deep-linked param'
         result = (Filters.regex('deep') & Filters.regex(r'linked param'))(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         result = (Filters.regex('deep') | Filters.regex(r'linked param'))(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         result = (Filters.regex('not int') | Filters.regex(r'linked param'))(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         result = (Filters.regex('not int') & Filters.regex(r'linked param'))(update)
         assert not result
 
@@ -98,20 +106,28 @@ class TestFilters(object):
         update.message.text = '/start deep-linked param'
         result = (Filters.command & Filters.regex(r'linked param'))(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         result = (Filters.regex(r'linked param') & Filters.command)(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         result = (Filters.regex(r'linked param') | Filters.command)(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         result = (Filters.command | Filters.regex(r'linked param'))(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
 
     def test_regex_complex_merges(self, update):
         SRE_TYPE = type(re.match("", ""))
@@ -120,32 +136,42 @@ class TestFilters(object):
                   ((Filters.status_update | Filters.forwarded) | Filters.regex('out')))
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert len(result) == 2
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 2
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.forward_date = datetime.datetime.now()
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.text = 'test it'
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.forward_date = False
         result = filter(update)
         assert not result
         update.message.text = 'test it out'
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.pinned_message = True
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.text = 'it out'
         result = filter(update)
         assert not result
@@ -157,18 +183,22 @@ class TestFilters(object):
                   (Filters.regex('it') | Filters.status_update))
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert len(result) == 2
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 2
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.text = 'test'
         result = filter(update)
         assert not result
         update.message.pinned_message = True
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 1
+        assert all([type(res) == SRE_TYPE for res in matches])
         update.message.text = 'nothing'
         result = filter(update)
         assert not result
@@ -179,9 +209,11 @@ class TestFilters(object):
         update.message.text = '/start it'
         result = filter(update)
         assert result
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert all([type(res) == SRE_TYPE for res in result])
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 1
+        assert all([type(res) == SRE_TYPE for res in matches])
 
     def test_regex_inverted(self, update):
         update.message.text = '/start deep-linked param'

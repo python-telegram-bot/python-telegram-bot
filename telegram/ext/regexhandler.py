@@ -126,10 +126,7 @@ class RegexHandler(MessageHandler):
         optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update,
                                                                         check_result)
         if self.pass_groups:
-            optional_args['groups'] = check_result[0].groups()
+            optional_args['groups'] = check_result['matches'][0].groups()
         if self.pass_groupdict:
-            optional_args['groupdict'] = check_result[0].groupdict()
+            optional_args['groupdict'] = check_result['matches'][0].groupdict()
         return optional_args
-
-    def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.matches = check_result

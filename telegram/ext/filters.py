@@ -60,13 +60,14 @@ class BaseFilter(object):
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         update_filter (:obj:`bool`): whether this filter should work on update. If ``False`` it
             will run the filter on :attr:`update.effective_message``. Default is ``False``.
-        regex_filter (:obj:`bool`): Whether this filter is a regexfilter. Will return a list with
-            the match object instead of a bool.
+        data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
+            return a dict with lists. The dict will be merged with
+            :class:`telegram.extCallbackContext`'s internal dict in most cases.
     """
 
     name = None
     update_filter = False
-    regex_filter = False
+    data_filter = False
 
     def __call__(self, update):
         if self.update_filter:
@@ -135,46 +136,54 @@ class MergedFilter(BaseFilter):
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
-        if self.base_filter.regex_filter:
-            self.regex_filter = True
+        if self.base_filter.data_filter:
+            self.data_filter = True
         self.and_filter = and_filter
-        if self.and_filter and not isinstance(self.and_filter,
-                                              bool) and self.and_filter.regex_filter:
-            self.regex_filter = True
+        if (self.and_filter
+                and not isinstance(self.and_filter, bool)
+                and self.and_filter.data_filter):
+            self.data_filter = True
         self.or_filter = or_filter
-        if self.or_filter and not isinstance(self.and_filter,
-                                             bool) and self.or_filter.regex_filter:
-            self.regex_filter = True
+        if (self.or_filter
+                and not isinstance(self.and_filter, bool)
+                and self.or_filter.data_filter):
+            self.data_filter = True
+
+    def _merge(self, base_output, comp_output):
+        base = base_output if isinstance(base_output, dict) else {}
+        comp = comp_output if isinstance(comp_output, dict) else {}
+        for k in comp.keys():
+            # Make sure comp values are lists
+            comp_value = comp[k] if isinstance(comp[k], list) else []
+            try:
+                # If base is a list then merge
+                if isinstance(base[k], list):
+                    base[k] += comp_value
+                else:
+                    base[k] = [base[k]] + comp_value
+            except KeyError:
+                base[k] = comp_value
+        return base
 
     def filter(self, update):
         base_output = self.base_filter(update)
-        # We need to check if the filters are regexfilters and if so return the list of matches.
-        # If it's not a regexfilter or an or_filter but no matches return bool
+        # We need to check if the filters are data filters and if so return the merged data.
+        # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
             comp_output = self.and_filter(update)
             if base_output and comp_output:
-                if self.regex_filter:
-                    if not isinstance(base_output, list):
-                        base = []
-                    else:
-                        base = base_output
-                    if isinstance(comp_output, list):
-                        base.extend(comp_output)
-                    if base:
-                        return base
+                if self.data_filter:
+                    merged = self._merge(base_output, comp_output)
+                    if merged:
+                        return merged
                 return True
         elif self.or_filter:
             comp_output = self.or_filter(update)
             if base_output or comp_output:
-                if self.regex_filter:
-                    if not isinstance(base_output, list):
-                        base = []
-                    else:
-                        base = base_output
-                    if isinstance(comp_output, list):
-                        base.extend(comp_output)
-                    if base:
-                        return base
+                if self.data_filter:
+                    merged = self._merge(base_output, comp_output)
+                    if merged:
+                        return merged
                 return True
         return False
 
@@ -244,7 +253,7 @@ class Filters(object):
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
 
-        regex_filter = True
+        data_filter = True
 
         def __init__(self, pattern):
             if isinstance(pattern, string_types):
@@ -257,8 +266,8 @@ class Filters(object):
             if message.text:
                 match = self.pattern.search(message.text)
                 if match:
-                    return [match]
-                return []
+                    return {'matches': [match]}
+                return {}
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'

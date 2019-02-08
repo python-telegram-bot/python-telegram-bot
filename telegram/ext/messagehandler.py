@@ -168,5 +168,5 @@ class MessageHandler(Handler):
             return self.filters(update)
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
-        if isinstance(check_result, list):
-            context.matches = check_result
+        if isinstance(check_result, dict):
+            context.update(check_result)

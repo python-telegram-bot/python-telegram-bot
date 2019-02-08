@@ -191,8 +191,8 @@ class CommandHandler(Handler):
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         context.args = check_result[0]
-        if isinstance(check_result[1], list):
-            context.matches = check_result[1]
+        if isinstance(check_result[1], dict):
+            context.update(check_result[1])
 
 
 class PrefixHandler(CommandHandler):
@@ -329,7 +329,7 @@ class PrefixHandler(CommandHandler):
             :obj:`list`: The list of args for the handler
 
         """
-        if (isinstance(update, Update) and update.effective_message):
+        if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
             text_list = message.text.split()
@@ -340,3 +340,8 @@ class PrefixHandler(CommandHandler):
                 return text_list[1:], filter_result
             else:
                 return False
+
+    def collect_additional_context(self, context, update, dispatcher, check_result):
+        context.args = check_result[0]
+        if isinstance(check_result[1], dict):
+            context.update(check_result[1])
