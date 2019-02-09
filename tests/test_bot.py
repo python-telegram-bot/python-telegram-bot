@@ -616,31 +616,49 @@ class TestBot(object):
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
-
+    
     def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
+
+        from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
+
         class OkException(Exception):
             pass
 
-        timeout = 500
+        TIMEOUT = 500
 
-        def post(*args, **kwargs):
-            if kwargs.get('timeout') == 500:
+        def request_wrapper(*args, **kwargs):
+            obj = kwargs.get('timeout')
+            if isinstance(obj, Timeout) and obj._read == TIMEOUT:
                 raise OkException
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', post)
+            return b'{"ok": true, "result": []}'
 
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', request_wrapper)
+
+        # Test file uploading
         with pytest.raises(OkException):
-            bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=timeout)
+            bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=TIMEOUT)
+
+        # Test JSON submition
+        with pytest.raises(OkException):
+            bot.get_chat_administrators(chat_id, timeout=TIMEOUT)
 
     def test_timeout_propagation_implicit(self, monkeypatch, bot, chat_id):
+
+        from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
+
         class OkException(Exception):
             pass
 
-        def post(*args, **kwargs):
-            if kwargs.get('timeout') == 20:
+        def request_wrapper(*args, **kwargs):
+            obj = kwargs.get('timeout')
+            if isinstance(obj, Timeout) and obj._read == 20:
                 raise OkException
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', post)
+            return b'{"ok": true, "result": []}'
 
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', request_wrapper)
+
+        # Test file uploading
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))

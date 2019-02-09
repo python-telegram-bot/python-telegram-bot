@@ -67,13 +67,13 @@ class TestJobQueue(object):
         self.job_time = time.time()
 
     def job_context_based_callback(self, context):
-        if (isinstance(context, CallbackContext) and
-                isinstance(context.job, Job) and
-                isinstance(context.update_queue, Queue) and
-                context.job.context == 2 and
-                context.chat_data is None and
-                context.user_data is None and
-                context.job_queue is context.job.job_queue):
+        if (isinstance(context, CallbackContext)
+                and isinstance(context.job, Job)
+                and isinstance(context.update_queue, Queue)
+                and context.job.context == 2
+                and context.chat_data is None
+                and context.user_data is None
+                and context.job_queue is context.job.job_queue):
             self.result += 1
 
     def test_run_once(self, job_queue):
@@ -197,6 +197,24 @@ class TestJobQueue(object):
         job_queue.run_once(self.job_datetime_tests, when)
         sleep(0.06)
         assert pytest.approx(self.job_time) == expected_time
+
+    def test_datetime_with_timezone_job_run_once(self, job_queue):
+        # Test that run_once jobs work with timezone aware datetimes.
+        offset = datetime.timedelta(hours=-3)
+        when = datetime.datetime.now(datetime.timezone(offset))
+
+        job_queue.run_once(self.job_run_once, when)
+        sleep(0.01)
+        assert self.result == 1
+
+    def test_datetime_with_timezone_job_run_repeating(self, job_queue):
+        # Test that run_repeating jobs work with timezone aware datetimes.
+        offset = datetime.timedelta(hours=5)
+        now_with_offset = datetime.datetime.now(datetime.timezone(offset))
+
+        job_queue.run_repeating(self.job_run_once, interval=0.01, first=now_with_offset)
+        sleep(0.015)
+        assert self.result == 2
 
     def test_time_unit_dt_time_today(self, job_queue):
         # Testing running at a specific time today

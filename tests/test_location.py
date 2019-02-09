@@ -42,6 +42,7 @@ class TestLocation(object):
         assert location.longitude == self.longitude
 
     @flaky(3, 1)
+    @pytest.mark.xfail
     @pytest.mark.timeout(10)
     def test_send_live_location(self, bot, chat_id):
         message = bot.send_location(chat_id=chat_id, latitude=52.223880, longitude=5.166146,

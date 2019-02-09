@@ -31,7 +31,7 @@ import pytest
 
 from telegram import Update, Message, User, Chat, MessageEntity
 from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageHandler, Filters, \
-    PicklePersistence, CommandHandler, DictPersistence
+    PicklePersistence, CommandHandler, DictPersistence, TypeHandler
 
 
 @pytest.fixture(scope="function")
@@ -200,6 +200,21 @@ class TestBasePersistence(object):
 
         assert dp.user_data[54321][1] == 'test7'
         assert dp.chat_data[-987654][2] == 'test8'
+
+    def test_persistence_dispatcher_arbitrary_update_types(self, dp, base_persistence, caplog):
+        # Updates used with TypeHandler doesn't necessarily have the proper attributes for
+        # persistence, makes sure it works anyways
+
+        dp.persistence = base_persistence
+
+        class MyUpdate(object):
+            pass
+
+        dp.add_handler(TypeHandler(MyUpdate, lambda *_: None))
+
+        with caplog.at_level(logging.ERROR):
+            dp.process_update(MyUpdate())
+        assert 'An uncaught error was raised while processing the update' not in caplog.text
 
 
 @pytest.fixture(scope='function')

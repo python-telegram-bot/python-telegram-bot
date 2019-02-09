@@ -80,14 +80,14 @@ class TestRegexHandler(object):
             self.test_flag = groupdict == {'begin': 't', 'end': ' message'}
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          isinstance(context.chat_data, dict) and
-                          isinstance(update.message, Message))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and isinstance(context.chat_data, dict)
+                          and isinstance(update.message, Message))
 
     def callback_context_pattern(self, update, context):
         if context.match.groups():
