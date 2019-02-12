@@ -938,8 +938,7 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return self._message(url, data, timeout=timeout,
-                             disable_notification=disable_notification,
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
                              **kwargs)
 
@@ -2844,7 +2843,7 @@ class Bot(TelegramObject):
         return result
 
     @log
-    def set_chat_photo(self, chat_id, photo, timeout=None, **kwargs):
+    def set_chat_photo(self, chat_id, photo, timeout=20, **kwargs):
         """Use this method to set a new profile photo for the chat.
 
         Photos can't be changed for private chats. The bot must be an administrator in the chat
@@ -3080,7 +3079,7 @@ class Bot(TelegramObject):
         return StickerSet.de_json(result, self)
 
     @log
-    def upload_sticker_file(self, user_id, png_sticker, timeout=None, **kwargs):
+    def upload_sticker_file(self, user_id, png_sticker, timeout=20, **kwargs):
         """
         Use this method to upload a .png file with a sticker for later use in
         :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
@@ -3121,7 +3120,7 @@ class Bot(TelegramObject):
 
     @log
     def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis,
-                               contains_masks=None, mask_position=None, timeout=None, **kwargs):
+                               contains_masks=None, mask_position=None, timeout=20, **kwargs):
         """Use this method to create new sticker set owned by a user.
 
         The bot will be able to edit the created sticker set.
@@ -3181,7 +3180,7 @@ class Bot(TelegramObject):
 
     @log
     def add_sticker_to_set(self, user_id, name, png_sticker, emojis, mask_position=None,
-                           timeout=None, **kwargs):
+                           timeout=20, **kwargs):
         """Use this method to add a new sticker to a set created by the bot.
 
         Note:
