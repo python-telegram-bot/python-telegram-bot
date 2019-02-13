@@ -620,7 +620,7 @@ class TestBot(object):
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
-    
+
     def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
 
         from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout

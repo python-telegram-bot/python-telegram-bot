@@ -98,7 +98,6 @@ class TestCallbackContext(object):
         assert callback_context.update_queue is cdp.update_queue
 
     def test_match(self, cdp):
-
         callback_context = CallbackContext(cdp)
 
         assert callback_context.match is None
@@ -106,4 +105,3 @@ class TestCallbackContext(object):
         callback_context.matches = ['test', 'blah']
 
         assert callback_context.match == 'test'
-
