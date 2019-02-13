@@ -317,7 +317,7 @@ class ConversationHandler(Handler):
 
         return key, handler, check
 
-    def handle_update(self, update, dispatcher, check_result):
+    def handle_update(self, update, dispatcher, check_result, context=None):
         """Send the update to the callback for the current state and Handler
 
         Args:
@@ -328,7 +328,7 @@ class ConversationHandler(Handler):
 
         """
         conversation_key, handler, check_result = check_result
-        new_state = handler.handle_update(update, dispatcher, check_result)
+        new_state = handler.handle_update(update, dispatcher, check_result, context)
         timeout_job = self.timeout_jobs.pop(conversation_key, None)
 
         if timeout_job is not None:

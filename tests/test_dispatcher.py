@@ -80,6 +80,26 @@ class TestDispatcher(object):
                 and isinstance(context.error, TelegramError)):
             self.received = context.error.message
 
+    def test_one_context_per_update(self, cdp):
+        def one(update, context):
+            if update.message.text == 'test':
+                context.my_flag = True
+
+        def two(update, context):
+            if update.message.text == 'test':
+                if not hasattr(context, 'my_flag'):
+                    pytest.fail()
+            else:
+                if hasattr(context, 'my_flag'):
+                    pytest.fail()
+
+        cdp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
+        cdp.add_handler(MessageHandler(None, two), group=2)
+        u = Update(1, Message(1, None, None, None, text='test'))
+        cdp.process_update(u)
+        u.message.text = 'something'
+        cdp.process_update(u)
+
     def test_error_handler(self, dp):
         dp.add_error_handler(self.error_handler)
         error = TelegramError('Unauthorized.')

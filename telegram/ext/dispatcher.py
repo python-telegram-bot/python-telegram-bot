@@ -43,14 +43,16 @@ DEFAULT_GROUP = 0
 
 
 def run_async(func):
-    """Function decorator that will run the function in a new thread.
+    """
+    Function decorator that will run the function in a new thread.
 
     Will run :attr:`telegram.ext.Dispatcher.run_async`.
 
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
-    Note: Use this decorator to run handlers asynchronously.
-
+    Warning:
+        If you're using @run_async you cannot rely on adding custom attributes to
+        :class:`telegram.ext.CallbackContext`s. See its docs for more info.
     """
 
     @wraps(func)
@@ -210,6 +212,10 @@ class Dispatcher(object):
     def run_async(self, func, *args, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
 
+        Warning:
+            If you're using @run_async you cannot rely on adding custom attributes to
+            :class:`telegram.ext.CallbackContext`s. See its docs for more info.
+
         Args:
             func (:obj:`callable`): The function to run in the thread.
             *args (:obj:`tuple`, optional): Arguments to `func`.
@@ -315,12 +321,16 @@ class Dispatcher(object):
                 self.logger.exception('An uncaught error was raised while handling the error')
             return
 
+        context = None
+
         for group in self.groups:
             try:
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        handler.handle_update(update, self, check)
+                        if not context and self.use_context:
+                            context = CallbackContext.from_update(update, self)
+                        handler.handle_update(update, self, check, context)
                         if self.persistence and isinstance(update, Update):
                             if self.persistence.store_chat_data and update.effective_chat:
                                 chat_id = update.effective_chat.id

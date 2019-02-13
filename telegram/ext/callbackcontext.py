@@ -28,6 +28,20 @@ class CallbackContext(object):
     :attr:`telegram.ext.Dispatcher.add_error_handler` or to the callback of a
     :class:`telegram.ext.Job`.
 
+    Note:
+        :class:`telegram.ext.Dispatcher` will create a single context for an entire update. This
+        means that if you got 2 handlers in different groups and they both get called, they will
+        get passed the same `CallbackContext` object (of course with proper attributes like
+        `.matches` differing). This allows you to add custom attributes in a lower handler group
+        callback, and then subsequently access those attributes in a higher handler group callback.
+        Note that the attributes on `CallbackContext` might change in the future, so make sure to
+        use a fairly unique name for the attributes.
+
+    Warning:
+         Do not combine custom attributes and @run_async. Due to how @run_async works, it will
+         almost certainly execute the callbacks for an update out of order, and the attributes
+         that you think you added will not be present.
+
     Attributes:
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same chat it will be the same ``dict``.
