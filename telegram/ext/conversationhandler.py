@@ -276,9 +276,7 @@ class ConversationHandler(Handler):
                     if check is not None and check is not False:
                         # Save the current user and the selected handler for handle_update
                         return key, candidate, check
-
-                else:
-                    return None
+                return None
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
 
