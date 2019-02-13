@@ -58,11 +58,12 @@ class BaseFilter(object):
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
-        update_filter (:obj:`bool`): whether this filter should work on update. If ``False`` it
+        update_filter (:obj:`bool`): Whether this filter should work on update. If ``False`` it
             will run the filter on :attr:`update.effective_message``. Default is ``False``.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
             return a dict with lists. The dict will be merged with
-            :class:`telegram.extCallbackContext`'s internal dict in most cases.
+            :class:`telegram.ext.CallbackContext`'s internal dict in most cases
+            (depends on the handler).
     """
 
     name = None
@@ -93,11 +94,15 @@ class BaseFilter(object):
     def filter(self, update):
         """This method must be overwritten.
 
+        Note:
+            If :attr:`update_filter` is false then the first argument is `message` and of
+            type :class:`telegram.Message`.
+
         Args:
             update (:class:`telegram.Update`): The update that is tested.
 
         Returns:
-            :obj:`bool`
+            :obj:`dict` or :obj:`bool`
 
         """
 
@@ -235,11 +240,7 @@ class Filters(object):
 
         Refer to the documentation of the ``re`` module for more information.
 
-        Note:
-            Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
-            but this will probably be implemented in a future update, gradually phasing out the
-            RegexHandler (See `Github Issue
-            <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
+        To get the groups and groupdict matched, see :attr:`telegram.ext.CallbackContext.matches`.
 
         Examples:
             Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
@@ -247,7 +248,6 @@ class Filters(object):
             ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
             you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
-
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
@@ -262,7 +262,7 @@ class Filters(object):
             self.name = 'Filters.regex({})'.format(self.pattern)
 
         def filter(self, message):
-            """:obj:`Filter`: Messages that have an occurrence of ``pattern``."""
+            """"""  # remove method from docs
             if message.text:
                 match = self.pattern.search(message.text)
                 if match:
@@ -313,6 +313,7 @@ class Filters(object):
                 self.name = "Filters.document.category('{}')".format(self.category)
 
             def filter(self, message):
+                """"""  # remove method from docs
                 if message.document:
                     return message.document.mime_type.startswith(self.category)
 
@@ -344,6 +345,7 @@ class Filters(object):
                 self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
 
             def filter(self, message):
+                """"""  # remove method from docs
                 if message.document:
                     return message.document.mime_type == self.mimetype
 
@@ -620,6 +622,7 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
+            """"""  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.entities)
 
     class caption_entity(BaseFilter):
@@ -641,6 +644,7 @@ class Filters(object):
             self.name = 'Filters.caption_entity({})'.format(self.entity_type)
 
         def filter(self, message):
+            """"""  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
@@ -692,6 +696,7 @@ class Filters(object):
                 self.usernames = [user.replace('@', '') for user in username]
 
         def filter(self, message):
+            """"""  # remove method from docs
             if self.user_ids is not None:
                 return bool(message.from_user and message.from_user.id in self.user_ids)
             else:
@@ -730,6 +735,7 @@ class Filters(object):
                 self.usernames = [chat.replace('@', '') for chat in username]
 
         def filter(self, message):
+            """"""  # remove method from docs
             if self.chat_ids is not None:
                 return bool(message.chat_id in self.chat_ids)
             else:
@@ -787,6 +793,7 @@ class Filters(object):
             self.name = 'Filters.language({})'.format(self.lang)
 
         def filter(self, message):
+            """"""  # remove method from docs
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
 

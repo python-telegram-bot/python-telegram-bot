@@ -35,7 +35,7 @@ class CallbackContext(object):
             update from the same user it will be the same ``dict``.
         matches (List[:obj:`re match object`], optional): If the associated update originated from
             a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
-            MatchObjects for every pattern where ``re.search(pattern, string)`` returned a Match.
+            match objects for every pattern where ``re.search(pattern, string)`` returned a match.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
@@ -122,7 +122,7 @@ class CallbackContext(object):
         """
         `Regex match type`: The first match from :attr:`matches`.
             Useful if you are only filtering using a single regex filter.
-            Returns `None` of matches is empty.
+            Returns `None` if :attr:`matches` is empty.
         """
         try:
             return self.matches[0]  # pylint: disable=unsubscriptable-object
