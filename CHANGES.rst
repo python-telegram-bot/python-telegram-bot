@@ -2,24 +2,111 @@
 Changes
 =======
 
-**2018-??-??**
-*Released 11.0.0*
+Version 12.0.0b1
+================
+*Released 2019-02-13*
 
-Context based callbacks:
-See https://git.io/fxJuV for help.
+First beta release ever.
+It has been so long since last release that we would like to test the impact before a final release.
 
-- Use of `pass_` in handlers is deprecated.
-- Instead use `use_context=True` on `Updater` or `Dispatcher` and change callback from (bot, update, others...) to (update, context).
-- This also applies to error handlers `Dispatcher.add_error_handler` and JobQueue jobs (change (bot, job) to (context) here).
+*We do NOT recommend uses this beta release in production.*
+
+**Major changes:**
+
+- Context based callbacks
+- Persistence
+- PrefixHandler added (Handler overhaul)
+- Deprecation of RegexHandler and edited_messages, channel_post, etc. arguments (Filter overhaul)
+
+**See the wiki page at https://git.io/fxJuV for a detailed guide on how to migrate from version 11 to version 12.**
+
+Context based callbacks (`#1100`_)
+----------------------------------
+
+- Use of ``pass_`` in handlers is deprecated.
+- Instead use ``use_context=True`` on ``Updater`` or ``Dispatcher`` and change callback from (bot, update, others...) to (update, context).
+- This also applies to error handlers ``Dispatcher.add_error_handler`` and JobQueue jobs (change (bot, job) to (context) here).
 - For users with custom handlers subclassing Handler, this is mostly backwards compatible, but to use the new context based callbacks you need to implement the new collect_additional_context method.
-- Passing bot to JobQueue.__init__ is deprecated. Use JobQueue.set_dispatcher with a dispatcher instead.
+- Passing bot to ``JobQueue.__init__`` is deprecated. Use JobQueue.set_dispatcher with a dispatcher instead.
+- Dispatcher makes sure to use a single `CallbackContext` for a entire update. This means that if an update is handled by multiple handlers (by using the group argument), you can add custom arguments to the `CallbackContext` in a lower group handler and use it in higher group handler. NOTE: Never use with @run_async, see docs for more info. (`#1283`_)
+- If you have custom handlers they will need to be updated to support the changes in this release.
+- Update all examples to use context based callbacks.
 
-Other:
+Persistence (`#1017`_)
+----------------------
+
+- Added PicklePersistence and DictPersistence for adding persistence to your bots.
+- BasePersistence can be subclassed for all your persistence needs.
+- Note than in this beta there may still be some outstanding bugs. See `#1325`_, `#1301`_, `#1312`_ and `#1324`_
+
+Handler overhaul (`#1114`_)
+---------------------------
+
+- CommandHandler now only triggers on actual commands as defined by telegram servers (everything that the clients mark as a tabable link).
+- PrefixHandler can be used if you need to trigger on prefixes (like all messages starting with a "/" (old CommandHandler behaviour) or even custom prefixes like "#" or "!").
+
+Filter overhaul (`#1221`_)
+--------------------------
+
+- RegexHandler is deprecated and should be replaced with a MessageHandler with a regex filter.
+- Use update filters to filter update types instead of arguments (message_updates, channel_post_updates and edited_updates) on the handlers.
+- Completely remove allow_edited argument - it has been deprecated for a while.
+- data_filters now exist which allows filters that return data into the callback function. This is how the regex filter is implemented.
+- All this means that it no longer possible to use a list of filters in a handler. Use bitwise operators instead!
+
+Bug fixes & improvements
+------------------------
+
 - Handlers should be faster due to deduped logic.
+- Avoid compiling compiled regex in regex filter. (`#1314`_)
+- Add missing ``left_chat_member`` to Message.MESSAGE_TYPES (`#1336`_)
+- Make custom timeouts actually work properly (`#1330`_)
+- Add convenience classmethods (from_button, from_row and from_column) to InlineKeyboardMarkup
+- Small typo fix in setup.py (`#1306`_)
+- Add Conflict error (HTTP error code 409) (`#1154`_)
+- Change MAX_CAPTION_LENGTH to 1024 (`#1262`_)
+- Remove some unnecessary clauses (`#1247`_, `#1239`_)
+- Allow filenames without dots in them when sending files (`#1228`_)
+- Fix uploading files with unicode filenames (`#1214`_)
+- Replace http.server with Tornado (`#1191`_)
+- Allow SOCKSConnection to parse username and password from URL (`#1211`_)
+- Fix for arguments in passport/data.py (`#1213`_)
+- Improve message entity parsing by adding text_mention (`#1206`_)
 
-Other removals:
-- Remove the ability to use filter lists in handlers.
+.. _`#1100`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1100
+.. _`#1283`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1283
+.. _`#1017`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1017
+.. _`#1325`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1325
+.. _`#1301`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1301
+.. _`#1312`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1312
+.. _`#1324`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1324
+.. _`#1114`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1114
+.. _`#1221`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1221
+.. _`#1314`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1314
+.. _`#1336`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1336
+.. _`#1330`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1330
+.. _`#1306`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1306
+.. _`#1154`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1154
+.. _`#1262`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1262
+.. _`#1247`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1247
+.. _`#1239`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1239
+.. _`#1228`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1228
+.. _`#1214`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1214
+.. _`#1191`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1191
+.. _`#1211`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1211
+.. _`#1213`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1213
+.. _`#1206`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1206
+
+Internal improvements
+---------------------
+
+- Finally fix our CI builds mostly (too many commits and PRs to list)
+- Use multiple bots for CI to improve testing times significantly.
+- Allow pypy to fail in CI.
 - Remove the last CamelCase CheckUpdate methods from the handlers we missed earlier.
+
+Pre-2019 (up and including to version 11.1.0)
+=============================================
 
 **2018-09-01**
 *Released 11.1.0*
