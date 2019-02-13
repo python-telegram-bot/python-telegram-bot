@@ -189,17 +189,20 @@ class ConversationHandler(Handler):
                     logging.warning("If 'per_message=True', all entry points and state handlers"
                                     " must be 'CallbackQueryHandler', since no other handlers "
                                     "have a message context.")
+                    break
         else:
             for handler in all_handlers:
                 if isinstance(handler, CallbackQueryHandler):
                     logging.warning("If 'per_message=False', 'CallbackQueryHandler' will not be "
                                     "tracked for every message.")
+                    break
 
         if self.per_chat:
             for handler in all_handlers:
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
                     logging.warning("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
                                     "since inline queries have no chat context.")
+                    break
 
     def _get_key(self, update):
         chat = update.effective_chat
