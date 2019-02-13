@@ -395,6 +395,15 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
+    def update_persistence(self):
+        """Update :attr:`user_data` and :attr:`chat_data` in :attr:`persistence`.
+        """
+        if self.persistence:
+            for chat_id in self.chat_data:
+                self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+            for user_id in self.user_data:
+                self.persistence.update_user_data(user_id, self.user_data[user_id])
+
     def add_error_handler(self, callback):
         """Registers an error handler in the Dispatcher.
 
