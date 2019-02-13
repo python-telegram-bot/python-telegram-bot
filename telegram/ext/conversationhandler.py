@@ -46,7 +46,9 @@ class ConversationHandler(Handler):
     The second collection, a ``dict`` named :attr:`states`, contains the different conversation
     steps and one or more associated handlers that should be used if the user sends a message when
     the conversation with them is currently in that state. Here you can also define a state for
-    :attr:`TIMEOUT` to define the behavior when :attr:`conversation_timeout` is exceeded.
+    :attr:`TIMEOUT` to define the behavior when :attr:`conversation_timeout` is exceeded, and a
+    state for :attr:`WAITING` to define behavior when a new update is received while the previous
+    ``@run_async`` decorated handler is not finished.
 
     The third collection, a ``list`` named :attr:`fallbacks`, is used if the user is currently in a
     conversation but the state has either no associated handler or the handler that is associated
@@ -76,10 +78,6 @@ class ConversationHandler(Handler):
             ``False`` on :attr:`check_update`.
         allow_reentry (:obj:`bool`): Determines if a user can restart a conversation with
             an entry point.
-        run_async_timeout (:obj:`float`): Optional. The time-out for ``run_async`` decorated
-            Handlers.
-        timed_out_behavior (List[:class:`telegram.ext.Handler`]): Optional. A list of handlers that
-            might be used if the wait for ``run_async`` timed out.
         per_chat (:obj:`bool`): If the conversationkey should contain the Chat's ID.
         per_user (:obj:`bool`): If the conversationkey should contain the User's ID.
         per_message (:obj:`bool`): If the conversationkey should contain the Message's
@@ -109,15 +107,6 @@ class ConversationHandler(Handler):
             returns ``True`` will be used. If all return ``False``, the update is not handled.
         allow_reentry (:obj:`bool`, optional): If set to ``True``, a user that is currently in a
             conversation can restart the conversation by triggering one of the entry points.
-        run_async_timeout (:obj:`float`, optional): If the previous handler for this user was
-            running asynchronously using the ``run_async`` decorator, it might not be finished when
-            the next message arrives. This timeout defines how long the conversation handler should
-            wait for the next state to be computed. The default is ``None`` which means it will
-            wait indefinitely.
-        timed_out_behavior (List[:class:`telegram.ext.Handler`], optional): A list of handlers that
-            might be used if the wait for ``run_async`` timed out. The first handler which
-            :attr:`check_update` method returns ``True`` will be used. If all return ``False``,
-            the update is not handled.
         per_chat (:obj:`bool`, optional): If the conversationkey should contain the Chat's ID.
             Default is ``True``.
         per_user (:obj:`bool`, optional): If the conversationkey should contain the User's ID.
@@ -142,14 +131,15 @@ class ConversationHandler(Handler):
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
     TIMEOUT = -2
     """:obj:`int`: Used as a constant to handle state when a conversation is timed out."""
+    WAITING = -3
+    """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
+    previous ``@run_sync`` decorated running handler to finish."""
 
     def __init__(self,
                  entry_points,
                  states,
                  fallbacks,
                  allow_reentry=False,
-                 run_async_timeout=None,
-                 timed_out_behavior=None,
                  per_chat=True,
                  per_user=True,
                  per_message=False,
@@ -162,8 +152,6 @@ class ConversationHandler(Handler):
         self.fallbacks = fallbacks
 
         self.allow_reentry = allow_reentry
-        self.run_async_timeout = run_async_timeout
-        self.timed_out_behavior = timed_out_behavior
         self.per_user = per_user
         self.per_chat = per_chat
         self.per_message = per_message
@@ -259,9 +247,9 @@ class ConversationHandler(Handler):
             self.logger.debug('waiting for promise...')
 
             old_state, new_state = state
-            if new_state.done.wait(timeout=self.run_async_timeout):
+            if new_state.done.wait(0):
                 try:
-                    res = new_state.result(timeout=0)
+                    res = new_state.result(0)
                     res = res if res is not None else old_state
                 except Exception as exc:
                     self.logger.exception("Promise function raised exception")
@@ -271,11 +259,11 @@ class ConversationHandler(Handler):
                     self.update_state(res, key)
                     state = self.conversations.get(key)
             else:
-                for candidate in (self.timed_out_behavior or []):
-                    check = candidate.check_update(update)
+                handlers = self.states.get(self.WAITING, [])
+                for handler in handlers:
+                    check = handler.check_update(update)
                     if check is not None and check is not False:
-                        # Save the current user and the selected handler for handle_update
-                        return key, candidate, check
+                        return key, handler, check
                 return None
 
         self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
