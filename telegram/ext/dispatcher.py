@@ -115,7 +115,7 @@ class Dispatcher(object):
         self.use_context = use_context
 
         if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/vp113 for details',
+            warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
                           TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
@@ -431,7 +431,7 @@ class Dispatcher(object):
                 The error that happened will be present in context.error.
 
         Note:
-            See https://git.io/vp113 for more info about switching to context based API.
+            See https://git.io/fxJuV for more info about switching to context based API.
         """
         self.error_handlers.append(callback)
 

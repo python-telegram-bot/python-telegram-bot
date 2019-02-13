@@ -20,14 +20,15 @@ import datetime
 
 import pytest
 
-from telegram import Message, User, Chat, MessageEntity, Document
+from telegram import Message, User, Chat, MessageEntity, Document, Update
 from telegram.ext import Filters, BaseFilter
 import re
 
 
 @pytest.fixture(scope='function')
-def message():
-    return Message(0, User(0, 'Testuser', False), datetime.datetime.now(), Chat(0, 'private'))
+def update():
+    return Update(0, Message(0, User(0, 'Testuser', False), datetime.datetime.now(),
+                             Chat(0, 'private')))
 
 
 @pytest.fixture(scope='function',
@@ -37,315 +38,493 @@ def message_entity(request):
 
 
 class TestFilters(object):
-    def test_filters_all(self, message):
-        assert Filters.all(message)
+    def test_filters_all(self, update):
+        assert Filters.all(update)
 
-    def test_filters_text(self, message):
-        message.text = 'test'
-        assert Filters.text(message)
-        message.text = '/test'
-        assert not Filters.text(message)
+    def test_filters_text(self, update):
+        update.message.text = 'test'
+        assert Filters.text(update)
+        update.message.text = '/test'
+        assert not Filters.text(update)
 
-    def test_filters_command(self, message):
-        message.text = 'test'
-        assert not Filters.command(message)
-        message.text = '/test'
-        assert Filters.command(message)
+    def test_filters_command(self, update):
+        update.message.text = 'test'
+        assert not Filters.command(update)
+        update.message.text = '/test'
+        assert Filters.command(update)
 
-    def test_filters_regex(self, message):
-        message.text = '/start deep-linked param'
-        assert Filters.regex(r'deep-linked param')(message)
-        message.text = '/help'
-        assert Filters.regex(r'help')(message)
-        message.text = '/help'
-        assert Filters.regex('help')(message)
+    def test_filters_regex(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = '/start deep-linked param'
+        result = Filters.regex(r'deep-linked param')(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert type(matches[0]) is SRE_TYPE
+        update.message.text = '/help'
+        assert Filters.regex(r'help')(update)
 
-        message.text = 'test'
-        assert not Filters.regex(r'fail')(message)
-        assert Filters.regex(r'test')(message)
-        assert Filters.regex(re.compile(r'test'))(message)
-        assert Filters.regex(re.compile(r'TEST', re.IGNORECASE))(message)
+        update.message.text = 'test'
+        assert not Filters.regex(r'fail')(update)
+        assert Filters.regex(r'test')(update)
+        assert Filters.regex(re.compile(r'test'))(update)
+        assert Filters.regex(re.compile(r'TEST', re.IGNORECASE))(update)
 
-        message.text = 'i love python'
-        assert Filters.regex(r'.\b[lo]{2}ve python')(message)
+        update.message.text = 'i love python'
+        assert Filters.regex(r'.\b[lo]{2}ve python')(update)
 
-        message.text = None
-        assert not Filters.regex(r'fail')(message)
+        update.message.text = None
+        assert not Filters.regex(r'fail')(update)
 
-    def test_filters_reply(self, message):
+    def test_filters_regex_multiple(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = '/start deep-linked param'
+        result = (Filters.regex('deep') & Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        result = (Filters.regex('deep') | Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        result = (Filters.regex('not int') | Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        result = (Filters.regex('not int') & Filters.regex(r'linked param'))(update)
+        assert not result
+
+    def test_filters_merged_with_regex(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = '/start deep-linked param'
+        result = (Filters.command & Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        result = (Filters.regex(r'linked param') & Filters.command)(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        result = (Filters.regex(r'linked param') | Filters.command)(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        result = (Filters.command | Filters.regex(r'linked param'))(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+
+    def test_regex_complex_merges(self, update):
+        SRE_TYPE = type(re.match("", ""))
+        update.message.text = 'test it out'
+        filter = (Filters.regex('test')
+                  & ((Filters.status_update | Filters.forwarded) | Filters.regex('out')))
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 2
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.forward_date = datetime.datetime.now()
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.text = 'test it'
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.forward_date = False
+        result = filter(update)
+        assert not result
+        update.message.text = 'test it out'
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.pinned_message = True
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.text = 'it out'
+        result = filter(update)
+        assert not result
+
+        update.message.text = 'test it out'
+        update.message.forward_date = None
+        update.message.pinned_message = None
+        filter = ((Filters.regex('test') | Filters.command)
+                  & (Filters.regex('it') | Filters.status_update))
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 2
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.text = 'test'
+        result = filter(update)
+        assert not result
+        update.message.pinned_message = True
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 1
+        assert all([type(res) == SRE_TYPE for res in matches])
+        update.message.text = 'nothing'
+        result = filter(update)
+        assert not result
+        update.message.text = '/start'
+        result = filter(update)
+        assert result
+        assert isinstance(result, bool)
+        update.message.text = '/start it'
+        result = filter(update)
+        assert result
+        assert isinstance(result, dict)
+        matches = result['matches']
+        assert isinstance(matches, list)
+        assert len(matches) == 1
+        assert all([type(res) == SRE_TYPE for res in matches])
+
+    def test_regex_inverted(self, update):
+        update.message.text = '/start deep-linked param'
+        filter = ~Filters.regex(r'deep-linked param')
+        result = filter(update)
+        assert not result
+        update.message.text = 'not it'
+        result = filter(update)
+        assert result
+        assert isinstance(result, bool)
+
+        filter = (~Filters.regex('linked') & Filters.command)
+        update.message.text = "it's linked"
+        result = filter(update)
+        assert not result
+        update.message.text = '/start'
+        result = filter(update)
+        assert result
+        update.message.text = '/linked'
+        result = filter(update)
+        assert not result
+
+        filter = (~Filters.regex('linked') | Filters.command)
+        update.message.text = "it's linked"
+        result = filter(update)
+        assert not result
+        update.message.text = '/start linked'
+        result = filter(update)
+        assert result
+        update.message.text = '/start'
+        result = filter(update)
+        assert result
+        update.message.text = 'nothig'
+        result = filter(update)
+        assert result
+
+    def test_filters_reply(self, update):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
                                   Chat(0, 'private'))
-        message.text = 'test'
-        assert not Filters.reply(message)
-        message.reply_to_message = another_message
-        assert Filters.reply(message)
+        update.message.text = 'test'
+        assert not Filters.reply(update)
+        update.message.reply_to_message = another_message
+        assert Filters.reply(update)
 
-    def test_filters_audio(self, message):
-        assert not Filters.audio(message)
-        message.audio = 'test'
-        assert Filters.audio(message)
+    def test_filters_audio(self, update):
+        assert not Filters.audio(update)
+        update.message.audio = 'test'
+        assert Filters.audio(update)
 
-    def test_filters_document(self, message):
-        assert not Filters.document(message)
-        message.document = 'test'
-        assert Filters.document(message)
+    def test_filters_document(self, update):
+        assert not Filters.document(update)
+        update.message.document = 'test'
+        assert Filters.document(update)
 
-    def test_filters_document_type(self, message):
-        message.document = Document("file_id", mime_type="application/vnd.android.package-archive")
-        assert Filters.document.apk(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.doc(message)
-        assert not Filters.document.audio(message)
+    def test_filters_document_type(self, update):
+        update.message.document = Document("file_id",
+                                           mime_type="application/vnd.android.package-archive")
+        assert Filters.document.apk(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.doc(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "application/msword"
-        assert Filters.document.doc(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.docx(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/msword"
+        assert Filters.document.doc(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.docx(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "application/vnd.openxmlformats-" \
-                                     "officedocument.wordprocessingml.document"
-        assert Filters.document.docx(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.exe(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/vnd.openxmlformats-officedocument." \
+                                            "wordprocessingml.document"
+        assert Filters.document.docx(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.exe(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "application/x-ms-dos-executable"
-        assert Filters.document.exe(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.docx(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/x-ms-dos-executable"
+        assert Filters.document.exe(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.docx(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "video/mp4"
-        assert Filters.document.gif(message)
-        assert Filters.document.video(message)
-        assert not Filters.document.jpg(message)
-        assert not Filters.document.text(message)
+        update.message.document.mime_type = "video/mp4"
+        assert Filters.document.gif(update)
+        assert Filters.document.video(update)
+        assert not Filters.document.jpg(update)
+        assert not Filters.document.text(update)
 
-        message.document.mime_type = "image/jpeg"
-        assert Filters.document.jpg(message)
-        assert Filters.document.image(message)
-        assert not Filters.document.mp3(message)
-        assert not Filters.document.video(message)
+        update.message.document.mime_type = "image/jpeg"
+        assert Filters.document.jpg(update)
+        assert Filters.document.image(update)
+        assert not Filters.document.mp3(update)
+        assert not Filters.document.video(update)
 
-        message.document.mime_type = "audio/mpeg"
-        assert Filters.document.mp3(message)
-        assert Filters.document.audio(message)
-        assert not Filters.document.pdf(message)
-        assert not Filters.document.image(message)
+        update.message.document.mime_type = "audio/mpeg"
+        assert Filters.document.mp3(update)
+        assert Filters.document.audio(update)
+        assert not Filters.document.pdf(update)
+        assert not Filters.document.image(update)
 
-        message.document.mime_type = "application/pdf"
-        assert Filters.document.pdf(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.py(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/pdf"
+        assert Filters.document.pdf(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.py(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "text/x-python"
-        assert Filters.document.py(message)
-        assert Filters.document.text(message)
-        assert not Filters.document.svg(message)
-        assert not Filters.document.application(message)
+        update.message.document.mime_type = "text/x-python"
+        assert Filters.document.py(update)
+        assert Filters.document.text(update)
+        assert not Filters.document.svg(update)
+        assert not Filters.document.application(update)
 
-        message.document.mime_type = "image/svg+xml"
-        assert Filters.document.svg(message)
-        assert Filters.document.image(message)
-        assert not Filters.document.txt(message)
-        assert not Filters.document.video(message)
+        update.message.document.mime_type = "image/svg+xml"
+        assert Filters.document.svg(update)
+        assert Filters.document.image(update)
+        assert not Filters.document.txt(update)
+        assert not Filters.document.video(update)
 
-        message.document.mime_type = "text/plain"
-        assert Filters.document.txt(message)
-        assert Filters.document.text(message)
-        assert not Filters.document.targz(message)
-        assert not Filters.document.application(message)
+        update.message.document.mime_type = "text/plain"
+        assert Filters.document.txt(update)
+        assert Filters.document.text(update)
+        assert not Filters.document.targz(update)
+        assert not Filters.document.application(update)
 
-        message.document.mime_type = "application/x-compressed-tar"
-        assert Filters.document.targz(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.wav(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/x-compressed-tar"
+        assert Filters.document.targz(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.wav(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "audio/x-wav"
-        assert Filters.document.wav(message)
-        assert Filters.document.audio(message)
-        assert not Filters.document.xml(message)
-        assert not Filters.document.image(message)
+        update.message.document.mime_type = "audio/x-wav"
+        assert Filters.document.wav(update)
+        assert Filters.document.audio(update)
+        assert not Filters.document.xml(update)
+        assert not Filters.document.image(update)
 
-        message.document.mime_type = "application/xml"
-        assert Filters.document.xml(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.zip(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/xml"
+        assert Filters.document.xml(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.zip(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "application/zip"
-        assert Filters.document.zip(message)
-        assert Filters.document.application(message)
-        assert not Filters.document.apk(message)
-        assert not Filters.document.audio(message)
+        update.message.document.mime_type = "application/zip"
+        assert Filters.document.zip(update)
+        assert Filters.document.application(update)
+        assert not Filters.document.apk(update)
+        assert not Filters.document.audio(update)
 
-        message.document.mime_type = "image/x-rgb"
-        assert not Filters.document.category("application/")(message)
-        assert not Filters.document.mime_type("application/x-sh")(message)
-        message.document.mime_type = "application/x-sh"
-        assert Filters.document.category("application/")(message)
-        assert Filters.document.mime_type("application/x-sh")(message)
+        update.message.document.mime_type = "image/x-rgb"
+        assert not Filters.document.category("application/")(update)
+        assert not Filters.document.mime_type("application/x-sh")(update)
+        update.message.document.mime_type = "application/x-sh"
+        assert Filters.document.category("application/")(update)
+        assert Filters.document.mime_type("application/x-sh")(update)
 
-    def test_filters_animation(self, message):
-        assert not Filters.animation(message)
-        message.animation = 'test'
-        assert Filters.animation(message)
+    def test_filters_animation(self, update):
+        assert not Filters.animation(update)
+        update.message.animation = 'test'
+        assert Filters.animation(update)
 
-    def test_filters_photo(self, message):
-        assert not Filters.photo(message)
-        message.photo = 'test'
-        assert Filters.photo(message)
+    def test_filters_photo(self, update):
+        assert not Filters.photo(update)
+        update.message.photo = 'test'
+        assert Filters.photo(update)
 
-    def test_filters_sticker(self, message):
-        assert not Filters.sticker(message)
-        message.sticker = 'test'
-        assert Filters.sticker(message)
+    def test_filters_sticker(self, update):
+        assert not Filters.sticker(update)
+        update.message.sticker = 'test'
+        assert Filters.sticker(update)
 
-    def test_filters_video(self, message):
-        assert not Filters.video(message)
-        message.video = 'test'
-        assert Filters.video(message)
+    def test_filters_video(self, update):
+        assert not Filters.video(update)
+        update.message.video = 'test'
+        assert Filters.video(update)
 
-    def test_filters_voice(self, message):
-        assert not Filters.voice(message)
-        message.voice = 'test'
-        assert Filters.voice(message)
+    def test_filters_voice(self, update):
+        assert not Filters.voice(update)
+        update.message.voice = 'test'
+        assert Filters.voice(update)
 
-    def test_filters_video_note(self, message):
-        assert not Filters.video_note(message)
-        message.video_note = 'test'
-        assert Filters.video_note(message)
+    def test_filters_video_note(self, update):
+        assert not Filters.video_note(update)
+        update.message.video_note = 'test'
+        assert Filters.video_note(update)
 
-    def test_filters_contact(self, message):
-        assert not Filters.contact(message)
-        message.contact = 'test'
-        assert Filters.contact(message)
+    def test_filters_contact(self, update):
+        assert not Filters.contact(update)
+        update.message.contact = 'test'
+        assert Filters.contact(update)
 
-    def test_filters_location(self, message):
-        assert not Filters.location(message)
-        message.location = 'test'
-        assert Filters.location(message)
+    def test_filters_location(self, update):
+        assert not Filters.location(update)
+        update.message.location = 'test'
+        assert Filters.location(update)
 
-    def test_filters_venue(self, message):
-        assert not Filters.venue(message)
-        message.venue = 'test'
-        assert Filters.venue(message)
+    def test_filters_venue(self, update):
+        assert not Filters.venue(update)
+        update.message.venue = 'test'
+        assert Filters.venue(update)
 
-    def test_filters_status_update(self, message):
-        assert not Filters.status_update(message)
+    def test_filters_status_update(self, update):
+        assert not Filters.status_update(update)
 
-        message.new_chat_members = ['test']
-        assert Filters.status_update(message)
-        assert Filters.status_update.new_chat_members(message)
-        message.new_chat_members = None
+        update.message.new_chat_members = ['test']
+        assert Filters.status_update(update)
+        assert Filters.status_update.new_chat_members(update)
+        update.message.new_chat_members = None
 
-        message.left_chat_member = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.left_chat_member(message)
-        message.left_chat_member = None
+        update.message.left_chat_member = 'test'
+        assert Filters.status_update(update)
+        assert Filters.status_update.left_chat_member(update)
+        update.message.left_chat_member = None
 
-        message.new_chat_title = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.new_chat_title(message)
-        message.new_chat_title = ''
+        update.message.new_chat_title = 'test'
+        assert Filters.status_update(update)
+        assert Filters.status_update.new_chat_title(update)
+        update.message.new_chat_title = ''
 
-        message.new_chat_photo = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.new_chat_photo(message)
-        message.new_chat_photo = None
+        update.message.new_chat_photo = 'test'
+        assert Filters.status_update(update)
+        assert Filters.status_update.new_chat_photo(update)
+        update.message.new_chat_photo = None
 
-        message.delete_chat_photo = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.delete_chat_photo(message)
-        message.delete_chat_photo = False
+        update.message.delete_chat_photo = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.delete_chat_photo(update)
+        update.message.delete_chat_photo = False
 
-        message.group_chat_created = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.chat_created(message)
-        message.group_chat_created = False
+        update.message.group_chat_created = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.chat_created(update)
+        update.message.group_chat_created = False
 
-        message.supergroup_chat_created = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.chat_created(message)
-        message.supergroup_chat_created = False
+        update.message.supergroup_chat_created = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.chat_created(update)
+        update.message.supergroup_chat_created = False
 
-        message.channel_chat_created = True
-        assert Filters.status_update(message)
-        assert Filters.status_update.chat_created(message)
-        message.channel_chat_created = False
+        update.message.channel_chat_created = True
+        assert Filters.status_update(update)
+        assert Filters.status_update.chat_created(update)
+        update.message.channel_chat_created = False
 
-        message.migrate_to_chat_id = 100
-        assert Filters.status_update(message)
-        assert Filters.status_update.migrate(message)
-        message.migrate_to_chat_id = 0
+        update.message.migrate_to_chat_id = 100
+        assert Filters.status_update(update)
+        assert Filters.status_update.migrate(update)
+        update.message.migrate_to_chat_id = 0
 
-        message.migrate_from_chat_id = 100
-        assert Filters.status_update(message)
-        assert Filters.status_update.migrate(message)
-        message.migrate_from_chat_id = 0
+        update.message.migrate_from_chat_id = 100
+        assert Filters.status_update(update)
+        assert Filters.status_update.migrate(update)
+        update.message.migrate_from_chat_id = 0
 
-        message.pinned_message = 'test'
-        assert Filters.status_update(message)
-        assert Filters.status_update.pinned_message(message)
-        message.pinned_message = None
+        update.message.pinned_message = 'test'
+        assert Filters.status_update(update)
+        assert Filters.status_update.pinned_message(update)
+        update.message.pinned_message = None
 
-        message.connected_website = 'http://example.com/'
-        assert Filters.status_update(message)
-        assert Filters.status_update.connected_website(message)
-        message.connected_website = None
+        update.message.connected_website = 'http://example.com/'
+        assert Filters.status_update(update)
+        assert Filters.status_update.connected_website(update)
+        update.message.connected_website = None
 
-    def test_filters_forwarded(self, message):
-        assert not Filters.forwarded(message)
-        message.forward_date = 'test'
-        assert Filters.forwarded(message)
+    def test_filters_forwarded(self, update):
+        assert not Filters.forwarded(update)
+        update.message.forward_date = datetime.datetime.now()
+        assert Filters.forwarded(update)
 
-    def test_filters_game(self, message):
-        assert not Filters.game(message)
-        message.game = 'test'
-        assert Filters.game(message)
+    def test_filters_game(self, update):
+        assert not Filters.game(update)
+        update.message.game = 'test'
+        assert Filters.game(update)
 
-    def test_entities_filter(self, message, message_entity):
-        message.entities = [message_entity]
-        assert Filters.entity(message_entity.type)(message)
+    def test_entities_filter(self, update, message_entity):
+        update.message.entities = [message_entity]
+        assert Filters.entity(message_entity.type)(update)
 
-        message.entities = []
-        assert not Filters.entity(MessageEntity.MENTION)(message)
-
-        second = message_entity.to_dict()
-        second['type'] = 'bold'
-        second = MessageEntity.de_json(second, None)
-        message.entities = [message_entity, second]
-        assert Filters.entity(message_entity.type)(message)
-        assert not Filters.caption_entity(message_entity.type)(message)
-
-    def test_caption_entities_filter(self, message, message_entity):
-        message.caption_entities = [message_entity]
-        assert Filters.caption_entity(message_entity.type)(message)
-
-        message.caption_entities = []
-        assert not Filters.caption_entity(MessageEntity.MENTION)(message)
+        update.message.entities = []
+        assert not Filters.entity(MessageEntity.MENTION)(update)
 
         second = message_entity.to_dict()
         second['type'] = 'bold'
         second = MessageEntity.de_json(second, None)
-        message.caption_entities = [message_entity, second]
-        assert Filters.caption_entity(message_entity.type)(message)
-        assert not Filters.entity(message_entity.type)(message)
+        update.message.entities = [message_entity, second]
+        assert Filters.entity(message_entity.type)(update)
+        assert not Filters.caption_entity(message_entity.type)(update)
 
-    def test_private_filter(self, message):
-        assert Filters.private(message)
-        message.chat.type = 'group'
-        assert not Filters.private(message)
+    def test_caption_entities_filter(self, update, message_entity):
+        update.message.caption_entities = [message_entity]
+        assert Filters.caption_entity(message_entity.type)(update)
 
-    def test_group_filter(self, message):
-        assert not Filters.group(message)
-        message.chat.type = 'group'
-        assert Filters.group(message)
-        message.chat.type = 'supergroup'
-        assert Filters.group(message)
+        update.message.caption_entities = []
+        assert not Filters.caption_entity(MessageEntity.MENTION)(update)
+
+        second = message_entity.to_dict()
+        second['type'] = 'bold'
+        second = MessageEntity.de_json(second, None)
+        update.message.caption_entities = [message_entity, second]
+        assert Filters.caption_entity(message_entity.type)(update)
+        assert not Filters.entity(message_entity.type)(update)
+
+    def test_private_filter(self, update):
+        assert Filters.private(update)
+        update.message.chat.type = 'group'
+        assert not Filters.private(update)
+
+    def test_group_filter(self, update):
+        assert not Filters.group(update)
+        update.message.chat.type = 'group'
+        assert Filters.group(update)
+        update.message.chat.type = 'supergroup'
+        assert Filters.group(update)
 
     def test_filters_user(self):
         with pytest.raises(ValueError, match='user_id or username'):
@@ -353,22 +532,22 @@ class TestFilters(object):
         with pytest.raises(ValueError, match='user_id or username'):
             Filters.user()
 
-    def test_filters_user_id(self, message):
-        assert not Filters.user(user_id=1)(message)
-        message.from_user.id = 1
-        assert Filters.user(user_id=1)(message)
-        message.from_user.id = 2
-        assert Filters.user(user_id=[1, 2])(message)
-        assert not Filters.user(user_id=[3, 4])(message)
+    def test_filters_user_id(self, update):
+        assert not Filters.user(user_id=1)(update)
+        update.message.from_user.id = 1
+        assert Filters.user(user_id=1)(update)
+        update.message.from_user.id = 2
+        assert Filters.user(user_id=[1, 2])(update)
+        assert not Filters.user(user_id=[3, 4])(update)
 
-    def test_filters_username(self, message):
-        assert not Filters.user(username='user')(message)
-        assert not Filters.user(username='Testuser')(message)
-        message.from_user.username = 'user'
-        assert Filters.user(username='@user')(message)
-        assert Filters.user(username='user')(message)
-        assert Filters.user(username=['user1', 'user', 'user2'])(message)
-        assert not Filters.user(username=['@username', '@user_2'])(message)
+    def test_filters_username(self, update):
+        assert not Filters.user(username='user')(update)
+        assert not Filters.user(username='Testuser')(update)
+        update.message.from_user.username = 'user'
+        assert Filters.user(username='@user')(update)
+        assert Filters.user(username='user')(update)
+        assert Filters.user(username=['user1', 'user', 'user2'])(update)
+        assert not Filters.user(username=['@username', '@user_2'])(update)
 
     def test_filters_chat(self):
         with pytest.raises(ValueError, match='chat_id or username'):
@@ -376,134 +555,173 @@ class TestFilters(object):
         with pytest.raises(ValueError, match='chat_id or username'):
             Filters.chat()
 
-    def test_filters_chat_id(self, message):
-        assert not Filters.chat(chat_id=-1)(message)
-        message.chat.id = -1
-        assert Filters.chat(chat_id=-1)(message)
-        message.chat.id = -2
-        assert Filters.chat(chat_id=[-1, -2])(message)
-        assert not Filters.chat(chat_id=[-3, -4])(message)
+    def test_filters_chat_id(self, update):
+        assert not Filters.chat(chat_id=-1)(update)
+        update.message.chat.id = -1
+        assert Filters.chat(chat_id=-1)(update)
+        update.message.chat.id = -2
+        assert Filters.chat(chat_id=[-1, -2])(update)
+        assert not Filters.chat(chat_id=[-3, -4])(update)
 
-    def test_filters_chat_username(self, message):
-        assert not Filters.chat(username='chat')(message)
-        message.chat.username = 'chat'
-        assert Filters.chat(username='@chat')(message)
-        assert Filters.chat(username='chat')(message)
-        assert Filters.chat(username=['chat1', 'chat', 'chat2'])(message)
-        assert not Filters.chat(username=['@chat1', 'chat_2'])(message)
+    def test_filters_chat_username(self, update):
+        assert not Filters.chat(username='chat')(update)
+        update.message.chat.username = 'chat'
+        assert Filters.chat(username='@chat')(update)
+        assert Filters.chat(username='chat')(update)
+        assert Filters.chat(username=['chat1', 'chat', 'chat2'])(update)
+        assert not Filters.chat(username=['@chat1', 'chat_2'])(update)
 
-    def test_filters_invoice(self, message):
-        assert not Filters.invoice(message)
-        message.invoice = 'test'
-        assert Filters.invoice(message)
+    def test_filters_invoice(self, update):
+        assert not Filters.invoice(update)
+        update.message.invoice = 'test'
+        assert Filters.invoice(update)
 
-    def test_filters_successful_payment(self, message):
-        assert not Filters.successful_payment(message)
-        message.successful_payment = 'test'
-        assert Filters.successful_payment(message)
+    def test_filters_successful_payment(self, update):
+        assert not Filters.successful_payment(update)
+        update.message.successful_payment = 'test'
+        assert Filters.successful_payment(update)
 
-    def test_filters_passport_data(self, message):
-        assert not Filters.passport_data(message)
-        message.passport_data = 'test'
-        assert Filters.passport_data(message)
+    def test_filters_passport_data(self, update):
+        assert not Filters.passport_data(update)
+        update.message.passport_data = 'test'
+        assert Filters.passport_data(update)
 
-    def test_language_filter_single(self, message):
-        message.from_user.language_code = 'en_US'
-        assert (Filters.language('en_US'))(message)
-        assert (Filters.language('en'))(message)
-        assert not (Filters.language('en_GB'))(message)
-        assert not (Filters.language('da'))(message)
-        message.from_user.language_code = 'da'
-        assert not (Filters.language('en_US'))(message)
-        assert not (Filters.language('en'))(message)
-        assert not (Filters.language('en_GB'))(message)
-        assert (Filters.language('da'))(message)
+    def test_language_filter_single(self, update):
+        update.message.from_user.language_code = 'en_US'
+        assert (Filters.language('en_US'))(update)
+        assert (Filters.language('en'))(update)
+        assert not (Filters.language('en_GB'))(update)
+        assert not (Filters.language('da'))(update)
+        update.message.from_user.language_code = 'da'
+        assert not (Filters.language('en_US'))(update)
+        assert not (Filters.language('en'))(update)
+        assert not (Filters.language('en_GB'))(update)
+        assert (Filters.language('da'))(update)
 
-    def test_language_filter_multiple(self, message):
+    def test_language_filter_multiple(self, update):
         f = Filters.language(['en_US', 'da'])
-        message.from_user.language_code = 'en_US'
-        assert f(message)
-        message.from_user.language_code = 'en_GB'
-        assert not f(message)
-        message.from_user.language_code = 'da'
-        assert f(message)
+        update.message.from_user.language_code = 'en_US'
+        assert f(update)
+        update.message.from_user.language_code = 'en_GB'
+        assert not f(update)
+        update.message.from_user.language_code = 'da'
+        assert f(update)
 
-    def test_and_filters(self, message):
-        message.text = 'test'
-        message.forward_date = True
-        assert (Filters.text & Filters.forwarded)(message)
-        message.text = '/test'
-        assert not (Filters.text & Filters.forwarded)(message)
-        message.text = 'test'
-        message.forward_date = None
-        assert not (Filters.text & Filters.forwarded)(message)
+    def test_and_filters(self, update):
+        update.message.text = 'test'
+        update.message.forward_date = datetime.datetime.now()
+        assert (Filters.text & Filters.forwarded)(update)
+        update.message.text = '/test'
+        assert not (Filters.text & Filters.forwarded)(update)
+        update.message.text = 'test'
+        update.message.forward_date = None
+        assert not (Filters.text & Filters.forwarded)(update)
 
-        message.text = 'test'
-        message.forward_date = True
-        assert (Filters.text & Filters.forwarded & Filters.private)(message)
+        update.message.text = 'test'
+        update.message.forward_date = datetime.datetime.now()
+        assert (Filters.text & Filters.forwarded & Filters.private)(update)
 
-    def test_or_filters(self, message):
-        message.text = 'test'
-        assert (Filters.text | Filters.status_update)(message)
-        message.group_chat_created = True
-        assert (Filters.text | Filters.status_update)(message)
-        message.text = None
-        assert (Filters.text | Filters.status_update)(message)
-        message.group_chat_created = False
-        assert not (Filters.text | Filters.status_update)(message)
+    def test_or_filters(self, update):
+        update.message.text = 'test'
+        assert (Filters.text | Filters.status_update)(update)
+        update.message.group_chat_created = True
+        assert (Filters.text | Filters.status_update)(update)
+        update.message.text = None
+        assert (Filters.text | Filters.status_update)(update)
+        update.message.group_chat_created = False
+        assert not (Filters.text | Filters.status_update)(update)
 
-    def test_and_or_filters(self, message):
-        message.text = 'test'
-        message.forward_date = True
-        assert (Filters.text & (Filters.forwarded | Filters.status_update))(message)
-        message.forward_date = False
-        assert not (Filters.text & (Filters.forwarded | Filters.status_update))(message)
-        message.pinned_message = True
-        assert (Filters.text & (Filters.forwarded | Filters.status_update)(message))
+    def test_and_or_filters(self, update):
+        update.message.text = 'test'
+        update.message.forward_date = datetime.datetime.now()
+        assert (Filters.text & (Filters.status_update | Filters.forwarded))(update)
+        update.message.forward_date = False
+        assert not (Filters.text & (Filters.forwarded | Filters.status_update))(update)
+        update.message.pinned_message = True
+        assert (Filters.text & (Filters.forwarded | Filters.status_update)(update))
 
         assert str((Filters.text & (Filters.forwarded | Filters.entity(
             MessageEntity.MENTION)))) == '<Filters.text and <Filters.forwarded or ' \
                                          'Filters.entity(mention)>>'
 
-    def test_inverted_filters(self, message):
-        message.text = '/test'
-        assert Filters.command(message)
-        assert not (~Filters.command)(message)
-        message.text = 'test'
-        assert not Filters.command(message)
-        assert (~Filters.command)(message)
+    def test_inverted_filters(self, update):
+        update.message.text = '/test'
+        assert Filters.command(update)
+        assert not (~Filters.command)(update)
+        update.message.text = 'test'
+        assert not Filters.command(update)
+        assert (~Filters.command)(update)
 
-    def test_inverted_and_filters(self, message):
-        message.text = '/test'
-        message.forward_date = 1
-        assert (Filters.forwarded & Filters.command)(message)
-        assert not (~Filters.forwarded & Filters.command)(message)
-        assert not (Filters.forwarded & ~Filters.command)(message)
-        assert not (~(Filters.forwarded & Filters.command))(message)
-        message.forward_date = None
-        assert not (Filters.forwarded & Filters.command)(message)
-        assert (~Filters.forwarded & Filters.command)(message)
-        assert not (Filters.forwarded & ~Filters.command)(message)
-        assert (~(Filters.forwarded & Filters.command))(message)
-        message.text = 'test'
-        assert not (Filters.forwarded & Filters.command)(message)
-        assert not (~Filters.forwarded & Filters.command)(message)
-        assert not (Filters.forwarded & ~Filters.command)(message)
-        assert (~(Filters.forwarded & Filters.command))(message)
+    def test_inverted_and_filters(self, update):
+        update.message.text = '/test'
+        update.message.forward_date = 1
+        assert (Filters.forwarded & Filters.command)(update)
+        assert not (~Filters.forwarded & Filters.command)(update)
+        assert not (Filters.forwarded & ~Filters.command)(update)
+        assert not (~(Filters.forwarded & Filters.command))(update)
+        update.message.forward_date = None
+        assert not (Filters.forwarded & Filters.command)(update)
+        assert (~Filters.forwarded & Filters.command)(update)
+        assert not (Filters.forwarded & ~Filters.command)(update)
+        assert (~(Filters.forwarded & Filters.command))(update)
+        update.message.text = 'test'
+        assert not (Filters.forwarded & Filters.command)(update)
+        assert not (~Filters.forwarded & Filters.command)(update)
+        assert not (Filters.forwarded & ~Filters.command)(update)
+        assert (~(Filters.forwarded & Filters.command))(update)
 
-    def test_faulty_custom_filter(self, message):
+    def test_faulty_custom_filter(self, update):
         class _CustomFilter(BaseFilter):
             pass
 
         custom = _CustomFilter()
 
         with pytest.raises(NotImplementedError):
-            (custom & Filters.text)(message)
+            (custom & Filters.text)(update)
 
-    def test_custom_unnamed_filter(self, message):
+    def test_custom_unnamed_filter(self, update):
         class Unnamed(BaseFilter):
             def filter(self, mes):
                 return True
 
         unnamed = Unnamed()
         assert str(unnamed) == Unnamed.__name__
+
+    def test_update_type_message(self, update):
+        assert Filters.update.message(update)
+        assert not Filters.update.edited_message(update)
+        assert Filters.update.messages(update)
+        assert not Filters.update.channel_post(update)
+        assert not Filters.update.edited_channel_post(update)
+        assert not Filters.update.channel_posts(update)
+        assert Filters.update(update)
+
+    def test_update_type_edited_message(self, update):
+        update.edited_message, update.message = update.message, update.edited_message
+        assert not Filters.update.message(update)
+        assert Filters.update.edited_message(update)
+        assert Filters.update.messages(update)
+        assert not Filters.update.channel_post(update)
+        assert not Filters.update.edited_channel_post(update)
+        assert not Filters.update.channel_posts(update)
+        assert Filters.update(update)
+
+    def test_update_type_channel_post(self, update):
+        update.channel_post, update.message = update.message, update.edited_message
+        assert not Filters.update.message(update)
+        assert not Filters.update.edited_message(update)
+        assert not Filters.update.messages(update)
+        assert Filters.update.channel_post(update)
+        assert not Filters.update.edited_channel_post(update)
+        assert Filters.update.channel_posts(update)
+        assert Filters.update(update)
+
+    def test_update_type_edited_channel_post(self, update):
+        update.edited_channel_post, update.message = update.message, update.edited_message
+        assert not Filters.update.message(update)
+        assert not Filters.update.edited_message(update)
+        assert not Filters.update.messages(update)
+        assert not Filters.update.channel_post(update)
+        assert Filters.update.edited_channel_post(update)
+        assert Filters.update.channel_posts(update)
+        assert Filters.update(update)

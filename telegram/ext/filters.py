@@ -19,8 +19,10 @@
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
-from telegram import Chat
+
 from future.utils import string_types
+
+from telegram import Chat
 
 
 class BaseFilter(object):
@@ -56,13 +58,23 @@ class BaseFilter(object):
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
-
+        update_filter (:obj:`bool`): Whether this filter should work on update. If ``False`` it
+            will run the filter on :attr:`update.effective_message``. Default is ``False``.
+        data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
+            return a dict with lists. The dict will be merged with
+            :class:`telegram.ext.CallbackContext`'s internal dict in most cases
+            (depends on the handler).
     """
 
     name = None
+    update_filter = False
+    data_filter = False
 
-    def __call__(self, message):
-        return self.filter(message)
+    def __call__(self, update):
+        if self.update_filter:
+            return self.filter(update)
+        else:
+            return self.filter(update.effective_message)
 
     def __and__(self, other):
         return MergedFilter(self, and_filter=other)
@@ -79,14 +91,18 @@ class BaseFilter(object):
             self.name = self.__class__.__name__
         return self.name
 
-    def filter(self, message):
+    def filter(self, update):
         """This method must be overwritten.
 
+        Note:
+            If :attr:`update_filter` is false then the first argument is `message` and of
+            type :class:`telegram.Message`.
+
         Args:
-            message (:class:`telegram.Message`): The message that is tested.
+            update (:class:`telegram.Update`): The update that is tested.
 
         Returns:
-            :obj:`bool`
+            :obj:`dict` or :obj:`bool`
 
         """
 
@@ -100,12 +116,13 @@ class InvertedFilter(BaseFilter):
         f: The filter to invert.
 
     """
+    update_filter = True
 
     def __init__(self, f):
         self.f = f
 
-    def filter(self, message):
-        return not self.f(message)
+    def filter(self, update):
+        return not bool(self.f(update))
 
     def __repr__(self):
         return "<inverted {}>".format(self.f)
@@ -120,17 +137,60 @@ class MergedFilter(BaseFilter):
         or_filter: Optional filter to "or" with base_filter. Mutually exclusive with and_filter.
 
     """
+    update_filter = True
 
     def __init__(self, base_filter, and_filter=None, or_filter=None):
         self.base_filter = base_filter
+        if self.base_filter.data_filter:
+            self.data_filter = True
         self.and_filter = and_filter
+        if (self.and_filter
+                and not isinstance(self.and_filter, bool)
+                and self.and_filter.data_filter):
+            self.data_filter = True
         self.or_filter = or_filter
+        if (self.or_filter
+                and not isinstance(self.and_filter, bool)
+                and self.or_filter.data_filter):
+            self.data_filter = True
 
-    def filter(self, message):
+    def _merge(self, base_output, comp_output):
+        base = base_output if isinstance(base_output, dict) else {}
+        comp = comp_output if isinstance(comp_output, dict) else {}
+        for k in comp.keys():
+            # Make sure comp values are lists
+            comp_value = comp[k] if isinstance(comp[k], list) else []
+            try:
+                # If base is a list then merge
+                if isinstance(base[k], list):
+                    base[k] += comp_value
+                else:
+                    base[k] = [base[k]] + comp_value
+            except KeyError:
+                base[k] = comp_value
+        return base
+
+    def filter(self, update):
+        base_output = self.base_filter(update)
+        # We need to check if the filters are data filters and if so return the merged data.
+        # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
-            return self.base_filter(message) and self.and_filter(message)
+            comp_output = self.and_filter(update)
+            if base_output and comp_output:
+                if self.data_filter:
+                    merged = self._merge(base_output, comp_output)
+                    if merged:
+                        return merged
+                return True
         elif self.or_filter:
-            return self.base_filter(message) or self.or_filter(message)
+            comp_output = self.or_filter(update)
+            if base_output or comp_output:
+                if self.data_filter:
+                    merged = self._merge(base_output, comp_output)
+                    if merged:
+                        return merged
+                return True
+        return False
 
     def __repr__(self):
         return "<{} {} {}>".format(self.base_filter, "and" if self.and_filter else "or",
@@ -180,11 +240,7 @@ class Filters(object):
 
         Refer to the documentation of the ``re`` module for more information.
 
-        Note:
-            Does not allow passing groups or a groupdict like the ``RegexHandler`` yet,
-            but this will probably be implemented in a future update, gradually phasing out the
-            RegexHandler (See `Github Issue
-            <https://github.com/python-telegram-bot/python-telegram-bot/issues/835/>`_).
+        To get the groups and groupdict matched, see :attr:`telegram.ext.CallbackContext.matches`.
 
         Examples:
             Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
@@ -193,10 +249,11 @@ class Filters(object):
             you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
 
-
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         """
+
+        data_filter = True
 
         def __init__(self, pattern):
             if isinstance(pattern, string_types):
@@ -204,14 +261,13 @@ class Filters(object):
             self.pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
 
-        # TODO: Once the callback revamp (#1026) is done, the regex filter should be able to pass
-        # the matched groups and groupdict to the context object.
-
         def filter(self, message):
-            """:obj:`Filter`: Messages that have an occurrence of ``pattern``."""
+            """"""  # remove method from docs
             if message.text:
-                return bool(self.pattern.search(message.text))
-            return False
+                match = self.pattern.search(message.text)
+                if match:
+                    return {'matches': [match]}
+                return {}
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
@@ -257,6 +313,7 @@ class Filters(object):
                 self.name = "Filters.document.category('{}')".format(self.category)
 
             def filter(self, message):
+                """"""  # remove method from docs
                 if message.document:
                     return message.document.mime_type.startswith(self.category)
 
@@ -288,6 +345,7 @@ class Filters(object):
                 self.name = "Filters.document.mime_type('{}')".format(self.mimetype)
 
             def filter(self, message):
+                """"""  # remove method from docs
                 if message.document:
                     return message.document.mime_type == self.mimetype
 
@@ -402,6 +460,7 @@ class Filters(object):
             ``Filters.status_update`` for all status update messages.
 
         """
+        update_filter = True
 
         class _NewChatMembers(BaseFilter):
             name = 'Filters.status_update.new_chat_members'
@@ -563,6 +622,7 @@ class Filters(object):
             self.name = 'Filters.entity({})'.format(self.entity_type)
 
         def filter(self, message):
+            """"""  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.entities)
 
     class caption_entity(BaseFilter):
@@ -584,6 +644,7 @@ class Filters(object):
             self.name = 'Filters.caption_entity({})'.format(self.entity_type)
 
         def filter(self, message):
+            """"""  # remove method from docs
             return any(entity.type == self.entity_type for entity in message.caption_entities)
 
     class _Private(BaseFilter):
@@ -635,6 +696,7 @@ class Filters(object):
                 self.usernames = [user.replace('@', '') for user in username]
 
         def filter(self, message):
+            """"""  # remove method from docs
             if self.user_ids is not None:
                 return bool(message.from_user and message.from_user.id in self.user_ids)
             else:
@@ -673,6 +735,7 @@ class Filters(object):
                 self.usernames = [chat.replace('@', '') for chat in username]
 
         def filter(self, message):
+            """"""  # remove method from docs
             if self.chat_ids is not None:
                 return bool(message.chat_id in self.chat_ids)
             else:
@@ -730,5 +793,80 @@ class Filters(object):
             self.name = 'Filters.language({})'.format(self.lang)
 
         def filter(self, message):
+            """"""  # remove method from docs
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
+
+    class _UpdateType(BaseFilter):
+        update_filter = True
+
+        class _Message(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.message is not None
+
+        message = _Message()
+
+        class _EditedMessage(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.edited_message is not None
+
+        edited_message = _EditedMessage()
+
+        class _Messages(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.message is not None or update.edited_message is not None
+
+        messages = _Messages()
+
+        class _ChannelPost(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.channel_post is not None
+
+        channel_post = _ChannelPost()
+
+        class _EditedChannelPost(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.edited_channel_post is not None
+
+        edited_channel_post = _EditedChannelPost()
+
+        class _ChannelPosts(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.channel_post is not None or update.edited_channel_post is not None
+
+        channel_posts = _ChannelPosts()
+
+        def filter(self, update):
+            return self.messages(update) or self.channel_posts(update)
+
+    update = _UpdateType()
+    """Subset for filtering the type of update.
+
+    Examples:
+        Use these filters like: ``Filters.update.message`` or
+        ``Filters.update.channel_posts`` etc. Or use just ``Filters.update`` for all
+        types.
+
+    Attributes:
+        message (:obj:`Filter`): Updates with :attr:`telegram.Update.message`
+        edited_message (:obj:`Filter`): Updates with :attr:`telegram.Update.edited_message`
+        messages (:obj:`Filter`): Updates with either :attr:`telegram.Update.message` or
+            :attr:`telegram.Update.edited_message`
+        channel_post (:obj:`Filter`): Updates with :attr:`telegram.Update.channel_post`
+        edited_channel_post (:obj:`Filter`): Updates with
+            :attr:`telegram.Update.edited_channel_post`
+        channel_posts (:obj:`Filter`): Updates with either :attr:`telegram.Update.channel_post` or
+            :attr:`telegram.Update.edited_channel_post`
+    """

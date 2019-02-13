@@ -19,6 +19,7 @@
 from queue import Queue
 
 import pytest
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
@@ -90,10 +91,14 @@ class TestRegexHandler(object):
                           and isinstance(update.message, Message))
 
     def callback_context_pattern(self, update, context):
-        if context.match.groups():
-            self.test_flag = context.match.groups() == ('t', ' message')
-        if context.match.groupdict():
-            self.test_flag = context.match.groupdict() == {'begin': 't', 'end': ' message'}
+        if context.matches[0].groups():
+            self.test_flag = context.matches[0].groups() == ('t', ' message')
+        if context.matches[0].groupdict():
+            self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' message'}
+
+    def test_deprecation_Warning(self):
+        with pytest.warns(TelegramDeprecationWarning, match='RegexHandler is deprecated.'):
+            RegexHandler('.*', self.callback_basic)
 
     def test_basic(self, dp, message):
         handler = RegexHandler('.*', self.callback_basic)
@@ -115,7 +120,6 @@ class TestRegexHandler(object):
         handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
                                pass_groups=True)
         dp.add_handler(handler)
-
         dp.process_update(Update(0, message))
         assert self.test_flag
 
@@ -153,17 +157,6 @@ class TestRegexHandler(object):
         assert handler.check_update(Update(0, edited_message=message))
         assert handler.check_update(Update(0, message=message))
         assert handler.check_update(Update(0, channel_post=message))
-        assert handler.check_update(Update(0, edited_channel_post=message))
-
-    def test_allow_edited(self, message):
-        with pytest.warns(UserWarning):
-            handler = RegexHandler('.*', self.callback_basic,
-                                   message_updates=True,
-                                   allow_edited=True)
-
-        assert handler.check_update(Update(0, edited_message=message))
-        assert handler.check_update(Update(0, message=message))
-        assert not handler.check_update(Update(0, channel_post=message))
         assert handler.check_update(Update(0, edited_channel_post=message))
 
     def test_none_allowed(self):

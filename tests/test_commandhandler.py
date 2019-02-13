@@ -17,9 +17,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import re
 from queue import Queue
 
 import pytest
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery, MessageEntity)
@@ -64,6 +66,7 @@ def message(bot):
 
 class TestCommandHandler(object):
     test_flag = False
+    SRE_TYPE = type(re.match("", ""))
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -106,6 +109,18 @@ class TestCommandHandler(object):
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
+
+    def callback_context_regex1(self, update, context):
+        if context.matches:
+            types = all([type(res) == self.SRE_TYPE for res in context.matches])
+            num = len(context.matches) == 1
+            self.test_flag = types and num
+
+    def callback_context_regex2(self, update, context):
+        if context.matches:
+            types = all([type(res) == self.SRE_TYPE for res in context.matches])
+            num = len(context.matches) == 2
+            self.test_flag = types and num
 
     def test_basic(self, dp, message):
         handler = CommandHandler('test', self.callback_basic)
@@ -153,10 +168,30 @@ class TestCommandHandler(object):
         check = handler.check_update(Update(0, message))
         assert check is None or check is False
 
-    def test_edited(self, message):
+    def test_deprecation_warning(self):
+        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
+            CommandHandler('test', self.callback_basic, allow_edited=True)
+
+    def test_no_edited(self, message):
+        handler = CommandHandler('test', self.callback_basic)
+        message.text = '/test'
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=message))
+        assert check is not None and check is not False
+
+        handler = CommandHandler('test', self.callback_basic,
+                                 filters=~Filters.update.edited_message)
+        check = handler.check_update(Update(0, message))
+        assert check is not None and check is not False
+
+        check = handler.check_update(Update(0, edited_message=message))
+        assert check is None or check is False
+
+    def test_edited_deprecated(self, message):
         handler = CommandHandler('test', self.callback_basic,
                                  allow_edited=False)
-
         message.text = '/test'
         check = handler.check_update(Update(0, message))
         assert check is not None and check is not False
@@ -164,7 +199,8 @@ class TestCommandHandler(object):
         check = handler.check_update(Update(0, edited_message=message))
         assert check is None or check is False
 
-        handler.allow_edited = True
+        handler = CommandHandler('test', self.callback_basic,
+                                 allow_edited=True)
         check = handler.check_update(Update(0, message))
         assert check is not None and check is not False
 
@@ -333,6 +369,31 @@ class TestCommandHandler(object):
         cdp.process_update(Update(0, message))
         assert self.test_flag
 
+    def test_context_regex(self, cdp, message):
+        handler = CommandHandler('test', self.callback_context_regex1, Filters.regex('one two'))
+        cdp.add_handler(handler)
+
+        message.text = '/test'
+        cdp.process_update(Update(0, message))
+        assert not self.test_flag
+
+        message.text += ' one two'
+        cdp.process_update(Update(0, message))
+        assert self.test_flag
+
+    def test_context_multiple_regex(self, cdp, message):
+        handler = CommandHandler('test', self.callback_context_regex2,
+                                 Filters.regex('one') & Filters.regex('two'))
+        cdp.add_handler(handler)
+
+        message.text = '/test'
+        cdp.process_update(Update(0, message))
+        assert not self.test_flag
+
+        message.text += ' one two'
+        cdp.process_update(Update(0, message))
+        assert self.test_flag
+
 
 par = ['!help', '!test', '#help', '#test', 'mytrig-help', 'mytrig-test']
 
@@ -349,6 +410,7 @@ def prefixmessage(bot, request):
 
 class TestPrefixHandler(object):
     test_flag = False
+    SRE_TYPE = type(re.match("", ""))
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -389,6 +451,18 @@ class TestPrefixHandler(object):
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
+
+    def callback_context_regex1(self, update, context):
+        if context.matches:
+            types = all([type(res) == self.SRE_TYPE for res in context.matches])
+            num = len(context.matches) == 1
+            self.test_flag = types and num
+
+    def callback_context_regex2(self, update, context):
+        if context.matches:
+            types = all([type(res) == self.SRE_TYPE for res in context.matches])
+            num = len(context.matches) == 2
+            self.test_flag = types and num
 
     def test_basic(self, dp, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
@@ -436,21 +510,21 @@ class TestPrefixHandler(object):
         else:
             assert check is None or check is False
 
-    def test_edited(self, prefixmessage):
+    def test_no_edited(self, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic)
+        check = handler.check_update(Update(0, prefixmessage))
+        assert check is not None and check is not False
 
+        check = handler.check_update(Update(0, edited_message=prefixmessage))
+        assert check is not None and check is not False
+
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
+                                filters=~Filters.update.edited_message)
         check = handler.check_update(Update(0, prefixmessage))
         assert check is not None and check is not False
 
         check = handler.check_update(Update(0, edited_message=prefixmessage))
         assert check is None or check is False
-
-        handler.allow_edited = True
-        check = handler.check_update(Update(0, prefixmessage))
-        assert check is not None and check is not False
-
-        check = handler.check_update(Update(0, edited_message=prefixmessage))
-        assert check is not None and check is not False
 
     def test_with_filter(self, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'], self.callback_basic,
@@ -562,6 +636,31 @@ class TestPrefixHandler(object):
     def test_context_args(self, cdp, prefixmessage):
         handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'],
                                 self.callback_context_args)
+        cdp.add_handler(handler)
+
+        cdp.process_update(Update(0, prefixmessage))
+        assert not self.test_flag
+
+        prefixmessage.text += ' one two'
+        cdp.process_update(Update(0, prefixmessage))
+        assert self.test_flag
+
+    def test_context_regex(self, cdp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'],
+                                self.callback_context_regex1, Filters.regex('one two'))
+        cdp.add_handler(handler)
+
+        cdp.process_update(Update(0, prefixmessage))
+        assert not self.test_flag
+
+        prefixmessage.text += ' one two'
+        cdp.process_update(Update(0, prefixmessage))
+        assert self.test_flag
+
+    def test_context_multiple_regex(self, cdp, prefixmessage):
+        handler = PrefixHandler(['!', '#', 'mytrig-'], ['help', 'test'],
+                                self.callback_context_regex2,
+                                Filters.regex('one') & Filters.regex('two'))
         cdp.add_handler(handler)
 
         cdp.process_update(Update(0, prefixmessage))
