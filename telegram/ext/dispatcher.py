@@ -396,7 +396,7 @@ class Dispatcher(object):
                 self.groups.remove(group)
 
     def update_persistence(self):
-        """Update ``user_data`` and ``chat_data`` in :attr:`persistence`.
+        """Update :attr:`user_data` and :attr:`chat_data` in :attr:`persistence`.
         """
         if self.persistence:
             for chat_id in self.chat_data:
