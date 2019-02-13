@@ -407,7 +407,7 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert handler.conversations.get((self.group.id, user2.id)) is None
 
-    def test_per_message_warning_is_only_shown_once(self, caplog):
+    def test_per_message_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
             entry_points=self.entry_points,
             states={
@@ -417,14 +417,14 @@ class TestConversationHandler(object):
             fallbacks=self.fallbacks,
             per_message=True
         )
-        assert len(caplog.messages) == 1
-        assert caplog.messages[0] == (
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
             "If 'per_message=True', all entry points and state handlers"
             " must be 'CallbackQueryHandler', since no other handlers"
             " have a message context."
         )
 
-    def test_per_message_false_warning_is_only_shown_once(self, caplog):
+    def test_per_message_false_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
             entry_points=self.entry_points,
             states={
@@ -434,13 +434,13 @@ class TestConversationHandler(object):
             fallbacks=self.fallbacks,
             per_message=False
         )
-        assert len(caplog.messages) == 1
-        assert caplog.messages[0] == (
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
             "If 'per_message=False', 'CallbackQueryHandler' will not be "
             "tracked for every message."
         )
 
-    def test_warnings_per_chat_is_only_shown_once(self, caplog):
+    def test_warnings_per_chat_is_only_shown_once(self, recwarn):
         def hello(bot, update):
             return self.BREWING
 
@@ -457,8 +457,8 @@ class TestConversationHandler(object):
             per_chat=True
         )
 
-        assert len(caplog.messages) == 1
-        assert caplog.messages[0] == (
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
             "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
             " since inline queries have no chat context."
         )
