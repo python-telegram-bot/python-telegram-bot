@@ -19,6 +19,7 @@
 """This module contains the PicklePersistence class."""
 import pickle
 from collections import defaultdict
+from copy import deepcopy
 
 from telegram.ext import BasePersistence
 
@@ -122,7 +123,7 @@ class PicklePersistence(BasePersistence):
             self.user_data = data
         else:
             self.load_singlefile()
-        return self.user_data.copy()
+        return deepcopy(self.user_data)
 
     def get_chat_data(self):
         """Returns the chat_data from the pickle file if it exsists or an empty defaultdict.
@@ -142,7 +143,7 @@ class PicklePersistence(BasePersistence):
             self.chat_data = data
         else:
             self.load_singlefile()
-        return self.chat_data.copy()
+        return deepcopy(self.chat_data)
 
     def get_conversations(self, name):
         """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
