@@ -43,14 +43,16 @@ DEFAULT_GROUP = 0
 
 
 def run_async(func):
-    """Function decorator that will run the function in a new thread.
+    """
+    Function decorator that will run the function in a new thread.
 
     Will run :attr:`telegram.ext.Dispatcher.run_async`.
 
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
-    Note: Use this decorator to run handlers asynchronously.
-
+    Warning:
+        If you're using @run_async you cannot rely on adding custom attributes to
+        :class:`telegram.ext.CallbackContext`s. See its docs for more info.
     """
 
     @wraps(func)

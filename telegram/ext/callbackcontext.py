@@ -34,6 +34,8 @@ class CallbackContext(object):
         get passed the same `CallbackContext` object (of course with proper attributes like
         `.matches` differing). This allows you to add custom attributes in a lower handler group
         callback, and then subsequently access those attributes in a higher handler group callback.
+        Note that the attributes on `CallbackContext` might change in the future, so make sure to
+        use a fairly unique name for the attributes.
 
     Warning:
          Do not combine custom attributes and @run_async. Due to how @run_async works, it will
