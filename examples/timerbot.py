@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-
-"""Simple Bot to send timed Telegram messages.
-
 # This program is dedicated to the public domain under the CC0 license.
+#
+# THIS EXAMPLE HSA BEEN UPDATED TO WORK WITH THE BETA VERSION 12 OF PYTHON-TELEGRAM-BOT.
+# If you're still using version 11.1.0, please see the examples at
+# https://github.com/python-telegram-bot/python-telegram-bot/tree/v11.1.0/examples
+
+"""
+Simple Bot to send timed Telegram messages.
 
 This Bot uses the Updater class to handle the bot and the JobQueue to send
 timed messages.

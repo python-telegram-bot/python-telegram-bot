@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Basic example for a bot that uses inline keyboards.
-
 # This program is dedicated to the public domain under the CC0 license.
+#
+# THIS EXAMPLE HSA BEEN UPDATED TO WORK WITH THE BETA VERSION 12 OF PYTHON-TELEGRAM-BOT.
+# If you're still using version 11.1.0, please see the examples at
+# https://github.com/python-telegram-bot/python-telegram-bot/tree/v11.1.0/examples
+
+"""
+Basic example for a bot that uses inline keyboards.
 """
 import logging
 
