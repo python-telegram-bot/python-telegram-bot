@@ -54,7 +54,7 @@ class TestDelayQueue(object):
         dsp.stop()
         assert dsp.is_alive() is False
 
-        assert self.testtimes or self.N == 0 is True
+        assert self.testtimes or self.N == 0
         passes, fails = [], []
         delta = (self.time_limit_ms - self.margin_ms) / 1000
         for start, stop in enumerate(range(self.burst_limit + 1, len(self.testtimes))):

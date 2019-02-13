@@ -48,7 +48,7 @@ class TestAudio(object):
     audio_file_url = 'https://goo.gl/3En24v'
     mime_type = 'audio/mpeg'
     file_size = 122920
-    thumb_file_size = 2744
+    thumb_file_size = 1427
     thumb_width = 50
     thumb_height = 50
 
@@ -56,7 +56,7 @@ class TestAudio(object):
         # Make sure file has been uploaded.
         assert isinstance(audio, Audio)
         assert isinstance(audio.file_id, str)
-        assert audio.file_id is not ''
+        assert audio.file_id != ''
 
     def test_expected_values(self, audio):
         assert audio.duration == self.duration

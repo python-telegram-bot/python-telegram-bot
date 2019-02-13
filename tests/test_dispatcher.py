@@ -40,7 +40,10 @@ class TestDispatcher(object):
     received = None
     count = 0
 
-    @pytest.fixture(autouse=True)
+    @pytest.fixture(autouse=True, name='reset')
+    def reset_fixture(self):
+        self.reset()
+
     def reset(self):
         self.received = None
         self.count = 0
