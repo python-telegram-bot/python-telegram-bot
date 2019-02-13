@@ -175,7 +175,7 @@ class ConversationHandler(Handler):
 
         if self.per_message and not self.per_chat:
             warnings.warn("If 'per_message=True' is used, 'per_chat=True' should also be used, "
-                                "since message IDs are not globally unique.")
+                          "since message IDs are not globally unique.")
 
         all_handlers = list()
         all_handlers.extend(entry_points)
@@ -190,17 +190,20 @@ class ConversationHandler(Handler):
                     warnings.warn("If 'per_message=True', all entry points and state handlers"
                                   " must be 'CallbackQueryHandler', since no other handlers "
                                   "have a message context.")
+                    break
         else:
             for handler in all_handlers:
                 if isinstance(handler, CallbackQueryHandler):
                     warnings.warn("If 'per_message=False', 'CallbackQueryHandler' will not be "
                                   "tracked for every message.")
+                    break
 
         if self.per_chat:
             for handler in all_handlers:
                 if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
                     warnings.warn("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
                                   "since inline queries have no chat context.")
+                    break
 
     def _get_key(self, update):
         chat = update.effective_chat
