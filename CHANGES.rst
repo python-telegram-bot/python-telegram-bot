@@ -17,6 +17,7 @@ It has been so long since last release that we would like to test the impact bef
 - Persistence
 - PrefixHandler added (Handler overhaul)
 - Deprecation of RegexHandler and edited_messages, channel_post, etc. arguments (Filter overhaul)
+- Various ConversationHandler changes and fixes
 
 **See the wiki page at https://git.io/fxJuV for a detailed guide on how to migrate from version 11 to version 12.**
 
@@ -37,7 +38,7 @@ Persistence (`#1017`_)
 
 - Added PicklePersistence and DictPersistence for adding persistence to your bots.
 - BasePersistence can be subclassed for all your persistence needs.
-- Note than in this beta there may still be some outstanding bugs. See `#1325`_, `#1301`_, `#1312`_ and `#1324`_
+- Add a new example that shows a persistent ConversationHandler bot
 
 Handler overhaul (`#1114`_)
 ---------------------------
@@ -53,6 +54,15 @@ Filter overhaul (`#1221`_)
 - Completely remove allow_edited argument - it has been deprecated for a while.
 - data_filters now exist which allows filters that return data into the callback function. This is how the regex filter is implemented.
 - All this means that it no longer possible to use a list of filters in a handler. Use bitwise operators instead!
+
+ConversationHandler
+-------------------
+
+- Remove ``run_async_timeout`` and ``timed_out_behavior`` arguments (`#1344`_)
+- Replace with ``WAITING`` constant and behavior from states (`#1344`_)
+- Only emit one warning for multiple CallbackQueryHandlers in a ConversationHandler (`#1319`_)
+- Use warnings.warn for ConversationHandler warnings (`#1343`_)
+- Fix unresolvable promises (`#1270`_)
 
 Bug fixes & improvements
 ------------------------
@@ -96,6 +106,10 @@ Bug fixes & improvements
 .. _`#1211`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1211
 .. _`#1213`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1213
 .. _`#1206`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1206
+.. _`#1344`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1344
+.. _`#1319`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1319
+.. _`#1343`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1343
+.. _`#1270`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1270
 
 Internal improvements
 ---------------------
