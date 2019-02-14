@@ -89,7 +89,7 @@ class JobQueue(object):
                 Specification of the time for which the job should be scheduled. The precise
                 semantics of this parameter depend on its type (see
                 :func:`telegram.ext.JobQueue.run_repeating` for details).
-                Defaults to now + ``job.interval``.
+                Defaults to now + ``job.interval``.  # TODO: look into this
             previous_t (optional):
                 Time at which the job last ran (``None`` if it hasn't run yet).
 
@@ -144,7 +144,7 @@ class JobQueue(object):
         self._put(job, time_spec=when)
         return job
 
-    def run_repeating(self, callback, interval, first=None, context=None, name=None):
+    def run_repeating(self, callback, interval, first=None, last=None, context=None, name=None):
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
@@ -171,6 +171,11 @@ class JobQueue(object):
                   tomorrow.
 
                 Defaults to ``interval``
+            last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
+                  :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+                Time after which the job should stop running.
+                This parameter will be interpreted depending on its type (same as for ``first``).
+                If ``None``, the job will run indefinitely.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
             name (:obj:`str`, optional): The name of the new job. Defaults to
@@ -189,6 +194,7 @@ class JobQueue(object):
         job = Job(callback,
                   interval=interval,
                   repeat=True,
+                  finish_time=last,
                   context=context,
                   name=name,
                   job_queue=self)
@@ -268,6 +274,9 @@ class JobQueue(object):
                 self._set_next_peek(t)
                 break
 
+            delay_buffer = 0.01  # tolerance for last
+            if job.finish_time is not None and now > job.finish_time + delay_buffer:
+                job.schedule_removal()  # job shouldn't run anymore
             if job.removed:
                 self.logger.debug('Removing job %s', job.name)
                 continue
@@ -288,7 +297,7 @@ class JobQueue(object):
             if job.repeat and not job.removed:
                 self._put(job, previous_t=t)
             else:
-                self.logger.debug('Dropping non-repeating or removed job %s', job.name)
+                self.logger.debug('Dropping non-repeating, removed, or finished job %s', job.name)
 
     def start(self):
         """Starts the job_queue thread."""
@@ -367,6 +376,10 @@ class Job(object):
             the job queue.
         repeat (:obj:`bool`, optional): If this job should be periodically execute its callback
             function (``True``) or only once (``False``). Defaults to ``True``.
+        finish_time (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                     \
+                     :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+            Time after which the job shouldn't run anymore. Only valid if :attr:`repeat` is
+            ``True``. Defaults to ``None``.
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to ``None``.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
@@ -383,6 +396,7 @@ class Job(object):
                  callback,
                  interval=None,
                  repeat=True,
+                 finish_time=None,
                  context=None,
                  days=Days.EVERY_DAY,
                  name=None,
@@ -395,8 +409,10 @@ class Job(object):
 
         self._repeat = None
         self._interval = None
+        self._finish_time = None
         self.interval = interval
         self.repeat = repeat
+        self.finish_time = finish_time
 
         self._days = None
         self.days = days
@@ -479,6 +495,20 @@ class Job(object):
         if self.interval is None and repeat:
             raise ValueError("'repeat' can not be set to 'True' when no 'interval' is set")
         self._repeat = repeat
+
+    @property
+    def finish_time(self):
+        """:obj:`float`: Optional. Time at which the job should stop repeating."""
+        return self._finish_time
+
+    @finish_time.setter
+    def finish_time(self, time_spec):
+        if time_spec is not None:
+            if not self.repeat:
+                raise ValueError("'finish_time' cannot be set if job doesn't repeat")
+            self._finish_time = to_float_timestamp(time_spec)
+        else:
+            self._finish_time = None
 
     @property
     def days(self):
