@@ -365,7 +365,10 @@ class TestConversationHandler(object):
 
         # User starts the state machine with an async function that returns None
         # Async results are resolved when the users state is queried next time.
-        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))],
+                          bot=bot)
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(.1)
         # Assert that the Promise has been accepted as the new state
