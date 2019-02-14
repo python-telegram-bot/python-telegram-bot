@@ -248,7 +248,7 @@ class JobQueue(object):
                 self._set_next_peek(t)
                 break
 
-            delay_buffer = 0.01
+            delay_buffer = 0.01  # tolerance for last
             if job.finish_time is not None and now > job.finish_time + delay_buffer:
                 job.schedule_removal()  # job shouldn't run anymore
             if job.removed:
@@ -462,11 +462,15 @@ class Job(object):
 
     @property
     def finish_time(self):
+        """:obj:`float`: Optional. Time at which the job should stop repeating."""
         return self._finish_time
 
     @finish_time.setter
     def finish_time(self, time_):
-        self._finish_time = time.time() + _to_interval_seconds(time_)
+        if time_ is not None:
+            if not self.repeat:
+                raise ValueError("'finish_time' cannot be set if job doesn't repeat")
+            self._finish_time = time.time() + _to_interval_seconds(time_)
 
     @property
     def days(self):
