@@ -84,6 +84,9 @@ class TestConversationHandler(object):
     def start_end(self, bot, update):
         return self._set_state(update, self.END)
 
+    def start_none(self, bot, update):
+        return self._set_state(update, None)
+
     def brew(self, bot, update):
         return self._set_state(update, self.BREWING)
 
@@ -338,6 +341,40 @@ class TestConversationHandler(object):
 
         message.text = 'resolve promise pls'
         message.entities[0].length = len('resolve promise pls')
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been resolved and the conversation ended.
+        assert len(handler.conversations) == 0
+
+    def test_none_on_first_message(self, dp, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_none)], states={}, fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine and a callback function returns None
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert len(handler.conversations) == 0
+
+    def test_none_on_first_message_async(self, dp, bot, user1):
+        start_none_async = (lambda bot, update: dp.run_async(self.start_none, bot, update))
+
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', start_none_async)], states={}, fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine with an async function that returns None
+        # Async results are resolved when the users state is queried next time.
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))],
+                          bot=bot)
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been accepted as the new state
+        assert len(handler.conversations) == 1
+
+        message.text = 'resolve promise pls'
         dp.update_queue.put(Update(update_id=0, message=message))
         sleep(.1)
         # Assert that the Promise has been resolved and the conversation ended.

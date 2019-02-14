@@ -64,9 +64,10 @@ class ConversationHandler(Handler):
 
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
-    default), the state will not change. To end the conversation, the callback function must
-    return :attr:`END` or ``-1``. To handle the conversation timeout, use handler
-    :attr:`TIMEOUT` or ``-2``.
+    default), the state will not change. If an entry point callback function returns None,
+    the conversation ends immediately after the execution of this callback function.
+    To end the conversation, the callback function must return :attr:`END` or ``-1``. To
+    handle the conversation timeout, use handler :attr:`TIMEOUT` or ``-2``.
 
     Attributes:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -260,6 +261,8 @@ class ConversationHandler(Handler):
                     self.logger.exception("{}".format(exc))
                     res = old_state
                 finally:
+                    if res is None and old_state is None:
+                        res = self.END
                     self.update_state(res, key)
                     state = self.conversations.get(key)
             else:
