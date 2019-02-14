@@ -24,7 +24,7 @@ import pytest
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
                       PreCheckoutQuery, ShippingQuery, Update, User, MessageEntity)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
-                          MessageHandler, Filters)
+                          MessageHandler, Filters, InlineQueryHandler)
 
 
 @pytest.fixture(scope='class')
@@ -479,6 +479,7 @@ class TestConversationHandler(object):
         handler = ConversationHandler(entry_points=self.entry_points, states=states,
                                       fallbacks=self.fallbacks, conversation_timeout=0.5)
         dp.add_handler(handler)
+
         # CommandHandler timeout
         message = Message(0, user1, None, self.group, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
@@ -516,3 +517,58 @@ class TestConversationHandler(object):
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert not self.is_timeout
+
+    def test_per_message_warning_is_only_shown_once(self, recwarn):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [CommandHandler('pourCoffee', self.drink)],
+                self.BREWING: [CommandHandler('startCoding', self.code)]
+            },
+            fallbacks=self.fallbacks,
+            per_message=True
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_message=True', all entry points and state handlers"
+            " must be 'CallbackQueryHandler', since no other handlers"
+            " have a message context."
+        )
+
+    def test_per_message_false_warning_is_only_shown_once(self, recwarn):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [CallbackQueryHandler(self.drink)],
+                self.BREWING: [CallbackQueryHandler(self.code)],
+            },
+            fallbacks=self.fallbacks,
+            per_message=False
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_message=False', 'CallbackQueryHandler' will not be "
+            "tracked for every message."
+        )
+
+    def test_warnings_per_chat_is_only_shown_once(self, recwarn):
+        def hello(bot, update):
+            return self.BREWING
+
+        def bye(bot, update):
+            return ConversationHandler.END
+
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [InlineQueryHandler(hello)],
+                self.BREWING: [InlineQueryHandler(bye)]
+            },
+            fallbacks=self.fallbacks,
+            per_chat=True
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
+            " since inline queries have no chat context."
+        )
