@@ -70,27 +70,21 @@ class JobQueue(object):
     def set_dispatcher(self, dispatcher):
         self._dispatcher = dispatcher
 
-    def _put(self, job, next_t=None, last_t=None):
-        if next_t is None:
-            next_t = job.interval
-            if next_t is None:
-                raise ValueError('next_t is None')
+    def _put(self, job, next_t=None, previous_t=None):
+        # """
+        # Enqueues the job, scheduling its next run at `<previous> + <interval>`.
+        # `<previous>` is the previous time the job was run, stored in `previous_t`,
+        # and defaults to `None`.
+        # `<interval>` is a time interval in seconds, and is calculated from the
+        # `next_t` kwarg (if given) or the job's interval.
+        # """
 
-        if isinstance(next_t, datetime.datetime):
-            next_t = (next_t - datetime.datetime.now()).total_seconds()
+        # get time distance in seconds till run:
+        interval = _to_interval_seconds(next_t or job.interval)
+        if interval is None:
+            raise ValueError('interval is None')
 
-        elif isinstance(next_t, datetime.time):
-            next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
-
-            if datetime.datetime.now().time() > next_t:
-                next_datetime += datetime.timedelta(days=1)
-
-            next_t = (next_datetime - datetime.datetime.now()).total_seconds()
-
-        elif isinstance(next_t, datetime.timedelta):
-            next_t = next_t.total_seconds()
-
-        next_t += last_t or time.time()
+        next_t = (previous_t or time.time()) + interval  # time at which to run
 
         self.logger.debug('Putting job %s with t=%f', job.name, next_t)
 
@@ -266,7 +260,7 @@ class JobQueue(object):
                 self.logger.debug('Skipping disabled job %s', job.name)
 
             if job.repeat and not job.removed:
-                self._put(job, last_t=t)
+                self._put(job, previous_t=t)
             else:
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
@@ -488,3 +482,26 @@ class Job(object):
 
     def __lt__(self, other):
         return False
+
+
+def _to_interval_seconds(t):
+    # """
+    # Converts a given time object (i.e., `datetime.datetime`,
+    # `datetime.time`, or `datetime.timedelta`) to seconds
+    # as a floating point number (if it isn't already). Used
+    # for converting given kwargs like `first` to a uniform format.
+    # """
+
+    if isinstance(t, datetime.datetime):
+        return (t - datetime.datetime.now()).total_seconds()
+    elif isinstance(t, datetime.time):
+        next_datetime = datetime.datetime.combine(datetime.date.today(), t)
+
+        if datetime.datetime.now().time() > t:
+            next_datetime += datetime.timedelta(days=1)
+
+        return (next_datetime - datetime.datetime.now()).total_seconds()
+    elif isinstance(t, datetime.timedelta):
+        return t.total_seconds()
+
+    return t
