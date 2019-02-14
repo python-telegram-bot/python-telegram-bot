@@ -20,7 +20,7 @@ import pytest
 
 from telegram import TelegramError
 from telegram.error import Unauthorized, InvalidToken, NetworkError, BadRequest, TimedOut, \
-    ChatMigrated, RetryAfter
+    ChatMigrated, RetryAfter, Conflict
 
 
 class TestErrors(object):
@@ -83,3 +83,7 @@ class TestErrors(object):
     def test_retry_after(self):
         with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
             raise RetryAfter(12)
+
+    def test_conflict(self):
+        with pytest.raises(Conflict, match='Something something.'):
+            raise Conflict('Something something.')

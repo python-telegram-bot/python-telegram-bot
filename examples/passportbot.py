@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Simple Bot to print/download all incoming passport data
 # This program is dedicated to the public domain under the CC0 license.
+#
+# THIS EXAMPLE HSA BEEN UPDATED TO WORK WITH THE BETA VERSION 12 OF PYTHON-TELEGRAM-BOT.
+# If you're still using version 11.1.0, please see the examples at
+# https://github.com/python-telegram-bot/python-telegram-bot/tree/v11.1.0/examples
+
 """
+Simple Bot to print/download all incoming passport data
+
 See https://telegram.org/blog/passport for info about what telegram passport is.
 
 See https://git.io/fAvYd for how to use Telegram Passport properly with python-telegram-bot.

@@ -45,14 +45,14 @@ class TestPassportElementErrorReverseSide(object):
         passport_element_error_reverse_side_dict = passport_element_error_reverse_side.to_dict()
 
         assert isinstance(passport_element_error_reverse_side_dict, dict)
-        assert (passport_element_error_reverse_side_dict['source'] ==
-                passport_element_error_reverse_side.source)
-        assert (passport_element_error_reverse_side_dict['type'] ==
-                passport_element_error_reverse_side.type)
-        assert (passport_element_error_reverse_side_dict['file_hash'] ==
-                passport_element_error_reverse_side.file_hash)
-        assert (passport_element_error_reverse_side_dict['message'] ==
-                passport_element_error_reverse_side.message)
+        assert (passport_element_error_reverse_side_dict['source']
+                == passport_element_error_reverse_side.source)
+        assert (passport_element_error_reverse_side_dict['type']
+                == passport_element_error_reverse_side.type)
+        assert (passport_element_error_reverse_side_dict['file_hash']
+                == passport_element_error_reverse_side.file_hash)
+        assert (passport_element_error_reverse_side_dict['message']
+                == passport_element_error_reverse_side.message)
 
     def test_equality(self):
         a = PassportElementErrorReverseSide(self.type, self.file_hash, self.message)

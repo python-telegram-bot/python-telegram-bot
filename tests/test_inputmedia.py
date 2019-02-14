@@ -290,7 +290,7 @@ class TestInputMediaDocument(object):
 
 
 @pytest.fixture(scope='function')  # noqa: F811
-def media_group(photo, thumb):
+def media_group(photo, thumb):  # noqa: F811
     return [InputMediaPhoto(photo, caption='photo `1`', parse_mode='Markdown'),
             InputMediaPhoto(thumb, caption='<b>photo</b> 2', parse_mode='HTML')]
 

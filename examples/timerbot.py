@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-
-"""Simple Bot to send timed Telegram messages.
-
 # This program is dedicated to the public domain under the CC0 license.
+#
+# THIS EXAMPLE HSA BEEN UPDATED TO WORK WITH THE BETA VERSION 12 OF PYTHON-TELEGRAM-BOT.
+# If you're still using version 11.1.0, please see the examples at
+# https://github.com/python-telegram-bot/python-telegram-bot/tree/v11.1.0/examples
+
+"""
+Simple Bot to send timed Telegram messages.
 
 This Bot uses the Updater class to handle the bot and the JobQueue to send
 timed messages.
@@ -19,8 +22,9 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-from telegram.ext import Updater, CommandHandler
 import logging
+
+from telegram.ext import Updater, CommandHandler
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -31,28 +35,29 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
-def start(bot, update):
+def start(update, context):
     update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 
-def alarm(bot, job):
+def alarm(context):
     """Send the alarm message."""
-    bot.send_message(job.context, text='Beep!')
+    job = context.job
+    context.bot.send_message(job.context, text='Beep!')
 
 
-def set_timer(bot, update, args, job_queue, chat_data):
+def set_timer(update, context):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
-        due = int(args[0])
+        due = int(context.args[0])
         if due < 0:
             update.message.reply_text('Sorry we can not go back to future!')
             return
 
         # Add job to queue
-        job = job_queue.run_once(alarm, due, context=chat_id)
-        chat_data['job'] = job
+        job = context.job_queue.run_once(alarm, due, context=chat_id)
+        context.chat_data['job'] = job
 
         update.message.reply_text('Timer successfully set!')
 
@@ -60,27 +65,30 @@ def set_timer(bot, update, args, job_queue, chat_data):
         update.message.reply_text('Usage: /set <seconds>')
 
 
-def unset(bot, update, chat_data):
+def unset(update, context):
     """Remove the job if the user changed their mind."""
-    if 'job' not in chat_data:
+    if 'job' not in context.chat_data:
         update.message.reply_text('You have no active timer')
         return
 
-    job = chat_data['job']
+    job = context.chat_data['job']
     job.schedule_removal()
-    del chat_data['job']
+    del context.chat_data['job']
 
     update.message.reply_text('Timer successfully unset!')
 
 
-def error(bot, update, error):
+def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
     """Run bot."""
-    updater = Updater("TOKEN")
+    # Create the Updater and pass it your bot's token.
+    # Make sure to set use_context=True to use the new context based callbacks
+    # Post version 12 this will no longer be necessary
+    updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher

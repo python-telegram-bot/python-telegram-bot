@@ -16,9 +16,11 @@ Contributors
 The following wonderful people contributed directly or indirectly to this project:
 
 - `Alateas <https://github.com/alateas>`_
+- `Ambro17 <https://github.com/Ambro17>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
+- `Bibo-Joshi <https://github.com/Bibo-Joshi>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
@@ -70,6 +72,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
 - `voider1 <https://github.com/voider1>`_
+- `Vorobjev Simon <https://github.com/simonvorobjev>`_
 - `Wagner Macedo <https://github.com/wagnerluis1982>`_
 - `wjt <https://github.com/wjt>`_
 

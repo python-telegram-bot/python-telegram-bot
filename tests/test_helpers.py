@@ -32,24 +32,33 @@ class TestHelpers(object):
         assert expected_str == helpers.escape_markdown(test_str)
 
     def test_effective_message_type(self):
-        test_message = Message(message_id=1,
-                               from_user=None,
-                               date=None,
-                               chat=None)
 
-        test_message.text = 'Test'
+        def build_test_message(**kwargs):
+            config = dict(
+                message_id=1,
+                from_user=None,
+                date=None,
+                chat=None,
+            )
+            config.update(**kwargs)
+            return Message(**config)
+
+        test_message = build_test_message(text='Test')
         assert helpers.effective_message_type(test_message) == 'text'
         test_message.text = None
 
-        test_message.sticker = Sticker('sticker_id', 50, 50)
+        test_message = build_test_message(sticker=Sticker('sticker_id', 50, 50))
         assert helpers.effective_message_type(test_message) == 'sticker'
         test_message.sticker = None
 
-        test_message.new_chat_members = [User(55, 'new_user', False)]
+        test_message = build_test_message(new_chat_members=[User(55, 'new_user', False)])
         assert helpers.effective_message_type(test_message) == 'new_chat_members'
 
+        test_message = build_test_message(left_chat_member=[User(55, 'new_user', False)])
+        assert helpers.effective_message_type(test_message) == 'left_chat_member'
+
         test_update = Update(1)
-        test_message.text = 'Test'
+        test_message = build_test_message(text='Test')
         test_update.message = test_message
         assert helpers.effective_message_type(test_update) == 'text'
 
