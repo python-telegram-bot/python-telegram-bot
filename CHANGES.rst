@@ -9,7 +9,7 @@ Version 12.0.0b1
 First beta release ever.
 It has been so long since last release that we would like to test the impact before a final release.
 
-*We do NOT recommend uses this beta release in production.*
+*We do NOT recommend using this beta release in production.*
 
 **Major changes:**
 
