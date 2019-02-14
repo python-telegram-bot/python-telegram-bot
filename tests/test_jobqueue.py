@@ -98,6 +98,13 @@ class TestJobQueue(object):
         sleep(0.07)
         assert self.result == 1
 
+    def test_run_repeating_last(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.05, last=0.1)
+        sleep(0.12)
+        assert self.result == 2
+        sleep(0.1)
+        assert self.result == 2
+
     def test_multiple(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)
         job_queue.run_once(self.job_run_once, 0.02)

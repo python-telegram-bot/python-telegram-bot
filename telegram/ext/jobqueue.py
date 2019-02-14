@@ -130,7 +130,7 @@ class JobQueue(object):
         self._put(job, next_t=when)
         return job
 
-    def run_repeating(self, callback, interval, first=None, context=None, name=None):
+    def run_repeating(self, callback, interval, first=None, last=None, context=None, name=None):
         """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
@@ -157,6 +157,11 @@ class JobQueue(object):
                   tomorrow.
 
                 Defaults to ``interval``
+            last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
+                  :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
+                Time in or at which the job should stop running.
+                This parameter will be interpreted depending on its type (same as for `first`).
+                If `None`, the job will run indefinitely.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
             name (:obj:`str`, optional): The name of the new job. Defaults to
@@ -170,6 +175,7 @@ class JobQueue(object):
         job = Job(callback,
                   interval=interval,
                   repeat=True,
+                  finish_time=last,
                   context=context,
                   name=name,
                   job_queue=self)
@@ -242,6 +248,9 @@ class JobQueue(object):
                 self._set_next_peek(t)
                 break
 
+            delay_buffer = 0.01
+            if job.finish_time is not None and now > job.finish_time + delay_buffer:
+                job.schedule_removal()  # job shouldn't run anymore
             if job.removed:
                 self.logger.debug('Removing job %s', job.name)
                 continue
@@ -262,7 +271,7 @@ class JobQueue(object):
             if job.repeat and not job.removed:
                 self._put(job, previous_t=t)
             else:
-                self.logger.debug('Dropping non-repeating or removed job %s', job.name)
+                self.logger.debug('Dropping non-repeating, removed, or finished job %s', job.name)
 
     def start(self):
         """Starts the job_queue thread."""
@@ -353,6 +362,7 @@ class Job(object):
                  callback,
                  interval=None,
                  repeat=True,
+                 finish_time=None,
                  context=None,
                  days=Days.EVERY_DAY,
                  name=None,
@@ -362,10 +372,12 @@ class Job(object):
         self.context = context
         self.name = name or callback.__name__
 
-        self._repeat = repeat
+        self._repeat = None
         self._interval = None
+        self._finish_time = None
         self.interval = interval
         self.repeat = repeat
+        self.finish_time = finish_time
 
         self._days = None
         self.days = days
@@ -449,6 +461,14 @@ class Job(object):
         self._repeat = repeat
 
     @property
+    def finish_time(self):
+        return self._finish_time
+
+    @finish_time.setter
+    def finish_time(self, time_):
+        self._finish_time = time.time() + _to_interval_seconds(time_)
+
+    @property
     def days(self):
         """Tuple[:obj:`int`]: Optional. Defines on which days of the week the job should run."""
         return self._days
@@ -484,7 +504,7 @@ class Job(object):
         return False
 
 
-def _to_interval_seconds(t):
+def _to_interval_seconds(time_):
     # """
     # Converts a given time object (i.e., `datetime.datetime`,
     # `datetime.time`, or `datetime.timedelta`) to seconds
@@ -492,16 +512,16 @@ def _to_interval_seconds(t):
     # for converting given kwargs like `first` to a uniform format.
     # """
 
-    if isinstance(t, datetime.datetime):
-        return (t - datetime.datetime.now()).total_seconds()
-    elif isinstance(t, datetime.time):
-        next_datetime = datetime.datetime.combine(datetime.date.today(), t)
+    if isinstance(time_, datetime.datetime):
+        return (time_ - datetime.datetime.now()).total_seconds()
+    elif isinstance(time_, datetime.time):
+        next_datetime = datetime.datetime.combine(datetime.date.today(), time_)
 
-        if datetime.datetime.now().time() > t:
+        if datetime.datetime.now().time() > time_:
             next_datetime += datetime.timedelta(days=1)
 
         return (next_datetime - datetime.datetime.now()).total_seconds()
-    elif isinstance(t, datetime.timedelta):
-        return t.total_seconds()
+    elif isinstance(time_, datetime.timedelta):
+        return time_.total_seconds()
 
-    return t
+    return time_
