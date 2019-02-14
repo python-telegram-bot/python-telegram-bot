@@ -79,12 +79,10 @@ class JobQueue(object):
         # `next_t` kwarg (if given) or the job's interval.
         # """
 
-        # get time distance in seconds till run:
-        interval = _to_interval_seconds(next_t or job.interval)
-        if interval is None:
-            raise ValueError('interval is None')
-
-        next_t = (previous_t or time.time()) + interval  # time at which to run
+        # get time at which to run:
+        next_t = _to_timestamp(next_t or job.interval, previous_t=previous_t)
+        if next_t is None:
+            raise ValueError("'next_t' is None'")
 
         self.logger.debug('Putting job %s with t=%f', job.name, next_t)
 
@@ -470,7 +468,9 @@ class Job(object):
         if time_ is not None:
             if not self.repeat:
                 raise ValueError("'finish_time' cannot be set if job doesn't repeat")
-            self._finish_time = time.time() + _to_interval_seconds(time_)
+            self._finish_time = _to_timestamp(time_)
+        else:
+            self._finish_time = None
 
     @property
     def days(self):
@@ -508,24 +508,30 @@ class Job(object):
         return False
 
 
-def _to_interval_seconds(time_):
+def _to_timestamp(time_, previous_t=None):
     # """
     # Converts a given time object (i.e., `datetime.datetime`,
-    # `datetime.time`, or `datetime.timedelta`) to seconds
-    # as a floating point number (if it isn't already). Used
-    # for converting given kwargs like `first` to a uniform format.
+    # `datetime.time`, `datetime.timedelta`, interval from now
+    # in seconds) to POSIX timestamp. Used for converting given
+    # kwargs like `first` to a uniform format.
     # """
 
-    if isinstance(time_, datetime.datetime):
-        return (time_ - datetime.datetime.now()).total_seconds()
+    previous_t = previous_t or time.time()
+
+    if time_ is None:
+        return None
+    elif hasattr(time_, 'timestamp'):
+        return time_.timestamp()
     elif isinstance(time_, datetime.time):
-        next_datetime = datetime.datetime.combine(datetime.date.today(), time_)
+        date = datetime.date.today()
 
-        if datetime.datetime.now().time() > time_:
-            next_datetime += datetime.timedelta(days=1)
+        if time_ < datetime.datetime.today().time():
+            date += datetime.timedelta(days=1)
 
-        return (next_datetime - datetime.datetime.now()).total_seconds()
+        return datetime.datetime.combine(date, time_).timestamp()
     elif isinstance(time_, datetime.timedelta):
-        return time_.total_seconds()
-
-    return time_
+        return previous_t + time_.total_seconds()
+    elif isinstance(time_, Number):
+        return previous_t + time_
+    else:
+        raise TypeError('Unable to convert to timestamp')
