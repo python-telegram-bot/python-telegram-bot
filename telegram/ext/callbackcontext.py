@@ -28,14 +28,28 @@ class CallbackContext(object):
     :attr:`telegram.ext.Dispatcher.add_error_handler` or to the callback of a
     :class:`telegram.ext.Job`.
 
+    Note:
+        :class:`telegram.ext.Dispatcher` will create a single context for an entire update. This
+        means that if you got 2 handlers in different groups and they both get called, they will
+        get passed the same `CallbackContext` object (of course with proper attributes like
+        `.matches` differing). This allows you to add custom attributes in a lower handler group
+        callback, and then subsequently access those attributes in a higher handler group callback.
+        Note that the attributes on `CallbackContext` might change in the future, so make sure to
+        use a fairly unique name for the attributes.
+
+    Warning:
+         Do not combine custom attributes and @run_async. Due to how @run_async works, it will
+         almost certainly execute the callbacks for an update out of order, and the attributes
+         that you think you added will not be present.
+
     Attributes:
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same chat it will be the same ``dict``.
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
-        match (:obj:`re match object`, optional): If the associated update originated from a
-            regex-supported handler, this will contain the object returned from
-            ``re.match(pattern, string)``.
+        matches (List[:obj:`re match object`], optional): If the associated update originated from
+            a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
+            match objects for every pattern where ``re.search(pattern, string)`` returned a match.
         args (List[:obj:`str`], optional): Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
@@ -60,7 +74,7 @@ class CallbackContext(object):
         self.chat_data = None
         self.user_data = None
         self.args = None
-        self.match = None
+        self.matches = None
         self.error = None
         self.job = None
 
@@ -89,6 +103,9 @@ class CallbackContext(object):
         self.job = job
         return self
 
+    def update(self, data):
+        self.__dict__.update(data)
+
     @property
     def bot(self):
         """:class:`telegram.Bot`: The bot associated with this context."""
@@ -113,3 +130,15 @@ class CallbackContext(object):
 
         """
         return self._dispatcher.update_queue
+
+    @property
+    def match(self):
+        """
+        `Regex match type`: The first match from :attr:`matches`.
+            Useful if you are only filtering using a single regex filter.
+            Returns `None` if :attr:`matches` is empty.
+        """
+        try:
+            return self.matches[0]  # pylint: disable=unsubscriptable-object
+        except (IndexError, TypeError):
+            return None

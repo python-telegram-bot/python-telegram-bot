@@ -87,20 +87,20 @@ class TestCallbackQueryHandler(object):
             self.test_flag = groupdict == {'begin': 't', 'end': ' query'}
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          context.chat_data is None and
-                          isinstance(update.inline_query, InlineQuery))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and context.chat_data is None
+                          and isinstance(update.inline_query, InlineQuery))
 
     def callback_context_pattern(self, update, context):
-        if context.match.groups():
-            self.test_flag = context.match.groups() == ('t', ' query')
-        if context.match.groupdict():
-            self.test_flag = context.match.groupdict() == {'begin': 't', 'end': ' query'}
+        if context.matches[0].groups():
+            self.test_flag = context.matches[0].groups() == ('t', ' query')
+        if context.matches[0].groupdict():
+            self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' query'}
 
     def test_basic(self, dp, inline_query):
         handler = InlineQueryHandler(self.callback_basic)

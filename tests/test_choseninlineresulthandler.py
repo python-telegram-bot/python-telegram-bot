@@ -80,14 +80,14 @@ class TestChosenInlineResultHandler(object):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
     def callback_context(self, update, context):
-        self.test_flag = (isinstance(context, CallbackContext) and
-                          isinstance(context.bot, Bot) and
-                          isinstance(update, Update) and
-                          isinstance(context.update_queue, Queue) and
-                          isinstance(context.job_queue, JobQueue) and
-                          isinstance(context.user_data, dict) and
-                          context.chat_data is None and
-                          isinstance(update.chosen_inline_result, ChosenInlineResult))
+        self.test_flag = (isinstance(context, CallbackContext)
+                          and isinstance(context.bot, Bot)
+                          and isinstance(update, Update)
+                          and isinstance(context.update_queue, Queue)
+                          and isinstance(context.job_queue, JobQueue)
+                          and isinstance(context.user_data, dict)
+                          and context.chat_data is None
+                          and isinstance(update.chosen_inline_result, ChosenInlineResult))
 
     def test_basic(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_basic)

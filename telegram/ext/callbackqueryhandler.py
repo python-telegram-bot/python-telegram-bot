@@ -55,7 +55,7 @@ class CallbackQueryHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -151,4 +151,4 @@ class CallbackQueryHandler(Handler):
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         if self.pattern:
-            context.match = check_result
+            context.matches = [check_result]

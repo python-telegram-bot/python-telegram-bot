@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
+from copy import deepcopy
+
 from telegram.utils.helpers import decode_user_chat_data_from_json,\
     decode_conversations_from_json, enocde_conversations_to_json
 
@@ -129,7 +131,7 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._user_data = defaultdict(dict)
-        return self.user_data.copy()
+        return deepcopy(self.user_data)
 
     def get_chat_data(self):
         """Returns the chat_data created from the ``chat_data_json`` or an empty defaultdict.
@@ -141,7 +143,7 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._chat_data = defaultdict(dict)
-        return self.chat_data.copy()
+        return deepcopy(self.chat_data)
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty

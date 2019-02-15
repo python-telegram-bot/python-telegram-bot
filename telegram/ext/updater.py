@@ -500,6 +500,8 @@ class Updater(object):
             self.logger.info('Received signal {} ({}), stopping...'.format(
                 signum, get_signal_name(signum)))
             if self.persistence:
+                # Update user_data and chat_data before flushing
+                self.dispatcher.update_persistence()
                 self.persistence.flush()
             self.stop()
             if self.user_sig_handler:

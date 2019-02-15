@@ -20,7 +20,10 @@
 """This module contains the MessageHandler class."""
 import warnings
 
+from telegram.utils.deprecate import TelegramDeprecationWarning
+
 from telegram import Update
+from telegram.ext import Filters
 from .handler import Handler
 
 
@@ -40,13 +43,11 @@ class MessageHandler(Handler):
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
         message_updates (:obj:`bool`): Should "normal" message updates be handled?
-            Default is ``True``.
+            Default is ``None``.
         channel_post_updates (:obj:`bool`): Should channel posts updates be handled?
-            Default is ``True``.
+            Default is ``None``.
         edited_updates (:obj:`bool`): Should "edited" message updates be handled?
-            Default is ``False``.
-        allow_edited (:obj:`bool`): If the handler should also accept edited messages.
-            Default is ``False`` - Deprecated. use edited_updates instead.
+            Default is ``None``.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -55,13 +56,17 @@ class MessageHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not).
+            operators (& for and, | for or, ~ for not). Default is
+            :attr:`telegram.ext.filters.Filters.update`. This defaults to all message_type updates
+            being: ``message``, ``edited_message``, ``channel_post`` and ``edited_channel_post``.
+            If you don't want or need any of those pass ``~Filters.update.*`` in the filter
+            argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature for context based API:
@@ -87,13 +92,14 @@ class MessageHandler(Handler):
             ``chat_data`` will be passed to the callback function. Default is ``False``.
             DEPRECATED: Please switch to context based callbacks.
         message_updates (:obj:`bool`, optional): Should "normal" message updates be handled?
-            Default is ``True``.
+            Default is ``None``.
+            DEPRECATED: Please switch to filters for update filtering.
         channel_post_updates (:obj:`bool`, optional): Should channel posts updates be handled?
-            Default is ``True``.
+            Default is ``None``.
+            DEPRECATED: Please switch to filters for update filtering.
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
-            is ``False``.
-        allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
-            Default is ``False`` - Deprecated. use edited_updates instead.
+            is ``None``.
+            DEPRECATED: Please switch to filters for update filtering.
 
     Raises:
         ValueError
@@ -103,20 +109,13 @@ class MessageHandler(Handler):
     def __init__(self,
                  filters,
                  callback,
-                 allow_edited=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False,
-                 message_updates=True,
-                 channel_post_updates=True,
-                 edited_updates=False):
-        if not message_updates and not channel_post_updates and not edited_updates:
-            raise ValueError(
-                'message_updates, channel_post_updates and edited_updates are all False')
-        if allow_edited:
-            warnings.warn('allow_edited is getting deprecated, please use edited_updates instead')
-            edited_updates = allow_edited
+                 message_updates=None,
+                 channel_post_updates=None,
+                 edited_updates=None):
 
         super(MessageHandler, self).__init__(
             callback,
@@ -124,15 +123,36 @@ class MessageHandler(Handler):
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
             pass_chat_data=pass_chat_data)
+        if message_updates is False and channel_post_updates is False and edited_updates is False:
+            raise ValueError(
+                'message_updates, channel_post_updates and edited_updates are all False')
         self.filters = filters
-        self.message_updates = message_updates
-        self.channel_post_updates = channel_post_updates
-        self.edited_updates = edited_updates
+        if self.filters is not None:
+            self.filters &= Filters.update
+        else:
+            self.filters = Filters.update
+        if message_updates is not None:
+            warnings.warn('message_updates is deprecated. See https://git.io/fxJuV for more info',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
+            if message_updates is False:
+                self.filters &= ~Filters.update.message
 
-    def _is_allowed_update(self, update):
-        return any([self.message_updates and update.message,
-                    self.edited_updates and (update.edited_message or update.edited_channel_post),
-                    self.channel_post_updates and update.channel_post])
+        if channel_post_updates is not None:
+            warnings.warn('channel_post_updates is deprecated. See https://git.io/fxJuV '
+                          'for more info',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
+            if channel_post_updates is False:
+                self.filters &= ~Filters.update.channel_post
+
+        if edited_updates is not None:
+            warnings.warn('edited_updates is deprecated. See https://git.io/fxJuV for more info',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
+            if edited_updates is False:
+                self.filters &= ~(Filters.update.edited_message
+                                  | Filters.update.edited_channel_post)
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -144,8 +164,9 @@ class MessageHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, Update) and self._is_allowed_update(update):
-            if not self.filters:
-                return True
-            else:
-                return self.filters(update.effective_message)
+        if isinstance(update, Update) and update.effective_message:
+            return self.filters(update)
+
+    def collect_additional_context(self, context, update, dispatcher, check_result):
+        if isinstance(check_result, dict):
+            context.update(check_result)
