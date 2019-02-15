@@ -43,7 +43,7 @@ class PreCheckoutQueryHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when

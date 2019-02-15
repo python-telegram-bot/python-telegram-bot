@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Dispatcher."""
-from telegram.ext.callbackcontext import CallbackContext
 
 
 class Handler(object):
@@ -41,7 +40,7 @@ class Handler(object):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -99,7 +98,7 @@ class Handler(object):
         """
         raise NotImplementedError
 
-    def handle_update(self, update, dispatcher, check_result):
+    def handle_update(self, update, dispatcher, check_result, context=None):
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. Calls :attr:`self.callback` along with its respectful
@@ -113,8 +112,7 @@ class Handler(object):
             check_result: The result from :attr:`check_update`.
 
         """
-        if dispatcher.use_context:
-            context = CallbackContext.from_update(update, dispatcher)
+        if context:
             self.collect_additional_context(context, update, dispatcher, check_result)
             return self.callback(update, context)
         else:
@@ -139,7 +137,7 @@ class Handler(object):
         it should subclass this method, but remember to call this super method.
 
         DEPRECATED: This method is being replaced by new context based callbacks. Please see
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.

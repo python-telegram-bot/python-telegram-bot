@@ -24,7 +24,7 @@ import pytest
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
                       PreCheckoutQuery, ShippingQuery, Update, User, MessageEntity)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
-                          MessageHandler, Filters)
+                          MessageHandler, Filters, InlineQueryHandler)
 
 
 @pytest.fixture(scope='class')
@@ -83,6 +83,9 @@ class TestConversationHandler(object):
 
     def start_end(self, bot, update):
         return self._set_state(update, self.END)
+
+    def start_none(self, bot, update):
+        return self._set_state(update, None)
 
     def brew(self, bot, update):
         return self._set_state(update, self.BREWING)
@@ -343,6 +346,40 @@ class TestConversationHandler(object):
         # Assert that the Promise has been resolved and the conversation ended.
         assert len(handler.conversations) == 0
 
+    def test_none_on_first_message(self, dp, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_none)], states={}, fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine and a callback function returns None
+        message = Message(0, user1, None, self.group, text='/start', bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert len(handler.conversations) == 0
+
+    def test_none_on_first_message_async(self, dp, bot, user1):
+        start_none_async = (lambda bot, update: dp.run_async(self.start_none, bot, update))
+
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', start_none_async)], states={}, fallbacks=[])
+        dp.add_handler(handler)
+
+        # User starts the state machine with an async function that returns None
+        # Async results are resolved when the users state is queried next time.
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))],
+                          bot=bot)
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been accepted as the new state
+        assert len(handler.conversations) == 1
+
+        message.text = 'resolve promise pls'
+        dp.update_queue.put(Update(update_id=0, message=message))
+        sleep(.1)
+        # Assert that the Promise has been resolved and the conversation ended.
+        assert len(handler.conversations) == 0
+
     def test_per_chat_message_without_chat(self, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_end)], states={},
@@ -479,6 +516,7 @@ class TestConversationHandler(object):
         handler = ConversationHandler(entry_points=self.entry_points, states=states,
                                       fallbacks=self.fallbacks, conversation_timeout=0.5)
         dp.add_handler(handler)
+
         # CommandHandler timeout
         message = Message(0, user1, None, self.group, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
@@ -516,3 +554,58 @@ class TestConversationHandler(object):
         dp.job_queue.tick()
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert not self.is_timeout
+
+    def test_per_message_warning_is_only_shown_once(self, recwarn):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [CommandHandler('pourCoffee', self.drink)],
+                self.BREWING: [CommandHandler('startCoding', self.code)]
+            },
+            fallbacks=self.fallbacks,
+            per_message=True
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_message=True', all entry points and state handlers"
+            " must be 'CallbackQueryHandler', since no other handlers"
+            " have a message context."
+        )
+
+    def test_per_message_false_warning_is_only_shown_once(self, recwarn):
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [CallbackQueryHandler(self.drink)],
+                self.BREWING: [CallbackQueryHandler(self.code)],
+            },
+            fallbacks=self.fallbacks,
+            per_message=False
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_message=False', 'CallbackQueryHandler' will not be "
+            "tracked for every message."
+        )
+
+    def test_warnings_per_chat_is_only_shown_once(self, recwarn):
+        def hello(bot, update):
+            return self.BREWING
+
+        def bye(bot, update):
+            return ConversationHandler.END
+
+        ConversationHandler(
+            entry_points=self.entry_points,
+            states={
+                self.THIRSTY: [InlineQueryHandler(hello)],
+                self.BREWING: [InlineQueryHandler(bye)]
+            },
+            fallbacks=self.fallbacks,
+            per_chat=True
+        )
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == (
+            "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
+            " since inline queries have no chat context."
+        )

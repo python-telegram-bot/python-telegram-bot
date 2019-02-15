@@ -31,7 +31,7 @@ from queue import Queue, Empty
 
 from future.builtins import range
 
-from telegram import TelegramError
+from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -43,14 +43,16 @@ DEFAULT_GROUP = 0
 
 
 def run_async(func):
-    """Function decorator that will run the function in a new thread.
+    """
+    Function decorator that will run the function in a new thread.
 
     Will run :attr:`telegram.ext.Dispatcher.run_async`.
 
     Using this decorator is only possible when only a single Dispatcher exist in the system.
 
-    Note: Use this decorator to run handlers asynchronously.
-
+    Warning:
+        If you're using @run_async you cannot rely on adding custom attributes to
+        :class:`telegram.ext.CallbackContext`s. See its docs for more info.
     """
 
     @wraps(func)
@@ -116,7 +118,7 @@ class Dispatcher(object):
         self.use_context = use_context
 
         if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/vp113 for details',
+            warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
                           TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
@@ -214,6 +216,10 @@ class Dispatcher(object):
 
     def run_async(self, func, *args, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
+
+        Warning:
+            If you're using @run_async you cannot rely on adding custom attributes to
+            :class:`telegram.ext.CallbackContext`s. See its docs for more info.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
@@ -320,19 +326,22 @@ class Dispatcher(object):
                 self.logger.exception('An uncaught error was raised while handling the error')
             return
 
+        context = None
+
         for group in self.groups:
             try:
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        handler.handle_update(update, self, check)
-                        if self.persistence:
+                        if not context and self.use_context:
+                            context = CallbackContext.from_update(update, self)
+                        handler.handle_update(update, self, check, context)
+                        if self.persistence and isinstance(update, Update):
                             if self.persistence.store_bot_data:
                                 try:
                                     self.persistence.update_bot_data(self.bot_data)
                                 except Exception:
                                     self.logger.exception('Saving bot data raised an error')
-
                             if self.persistence.store_chat_data and update.effective_chat:
                                 chat_id = update.effective_chat.id
                                 try:
@@ -430,6 +439,15 @@ class Dispatcher(object):
                 del self.handlers[group]
                 self.groups.remove(group)
 
+    def update_persistence(self):
+        """Update :attr:`user_data` and :attr:`chat_data` in :attr:`persistence`.
+        """
+        if self.persistence:
+            for chat_id in self.chat_data:
+                self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+            for user_id in self.user_data:
+                self.persistence.update_user_data(user_id, self.user_data[user_id])
+
     def add_error_handler(self, callback):
         """Registers an error handler in the Dispatcher.
 
@@ -442,7 +460,7 @@ class Dispatcher(object):
                 The error that happened will be present in context.error.
 
         Note:
-            See https://git.io/vp113 for more info about switching to context based API.
+            See https://git.io/fxJuV for more info about switching to context based API.
         """
         self.error_handlers.append(callback)
 

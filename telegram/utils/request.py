@@ -323,7 +323,8 @@ class Request(object):
         else:
             result = self._request_wrapper('POST', url,
                                            body=json.dumps(data).encode('utf-8'),
-                                           headers={'Content-Type': 'application/json'})
+                                           headers={'Content-Type': 'application/json'},
+                                           **urlopen_kwargs)
 
         return self._parse(result)
 

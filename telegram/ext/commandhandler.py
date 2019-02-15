@@ -18,8 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
+import warnings
 
 from future.utils import string_types
+
+from telegram.ext import Filters
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import Update, MessageEntity
 from .handler import Handler
@@ -32,6 +36,9 @@ class CommandHandler(Handler):
     bot's name and/or some additional text. The handler will add a ``list`` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single or consecutive whitespace characters.
+
+    By default the handler listens to messages as well as edited messages. To change this behavior
+    use ``~Filters.update.edited_message`` in the filter argument.
 
     Attributes:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -60,7 +67,7 @@ class CommandHandler(Handler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -80,6 +87,8 @@ class CommandHandler(Handler):
             operators (& for and, | for or, ~ for not).
         allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
             edited messages. Default is ``False``.
+            DEPRECATED: Edited is allowed by default. To change this behavior use
+            ``~Filters.update.edited_message``.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -110,7 +119,7 @@ class CommandHandler(Handler):
                  command,
                  callback,
                  filters=None,
-                 allow_edited=False,
+                 allow_edited=None,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
@@ -131,8 +140,17 @@ class CommandHandler(Handler):
             if not re.match(r'^[\da-z_]{1,32}$', comm):
                 raise ValueError('Command is not a valid bot command')
 
-        self.filters = filters
-        self.allow_edited = allow_edited
+        if filters:
+            self.filters = Filters.update.messages & filters
+        else:
+            self.filters = Filters.update.messages
+
+        if allow_edited is not None:
+            warnings.warn('allow_edited is deprecated. See https://git.io/fxJuV for more info',
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
+            if not allow_edited:
+                self.filters &= ~Filters.update.edited_message
         self.pass_args = pass_args
 
     def check_update(self, update):
@@ -142,11 +160,10 @@ class CommandHandler(Handler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            :obj:`bool`
+            :obj:`list`: The list of args for the handler
 
         """
-        if (isinstance(update, Update)
-                and (update.message or update.edited_message and self.allow_edited)):
+        if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
             if (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
@@ -160,17 +177,22 @@ class CommandHandler(Handler):
                         and command[1].lower() == message.bot.username.lower()):
                     return None
 
-                if self.filters is None or self.filters(message):
-                    return args
+                filter_result = self.filters(update)
+                if filter_result:
+                    return args, filter_result
+                else:
+                    return False
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
         if self.pass_args:
-            optional_args['args'] = check_result
+            optional_args['args'] = check_result[0]
         return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
-        context.args = check_result
+        context.args = check_result[0]
+        if isinstance(check_result[1], dict):
+            context.update(check_result[1])
 
 
 class PrefixHandler(CommandHandler):
@@ -198,6 +220,10 @@ class PrefixHandler(CommandHandler):
             PrefixHandler(['!', '#'], ['test', 'help`], callback) will respond to '!test',
             '#test', '!help' and '#help'.
 
+
+    By default the handler listens to messages as well as edited messages. To change this behavior
+    use ~``Filters.update.edited_message``.
+
     Attributes:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -205,8 +231,6 @@ class PrefixHandler(CommandHandler):
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
-        allow_edited (:obj:`bool`): Determines Whether the handler should also accept
-            edited messages.
         pass_args (:obj:`bool`): Determines whether the handler should be passed
             ``args``.
         pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
@@ -225,7 +249,7 @@ class PrefixHandler(CommandHandler):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/vp113 for more info.
+        https://git.io/fxJuV for more info.
 
     Args:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
@@ -243,8 +267,6 @@ class PrefixHandler(CommandHandler):
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
-        allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
-            edited messages. Default is ``False``.
         pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
             arguments passed to the command as a keyword argument called ``args``. It will contain
             a list of strings, which is the text following the command split on single or
@@ -274,7 +296,6 @@ class PrefixHandler(CommandHandler):
                  command,
                  callback,
                  filters=None,
-                 allow_edited=False,
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False,
@@ -282,7 +303,7 @@ class PrefixHandler(CommandHandler):
                  pass_chat_data=False):
 
         super(PrefixHandler, self).__init__(
-            'nocommand', callback, filters=filters, allow_edited=allow_edited, pass_args=pass_args,
+            'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
@@ -305,15 +326,22 @@ class PrefixHandler(CommandHandler):
             update (:class:`telegram.Update`): Incoming telegram update.
 
         Returns:
-            :obj:`bool`
+            :obj:`list`: The list of args for the handler
 
         """
-        if (isinstance(update, Update)
-                and (update.message or update.edited_message and self.allow_edited)):
+        if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
             text_list = message.text.split()
             if text_list[0].lower() not in self.command:
                 return None
-            if self.filters is None or self.filters(message):
-                return text_list[1:]
+            filter_result = self.filters(update)
+            if filter_result:
+                return text_list[1:], filter_result
+            else:
+                return False
+
+    def collect_additional_context(self, context, update, dispatcher, check_result):
+        context.args = check_result[0]
+        if isinstance(check_result[1], dict):
+            context.update(check_result[1])

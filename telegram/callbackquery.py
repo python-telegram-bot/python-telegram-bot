@@ -116,16 +116,16 @@ class CallbackQuery(TelegramObject):
         """
         return self.bot.answerCallbackQuery(self.id, *args, **kwargs)
 
-    def edit_message_text(self, *args, **kwargs):
+    def edit_message_text(self, text, *args, **kwargs):
         """Shortcut for either::
 
-            bot.edit_message_text(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_text(text, chat_id=update.callback_query.message.chat_id,
                                 message_id=update.callback_query.message.message_id,
                                 *args, **kwargs)
 
         or::
 
-            bot.edit_message_text(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_text(text, inline_message_id=update.callback_query.inline_message_id,
                                 *args, **kwargs)
 
         Returns:
@@ -134,22 +134,24 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.edit_message_text(
-                inline_message_id=self.inline_message_id, *args, **kwargs)
+            return self.bot.edit_message_text(text, inline_message_id=self.inline_message_id,
+                                              *args, **kwargs)
         else:
-            return self.bot.edit_message_text(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+            return self.bot.edit_message_text(text, chat_id=self.message.chat_id,
+                                              message_id=self.message.message_id, *args, **kwargs)
 
-    def edit_message_caption(self, *args, **kwargs):
+    def edit_message_caption(self, caption, *args, **kwargs):
         """Shortcut for either::
 
-            bot.edit_message_caption(chat_id=update.callback_query.message.chat_id,
+            bot.edit_message_caption(caption=caption,
+                                   chat_id=update.callback_query.message.chat_id,
                                    message_id=update.callback_query.message.message_id,
                                    *args, **kwargs)
 
         or::
 
-            bot.edit_message_caption(inline_message_id=update.callback_query.inline_message_id,
+            bot.edit_message_caption(caption=caption
+                                    inline_message_id=update.callback_query.inline_message_id,
                                    *args, **kwargs)
 
         Returns:
@@ -158,22 +160,26 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.edit_message_caption(
-                inline_message_id=self.inline_message_id, *args, **kwargs)
+            return self.bot.edit_message_caption(caption=caption,
+                                                 inline_message_id=self.inline_message_id,
+                                                 *args, **kwargs)
         else:
-            return self.bot.edit_message_caption(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+            return self.bot.edit_message_caption(caption=caption, chat_id=self.message.chat_id,
+                                                 message_id=self.message.message_id,
+                                                 *args, **kwargs)
 
-    def edit_message_reply_markup(self, *args, **kwargs):
+    def edit_message_reply_markup(self, reply_markup, *args, **kwargs):
         """Shortcut for either::
 
             bot.edit_message_replyMarkup(chat_id=update.callback_query.message.chat_id,
                                        message_id=update.callback_query.message.message_id,
+                                       reply_markup=reply_markup,
                                        *args, **kwargs)
 
         or::
 
             bot.edit_message_reply_markup(inline_message_id=update.callback_query.inline_message_id,
+                                        reply_markup=reply_markup,
                                        *args, **kwargs)
 
         Returns:
@@ -182,8 +188,11 @@ class CallbackQuery(TelegramObject):
 
         """
         if self.inline_message_id:
-            return self.bot.edit_message_reply_markup(
-                inline_message_id=self.inline_message_id, *args, **kwargs)
+            return self.bot.edit_message_reply_markup(reply_markup=reply_markup,
+                                                      inline_message_id=self.inline_message_id,
+                                                      *args, **kwargs)
         else:
-            return self.bot.edit_message_reply_markup(
-                chat_id=self.message.chat_id, message_id=self.message.message_id, *args, **kwargs)
+            return self.bot.edit_message_reply_markup(reply_markup=reply_markup,
+                                                      chat_id=self.message.chat_id,
+                                                      message_id=self.message.message_id,
+                                                      *args, **kwargs)

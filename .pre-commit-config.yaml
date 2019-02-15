@@ -13,7 +13,7 @@
         args:
         - --ignore=W605,W503
 -   repo: git://github.com/pre-commit/mirrors-pylint
-    sha: v1.7.1
+    sha: v2.2.2
     hooks:
     -   id: pylint
         files: ^telegram/.*\.py$
