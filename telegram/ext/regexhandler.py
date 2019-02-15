@@ -19,16 +19,14 @@
 # TODO: Remove allow_edited
 """This module contains the RegexHandler class."""
 
-import re
 import warnings
 
-from future.utils import string_types
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
-from telegram import Update
-from .handler import Handler
+from telegram.ext import MessageHandler, Filters
 
 
-class RegexHandler(Handler):
+class RegexHandler(MessageHandler):
     """Handler class to handle Telegram updates based on a regex.
 
     It uses a regular expression to check text messages. Read the documentation of the ``re``
@@ -38,30 +36,34 @@ class RegexHandler(Handler):
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_groups (:obj:`bool`): Optional. Determines whether ``groups`` will be passed to the
+        pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
-        pass_groupdict (:obj:`bool`): Optional. Determines whether ``groupdict``. will be passed to
+        pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
             the callback function.
-        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        pass_user_data (:obj:`bool`): Optional. Determines whether ``user_data`` will be passed to
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
             the callback function.
-        pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
 
     Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
+        This handler is being deprecated. For the same usecase use:
+        ``MessageHandler(Filters.regex(r'pattern'), callback)``
+
 
     Args:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
-            It will be called when the :attr:`check_update` has determined that an update should be
-            processed by this handler.
+        callback (:obj:`callable`): The callback function for this handler. Will be called when
+            :attr:`check_update` has determined that an update should be processed by this handler.
+            Callback signature for context based API:
+
+            ``def callback(update: Update, context: CallbackContext)``
+
+            The return value of the callback is usually ignored except for the special case of
+            :class:`telegram.ext.ConversationHandler`.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -86,8 +88,6 @@ class RegexHandler(Handler):
             Default is ``True``.
         edited_updates (:obj:`bool`, optional): Should "edited" message updates be handled? Default
             is ``False``.
-        allow_edited (:obj:`bool`, optional): If the handler should also accept edited messages.
-            Default is ``False`` - Deprecated. use edited_updates instead.
 
     Raises:
         ValueError
@@ -106,68 +106,27 @@ class RegexHandler(Handler):
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
-                 edited_updates=False
-                 ):
-        if not message_updates and not channel_post_updates and not edited_updates:
-            raise ValueError(
-                'message_updates, channel_post_updates and edited_updates are all False')
-        if allow_edited:
-            warnings.warn('allow_edited is getting deprecated, please use edited_updates instead')
-            edited_updates = allow_edited
-
-        super(RegexHandler, self).__init__(
-            callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
-
-        if isinstance(pattern, string_types):
-            pattern = re.compile(pattern)
-
-        self.pattern = pattern
+                 edited_updates=False):
+        warnings.warn('RegexHandler is deprecated. See https://git.io/fxJuV for more info',
+                      TelegramDeprecationWarning,
+                      stacklevel=2)
+        super(RegexHandler, self).__init__(Filters.regex(pattern),
+                                           callback,
+                                           pass_update_queue=pass_update_queue,
+                                           pass_job_queue=pass_job_queue,
+                                           pass_user_data=pass_user_data,
+                                           pass_chat_data=pass_chat_data,
+                                           message_updates=message_updates,
+                                           channel_post_updates=channel_post_updates,
+                                           edited_updates=edited_updates)
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
-        self.allow_edited = allow_edited
-        self.message_updates = message_updates
-        self.channel_post_updates = channel_post_updates
-        self.edited_updates = edited_updates
 
-    def check_update(self, update):
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-
-        Returns:
-            :obj:`bool`
-
-        """
-        if not isinstance(update, Update) and not update.effective_message:
-            return False
-        if any([self.message_updates and update.message,
-                self.edited_updates and (update.edited_message or update.edited_channel_post),
-                self.channel_post_updates and update.channel_post]) and \
-                update.effective_message.text:
-            match = re.match(self.pattern, update.effective_message.text)
-            return bool(match)
-        return False
-
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-
-        """
-
-        optional_args = self.collect_optional_args(dispatcher, update)
-        match = re.match(self.pattern, update.effective_message.text)
-
+    def collect_optional_args(self, dispatcher, update=None, check_result=None):
+        optional_args = super(RegexHandler, self).collect_optional_args(dispatcher, update,
+                                                                        check_result)
         if self.pass_groups:
-            optional_args['groups'] = match.groups()
+            optional_args['groups'] = check_result['matches'][0].groups()
         if self.pass_groupdict:
-            optional_args['groupdict'] = match.groupdict()
-
-        return self.callback(dispatcher.bot, update, **optional_args)
+            optional_args['groupdict'] = check_result['matches'][0].groupdict()
+        return optional_args

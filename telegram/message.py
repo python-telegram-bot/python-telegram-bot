@@ -209,10 +209,11 @@ class Message(TelegramObject):
     ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
                         'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
                         'successful_payment']
-    MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
-                     'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
-                     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id',
-                     'pinned_message', 'passport_data'] + ATTACHMENT_TYPES
+    MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
+                     'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
+                     'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
+                     'migrate_from_chat_id', 'pinned_message',
+                     'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
                  message_id,

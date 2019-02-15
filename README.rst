@@ -104,7 +104,21 @@ All types and methods of the Telegram Bot API **4.1** are supported.
 Installing
 ==========
 
-You can install or upgrade python-telegram-bot with:
+**Beta note**
+
+The newest stable release is currently version 11.1.0.
+
+The newest release is a beta release for version 12.
+Install or upgrade with:
+
+.. code:: shell
+
+    $ pip install python-telegram-bot=12.0.0b1 --upgrade
+
+
+See CHANGES.rst for the changelog and make sure to report any bugs you find!
+
+You can install or upgrade the stable python-telegram-bot with:
 
 .. code:: shell
 

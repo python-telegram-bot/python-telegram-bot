@@ -50,9 +50,9 @@ class TestSticker(object):
     width = 510
     height = 512
     file_size = 39518
-    thumb_width = 90
-    thumb_heigth = 90
-    thumb_file_size = 3672
+    thumb_width = 319
+    thumb_height = 320
+    thumb_file_size = 21472
 
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
@@ -68,7 +68,7 @@ class TestSticker(object):
         assert sticker.height == self.height
         assert sticker.file_size == self.file_size
         assert sticker.thumb.width == self.thumb_width
-        assert sticker.thumb.height == self.thumb_heigth
+        assert sticker.thumb.height == self.thumb_height
         assert sticker.thumb.file_size == self.thumb_file_size
 
     @flaky(3, 1)
@@ -243,6 +243,15 @@ class TestStickerSet(object):
         assert sticker_set.contains_masks == self.contains_masks
         assert sticker_set.stickers == self.stickers
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_bot_methods_1(self, bot, chat_id):
+        with open('tests/data/telegram_sticker.png', 'rb') as f:
+            file = bot.upload_sticker_file(95205500, f)
+        assert file
+        assert bot.add_sticker_to_set(chat_id, 'test_by_{0}'.format(bot.username),
+                                      file.file_id, '😄')
+
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
 
@@ -251,14 +260,6 @@ class TestStickerSet(object):
         assert sticker_set_dict['title'] == sticker_set.title
         assert sticker_set_dict['contains_masks'] == sticker_set.contains_masks
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_bot_methods_1(self, bot, chat_id, sticker_set):
-        with open('tests/data/telegram_sticker.png', 'rb') as f:
-            file = bot.upload_sticker_file(95205500, f)
-        assert file
-        assert bot.add_sticker_to_set(chat_id, sticker_set.name, file.file_id, '😄')
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
