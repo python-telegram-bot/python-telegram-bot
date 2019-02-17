@@ -289,6 +289,10 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
+# Napoleon stuff
+
+napoleon_use_admonition_for_examples = True
+
 # -- script stuff --------------------------------------------------------
 
 
