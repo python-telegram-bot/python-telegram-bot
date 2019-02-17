@@ -143,13 +143,3 @@ telegram.utils
 
 .. toctree::
     telegram.utils
-
-
-Module contents
----------------
-
-.. automodule:: telegram
-    :members:
-    :undoc-members:
-    :show-inheritance:
-    :noindex:
