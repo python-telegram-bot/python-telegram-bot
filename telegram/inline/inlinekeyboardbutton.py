@@ -32,7 +32,7 @@ class InlineKeyboardButton(TelegramObject):
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`): Optional. HTTP url to be opened when button is pressed.
         callback_data (:obj:`str`): Optional. Data to be sent in a callback query to the bot when
-            button is pressed, 1-64 bytes.
+            button is pressed, UTF-8 1-64 bytes.
         switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
             chats, open that chat and insert the bot's username and the specified inline query in
             the input field.
@@ -46,7 +46,7 @@ class InlineKeyboardButton(TelegramObject):
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`): HTTP url to be opened when button is pressed.
         callback_data (:obj:`str`, optional): Data to be sent in a callback query to the bot when
-            button is pressed, 1-64 bytes.
+            button is pressed, 1-64 UTF-8 bytes.
         switch_inline_query (:obj:`str`, optional): If set, pressing the button will prompt the
             user to select one of their chats, open that chat and insert the bot's username and the
             specified inline query in the input field. Can be empty, in which case just the bot's
