@@ -28,7 +28,8 @@ from . import __version__ as telegram_ver
 
 def _git_revision():
     try:
-        output = subprocess.check_output(["git", "describe", "--long", "--tags"], stderr=subprocess.STDOUT)
+        output = subprocess.check_output(["git", "describe", "--long", "--tags"],
+                                         stderr=subprocess.STDOUT)
     except (subprocess.SubprocessError, OSError):
         return None
     return output.decode().strip()
