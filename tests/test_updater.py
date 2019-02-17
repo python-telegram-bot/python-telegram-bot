@@ -334,9 +334,16 @@ class TestUpdater(object):
         with caplog.at_level(logging.INFO):
             updater.idle()
 
-        rec = caplog.records[-1]
-        assert rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
-        assert rec.levelname == 'INFO'
+        rec1, rec2 = caplog.records[-1], caplog.records[-2]
+
+        def test1(rec):
+            return rec.msg.startswith('Received signal {}'.format(signal.SIGTERM))
+
+        def test2(rec):
+            return rec.levelname == 'INFO'
+
+        assert test1(rec1) or test1(rec2)
+        assert test2(rec1) or test2(rec2)
 
         # If we get this far, idle() ran through
         sleep(.5)
