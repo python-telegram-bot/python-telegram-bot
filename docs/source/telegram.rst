@@ -1,10 +1,10 @@
+.. include:: telegram.ext.rst
+
+
 telegram package
 ================
 
 .. toctree::
-
-   telegram.ext
-   telegram.utils
    telegram.animation
    telegram.audio
    telegram.bot
@@ -136,6 +136,12 @@ Passport
     telegram.passportfile
     telegram.encryptedpassportelement
     telegram.encryptedcredentials
+
+telegram.utils
+--------------
+
+.. toctree::
+    telegram.utils
 
 
 Module contents
