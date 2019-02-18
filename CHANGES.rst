@@ -1,6 +1,6 @@
-=======
-Changes
-=======
+=========
+Changelog
+=========
 
 Version 12.0.0b1
 ================
@@ -119,11 +119,9 @@ Internal improvements
 - Allow pypy to fail in CI.
 - Remove the last CamelCase CheckUpdate methods from the handlers we missed earlier.
 
-Pre-2019 (up and including to version 11.1.0)
-=============================================
-
-**2018-09-01**
-*Released 11.1.0*
+Version 11.1.0
+==============
+*Released 2018-09-01*
 
 Fixes and updates for Telegram Passport: (`#1198`_)
 
@@ -137,8 +135,9 @@ Fixes and updates for Telegram Passport: (`#1198`_)
 
 .. _`#1198`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1198
 
-**2018-08-29**
-*Released 11.0.0*
+Version 11.0.0
+==============
+*Released 2018-08-29*
 
 Fully support Bot API version 4.0!
 (also some bugfixes :))
@@ -193,8 +192,9 @@ Non Bot API 4.0 changes:
 .. _`#1184`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1184
 .. _`our telegram passport wiki page`: https://git.io/fAvYd
 
-**2018-05-02**
-*Released 10.1.0*
+Version 10.1.0
+==============
+*Released 2018-05-02*
 
 Fixes changing previous behaviour:
 
@@ -220,8 +220,9 @@ Fixes:
 .. _`#1096`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1096
 .. _`#1099`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1099
 
-**2018-04-17**
-*Released 10.0.2*
+Version 10.0.2
+==============
+*Released 2018-04-17*
 
 Important fix:
 
@@ -252,8 +253,9 @@ Fixes:
 .. _`#1076`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1076
 .. _`#1071`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1071
 
-**2018-03-05**
-*Released 10.0.1*
+Version 10.0.1
+==============
+*Released 2018-03-05*
 
 Fixes:
 
@@ -263,8 +265,9 @@ Fixes:
 .. _`#1032`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
 .. _`#912`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
 
-**2018-03-02**
-*Released 10.0.0*
+Version 10.0.0
+==============
+*Released 2018-03-02*
 
 Non backward compatabile changes and changed defaults
 
@@ -329,8 +332,9 @@ Changes
 .. _`#1019`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1019
 .. _`#1020`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1020
 
-**2017-12-08**
-*Released 9.0.0*
+Version 9.0.0
+=============
+*Released 2017-12-08*
 
 Breaking changes (possibly)
 
@@ -355,15 +359,17 @@ Changes
 .. _`#694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/694
 .. _`#870`: https://github.com/python-telegram-bot/python-telegram-bot/pull/870
 
-**2017-10-15**
-*Released 8.1.1*
+Version 8.1.1
+=============
+*Released 2017-10-15*
 
 - Fix Commandhandler crashing on single character messages (PR `#873`_).
 
 .. _`#873`: https://github.com/python-telegram-bot/python-telegram-bot/pull/871
 
-**2017-10-14**
-*Released 8.1.0*
+Version 8.1.0
+=============
+*Released 2017-10-14*
 
 New features
 - Support Bot API 3.4 (PR `#865`_).
@@ -380,8 +386,9 @@ Changes
 .. _`#865`: https://github.com/python-telegram-bot/python-telegram-bot/pull/865
 .. _`#869`: https://github.com/python-telegram-bot/python-telegram-bot/pull/869
 
-**2017-09-01**
-*Released 8.0.0*
+Version 8.0.0
+=============
+*Released 2017-09-01*
 
 New features
 
@@ -422,14 +429,16 @@ Changes
 .. _`#793`: https://github.com/python-telegram-bot/python-telegram-bot/pull/793
 .. _`#810`: https://github.com/python-telegram-bot/python-telegram-bot/pull/810
 
-**2017-07-28**
-*Released 7.0.1*
+Version 7.0.1
+===============
+*Released 2017-07-28*
 
 - Fix TypeError exception in RegexHandler (PR #751).
 - Small documentation fix (PR #749).
 
-**2017-07-25**
-*Released 7.0.0*
+Version 7.0.0
+=============
+*Released 2017-07-25*
 
 - Fully support Bot API 3.2.
 - New filters for handling messages from specific chat/user id (PR #677).
@@ -446,6 +455,9 @@ Changes
 - Internal restructure of files.
 - Improved documentation.
 - Improved unitests.
+
+Pre-version 7.0
+===============
 
 **2017-06-18**
 

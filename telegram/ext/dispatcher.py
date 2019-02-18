@@ -52,7 +52,7 @@ def run_async(func):
 
     Warning:
         If you're using @run_async you cannot rely on adding custom attributes to
-        :class:`telegram.ext.CallbackContext`s. See its docs for more info.
+        :class:`telegram.ext.CallbackContext`. See its docs for more info.
     """
 
     @wraps(func)
@@ -214,7 +214,7 @@ class Dispatcher(object):
 
         Warning:
             If you're using @run_async you cannot rely on adding custom attributes to
-            :class:`telegram.ext.CallbackContext`s. See its docs for more info.
+            :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
         Args:
             func (:obj:`callable`): The function to run in the thread.

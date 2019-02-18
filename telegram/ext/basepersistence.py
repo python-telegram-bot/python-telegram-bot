@@ -101,7 +101,7 @@ class BasePersistence(object):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
         """
         raise NotImplementedError
 
@@ -111,7 +111,7 @@ class BasePersistence(object):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [user_id].
         """
         raise NotImplementedError
 
