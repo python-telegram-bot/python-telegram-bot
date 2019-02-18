@@ -175,21 +175,27 @@ class MergedFilter(BaseFilter):
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
-            comp_output = self.and_filter(update)
-            if base_output and comp_output:
-                if self.data_filter:
-                    merged = self._merge(base_output, comp_output)
-                    if merged:
-                        return merged
-                return True
+            # And filter needs to short circuit if base is falsey
+            if base_output:
+                comp_output = self.and_filter(update)
+                if comp_output:
+                    if self.data_filter:
+                        merged = self._merge(base_output, comp_output)
+                        if merged:
+                            return merged
+                    return True
         elif self.or_filter:
-            comp_output = self.or_filter(update)
-            if base_output or comp_output:
+            # Or filter needs to short circuit if base is truthey
+            if base_output:
                 if self.data_filter:
-                    merged = self._merge(base_output, comp_output)
-                    if merged:
-                        return merged
+                    return base_output
                 return True
+            else:
+                comp_output = self.or_filter(update)
+                if comp_output:
+                    if self.data_filter:
+                        return comp_output
+                    return True
         return False
 
     def __repr__(self):
