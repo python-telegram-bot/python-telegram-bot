@@ -70,6 +70,11 @@ class TestBot(object):
         with pytest.raises(InvalidToken):
             bot.get_me()
 
+    def test_bot_fails(self, bot):
+        from tests.bots import get_bot
+        get_bot()
+        assert False
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_me_and_properties(self, bot):
