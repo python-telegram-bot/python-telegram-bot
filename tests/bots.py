@@ -59,6 +59,7 @@ def get(name, fallback):
     if val:
         return val
     # Otherwise go with the fallback
+    print(full_name, bool(val))
     return fallback
 
 
