@@ -50,6 +50,7 @@ class TestShippingQuery(object):
         assert shipping_query.invoice_payload == self.invoice_payload
         assert shipping_query.from_user == self.from_user
         assert shipping_query.shipping_address == self.shipping_address
+        assert shipping_query.bot == bot
 
     def test_to_dict(self, shipping_query):
         shipping_query_dict = shipping_query.to_dict()
