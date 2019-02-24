@@ -19,12 +19,14 @@
 import datetime
 import os
 import time
-from time import sleep
-
+from freezegun import freeze_time
 import pytest
 from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job
+
+
+DAY = 24 * 60 * 60
 
 
 @pytest.fixture(scope='function')
@@ -33,6 +35,20 @@ def job_queue(bot):
     jq.start()
     yield jq
     jq.stop()
+
+
+@pytest.fixture(scope='function')
+def frozen_jq(bot):
+    with freeze_time(datetime.datetime.now()) as frozen_time:
+        jq = JobQueue(bot)
+        jq.start()
+        yield jq, frozen_time
+        jq.stop()
+
+
+def tick_seconds(frozen_time, seconds):
+    """Simulate that we have traveled `seconds` in time."""
+    frozen_time.tick(delta=datetime.timedelta(seconds=seconds))
 
 
 @pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
@@ -61,158 +77,230 @@ class TestJobQueue(object):
 
     def job_datetime_tests(self, bot, job):
         self.job_time = time.time()
+        self.result += 1
 
-    def test_run_once(self, job_queue):
-        job_queue.run_once(self.job_run_once, 0.01)
-        sleep(0.02)
+    def test_run_once(self, frozen_jq):
+        jq, fztime = frozen_jq
+        jq.run_once(self.job_run_once, 10)
+
+        # Simulate that 0.03 seconds have passed
+        tick_seconds(fztime, 11)
+
+        # Run due jobs
+        jq.tick()
+
         assert self.result == 1
 
-    def test_job_with_context(self, job_queue):
-        job_queue.run_once(self.job_run_once_with_context, 0.01, context=5)
-        sleep(0.02)
+    def test_job_with_context(self, frozen_jq):
+        jq, fz_time = frozen_jq
+        jq.run_once(self.job_run_once_with_context, 10, context=5)
+
+        tick_seconds(fz_time, 11)
+
+        # Run due jobs
+        jq.tick()
+
         assert self.result == 5
 
-    def test_run_repeating(self, job_queue):
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.05)
+    def test_run_repeating(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        job_queue.run_repeating(self.job_run_once, 2)
+
+        tick_seconds(fz_time, 5)
+        job_queue.tick()
+
         assert self.result == 2
 
-    def test_run_repeating_first(self, job_queue):
-        job_queue.run_repeating(self.job_run_once, 0.05, first=0.2)
-        sleep(0.15)
+    def test_run_repeating_first(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        job_queue.run_repeating(self.job_run_once, 1, first=2)
+
+        tick_seconds(fz_time, 1.5)
+        job_queue.tick()
         assert self.result == 0
-        sleep(0.07)
+
+        tick_seconds(fz_time, 1)
+        job_queue.tick()
         assert self.result == 1
 
-    def test_multiple(self, job_queue):
-        job_queue.run_once(self.job_run_once, 0.01)
-        job_queue.run_once(self.job_run_once, 0.02)
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.055)
+    def test_multiple(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        job_queue.run_once(self.job_run_once, 1)
+        job_queue.run_once(self.job_run_once, 2)
+        job_queue.run_repeating(self.job_run_once, 2)
+
+        tick_seconds(fz_time, 5)
+        job_queue.tick()
         assert self.result == 4
 
-    def test_disabled(self, job_queue):
-        j1 = job_queue.run_once(self.job_run_once, 0.1)
-        j2 = job_queue.run_repeating(self.job_run_once, 0.05)
+    def test_disabled(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        j1 = job_queue.run_once(self.job_run_once, 10)
+        j2 = job_queue.run_repeating(self.job_run_once, 5)
 
         j1.enabled = False
         j2.enabled = False
 
-        sleep(0.06)
-
+        tick_seconds(fz_time, 11)
+        job_queue.tick()
         assert self.result == 0
 
-        j1.enabled = True
+        j2.enabled = True
 
-        sleep(0.2)
+        tick_seconds(fz_time, 6)
+        job_queue.tick()
 
+        assert len(job_queue.jobs()) == 1
         assert self.result == 1
 
-    def test_schedule_removal(self, job_queue):
-        j1 = job_queue.run_once(self.job_run_once, 0.03)
-        j2 = job_queue.run_repeating(self.job_run_once, 0.02)
+    def test_schedule_removal(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        j1 = job_queue.run_once(self.job_run_once, 5)
+        j2 = job_queue.run_repeating(self.job_run_once, 3)
 
-        sleep(0.025)
+        tick_seconds(fz_time, 3.5)
+        job_queue.tick()
+        assert self.result == 1
 
         j1.schedule_removal()
         j2.schedule_removal()
 
-        sleep(0.04)
+        tick_seconds(fz_time, 2)
+        job_queue.tick()
 
         assert self.result == 1
 
-    def test_schedule_removal_from_within(self, job_queue):
-        job_queue.run_repeating(self.job_remove_self, 0.01)
+    def test_schedule_removal_from_within(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        job_queue.run_repeating(self.job_remove_self, 1)
 
-        sleep(0.05)
-
-        assert self.result == 1
-
-    def test_longer_first(self, job_queue):
-        job_queue.run_once(self.job_run_once, 0.02)
-        job_queue.run_once(self.job_run_once, 0.01)
-
-        sleep(0.015)
+        tick_seconds(fz_time, 5)
+        job_queue.tick()
 
         assert self.result == 1
 
-    def test_error(self, job_queue):
-        job_queue.run_repeating(self.job_with_exception, 0.01)
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.03)
+    def test_longer_first(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        job_queue.run_once(self.job_run_once, 5)
+        job_queue.run_once(self.job_run_once, 3)
+
+        tick_seconds(fz_time, 4)
+        job_queue.tick()
+
+        assert self.result == 1
+
+    def test_error(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
+        job_queue.run_repeating(self.job_with_exception, 1)
+        job_queue.run_repeating(self.job_run_once, 2)
+
+        tick_seconds(fz_time, 3)
+        job_queue.tick()
+
         assert self.result == 1
 
     def test_in_updater(self, bot):
-        u = Updater(bot=bot)
-        u.job_queue.start()
-        try:
-            u.job_queue.run_repeating(self.job_run_once, 0.02)
-            sleep(0.03)
-            assert self.result == 1
-            u.stop()
-            sleep(1)
-            assert self.result == 1
-        finally:
-            u.stop()
+        with freeze_time(datetime.datetime.now()) as fz_time:
+            u = Updater(bot=bot)
+            u.job_queue.start()
+            try:
+                u.job_queue.run_repeating(self.job_run_once, 2)
+                tick_seconds(fz_time, 3)
+                u.job_queue.tick()
+                assert self.result == 1
+                u.stop()
+                tick_seconds(fz_time, 5)
+                assert self.result == 1
+            finally:
+                u.stop()
 
-    def test_time_unit_int(self, job_queue):
-        # Testing seconds in int
+    def test_time_unit_float(self, frozen_jq):
+        # Testing seconds in float
         delta = 0.05
         expected_time = time.time() + delta
 
+        job_queue, fz_time = frozen_jq
         job_queue.run_once(self.job_datetime_tests, delta)
-        sleep(0.06)
+
+        tick_seconds(fz_time, 0.06)
+
+        job_queue.tick()
+
         assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_timedelta(self, job_queue):
+    def test_time_unit_dt_timedelta(self, frozen_jq):
         # Testing seconds, minutes and hours as datetime.timedelta object
         # This is sufficient to test that it actually works.
-        interval = datetime.timedelta(seconds=0.05)
+        interval = datetime.timedelta(seconds=5)
         expected_time = time.time() + interval.total_seconds()
 
+        job_queue, fz_time = frozen_jq
         job_queue.run_once(self.job_datetime_tests, interval)
-        sleep(0.06)
+
+        tick_seconds(fz_time, 6)
+
+        job_queue.tick()
+
         assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_datetime(self, job_queue):
+    def test_time_unit_dt_datetime(self, frozen_jq):
         # Testing running at a specific datetime
         delta = datetime.timedelta(seconds=0.05)
         when = datetime.datetime.now() + delta
         expected_time = time.time() + delta.total_seconds()
 
+        job_queue, fz_time = frozen_jq
         job_queue.run_once(self.job_datetime_tests, when)
-        sleep(0.06)
+
+        tick_seconds(fz_time, 0.06)
+
+        job_queue.tick()
+
         assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_time_today(self, job_queue):
+    def test_time_unit_dt_time_today(self, frozen_jq):
         # Testing running at a specific time today
         delta = 0.05
         when = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
         expected_time = time.time() + delta
 
+        job_queue, fz_time = frozen_jq
         job_queue.run_once(self.job_datetime_tests, when)
-        sleep(0.06)
+
+        tick_seconds(fz_time, 0.06)
+
+        job_queue.tick()
+
         assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_time_tomorrow(self, job_queue):
-        # Testing running at a specific time that has passed today. Since we can't wait a day, we
-        # test if the jobs next_t has been calculated correctly
+    def test_time_unit_dt_time_tomorrow(self, frozen_jq):
         delta = -2
         when = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
-        expected_time = time.time() + delta + 60 * 60 * 24
+        expected_time = time.time() + delta + DAY
 
+        job_queue, fz_time = frozen_jq
         job_queue.run_once(self.job_datetime_tests, when)
-        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
 
-    def test_run_daily(self, job_queue):
+        # Simulate a day has passed
+        tick_seconds(fz_time, DAY)
+
+        # Run scheduled jobs
+        job_queue.tick()
+
+        assert pytest.approx(self.job_time) == expected_time
+
+    def test_run_daily(self, frozen_jq):
         delta = 0.5
         time_of_day = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
-        expected_time = time.time() + 60 * 60 * 24 + delta
 
+        job_queue, fz_time = frozen_jq
         job_queue.run_daily(self.job_run_once, time_of_day)
-        sleep(0.6)
-        assert self.result == 1
-        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
+
+        tick_seconds(fz_time, 7 * DAY)
+
+        job_queue.tick()
+
+        assert self.result == 7
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)

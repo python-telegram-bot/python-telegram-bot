@@ -8,3 +8,4 @@ beautifulsoup4
 pytest
 pytest-timeout
 wheel
+freezegun
