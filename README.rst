@@ -113,7 +113,7 @@ Install or upgrade with:
 
 .. code:: shell
 
-    $ pip install python-telegram-bot=12.0.0b1 --upgrade
+    $ pip install python-telegram-bot==12.0.0b1 --upgrade
 
 
 See CHANGES.rst for the changelog and make sure to report any bugs you find!
