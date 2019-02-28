@@ -18,18 +18,23 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
 import time
-from freezegun import freeze_time
-import pytest
+import sys
 
-from telegram.ext import JobQueue, Updater, Job
+import pytest
+from freezegun import freeze_time
+
+from queue import Queue
+from telegram.ext import JobQueue, Updater, Job, CallbackContext
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 DAY = 24 * 60 * 60
 
 
 @pytest.fixture(scope='function')
-def job_queue(bot):
-    jq = JobQueue(bot)
+def job_queue(bot, _dp):
+    jq = JobQueue()
+    jq.set_dispatcher(_dp)
     jq.start()
     yield jq
     jq.stop()
@@ -80,13 +85,23 @@ class TestJobQueue(object):
     def job_datetime_tests(self, bot, job):
         self.job_time = time.time()
         self.result += 1
+        
+    def job_context_based_callback(self, context):
+        if (isinstance(context, CallbackContext)
+                and isinstance(context.job, Job)
+                and isinstance(context.update_queue, Queue)
+                and context.job.context == 2
+                and context.chat_data is None
+                and context.user_data is None
+                and context.job_queue is context.job.job_queue):
+            self.result += 1
+
 
     def test_run_once(self, frozen_jq):
         jq, fz_time = frozen_jq
         jq.run_once(self.job_run_once, 10)
 
         time_travel(jq, fz_time, 11)
-
         assert self.result == 1
 
     def test_job_with_context(self, frozen_jq):
@@ -305,3 +320,15 @@ class TestJobQueue(object):
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
+
+    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
+    def test_bot_in_init_deprecation(self, bot):
+        with pytest.warns(TelegramDeprecationWarning):
+            JobQueue(bot)
+
+    def test_context_based_callback(self, job_queue):
+        job_queue.run_once(self.job_context_based_callback, 1, context=2)
+
+        time_travel(job_queue, fz_time, 3)
+
+        assert self.result == 0

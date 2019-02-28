@@ -21,6 +21,7 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+
 try:
     import ujson as json
 except ImportError:
@@ -70,33 +71,6 @@ def log(func):
     return decorator
 
 
-def message(func):
-    @functools.wraps(func)
-    def decorator(self, *args, **kwargs):
-        url, data = func(self, *args, **kwargs)
-        if kwargs.get('reply_to_message_id'):
-            data['reply_to_message_id'] = kwargs.get('reply_to_message_id')
-
-        if kwargs.get('disable_notification'):
-            data['disable_notification'] = kwargs.get('disable_notification')
-
-        if kwargs.get('reply_markup'):
-            reply_markup = kwargs.get('reply_markup')
-            if isinstance(reply_markup, ReplyMarkup):
-                data['reply_markup'] = reply_markup.to_json()
-            else:
-                data['reply_markup'] = reply_markup
-
-        result = self._request.post(url, data, timeout=kwargs.get('timeout'))
-
-        if result is True:
-            return result
-
-        return Message.de_json(result, self)
-
-    return decorator
-
-
 class Bot(TelegramObject):
     """This object represents a Telegram Bot.
 
@@ -131,6 +105,27 @@ class Bot(TelegramObject):
             self.private_key = serialization.load_pem_private_key(private_key,
                                                                   password=private_key_password,
                                                                   backend=default_backend())
+
+    def _message(self, url, data, reply_to_message_id=None, disable_notification=None,
+                 reply_markup=None, timeout=None, **kwargs):
+        if reply_to_message_id is not None:
+            data['reply_to_message_id'] = reply_to_message_id
+
+        if disable_notification is not None:
+            data['disable_notification'] = disable_notification
+
+        if reply_markup is not None:
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        if result is True:
+            return result
+
+        return Message.de_json(result, self)
 
     @property
     def request(self):
@@ -208,7 +203,6 @@ class Bot(TelegramObject):
         return self.bot
 
     @log
-    @message
     def send_message(self,
                      chat_id,
                      text,
@@ -259,7 +253,9 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return url, data
+        return self._message(url, data, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             timeout=timeout, **kwargs)
 
     @log
     def delete_message(self, chat_id, message_id, timeout=None, **kwargs):
@@ -298,7 +294,6 @@ class Bot(TelegramObject):
         return result
 
     @log
-    @message
     def forward_message(self,
                         chat_id,
                         from_chat_id,
@@ -340,10 +335,10 @@ class Bot(TelegramObject):
         if message_id:
             data['message_id'] = message_id
 
-        return url, data
+        return self._message(url, data, disable_notification=disable_notification,
+                             timeout=timeout, **kwargs)
 
     @log
-    @message
     def send_photo(self,
                    chat_id,
                    photo,
@@ -404,10 +399,11 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_audio(self,
                    chat_id,
                    audio,
@@ -494,10 +490,11 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_document(self,
                       chat_id,
                       document,
@@ -570,10 +567,11 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_sticker(self,
                      chat_id,
                      sticker,
@@ -622,10 +620,11 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'sticker': sticker}
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_video(self,
                    chat_id,
                    video,
@@ -714,10 +713,11 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_video_note(self,
                         chat_id,
                         video_note,
@@ -784,10 +784,11 @@ class Bot(TelegramObject):
                 thumb = InputFile(thumb, attach=True)
             data['thumb'] = thumb
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_animation(self,
                        chat_id,
                        animation,
@@ -866,10 +867,11 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_voice(self,
                    chat_id,
                    voice,
@@ -936,7 +938,9 @@ class Bot(TelegramObject):
         if parse_mode:
             data['parse_mode'] = parse_mode
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
     def send_media_group(self,
@@ -981,7 +985,6 @@ class Bot(TelegramObject):
         return [Message.de_json(res, self) for res in result]
 
     @log
-    @message
     def send_location(self,
                       chat_id,
                       latitude=None,
@@ -1044,10 +1047,11 @@ class Bot(TelegramObject):
         if live_period:
             data['live_period'] = live_period
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def edit_message_live_location(self,
                                    chat_id=None,
                                    message_id=None,
@@ -1056,6 +1060,7 @@ class Bot(TelegramObject):
                                    longitude=None,
                                    location=None,
                                    reply_markup=None,
+                                   timeout=None,
                                    **kwargs):
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`live_period` expires or
@@ -1107,15 +1112,15 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return url, data
+        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
 
     @log
-    @message
     def stop_message_live_location(self,
                                    chat_id=None,
                                    message_id=None,
                                    inline_message_id=None,
                                    reply_markup=None,
+                                   timeout=None,
                                    **kwargs):
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before live_period expires.
@@ -1149,10 +1154,9 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return url, data
+        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
 
     @log
-    @message
     def send_venue(self,
                    chat_id,
                    latitude=None,
@@ -1232,10 +1236,11 @@ class Bot(TelegramObject):
         if foursquare_type:
             data['foursquare_type'] = foursquare_type
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_contact(self,
                      chat_id,
                      phone_number=None,
@@ -1301,10 +1306,11 @@ class Bot(TelegramObject):
         if vcard:
             data['vcard'] = vcard
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
-    @message
     def send_game(self,
                   chat_id,
                   game_short_name,
@@ -1343,7 +1349,9 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
     def send_chat_action(self, chat_id, action, timeout=None, **kwargs):
@@ -1677,7 +1685,6 @@ class Bot(TelegramObject):
         return result
 
     @log
-    @message
     def edit_message_text(self,
                           text,
                           chat_id=None,
@@ -1736,10 +1743,9 @@ class Bot(TelegramObject):
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
-        return url, data
+        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
 
     @log
-    @message
     def edit_message_caption(self,
                              chat_id=None,
                              message_id=None,
@@ -1800,10 +1806,9 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return url, data
+        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
 
     @log
-    @message
     def edit_message_media(self,
                            chat_id=None,
                            message_id=None,
@@ -1853,10 +1858,9 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return url, data
+        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
 
     @log
-    @message
     def edit_message_reply_markup(self,
                                   chat_id=None,
                                   message_id=None,
@@ -1907,7 +1911,7 @@ class Bot(TelegramObject):
         if inline_message_id:
             data['inline_message_id'] = inline_message_id
 
-        return url, data
+        return self._message(url, data, timeout=timeout, reply_markup=reply_markup, **kwargs)
 
     @log
     def get_updates(self,
@@ -2326,7 +2330,6 @@ class Bot(TelegramObject):
         return WebhookInfo.de_json(result, self)
 
     @log
-    @message
     def set_game_score(self,
                        user_id,
                        score,
@@ -2385,7 +2388,7 @@ class Bot(TelegramObject):
         if disable_edit_message is not None:
             data['disable_edit_message'] = disable_edit_message
 
-        return url, data
+        return self._message(url, data, timeout=timeout, **kwargs)
 
     @log
     def get_game_high_scores(self,
@@ -2436,7 +2439,6 @@ class Bot(TelegramObject):
         return [GameHighScore.de_json(hs, self) for hs in result]
 
     @log
-    @message
     def send_invoice(self,
                      chat_id,
                      title,
@@ -2560,7 +2562,9 @@ class Bot(TelegramObject):
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
 
-        return url, data
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
 
     @log
     def answer_shipping_query(self,
@@ -2839,7 +2843,7 @@ class Bot(TelegramObject):
         return result
 
     @log
-    def set_chat_photo(self, chat_id, photo, timeout=None, **kwargs):
+    def set_chat_photo(self, chat_id, photo, timeout=20, **kwargs):
         """Use this method to set a new profile photo for the chat.
 
         Photos can't be changed for private chats. The bot must be an administrator in the chat
@@ -3075,7 +3079,7 @@ class Bot(TelegramObject):
         return StickerSet.de_json(result, self)
 
     @log
-    def upload_sticker_file(self, user_id, png_sticker, timeout=None, **kwargs):
+    def upload_sticker_file(self, user_id, png_sticker, timeout=20, **kwargs):
         """
         Use this method to upload a .png file with a sticker for later use in
         :attr:`create_new_sticker_set` and :attr:`add_sticker_to_set` methods (can be used multiple
@@ -3116,7 +3120,7 @@ class Bot(TelegramObject):
 
     @log
     def create_new_sticker_set(self, user_id, name, title, png_sticker, emojis,
-                               contains_masks=None, mask_position=None, timeout=None, **kwargs):
+                               contains_masks=None, mask_position=None, timeout=20, **kwargs):
         """Use this method to create new sticker set owned by a user.
 
         The bot will be able to edit the created sticker set.
@@ -3176,7 +3180,7 @@ class Bot(TelegramObject):
 
     @log
     def add_sticker_to_set(self, user_id, name, png_sticker, emojis, mask_position=None,
-                           timeout=None, **kwargs):
+                           timeout=20, **kwargs):
         """Use this method to add a new sticker to a set created by the bot.
 
         Note:

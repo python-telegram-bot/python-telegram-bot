@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 
-from .handler import Handler
 from telegram import Update
-from telegram.utils.deprecate import deprecate
+from .handler import Handler
 
 
 class ChosenInlineResultHandler(Handler):
@@ -28,13 +27,13 @@ class ChosenInlineResultHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Optional. Determines whether ``update_queue`` will be
+        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
-        pass_job_queue (:obj:`bool`): Optional. Determines whether ``job_queue`` will be passed to
+        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        pass_user_data (:obj:`bool`): Optional. Determines whether ``user_data`` will be passed to
+        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
             the callback function.
-        pass_chat_data (:obj:`bool`): Optional. Determines whether ``chat_data`` will be passed to
+        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
 
     Note:
@@ -43,37 +42,36 @@ class ChosenInlineResultHandler(Handler):
         either the user or the chat that the update was sent in. For each update from the same user
         or in the same chat, it will be the same ``dict``.
 
+        Note that this is DEPRECATED, and you should use context based callbacks. See
+        https://git.io/fxJuV for more info.
+
     Args:
-        callback (:obj:`callable`): A function that takes ``bot, update`` as positional arguments.
-            It will be called when the :attr:`check_update` has determined that an update should be
-            processed by this handler.
+        callback (:obj:`callable`): The callback function for this handler. Will be called when
+            :attr:`check_update` has determined that an update should be processed by this handler.
+            Callback signature for context based API:
+
+            ``def callback(update: Update, context: CallbackContext)``
+
+            The return value of the callback is usually ignored except for the special case of
+            :class:`telegram.ext.ConversationHandler`.
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
             that contains new updates which can be used to insert updates. Default is ``False``.
+            DEPRECATED: Please switch to context based callbacks.
         pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``job_queue`` will be passed to the callback function. It will be a
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
+            DEPRECATED: Please switch to context based callbacks.
         pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``user_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based callbacks.
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
+            DEPRECATED: Please switch to context based callbacks.
 
     """
-
-    def __init__(self,
-                 callback,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
-        super(ChosenInlineResultHandler, self).__init__(
-            callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -86,20 +84,3 @@ class ChosenInlineResultHandler(Handler):
 
         """
         return isinstance(update, Update) and update.chosen_inline_result
-
-    def handle_update(self, update, dispatcher):
-        """Send the update to the :attr:`callback`.
-
-        Args:
-            update (:class:`telegram.Update`): Incoming telegram update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
-
-        """
-        optional_args = self.collect_optional_args(dispatcher, update)
-
-        return self.callback(dispatcher.bot, update, **optional_args)
-
-    # old non-PEP8 Handler methods
-    m = "telegram.ChosenInlineResultHandler."
-    checkUpdate = deprecate(check_update, m + "checkUpdate", m + "check_update")
-    handleUpdate = deprecate(handle_update, m + "handleUpdate", m + "handle_update")
