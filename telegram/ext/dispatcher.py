@@ -166,7 +166,8 @@ class Dispatcher(object):
         base_name = '{}_'.format(base_name) if base_name else ''
 
         for i in range(workers):
-            thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
+            thread = Thread(target=self._pooled, name='Bot:{}:worker:{}{}'.format(self.bot.id,
+                                                                                  base_name, i))
             self.__async_threads.add(thread)
             thread.start()
 
@@ -208,6 +209,13 @@ class Dispatcher(object):
                 self.logger.warning(
                     'DispatcherHandlerStop is not supported with async functions; func: %s',
                     promise.pooled_function.__name__)
+
+    # This method purely exsists for testing purposes.
+    def _get_thread_names(self):
+        if self.__async_threads:
+            return (x.name for x in self.__async_threads)
+        else:
+            return None
 
     def run_async(self, func, *args, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
