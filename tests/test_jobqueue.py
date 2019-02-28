@@ -85,7 +85,7 @@ class TestJobQueue(object):
     def job_datetime_tests(self, bot, job):
         self.job_time = time.time()
         self.result += 1
-        
+
     def job_context_based_callback(self, context):
         if (isinstance(context, CallbackContext)
                 and isinstance(context.job, Job)
@@ -95,7 +95,6 @@ class TestJobQueue(object):
                 and context.user_data is None
                 and context.job_queue is context.job.job_queue):
             self.result += 1
-
 
     def test_run_once(self, frozen_jq):
         jq, fz_time = frozen_jq
@@ -326,7 +325,8 @@ class TestJobQueue(object):
         with pytest.warns(TelegramDeprecationWarning):
             JobQueue(bot)
 
-    def test_context_based_callback(self, job_queue):
+    def test_context_based_callback(self, frozen_jq):
+        job_queue, fz_time = frozen_jq
         job_queue.run_once(self.job_context_based_callback, 1, context=2)
 
         time_travel(job_queue, fz_time, 3)
