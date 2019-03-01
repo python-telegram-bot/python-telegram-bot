@@ -508,7 +508,7 @@ class Job(object):
         return False
 
 
-def _to_timestamp(time_, previous_t=None):
+def _to_timestamp(t, previous_t=None):
     # """
     # Converts a given time object (i.e., `datetime.datetime`,
     # `datetime.time`, `datetime.timedelta`, interval from now
@@ -516,22 +516,28 @@ def _to_timestamp(time_, previous_t=None):
     # kwargs like `first` to a uniform format.
     # """
 
-    previous_t = previous_t or time.time()
+    now = time.time()
+    previous_t = previous_t or now
 
-    if time_ is None:
+    if t is None:
         return None
-    elif hasattr(time_, 'timestamp'):
-        return time_.timestamp()
-    elif isinstance(time_, datetime.time):
+
+    if isinstance(t, datetime.timedelta):
+        return previous_t + t.total_seconds()
+
+    if isinstance(t, Number):
+        return previous_t + t
+
+    if isinstance(t, datetime.time):
         date = datetime.date.today()
 
-        if time_ < datetime.datetime.today().time():
+        if t < datetime.datetime.today().time():
             date += datetime.timedelta(days=1)
 
-        return datetime.datetime.combine(date, time_).timestamp()
-    elif isinstance(time_, datetime.timedelta):
-        return previous_t + time_.total_seconds()
-    elif isinstance(time_, Number):
-        return previous_t + time_
-    else:
-        raise TypeError('Unable to convert to timestamp')
+        t = datetime.datetime.combine(date, t)
+
+    if isinstance(t, datetime.datetime):
+        # replacement for datetime.datetime.timestamp() for py2
+        return (t - datetime.datetime.fromtimestamp(now)).total_seconds() + now
+
+    raise TypeError('Unable to convert to timestamp')
