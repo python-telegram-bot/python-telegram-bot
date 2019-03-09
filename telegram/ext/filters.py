@@ -47,6 +47,16 @@ class BaseFilter(object):
         >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
         >>> Filters.text & (~ Filters.forwarded)
 
+    Note:
+        Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+        This means that for example:
+
+            >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
+
+        With a message.text of `x`, will only ever return the matches for the first filter,
+        since the second one is never evaluated.
+
+
     If you want to create your own filters create a class inheriting from this class and implement
     a `filter` method that returns a boolean: `True` if the message should be handled, `False`
     otherwise. Note that the filters work only as class instances, not actual class objects
@@ -254,6 +264,15 @@ class Filters(object):
             ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
             you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
+
+        Note:
+            Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+            This means that for example:
+
+                >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
+
+            With a message.text of `x`, will only ever return the matches for the first filter,
+            since the second one is never evaluated.
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
