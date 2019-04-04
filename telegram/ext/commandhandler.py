@@ -332,7 +332,7 @@ class PrefixHandler(CommandHandler):
         if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
-            if message.text and len(message.text) > 1:
+            if message.text:
                 text_list = message.text.split()
                 if text_list[0].lower() not in self.command:
                     return None
