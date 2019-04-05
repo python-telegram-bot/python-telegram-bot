@@ -356,13 +356,13 @@ class ConversationHandler(Handler):
 
     def _trigger_timeout(self, context, job=None):
         self.logger.debug('conversation timeout was triggered!')
-        
+
         # Backward compatibility with bots that do not use CallbackContext
         if isinstance(context, CallbackContext):
             context = context.job.context
         else:
             context = job.context
-        
+
         del self.timeout_jobs[context.conversation_key]
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
