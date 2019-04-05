@@ -332,14 +332,15 @@ class PrefixHandler(CommandHandler):
         if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
-            text_list = message.text.split()
-            if text_list[0].lower() not in self.command:
-                return None
-            filter_result = self.filters(update)
-            if filter_result:
-                return text_list[1:], filter_result
-            else:
-                return False
+            if message.text:
+                text_list = message.text.split()
+                if text_list[0].lower() not in self.command:
+                    return None
+                filter_result = self.filters(update)
+                if filter_result:
+                    return text_list[1:], filter_result
+                else:
+                    return False
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         context.args = check_result[0]
