@@ -34,8 +34,9 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 class WebhookServer(object):
 
-    def __init__(self, port, webhook_app, ssl_ctx):
+    def __init__(self, listen, port, webhook_app, ssl_ctx):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
+        self.listen = listen
         self.port = port
         self.loop = None
         self.logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class WebhookServer(object):
             IOLoop().make_current()
             self.is_running = True
             self.logger.debug('Webhook Server started.')
-            self.http_server.listen(self.port)
+            self.http_server.listen(self.port, address=self.listen)
             self.loop = IOLoop.current()
             self.loop.start()
             self.logger.debug('Webhook Server stopped.')
