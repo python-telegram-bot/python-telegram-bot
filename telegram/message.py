@@ -99,6 +99,8 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`): Optional. Signature of the post author for messages
             forwarded from channels.
+        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded
+            from users who hided their account.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data
@@ -199,6 +201,8 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`, optional): Signature of the post author for messages
             forwarded from channels.
+        forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
+            users who disallow adding a link to their account in forwarded messages.
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data
@@ -209,11 +213,10 @@ class Message(TelegramObject):
     ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
                         'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
                         'successful_payment']
-    MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
-                     'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
-                     'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
-                     'migrate_from_chat_id', 'pinned_message',
-                     'passport_data'] + ATTACHMENT_TYPES
+    MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
+                     'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
+                     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id',
+                     'pinned_message', 'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
                  message_id,
@@ -255,6 +258,7 @@ class Message(TelegramObject):
                  invoice=None,
                  successful_payment=None,
                  forward_signature=None,
+                 forward_sender_name=None,
                  author_signature=None,
                  media_group_id=None,
                  connected_website=None,
@@ -304,6 +308,7 @@ class Message(TelegramObject):
         self.successful_payment = successful_payment
         self.connected_website = connected_website
         self.forward_signature = forward_signature
+        self.forward_sender_name = forward_sender_name
         self.author_signature = author_signature
         self.media_group_id = media_group_id
         self.animation = animation

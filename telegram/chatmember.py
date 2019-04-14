@@ -46,6 +46,7 @@ class ChatMember(TelegramObject):
         can_pin_messages (:obj:`bool`): Optional. If the administrator can pin messages.
         can_promote_members (:obj:`bool`): Optional. If the administrator can add new
             administrators.
+        is_member (:obj:`bool`): Optional. If the user is a chat member.
         can_send_messages (:obj:`bool`): Optional. If the user can send text messages, contacts,
             locations and venues.
         can_send_media_messages (:obj:`bool`): Optional. If the user can send media messages,
@@ -90,6 +91,8 @@ class ChatMember(TelegramObject):
             send animations, games, stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. True, if user may add
             web page previews to his messages, implies can_send_media_messages.
+        is_member (:obj:`bool`, optional): Restricted only. True, if the user is a member of the
+            chat at the moment of the request.
 
     """
     ADMINISTRATOR = 'administrator'
@@ -111,7 +114,7 @@ class ChatMember(TelegramObject):
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, **kwargs):
+                 can_add_web_page_previews=None, is_member=None, **kwargs):
         # Required
         self.user = user
         self.status = status
@@ -125,6 +128,7 @@ class ChatMember(TelegramObject):
         self.can_restrict_members = can_restrict_members
         self.can_pin_messages = can_pin_messages
         self.can_promote_members = can_promote_members
+        self.is_member = is_member
         self.can_send_messages = can_send_messages
         self.can_send_media_messages = can_send_media_messages
         self.can_send_other_messages = can_send_other_messages

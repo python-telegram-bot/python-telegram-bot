@@ -84,6 +84,7 @@ def message(bot):
                                                              order_info={})},
                     {'connected_website': 'http://example.com/'},
                     {'forward_signature': 'some_forward_sign'},
+                    {'forward_sender_name': 'some_sender_name'},
                     {'author_signature': 'some_author_sign'},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
@@ -97,7 +98,7 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group', 'passport_data'])
+                     'photo_from_media_group', 'passport_data', 'forward_sender_name'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -115,7 +116,7 @@ class TestMessage(object):
                      {'length': 4, 'offset': 25, 'type': 'code'},
                      {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
                      {'length': 12, 'offset': 38, 'type': 'text_mention',
-                      'user': User(123456789, 'mentioned user', False)},
+                     'user': User(123456789, 'mentioned user', False)},
                      {'length': 3, 'offset': 55, 'type': 'pre'},
                      {'length': 17, 'offset': 60, 'type': 'url'}]
     test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
@@ -195,7 +196,7 @@ class TestMessage(object):
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
                           'http://google.com')
         text_markdown = self.test_message.text_markdown
@@ -207,7 +208,7 @@ class TestMessage(object):
         assert message.text_markdown is None
 
     def test_text_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
                           '[http://google.com](http://google.com)')
         text_markdown = self.test_message.text_markdown_urled
@@ -251,7 +252,7 @@ class TestMessage(object):
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
                           'http://google.com')
         caption_markdown = self.test_message.caption_markdown
@@ -263,7 +264,7 @@ class TestMessage(object):
         assert message.caption_markdown is None
 
     def test_caption_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
                           '[http://google.com](http://google.com)')
         caption_markdown = self.test_message.caption_markdown_urled
@@ -336,7 +337,7 @@ class TestMessage(object):
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_markdown(self, monkeypatch, message):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
                           'http://google.com')
 

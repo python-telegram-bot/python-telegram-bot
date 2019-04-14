@@ -62,7 +62,8 @@ class TestChatMember(object):
                      'can_send_messages': False,
                      'can_send_media_messages': True,
                      'can_send_other_messages': False,
-                     'can_add_web_page_previews': True}
+                     'can_add_web_page_previews': True,
+                     'is_member': False}
 
         chat_member = ChatMember.de_json(json_dict, bot)
 
@@ -81,6 +82,7 @@ class TestChatMember(object):
         assert chat_member.can_send_media_messages is True
         assert chat_member.can_send_other_messages is False
         assert chat_member.can_add_web_page_previews is True
+        assert chat_member.is_member is False
 
     def test_to_dict(self, chat_member):
         chat_member_dict = chat_member.to_dict()
