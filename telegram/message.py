@@ -23,7 +23,7 @@ from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote, PassportData)
+                      SuccessfulPayment, VideoNote, PassportData, Poll)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -102,6 +102,7 @@ class Message(TelegramObject):
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data
+        poll (:class:`telegram.Poll): Optional. Message is a native poll, information about the poll
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -202,6 +203,7 @@ class Message(TelegramObject):
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data
+        poll (:class:`telegram.Poll, optional): Message is a native poll, information about the poll
     """
 
     _effective_attachment = _UNDEFINED
@@ -260,6 +262,7 @@ class Message(TelegramObject):
                  connected_website=None,
                  animation=None,
                  passport_data=None,
+                 poll=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -308,6 +311,7 @@ class Message(TelegramObject):
         self.media_group_id = media_group_id
         self.animation = animation
         self.passport_data = passport_data
+        self.poll = poll
 
         self.bot = bot
 
@@ -362,6 +366,7 @@ class Message(TelegramObject):
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
+        data['poll'] = Poll.de_json(data.get('poll'), bot)
 
         return cls(bot=bot, **data)
 
@@ -704,6 +709,23 @@ class Message(TelegramObject):
         """
         self._quote(kwargs)
         return self.bot.send_contact(self.chat_id, *args, **kwargs)
+
+    def reply_poll(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_poll(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        self._quote(kwargs)
+        return self.bot.send_poll(self.chat_id, *args, **kwargs)
 
     def forward(self, chat_id, disable_notification=False):
         """Shortcut for::
