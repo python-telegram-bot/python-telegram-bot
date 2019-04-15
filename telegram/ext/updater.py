@@ -383,7 +383,7 @@ class Updater(object):
             ssl_ctx = None
 
         # Create and start server
-        self.httpd = WebhookServer(port, app, ssl_ctx)
+        self.httpd = WebhookServer(listen, port, app, ssl_ctx)
 
         if use_ssl:
             # DO NOT CHANGE: Only set webhook if SSL is handled by library
