@@ -305,7 +305,7 @@ class TestStickerSet(object):
 @pytest.fixture(scope='class')
 def mask_position():
     return MaskPosition(TestMaskPosition.point,
-                        TestMaskPosition.x_shift,
+                        TestMaskPosition.x_shift
                         TestMaskPosition.y_shift,
                         TestMaskPosition.scale)
 
