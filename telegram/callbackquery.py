@@ -196,3 +196,27 @@ class CallbackQuery(TelegramObject):
                                                       chat_id=self.message.chat_id,
                                                       message_id=self.message.message_id,
                                                       *args, **kwargs)
+
+    def edit_message_media(self, media, *args, **kwargs):
+        """Shortcut for either::
+
+            bot.edit_message_media(text, chat_id=update.callback_query.message.chat_id,
+                                message_id=update.callback_query.message.message_id, media=media,
+                                *args, **kwargs)
+
+        or::
+
+            bot.edit_message_media(text, inline_message_id=update.callback_query.inline_message_id, media=media, 
+                                *args, **kwargs)
+
+        Returns:
+            :class:`telegram.Message`: On success, if edited message is sent by the bot, the
+            edited Message is returned, otherwise ``True`` is returned.
+
+        """
+        if self.inline_message_id:
+            return self.bot.edit_message_media(media=media, inline_message_id=self.inline_message_id,
+                                              *args, **kwargs)
+        else:
+            return self.bot.edit_message_media(media=media, chat_id=self.message.chat_id,
+                                              message_id=self.message.message_id, *args, **kwargs)
