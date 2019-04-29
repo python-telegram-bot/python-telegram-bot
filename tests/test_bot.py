@@ -28,7 +28,7 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice)
+                      ShippingOption, LabeledPrice, PollOption)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp
 
@@ -622,6 +622,30 @@ class TestBot(object):
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_stop_poll(self, bot, channel_id):
+        question = 'Test?'
+        options = ['test', 'test2']
+
+        message = bot.send_poll(channel_id, question, options)
+
+        assert message.poll
+        assert message.poll.question == question
+        assert len(message.poll.options) == 2
+        assert isinstance(message.poll.options[0], PollOption)
+        assert message.poll.options[0].text == 'test'
+        assert message.poll.options[1].text == 'test2'
+
+        poll = bot.stop_poll(channel_id, message.message_id)
+
+        assert poll
+        assert poll.question == question
+        assert len(poll.options) == 2
+        assert isinstance(poll.options[0], PollOption)
+        assert poll.options[0].text == 'test'
+        assert poll.options[1].text == 'test2'
 
     def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
 
