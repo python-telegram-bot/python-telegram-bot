@@ -101,8 +101,9 @@ class Message(TelegramObject):
             forwarded from channels.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
-        passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data
-        poll (:class:`telegram.Poll): Optional. Message is a native poll, information about the poll
+        passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
+        poll (:class:`telegram.Poll): Optional. Message is a native poll,
+            information about the poll.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -202,8 +203,9 @@ class Message(TelegramObject):
             forwarded from channels.
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
-        passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data
-        poll (:class:`telegram.Poll, optional): Message is a native poll, information about the poll
+        passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
+        poll (:class:`telegram.Poll, optional): Message is a native poll,
+            information about the poll.
     """
 
     _effective_attachment = _UNDEFINED

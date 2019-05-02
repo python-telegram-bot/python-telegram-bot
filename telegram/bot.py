@@ -3390,7 +3390,8 @@ class Bot(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         Returns:
-            :class:`telegram.Poll`: On success, the stopped Poll with the final results is returned.
+            :class:`telegram.Poll`: On success, the stopped Poll with the
+                final results is returned.
 
         Raises:
             :class:`telegram.TelegramError`
