@@ -260,13 +260,16 @@ class Bot(TelegramObject):
     @log
     def delete_message(self, chat_id, message_id, timeout=None, **kwargs):
         """
-        Use this method to delete a message. A message can only be deleted if it was sent less
-        than 48 hours ago. Any such recently sent outgoing message may be deleted. Additionally,
-        if the bot is an administrator in a group chat, it can delete any message. If the bot is
-        an administrator in a supergroup, it can delete messages from any other user and service
-        messages about people joining or leaving the group (other types of service messages may
-        only be removed by the group creator). In channels, bots can only remove their own
-        messages.
+        Use this method to delete a message, including service messages, with the following
+        limitations:
+
+            - A message can only be deleted if it was sent less than 48 hours ago.
+            - Bots can delete outgoing messages in private chats, groups, and supergroups.
+            - Bots can delete incoming messages in private chats.
+            - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+            - If the bot is an administrator of a group, it can delete any message there.
+            - If the bot has can_delete_messages permission in a supergroup or a channel, it can
+              delete any message there.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3554,4 +3557,4 @@ class Bot(TelegramObject):
     sendPoll = send_poll
     """Alias for :attr:`send_poll`"""
     stopPoll = stop_poll
-    """Alias for :attr:`send_poll`"""
+    """Alias for :attr:`stop_poll`"""

@@ -22,8 +22,36 @@ import pytest
 from telegram import Poll, PollOption
 
 
+@pytest.fixture(scope="class")
+def poll_option():
+    return PollOption(text=TestPollOption.text,
+                      voter_count=TestPollOption.voter_count)
+
+
+class TestPollOption(object):
+    text = "test option"
+    voter_count = 3
+
+    def test_de_json(self):
+        json_dict = {
+            'text': self.text,
+            'voter_count': self.voter_count
+        }
+        poll_option = PollOption.de_json(json_dict, None)
+
+        assert poll_option.text == self.text
+        assert poll_option.voter_count == self.voter_count
+
+    def test_to_dict(self, poll_option):
+        poll_option_dict = poll_option.to_dict()
+
+        assert isinstance(poll_option_dict, dict)
+        assert poll_option_dict['text'] == poll_option.text
+        assert poll_option_dict['voter_count'] == poll_option.voter_count
+
+
 @pytest.fixture(scope='class')
-def poll(bot):
+def poll():
     return Poll(TestPoll.id,
                 TestPoll.question,
                 TestPoll.options,
@@ -36,14 +64,14 @@ class TestPoll(object):
     options = [PollOption('test', 10), PollOption('test2', 11)]
     is_closed = True
 
-    def test_de_json(self, bot):
+    def test_de_json(self):
         json_dict = {
-            'id': TestPoll.id,
-            'question': TestPoll.question,
-            'options': [o.to_dict() for o in TestPoll.options],
-            'is_closed': TestPoll.is_closed
+            'id': self.id,
+            'question': self.question,
+            'options': [o.to_dict() for o in self.options],
+            'is_closed': self.is_closed
         }
-        poll = Poll.de_json(json_dict, bot)
+        poll = Poll.de_json(json_dict, None)
 
         assert poll.id == self.id
         assert poll.question == self.question

@@ -28,7 +28,7 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice, PollOption)
+                      ShippingOption, LabeledPrice, Poll)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp
 
@@ -148,6 +148,34 @@ class TestBot(object):
         assert message.contact.phone_number == phone_number
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
+
+    # TODO: Add bot to group to test polls too
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_and_stop_poll(self, bot, super_group_id):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                timeout=60)
+
+        assert message.poll
+        assert message.poll.question == question
+        assert message.poll.options[0].text == answers[0]
+        assert message.poll.options[1].text == answers[1]
+        assert message.poll.options[2].text == answers[2]
+        assert not message.poll.is_closed
+
+        poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id, timeout=60)
+        assert isinstance(poll, Poll)
+        assert poll.is_closed
+        assert poll.options[0].text == answers[0]
+        assert poll.options[0].voter_count == 0
+        assert poll.options[1].text == answers[1]
+        assert poll.options[1].voter_count == 0
+        assert poll.options[2].text == answers[2]
+        assert poll.options[2].voter_count == 0
+        assert poll.question == question
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -346,12 +374,12 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_chat(self, bot, group_id):
-        chat = bot.get_chat(group_id)
+    def test_get_chat(self, bot, super_group_id):
+        chat = bot.get_chat(super_group_id)
 
-        assert chat.type == 'group'
+        assert chat.type == 'supergroup'
         assert chat.title == '>>> telegram.Bot(test)'
-        assert chat.id == int(group_id)
+        assert chat.id == int(super_group_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -609,43 +637,19 @@ class TestBot(object):
     def test_set_chat_description(self, bot, channel_id):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_error_pin_unpin_message(self, bot, message):
-        # TODO: Add bot to supergroup so this can be tested properly
-        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            bot.pin_chat_message(message.chat_id, message.message_id, disable_notification=True)
+    # TODO: Add bot to group to test there too
+    def test_pin_and_unpin_message(self, bot, super_group_id):
+        message = bot.send_message(super_group_id, text="test_pin_message")
+        assert bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id)
 
-        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            bot.unpin_chat_message(message.chat_id)
+        chat = bot.get_chat(super_group_id)
+        assert chat.pinned_message == message
+
+        assert bot.unpinChatMessage(super_group_id)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
-
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_send_stop_poll(self, bot, channel_id):
-        question = 'Test?'
-        options = ['test', 'test2']
-
-        message = bot.send_poll(channel_id, question, options)
-
-        assert message.poll
-        assert message.poll.question == question
-        assert len(message.poll.options) == 2
-        assert isinstance(message.poll.options[0], PollOption)
-        assert message.poll.options[0].text == 'test'
-        assert message.poll.options[1].text == 'test2'
-
-        poll = bot.stop_poll(channel_id, message.message_id)
-
-        assert poll
-        assert poll.question == question
-        assert len(poll.options) == 2
-        assert isinstance(poll.options[0], PollOption)
-        assert poll.options[0].text == 'test'
-        assert poll.options[1].text == 'test2'
 
     def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
 

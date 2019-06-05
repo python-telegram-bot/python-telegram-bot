@@ -99,10 +99,12 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`): Optional. Signature of the post author for messages
             forwarded from channels.
+        forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from users
+            who disallow adding a link to their account in forwarded messages.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
-        poll (:class:`telegram.Poll): Optional. Message is a native poll,
+        poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
@@ -119,6 +121,8 @@ class Message(TelegramObject):
             channel, information about the original channel.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
+        forward_sender_name	(:obj:`str`, optional): Sender's name for messages forwarded from users
+            who disallow adding a link to their account in forwarded messages.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
@@ -204,7 +208,7 @@ class Message(TelegramObject):
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
-        poll (:class:`telegram.Poll, optional): Message is a native poll,
+        poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
     """
 
@@ -265,6 +269,7 @@ class Message(TelegramObject):
                  animation=None,
                  passport_data=None,
                  poll=None,
+                 forward_sender_name=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -309,6 +314,7 @@ class Message(TelegramObject):
         self.successful_payment = successful_payment
         self.connected_website = connected_website
         self.forward_signature = forward_signature
+        self.forward_sender_name = forward_sender_name
         self.author_signature = author_signature
         self.media_group_id = media_group_id
         self.animation = animation
