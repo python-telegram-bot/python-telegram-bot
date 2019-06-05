@@ -439,11 +439,12 @@ class Dispatcher(object):
                 self.persistence.update_user_data(user_id, self.user_data[user_id])
 
     def add_error_handler(self, callback):
-        """Registers an error handler in the Dispatcher.
+        """Registers an error handler in the Dispatcher. The handler will only receive
+        :class:`telegram.TelegramError`.
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised Callback signature for context based API:
+                called when an error is raised. Callback signature for context based API:
 
                 ``def callback(update: Update, context: CallbackContext)``
 
