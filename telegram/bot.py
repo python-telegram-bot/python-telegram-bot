@@ -37,7 +37,7 @@ from future.utils import string_types
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
-                      Location, Venue, Contact, InputFile)
+                      Location, Venue, Contact, InputFile, Poll)
 from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
@@ -260,13 +260,16 @@ class Bot(TelegramObject):
     @log
     def delete_message(self, chat_id, message_id, timeout=None, **kwargs):
         """
-        Use this method to delete a message. A message can only be deleted if it was sent less
-        than 48 hours ago. Any such recently sent outgoing message may be deleted. Additionally,
-        if the bot is an administrator in a group chat, it can delete any message. If the bot is
-        an administrator in a supergroup, it can delete messages from any other user and service
-        messages about people joining or leaving the group (other types of service messages may
-        only be removed by the group creator). In channels, bots can only remove their own
-        messages.
+        Use this method to delete a message, including service messages, with the following
+        limitations:
+
+            - A message can only be deleted if it was sent less than 48 hours ago.
+            - Bots can delete outgoing messages in private chats, groups, and supergroups.
+            - Bots can delete incoming messages in private chats.
+            - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+            - If the bot is an administrator of a group, it can delete any message there.
+            - If the bot has can_delete_messages permission in a supergroup or a channel, it can
+              delete any message there.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3319,6 +3322,101 @@ class Bot(TelegramObject):
 
         return result
 
+    @log
+    def send_poll(self,
+                  chat_id,
+                  question,
+                  options,
+                  disable_notification=None,
+                  reply_to_message_id=None,
+                  reply_markup=None,
+                  timeout=None,
+                  **kwargs):
+        """
+        Use this method to send a native poll. A native poll can't be sent to a private chat.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
+            question (:obj:`str`): Poll question, 1-255 characters.
+            options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Message`: On success, the sent Message is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/sendPoll'.format(self.base_url)
+
+        data = {
+            'chat_id': chat_id,
+            'question': question,
+            'options': options
+        }
+
+        return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
+                             reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                             **kwargs)
+
+    @log
+    def stop_poll(self,
+                  chat_id,
+                  message_id,
+                  reply_markup=None,
+                  timeout=None,
+                  **kwargs):
+        """
+        Use this method to stop a poll which was sent by the bot.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format @channelusername).
+            message_id (:obj:`int`): Identifier of the original message with the poll.
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
+                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+                to remove reply keyboard or to force a reply from the user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
+
+        Returns:
+            :class:`telegram.Poll`: On success, the stopped Poll with the
+                final results is returned.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/stopPoll'.format(self.base_url)
+
+        data = {
+            'chat_id': chat_id,
+            'message_id': message_id
+        }
+
+        if reply_markup:
+            if isinstance(reply_markup, ReplyMarkup):
+                data['reply_markup'] = reply_markup.to_json()
+            else:
+                data['reply_markup'] = reply_markup
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return Poll.de_json(result, self)
+
     def to_dict(self):
         data = {'id': self.id, 'username': self.username, 'first_name': self.username}
 
@@ -3456,3 +3554,7 @@ class Bot(TelegramObject):
     """Alias for :attr:`delete_sticker_from_set`"""
     setPassportDataErrors = set_passport_data_errors
     """Alias for :attr:`set_passport_data_errors`"""
+    sendPoll = send_poll
+    """Alias for :attr:`send_poll`"""
+    stopPoll = stop_poll
+    """Alias for :attr:`stop_poll`"""

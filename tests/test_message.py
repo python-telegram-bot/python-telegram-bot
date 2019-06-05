@@ -554,6 +554,20 @@ class TestMessage(object):
         assert message.reply_contact(contact='test_contact')
         assert message.reply_contact(contact='test_contact', quote=True)
 
+    def test_reply_poll(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            contact = kwargs['contact'] == 'test_poll'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and contact and reply
+
+        monkeypatch.setattr('telegram.Bot.send_poll', test)
+        assert message.reply_poll(contact='test_poll')
+        assert message.reply_poll(contact='test_poll', quote=True)
+
     def test_forward(self, monkeypatch, message):
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == 123456

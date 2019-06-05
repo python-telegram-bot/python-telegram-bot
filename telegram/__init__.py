@@ -47,6 +47,7 @@ from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.game import Game
+from .poll import Poll, PollOption
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
@@ -152,5 +153,5 @@ __all__ = [
     'PersonalDetails', 'ResidentialAddress', 'InputMediaVideo', 'InputMediaAnimation',
     'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError',
     'PassportElementErrorSelfie', 'PassportElementErrorTranslationFile',
-    'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified'
+    'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified', 'Poll', 'PollOption'
 ]

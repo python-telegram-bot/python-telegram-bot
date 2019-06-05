@@ -196,6 +196,13 @@ class TestChat(object):
         monkeypatch.setattr('telegram.Bot.send_animation', test)
         assert chat.send_animation('test_animation')
 
+    def test_instance_method_send_poll(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            return args[1] == chat.id and args[2] == 'test_poll'
+
+        monkeypatch.setattr('telegram.Bot.send_poll', test)
+        assert chat.send_poll('test_poll')
+
     def test_equality(self):
         a = Chat(self.id, self.title, self.type)
         b = Chat(self.id, self.title, self.type)
