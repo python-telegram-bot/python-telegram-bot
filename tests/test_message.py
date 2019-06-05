@@ -20,7 +20,7 @@ from datetime import datetime
 
 import pytest
 
-from telegram import ParseMode
+from telegram import ParseMode, Poll, PollOption
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
                       Invoice, SuccessfulPayment, PassportData)
@@ -88,7 +88,10 @@ def message(bot):
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
                      'media_group_id': 1234443322222},
-                    {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)}
+                    {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
+                    {'poll': Poll(id='abc', question='What is this?',
+                                  options=[PollOption(text='a', voter_count=1),
+                                           PollOption(text='b', voter_count=2)], is_closed=False)}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -97,7 +100,7 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group', 'passport_data'])
+                     'photo_from_media_group', 'passport_data', 'poll'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
