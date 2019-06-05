@@ -20,10 +20,9 @@ from datetime import datetime
 
 import pytest
 
-from telegram import ParseMode, Poll, PollOption
 from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
-                      Invoice, SuccessfulPayment, PassportData)
+                      Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption)
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -91,7 +90,11 @@ def message(bot):
                     {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
                     {'poll': Poll(id='abc', question='What is this?',
                                   options=[PollOption(text='a', voter_count=1),
-                                           PollOption(text='b', voter_count=2)], is_closed=False)}
+                                           PollOption(text='b', voter_count=2)], is_closed=False)},
+                    {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
+                        'text': 'start', 'url': 'http://google.com'}, {
+                        'text': 'next', 'callback_data': 'abcd'}],
+                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -100,7 +103,7 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group', 'passport_data', 'poll'])
+                     'photo_from_media_group', 'passport_data', 'poll', 'reply_markup'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
