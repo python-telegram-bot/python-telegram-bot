@@ -78,3 +78,34 @@ class TestInlineKeyboardMarkup(object):
                 self.inline_keyboard[0][1].to_dict()
             ]
         ]
+
+    def test_de_json(self):
+        json_dict = {
+            'inline_keyboard': [[
+                {
+                    'text': 'start',
+                    'url': 'http://google.com'
+                },
+                {
+                    'text': 'next',
+                    'callback_data': 'abcd'
+                }],
+                [{
+                    'text': 'Cancel',
+                    'callback_data': 'Cancel'
+                }]
+            ]}
+        inline_keyboard_markup = InlineKeyboardMarkup.de_json(json_dict, None)
+
+        assert isinstance(inline_keyboard_markup, InlineKeyboardMarkup)
+        keyboard = inline_keyboard_markup.inline_keyboard
+        assert len(keyboard) == 2
+        assert len(keyboard[0]) == 2
+        assert len(keyboard[1]) == 1
+
+        assert isinstance(keyboard[0][0], InlineKeyboardButton)
+        assert isinstance(keyboard[0][1], InlineKeyboardButton)
+        assert isinstance(keyboard[1][0], InlineKeyboardButton)
+
+        assert keyboard[0][0].text == 'start'
+        assert keyboard[0][0].url == 'http://google.com'

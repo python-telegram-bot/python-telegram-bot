@@ -23,7 +23,7 @@ from html import escape
 
 from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
                       TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
-                      SuccessfulPayment, VideoNote, PassportData, Poll)
+                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -106,6 +106,8 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -210,6 +212,9 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message. login_url buttons are represented as ordinary url buttons.
+
     """
 
     _effective_attachment = _UNDEFINED
@@ -270,6 +275,7 @@ class Message(TelegramObject):
                  passport_data=None,
                  poll=None,
                  forward_sender_name=None,
+                 reply_markup=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -320,7 +326,7 @@ class Message(TelegramObject):
         self.animation = animation
         self.passport_data = passport_data
         self.poll = poll
-
+        self.reply_markup = reply_markup
         self.bot = bot
 
         self._id_attrs = (self.message_id,)
@@ -375,6 +381,7 @@ class Message(TelegramObject):
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
 

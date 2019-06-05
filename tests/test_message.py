@@ -88,7 +88,11 @@ def message(bot):
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
                      'media_group_id': 1234443322222},
-                    {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)}
+                    {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
+                    {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
+                        'text': 'start', 'url': 'http://google.com'}, {
+                        'text': 'next', 'callback_data': 'abcd'}],
+                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -97,7 +101,7 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group', 'passport_data'])
+                     'photo_from_media_group', 'passport_data', 'reply_markup'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
