@@ -26,6 +26,7 @@ from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
 from uuid import uuid4
 from collections import defaultdict
+import traceback as tb
 
 from queue import Queue, Empty
 
@@ -337,15 +338,27 @@ class Dispatcher(object):
                                 try:
                                     self.persistence.update_chat_data(chat_id,
                                                                       self.chat_data[chat_id])
-                                except Exception:
-                                    self.logger.exception('Saving chat data raised an error')
+                                except Exception as e:
+                                    try:
+                                        self.dispatch_error(update, e)
+                                    except Exception:
+                                        message = 'Saving chat data raised an error and an ' \
+                                                  'uncaught error was raised while handling ' \
+                                                  'the error with an error_handler'
+                                        self.logger.exception(message)
                             if self.persistence.store_user_data and update.effective_user:
                                 user_id = update.effective_user.id
                                 try:
                                     self.persistence.update_user_data(user_id,
                                                                       self.user_data[user_id])
-                                except Exception:
-                                    self.logger.exception('Saving user data raised an error')
+                                except Exception as e:
+                                    try:
+                                        self.dispatch_error(update, e)
+                                    except Exception:
+                                        message = 'Saving user data raised an error and an ' \
+                                                  'uncaught error was raised while handling ' \
+                                                  'the error with an error_handler'
+                                        self.logger.exception(message)
                         break
 
             # Stop processing with any other handler.
@@ -353,21 +366,14 @@ class Dispatcher(object):
                 self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
                 break
 
-            # Dispatch any error.
-            except TelegramError as te:
-                self.logger.warning('A TelegramError was raised while processing the Update')
-
+            # Dispatch any error - errors should not stop the thread.
+            except Exception as e:
                 try:
-                    self.dispatch_error(update, te)
-                except DispatcherHandlerStop:
-                    self.logger.debug('Error handler stopped further handlers')
-                    break
+                    self.dispatch_error(update, e)
                 except Exception:
-                    self.logger.exception('An uncaught error was raised while handling the error')
-
-            # Errors should not stop the thread.
-            except Exception:
-                self.logger.exception('An uncaught error was raised while processing the update')
+                    self.logger.exception('An error was raised while processing the update and an '
+                                          'uncaught error was raised while handling the error '
+                                          'with an error_handler')
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
@@ -439,11 +445,15 @@ class Dispatcher(object):
                 self.persistence.update_user_data(user_id, self.user_data[user_id])
 
     def add_error_handler(self, callback):
-        """Registers an error handler in the Dispatcher.
+        """Registers an error handler in the Dispatcher. This handler will receive every error
+        which happens in your bot.
+
+        Warning: The errors handled within these handlers won't show up in the logger, so you
+        need to make sure that you reraise the error.
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised Callback signature for context based API:
+                called when an error is raised. Callback signature for context based API:
 
                 ``def callback(update: Update, context: CallbackContext)``
 
@@ -469,7 +479,7 @@ class Dispatcher(object):
 
         Args:
             update (:obj:`str` | :class:`telegram.Update` | None): The update that caused the error
-            error (:class:`telegram.TelegramError`): The Telegram error that was raised.
+            error (:class:`telegram.TelegramError` | :Type:`Exception`): The (Telegram) error that was raised.
 
         """
         if self.error_handlers:
