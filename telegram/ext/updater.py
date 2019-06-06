@@ -157,7 +157,8 @@ class Updater(object):
         self.__threads = []
 
     def _init_thread(self, target, name, *args, **kwargs):
-        thr = Thread(target=self._thread_wrapper, name=name, args=(target,) + args, kwargs=kwargs)
+        thr = Thread(target=self._thread_wrapper, name="Bot:{}:{}".format(self.bot.id, name),
+                     args=(target,) + args, kwargs=kwargs)
         thr.start()
         self.__threads.append(thr)
 
