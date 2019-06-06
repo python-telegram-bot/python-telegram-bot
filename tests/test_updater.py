@@ -111,8 +111,10 @@ class TestUpdater(object):
         # NOTE: Checking Updater.running is problematic because it is not set to False when there's
         #       an unhandled exception.
         # TODO: We should have a way to poll Updater status and decide if it's running or not.
-        assert any('unhandled exception in updater' in rec.getMessage() for rec in
-                   caplog.get_records('call'))
+        import pprint
+        pprint.pprint([rec.getMessage() for rec in caplog.get_records('call')])
+        assert any('unhandled exception in Bot:{}:updater'.format(updater.bot.id) in
+                   rec.getMessage() for rec in caplog.get_records('call'))
 
     @pytest.mark.parametrize(('error',),
                              argvalues=[(RetryAfter(0.01),),
