@@ -26,7 +26,6 @@ from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
 from time import sleep
 from uuid import uuid4
 from collections import defaultdict
-import traceback as tb
 
 from queue import Queue, Empty
 
@@ -479,7 +478,8 @@ class Dispatcher(object):
 
         Args:
             update (:obj:`str` | :class:`telegram.Update` | None): The update that caused the error
-            error (:class:`telegram.TelegramError` | :Type:`Exception`): The (Telegram) error that was raised.
+            error (:class:`telegram.TelegramError` | :Type:`Exception`): The (Telegram) error
+            that was raised.
 
         """
         if self.error_handlers:
