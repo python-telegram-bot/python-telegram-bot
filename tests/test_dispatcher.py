@@ -385,7 +385,8 @@ class TestDispatcher(object):
         assert self.received == 'Unauthorized.'
 
     def test_sensible_worker_thread_names(self, dp2):
-        thread_names = [name for name in dp2._get_thread_names()]
+        thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
+        print(thread_names)
         for thread_name in thread_names:
             assert thread_name.startswith("Bot:{}:worker:".format(dp2.bot.id))
 

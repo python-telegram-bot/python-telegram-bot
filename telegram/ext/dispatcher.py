@@ -210,13 +210,6 @@ class Dispatcher(object):
                     'DispatcherHandlerStop is not supported with async functions; func: %s',
                     promise.pooled_function.__name__)
 
-    # This method purely exsists for testing purposes.
-    def _get_thread_names(self):
-        if self.__async_threads:
-            return (x.name for x in self.__async_threads)
-        else:
-            return None
-
     def run_async(self, func, *args, **kwargs):
         """Queue a function (with given args/kwargs) to be run asynchronously.
 
