@@ -19,7 +19,7 @@ bot.
 """
 
 from telegram import ReplyKeyboardMarkup
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler, PicklePersistence)
 
 import logging
@@ -129,10 +129,10 @@ def main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            CHOOSING: [RegexHandler('^(Age|Favourite colour|Number of siblings)$',
-                                    regular_choice),
-                       RegexHandler('^Something else...$',
-                                    custom_choice),
+            CHOOSING: [MessageHandler(Filters.regex('^(Age|Favourite colour|Number of siblings)$'),
+                                      regular_choice),
+                       MessageHandler(Filters.regex('^Something else...$'),
+                                      custom_choice),
                        ],
 
             TYPING_CHOICE: [MessageHandler(Filters.text,
@@ -144,7 +144,7 @@ def main():
                            ],
         },
 
-        fallbacks=[RegexHandler('^Done$', done)],
+        fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
         name="my_conversation",
         persistent=True
     )
