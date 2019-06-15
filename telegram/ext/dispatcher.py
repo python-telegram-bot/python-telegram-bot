@@ -369,6 +369,9 @@ class Dispatcher(object):
             except Exception as e:
                 try:
                     self.dispatch_error(update, e)
+                except DispatcherHandlerStop:
+                    self.logger.exception('An uncaught error was raised while handling the error')
+                    break
                 except Exception:
                     self.logger.exception('An error was raised while processing the update and an '
                                           'uncaught error was raised while handling the error '
@@ -478,8 +481,7 @@ class Dispatcher(object):
 
         Args:
             update (:obj:`str` | :class:`telegram.Update` | None): The update that caused the error
-            error (:class:`telegram.TelegramError` | :Type:`Exception`): The (Telegram) error
-            that was raised.
+            error (:obj:`Exception`): The error that was raised.
 
         """
         if self.error_handlers:

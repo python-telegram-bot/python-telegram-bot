@@ -276,10 +276,11 @@ class TestDispatcher(object):
 
     def test_exception_in_handler(self, dp, bot):
         passed = []
+        err = Exception('General exception')
 
         def start1(b, u):
             passed.append('start1')
-            raise Exception('General exception')
+            raise err
 
         def start2(b, u):
             passed.append('start2')
@@ -298,14 +299,14 @@ class TestDispatcher(object):
                                            bot=bot))
 
         # If an unhandled exception was caught, no further handlers from the same group should be
-        # called.
+        # called. Also, the error handler should be called and receive the exception
         passed = []
         dp.add_handler(CommandHandler('start', start1), 1)
         dp.add_handler(CommandHandler('start', start2), 1)
         dp.add_handler(CommandHandler('start', start3), 2)
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert passed == ['start1', 'start3']
+        assert passed == ['start1', 'error', err, 'start3']
 
     def test_telegram_error_in_handler(self, dp, bot):
         passed = []
