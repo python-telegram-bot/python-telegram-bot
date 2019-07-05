@@ -1030,7 +1030,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/sendLocation'.format(self.base_url)
 
-        if not (all([latitude, longitude]) or location):
+        if not ((latitude is not None and longitude is not None) or location):
             raise ValueError("Either location or latitude and longitude must be passed as"
                              "argument.")
 
