@@ -36,6 +36,22 @@ class Days(object):
     EVERY_DAY = tuple(range(7))
 
 
+class UTC(datetime.tzinfo):
+    """UTC"""
+
+    ZERO = datetime.timedelta(0)
+    HOUR = datetime.timedelta(hours=1)
+
+    def utcoffset(self, dt):
+        return ZERO
+
+    def tzname(self, dt):
+        return "UTC"
+
+    def dst(self, dt):
+        return ZERO
+
+
 class JobQueue(object):
     """This class allows you to periodically perform tasks with the bot.
 
@@ -77,7 +93,10 @@ class JobQueue(object):
                 raise ValueError('next_t is None')
 
         if isinstance(next_t, datetime.datetime):
-            next_t = (next_t - datetime.datetime.now()).total_seconds()
+            if next_t.tzinfo == None:
+                next_t = (next_t - datetime.datetime.now()).total_seconds()
+            else:
+                next_t = (next_t.astimezone(UTC()).replace(tzinfo=None) - datetime.datetime.utcnow()).total_seconds()
 
         elif isinstance(next_t, datetime.time):
             next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
