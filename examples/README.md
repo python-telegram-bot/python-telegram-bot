@@ -28,5 +28,8 @@ A basic example of a bot that can accept payments. Don't forget to enable and co
 ### [`persistentconversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/persistentconversationbot.py)
 A basic example of a bot store conversation state and user_data over multiple restarts.
 
+### [`mvc_model_sample`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/mvc_model_sample)
+A mvc model sample for bot developing.
+
 ## Pure API
 The [`echobot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot.py) example uses only the pure, "bare-metal" API wrapper. 
