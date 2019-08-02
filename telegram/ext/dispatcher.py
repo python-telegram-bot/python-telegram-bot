@@ -327,54 +327,54 @@ class Dispatcher(object):
 
         context = None
 
-        for group in self.groups:
-            try:
-                for handler in self.handlers[group]:
-                    check = handler.check_update(update)
-                    if self.filters is not None and not self.filters(update):
-                        check = False
-
-                    if check is not None and check is not False:
-                        if not context and self.use_context:
-                            context = CallbackContext.from_update(update, self)
-                        handler.handle_update(update, self, check, context)
-                        if self.persistence and isinstance(update, Update):
-                            if self.persistence.store_chat_data and update.effective_chat:
-                                chat_id = update.effective_chat.id
-                                try:
-                                    self.persistence.update_chat_data(chat_id,
-                                                                      self.chat_data[chat_id])
-                                except Exception:
-                                    self.logger.exception('Saving chat data raised an error')
-                            if self.persistence.store_user_data and update.effective_user:
-                                user_id = update.effective_user.id
-                                try:
-                                    self.persistence.update_user_data(user_id,
-                                                                      self.user_data[user_id])
-                                except Exception:
-                                    self.logger.exception('Saving user data raised an error')
-                        break
-
-            # Stop processing with any other handler.
-            except DispatcherHandlerStop:
-                self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
-                break
-
-            # Dispatch any error.
-            except TelegramError as te:
-                self.logger.warning('A TelegramError was raised while processing the Update')
-
+        if self.filters is None or self.filters(update):
+            for group in self.groups:
                 try:
-                    self.dispatch_error(update, te)
-                except DispatcherHandlerStop:
-                    self.logger.debug('Error handler stopped further handlers')
-                    break
-                except Exception:
-                    self.logger.exception('An uncaught error was raised while handling the error')
+                    for handler in self.handlers[group]:
+                        check = handler.check_update(update)
+                        if check is not None and check is not False:
+                            if not context and self.use_context:
+                                context = CallbackContext.from_update(update, self)
+                            handler.handle_update(update, self, check, context)
+                            if self.persistence and isinstance(update, Update):
+                                if self.persistence.store_chat_data and update.effective_chat:
+                                    chat_id = update.effective_chat.id
+                                    try:
+                                        self.persistence.update_chat_data(chat_id,
+                                                                          self.chat_data[chat_id])
+                                    except Exception:
+                                        self.logger.exception('Saving chat data raised an error')
+                                if self.persistence.store_user_data and update.effective_user:
+                                    user_id = update.effective_user.id
+                                    try:
+                                        self.persistence.update_user_data(user_id,
+                                                                          self.user_data[user_id])
+                                    except Exception:
+                                        self.logger.exception('Saving user data raised an error')
+                            break
 
-            # Errors should not stop the thread.
-            except Exception:
-                self.logger.exception('An uncaught error was raised while processing the update')
+                # Stop processing with any other handler.
+                except DispatcherHandlerStop:
+                    self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
+                    break
+
+                # Dispatch any error.
+                except TelegramError as te:
+                    self.logger.warning('A TelegramError was raised while processing the Update')
+
+                    try:
+                        self.dispatch_error(update, te)
+                    except DispatcherHandlerStop:
+                        self.logger.debug('Error handler stopped further handlers')
+                        break
+                    except Exception:
+                        self.logger.exception(
+                            'An uncaught error was raised while handling the error')
+
+                # Errors should not stop the thread.
+                except Exception:
+                    self.logger.exception(
+                        'An uncaught error was raised while processing the update')
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
