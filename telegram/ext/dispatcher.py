@@ -94,6 +94,8 @@ class Dispatcher(object):
         use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
             During the deprecation period of the old API the default is ``False``. **New users**:
             set this to ``True``.
+        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+            Filters.
 
     """
 
@@ -109,12 +111,14 @@ class Dispatcher(object):
                  exception_event=None,
                  job_queue=None,
                  persistence=None,
-                 use_context=False):
+                 use_context=False,
+                 filters=None):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
         self.use_context = use_context
+        self.filters = filters
 
         if not use_context:
             warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
@@ -327,6 +331,9 @@ class Dispatcher(object):
             try:
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
+                    if self.filters is not None and not self.filters(update):
+                        check = False
+
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)

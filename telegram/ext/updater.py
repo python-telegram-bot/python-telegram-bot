@@ -27,6 +27,7 @@ from queue import Queue
 
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
+from telegram.ext.filters import Filters
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
@@ -81,6 +82,8 @@ class Updater(object):
             set this to ``True``.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
+        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+            Filters.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -102,7 +105,8 @@ class Updater(object):
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
-                 use_context=False):
+                 use_context=False,
+                 filters=None):
 
         if (token is None) and (bot is None):
             raise ValueError('`token` or `bot` must be passed')
@@ -140,6 +144,10 @@ class Updater(object):
         self.job_queue = JobQueue()
         self.__exception_event = Event()
         self.persistence = persistence
+
+        if filters is not None:
+            filters = Filters.update.messages & filters
+
         self.dispatcher = Dispatcher(
             self.bot,
             self.update_queue,
@@ -147,7 +155,8 @@ class Updater(object):
             workers=workers,
             exception_event=self.__exception_event,
             persistence=persistence,
-            use_context=use_context)
+            use_context=use_context,
+            filters=filters)
         self.job_queue.set_dispatcher(self.dispatcher)
         self.last_update_id = 0
         self.running = False
