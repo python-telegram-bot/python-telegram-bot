@@ -51,6 +51,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Li-aung Yip <https://github.com/LiaungYip>`_
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_
 - `macrojames <https://github.com/macrojames>`_
+- `Marco Ferrati <https://github.com/jjocram>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
