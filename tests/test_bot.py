@@ -38,7 +38,9 @@ HIGHSCORE_DELTA = 1450000000
 
 @pytest.fixture(scope='class')
 def message(bot, chat_id):
-    return bot.send_message(chat_id, 'Text', reply_to_message_id=1,
+    to_reply_to = bot.send_message(chat_id, 'Text',
+                                   disable_web_page_preview=True, disable_notification=True)
+    return bot.send_message(chat_id, 'Text', reply_to_message_id=to_reply_to.message_id,
                             disable_web_page_preview=True, disable_notification=True)
 
 
@@ -101,7 +103,7 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_message_old_message(self, bot, chat_id):
-        with pytest.raises(TelegramError, match='can\'t be deleted'):
+        with pytest.raises(TelegramError, match='Message to delete not found'):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
