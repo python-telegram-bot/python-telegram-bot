@@ -272,6 +272,16 @@ def pickle_persistence():
 
 
 @pytest.fixture(scope='function')
+def pickle_persistence_only_bot():
+    return PicklePersistence(filename='pickletest',
+                             store_user_data=False,
+                             store_chat_data=False,
+                             store_bot_data=True,
+                             singe_file=False,
+                             on_flush=False)
+
+
+@pytest.fixture(scope='function')
 def bad_pickle_files():
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_bot_data',
                  'pickletest_conversations', 'pickletest']:
@@ -664,6 +674,7 @@ class TestPickelPersistence(object):
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
+        dp.bot_data['test'] = 'Working3!'
         u.signal_handler(signal.SIGINT, None)
         del (dp)
         del (u)
@@ -675,6 +686,7 @@ class TestPickelPersistence(object):
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
+        assert pickle_persistence_2.get_bot_data()['test'] == 'Working3!'
 
     def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
         dp.persistence = pickle_persistence
