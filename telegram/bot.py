@@ -2716,7 +2716,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/restrictChatMember'.format(self.base_url)
 
-        data = {'chat_id': chat_id, 'user_id': user_id, 'permissions': permissions}
+        data = {'chat_id': chat_id, 'user_id': user_id, 'permissions': permissions.to_dict()}
 
         if until_date is not None:
             if isinstance(until_date, datetime):
@@ -2824,7 +2824,7 @@ class Bot(TelegramObject):
         """
         url = '{0}/setChatPermissions'.format(self.base_url)
 
-        data = {'chat_id': chat_id, 'permissions': permissions}
+        data = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)

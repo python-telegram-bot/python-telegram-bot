@@ -28,7 +28,7 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice)
+                      ShippingOption, LabeledPrice, ChatPermissions)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp
 
@@ -48,6 +48,11 @@ def message(bot, chat_id):
 def media_message(bot, chat_id):
     with open('tests/data/telegram.ogg', 'rb') as f:
         return bot.send_voice(chat_id, voice=f, caption='my caption', timeout=10)
+
+
+@pytest.fixture(scope='class')
+def chat_permissions():
+    return ChatPermissions(can_send_messages=False, can_change_info=False, can_invite_users=False)
 
 
 class TestBot(object):
@@ -553,16 +558,13 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_restrict_chat_member(self, bot, channel_id):
+    def test_restrict_chat_member(self, bot, channel_id, chat_permissions):
         # TODO: Add bot to supergroup so this can be tested properly
         with pytest.raises(BadRequest, match='Method is available only for supergroups'):
             assert bot.restrict_chat_member(channel_id,
                                             95205500,
-                                            until_date=datetime.now(),
-                                            can_send_messages=False,
-                                            can_send_media_messages=False,
-                                            can_send_other_messages=False,
-                                            can_add_web_page_previews=False)
+                                            chat_permissions,
+                                            until_date=datetime.now())
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
