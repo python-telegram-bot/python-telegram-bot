@@ -230,7 +230,7 @@ def pickle_persistence():
 
 @pytest.fixture(scope='function')
 def pickle_persistence_only_chat():
-    return PicklePersistence(filename='pickletest_chat',
+    return PicklePersistence(filename='pickletest',
                              store_user_data=False,
                              store_chat_data=True,
                              singe_file=False,
@@ -239,7 +239,7 @@ def pickle_persistence_only_chat():
 
 @pytest.fixture(scope='function')
 def pickle_persistence_only_user():
-    return PicklePersistence(filename='pickletest_user',
+    return PicklePersistence(filename='pickletest',
                              store_user_data=True,
                              store_chat_data=False,
                              singe_file=False,
@@ -578,6 +578,8 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
 
     def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
+        os.remove('pickletest_user_data')
+        os.remove('pickletest_chat_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
         dp = u.dispatcher
         u.running = True
@@ -587,7 +589,7 @@ class TestPickelPersistence(object):
         del (dp)
         del (u)
         del (pickle_persistence_only_chat)
-        pickle_persistence_2 = PicklePersistence(filename='pickletest_chat',
+        pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=False,
                                                  store_chat_data=True,
                                                  singe_file=False,
@@ -596,6 +598,7 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
 
     def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
+        os.remove('pickletest_chat_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_user)
         dp = u.dispatcher
         u.running = True
@@ -605,7 +608,7 @@ class TestPickelPersistence(object):
         del (dp)
         del (u)
         del (pickle_persistence_only_user)
-        pickle_persistence_2 = PicklePersistence(filename='pickletest_user',
+        pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=True,
                                                  store_chat_data=False,
                                                  singe_file=False,
@@ -650,7 +653,7 @@ class TestPickelPersistence(object):
         try:
             for name in ['pickletest_user_data', 'pickletest_chat_data',
                          'pickletest_conversations',
-                         'pickletest', 'pickletest_chat', 'pickletest_user']:
+                         'pickletest']:
                 os.remove(name)
         except Exception:
             pass
