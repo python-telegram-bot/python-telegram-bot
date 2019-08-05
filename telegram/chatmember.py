@@ -32,24 +32,25 @@ class ChatMember(TelegramObject):
             for this user.
         can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
             privileges of that user.
-        can_change_info (:obj:`bool`): Optional. If the administrator can change the chat title,
-            photo and other settings.
+        can_change_info (:obj:`bool`): Optional. If the user can change the chat title, photo and
+            other settings.
         can_post_messages (:obj:`bool`): Optional. If the administrator can post in the channel.
         can_edit_messages (:obj:`bool`): Optional. If the administrator can edit messages of other
             users.
         can_delete_messages (:obj:`bool`): Optional. If the administrator can delete messages of
             other users.
-        can_invite_users (:obj:`bool`): Optional. If the administrator can invite new users to the
-            chat.
+        can_invite_users (:obj:`bool`): Optional. If the user can invite new users to the chat.
         can_restrict_members (:obj:`bool`): Optional. If the administrator can restrict, ban or
             unban chat members.
-        can_pin_messages (:obj:`bool`): Optional. If the administrator can pin messages.
+        can_pin_messages (:obj:`bool`): Optional. If the user can pin messages.
         can_promote_members (:obj:`bool`): Optional. If the administrator can add new
             administrators.
         can_send_messages (:obj:`bool`): Optional. If the user can send text messages, contacts,
             locations and venues.
         can_send_media_messages (:obj:`bool`): Optional. If the user can send media messages,
             implies can_send_messages.
+        can_send_polls (:obj:`bool`): Optional. True, if the user is allowed to
+            send polls.
         can_send_other_messages (:obj:`bool`): Optional. If the user can send animations, games,
             stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`): Optional. If user may add web page previews to his
@@ -63,20 +64,20 @@ class ChatMember(TelegramObject):
             restrictions will be lifted for this user.
         can_be_edited (:obj:`bool`, optional): Administrators only. True, if the bot is allowed to
             edit administrator privileges of that user.
-        can_change_info (:obj:`bool`, optional): Administrators only. True, if the administrator
-            can change the chat title, photo and other settings.
+        can_change_info (:obj:`bool`, optional): Administrators and restricted only. True, if the
+            user can change the chat title, photo and other settings.
         can_post_messages (:obj:`bool`, optional): Administrators only. True, if the administrator
             can post in the channel, channels only.
         can_edit_messages (:obj:`bool`, optional): Administrators only. True, if the administrator
             can edit messages of other users, channels only.
         can_delete_messages (:obj:`bool`, optional): Administrators only. True, if the
             administrator can delete messages of other user.
-        can_invite_users (:obj:`bool`, optional): Administrators only. True, if the administrator
-            can invite new users to the chat.
+        can_invite_users (:obj:`bool`, optional): Administrators and restricted only. True, if the
+            user can invite new users to the chat.
         can_restrict_members (:obj:`bool`, optional): Administrators only. True, if the
             administrator can restrict, ban or unban chat members.
-        can_pin_messages (:obj:`bool`, optional): Administrators only. True, if the administrator
-            can pin messages, supergroups only.
+        can_pin_messages (:obj:`bool`, optional): Administrators and restricted only. True, if the
+            user can pin messages, supergroups only.
         can_promote_members (:obj:`bool`, optional): Administrators only. True, if the
             administrator can add new administrators with a subset of his own privileges or demote
             administrators that he has promoted, directly or indirectly (promoted by administrators
@@ -86,6 +87,8 @@ class ChatMember(TelegramObject):
         can_send_media_messages (:obj:`bool`, optional): Restricted only. True, if the user can
             send audios, documents, photos, videos, video notes and voice notes, implies
             can_send_messages.
+        can_send_polls (:obj:`bool`, optional): Restricted only. True, if the user is allowed to
+            send polls.
         can_send_other_messages (:obj:`bool`, optional): Restricted only. True, if the user can
             send animations, games, stickers and use inline bots, implies can_send_media_messages.
         can_add_web_page_previews (:obj:`bool`, optional): Restricted only. True, if user may add

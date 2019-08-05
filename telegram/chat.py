@@ -18,8 +18,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
+import warnings
 
 from telegram import TelegramObject, ChatPhoto
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class Chat(TelegramObject):
@@ -32,12 +34,15 @@ class Chat(TelegramObject):
         username (:obj:`str`): Optional. Username.
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
-        all_members_are_administrators (:obj:`bool`): Optional.
+        all_members_are_administrators (:obj:`bool`): Optional. - *Deprecated* since Bot API 4.4.
+            Use :attr:`permissions` instead.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        description (:obj:`str`): Optional. Description, for supergroups and channel chats.
+        description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
             Returned only in get_chat.
+        permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
+            for groups and supergroups. Returned only in getChat.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
             sticker set.
@@ -55,14 +60,16 @@ class Chat(TelegramObject):
         first_name(:obj:`str`, optional): First name of the other party in a private chat.
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
         all_members_are_administrators (:obj:`bool`, optional): True if a group has `All Members
-            Are Admins` enabled.
+            Are Admins` enabled. - *Deprecated* since Bot API 4.4. Use :attr:`permissions` instead.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo. Returned only in getChat.
-        description (:obj:`str`, optional): Description, for supergroups and channel chats.
+        description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in get_chat.
         invite_link (:obj:`str`, optional): Chat invite link, for supergroups and channel chats.
             Returned only in get_chat.
         pinned_message (:class:`telegram.Message`, optional): Pinned message, for supergroups.
             Returned only in get_chat.
+        permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
+            for groups and supergroups. Returned only in getChat.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of Group sticker set.
             Returned only in get_chat.
@@ -94,6 +101,7 @@ class Chat(TelegramObject):
                  description=None,
                  invite_link=None,
                  pinned_message=None,
+                 permissions=None,
                  sticker_set_name=None,
                  can_set_sticker_set=None,
                  **kwargs):
@@ -106,10 +114,16 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         self.all_members_are_administrators = all_members_are_administrators
+        if all_members_are_administrators is not None:
+            warnings.warn(('all_members_are_administrators is deprecated. See '
+                           'https://core.telegram.org/bots/api#july-29-2019 for more info'),
+                          TelegramDeprecationWarning,
+                          stacklevel=2)
         self.photo = photo
         self.description = description
         self.invite_link = invite_link
         self.pinned_message = pinned_message
+        self.permissions = permissions
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
 
@@ -132,6 +146,8 @@ class Chat(TelegramObject):
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
         from telegram import Message
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        from telegram import ChatPermissions
+        data['permissions'] = ChatPermissions.de_json(data.get('permission'), bot)
 
         return cls(bot=bot, **data)
 

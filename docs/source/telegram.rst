@@ -13,6 +13,7 @@ telegram package
     telegram.chat
     telegram.chataction
     telegram.chatmember
+    telegram.chatpermissions
     telegram.chatphoto
     telegram.constants
     telegram.contact
