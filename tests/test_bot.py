@@ -237,6 +237,16 @@ class TestBot(object):
 
         assert bot.unban_chat_member(2, 32)
 
+    def test_set_chat_permissions(self, monkeypatch, bot, chat_permissions):
+        def test(_, url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            permissions = data['permissions'] == chat_permissions.to_dict()
+            return chat_id and permissions
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+
+        assert bot.set_chat_permissions(2, chat_permissions)
+
     # TODO: Needs improvement. Need an incoming callbackquery to test
     def test_answer_callback_query(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data

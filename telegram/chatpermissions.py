@@ -84,8 +84,6 @@ class ChatPermissions(TelegramObject):
         if not data:
             return None
 
-        data = super(ChatPermissions, cls).de_json(data, bot)
-
         return cls(**data)
 
     def to_dict(self):

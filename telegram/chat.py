@@ -147,7 +147,7 @@ class Chat(TelegramObject):
         from telegram import Message
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         from telegram import ChatPermissions
-        data['permissions'] = ChatPermissions.de_json(data.get('permission'), bot)
+        data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
 
         return cls(bot=bot, **data)
 
@@ -236,6 +236,16 @@ class Chat(TelegramObject):
 
         """
         return self.bot.unban_chat_member(self.id, *args, **kwargs)
+
+    def set_permissions(self, *args, **kwargs):
+        """Shortcut for::
+                bot.set_chat_permissions(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+        :obj:`bool`: If the action was sent successfully.
+
+    """
+        return self.bot.set_chat_permissions(self.id, *args, **kwargs)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
