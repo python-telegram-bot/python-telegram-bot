@@ -828,7 +828,7 @@ class Message(TelegramObject):
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-            be an entity that belongs to this message.
+                be an entity that belongs to this message.
 
         Returns:
             :obj:`str`: The text of the given entity
@@ -853,7 +853,7 @@ class Message(TelegramObject):
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-            be an entity that belongs to this message.
+                be an entity that belongs to this message.
 
         Returns:
             :obj:`str`: The text of the given entity
