@@ -841,7 +841,7 @@ class Message(TelegramObject):
             entity_text = self.text.encode('utf-16-le')
             entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
 
-        return entity_text.decode('utf-16-le')
+            return entity_text.decode('utf-16-le')
 
     def parse_caption_entity(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -866,7 +866,7 @@ class Message(TelegramObject):
             entity_text = self.caption.encode('utf-16-le')
             entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
 
-        return entity_text.decode('utf-16-le')
+            return entity_text.decode('utf-16-le')
 
     def parse_entities(self, types=None):
         """
