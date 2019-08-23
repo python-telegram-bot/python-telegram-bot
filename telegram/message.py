@@ -1096,7 +1096,7 @@ class Message(TelegramObject):
         sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
         parsed_entities = []
 
-        for iter, (entity, text) in enumerate(sorted_entities):
+        for (entity, text) in sorted_entities:
             if entity not in parsed_entities:
                 nested_entities = {
                     e: t
