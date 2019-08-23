@@ -62,13 +62,13 @@ def start(update, context):
 
 
 def regular_choice(update, context):
-    text = update.message.text
+    text = update.message.text.lower()
     context.user_data['choice'] = text
     if context.user_data.get(text):
         reply_text = 'Your {}, I already know the following ' \
-                     'about that: {}'.format(text.lower(), context.user_data[text.lower()])
+                     'about that: {}'.format(text, context.user_data[text])
     else:
-        reply_text = 'Your {}? Yes, I would love to hear about that!'.format(text.lower())
+        reply_text = 'Your {}? Yes, I would love to hear about that!'.format(text)
     update.message.reply_text(reply_text)
 
     return TYPING_REPLY
@@ -113,7 +113,7 @@ def done(update, context):
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():

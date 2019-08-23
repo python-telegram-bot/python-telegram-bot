@@ -16,6 +16,7 @@ Contributors
 The following wonderful people contributed directly or indirectly to this project:
 
 - `Alateas <https://github.com/alateas>`_
+- `Ales Dokshanin <https://github.com/alesdokshanin>`_
 - `Ambro17 <https://github.com/Ambro17>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
 - `Avanatiker <https://github.com/Avanatiker>`_

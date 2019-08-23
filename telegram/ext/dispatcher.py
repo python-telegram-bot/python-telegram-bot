@@ -274,6 +274,7 @@ class Dispatcher(object):
 
             self.logger.debug('Processing Update: %s' % update)
             self.process_update(update)
+            self.update_queue.task_done()
 
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
@@ -313,6 +314,29 @@ class Dispatcher(object):
                 The update to process.
 
         """
+
+        def persist_update(update):
+            """Persist a single update.
+
+            Args:
+            update (:class:`telegram.Update`):
+                The update to process.
+
+            """
+            if self.persistence and isinstance(update, Update):
+                if self.persistence.store_chat_data and update.effective_chat:
+                    chat_id = update.effective_chat.id
+                    try:
+                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                    except Exception:
+                        self.logger.exception('Saving chat data raised an error')
+                if self.persistence.store_user_data and update.effective_user:
+                    user_id = update.effective_user.id
+                    try:
+                        self.persistence.update_user_data(user_id, self.user_data[user_id])
+                    except Exception:
+                        self.logger.exception('Saving user data raised an error')
+
         # An error happened while polling
         if isinstance(update, TelegramError):
             try:
@@ -331,26 +355,13 @@ class Dispatcher(object):
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)
                         handler.handle_update(update, self, check, context)
-                        if self.persistence and isinstance(update, Update):
-                            if self.persistence.store_chat_data and update.effective_chat:
-                                chat_id = update.effective_chat.id
-                                try:
-                                    self.persistence.update_chat_data(chat_id,
-                                                                      self.chat_data[chat_id])
-                                except Exception:
-                                    self.logger.exception('Saving chat data raised an error')
-                            if self.persistence.store_user_data and update.effective_user:
-                                user_id = update.effective_user.id
-                                try:
-                                    self.persistence.update_user_data(user_id,
-                                                                      self.user_data[user_id])
-                                except Exception:
-                                    self.logger.exception('Saving user data raised an error')
+                        persist_update(update)
                         break
 
             # Stop processing with any other handler.
             except DispatcherHandlerStop:
                 self.logger.debug('Stopping further handlers due to DispatcherHandlerStop')
+                persist_update(update)
                 break
 
             # Dispatch any error.
@@ -433,10 +444,12 @@ class Dispatcher(object):
         """Update :attr:`user_data` and :attr:`chat_data` in :attr:`persistence`.
         """
         if self.persistence:
-            for chat_id in self.chat_data:
-                self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
-            for user_id in self.user_data:
-                self.persistence.update_user_data(user_id, self.user_data[user_id])
+            if self.persistence.store_chat_data:
+                for chat_id in self.chat_data:
+                    self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+            if self.persistence.store_user_data:
+                for user_id in self.user_data:
+                    self.persistence.update_user_data(user_id, self.user_data[user_id])
 
     def add_error_handler(self, callback):
         """Registers an error handler in the Dispatcher.
