@@ -274,6 +274,7 @@ class Dispatcher(object):
 
             self.logger.debug('Processing Update: %s' % update)
             self.process_update(update)
+            self.update_queue.task_done()
 
         self.running = False
         self.logger.debug('Dispatcher thread stopped')
