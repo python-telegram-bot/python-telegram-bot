@@ -154,9 +154,11 @@ class JobQueue(object):
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
                 :class:`telegram.ext.Job` instance. It can be used to access its
                 ``Job.context`` or change it to a repeating job.
-            interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`) | :obj:`str`): The interval in which
-                the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
-                as seconds, if it is an :obj:`str` it will be interpreted as crontab
+            interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |
+                :obj:`str`): The interval in which the job will run. If it is
+                an :obj:`int` or a :obj:`float`, it will be interpreted as
+                seconds, if it is an :obj:`str` it will be
+                interpreted as crontab
             first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Time in or at which the job should run. This parameter will be interpreted
