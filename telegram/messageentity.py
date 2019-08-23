@@ -55,7 +55,7 @@ class MessageEntity(TelegramObject):
         self.url = url
         self.user = user
 
-        self._id_attrs = (self.type, self.offset, self.length)
+        self._id_attrs = (self.type, self.offset, self.length, self.url, self.user)
 
     @classmethod
     def de_json(cls, data, bot):
