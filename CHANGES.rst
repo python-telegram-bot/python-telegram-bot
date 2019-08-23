@@ -119,7 +119,7 @@ Bug fixes & improvements
 .. _`#1319`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1319
 .. _`#1343`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1343
 .. _`#1270`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1270
-.. _`#1345`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1348
+.. _`#1348`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1348
 .. _`#1350`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1350
 .. _`#1383`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1383
 .. _`#1397`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1397
