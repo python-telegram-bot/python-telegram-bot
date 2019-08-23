@@ -166,7 +166,8 @@ class Dispatcher(object):
         base_name = '{}_'.format(base_name) if base_name else ''
 
         for i in range(workers):
-            thread = Thread(target=self._pooled, name='{}{}'.format(base_name, i))
+            thread = Thread(target=self._pooled, name='Bot:{}:worker:{}{}'.format(self.bot.id,
+                                                                                  base_name, i))
             self.__async_threads.add(thread)
             thread.start()
 
