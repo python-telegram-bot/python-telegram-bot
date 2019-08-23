@@ -46,6 +46,8 @@ class ChatMember(TelegramObject):
         can_pin_messages (:obj:`bool`): Optional. If the administrator can pin messages.
         can_promote_members (:obj:`bool`): Optional. If the administrator can add new
             administrators.
+        is_member (:obj:`bool`): Optional. Restricted only. True, if the user is a member of the
+            chat at the moment of the request.
         can_send_messages (:obj:`bool`): Optional. If the user can send text messages, contacts,
             locations and venues.
         can_send_media_messages (:obj:`bool`): Optional. If the user can send media messages,
@@ -81,6 +83,8 @@ class ChatMember(TelegramObject):
             administrator can add new administrators with a subset of his own privileges or demote
             administrators that he has promoted, directly or indirectly (promoted by administrators
             that were appointed by the user).
+        is_member (:obj:`bool`, optional): Restricted only. True, if the user is a member of the
+            chat at the moment of the request.
         can_send_messages (:obj:`bool`, optional): Restricted only. True, if the user can send text
             messages, contacts, locations and venues.
         can_send_media_messages (:obj:`bool`, optional): Restricted only. True, if the user can
@@ -111,7 +115,7 @@ class ChatMember(TelegramObject):
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, **kwargs):
+                 can_add_web_page_previews=None, is_member=None, **kwargs):
         # Required
         self.user = user
         self.status = status
@@ -129,6 +133,7 @@ class ChatMember(TelegramObject):
         self.can_send_media_messages = can_send_media_messages
         self.can_send_other_messages = can_send_other_messages
         self.can_add_web_page_previews = can_add_web_page_previews
+        self.is_member = is_member
 
         self._id_attrs = (self.user, self.status)
 

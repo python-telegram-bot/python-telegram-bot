@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InlineKeyboardButton
+from telegram import InlineKeyboardButton, LoginUrl
 
 
 @pytest.fixture(scope='class')
@@ -31,7 +31,8 @@ def inline_keyboard_button():
                                 switch_inline_query_current_chat=TestInlineKeyboardButton
                                 .switch_inline_query_current_chat,
                                 callback_game=TestInlineKeyboardButton.callback_game,
-                                pay=TestInlineKeyboardButton.pay)
+                                pay=TestInlineKeyboardButton.pay,
+                                login_url=TestInlineKeyboardButton.login_url)
 
 
 class TestInlineKeyboardButton(object):
@@ -42,6 +43,7 @@ class TestInlineKeyboardButton(object):
     switch_inline_query_current_chat = 'switch_inline_query_current_chat'
     callback_game = 'callback_game'
     pay = 'pay'
+    login_url = LoginUrl("http://google.com")
 
     def test_expected_values(self, inline_keyboard_button):
         assert inline_keyboard_button.text == self.text
@@ -52,6 +54,7 @@ class TestInlineKeyboardButton(object):
                 == self.switch_inline_query_current_chat)
         assert inline_keyboard_button.callback_game == self.callback_game
         assert inline_keyboard_button.pay == self.pay
+        assert inline_keyboard_button.login_url == self.login_url
 
     def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()
@@ -66,3 +69,26 @@ class TestInlineKeyboardButton(object):
                 == inline_keyboard_button.switch_inline_query_current_chat)
         assert inline_keyboard_button_dict['callback_game'] == inline_keyboard_button.callback_game
         assert inline_keyboard_button_dict['pay'] == inline_keyboard_button.pay
+        assert inline_keyboard_button_dict['login_url'] == \
+               inline_keyboard_button.login_url.to_dict()  # NOQA: E127
+
+    def test_de_json(self, bot):
+        json_dict = {
+            'text': self.text,
+            'url': self.url,
+            'callback_data': self.callback_data,
+            'switch_inline_query': self.switch_inline_query,
+            'switch_inline_query_current_chat': self.switch_inline_query_current_chat,
+            'callback_game': self.callback_game,
+            'pay': self.pay
+        }
+
+        inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, None)
+        assert inline_keyboard_button.text == self.text
+        assert inline_keyboard_button.url == self.url
+        assert inline_keyboard_button.callback_data == self.callback_data
+        assert inline_keyboard_button.switch_inline_query == self.switch_inline_query
+        assert (inline_keyboard_button.switch_inline_query_current_chat
+                == self.switch_inline_query_current_chat)
+        assert inline_keyboard_button.callback_game == self.callback_game
+        assert inline_keyboard_button.pay == self.pay
