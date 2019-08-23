@@ -23,6 +23,7 @@ import logging
 import time
 import warnings
 import weakref
+from croniter import croniter
 from numbers import Number
 from queue import PriorityQueue, Empty
 from threading import Thread, Lock, Event
@@ -71,13 +72,14 @@ class JobQueue(object):
         self._dispatcher = dispatcher
 
     def _put(self, job, next_t=None, last_t=None):
-        if next_t is None:
+        if next_t is None and not isinstance(job.interval, str):
             next_t = job.interval
             if next_t is None:
                 raise ValueError('next_t is None')
 
         if isinstance(next_t, datetime.datetime):
             next_t = (next_t - datetime.datetime.now()).total_seconds()
+            next_t += last_t or time.time()
 
         elif isinstance(next_t, datetime.time):
             next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
@@ -86,11 +88,19 @@ class JobQueue(object):
                 next_datetime += datetime.timedelta(days=1)
 
             next_t = (next_datetime - datetime.datetime.now()).total_seconds()
+            next_t += last_t or time.time()
 
         elif isinstance(next_t, datetime.timedelta):
             next_t = next_t.total_seconds()
+            next_t += last_t or time.time()
 
-        next_t += last_t or time.time()
+        elif isinstance(job.interval, str):
+            base = self._now()
+            dt = croniter(job.interval, base).get_next(datetime.datetime)
+            next_t = datetime.datetime.timestamp(dt)
+
+        else:
+            next_t += last_t or time.time()
 
         self.logger.debug('Putting job %s with t=%f', job.name, next_t)
 
@@ -144,9 +154,9 @@ class JobQueue(object):
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
                 :class:`telegram.ext.Job` instance. It can be used to access its
                 ``Job.context`` or change it to a repeating job.
-            interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
+            interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`) | :obj:`str`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
-                as seconds.
+                as seconds, if it is an :obj:`str` it will be interpreted as crontab
             first (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -335,6 +345,9 @@ class JobQueue(object):
         with self._queue.mutex:
             return tuple(job[1] for job in self._queue.queue if job and job[1].name == name)
 
+    def _now(self):
+        return datetime.datetime.now()
+
 
 class Job(object):
     """This class encapsulates a Job.
@@ -438,9 +451,13 @@ class Job(object):
         if interval is None and self.repeat:
             raise ValueError("The 'interval' can not be 'None' when 'repeat' is set to 'True'")
 
-        if not (interval is None or isinstance(interval, (Number, datetime.timedelta))):
+        if not (interval is None or isinstance(interval, (Number, datetime.timedelta, str))):
             raise ValueError("The 'interval' must be of type 'datetime.timedelta',"
-                             " 'int' or 'float'")
+                             " 'int' or 'float' or 'str'")
+
+        if isinstance(interval, str):
+            if not croniter.is_valid(interval):
+                raise ValueError("The 'interval' of type 'str' must be a valid crontab")
 
         self._interval = interval
 

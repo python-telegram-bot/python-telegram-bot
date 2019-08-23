@@ -25,6 +25,7 @@ from time import sleep
 
 import pytest
 from flaky import flaky
+from unittest.mock import patch
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -228,6 +229,23 @@ class TestJobQueue(object):
         assert self.result == 1
         assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
 
+    def test_run_cron_daily(self, job_queue):
+        dt = datetime.datetime(year=2019, month=1, day=1, hour=1, minute=0, second=0)
+        ts = datetime.datetime.timestamp(dt)
+        def patchDateTime() :
+            return dt
+        def patchTime() :
+            return ts
+        with patch('telegram.ext.JobQueue._now', side_effect=patchDateTime):
+            with patch('time.time', side_effect=patchTime):
+                with patch('threading.Event.wait', return_value=True):
+                    job_queue.run_repeating(self.job_run_once, '0 2 * * *')
+                    for i in range(24 * 7 * 2):
+                        dt += datetime.timedelta(hours=1)
+                        ts = datetime.datetime.timestamp(dt)
+                        sleep(0.01)
+                    assert self.result == 14
+
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)
         with pytest.raises(ValueError, match='can not be set to'):
@@ -239,7 +257,9 @@ class TestJobQueue(object):
             j.interval = None
         j.repeat = False
         with pytest.raises(ValueError, match='must be of type'):
-            j.interval = 'every 3 minutes'
+            j.interval = {'every': {'minutes': 3}}
+        with pytest.raises(ValueError, match='must be a valid crontab'):
+            j.interval = '* * * janu-jun *'
         j.interval = 15
         assert j.interval_seconds == 15
 
