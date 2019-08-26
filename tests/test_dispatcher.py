@@ -348,7 +348,9 @@ class TestDispatcher(object):
 
         class OwnPersistence(BasePersistence):
             def __init__(self):
-                super().__init__()
+                super(BasePersistence, self).__init__()
+                self.store_user_data = True
+                self.store_chat_data = True
 
             def get_chat_data(self):
                 return defaultdict(dict)
