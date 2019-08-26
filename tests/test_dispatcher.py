@@ -24,7 +24,8 @@ from time import sleep
 import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
-from telegram.ext import MessageHandler, Filters, CommandHandler, CallbackContext, JobQueue, BasePersistence
+from telegram.ext import (MessageHandler, Filters, CommandHandler, CallbackContext,
+                          JobQueue, BasePersistence)
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
@@ -373,7 +374,8 @@ class TestDispatcher(object):
         # If updating a user_data or chat_data from a persistence object throws an error,
         # the error handler should catch it
 
-        update = Update(1, message=Message(1, User(1, "Test", False), None, Chat(1, "lala"), text='/start',
+        update = Update(1, message=Message(1, User(1, "Test", False), None, Chat(1, "lala"),
+                                           text='/start',
                                            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                                    offset=0,
                                                                    length=len('/start'))],
@@ -427,6 +429,12 @@ class TestDispatcher(object):
         cdp.update_queue.put(error)
         sleep(.1)
         assert self.received == 'Unauthorized.'
+
+    def test_sensible_worker_thread_names(self, dp2):
+        thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
+        print(thread_names)
+        for thread_name in thread_names:
+            assert thread_name.startswith("Bot:{}:worker:".format(dp2.bot.id))
 
     @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_non_context_deprecation(self, dp):

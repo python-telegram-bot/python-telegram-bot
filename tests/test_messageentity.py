@@ -64,3 +64,19 @@ class TestMessageEntity(object):
             assert entity_dict['url'] == message_entity.url
         if message_entity.user:
             assert entity_dict['user'] == message_entity.user.to_dict()
+
+    def test_equality(self):
+        a = MessageEntity(MessageEntity.BOLD, 2, 3)
+        b = MessageEntity(MessageEntity.BOLD, 2, 3)
+        c = MessageEntity(MessageEntity.CODE, 2, 3)
+        d = MessageEntity(MessageEntity.CODE, 5, 6)
+
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a is not b
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

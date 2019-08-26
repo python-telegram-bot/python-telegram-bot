@@ -37,8 +37,10 @@ class InputMediaAnimation(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``animation``.
-        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
-            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
+        media (:obj:`str` | `filelike object` | :class:`telegram.Animation`): Animation to
+            send. Pass a file_id as String to send an animation that exists on the Telegram
+            servers (recommended), pass an HTTP URL as a String for Telegram to get an
+            animation from the Internet, or upload a new animation using multipart/form-data.
             Lastly you can pass an existing :class:`telegram.Animation` object to send.
         thumb (`filelike object`): Optional. Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
@@ -111,9 +113,11 @@ class InputMediaPhoto(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``photo``.
-        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the
-            Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the
-            Internet. Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+        media (:obj:`str` | `filelike object` | :class:`telegram.PhotoSize`): Photo to send.
+            Pass a file_id as String to send a photo that exists on the Telegram servers
+            (recommended), pass an HTTP URL as a String for Telegram to get a photo from the
+            Internet, or upload a new photo using multipart/form-data. Lastly you can pass
+            an existing :class:`telegram.PhotoSize` object to send.
         caption (:obj:`str`): Optional. Caption of the photo to be sent, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -150,9 +154,11 @@ class InputMediaVideo(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``video``.
-        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
-            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
-            Lastly you can pass an existing :class:`telegram.Video` object to send.
+        media (:obj:`str` | `filelike object` | :class:`telegram.Video`): Video file to send.
+            Pass a file_id as String to send an video file that exists on the Telegram servers
+            (recommended), pass an HTTP URL as a String for Telegram to get an video file from
+            the Internet, or upload a new one using multipart/form-data. Lastly you can pass
+            an existing :class:`telegram.Video` object to send.
         caption (:obj:`str`): Optional. Caption of the video to be sent, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -229,9 +235,11 @@ class InputMediaAudio(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``audio``.
-        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
-            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
-            Lastly you can pass an existing :class:`telegram.Audio` object to send.
+        media (:obj:`str` | `filelike object` | :class:`telegram.Audio`): Audio file to send.
+            Pass a file_id as String to send an audio file that exists on the Telegram servers
+            (recommended), pass an HTTP URL as a String for Telegram to get an audio file from
+            the Internet, or upload a new one using multipart/form-data. Lastly you can pass
+            an existing :class:`telegram.Audio` object to send.
         caption (:obj:`str`): Optional. Caption of the audio to be sent, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -304,9 +312,11 @@ class InputMediaDocument(InputMedia):
 
     Attributes:
         type (:obj:`str`): ``document``.
-        media (:obj:`str`): File to send. Pass a file_id to send a file that exists on the Telegram
-            servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet.
-            Lastly you can pass an existing :class:`telegram.Document` object to send.
+        media (:obj:`str` | `filelike object` | :class:`telegram.Document`): File to send.
+            Pass a file_id as String to send a file that exists on the Telegram servers
+            (recommended), pass an HTTP URL as a String for Telegram to get a file from the
+            Internet, or upload a new one using multipart/form-data. Lastly you can pass
+            an existing :class:`telegram.Document` object to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants

@@ -49,11 +49,11 @@ def photo(_photo):
 
 
 class TestPhoto(object):
-    width = 300
-    height = 300
+    width = 800
+    height = 800
     caption = u'<b>PhotoTest</b> - *Caption*'
-    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
-    file_size = 10209
+    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
+    file_size = 29176
 
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
@@ -69,9 +69,9 @@ class TestPhoto(object):
         assert photo.width == self.width
         assert photo.height == self.height
         assert photo.file_size == self.file_size
-        assert thumb.width == 90
-        assert thumb.height == 90
-        assert thumb.file_size == 1478
+        assert thumb.width == 320
+        assert thumb.height == 320
+        assert thumb.file_size == 9331
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
