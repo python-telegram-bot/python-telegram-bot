@@ -68,7 +68,7 @@ class Updater(object):
             `dispatcher` argument is used). If a pre-initialized bot is used, it is the user's
             responsibility to create it using a `Request` instance with a large enough connection
             pool.
-        dispatcher (:class:`telegram.ext.Dispatcher, optional): A pre-initialized dispatcher
+        dispatcher (:class:`telegram.ext.Dispatcher`, optional): A pre-initialized dispatcher
             instance. If a pre-initialized dispatcher is used, it is the user's responsibility to
             create it with proper arguments.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
