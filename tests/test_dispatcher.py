@@ -24,10 +24,12 @@ from time import sleep
 import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
-from telegram.ext import MessageHandler, Filters, CommandHandler, CallbackContext, JobQueue
+from telegram.ext import (MessageHandler, Filters, CommandHandler, CallbackContext,
+                          JobQueue, BasePersistence)
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
+from collections import defaultdict
 
 
 @pytest.fixture(scope='function')
@@ -276,10 +278,11 @@ class TestDispatcher(object):
 
     def test_exception_in_handler(self, dp, bot):
         passed = []
+        err = Exception('General exception')
 
         def start1(b, u):
             passed.append('start1')
-            raise Exception('General exception')
+            raise err
 
         def start2(b, u):
             passed.append('start2')
@@ -298,14 +301,14 @@ class TestDispatcher(object):
                                            bot=bot))
 
         # If an unhandled exception was caught, no further handlers from the same group should be
-        # called.
+        # called. Also, the error handler should be called and receive the exception
         passed = []
         dp.add_handler(CommandHandler('start', start1), 1)
         dp.add_handler(CommandHandler('start', start2), 1)
         dp.add_handler(CommandHandler('start', start3), 2)
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert passed == ['start1', 'start3']
+        assert passed == ['start1', 'error', err, 'start3']
 
     def test_telegram_error_in_handler(self, dp, bot):
         passed = []
@@ -340,6 +343,49 @@ class TestDispatcher(object):
         dp.process_update(update)
         assert passed == ['start1', 'error', err, 'start3']
         assert passed[2] is err
+
+    def test_error_while_saving_chat_data(self, dp, bot):
+        increment = []
+
+        class OwnPersistence(BasePersistence):
+            def __init__(self):
+                super(BasePersistence, self).__init__()
+                self.store_user_data = True
+                self.store_chat_data = True
+
+            def get_chat_data(self):
+                return defaultdict(dict)
+
+            def update_chat_data(self, chat_id, data):
+                raise Exception
+
+            def get_user_data(self):
+                return defaultdict(dict)
+
+            def update_user_data(self, user_id, data):
+                raise Exception
+
+        def start1(b, u):
+            pass
+
+        def error(b, u, e):
+            increment.append("error")
+
+        # If updating a user_data or chat_data from a persistence object throws an error,
+        # the error handler should catch it
+
+        update = Update(1, message=Message(1, User(1, "Test", False), None, Chat(1, "lala"),
+                                           text='/start',
+                                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                                   offset=0,
+                                                                   length=len('/start'))],
+                                           bot=bot))
+        my_persistence = OwnPersistence()
+        dp = Dispatcher(bot, None, persistence=my_persistence)
+        dp.add_handler(CommandHandler('start', start1))
+        dp.add_error_handler(error)
+        dp.process_update(update)
+        assert increment == ["error", "error"]
 
     def test_flow_stop_in_error_handler(self, dp, bot):
         passed = []

@@ -176,10 +176,10 @@ class TestBasePersistence(object):
         with caplog.at_level(logging.ERROR):
             dp.process_update(u)
         rec = caplog.records[-1]
-        assert rec.msg == 'Saving user data raised an error'
+        assert rec.msg == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         rec = caplog.records[-2]
-        assert rec.msg == 'Saving chat data raised an error'
+        assert rec.msg == 'No error handlers are registered, logging exception.'
         assert rec.levelname == 'ERROR'
         m.from_user = user2
         m.chat = chat1
