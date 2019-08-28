@@ -58,6 +58,8 @@ class Updater(object):
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
         use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
+        default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
+            method call. See the constants in :class:`telegram.ParseMode` for the available modes.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -81,8 +83,8 @@ class Updater(object):
             set this to ``True``.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
-        parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in method
-                call. See the constants in :class:`telegram.ParseMode` for the available modes.
+        default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
+            method call. See the constants in :class:`telegram.ParseMode` for the available modes.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -104,7 +106,7 @@ class Updater(object):
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
-                 parse_mode=None,
+                 default_parse_mode=None,
                  use_context=False):
 
         if (token is None) and (bot is None):
@@ -137,7 +139,8 @@ class Updater(object):
                 request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
-                           private_key_password=private_key_password, parse_mode=parse_mode)
+                           private_key_password=private_key_password,
+                           default_parse_mode=default_parse_mode)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue()

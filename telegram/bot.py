@@ -82,15 +82,15 @@ class Bot(TelegramObject):
             :obj:`telegram.utils.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
-        parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in method
-                call. See the constants in :class:`telegram.ParseMode` for the available modes.
+        default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
+            method call. See the constants in :class:`telegram.ParseMode` for the available modes.
 
     """
 
     def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
-                 private_key_password=None, parse_mode=None):
+                 private_key_password=None, default_parse_mode=None):
         self.token = self._validate_token(token)
-        self.default_parse_mode = parse_mode
+        self.default_parse_mode = default_parse_mode
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -1489,7 +1489,6 @@ class Bot(TelegramObject):
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
-        print(data)
 
         return result
 
