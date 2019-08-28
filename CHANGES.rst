@@ -18,7 +18,6 @@ Expect minor releases soon (mainly complete Bot API 4.4 support)
 - Deprecation of RegexHandler and edited_messages, channel_post, etc. arguments (Filter overhaul)
 - Various ConversationHandler changes and fixes
 - Bot API 4.1, 4.2, 4.3 support
-- Initial Bot API 4.4 support
 - Python 3.4 is no longer supported
 - Error Handler now handles all types of exceptions
 - Return UTC from from_timestamp()
