@@ -34,8 +34,6 @@ class Chat(TelegramObject):
         username (:obj:`str`): Optional. Username.
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
-        all_members_are_administrators (:obj:`bool`): Optional. - *Deprecated* since Bot API 4.4.
-            Use :attr:`permissions` instead.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
@@ -59,8 +57,6 @@ class Chat(TelegramObject):
             available.
         first_name(:obj:`str`, optional): First name of the other party in a private chat.
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
-        all_members_are_administrators (:obj:`bool`, optional): True if a group has `All Members
-            Are Admins` enabled. - *Deprecated* since Bot API 4.4. Use :attr:`permissions` instead.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo. Returned only in getChat.
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in get_chat.
