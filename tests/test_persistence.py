@@ -224,7 +224,7 @@ def pickle_persistence():
     return PicklePersistence(filename='pickletest',
                              store_user_data=True,
                              store_chat_data=True,
-                             singe_file=False,
+                             single_file=False,
                              on_flush=False)
 
 
@@ -233,7 +233,7 @@ def pickle_persistence_only_chat():
     return PicklePersistence(filename='pickletest',
                              store_user_data=False,
                              store_chat_data=True,
-                             singe_file=False,
+                             single_file=False,
                              on_flush=False)
 
 
@@ -242,7 +242,7 @@ def pickle_persistence_only_user():
     return PicklePersistence(filename='pickletest',
                              store_user_data=True,
                              store_chat_data=False,
-                             singe_file=False,
+                             single_file=False,
                              on_flush=False)
 
 
@@ -552,7 +552,7 @@ class TestPickelPersistence(object):
         pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=True,
                                                  store_chat_data=True,
-                                                 singe_file=False,
+                                                 single_file=False,
                                                  on_flush=False)
         u = Updater(bot=bot, persistence=pickle_persistence_2)
         dp = u.dispatcher
@@ -572,7 +572,7 @@ class TestPickelPersistence(object):
         pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=True,
                                                  store_chat_data=True,
-                                                 singe_file=False,
+                                                 single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
@@ -592,7 +592,7 @@ class TestPickelPersistence(object):
         pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=False,
                                                  store_chat_data=True,
-                                                 singe_file=False,
+                                                 single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data() == {}
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
@@ -611,7 +611,7 @@ class TestPickelPersistence(object):
         pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=True,
                                                  store_chat_data=False,
-                                                 singe_file=False,
+                                                 single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
         assert pickle_persistence_2.get_chat_data()[-4242424242] == {}
