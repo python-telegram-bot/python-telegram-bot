@@ -16,9 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import inspect
-import sys
-from platform import python_implementation
 
 import certifi
 import pytest
@@ -149,7 +148,7 @@ for thing in soup.select('h4 > a.anchor'):
 
 
 @pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(not sys.version_info >= (3, 7) or python_implementation() != 'CPython',
-                    reason='follow_wrapped (inspect.signature) is not supported on this platform')
+@pytest.mark.skipif(os.getenv('TEST_OFFICIAL') != 'true',
+                    reason='test_official is not enabled')
 def test_official(method, data):
     method(data)
