@@ -81,9 +81,8 @@ class Updater(object):
             set this to ``True``.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+        parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in method
+                call. See the constants in :class:`telegram.ParseMode` for the available modes.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.

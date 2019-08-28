@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultVideo(InlineQueryResult):
@@ -83,7 +84,7 @@ class InlineQueryResultVideo(InlineQueryResult):
                  description=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
 
         # Required
@@ -96,7 +97,11 @@ class InlineQueryResultVideo(InlineQueryResult):
         # Optional
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
         if video_width:
             self.video_width = video_width

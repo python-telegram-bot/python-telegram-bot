@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultAudio."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultAudio(InlineQueryResult):
@@ -70,7 +71,7 @@ class InlineQueryResultAudio(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
 
         # Required
@@ -85,7 +86,11 @@ class InlineQueryResultAudio(InlineQueryResult):
             self.audio_duration = audio_duration
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
         if reply_markup:
             self.reply_markup = reply_markup

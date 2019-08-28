@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultGif(InlineQueryResult):
@@ -76,7 +77,7 @@ class InlineQueryResultGif(InlineQueryResult):
                  reply_markup=None,
                  input_message_content=None,
                  gif_duration=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
 
         # Required
@@ -95,7 +96,11 @@ class InlineQueryResultGif(InlineQueryResult):
             self.title = title
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
         if reply_markup:
             self.reply_markup = reply_markup

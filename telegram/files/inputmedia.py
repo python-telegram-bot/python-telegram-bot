@@ -19,6 +19,7 @@
 """Base class for Telegram InputMedia Objects."""
 
 from telegram import TelegramObject, InputFile, PhotoSize, Animation, Video, Audio, Document
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InputMedia(TelegramObject):
@@ -77,7 +78,13 @@ class InputMediaAnimation(InputMedia):
         arguments.
     """
 
-    def __init__(self, media, thumb=None, caption=None, parse_mode=None, width=None, height=None,
+    def __init__(self,
+                 media,
+                 thumb=None,
+                 caption=None,
+                 parse_mode=DEFAULT_NONE,
+                 width=None,
+                 height=None,
                  duration=None):
         self.type = 'animation'
 
@@ -98,7 +105,11 @@ class InputMediaAnimation(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
         if width:
             self.width = width
@@ -133,7 +144,7 @@ class InputMediaPhoto(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
     """
 
-    def __init__(self, media, caption=None, parse_mode=None):
+    def __init__(self, media, caption=None, parse_mode=DEFAULT_NONE):
         self.type = 'photo'
 
         if isinstance(media, PhotoSize):
@@ -145,7 +156,11 @@ class InputMediaPhoto(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
 
 
@@ -198,7 +213,7 @@ class InputMediaVideo(InputMedia):
     """
 
     def __init__(self, media, caption=None, width=None, height=None, duration=None,
-                 supports_streaming=None, parse_mode=None, thumb=None):
+                 supports_streaming=None, parse_mode=DEFAULT_NONE, thumb=None):
         self.type = 'video'
 
         if isinstance(media, Video):
@@ -218,7 +233,11 @@ class InputMediaVideo(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
         if width:
             self.width = width
@@ -276,7 +295,7 @@ class InputMediaAudio(InputMedia):
         optional arguments.
     """
 
-    def __init__(self, media, thumb=None, caption=None, parse_mode=None,
+    def __init__(self, media, thumb=None, caption=None, parse_mode=DEFAULT_NONE,
                  duration=None, performer=None, title=None):
         self.type = 'audio'
 
@@ -297,7 +316,11 @@ class InputMediaAudio(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
         if duration:
             self.duration = duration
@@ -340,7 +363,7 @@ class InputMediaDocument(InputMedia):
             is passed as a string or file_id.
     """
 
-    def __init__(self, media, thumb=None, caption=None, parse_mode=None):
+    def __init__(self, media, thumb=None, caption=None, parse_mode=DEFAULT_NONE):
         self.type = 'document'
 
         if isinstance(media, Document):
@@ -357,5 +380,9 @@ class InputMediaDocument(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode:
+        if parse_mode is DEFAULT_NONE:
+            self._explicit_parse_mode = False
+            self.parse_mode = None
+        else:
+            self._explicit_parse_mode = True
             self.parse_mode = parse_mode
