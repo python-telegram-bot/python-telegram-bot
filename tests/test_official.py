@@ -149,7 +149,7 @@ for thing in soup.select('h4 > a.anchor'):
 
 
 @pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(not sys.version_info >= (3, 6) or python_implementation() != 'CPython',
+@pytest.mark.skipif(not sys.version_info >= (3, 7) or python_implementation() != 'CPython',
                     reason='follow_wrapped (inspect.signature) is not supported on this platform')
 def test_official(method, data):
     method(data)

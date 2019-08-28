@@ -55,8 +55,8 @@ def chat_id(bot_info):
 
 
 @pytest.fixture(scope='session')
-def group_id(bot_info):
-    return bot_info['group_id']
+def super_group_id(bot_info):
+    return bot_info['super_group_id']
 
 
 @pytest.fixture(scope='session')

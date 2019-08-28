@@ -229,6 +229,24 @@ def pickle_persistence():
 
 
 @pytest.fixture(scope='function')
+def pickle_persistence_only_chat():
+    return PicklePersistence(filename='pickletest',
+                             store_user_data=False,
+                             store_chat_data=True,
+                             singe_file=False,
+                             on_flush=False)
+
+
+@pytest.fixture(scope='function')
+def pickle_persistence_only_user():
+    return PicklePersistence(filename='pickletest',
+                             store_user_data=True,
+                             store_chat_data=False,
+                             singe_file=False,
+                             on_flush=False)
+
+
+@pytest.fixture(scope='function')
 def bad_pickle_files():
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_conversations',
                  'pickletest']:
@@ -541,7 +559,7 @@ class TestPickelPersistence(object):
         dp.add_handler(h2)
         dp.process_update(update)
 
-    def test_flush_on_stop(self, bot, update, pickle_persistence, good_pickle_files):
+    def test_flush_on_stop(self, bot, update, pickle_persistence):
         u = Updater(bot=bot, persistence=pickle_persistence)
         dp = u.dispatcher
         u.running = True
@@ -558,6 +576,45 @@ class TestPickelPersistence(object):
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
+
+    def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
+        os.remove('pickletest_user_data')
+        os.remove('pickletest_chat_data')
+        u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
+        dp = u.dispatcher
+        u.running = True
+        dp.user_data[4242424242]['my_test'] = 'Working!'
+        dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
+        u.signal_handler(signal.SIGINT, None)
+        del (dp)
+        del (u)
+        del (pickle_persistence_only_chat)
+        pickle_persistence_2 = PicklePersistence(filename='pickletest',
+                                                 store_user_data=False,
+                                                 store_chat_data=True,
+                                                 singe_file=False,
+                                                 on_flush=False)
+        assert pickle_persistence_2.get_user_data() == {}
+        assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
+
+    def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
+        os.remove('pickletest_chat_data')
+        u = Updater(bot=bot, persistence=pickle_persistence_only_user)
+        dp = u.dispatcher
+        u.running = True
+        dp.user_data[4242424242]['my_test'] = 'Working!'
+        dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
+        u.signal_handler(signal.SIGINT, None)
+        del (dp)
+        del (u)
+        del (pickle_persistence_only_user)
+        pickle_persistence_2 = PicklePersistence(filename='pickletest',
+                                                 store_user_data=True,
+                                                 store_chat_data=False,
+                                                 singe_file=False,
+                                                 on_flush=False)
+        assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
+        assert pickle_persistence_2.get_chat_data()[-4242424242] == {}
 
     def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
         dp.persistence = pickle_persistence

@@ -36,6 +36,8 @@ telegram package
     telegram.messageentity
     telegram.parsemode
     telegram.photosize
+    telegram.poll
+    telegram.polloption
     telegram.replykeyboardremove
     telegram.replykeyboardmarkup
     telegram.replymarkup
