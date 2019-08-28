@@ -22,6 +22,7 @@ import pytest
 from flaky import flaky
 
 from telegram import Document, PhotoSize, TelegramError, Voice
+from telegram.utils.helpers import escape_markdown
 
 
 @pytest.fixture(scope='function')
@@ -122,6 +123,48 @@ class TestDocument(object):
         message = bot.send_document(document=document, chat_id=chat_id)
 
         assert message
+
+    flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_document_default_parse_mode_1(self, bot, chat_id, document):
+        bot.default_parse_mode = 'Markdown'
+
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_document(chat_id, document, caption=test_markdown_string)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+        bot.default_parse_mode = None
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_document_default_parse_mode_2(self, bot, chat_id, document):
+        bot.default_parse_mode = 'Markdown'
+
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_document(chat_id, document, caption=test_markdown_string,
+                                    parse_mode=None)
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_document_default_parse_mode_3(self, bot, chat_id, document):
+        bot.default_parse_mode = 'Markdown'
+
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_document(chat_id, document, caption=test_markdown_string,
+                                    parse_mode='HTML')
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
 
     def test_de_json(self, bot, document):
         json_dict = {'file_id': 'not a file id',

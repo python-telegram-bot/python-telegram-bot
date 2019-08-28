@@ -22,6 +22,7 @@ import pytest
 from flaky import flaky
 
 from telegram import Audio, Voice, TelegramError
+from telegram.utils.helpers import escape_markdown
 
 
 @pytest.fixture(scope='function')
@@ -110,6 +111,48 @@ class TestVoice(object):
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         message = bot.send_voice(chat_id, voice=voice)
         assert message
+
+    flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_voice_default_parse_mode_1(self, bot, chat_id, voice):
+        bot.default_parse_mode = 'Markdown'
+
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_voice(chat_id, voice, caption=test_markdown_string)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+        bot.default_parse_mode = None
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_voice_default_parse_mode_2(self, bot, chat_id, voice):
+        bot.default_parse_mode = 'Markdown'
+
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_voice(chat_id, voice, caption=test_markdown_string,
+                                 parse_mode=None)
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_voice_default_parse_mode_3(self, bot, chat_id, voice):
+        bot.default_parse_mode = 'Markdown'
+
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_voice(chat_id, voice, caption=test_markdown_string,
+                                 parse_mode='HTML')
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
 
     def test_de_json(self, bot):
         json_dict = {

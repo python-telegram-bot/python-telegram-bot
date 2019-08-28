@@ -30,7 +30,7 @@ from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboa
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
                       ShippingOption, LabeledPrice, Poll)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.utils.helpers import from_timestamp
+from telegram.utils.helpers import from_timestamp, escape_markdown
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -281,6 +281,37 @@ class TestBot(object):
 
         assert message.text == 'new_text'
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_text_default_parse_mode(self, bot, message):
+        bot.default_parse_mode = 'Markdown'
+
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                        message_id=message.message_id,
+                                        disable_web_page_preview=True)
+        assert message.text_markdown == test_markdown_string
+        assert message.text == test_string
+
+        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                        message_id=message.message_id, parse_mode=None,
+                                        disable_web_page_preview=True)
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                        message_id=message.message_id,
+                                        disable_web_page_preview=True)
+        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                        message_id=message.message_id, parse_mode='HTML',
+                                        disable_web_page_preview=True)
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
+
     @pytest.mark.skip(reason='need reference to an inline message')
     def test_edit_message_text_inline(self):
         pass
@@ -294,6 +325,37 @@ class TestBot(object):
         assert message.caption == 'new_caption'
 
     # edit_message_media is tested in test_inputmedia
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_edit_message_caption_default_parse_mode(self, bot, media_message):
+        bot.default_parse_mode = 'Markdown'
+
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.edit_message_caption(caption=test_markdown_string,
+                                           chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+        message = bot.edit_message_caption(caption=test_markdown_string,
+                                           chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id, parse_mode=None)
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        message = bot.edit_message_caption(caption=test_markdown_string,
+                                           chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id)
+        message = bot.edit_message_caption(caption=test_markdown_string,
+                                           chat_id=media_message.chat_id,
+                                           message_id=media_message.message_id, parse_mode='HTML')
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -697,3 +759,23 @@ class TestBot(object):
         # Test file uploading
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
+
+    def test_send_message_default_parse_mode(self, bot, chat_id):
+        bot.default_parse_mode = 'Markdown'
+
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = bot.send_message(chat_id, test_markdown_string)
+        assert message.text_markdown == test_markdown_string
+        assert message.text == test_string
+
+        message = bot.send_message(chat_id, test_markdown_string, parse_mode=None)
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+        message = bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+        bot.default_parse_mode = None
