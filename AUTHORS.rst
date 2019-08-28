@@ -65,6 +65,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
+- `Poolitzer <https://github.com/Poolitzer>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
