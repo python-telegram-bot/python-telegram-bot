@@ -151,7 +151,7 @@ class Updater(object):
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
                 self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
-                            private_key_password=private_key_password)
+                               private_key_password=private_key_password)
             self.update_queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
@@ -174,7 +174,7 @@ class Updater(object):
                     'Connection pool of Request object is smaller than optimal value (%s)',
                     con_pool_size)
             self.update_queue = dispatcher.update_queue
-            self.__exception_event = dispatcher.__exception_event
+            self.__exception_event = dispatcher._exception_event
             self.persistence = dispatcher.persistence
             self.job_queue = dispatcher.job_queue
             self.dispatcher = dispatcher
