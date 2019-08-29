@@ -47,6 +47,8 @@ from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.game import Game
+from .poll import Poll, PollOption
+from .loginurl import LoginUrl
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
@@ -57,11 +59,11 @@ from .passport.passportfile import PassportFile
 from .passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
 from .passport.encryptedpassportelement import EncryptedPassportElement
 from .passport.passportdata import PassportData
+from .inline.inlinekeyboardbutton import InlineKeyboardButton
+from .inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from .message import Message
 from .callbackquery import CallbackQuery
 from .choseninlineresult import ChosenInlineResult
-from .inline.inlinekeyboardbutton import InlineKeyboardButton
-from .inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from .inline.inputmessagecontent import InputMessageContent
 from .inline.inlinequery import InlineQuery
 from .inline.inlinequeryresult import InlineQueryResult
@@ -152,5 +154,6 @@ __all__ = [
     'PersonalDetails', 'ResidentialAddress', 'InputMediaVideo', 'InputMediaAnimation',
     'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError',
     'PassportElementErrorSelfie', 'PassportElementErrorTranslationFile',
-    'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified'
+    'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified', 'Poll',
+    'PollOption', 'LoginUrl'
 ]

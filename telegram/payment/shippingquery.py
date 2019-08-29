@@ -64,7 +64,7 @@ class ShippingQuery(TelegramObject):
         data['from_user'] = User.de_json(data.pop('from'), bot)
         data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
 
-        return cls(**data)
+        return cls(bot=bot, **data)
 
     def answer(self, *args, **kwargs):
         """Shortcut for::

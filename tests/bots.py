@@ -31,13 +31,13 @@ FALLBACKS = [
         'token': '579694714:AAHRLL5zBVy4Blx2jRFKe1HlfnXCg08WuLY',
         'payment_provider_token': '284685063:TEST:NjQ0NjZlNzI5YjJi',
         'chat_id': '675666224',
-        'group_id': '-269513406',
+        'super_group_id': '-1001493296829',
         'channel_id': '@pythontelegrambottests'
     }, {
         'token': '558194066:AAEEylntuKSLXj9odiv3TnX7Z5KY2J3zY3M',
         'payment_provider_token': '284685063:TEST:YjEwODQwMTFmNDcy',
         'chat_id': '675666224',
-        'group_id': '-269513406',
+        'super_group_id': '-1001493296829',
         'channel_id': '@pythontelegrambottests'
     }
 ]

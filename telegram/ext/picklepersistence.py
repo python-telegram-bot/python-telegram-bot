@@ -56,12 +56,12 @@ class PicklePersistence(BasePersistence):
             on any transaction *and* on call fo :meth:`flush`. Default is ``False``.
     """
 
-    def __init__(self, filename, store_user_data=True, store_chat_data=True, singe_file=True,
+    def __init__(self, filename, store_user_data=True, store_chat_data=True, single_file=True,
                  on_flush=False):
         self.filename = filename
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
-        self.single_file = singe_file
+        self.single_file = single_file
         self.on_flush = on_flush
         self.user_data = None
         self.chat_data = None
@@ -191,7 +191,7 @@ class PicklePersistence(BasePersistence):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
         """
         if self.user_data.get(user_id) == data:
             return
@@ -209,7 +209,7 @@ class PicklePersistence(BasePersistence):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[chat_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
         """
         if self.chat_data.get(chat_id) == data:
             return

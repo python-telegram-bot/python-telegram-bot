@@ -157,7 +157,8 @@ class Updater(object):
         self.__threads = []
 
     def _init_thread(self, target, name, *args, **kwargs):
-        thr = Thread(target=self._thread_wrapper, name=name, args=(target,) + args, kwargs=kwargs)
+        thr = Thread(target=self._thread_wrapper, name="Bot:{}:{}".format(self.bot.id, name),
+                     args=(target,) + args, kwargs=kwargs)
         thr.start()
         self.__threads.append(thr)
 
@@ -383,7 +384,7 @@ class Updater(object):
             ssl_ctx = None
 
         # Create and start server
-        self.httpd = WebhookServer(port, app, ssl_ctx)
+        self.httpd = WebhookServer(listen, port, app, ssl_ctx)
 
         if use_ssl:
             # DO NOT CHANGE: Only set webhook if SSL is handled by library

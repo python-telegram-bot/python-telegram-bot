@@ -176,7 +176,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data`[user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.user_data` [user_id].
         """
         if self._user_data.get(user_id) == data:
             return
@@ -188,7 +188,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data`[chat_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
         """
         if self._chat_data.get(chat_id) == data:
             return

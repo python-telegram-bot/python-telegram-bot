@@ -1,23 +1,26 @@
-=======
-Changes
-=======
+=========
+Changelog
+=========
 
-Version 12.0.0b1
+Version 12.0.0
 ================
-*Released 2019-02-13*
+*Released 2019-08-29*
 
-First beta release ever.
-It has been so long since last release that we would like to test the impact before a final release.
+Well... This felt like decades. But here we are with a new release.
 
-*We do NOT recommend using this beta release in production.*
+Expect minor releases soon (mainly complete Bot API 4.4 support)
 
-**Major changes:**
+**Major and/or breaking changes:**
 
 - Context based callbacks
 - Persistence
 - PrefixHandler added (Handler overhaul)
 - Deprecation of RegexHandler and edited_messages, channel_post, etc. arguments (Filter overhaul)
 - Various ConversationHandler changes and fixes
+- Bot API 4.1, 4.2, 4.3 support
+- Python 3.4 is no longer supported
+- Error Handler now handles all types of exceptions (`#1485`_)
+- Return UTC from from_timestamp() (`#1485`_)
 
 **See the wiki page at https://git.io/fxJuV for a detailed guide on how to migrate from version 11 to version 12.**
 
@@ -64,6 +67,7 @@ ConversationHandler
 - Use warnings.warn for ConversationHandler warnings (`#1343`_)
 - Fix unresolvable promises (`#1270`_)
 
+
 Bug fixes & improvements
 ------------------------
 
@@ -82,6 +86,22 @@ Bug fixes & improvements
 - Allow SOCKSConnection to parse username and password from URL (`#1211`_)
 - Fix for arguments in passport/data.py (`#1213`_)
 - Improve message entity parsing by adding text_mention (`#1206`_)
+- Documentation fixes (`#1348`_, `#1397_`, `#1436`_)
+- Merged filters short-circuit (`#1350`_)
+- Fix webhook listen with tornado (`#1383`_)
+- Call task_done() on update queue after update processing finished (`#1428`_)
+- Fix send_location() - latitude may be 0 (`#1437`_)
+- Make MessageEntity objects comparable (`#1465`_)
+- Add prefix to thread names (`#1358`_)
+
+Buf fixes since v12.0.0b1
+-------------------------
+
+- Fix setting bot on ShippingQuery (`#1355`_)
+- Fix _trigger_timeout() missing 1 required positional argument: 'job' (`#1367`_)
+- Add missing message.text check in PrefixHandler check_update (`#1375`_)
+- Make updates persist even on DispatcherHandlerStop (`#1463`_)
+- Dispatcher force updating persistence object's chat data attribute(`#1462`)
 
 .. _`#1100`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1100
 .. _`#1283`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1283
@@ -110,6 +130,22 @@ Bug fixes & improvements
 .. _`#1319`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1319
 .. _`#1343`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1343
 .. _`#1270`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1270
+.. _`#1348`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1348
+.. _`#1350`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1350
+.. _`#1383`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1383
+.. _`#1397`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1397
+.. _`#1428`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1428
+.. _`#1436`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1436
+.. _`#1437`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1437
+.. _`#1465`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1465
+.. _`#1358`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1358
+.. _`#1355`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1355
+.. _`#1367`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1367
+.. _`#1375`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1375
+.. _`#1463`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1463
+.. _`#1462`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1462
+.. _`#1483`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1483
+.. _`#1485`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1485
 
 Internal improvements
 ---------------------
@@ -118,12 +154,11 @@ Internal improvements
 - Use multiple bots for CI to improve testing times significantly.
 - Allow pypy to fail in CI.
 - Remove the last CamelCase CheckUpdate methods from the handlers we missed earlier.
+- test_official is now executed in a different job
 
-Pre-2019 (up and including to version 11.1.0)
-=============================================
-
-**2018-09-01**
-*Released 11.1.0*
+Version 11.1.0
+==============
+*Released 2018-09-01*
 
 Fixes and updates for Telegram Passport: (`#1198`_)
 
@@ -137,8 +172,9 @@ Fixes and updates for Telegram Passport: (`#1198`_)
 
 .. _`#1198`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1198
 
-**2018-08-29**
-*Released 11.0.0*
+Version 11.0.0
+==============
+*Released 2018-08-29*
 
 Fully support Bot API version 4.0!
 (also some bugfixes :))
@@ -193,8 +229,9 @@ Non Bot API 4.0 changes:
 .. _`#1184`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1184
 .. _`our telegram passport wiki page`: https://git.io/fAvYd
 
-**2018-05-02**
-*Released 10.1.0*
+Version 10.1.0
+==============
+*Released 2018-05-02*
 
 Fixes changing previous behaviour:
 
@@ -220,8 +257,9 @@ Fixes:
 .. _`#1096`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1096
 .. _`#1099`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1099
 
-**2018-04-17**
-*Released 10.0.2*
+Version 10.0.2
+==============
+*Released 2018-04-17*
 
 Important fix:
 
@@ -252,8 +290,9 @@ Fixes:
 .. _`#1076`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1076
 .. _`#1071`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1071
 
-**2018-03-05**
-*Released 10.0.1*
+Version 10.0.1
+==============
+*Released 2018-03-05*
 
 Fixes:
 
@@ -263,8 +302,9 @@ Fixes:
 .. _`#1032`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
 .. _`#912`: https://github.com/python-telegram-bot/python-telegram-bot/pull/826
 
-**2018-03-02**
-*Released 10.0.0*
+Version 10.0.0
+==============
+*Released 2018-03-02*
 
 Non backward compatabile changes and changed defaults
 
@@ -329,8 +369,9 @@ Changes
 .. _`#1019`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1019
 .. _`#1020`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1020
 
-**2017-12-08**
-*Released 9.0.0*
+Version 9.0.0
+=============
+*Released 2017-12-08*
 
 Breaking changes (possibly)
 
@@ -355,15 +396,17 @@ Changes
 .. _`#694`: https://github.com/python-telegram-bot/python-telegram-bot/pull/694
 .. _`#870`: https://github.com/python-telegram-bot/python-telegram-bot/pull/870
 
-**2017-10-15**
-*Released 8.1.1*
+Version 8.1.1
+=============
+*Released 2017-10-15*
 
 - Fix Commandhandler crashing on single character messages (PR `#873`_).
 
 .. _`#873`: https://github.com/python-telegram-bot/python-telegram-bot/pull/871
 
-**2017-10-14**
-*Released 8.1.0*
+Version 8.1.0
+=============
+*Released 2017-10-14*
 
 New features
 - Support Bot API 3.4 (PR `#865`_).
@@ -380,8 +423,9 @@ Changes
 .. _`#865`: https://github.com/python-telegram-bot/python-telegram-bot/pull/865
 .. _`#869`: https://github.com/python-telegram-bot/python-telegram-bot/pull/869
 
-**2017-09-01**
-*Released 8.0.0*
+Version 8.0.0
+=============
+*Released 2017-09-01*
 
 New features
 
@@ -422,14 +466,16 @@ Changes
 .. _`#793`: https://github.com/python-telegram-bot/python-telegram-bot/pull/793
 .. _`#810`: https://github.com/python-telegram-bot/python-telegram-bot/pull/810
 
-**2017-07-28**
-*Released 7.0.1*
+Version 7.0.1
+===============
+*Released 2017-07-28*
 
 - Fix TypeError exception in RegexHandler (PR #751).
 - Small documentation fix (PR #749).
 
-**2017-07-25**
-*Released 7.0.0*
+Version 7.0.0
+=============
+*Released 2017-07-25*
 
 - Fully support Bot API 3.2.
 - New filters for handling messages from specific chat/user id (PR #677).
@@ -446,6 +492,9 @@ Changes
 - Internal restructure of files.
 - Improved documentation.
 - Improved unitests.
+
+Pre-version 7.0
+===============
 
 **2017-06-18**
 

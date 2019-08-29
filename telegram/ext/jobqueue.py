@@ -172,6 +172,11 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
+        Notes:
+             `interval` is always respected "as-is". That means that if DST changes during that
+             interval, the job might not run at the time one would expect. It is always recommended
+             to pin servers to UTC time, then time related behaviour can always be expected.
+
         """
         job = Job(callback,
                   interval=interval,
@@ -201,6 +206,11 @@ class JobQueue(object):
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
+
+        Notes:
+             Daily is just an alias for "24 Hours". That means that if DST changes during that
+             interval, the job might not run at the time one would expect. It is always recommended
+             to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
         job = Job(callback,
@@ -277,7 +287,8 @@ class JobQueue(object):
         if not self._running:
             self._running = True
             self.__start_lock.release()
-            self.__thread = Thread(target=self._main_loop, name="job_queue")
+            self.__thread = Thread(target=self._main_loop,
+                                   name="Bot:{}:job_queue".format(self._dispatcher.bot.id))
             self.__thread.start()
             self.logger.debug('%s thread started', self.__class__.__name__)
         else:
