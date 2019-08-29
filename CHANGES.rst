@@ -19,8 +19,8 @@ Expect minor releases soon (mainly complete Bot API 4.4 support)
 - Various ConversationHandler changes and fixes
 - Bot API 4.1, 4.2, 4.3 support
 - Python 3.4 is no longer supported
-- Error Handler now handles all types of exceptions
-- Return UTC from from_timestamp()
+- Error Handler now handles all types of exceptions (`#1485`_)
+- Return UTC from from_timestamp() (`#1485`_)
 
 **See the wiki page at https://git.io/fxJuV for a detailed guide on how to migrate from version 11 to version 12.**
 
@@ -66,24 +66,6 @@ ConversationHandler
 - Only emit one warning for multiple CallbackQueryHandlers in a ConversationHandler (`#1319`_)
 - Use warnings.warn for ConversationHandler warnings (`#1343`_)
 - Fix unresolvable promises (`#1270`_)
-
-Error Handler now handles all types of exceptions (`#1483`_)
-------------------------------------------------------------
-
-Error_handler got a major improvement. Instead of only handling TelegramErrors, every error from
-every handler will be passed to it.
-
-You can use it now to get notifications if an error happened while your bot is running, for example
-(`#1173`_).
-
-Note: If an error handler callback is successfully executed, the error itself won't be caught by
-the logger module. If you still want this, reraise the error at the end of your function.
-
-
-Return UTC from from_timestamp() (`#1485`_)
--------------------------------------------
-from_timestamp() now returns UTC timestamps. The recommended way to work is to run your bot on a
-machine configured to UTC.
 
 
 Bug fixes & improvements
