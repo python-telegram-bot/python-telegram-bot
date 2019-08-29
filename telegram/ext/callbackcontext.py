@@ -73,12 +73,34 @@ class CallbackContext(object):
             raise ValueError('CallbackContext should not be used with a non context aware '
                              'dispatcher!')
         self._dispatcher = dispatcher
-        self.chat_data = None
-        self.user_data = None
+        self._chat_data = None
+        self._user_data = None
         self.args = None
         self.matches = None
         self.error = None
         self.job = None
+
+    @property
+    def chat_data(self):
+        return self._chat_data
+
+    @chat_data.setter
+    def chat_data(self, value):
+        if self._chat_data is not None:
+            raise AttributeError("You can not assign a new value to chat_data, see "
+                                 "https://git.io/fjxKe")
+        self._chat_data = value
+
+    @property
+    def user_data(self):
+        return self._user_data
+
+    @user_data.setter
+    def user_data(self, value):
+        if self._user_data is not None:
+            raise AttributeError("You can not assign a new value to user_data, see "
+                                 "https://git.io/fjxKe")
+        self._user_data = value
 
     @classmethod
     def from_error(cls, update, error, dispatcher):

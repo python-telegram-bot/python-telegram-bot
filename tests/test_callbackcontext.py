@@ -105,3 +105,13 @@ class TestCallbackContext(object):
         callback_context.matches = ['test', 'blah']
 
         assert callback_context.match == 'test'
+
+    def test_data_assignment(self, cdp):
+        update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
+
+        callback_context = CallbackContext.from_update(update, cdp)
+
+        with pytest.raises(AttributeError):
+            callback_context.chat_data = {"test": 123}
+            callback_context.user_data = {}
+            callback_context.chat_data = "test"
