@@ -4,13 +4,13 @@ Changelog
 
 Version 12.0.0
 ================
-*Released 2019-08-24*
+*Released 2019-08-28*
 
 Well... This felt like decades. But here we are with a new release.
 
 Expect minor releases soon (mainly complete Bot API 4.4 support)
 
-**Major changes:**
+**Major and/or breaking changes:**
 
 - Context based callbacks
 - Persistence
@@ -18,8 +18,9 @@ Expect minor releases soon (mainly complete Bot API 4.4 support)
 - Deprecation of RegexHandler and edited_messages, channel_post, etc. arguments (Filter overhaul)
 - Various ConversationHandler changes and fixes
 - Bot API 4.1, 4.2, 4.3 support
-- Initial Bot API 4.4 support
 - Python 3.4 is no longer supported
+- Error Handler now handles all types of exceptions (`#1485`_)
+- Return UTC from from_timestamp() (`#1485`_)
 
 **See the wiki page at https://git.io/fxJuV for a detailed guide on how to migrate from version 11 to version 12.**
 
@@ -66,6 +67,7 @@ ConversationHandler
 - Use warnings.warn for ConversationHandler warnings (`#1343`_)
 - Fix unresolvable promises (`#1270`_)
 
+
 Bug fixes & improvements
 ------------------------
 
@@ -91,6 +93,15 @@ Bug fixes & improvements
 - Fix send_location() - latitude may be 0 (`#1437`_)
 - Make MessageEntity objects comparable (`#1465`_)
 - Add prefix to thread names (`#1358`_)
+
+Buf fixes since v12.0.0b1
+-------------------------
+
+- Fix setting bot on ShippingQuery (`#1355`_)
+- Fix _trigger_timeout() missing 1 required positional argument: 'job' (`#1367`_)
+- Add missing message.text check in PrefixHandler check_update (`#1375`_)
+- Make updates persist even on DispatcherHandlerStop (`#1463`_)
+- Dispatcher force updating persistence object's chat data attribute(`#1462`)
 
 .. _`#1100`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1100
 .. _`#1283`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1283
@@ -128,6 +139,13 @@ Bug fixes & improvements
 .. _`#1437`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1437
 .. _`#1465`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1465
 .. _`#1358`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1358
+.. _`#1355`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1355
+.. _`#1367`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1367
+.. _`#1375`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1375
+.. _`#1463`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1463
+.. _`#1462`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1462
+.. _`#1483`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1483
+.. _`#1485`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1485
 
 Internal improvements
 ---------------------
@@ -136,6 +154,7 @@ Internal improvements
 - Use multiple bots for CI to improve testing times significantly.
 - Allow pypy to fail in CI.
 - Remove the last CamelCase CheckUpdate methods from the handlers we missed earlier.
+- test_official is now executed in a different job
 
 Version 11.1.0
 ==============
