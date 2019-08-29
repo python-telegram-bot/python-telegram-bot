@@ -4,7 +4,7 @@ Changelog
 
 Version 12.0.0
 ================
-*Released 2019-08-28*
+*Released 2019-08-29*
 
 Well... This felt like decades. But here we are with a new release.
 
