@@ -82,7 +82,7 @@ the logger module. If you still want this, reraise the error at the end of your 
 
 Return UTC from from_timestamp() (`#1485`_)
 -------------------------------------------
-from_timestamp() now returns UTC timestamps. This recommended way to work is to run your bot on a
+from_timestamp() now returns UTC timestamps. The recommended way to work is to run your bot on a
 machine configured to UTC.
 
 
