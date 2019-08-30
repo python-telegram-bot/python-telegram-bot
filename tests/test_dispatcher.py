@@ -353,6 +353,13 @@ class TestDispatcher(object):
                 super(BasePersistence, self).__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
+                self.store_bot_data = True
+
+            def get_bot_data(self):
+                return dict()
+
+            def update_bot_data(self, data):
+                raise Exception
 
             def get_chat_data(self):
                 return defaultdict(dict)
