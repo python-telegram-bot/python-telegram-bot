@@ -87,7 +87,7 @@ def from_timestamp(unixtime):
     if not unixtime:
         return None
 
-    return datetime.fromtimestamp(unixtime)
+    return datetime.utcfromtimestamp(unixtime)
 
 
 def mention_html(user_id, name):

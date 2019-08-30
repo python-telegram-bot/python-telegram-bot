@@ -1,0 +1,25 @@
+Source: telegram
+Section: utils
+Priority: optional
+Maintainer: Marco Marinello <me@marcomarinello.it>
+Build-Depends: debhelper (>= 11), dh-python, python3-all, python3-setuptools
+Standards-Version: 4.1.3
+Homepage: https://python-telegram-bot.org
+X-Python-Version: >= 3.2
+Vcs-Browser: https://github.com/python-telegram-bot/python-telegram-bot
+Vcs-Git: https://github.com/python-telegram-bot/python-telegram-bot.git
+
+Package: python3-telegram-bot
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}
+Description: We have made you a wrapper you can't refuse!
+ The Python Telegram bot (Python 3)
+ This library provides a pure Python interface for the Telegram Bot API.
+ It's compatible with Python versions 2.7, 3.3+ and PyPy.
+ .
+ In addition to the pure API implementation, this library features
+ a number of high-level
+ classes to make the development of bots easy and straightforward.
+ These classes are contained in the telegram.ext submodule.
+ .
+ This package installs the library for Python 3.

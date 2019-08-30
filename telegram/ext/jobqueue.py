@@ -287,7 +287,8 @@ class JobQueue(object):
         if not self._running:
             self._running = True
             self.__start_lock.release()
-            self.__thread = Thread(target=self._main_loop, name="job_queue")
+            self.__thread = Thread(target=self._main_loop,
+                                   name="Bot:{}:job_queue".format(self._dispatcher.bot.id))
             self.__thread.start()
             self.logger.debug('%s thread started', self.__class__.__name__)
         else:

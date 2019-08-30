@@ -64,13 +64,12 @@ class PicklePersistence(BasePersistence):
                  store_user_data=True,
                  store_chat_data=True,
                  store_bot_data=True,
-                 singe_file=True,
+                 single_file=True,
                  on_flush=False):
-        super(PicklePersistence, self).__init__(store_user_data=store_user_data,
-                                                store_chat_data=store_chat_data,
-                                                store_bot_data=store_bot_data)
         self.filename = filename
-        self.single_file = singe_file
+        self.store_user_data = store_user_data
+        self.store_chat_data = store_chat_data
+        self.single_file = single_file
         self.on_flush = on_flush
         self.user_data = None
         self.chat_data = None
