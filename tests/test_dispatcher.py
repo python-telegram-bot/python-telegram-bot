@@ -23,9 +23,9 @@ from time import sleep
 
 import pytest
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
+from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity, CallbackQuery
 from telegram.ext import (MessageHandler, Filters, CommandHandler, CallbackContext,
-                          JobQueue, BasePersistence)
+                          JobQueue, BasePersistence, CallbackQueryHandler)
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
@@ -235,6 +235,23 @@ class TestDispatcher(object):
         dp.update_queue.put(self.message_update)
         sleep(.1)
         assert self.count == 3
+
+    def test_callbackquery_answered_when_no_handler(self, dp, bot, monkeypatch):
+        update = Update(1, callback_query=CallbackQuery(1, User(1, "pool", False), 1, bot=bot))
+        wuhu = []
+
+        def test(*args, **kwargs):
+            wuhu.append(1)
+
+        def test_2(update, context):
+            wuhu.append(2)
+
+        monkeypatch.setattr('telegram.Bot.answerCallbackQuery', test)
+
+        dp.process_update(update)
+        dp.add_handler(CallbackQueryHandler(test_2))
+        dp.process_update(update)
+        assert wuhu == [1, 2]
 
     def test_add_handler_errors(self, dp):
         handler = 'not a handler'

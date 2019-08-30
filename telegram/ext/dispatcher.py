@@ -361,6 +361,7 @@ class Dispatcher(object):
             return
 
         context = None
+        skip = False
 
         for group in self.groups:
             try:
@@ -371,6 +372,7 @@ class Dispatcher(object):
                             context = CallbackContext.from_update(update, self)
                         handler.handle_update(update, self, check, context)
                         persist_update(update)
+                        skip = True
                         break
 
             # Stop processing with any other handler.
@@ -391,6 +393,11 @@ class Dispatcher(object):
                     self.logger.exception('An error was raised while processing the update and an '
                                           'uncaught error was raised while handling the error '
                                           'with an error_handler')
+
+        if not skip and update.callback_query:
+            # this means the update wasn't handled so far, and we can simply answer the query for
+            # the user
+            update.callback_query.answer()
 
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
