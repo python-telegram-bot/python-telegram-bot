@@ -122,12 +122,9 @@ class TestFilters(object):
         matches = result['matches']
         assert isinstance(matches, list)
         assert all([type(res) == SRE_TYPE for res in matches])
+        # Should not give a match since it's a or filter and it short circuits
         result = (Filters.command | Filters.regex(r'linked param'))(update)
-        assert result
-        assert isinstance(result, dict)
-        matches = result['matches']
-        assert isinstance(matches, list)
-        assert all([type(res) == SRE_TYPE for res in matches])
+        assert result is True
 
     def test_regex_complex_merges(self, update):
         SRE_TYPE = type(re.match("", ""))
@@ -725,3 +722,83 @@ class TestFilters(object):
         assert Filters.update.edited_channel_post(update)
         assert Filters.update.channel_posts(update)
         assert Filters.update(update)
+
+    def test_merged_short_circuit_and(self, update):
+        update.message.text = '/test'
+
+        class TestException(Exception):
+            pass
+
+        class RaisingFilter(BaseFilter):
+            def filter(self, _):
+                raise TestException
+
+        raising_filter = RaisingFilter()
+
+        with pytest.raises(TestException):
+            (Filters.command & raising_filter)(update)
+
+        update.message.text = 'test'
+        (Filters.command & raising_filter)(update)
+
+    def test_merged_short_circuit_or(self, update):
+        update.message.text = 'test'
+
+        class TestException(Exception):
+            pass
+
+        class RaisingFilter(BaseFilter):
+            def filter(self, _):
+                raise TestException
+
+        raising_filter = RaisingFilter()
+
+        with pytest.raises(TestException):
+            (Filters.command | raising_filter)(update)
+
+        update.message.text = '/test'
+        (Filters.command | raising_filter)(update)
+
+    def test_merged_data_merging_and(self, update):
+        update.message.text = '/test'
+
+        class DataFilter(BaseFilter):
+            data_filter = True
+
+            def __init__(self, data):
+                self.data = data
+
+            def filter(self, _):
+                return {'test': [self.data]}
+
+        result = (Filters.command & DataFilter('blah'))(update)
+        assert result['test'] == ['blah']
+
+        result = (DataFilter('blah1') & DataFilter('blah2'))(update)
+        assert result['test'] == ['blah1', 'blah2']
+
+        update.message.text = 'test'
+        result = (Filters.command & DataFilter('blah'))(update)
+        assert not result
+
+    def test_merged_data_merging_or(self, update):
+        update.message.text = '/test'
+
+        class DataFilter(BaseFilter):
+            data_filter = True
+
+            def __init__(self, data):
+                self.data = data
+
+            def filter(self, _):
+                return {'test': [self.data]}
+
+        result = (Filters.command | DataFilter('blah'))(update)
+        assert result
+
+        result = (DataFilter('blah1') | DataFilter('blah2'))(update)
+        assert result['test'] == ['blah1']
+
+        update.message.text = 'test'
+        result = (Filters.command | DataFilter('blah'))(update)
+        assert result['test'] == ['blah']

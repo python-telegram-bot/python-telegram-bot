@@ -337,3 +337,16 @@ class Chat(TelegramObject):
 
         """
         return self.bot.send_voice(self.id, *args, **kwargs)
+
+    def send_poll(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_poll(Chat.id, *args, **kwargs)
+
+        Where Chat is the current instance.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return self.bot.send_poll(self.id, *args, **kwargs)

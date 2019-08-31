@@ -49,6 +49,16 @@ class BaseFilter(object):
         >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
         >>> Filters.text & (~ Filters.forwarded)
 
+    Note:
+        Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+        This means that for example:
+
+            >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
+
+        With a message.text of `x`, will only ever return the matches for the first filter,
+        since the second one is never evaluated.
+
+
     If you want to create your own filters create a class inheriting from this class and implement
     a `filter` method that returns a boolean: `True` if the message should be handled, `False`
     otherwise. Note that the filters work only as class instances, not actual class objects
@@ -177,21 +187,27 @@ class MergedFilter(BaseFilter):
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
-            comp_output = self.and_filter(update)
-            if base_output and comp_output:
-                if self.data_filter:
-                    merged = self._merge(base_output, comp_output)
-                    if merged:
-                        return merged
-                return True
+            # And filter needs to short circuit if base is falsey
+            if base_output:
+                comp_output = self.and_filter(update)
+                if comp_output:
+                    if self.data_filter:
+                        merged = self._merge(base_output, comp_output)
+                        if merged:
+                            return merged
+                    return True
         elif self.or_filter:
-            comp_output = self.or_filter(update)
-            if base_output or comp_output:
+            # Or filter needs to short circuit if base is truthey
+            if base_output:
                 if self.data_filter:
-                    merged = self._merge(base_output, comp_output)
-                    if merged:
-                        return merged
+                    return base_output
                 return True
+            else:
+                comp_output = self.or_filter(update)
+                if comp_output:
+                    if self.data_filter:
+                        return comp_output
+                    return True
         return False
 
     def __repr__(self):
@@ -250,6 +266,15 @@ class Filters(object):
             ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE), callback)`` if
             you want your pattern to be case insensitive. This approach is recommended
             if you need to specify flags on your pattern.
+
+        Note:
+            Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+            This means that for example:
+
+                >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
+
+            With a message.text of `x`, will only ever return the matches for the first filter,
+            since the second one is never evaluated.
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.

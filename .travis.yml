@@ -2,12 +2,14 @@ language: python
 matrix:
   include:
     - python: 2.7
-    - python: 3.4
     - python: 3.5
     - python: 3.6
     - python: 3.7
       dist: xenial
       sudo: true
+    - python: 3.7
+      dist: xenial
+      env: TEST_OFFICIAL=true
     - python: pypy2.7-5.10.0
       dist: xenial
     - python: pypy3.5-5.10.1
@@ -15,6 +17,7 @@ matrix:
   allow_failures:
     - python: pypy2.7-5.10.0
     - python: pypy3.5-5.10.1
+    - env: TEST_OFFICIAL=true
 
 dist: trusty
 sudo: false
@@ -41,8 +44,9 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
 
 script:
-  - pytest -v -m nocoverage
-  - pytest -v -m "not nocoverage" --cov
+  - if [[ $TEST_OFFICIAL != 'true' ]]; then pytest -v -m nocoverage; fi
+  - if [[ $TEST_OFFICIAL != 'true' ]]; then pytest -v -m "not nocoverage" --cov; fi
+  - if [[ $TEST_OFFICIAL == 'true' ]]; then pytest -v tests/test_official.py; fi
 
 after_success:
   - coverage combine
