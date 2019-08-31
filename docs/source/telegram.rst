@@ -31,6 +31,7 @@ telegram package
     telegram.inputmediavideo
     telegram.keyboardbutton
     telegram.location
+    telegram.loginurl
     telegram.message
     telegram.messageentity
     telegram.parsemode
