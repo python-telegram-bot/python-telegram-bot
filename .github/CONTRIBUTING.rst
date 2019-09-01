@@ -66,6 +66,26 @@ Here's how to make a one-off code change.
    - You can refer to relevant issues in the commit message by writing, e.g., "#105".
 
    - Your code should adhere to the `PEP 8 Style Guide`_, with the exception that we have a maximum line length of 99.
+   
+   - Document your code. This project uses `sphinx`_ to generate static HTML docs. To build them, first make sure you have the required dependencies:
+
+     .. code-block:: bash
+
+        $ pip install -r docs/requirements-docs.txt
+
+     then run the following from the PTB root directory:
+   
+     .. code-block:: bash
+         
+        $ make -C docs html
+
+     or, if you don't have ``make`` available (e.g. on Windows):
+
+     .. code-block:: bash
+
+        $ sphinx-build docs/source docs/build/html
+
+     Once the process terminates, you can view the built documentation by opening ``docs/build/html/index.html`` with a browser.
 
    - For consistency, please conform to `Google Python Style Guide`_ and `Google Python Style Docstrings`_. In addition, code should be formatted consistently with other code around it.
 
@@ -217,6 +237,7 @@ break the API classes. For example:
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
 .. _`developers' mailing list`: mailto:devs@python-telegram-bot.org
 .. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
+.. _`sphinx`: http://sphinx-doc.org
 .. _`Google Python Style Guide`: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
 .. _`Google Python Style Docstrings`: http://sphinx-doc.org/latest/ext/example_google.html
 .. _AUTHORS.rst: ../AUTHORS.rst
