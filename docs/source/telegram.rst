@@ -141,8 +141,4 @@ Passport
     telegram.encryptedpassportelement
     telegram.encryptedcredentials
 
-telegram.utils
---------------
-
-.. toctree::
-    telegram.utils
+.. include:: telegram.utils.rst
