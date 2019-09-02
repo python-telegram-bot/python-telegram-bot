@@ -140,7 +140,8 @@ def end(update, context):
 
 
 def error(update, context):
-    logger.warn('Update "%s" caused error "%s"', (update, context.error))
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
