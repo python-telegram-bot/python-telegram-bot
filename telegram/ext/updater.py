@@ -174,7 +174,7 @@ class Updater(object):
                     'Connection pool of Request object is smaller than optimal value (%s)',
                     con_pool_size)
             self.update_queue = dispatcher.update_queue
-            self.__exception_event = dispatcher._exception_event
+            self.__exception_event = dispatcher.exception_event
             self.persistence = dispatcher.persistence
             self.job_queue = dispatcher.job_queue
             self.dispatcher = dispatcher

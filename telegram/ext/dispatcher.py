@@ -161,7 +161,7 @@ class Dispatcher(object):
                 self._set_singleton(None)
 
     @property
-    def _exception_event(self):
+    def exception_event(self):
         return self.__exception_event
 
     def _init_async_threads(self, base_name, workers):
