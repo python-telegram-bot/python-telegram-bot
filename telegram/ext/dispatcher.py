@@ -68,7 +68,9 @@ class DispatcherHandlerStop(Exception):
 
 
 class Dispatcher(object):
-    """This class dispatches all kinds of updates to its registered handlers.
+    """This class dispatches all kinds of updates to its registered handlers. If there is a not
+    handled CallbackQuery update, the library answers it silently, which prevents clients from
+    showing an error message.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -361,7 +363,7 @@ class Dispatcher(object):
             return
 
         context = None
-        skip = False
+        is_update_handled = False
 
         for group in self.groups:
             try:
@@ -372,7 +374,7 @@ class Dispatcher(object):
                             context = CallbackContext.from_update(update, self)
                         handler.handle_update(update, self, check, context)
                         persist_update(update)
-                        skip = True
+                        is_update_handled = True
                         break
 
             # Stop processing with any other handler.
@@ -394,7 +396,7 @@ class Dispatcher(object):
                                           'uncaught error was raised while handling the error '
                                           'with an error_handler')
 
-        if not skip and update.callback_query:
+        if not is_update_handled and update.callback_query:
             # this means the update wasn't handled so far, and we can simply answer the query for
             # the user
             update.callback_query.answer()
