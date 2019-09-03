@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
+import datetime as dtm
 import os
 import sys
 import time
@@ -181,7 +181,7 @@ class TestJobQueue(object):
     def test_time_unit_dt_timedelta(self, job_queue):
         # Testing seconds, minutes and hours as datetime.timedelta object
         # This is sufficient to test that it actually works.
-        interval = datetime.timedelta(seconds=0.05)
+        interval = dtm.timedelta(seconds=0.05)
         expected_time = time.time() + interval.total_seconds()
 
         job_queue.run_once(self.job_datetime_tests, interval)
@@ -190,43 +190,43 @@ class TestJobQueue(object):
 
     def test_time_unit_dt_datetime(self, job_queue):
         # Testing running at a specific datetime
-        delta = datetime.timedelta(seconds=0.05)
-        when = datetime.datetime.now() + delta
-        expected_time = time.time() + delta.total_seconds()
+        delta, now = dtm.timedelta(seconds=0.05), time.time()
+        when = dtm.datetime.utcfromtimestamp(now) + delta
+        expected_time = now + delta.total_seconds()
 
         job_queue.run_once(self.job_datetime_tests, when)
         sleep(0.06)
-        assert pytest.approx(self.job_time) == expected_time
+        assert self.job_time == pytest.approx(expected_time)
 
     def test_time_unit_dt_time_today(self, job_queue):
         # Testing running at a specific time today
-        delta = 0.05
-        when = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
-        expected_time = time.time() + delta
+        delta, now = 0.05, time.time()
+        when = (dtm.datetime.utcfromtimestamp(now) + dtm.timedelta(seconds=delta)).time()
+        expected_time = now + delta
 
         job_queue.run_once(self.job_datetime_tests, when)
         sleep(0.06)
-        assert pytest.approx(self.job_time) == expected_time
+        assert self.job_time == pytest.approx(expected_time)
 
     def test_time_unit_dt_time_tomorrow(self, job_queue):
         # Testing running at a specific time that has passed today. Since we can't wait a day, we
         # test if the jobs next_t has been calculated correctly
-        delta = -2
-        when = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
-        expected_time = time.time() + delta + 60 * 60 * 24
+        delta, now = -2, time.time()
+        when = (dtm.datetime.utcfromtimestamp(now) + dtm.timedelta(seconds=delta)).time()
+        expected_time = now + delta + 60 * 60 * 24
 
         job_queue.run_once(self.job_datetime_tests, when)
-        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_time)
 
     def test_run_daily(self, job_queue):
-        delta = 0.5
-        time_of_day = (datetime.datetime.now() + datetime.timedelta(seconds=delta)).time()
-        expected_time = time.time() + 60 * 60 * 24 + delta
+        delta, now = 0.5, time.time()
+        time_of_day = (dtm.datetime.utcfromtimestamp(now) + dtm.timedelta(seconds=delta)).time()
+        expected_time = now + 60 * 60 * 24 + delta
 
         job_queue.run_daily(self.job_run_once, time_of_day)
         sleep(0.6)
         assert self.result == 1
-        assert pytest.approx(job_queue._queue.get(False)[0]) == expected_time
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_time)
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)

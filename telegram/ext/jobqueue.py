@@ -29,6 +29,7 @@ from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.helpers import to_float_timestamp
 
 
 class Days(object):
@@ -70,30 +71,25 @@ class JobQueue(object):
     def set_dispatcher(self, dispatcher):
         self._dispatcher = dispatcher
 
-    def _put(self, job, next_t=None, last_t=None):
-        if next_t is None:
-            next_t = job.interval
-            if next_t is None:
-                raise ValueError('next_t is None')
+    def _put(self, job, next_t=None, previous_t=None):
+        """
+        Enqueues the job, scheduling its next run at the correct time.
 
-        if isinstance(next_t, datetime.datetime):
-            next_t = (next_t - datetime.datetime.now()).total_seconds()
+        Args:
+            job (telegram.ext.Job): job to enqueue
+            next_t (optional):
+                Time for which the job should be scheduled. The precise semantics of this parameter
+                depend on its type (see :func:`telegram.ext.JobQueue.run_repeating` for details).
+                Defaults to now + ``job.interval``.
+            previous_t (optional):
+                Time at which the job last ran (``None`` if it hasn't run yet).
+        """
 
-        elif isinstance(next_t, datetime.time):
-            next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
+        # get time at which to run:
+        next_t = to_float_timestamp(next_t or job.interval, reference_timestamp=previous_t)
 
-            if datetime.datetime.now().time() > next_t:
-                next_datetime += datetime.timedelta(days=1)
-
-            next_t = (next_datetime - datetime.datetime.now()).total_seconds()
-
-        elif isinstance(next_t, datetime.timedelta):
-            next_t = next_t.total_seconds()
-
-        next_t += last_t or time.time()
-
+        # enqueue:
         self.logger.debug('Putting job %s with t=%f', job.name, next_t)
-
         self._queue.put((next_t, job))
 
         # Wake up the loop if this job should be executed next
@@ -276,7 +272,7 @@ class JobQueue(object):
                 self.logger.debug('Skipping disabled job %s', job.name)
 
             if job.repeat and not job.removed:
-                self._put(job, last_t=t)
+                self._put(job, previous_t=t)
             else:
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
@@ -379,7 +375,7 @@ class Job(object):
         self.context = context
         self.name = name or callback.__name__
 
-        self._repeat = repeat
+        self._repeat = None
         self._interval = None
         self.interval = interval
         self.repeat = repeat
