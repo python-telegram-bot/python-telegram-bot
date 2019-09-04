@@ -51,6 +51,7 @@ def escape_markdown(text):
 
 
 # -------- date/time related helpers --------
+# TODO: add generic specification of UTC for naive datetimes to docs
 
 # hardcoded UTC timezone object (`datetime.timezone` isn't available in py2)
 def _utc():

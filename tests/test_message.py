@@ -35,12 +35,12 @@ def message(bot):
 @pytest.fixture(scope='function',
                 params=[
                     {'forward_from': User(99, 'forward_user', False),
-                     'forward_date': datetime.now()},
+                     'forward_date': datetime.utcnow()},
                     {'forward_from_chat': Chat(-23, 'channel'),
                      'forward_from_message_id': 101,
-                     'forward_date': datetime.now()},
+                     'forward_date': datetime.utcnow()},
                     {'reply_to_message': Message(50, None, None, None)},
-                    {'edit_date': datetime.now()},
+                    {'edit_date': datetime.utcnow()},
                     {'text': 'a text message',
                      'enitites': [MessageEntity('bold', 10, 4),
                                   MessageEntity('italic', 16, 7)]},
@@ -114,7 +114,7 @@ def message_params(bot, request):
 class TestMessage(object):
     id = 1
     from_user = User(2, 'testuser', False)
-    date = datetime.now()
+    date = datetime.utcnow()
     chat = Chat(3, 'private')
     test_entities = [{'length': 4, 'offset': 10, 'type': 'bold'},
                      {'length': 7, 'offset': 16, 'type': 'italic'},

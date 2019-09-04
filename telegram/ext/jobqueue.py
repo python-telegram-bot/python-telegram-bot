@@ -260,7 +260,8 @@ class JobQueue(object):
 
             if job.enabled:
                 try:
-                    current_week_day = datetime.datetime.now().weekday()
+                    # TODO: set timezone for checking weekday
+                    current_week_day = datetime.date.today().weekday()
                     if any(day == current_week_day for day in job.days):
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)

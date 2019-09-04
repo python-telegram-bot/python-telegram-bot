@@ -46,7 +46,7 @@ class TestChatMember(object):
         assert chat_member.status == self.status
 
     def test_de_json_all_args(self, bot, user):
-        time = datetime.datetime.now()
+        time = datetime.datetime.utcnow()
         json_dict = {'user': user.to_dict(),
                      'status': self.status,
                      'until_date': to_timestamp(time),
