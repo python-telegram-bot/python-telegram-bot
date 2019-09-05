@@ -237,21 +237,21 @@ class TestDispatcher(object):
         assert self.count == 3
 
     def test_callbackquery_answered_when_no_handler(self, dp, bot, monkeypatch):
-        update = Update(1, callback_query=CallbackQuery(1, User(1, "pool", False), 1, bot=bot))
-        wuhu = []
+        update = Update(1, callback_query=CallbackQuery(1, User(1, "Test", False), 1, bot=bot))
+        passed = []
 
         def test(*args, **kwargs):
-            wuhu.append(1)
+            passed.append(1)
 
         def test_2(update, context):
-            wuhu.append(2)
+            passed.append(2)
 
         monkeypatch.setattr('telegram.Bot.answerCallbackQuery', test)
 
         dp.process_update(update)
         dp.add_handler(CallbackQueryHandler(test_2))
         dp.process_update(update)
-        assert wuhu == [1, 2]
+        assert passed == [1, 2]
 
     def test_add_handler_errors(self, dp):
         handler = 'not a handler'
