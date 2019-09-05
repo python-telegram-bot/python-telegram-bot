@@ -86,10 +86,8 @@ class CallbackContext(object):
 
     @chat_data.setter
     def chat_data(self, value):
-        if self._chat_data is not None:
-            raise AttributeError("You can not assign a new value to chat_data, see "
-                                 "https://git.io/fjxKe")
-        self._chat_data = value
+        raise AttributeError("You can not assign a new value to chat_data, see "
+                             "https://git.io/fjxKe")
 
     @property
     def user_data(self):
@@ -97,10 +95,8 @@ class CallbackContext(object):
 
     @user_data.setter
     def user_data(self, value):
-        if self._user_data is not None:
-            raise AttributeError("You can not assign a new value to user_data, see "
-                                 "https://git.io/fjxKe")
-        self._user_data = value
+        raise AttributeError("You can not assign a new value to user_data, see "
+                             "https://git.io/fjxKe")
 
     @classmethod
     def from_error(cls, update, error, dispatcher):
@@ -116,9 +112,9 @@ class CallbackContext(object):
             user = update.effective_user
 
             if chat:
-                self.chat_data = dispatcher.chat_data[chat.id]
+                self._chat_data = dispatcher.chat_data[chat.id]
             if user:
-                self.user_data = dispatcher.user_data[user.id]
+                self._user_data = dispatcher.user_data[user.id]
         return self
 
     @classmethod
