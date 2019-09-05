@@ -18,10 +18,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
-import warnings
 
 from telegram import TelegramObject, ChatPhoto
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class Chat(TelegramObject):
@@ -110,11 +108,6 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         self.all_members_are_administrators = all_members_are_administrators
-        if all_members_are_administrators is not None:
-            warnings.warn(('all_members_are_administrators is deprecated. See '
-                           'https://core.telegram.org/bots/api#july-29-2019 for more info'),
-                          TelegramDeprecationWarning,
-                          stacklevel=2)
         self.photo = photo
         self.description = description
         self.invite_link = invite_link
