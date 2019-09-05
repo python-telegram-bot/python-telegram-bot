@@ -113,5 +113,7 @@ class TestCallbackContext(object):
 
         with pytest.raises(AttributeError):
             callback_context.chat_data = {"test": 123}
+        with pytest.raises(AttributeError):
             callback_context.user_data = {}
+        with pytest.raises(AttributeError):
             callback_context.chat_data = "test"
