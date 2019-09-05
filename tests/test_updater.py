@@ -393,7 +393,7 @@ class TestUpdater(object):
     def test_mutual_exclude_workers_dispatcher(self):
         dispatcher = Dispatcher(None, None)
         with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, workers = 8)
+            Updater(dispatcher=dispatcher, workers=8)
 
     def test_mutual_exclude_use_context_dispatcher(self):
         dispatcher = Dispatcher(None, None)
