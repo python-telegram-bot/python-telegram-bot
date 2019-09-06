@@ -27,14 +27,14 @@ class ChatPhoto(TelegramObject):
     """This object represents a chat photo.
 
     Attributes:
-        small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo.
-        big_file_id (:obj:`str`): Unique file identifier of big (640x640) chat photo.
+        small_file_id (:obj:`str`): File identifier of small (160x160) chat photo.
+        big_file_id (:obj:`str`): File identifier of big (640x640) chat photo.
 
     Args:
-        small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo. This
-            file_id can be used only for photo download.
-        big_file_id (:obj:`str`): Unique file identifier of big (640x640) chat photo. This file_id
-            can be used only for photo download.
+        small_file_id (:obj:`str`): File identifier of small (160x160) chat photo. This file_id can
+            be used only for photo download and only for as long as the photo is not changed.
+        big_file_id (:obj:`str`): File identifier of big (640x640) chat photo. This file_id can be
+            used only for photo download and only for as long as the photo is not changed.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 

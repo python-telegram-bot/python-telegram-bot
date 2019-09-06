@@ -2685,13 +2685,17 @@ class Bot(TelegramObject):
         return result
 
     @log
-    def restrict_chat_member(self, chat_id, user_id, until_date=None, can_send_messages=None,
-                             can_send_media_messages=None, can_send_other_messages=None,
-                             can_add_web_page_previews=None, timeout=None, **kwargs):
+    def restrict_chat_member(self, chat_id, user_id, permissions, until_date=None,
+                             timeout=None, **kwargs):
         """
         Use this method to restrict a user in a supergroup. The bot must be an administrator in
         the supergroup for this to work and must have the appropriate admin rights. Pass True for
         all boolean parameters to lift restrictions from a user.
+
+        Note:
+            Since Bot API 4.4, :attr:`restrict_chat_member` takes the new user permissions in a
+            single argument of type :class:`telegram.ChatPermissions`. The old way of passing
+            parameters will not keep working forever.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2701,15 +2705,7 @@ class Bot(TelegramObject):
                 will be lifted for the user, unix time. If user is restricted for more than 366
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
-            can_send_messages (:obj:`bool`, optional): Pass True, if the user can send text
-                messages, contacts, locations and venues.
-            can_send_media_messages (:obj:`bool`, optional): Pass True, if the user can send
-                audios, documents, photos, videos, video notes and voice notes, implies
-                can_send_messages.
-            can_send_other_messages (:obj:`bool`, optional): Pass True, if the user can send
-                animations, games, stickers and use inline bots, implies can_send_media_messages.
-            can_add_web_page_previews (:obj:`bool`, optional): Pass True, if the user may add
-                web page previews to their messages, implies can_send_media_messages.
+            permissions (:class:`telegram.ChatPermissions`): New user permissions.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2720,24 +2716,15 @@ class Bot(TelegramObject):
 
         Raises:
             :class:`telegram.TelegramError`
-
         """
         url = '{0}/restrictChatMember'.format(self.base_url)
 
-        data = {'chat_id': chat_id, 'user_id': user_id}
+        data = {'chat_id': chat_id, 'user_id': user_id, 'permissions': permissions.to_dict()}
 
         if until_date is not None:
             if isinstance(until_date, datetime):
                 until_date = to_timestamp(until_date)
             data['until_date'] = until_date
-        if can_send_messages is not None:
-            data['can_send_messages'] = can_send_messages
-        if can_send_media_messages is not None:
-            data['can_send_media_messages'] = can_send_media_messages
-        if can_send_other_messages is not None:
-            data['can_send_other_messages'] = can_send_other_messages
-        if can_add_web_page_previews is not None:
-            data['can_add_web_page_previews'] = can_add_web_page_previews
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2809,6 +2796,38 @@ class Bot(TelegramObject):
             data['can_pin_messages'] = can_pin_messages
         if can_promote_members is not None:
             data['can_promote_members'] = can_promote_members
+        data.update(kwargs)
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
+    def set_chat_permissions(self, chat_id, permissions, timeout=None, **kwargs):
+        """
+        Use this method to set default chat permissions for all members. The bot must be an
+        administrator in the group or a supergroup for this to work and must have the
+        :attr:`can_restrict_members` admin rights. Returns True on success.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
+                the target supergroup (in the format `@supergroupusername`).
+            permissions (:class:`telegram.ChatPermissions`): New default chat permissions.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+
+        Returns:
+            :obj:`bool`: Returns True on success.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatPermissions'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'permissions': permissions.to_dict()}
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
@@ -2958,8 +2977,9 @@ class Bot(TelegramObject):
     @log
     def set_chat_description(self, chat_id, description, timeout=None, **kwargs):
         """
-        Use this method to change the description of a supergroup or a channel. The bot must be an
-        administrator in the chat for this to work and must have the appropriate admin rights.
+        Use this method to change the description of a group, a supergroup or a channel. The bot
+        must be an administrator in the chat for this to work and must have the appropriate admin
+        rights.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3526,6 +3546,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member
     """Alias for :attr:`promote_chat_member`"""
+    setChatPermissions = set_chat_permissions
+    """Alias for :attr:`set_chat_permissions`"""
     exportChatInviteLink = export_chat_invite_link
     """Alias for :attr:`export_chat_invite_link`"""
     setChatPhoto = set_chat_photo
