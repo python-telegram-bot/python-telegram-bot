@@ -147,7 +147,7 @@ def effective_message_type(entity):
     return None
 
 
-def create_deep_linked_url(bot_username, payload=None):
+def create_deep_linked_url(bot_username, payload=None, group=False):
     """
     Creates a deep-linked URL for this ``bot_username`` with the specified ``payload``.
     See  https://core.telegram.org/bots#deep-linking to learn more.
@@ -162,8 +162,10 @@ def create_deep_linked_url(bot_username, payload=None):
         ``create_deep_linked_url(bot.get_me().username, "some-params")``
 
     Args:
-        bot_username (:obj:`str`) The username to link to
-        payload (:obj:`str`) Parameters to encode in the created URL
+        bot_username (:obj:`str`): The username to link to
+        payload (:obj:`str`, optional): Parameters to encode in the created URL
+        group (:obj:`bool`, optional): If `True` the user is prompted to select a group to add the
+            bot to. If `False`, opens a one-on-one conversation with the bot. Defaults to `False`.
 
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters
@@ -182,8 +184,14 @@ def create_deep_linked_url(bot_username, payload=None):
         raise ValueError("Only the following characters are allowed for deep-linked "
                          "URLs: A-Z, a-z, 0-9, _ and -")
 
-    return '{0}?start={1}'.format(
+    if group:
+        key = 'startgroup'
+    else:
+        key = 'start'
+
+    return '{0}?{1}={2}'.format(
         base_url,
+        key,
         payload
     )
 

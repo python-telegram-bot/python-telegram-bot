@@ -40,6 +40,10 @@ class TestHelpers(object):
         actual = helpers.create_deep_linked_url(username, payload)
         assert expected == actual
 
+        expected = "https://t.me/{}?startgroup={}".format(username, payload)
+        actual = helpers.create_deep_linked_url(username, payload, group=True)
+        assert expected == actual
+
         payload = ""
         expected = "https://t.me/{}".format(username)
         assert expected == helpers.create_deep_linked_url(username)
