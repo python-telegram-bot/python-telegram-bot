@@ -35,44 +35,47 @@ USING_ENTITIES = 'using-entities-here'
 SO_COOL = 'so-cool'
 
 
-def start(bot, update):
+def start(update, context):
     """Send a deep-linked URL when the command /start is issued."""
+    bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, CHECK_THIS_OUT)
     text = "Feel free to tell your friends about it:\n\n" + url
     update.message.reply_text(text)
 
 
-def deep_linked_level_1(bot, update):
+def deep_linked_level_1(update, context):
     """Reached through the CHECK_THIS_OUT payload"""
+    bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, SO_COOL)
     text = "Awesome, you just accessed hidden functionality!\n\nContinue here: " + url
     update.message.reply_text(text)
 
 
-def deep_linked_level_2(bot, update):
+def deep_linked_level_2(update, context):
     """Reached through the SO_COOL payload"""
+    bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, USING_ENTITIES)
     text = "You can also mask the deep-linked URLs as links: " \
            "[▶️ CLICK HERE]({0}).".format(url)
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-def deep_linked_level_3(bot, update, args):
+def deep_linked_level_3(update, context):
     """Reached through the USING_ENTITIES payload"""
-    payload = args
+    payload = context.args
     update.message.reply_text("Congratulations! This is as deep as it gets 👏🏻\n\n"
                               "The payload was: {0}".format(payload))
 
 
-def error(bot, update, error):
+def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater("TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
