@@ -1,0 +1,6 @@
+telegram (12.0.0b1) unstable; urgency=medium
+
+  * Debian packaging;
+  * Initial Release.
+
+ -- Marco Marinello <me@marcomarinello.it>  Thu, 22 Aug 2019 20:36:47 +0200

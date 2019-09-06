@@ -18,13 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes JobQueue and Job."""
 
+import datetime
 import logging
 import time
-import datetime
+import warnings
 import weakref
 from numbers import Number
-from threading import Thread, Lock, Event
 from queue import PriorityQueue, Empty
+from threading import Thread, Lock, Event
+
+from telegram.ext.callbackcontext import CallbackContext
+from telegram.utils.deprecate import TelegramDeprecationWarning
 
 
 class Days(object):
@@ -37,16 +41,24 @@ class JobQueue(object):
 
     Attributes:
         _queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
-        bot (:class:`telegram.Bot`): Bot that's send to the handlers.
-
-    Args:
         bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
-
+            DEPRECATED: Use set_dispatcher instead.
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot=None):
         self._queue = PriorityQueue()
-        self.bot = bot
+        if bot:
+            warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
+                          "instead!", TelegramDeprecationWarning, stacklevel=2)
+
+            class MockDispatcher(object):
+                def __init__(self):
+                    self.bot = bot
+                    self.use_context = False
+
+            self._dispatcher = MockDispatcher()
+        else:
+            self._dispatcher = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__start_lock = Lock()
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick
@@ -54,6 +66,9 @@ class JobQueue(object):
         self.__thread = None
         self._next_peek = None
         self._running = False
+
+    def set_dispatcher(self, dispatcher):
+        self._dispatcher = dispatcher
 
     def _put(self, job, next_t=None, last_t=None):
         if next_t is None:
@@ -90,7 +105,7 @@ class JobQueue(object):
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access it's
+                :class:`telegram.ext.Job` instance. It can be used to access its
                 ``job.context`` or change it to a repeating job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
@@ -122,12 +137,12 @@ class JobQueue(object):
         return job
 
     def run_repeating(self, callback, interval, first=None, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access it's
+                :class:`telegram.ext.Job` instance. It can be used to access its
                 ``Job.context`` or change it to a repeating job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
@@ -157,6 +172,11 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
+        Notes:
+             `interval` is always respected "as-is". That means that if DST changes during that
+             interval, the job might not run at the time one would expect. It is always recommended
+             to pin servers to UTC time, then time related behaviour can always be expected.
+
         """
         job = Job(callback,
                   interval=interval,
@@ -168,12 +188,12 @@ class JobQueue(object):
         return job
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access it's ``Job.context``
+                :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
                 or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
@@ -186,6 +206,11 @@ class JobQueue(object):
         Returns:
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
+
+        Notes:
+             Daily is just an alias for "24 Hours". That means that if DST changes during that
+             interval, the job might not run at the time one would expect. It is always recommended
+             to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
         job = Job(callback,
@@ -242,7 +267,7 @@ class JobQueue(object):
                     current_week_day = datetime.datetime.now().weekday()
                     if any(day == current_week_day for day in job.days):
                         self.logger.debug('Running job %s', job.name)
-                        job.run(self.bot)
+                        job.run(self._dispatcher)
 
                 except Exception:
                     self.logger.exception('An uncaught error was raised while executing job %s',
@@ -262,7 +287,8 @@ class JobQueue(object):
         if not self._running:
             self._running = True
             self.__start_lock.release()
-            self.__thread = Thread(target=self._main_loop, name="job_queue")
+            self.__thread = Thread(target=self._main_loop,
+                                   name="Bot:{}:job_queue".format(self._dispatcher.bot.id))
             self.__thread.start()
             self.logger.debug('%s thread started', self.__class__.__name__)
         else:
@@ -367,9 +393,12 @@ class Job(object):
         self._enabled = Event()
         self._enabled.set()
 
-    def run(self, bot):
+    def run(self, dispatcher):
         """Executes the callback function."""
-        self.callback(bot, self)
+        if dispatcher.use_context:
+            self.callback(CallbackContext.from_job(self, dispatcher))
+        else:
+            self.callback(dispatcher.bot, self)
 
     def schedule_removal(self):
         """

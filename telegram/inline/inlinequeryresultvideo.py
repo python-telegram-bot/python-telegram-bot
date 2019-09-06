@@ -35,9 +35,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`): Optional. Caption, 0-200 characters
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         video_width (:obj:`int`): Optional. Video width.
         video_height (:obj:`int`): Optional. Video height.
@@ -54,9 +54,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
-        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        caption (:obj:`str`, optional): Caption, 0-1024 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
+            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
             in :class:`telegram.ParseMode` for the available modes.
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.

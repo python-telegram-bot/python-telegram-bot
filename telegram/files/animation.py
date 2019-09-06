@@ -26,6 +26,9 @@ class Animation(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique file identifier.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined
             by sender.
         file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
@@ -34,6 +37,9 @@ class Animation(TelegramObject):
 
     Args:
         file_id (:obj:`str`): Unique file identifier.
+        width (:obj:`int`): Video width as defined by sender.
+        height (:obj:`int`): Video height as defined by sender.
+        duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
         file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
@@ -43,12 +49,19 @@ class Animation(TelegramObject):
 
     def __init__(self,
                  file_id,
+                 width,
+                 height,
+                 duration,
                  thumb=None,
                  file_name=None,
                  mime_type=None,
                  file_size=None,
                  **kwargs):
-        self.file_id = file_id
+        # Required
+        self.file_id = str(file_id)
+        self.width = int(width)
+        self.height = int(height)
+        self.duration = duration
         self.thumb = thumb
         self.file_name = file_name
         self.mime_type = mime_type

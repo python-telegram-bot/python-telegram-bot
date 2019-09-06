@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Telegram passport test!</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--- Needs file from https://github.com/TelegramMessenger/TGPassportJsSDK downloaded --->
+    <script src="telegram-passport.js"></script>
+    <script>
+        "use strict";
+
+        Telegram.Passport.createAuthButton('telegram_passport_auth', {
+            bot_id:       BOT_ID, // YOUR BOT ID
+            scope:        {data: [{type: 'id_document', selfie: true}, 'address_document', 'phone_number', 'email'], v: 1}, // WHAT DATA YOU WANT TO RECEIVE
+            public_key:   '-----BEGIN PUBLIC KEY----- ...', // YOUR PUBLIC KEY
+            payload:      'thisisatest', // YOUR BOT WILL RECEIVE THIS DATA WITH THE REQUEST
+            callback_url: 'https://example.org' // TELEGRAM WILL SEND YOUR USER BACK TO THIS URL
+        });
+
+    </script>
+</head>
+<body>
+<h1>Telegram passport test</h1>
+
+<div id="telegram_passport_auth"></div>
+</body>
+</html>

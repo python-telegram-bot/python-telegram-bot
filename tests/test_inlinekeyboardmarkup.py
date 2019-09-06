@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+from flaky import flaky
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -33,6 +34,8 @@ class TestInlineKeyboardMarkup(object):
         InlineKeyboardButton(text='button2', callback_data='data2')
     ]]
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_message_with_inline_keyboard_markup(self, bot, chat_id, inline_keyboard_markup):
         message = bot.send_message(
             chat_id,
@@ -40,6 +43,27 @@ class TestInlineKeyboardMarkup(object):
             reply_markup=inline_keyboard_markup)
 
         assert message.text == 'Testing InlineKeyboardMarkup'
+
+    def test_from_button(self):
+        inline_keyboard_markup = InlineKeyboardMarkup.from_button(
+            InlineKeyboardButton(text='button1', callback_data='data1')).inline_keyboard
+        assert len(inline_keyboard_markup) == 1
+        assert len(inline_keyboard_markup[0]) == 1
+
+    def test_from_row(self):
+        inline_keyboard_markup = InlineKeyboardMarkup.from_row([
+            InlineKeyboardButton(text='button1', callback_data='data1'),
+            InlineKeyboardButton(text='button1', callback_data='data1')]).inline_keyboard
+        assert len(inline_keyboard_markup) == 1
+        assert len(inline_keyboard_markup[0]) == 2
+
+    def test_from_column(self):
+        inline_keyboard_markup = InlineKeyboardMarkup.from_column([
+            InlineKeyboardButton(text='button1', callback_data='data1'),
+            InlineKeyboardButton(text='button1', callback_data='data1')]).inline_keyboard
+        assert len(inline_keyboard_markup) == 2
+        assert len(inline_keyboard_markup[0]) == 1
+        assert len(inline_keyboard_markup[1]) == 1
 
     def test_expected_values(self, inline_keyboard_markup):
         assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
@@ -54,3 +78,34 @@ class TestInlineKeyboardMarkup(object):
                 self.inline_keyboard[0][1].to_dict()
             ]
         ]
+
+    def test_de_json(self):
+        json_dict = {
+            'inline_keyboard': [[
+                {
+                    'text': 'start',
+                    'url': 'http://google.com'
+                },
+                {
+                    'text': 'next',
+                    'callback_data': 'abcd'
+                }],
+                [{
+                    'text': 'Cancel',
+                    'callback_data': 'Cancel'
+                }]
+            ]}
+        inline_keyboard_markup = InlineKeyboardMarkup.de_json(json_dict, None)
+
+        assert isinstance(inline_keyboard_markup, InlineKeyboardMarkup)
+        keyboard = inline_keyboard_markup.inline_keyboard
+        assert len(keyboard) == 2
+        assert len(keyboard[0]) == 2
+        assert len(keyboard[1]) == 1
+
+        assert isinstance(keyboard[0][0], InlineKeyboardButton)
+        assert isinstance(keyboard[0][1], InlineKeyboardButton)
+        assert isinstance(keyboard[1][0], InlineKeyboardButton)
+
+        assert keyboard[0][0].text == 'start'
+        assert keyboard[0][0].url == 'http://google.com'

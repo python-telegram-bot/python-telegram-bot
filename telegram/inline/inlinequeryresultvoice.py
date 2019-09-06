@@ -33,7 +33,7 @@ class InlineQueryResultVoice(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Voice message title.
-        caption (:obj:`str`): Optional. Caption, 0-200 characters.
+        caption (:obj:`str`): Optional. Caption, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
             in :class:`telegram.ParseMode` for the available modes.
@@ -47,7 +47,7 @@ class InlineQueryResultVoice(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Voice message title.
-        caption (:obj:`str`, optional): Caption, 0-200 characters.
+        caption (:obj:`str`, optional): Caption, 0-1024 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption.. See the constants
             in :class:`telegram.ParseMode` for the available modes.

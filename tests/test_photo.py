@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#
+# -*- coding: utf-8 -*-
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2018
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
@@ -27,7 +27,7 @@ from telegram import Sticker, TelegramError, PhotoSize, InputFile
 
 @pytest.fixture(scope='function')
 def photo_file():
-    f = open('tests/data/telegram.jpg', 'rb')
+    f = open(u'tests/data/telegram.jpg', 'rb')
     yield f
     f.close()
 
@@ -49,29 +49,29 @@ def photo(_photo):
 
 
 class TestPhoto(object):
-    width = 300
-    height = 300
+    width = 800
+    height = 800
     caption = u'<b>PhotoTest</b> - *Caption*'
-    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
-    file_size = 10209
+    photo_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram_new.jpg'
+    file_size = 29176
 
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
-        assert photo.file_id is not ''
+        assert photo.file_id != ''
 
         assert isinstance(thumb, PhotoSize)
         assert isinstance(thumb.file_id, str)
-        assert thumb.file_id is not ''
+        assert thumb.file_id != ''
 
     def test_expected_values(self, photo, thumb):
         assert photo.width == self.width
         assert photo.height == self.height
         assert photo.file_size == self.file_size
-        assert thumb.width == 90
-        assert thumb.height == 90
-        assert thumb.file_size == 1478
+        assert thumb.width == 320
+        assert thumb.height == 320
+        assert thumb.file_size == 9331
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -197,19 +197,34 @@ class TestPhoto(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    def test_send_file_unicode_filename(self, bot, chat_id):
+        """
+        Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
+        """
+        with open(u'tests/data/测试.png', 'rb') as f:
+            message = bot.send_photo(photo=f, chat_id=chat_id)
+
+        photo = message.photo[-1]
+
+        assert isinstance(photo, PhotoSize)
+        assert isinstance(photo.file_id, str)
+        assert photo.file_id != ''
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_send_bytesio_jpg_file(self, bot, chat_id):
         file_name = 'tests/data/telegram_no_standard_header.jpg'
 
         # raw image bytes
         raw_bytes = BytesIO(open(file_name, 'rb').read())
-        inputfile = InputFile({'photo': raw_bytes})
-        assert inputfile.mimetype == 'application/octet-stream'
+        input_file = InputFile(raw_bytes)
+        assert input_file.mimetype == 'application/octet-stream'
 
         # raw image bytes with name info
         raw_bytes = BytesIO(open(file_name, 'rb').read())
         raw_bytes.name = file_name
-        inputfile = InputFile({'photo': raw_bytes})
-        assert inputfile.mimetype == 'image/jpeg'
+        input_file = InputFile(raw_bytes)
+        assert input_file.mimetype == 'image/jpeg'
 
         # send raw photo
         raw_bytes = BytesIO(open(file_name, 'rb').read())

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+import sys
 import time
 from datetime import datetime
 from platform import python_implementation
@@ -27,7 +28,7 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice)
+                      ShippingOption, LabeledPrice, Poll)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
 from telegram.utils.helpers import from_timestamp
 
@@ -37,7 +38,9 @@ HIGHSCORE_DELTA = 1450000000
 
 @pytest.fixture(scope='class')
 def message(bot, chat_id):
-    return bot.send_message(chat_id, 'Text', reply_to_message_id=1,
+    to_reply_to = bot.send_message(chat_id, 'Text',
+                                   disable_web_page_preview=True, disable_notification=True)
+    return bot.send_message(chat_id, 'Text', reply_to_message_id=to_reply_to.message_id,
                             disable_web_page_preview=True, disable_notification=True)
 
 
@@ -100,12 +103,13 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_message_old_message(self, bot, chat_id):
-        with pytest.raises(TelegramError, match='can\'t be deleted'):
+        with pytest.raises(TelegramError, match='Message to delete not found'):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
-    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note
-    # and send_media_group are tested in their respective test modules. No need to duplicate here.
+    # send_photo, send_audio, send_document, send_sticker, send_video, send_voice, send_video_note,
+    # send_media_group and send_animation are tested in their respective test modules. No need to
+    # duplicate here.
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -114,14 +118,19 @@ class TestBot(object):
         latitude = -23.691288
         title = 'title'
         address = 'address'
+        foursquare_id = 'foursquare id'
+        foursquare_type = 'foursquare type'
         message = bot.send_venue(chat_id=chat_id, title=title, address=address, latitude=latitude,
-                                 longitude=longitude)
+                                 longitude=longitude, foursquare_id=foursquare_id,
+                                 foursquare_type=foursquare_type)
 
         assert message.venue
         assert message.venue.title == title
         assert message.venue.address == address
         assert message.venue.location.latitude == latitude
         assert message.venue.location.longitude == longitude
+        assert message.venue.foursquare_id == foursquare_id
+        assert message.venue.foursquare_type == foursquare_type
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -140,16 +149,44 @@ class TestBot(object):
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (''yet)')
+    # TODO: Add bot to group to test polls too
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_and_stop_poll(self, bot, super_group_id):
+        question = 'Is this a test?'
+        answers = ['Yes', 'No', 'Maybe']
+        message = bot.send_poll(chat_id=super_group_id, question=question, options=answers,
+                                timeout=60)
+
+        assert message.poll
+        assert message.poll.question == question
+        assert message.poll.options[0].text == answers[0]
+        assert message.poll.options[1].text == answers[1]
+        assert message.poll.options[2].text == answers[2]
+        assert not message.poll.is_closed
+
+        poll = bot.stop_poll(chat_id=super_group_id, message_id=message.message_id, timeout=60)
+        assert isinstance(poll, Poll)
+        assert poll.is_closed
+        assert poll.options[0].text == answers[0]
+        assert poll.options[0].voter_count == 0
+        assert poll.options[1].text == answers[1]
+        assert poll.options[1].voter_count == 0
+        assert poll.options[2].text == answers[2]
+        assert poll.options[2].voter_count == 0
+        assert poll.question == question
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_send_game(self, bot, chat_id):
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         message = bot.send_game(chat_id, game_short_name)
 
         assert message.game
-        assert message.game.description == 'This is a test game for python-telegram-bot.'
-        assert message.game.animation.file_id == 'CgADAQADKwIAAvjAuQABozciVqhFDO0C'
+        assert message.game.description == ('A no-op test game, for python-telegram-bot '
+                                            'bot framework testing.')
+        assert message.game.animation.file_id != ''
         assert message.game.photo[0].file_size == 851
 
     @flaky(3, 1)
@@ -184,18 +221,16 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_user_profile_photos(self, bot):
-        chat_id = 12173560  # hardcoded Leandro's chat_id
+    def test_get_user_profile_photos(self, bot, chat_id):
         user_profile_photos = bot.get_user_profile_photos(chat_id)
 
-        assert user_profile_photos.photos[0][0].file_size == 9999
+        assert user_profile_photos.photos[0][0].file_size == 5403
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_one_user_profile_photo(self, bot):
-        chat_id = 12173560  # hardcoded Leandro's chat_id
+    def test_get_one_user_profile_photo(self, bot, chat_id):
         user_profile_photos = bot.get_user_profile_photos(chat_id, offset=0, limit=1)
-        assert user_profile_photos.photos[0][0].file_size == 9999
+        assert user_profile_photos.photos[0][0].file_size == 5403
 
     # get_file is tested multiple times in the test_*media* modules.
 
@@ -258,6 +293,8 @@ class TestBot(object):
 
         assert message.caption == 'new_caption'
 
+    # edit_message_media is tested in test_inputmedia
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_edit_message_caption_with_parse_mode(self, bot, media_message):
@@ -267,7 +304,6 @@ class TestBot(object):
 
         assert message.caption == 'new caption'
 
-    @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_caption_without_required(self, bot):
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
             bot.edit_message_caption(caption='new_caption')
@@ -286,7 +322,6 @@ class TestBot(object):
 
         assert message is not True
 
-    @pytest.mark.xfail(raises=TelegramError)  # TODO: remove when #744 is merged
     def test_edit_message_reply_markup_without_required(self, bot):
         new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text='test', callback_data='1')]])
         with pytest.raises(ValueError, match='Both chat_id and message_id are required when'):
@@ -310,6 +345,8 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(15)
     @pytest.mark.xfail
+    @pytest.mark.skipif(os.getenv('APPVEYOR') and (sys.version_info < (3, 6)),
+                        reason='only run on 3.6 on appveyor')
     def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7
@@ -337,12 +374,12 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_chat(self, bot, group_id):
-        chat = bot.get_chat(group_id)
+    def test_get_chat(self, bot, super_group_id):
+        chat = bot.get_chat(super_group_id)
 
-        assert chat.type == 'group'
-        assert chat.title == '>>> telegram.Bot() - Developers'
-        assert chat.id == int(group_id)
+        assert chat.type == 'supergroup'
+        assert chat.title == '>>> telegram.Bot(test)'
+        assert chat.id == int(super_group_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -362,11 +399,12 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_get_chat_member(self, bot, channel_id):
-        chat_member = bot.get_chat_member(channel_id, 103246792)  # Eldin
+    def test_get_chat_member(self, bot, channel_id, chat_id):
+        chat_member = bot.get_chat_member(channel_id, chat_id)
 
         assert chat_member.status == 'administrator'
-        assert chat_member.user.username == 'EchteEldin'
+        assert chat_member.user.first_name == 'PTB'
+        assert chat_member.user.last_name == 'Test user'
 
     @pytest.mark.skip(reason="Not implemented yet.")
     def test_set_chat_sticker_set(self):
@@ -376,12 +414,11 @@ class TestBot(object):
     def test_delete_chat_sticker_set(self):
         pass
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         message = bot.set_game_score(
@@ -395,12 +432,11 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text != game.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_2(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA + 1
@@ -417,12 +453,11 @@ class TestBot(object):
         assert message.game.photo[0].file_size == game.game.photo[0].file_size
         assert message.game.text == game.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_3(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA - 1
@@ -434,12 +469,11 @@ class TestBot(object):
                 chat_id=game.chat_id,
                 message_id=game.message_id)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_4(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         score = int(BASE_TIME) - HIGHSCORE_DELTA - 2
@@ -460,24 +494,22 @@ class TestBot(object):
         game2 = bot.send_game(chat_id, game_short_name)
         assert str(score) in game2.game.text
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_set_game_score_too_low_score(self, bot, chat_id):
         # We need a game to set the score for
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
 
         with pytest.raises(BadRequest):
             bot.set_game_score(user_id=chat_id, score=100,
                                chat_id=game.chat_id, message_id=game.message_id)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No game made for Appveyor bot (yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_game_high_scores(self, bot, chat_id):
         # We need a game to get the scores for
-        game_short_name = 'python_telegram_bot_test_game'
+        game_short_name = 'test_game'
         game = bot.send_game(chat_id, game_short_name)
         high_scores = bot.get_game_high_scores(chat_id, game.chat_id, game.message_id)
         # We assume that the other game score tests ran within 20 sec
@@ -564,7 +596,7 @@ class TestBot(object):
     @pytest.mark.timeout(10)
     def test_promote_chat_member(self, bot, channel_id):
         # TODO: Add bot to supergroup so this can be tested properly / give bot perms
-        with pytest.raises(BadRequest, match='Chat_admin_required'):
+        with pytest.raises(BadRequest, match='Not enough rights'):
             assert bot.promote_chat_member(channel_id,
                                            95205500,
                                            can_change_info=True,
@@ -605,31 +637,63 @@ class TestBot(object):
     def test_set_chat_description(self, bot, channel_id):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_error_pin_unpin_message(self, bot, message):
-        # TODO: Add bot to supergroup so this can be tested properly
-        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            bot.pin_chat_message(message.chat_id, message.message_id, disable_notification=True)
+    # TODO: Add bot to group to test there too
+    def test_pin_and_unpin_message(self, bot, super_group_id):
+        message = bot.send_message(super_group_id, text="test_pin_message")
+        assert bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
+                                    disable_notification=True)
 
-        with pytest.raises(BadRequest, match='Method is available only for supergroups'):
-            bot.unpin_chat_message(message.chat_id)
+        chat = bot.get_chat(super_group_id)
+        assert chat.pinned_message == message
+
+        assert bot.unpinChatMessage(super_group_id)
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
 
-    def test_timeout_propagation(self, monkeypatch, bot, chat_id):
+    def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
+
+        from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
+
         class OkException(Exception):
             pass
 
-        timeout = 500
+        TIMEOUT = 500
 
-        def post(*args, **kwargs):
-            if kwargs.get('timeout') == 500:
+        def request_wrapper(*args, **kwargs):
+            obj = kwargs.get('timeout')
+            if isinstance(obj, Timeout) and obj._read == TIMEOUT:
                 raise OkException
 
-        monkeypatch.setattr('telegram.utils.request.Request.post', post)
+            return b'{"ok": true, "result": []}'
 
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', request_wrapper)
+
+        # Test file uploading
         with pytest.raises(OkException):
-            bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=timeout)
+            bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'), timeout=TIMEOUT)
+
+        # Test JSON submition
+        with pytest.raises(OkException):
+            bot.get_chat_administrators(chat_id, timeout=TIMEOUT)
+
+    def test_timeout_propagation_implicit(self, monkeypatch, bot, chat_id):
+
+        from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
+
+        class OkException(Exception):
+            pass
+
+        def request_wrapper(*args, **kwargs):
+            obj = kwargs.get('timeout')
+            if isinstance(obj, Timeout) and obj._read == 20:
+                raise OkException
+
+            return b'{"ok": true, "result": []}'
+
+        monkeypatch.setattr('telegram.utils.request.Request._request_wrapper', request_wrapper)
+
+        # Test file uploading
+        with pytest.raises(OkException):
+            bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
