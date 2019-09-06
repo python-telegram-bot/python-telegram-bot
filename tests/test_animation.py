@@ -94,7 +94,7 @@ class TestAnimation(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_mp3_url_file(self, bot, chat_id, animation):
+    def test_send_animation_url_file(self, bot, chat_id, animation):
         message = bot.send_animation(chat_id=chat_id, animation=self.animation_file_url,
                                      caption=self.caption)
 
