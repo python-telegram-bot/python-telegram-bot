@@ -1514,10 +1514,10 @@ class Bot(TelegramObject):
         calling get_file again.
 
         Args:
-            file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` |          \
-                     :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |                    \
-                     :class:`telegram.Video` | :class:`telegram.VideoNote` |                      \
-                     :class:`telegram.Voice`):
+            file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
+                     :class:`telegram.Document` | :class:`telegram.PhotoSize` |                   \
+                     :class:`telegram.Sticker` | :class:`telegram.Video` |                        \
+                     :class:`telegram.VideoNote` | :class:`telegram.Voice`):
                 Either the file identifier or an object that has a file_id attribute
                 to get file information about.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
