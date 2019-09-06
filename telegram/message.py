@@ -987,7 +987,7 @@ class Message(TelegramObject):
                     e: t
                     for (e, t) in sorted_entities if e.offset >= entity.offset
                     and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
+                    and e.to_dict() != entity.to_dict()
                 }
                 parsed_entities.extend([e for e in nested_entities.keys()])
 
@@ -1102,7 +1102,7 @@ class Message(TelegramObject):
                     e: t
                     for (e, t) in sorted_entities if e.offset >= entity.offset
                     and e.offset + e.length <= entity.offset + entity.length
-                    and e != entity
+                    and e.to_dict() != entity.to_dict()
                 }
                 parsed_entities.extend([e for e in nested_entities.keys()])
 
