@@ -70,7 +70,7 @@ class ChatPhoto(TelegramObject):
         """
         return self.bot.get_file(self.small_file_id, timeout=timeout, **kwargs)
 
-    def get_file(self, timeout=None, **kwargs):
+    def get_big_file(self, timeout=None, **kwargs):
         """Convenience wrapper over :attr:`telegram.Bot.get_file` for getting the
         big (640x640) chat photo
 
