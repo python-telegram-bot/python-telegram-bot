@@ -85,8 +85,3 @@ class ChatPermissions(TelegramObject):
             return None
 
         return cls(**data)
-
-    def to_dict(self):
-        data = super(ChatPermissions, self).to_dict()
-
-        return data
