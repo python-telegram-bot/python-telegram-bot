@@ -19,8 +19,9 @@ bot.
 
 import logging
 
-from telegram import ParseMode
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import Updater, CommandHandler, Filters
+
 # Enable logging
 from telegram.utils import helpers
 
@@ -38,7 +39,7 @@ SO_COOL = 'so-cool'
 def start(update, context):
     """Send a deep-linked URL when the command /start is issued."""
     bot = context.bot
-    url = helpers.create_deep_linked_url(bot.get_me().username, CHECK_THIS_OUT)
+    url = helpers.create_deep_linked_url(bot.get_me().username, CHECK_THIS_OUT, group=True)
     text = "Feel free to tell your friends about it:\n\n" + url
     update.message.reply_text(text)
 
@@ -47,8 +48,12 @@ def deep_linked_level_1(update, context):
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.get_me().username, SO_COOL)
-    text = "Awesome, you just accessed hidden functionality!\n\nContinue here: " + url
-    update.message.reply_text(text)
+    text = "Awesome, you just accessed hidden functionality! " \
+           " Now let's get back to the private chat."
+    keyboard = InlineKeyboardMarkup.from_button(
+        InlineKeyboardButton(text='Continue here!', url=url)
+    )
+    update.message.reply_text(text, reply_markup=keyboard)
 
 
 def deep_linked_level_2(update, context):
