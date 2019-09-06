@@ -20,6 +20,7 @@
 """This module contains an object that represents a Telegram Chat."""
 
 from telegram import TelegramObject, ChatPhoto
+from .chatpermissions import ChatPermissions
 
 
 class Chat(TelegramObject):
@@ -135,7 +136,6 @@ class Chat(TelegramObject):
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
         from telegram import Message
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
-        from telegram import ChatPermissions
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
 
         return cls(bot=bot, **data)
