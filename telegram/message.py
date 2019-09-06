@@ -968,7 +968,7 @@ class Message(TelegramObject):
         }
 
     @staticmethod
-    def _parse_html(message_text, entities, urled=False, offset=0):
+    def _parse_html(message_text, entities, urled=False):
         if message_text is None:
             return None
 
@@ -978,49 +978,33 @@ class Message(TelegramObject):
         html_text = ''
         last_offset = 0
 
-        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
-        parsed_entities = []
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+            text = escape(text)
 
-        for iter, (entity, text) in enumerate(sorted_entities):
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e.to_dict() != entity.to_dict()
-                }
-                parsed_entities.extend([e for e in nested_entities.keys()])
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '<a href="{}">{}</a>'.format(entity.url, text)
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
+            elif entity.type == MessageEntity.URL and urled:
+                insert = '<a href="{0}">{0}</a>'.format(text)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '<b>' + text + '</b>'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '<i>' + text + '</i>'
+            elif entity.type == MessageEntity.CODE:
+                insert = '<code>' + text + '</code>'
+            elif entity.type == MessageEntity.PRE:
+                insert = '<pre>' + text + '</pre>'
+            else:
+                insert = text
 
-                text = escape(text)
+            if sys.maxunicode == 0xffff:
+                html_text += escape(message_text[last_offset:entity.offset]) + insert
+            else:
+                html_text += escape(message_text[last_offset * 2:entity.offset * 2]
+                                    .decode('utf-16-le')) + insert
 
-                if nested_entities:
-                    text = Message._parse_html(text, nested_entities,
-                                               urled=urled, offset=entity.offset)
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    insert = '<a href="{}">{}</a>'.format(entity.url, text)
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
-                elif entity.type == MessageEntity.URL and urled:
-                    insert = '<a href="{0}">{0}</a>'.format(text)
-                elif entity.type == MessageEntity.BOLD:
-                    insert = '<b>' + text + '</b>'
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = '<i>' + text + '</i>'
-                elif entity.type == MessageEntity.CODE:
-                    insert = '<code>' + text + '</code>'
-                elif entity.type == MessageEntity.PRE:
-                    insert = '<pre>' + text + '</pre>'
-                else:
-                    insert = text
-
-                if sys.maxunicode == 0xffff:
-                    html_text += escape(message_text[last_offset:entity.offset - offset]) + insert
-                else:
-                    html_text += escape(message_text[last_offset * 2:(entity.offset - offset) * 2]
-                                        .decode('utf-16-le')) + insert
-
-                last_offset = entity.offset - offset + entity.length
+            last_offset = entity.offset + entity.length
 
         if sys.maxunicode == 0xffff:
             html_text += escape(message_text[last_offset:])
@@ -1083,7 +1067,7 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
     @staticmethod
-    def _parse_markdown(message_text, entities, urled=False, offset=0):
+    def _parse_markdown(message_text, entities, urled=False):
         if message_text is None:
             return None
 
@@ -1093,50 +1077,32 @@ class Message(TelegramObject):
         markdown_text = ''
         last_offset = 0
 
-        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
-        parsed_entities = []
+        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
+            text = escape_markdown(text)
 
-        for iter, (entity, text) in enumerate(sorted_entities):
-            if entity not in parsed_entities:
-                nested_entities = {
-                    e: t
-                    for (e, t) in sorted_entities if e.offset >= entity.offset
-                    and e.offset + e.length <= entity.offset + entity.length
-                    and e.to_dict() != entity.to_dict()
-                }
-                parsed_entities.extend([e for e in nested_entities.keys()])
+            if entity.type == MessageEntity.TEXT_LINK:
+                insert = '[{}]({})'.format(text, entity.url)
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
+            elif entity.type == MessageEntity.URL and urled:
+                insert = '[{0}]({0})'.format(text)
+            elif entity.type == MessageEntity.BOLD:
+                insert = '*' + text + '*'
+            elif entity.type == MessageEntity.ITALIC:
+                insert = '_' + text + '_'
+            elif entity.type == MessageEntity.CODE:
+                insert = '`' + text + '`'
+            elif entity.type == MessageEntity.PRE:
+                insert = '```' + text + '```'
+            else:
+                insert = text
+            if sys.maxunicode == 0xffff:
+                markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
+            else:
+                markdown_text += escape_markdown(message_text[last_offset * 2:entity.offset * 2]
+                                                 .decode('utf-16-le')) + insert
 
-                text = escape_markdown(text)
-
-                if nested_entities:
-                    text = Message._parse_markdown(text, nested_entities,
-                                                   urled=urled, offset=entity.offset)
-
-                if entity.type == MessageEntity.TEXT_LINK:
-                    insert = '[{}]({})'.format(text, entity.url)
-                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
-                elif entity.type == MessageEntity.URL and urled:
-                    insert = '[{0}]({0})'.format(text)
-                elif entity.type == MessageEntity.BOLD:
-                    insert = '*' + text + '*'
-                elif entity.type == MessageEntity.ITALIC:
-                    insert = '_' + text + '_'
-                elif entity.type == MessageEntity.CODE:
-                    insert = '`' + text + '`'
-                elif entity.type == MessageEntity.PRE:
-                    insert = '```' + text + '```'
-                else:
-                    insert = text
-                if sys.maxunicode == 0xffff:
-                    markdown_text += escape_markdown(message_text[last_offset:entity.offset
-                                                                  - offset]) + insert
-                else:
-                    markdown_text += escape_markdown(message_text[last_offset * 2:(entity.offset
-                                                                                   - offset) * 2]
-                                                     .decode('utf-16-le')) + insert
-
-                last_offset = entity.offset - offset + entity.length
+            last_offset = entity.offset + entity.length
 
         if sys.maxunicode == 0xffff:
             markdown_text += escape_markdown(message_text[last_offset:])
