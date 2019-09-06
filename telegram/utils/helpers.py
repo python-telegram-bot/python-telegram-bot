@@ -150,15 +150,16 @@ def effective_message_type(entity):
 def create_deep_linked_url(bot_username, payload=None):
     """
     Creates a deep-linked URL for this ``bot_username`` with the specified ``payload``.
-    See  https://core.telegram.org/bots#deep-linking  to learn more.
+    See  https://core.telegram.org/bots#deep-linking to learn more.
 
     The ``payload`` may consist of the following characters: ``A-Z, a-z, 0-9, _, -``
 
-    Note: Works well in conjunction with
-    ``CommandHandler("start", callback, Filters.regex('payload')``.
+    Note:
+        Works well in conjunction with
+        ``CommandHandler("start", callback, filters = Filters.regex('payload'))``
 
     Examples:
-        Example ``create_deep_linked_url(bot.get_me().username, "some-params")``
+        ``create_deep_linked_url(bot.get_me().username, "some-params")``
 
     Args:
         bot_username (:obj:`str`) The username to link to
