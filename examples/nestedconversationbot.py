@@ -27,43 +27,41 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # State definitions for top level conversation
-SELECTING_ACTION, ADDING_PARENT, ADDING_CHILD = map(chr, range(3))
+SELECTING_ACTION, ADDING_MEMBER, ADDING_SELF, DESCRIBING_SELF = map(chr, range(4))
 # State definitions for second level conversation
-SELECTING_GENDER, DESCRIBING = map(chr, range(4, 6))
+SELECTING_LEVEL, SELECTING_GENDER = map(chr, range(4, 6))
 # State definitions for descriptions conversation
 SELECTING_FEATURE, TYPING = map(chr, range(6, 8))
 # Meta states
-STOPPING, SHOWING, SHOWING_NESTED = map(chr, range(8, 11))
+STOPPING, SHOWING = map(chr, range(8, 10))
 # Shortcut for ConversationHandler.END
 END = ConversationHandler.END
 
 # Different constants for this example
-(PARENTS, CHILDREN, GENDER, MALE, FEMALE, AGE, NAME, START_OVER, FEATURES,
- CURRENT_FEATURE, CURRENT_LEVEL) = map(chr, range(11, 22))
+(PARENTS, CHILDREN, SELF, GENDER, MALE, FEMALE, AGE, NAME, START_OVER, FEATURES,
+ CURRENT_FEATURE, CURRENT_LEVEL) = map(chr, range(10, 22))
+
+
+# Helper
+def _name_switcher(level):
+    if level == PARENTS:
+        return ('Father', 'Mother')
+    elif level == CHILDREN:
+        return ('Brother', 'Sister')
 
 
 # Top level conversation callbacks
 def start(update, context):
-    """Select an action: Adding prante/child or show data."""
-    parents = context.user_data.get(PARENTS)
-    if parents and len(parents) == 2:
-        text = 'You already added both the mother and the father. ' \
-               'Your may add a child, show the gathered data or end the conversation.'
-        buttons = [[
-            InlineKeyboardButton(text='Add Child', callback_data=str(ADDING_CHILD)),
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Done', callback_data=str(END))
-        ]]
-    else:
-        text = 'You may add a parent, add a child, show the gathered data or end the ' \
-               'conversation. To abort, simply type /stop.'
-        buttons = [[
-            InlineKeyboardButton(text='Add parent', callback_data=str(ADDING_PARENT)),
-            InlineKeyboardButton(text='Add child', callback_data=str(ADDING_CHILD))
-        ], [
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Done', callback_data=str(END))
-        ]]
+    """Select an action: Adding parent/child or show data."""
+    text = 'You may add a familiy member, yourself show the gathered data or end the ' \
+           'conversation. To abort, simply type /stop.'
+    buttons = [[
+        InlineKeyboardButton(text='Add family member', callback_data=str(ADDING_MEMBER)),
+        InlineKeyboardButton(text='Add yourself', callback_data=str(ADDING_SELF))
+    ], [
+        InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
+        InlineKeyboardButton(text='Done', callback_data=str(END))
+    ]]
     keyboard = InlineKeyboardMarkup(buttons)
 
     # If we're starting over we don't need do send a new message
@@ -78,44 +76,42 @@ def start(update, context):
     return SELECTING_ACTION
 
 
-def end(update, context):
-    """End conversation from InlineKeyboardButton."""
-    text = 'See you around!'
-    update.callback_query.edit_message_text(text=text)
+def adding_self(update, context):
+    """Add information about youself."""
+    context.user_data[CURRENT_LEVEL] = SELF
+    text = 'Okay, please tell me about yourself.'
+    button = InlineKeyboardButton(text='Add info', callback_data=str(MALE))
+    keyboard = InlineKeyboardMarkup.from_button(button)
 
-    return END
+    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
-
-def child_data(user_data):
-    children = user_data.get(CHILDREN)
-    if not children:
-        return 'No information about children yet.'
-
-    text = 'CHILDREN:'
-    for child in user_data[CHILDREN]:
-        gender = 'Daughter' if child[GENDER] == FEMALE else 'Son'
-        text += '\n{0}: Name: {1}, Age: {2}'.format(gender, child.get(NAME, '-'),
-                                                    child.get(AGE, '-'))
-    return text
-
-
-def parent_data(user_data):
-    parents = user_data.get(PARENTS)
-    if not parents:
-        return 'No information about parents yet.'
-
-    text = 'PARENTS:'
-    for parent in user_data[PARENTS]:
-        gender = 'Mother' if parent[GENDER] == FEMALE else 'Father'
-        text += '\n{0}: Name: {1}, Age: {2}'.format(gender, parent.get(NAME, '-'),
-                                                    parent.get(AGE, '-'))
-    return text
+    return DESCRIBING_SELF
 
 
 def show_data(update, context):
     """Pretty print gathered data."""
+    def prettyprint(user_data, level):
+        people = user_data.get(level)
+        if not people:
+            return '\nNo information yet.'
+
+        text = ''
+        if level == SELF:
+            for person in user_data[level]:
+                text += '\nName: {0}, Age: {1}'.format(person.get(NAME, '-'), person.get(AGE, '-'))
+        else:
+            male, female = _name_switcher(level)
+
+            for person in user_data[level]:
+                gender = female if person[GENDER] == FEMALE else male
+                text += '\n{0}: Name: {1}, Age: {2}'.format(gender, person.get(NAME, '-'),
+                                                            person.get(AGE, '-'))
+        return text
+
     ud = context.user_data
-    text = parent_data(ud) + '\n\n' + child_data(ud)
+    text = 'Yourself:' + prettyprint(ud, SELF)
+    text += '\n\nParents:' + prettyprint(ud, PARENTS)
+    text += '\n\nChildren:' + prettyprint(ud, CHILDREN)
 
     buttons = [[
         InlineKeyboardButton(text='Back', callback_data=str(END))
@@ -135,100 +131,52 @@ def stop(update, context):
     return END
 
 
-# Second level callbacks
-def add_parent(update, context):
-    """Choose to add mother or father."""
-    parents = context.user_data.get(PARENTS)
-    if not parents:
-        text = 'Which parent do you want to add first?'
-        buttons = [[
-            InlineKeyboardButton(text='Mother', callback_data=str(FEMALE)),
-            InlineKeyboardButton(text='Father', callback_data=str(MALE))
-        ], [
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Done', callback_data=str(END))
-        ]]
-    elif len(parents) == 2:
-        text = 'You already added both parents. Sorry, but this example doesn\'t support ' \
-               'patchwork families.'
-        buttons = [[
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Done', callback_data=str(END))
-        ]]
-    else:
-        gender = parents[0][GENDER]
-        if gender == MALE:
-            parent_text = 'father'
-            missing_parent_text = 'mother'
-            missing_gender = FEMALE
-        else:
-            parent_text = 'mother'
-            missing_parent_text = 'father'
-            missing_gender = MALE
-        text = 'You already added the {0}. Press the button ' \
-               'to add the {1}'.format(parent_text, missing_parent_text)
-        buttons = [[
-            InlineKeyboardButton(text='Add {0}'.format(missing_parent_text),
-                                 callback_data=str(missing_gender)),
-            InlineKeyboardButton(text='Show data', callback_data=str(PARENTS) + str(SHOWING)),
-            InlineKeyboardButton(text='Done', callback_data=str(END))
-        ]]
-    keyboard = InlineKeyboardMarkup(buttons)
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+def end(update, context):
+    """End conversation from InlineKeyboardButton."""
+    text = 'See you around!'
+    update.callback_query.edit_message_text(text=text)
 
-    context.user_data[CURRENT_LEVEL] = PARENTS
-
-    return DESCRIBING
+    return END
 
 
-def add_child(update, context):
-    """Choose to add daughter or son."""
-    print('1')
-    text = 'Do you want to add a son or a daughter?'
+# Second level conversation callbacks
+def select_level(update, context):
+    """Choose to add a parent or a child."""
+    text = 'You may add a parent or a child. Also you can show the gathered data or go back.'
     buttons = [[
-        InlineKeyboardButton(text='Son', callback_data=str(MALE)),
-        InlineKeyboardButton(text='Daughter', callback_data=str(FEMALE))
+        InlineKeyboardButton(text='Add parent', callback_data=str(PARENTS)),
+        InlineKeyboardButton(text='Add child', callback_data=str(CHILDREN))
     ], [
-        InlineKeyboardButton(text='Show data', callback_data=str(CHILDREN) + str(SHOWING)),
-        InlineKeyboardButton(text='Done', callback_data=str(END)),
-    ]]
-    print('2')
-    keyboard = InlineKeyboardMarkup(buttons)
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-    print('3')
-    context.user_data[CURRENT_LEVEL] = CHILDREN
-
-    return DESCRIBING
-
-
-def show_parent_data(update, context):
-    """Show gathered data for parents."""
-    text = parent_data(context.user_data)
-
-    buttons = [[
+        InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
         InlineKeyboardButton(text='Back', callback_data=str(END))
     ]]
     keyboard = InlineKeyboardMarkup(buttons)
-
     update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-    context.user_data[START_OVER] = True
 
-    return SHOWING_NESTED
+    return SELECTING_LEVEL
 
 
-def show_child_data(update, context):
-    """Show gathered data for children."""
-    text = child_data(context.user_data)
+def select_gender(update, context):
+    """Choose to add mother or father."""
+    level = update.callback_query.data
+    context.user_data[CURRENT_LEVEL] = level
+
+    text = 'Please choose, whom to add.'
+
+    male, female = _name_switcher(level)
 
     buttons = [[
+        InlineKeyboardButton(text='Add ' + male, callback_data=str(MALE)),
+        InlineKeyboardButton(text='Add ' + female, callback_data=str(FEMALE))
+    ], [
+        InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
         InlineKeyboardButton(text='Back', callback_data=str(END))
     ]]
+
     keyboard = InlineKeyboardMarkup(buttons)
-
     update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-    context.user_data[START_OVER] = True
 
-    return SHOWING_NESTED
+    return SELECTING_GENDER
 
 
 def end_second_level(update, context):
@@ -241,7 +189,7 @@ def end_second_level(update, context):
 
 # Third level callbacks
 def select_feature(update, context):
-    """Select a feature to update for a person."""
+    """Select a feature to update for the person."""
     buttons = [[
         InlineKeyboardButton(text='Name', callback_data=str(NAME)),
         InlineKeyboardButton(text='Age', callback_data=str(AGE)),
@@ -290,16 +238,18 @@ def end_describing(update, context):
         ud[level] = []
     ud[level].append(ud[FEATURES])
 
-    if level == PARENTS:
-        add_parent(update, context)
-    elif level == CHILDREN:
-        add_child(update, context)
+    # Print upper level menu
+    if level == SELF:
+        ud[START_OVER] = True
+        start(update, context)
+    else:
+        select_level(update, context)
 
     return END
 
 
 def stop_nested(update, context):
-    """Completely end conversation from nested conversation."""
+    """Completely end conversation from within nested conversation."""
     update.message.reply_text('Okay, bye.')
 
     return STOPPING
@@ -320,7 +270,7 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Set up Description-Conversation to use in both the parents and the childrens conversation
+    # Set up third level ConversationHandler (collecting features)
     description_conv = ConversationHandler(
         entry_points=[CallbackQueryHandler(select_feature,
                                            pattern='^' + str(MALE) + '$|^' + str(FEMALE) + '$')],
@@ -338,80 +288,61 @@ def main():
 
         map_to_parent={
             # Return to second level menu
-            END: DESCRIBING,
+            END: SELECTING_LEVEL,
             # End conversation alltogether
             STOPPING: STOPPING,
         }
     )
 
-    # Set up the main ConversationHandler
+    # Set up second level ConversationHandler (adding a person)
+    add_member_conv = ConversationHandler(
+        entry_points=[CallbackQueryHandler(select_level,
+                                           pattern='^' + str(ADDING_MEMBER) + '$')],
+
+        states={
+            SELECTING_LEVEL: [CallbackQueryHandler(select_gender,
+                                                   pattern='^{0}$|^{1}$'.format(str(PARENTS),
+                                                                                str(CHILDREN)))],
+            SELECTING_GENDER: [description_conv]
+        },
+
+        fallbacks=[
+            CallbackQueryHandler(show_data, pattern='^' + str(SHOWING) + '$'),
+            CallbackQueryHandler(end_second_level, pattern='^' + str(END) + '$'),
+            CommandHandler('stop', stop_nested)
+        ],
+
+        map_to_parent={
+            # After showing data return to top level menu
+            SHOWING: SHOWING,
+            # Return to top level menu
+            END: SELECTING_ACTION,
+            # End conversation alltogether
+            STOPPING: END,
+        }
+    )
+
+    # Set up top level ConversationHandler (selecting action)
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
 
         states={
             SHOWING: [CallbackQueryHandler(start, pattern='^' + str(END) + '$')],
             SELECTING_ACTION: [
+                add_member_conv,
                 CallbackQueryHandler(show_data, pattern='^' + str(SHOWING) + '$'),
-                # For adding parents
-                ConversationHandler(
-                    entry_points=[CallbackQueryHandler(add_parent,
-                                                       pattern='^' + str(ADDING_PARENT) + '$')],
-
-                    states={
-                        DESCRIBING: [
-                            description_conv,
-                            CallbackQueryHandler(show_parent_data,
-                                                 pattern='^' + str(PARENTS) + str(SHOWING) + '$')
-                        ]
-                    },
-
-                    fallbacks=[
-                        CallbackQueryHandler(end_second_level, pattern='^' + str(END) + '$'),
-                        CommandHandler('stop', stop_nested)
-                    ],
-
-                    map_to_parent={
-                        # Return to top level menu
-                        END: SELECTING_ACTION,
-                        # Return to top level menu after showing data
-                        SHOWING_NESTED: SHOWING,
-                        # End conversation alltogether
-                        STOPPING: END,
-                    }
-                ),
-                # For adding children
-                ConversationHandler(
-                    entry_points=[CallbackQueryHandler(add_child,
-                                                       pattern='^' + str(ADDING_CHILD) + '$')],
-
-                    states={
-                        DESCRIBING: [
-                            description_conv,
-                            CallbackQueryHandler(show_child_data,
-                                                 pattern='^' + str(CHILDREN) + str(SHOWING) + '$')
-                        ]
-                    },
-
-                    fallbacks=[
-                        CallbackQueryHandler(end_second_level, pattern='^' + str(END) + '$'),
-                        CommandHandler('stop', stop_nested)
-                    ],
-
-                    map_to_parent={
-                        # Return to top level menu
-                        END: SELECTING_ACTION,
-                        # Return to top level menu after showing data
-                        SHOWING_NESTED: SHOWING,
-                        # End conversation alltogether
-                        STOPPING: END,
-                    }
-                )
+                CallbackQueryHandler(adding_self, pattern='^' + str(ADDING_SELF) + '$'),
+                CallbackQueryHandler(end, pattern='^' + str(END) + '$'),
             ],
+            DESCRIBING_SELF: [description_conv],
         },
 
-        fallbacks=[CallbackQueryHandler(end, pattern='^' + str(END) + '$'),
-                   CommandHandler('stop', stop)],
+        fallbacks=[CommandHandler('stop', stop)],
     )
+    # Because the states of the third level conversation map to the ones of the
+    # second level conversation, we need to be a bit hacky about that:
+    conv_handler.states[SELECTING_LEVEL] = conv_handler.states[SELECTING_ACTION]
+    conv_handler.states[STOPPING] = conv_handler.entry_points
 
     dp.add_handler(conv_handler)
 
