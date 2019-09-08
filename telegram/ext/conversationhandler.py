@@ -57,11 +57,6 @@ class ConversationHandler(Handler):
     a regular text message is expected. You could use this for a ``/cancel`` command or to let the
     user know their message was not recognized.
 
-    The fourth, optional collection of handlers, a ``list`` named :attr:`timed_out_behavior` is
-    used if the wait for ``run_async`` takes longer than defined in :attr:`run_async_timeout`.
-    For example, you can let the user know that they should wait for a bit before they can
-    continue.
-
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. If an entry point callback function returns None,
