@@ -86,7 +86,7 @@ Bug fixes & improvements
 - Allow SOCKSConnection to parse username and password from URL (`#1211`_)
 - Fix for arguments in passport/data.py (`#1213`_)
 - Improve message entity parsing by adding text_mention (`#1206`_)
-- Documentation fixes (`#1348`_, `#1397_`, `#1436`_)
+- Documentation fixes (`#1348`_, `#1397`_, `#1436`_)
 - Merged filters short-circuit (`#1350`_)
 - Fix webhook listen with tornado (`#1383`_)
 - Call task_done() on update queue after update processing finished (`#1428`_)
@@ -101,7 +101,7 @@ Buf fixes since v12.0.0b1
 - Fix _trigger_timeout() missing 1 required positional argument: 'job' (`#1367`_)
 - Add missing message.text check in PrefixHandler check_update (`#1375`_)
 - Make updates persist even on DispatcherHandlerStop (`#1463`_)
-- Dispatcher force updating persistence object's chat data attribute(`#1462`)
+- Dispatcher force updating persistence object's chat data attribute(`#1462`_)
 
 .. _`#1100`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1100
 .. _`#1283`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1283
