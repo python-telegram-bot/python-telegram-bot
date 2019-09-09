@@ -155,12 +155,14 @@ def effective_message_type(entity):
 
 def extract_urls(message):
     """
-    Extracts all Hyperlinks that are contained in a message. This includes
-    message entities and the media caption. Distinct links are returned in order of appearance,
-    while links in the text take precedence over ones in the media caption.
+    Extracts all Hyperlinks that are contained in a message. This includes message entities and the
+    media caption, i.e. while of course only text *or* caption is present this works for both.
+    Distinct links are returned in order of appearance.
 
     Note:
-        Exact duplicates are removed, but there may still be URLs that link to the same resource.
+        For exact duplicates, only the first appearence will be kept, but there may still be URLs
+        that link to the same resource. If two URLs differ only in (a) trailing slash(es), the one
+        with slash(es) will be kept.
 
     Args:
         message (:obj:`telegram.Message`) The message to extract from
