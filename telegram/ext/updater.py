@@ -108,7 +108,8 @@ class Updater(object):
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
-                 use_context=False):
+                 use_context=False,
+                 **kwargs):
 
         if dispatcher is None:
             if (token is None) and (bot is None):
