@@ -17,15 +17,28 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import sys
+import subprocess
 
 import certifi
 import future
 
+
 from . import __version__ as telegram_ver
 
 
+def _git_revision():
+    try:
+        output = subprocess.check_output(["git", "describe", "--long", "--tags"],
+                                         stderr=subprocess.STDOUT)
+    except (subprocess.SubprocessError, OSError):
+        return None
+    return output.decode().strip()
+
+
 def print_ver_info():
-    print('python-telegram-bot {0}'.format(telegram_ver))
+    git_revision = _git_revision()
+    print('python-telegram-bot {0}'.format(telegram_ver) + (' ({0})'.format(git_revision)
+                                                            if git_revision else ''))
     print('certifi {0}'.format(certifi.__version__))
     print('future {0}'.format(future.__version__))
     print('Python {0}'.format(sys.version.replace('\n', ' ')))

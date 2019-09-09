@@ -20,10 +20,10 @@ from datetime import datetime
 
 import pytest
 
-from telegram import ParseMode
-from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document,
+from telegram import (Update, Message, User, MessageEntity, Chat, Audio, Document, Animation,
                       Game, PhotoSize, Sticker, Video, Voice, VideoNote, Contact, Location, Venue,
-                      Invoice, SuccessfulPayment)
+                      Invoice, SuccessfulPayment, PassportData, ParseMode, Poll, PollOption)
+from tests.test_passport import RAW_PASSPORT_DATA
 
 
 @pytest.fixture(scope='class')
@@ -51,11 +51,13 @@ def message(bot):
                      'caption': 'audio_file'},
                     {'document': Document('document_id'),
                      'caption': 'document_file'},
+                    {'animation': Animation('animation_id', 30, 30, 1),
+                     'caption': 'animation_file'},
                     {'game': Game('my_game', 'just my game',
                                   [PhotoSize('game_photo_id', 30, 30), ])},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file'},
-                    {'sticker': Sticker('sticker_id', 50, 50)},
+                    {'sticker': Sticker('sticker_id', 50, 50, True)},
                     {'video': Video('video_id', 12, 12, 12),
                      'caption': 'video_file'},
                     {'voice': Voice('voice_id', 5)},
@@ -84,15 +86,24 @@ def message(bot):
                     {'author_signature': 'some_author_sign'},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file',
-                     'media_group_id': 1234443322222}
+                     'media_group_id': 1234443322222},
+                    {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
+                    {'poll': Poll(id='abc', question='What is this?',
+                                  options=[PollOption(text='a', voter_count=1),
+                                           PollOption(text='b', voter_count=2)], is_closed=False)},
+                    {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
+                        'text': 'start', 'url': 'http://google.com'}, {
+                        'text': 'next', 'callback_data': 'abcd'}],
+                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
-                     'caption_entities', 'audio', 'document', 'game', 'photo', 'sticker', 'video',
-                     'voice', 'video_note', 'new_members', 'contact', 'location', 'venue',
-                     'left_member', 'new_title', 'new_photo', 'delete_photo', 'group_created',
-                     'supergroup_created', 'channel_created', 'migrated_to', 'migrated_from',
-                     'pinned', 'invoice', 'successful_payment', 'connected_website',
-                     'forward_signature', 'author_signature', 'photo_from_media_group'])
+                     'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
+                     'sticker', 'video', 'voice', 'video_note', 'new_members', 'contact',
+                     'location', 'venue', 'left_member', 'new_title', 'new_photo', 'delete_photo',
+                     'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
+                     'migrated_from', 'pinned', 'invoice', 'successful_payment',
+                     'connected_website', 'forward_signature', 'author_signature',
+                     'photo_from_media_group', 'passport_data', 'poll', 'reply_markup'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -109,9 +120,11 @@ class TestMessage(object):
                      {'length': 7, 'offset': 16, 'type': 'italic'},
                      {'length': 4, 'offset': 25, 'type': 'code'},
                      {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
-                     {'length': 3, 'offset': 41, 'type': 'pre'},
-                     {'length': 17, 'offset': 46, 'type': 'url'}]
-    test_text = 'Test for <bold, ita_lic, code, links and pre. http://google.com'
+                     {'length': 12, 'offset': 38, 'type': 'text_mention',
+                      'user': User(123456789, 'mentioned user', False)},
+                     {'length': 3, 'offset': 55, 'type': 'pre'},
+                     {'length': 17, 'offset': 60, 'type': 'url'}]
+    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
     test_message = Message(message_id=1,
                            from_user=None,
                            date=None,
@@ -168,27 +181,41 @@ class TestMessage(object):
 
     def test_text_html_simple(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
-                            'http://google.com')
+                            '<a href="http://github.com/">links</a>, '
+                            '<a href="tg://user?id=123456789">text-mention</a> and '
+                            '<pre>pre</pre>. http://google.com')
         text_html = self.test_message.text_html
         assert text_html == test_html_string
 
+    def test_text_html_empty(self, message):
+        message.text = None
+        message.caption = "test"
+        assert message.text_html is None
+
     def test_text_html_urled(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
-                            '<a href="http://google.com">http://google.com</a>')
+                            '<a href="http://github.com/">links</a>, '
+                            '<a href="tg://user?id=123456789">text-mention</a> and '
+                            '<pre>pre</pre>. <a href="http://google.com">http://google.com</a>')
         text_html = self.test_message.text_html_urled
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
-        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
-                          '```pre```. http://google.com')
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google.com')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
 
+    def test_text_markdown_empty(self, message):
+        message.text = None
+        message.caption = "test"
+        assert message.text_markdown is None
+
     def test_text_markdown_urled(self):
-        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
-                          '```pre```. [http://google.com](http://google.com)')
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text-mention](tg://user?id=123456789) and ```pre```. '
+                          '[http://google.com](http://google.com)')
         text_markdown = self.test_message.text_markdown_urled
         assert text_markdown == test_md_string
 
@@ -210,27 +237,41 @@ class TestMessage(object):
 
     def test_caption_html_simple(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
-                            'http://google.com')
+                            '<a href="http://github.com/">links</a>, '
+                            '<a href="tg://user?id=123456789">text-mention</a> and '
+                            '<pre>pre</pre>. http://google.com')
         caption_html = self.test_message.caption_html
         assert caption_html == test_html_string
 
+    def test_caption_html_empty(self, message):
+        message.text = "test"
+        message.caption = None
+        assert message.caption_html is None
+
     def test_caption_html_urled(self):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
-                            '<a href="http://google.com">http://google.com</a>')
+                            '<a href="http://github.com/">links</a>, '
+                            '<a href="tg://user?id=123456789">text-mention</a> and '
+                            '<pre>pre</pre>. <a href="http://google.com">http://google.com</a>')
         caption_html = self.test_message.caption_html_urled
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
-        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
-                          '```pre```. http://google.com')
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google.com')
         caption_markdown = self.test_message.caption_markdown
         assert caption_markdown == test_md_string
 
+    def test_caption_markdown_empty(self, message):
+        message.text = "test"
+        message.caption = None
+        assert message.caption_markdown is None
+
     def test_caption_markdown_urled(self):
-        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
-                          '```pre```. [http://google.com](http://google.com)')
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text-mention](tg://user?id=123456789) and ```pre```. '
+                          '[http://google.com](http://google.com)')
         caption_markdown = self.test_message.caption_markdown_urled
         assert caption_markdown == test_md_string
 
@@ -262,9 +303,22 @@ class TestMessage(object):
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
+    def test_link(self, message):
+        assert message.link is None
+        message.chat.username = 'username'
+        message.chat.type = 'supergroup'
+        assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
+                                                           message.message_id)
+        message.chat.type = 'channel'
+        assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
+                                                           message.message_id)
+        message.chat.type = 'private'
+        assert message.link is None
+
     def test_effective_attachment(self, message_params):
-        for i in ('audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice', 'video_note',
-                  'contact', 'location', 'venue', 'invoice', 'invoice', 'successful_payment'):
+        for i in ('audio', 'game', 'document', 'animation', 'photo', 'sticker', 'video', 'voice',
+                  'video_note', 'contact', 'location', 'venue', 'invoice', 'invoice',
+                  'successful_payment'):
             item = getattr(message_params, i, None)
             if item:
                 break
@@ -288,8 +342,9 @@ class TestMessage(object):
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_markdown(self, monkeypatch, message):
-        test_md_string = ('Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/) and '
-                          '```pre```. http://google.com')
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google.com')
 
         def test(*args, **kwargs):
             cid = args[1] == message.chat_id
@@ -313,8 +368,9 @@ class TestMessage(object):
 
     def test_reply_html(self, monkeypatch, message):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a> and <pre>pre</pre>. '
-                            'http://google.com')
+                            '<a href="http://github.com/">links</a>, '
+                            '<a href="tg://user?id=123456789">text-mention</a> and '
+                            '<pre>pre</pre>. http://google.com')
 
         def test(*args, **kwargs):
             cid = args[1] == message.chat_id
@@ -391,6 +447,20 @@ class TestMessage(object):
         monkeypatch.setattr('telegram.Bot.send_document', test)
         assert message.reply_document(document='test_document')
         assert message.reply_document(document='test_document', quote=True)
+
+    def test_reply_animation(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            animation = kwargs['animation'] == 'test_animation'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and animation and reply
+
+        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        assert message.reply_animation(animation='test_animation')
+        assert message.reply_animation(animation='test_animation', quote=True)
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
@@ -490,6 +560,20 @@ class TestMessage(object):
         assert message.reply_contact(contact='test_contact')
         assert message.reply_contact(contact='test_contact', quote=True)
 
+    def test_reply_poll(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            id = args[1] == message.chat_id
+            contact = kwargs['contact'] == 'test_poll'
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return id and contact and reply
+
+        monkeypatch.setattr('telegram.Bot.send_poll', test)
+        assert message.reply_poll(contact='test_poll')
+        assert message.reply_poll(contact='test_poll', quote=True)
+
     def test_forward(self, monkeypatch, message):
         def test(*args, **kwargs):
             chat_id = kwargs['chat_id'] == 123456
@@ -525,6 +609,16 @@ class TestMessage(object):
 
         monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
         assert message.edit_caption(caption='new caption')
+
+    def test_edit_media(self, monkeypatch, message):
+        def test(*args, **kwargs):
+            chat_id = kwargs['chat_id'] == message.chat_id
+            message_id = kwargs['message_id'] == message.message_id
+            media = kwargs['media'] == 'my_media'
+            return chat_id and message_id and media
+
+        monkeypatch.setattr('telegram.Bot.edit_message_media', test)
+        assert message.edit_media('my_media')
 
     def test_edit_reply_markup(self, monkeypatch, message):
         def test(*args, **kwargs):

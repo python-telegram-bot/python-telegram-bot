@@ -45,6 +45,10 @@ class TestVideo(object):
     mime_type = 'video/mp4'
     supports_streaming = True
 
+    thumb_width = 180
+    thumb_height = 320
+    thumb_file_size = 1767
+
     caption = u'<b>VideoTest</b> - *Caption*'
     video_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
 
@@ -52,11 +56,11 @@ class TestVideo(object):
         # Make sure file has been uploaded.
         assert isinstance(video, Video)
         assert isinstance(video.file_id, str)
-        assert video.file_id is not ''
+        assert video.file_id != ''
 
         assert isinstance(video.thumb, PhotoSize)
         assert isinstance(video.thumb.file_id, str)
-        assert video.thumb.file_id is not ''
+        assert video.thumb.file_id != ''
 
     def test_expected_values(self, video):
         assert video.width == self.width
@@ -67,11 +71,11 @@ class TestVideo(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_all_args(self, bot, chat_id, video_file, video):
+    def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = bot.send_video(chat_id, video_file, duration=self.duration,
                                  caption=self.caption, supports_streaming=self.supports_streaming,
                                  disable_notification=False, width=video.width,
-                                 height=video.height, parse_mode='Markdown')
+                                 height=video.height, parse_mode='Markdown', thumb=thumb_file)
 
         assert isinstance(message.video, Video)
         assert isinstance(message.video.file_id, str)
@@ -81,14 +85,11 @@ class TestVideo(object):
         assert message.video.duration == video.duration
         assert message.video.file_size == video.file_size
 
-        assert isinstance(message.video.thumb, PhotoSize)
-        assert isinstance(message.video.thumb.file_id, str)
-        assert message.video.thumb.file_id != ''
-        assert message.video.thumb.width == video.thumb.width
-        assert message.video.thumb.height == video.thumb.height
-        assert message.video.thumb.file_size == video.thumb.file_size
-
         assert message.caption == self.caption.replace('*', '')
+
+        assert message.video.thumb.file_size == self.thumb_file_size
+        assert message.video.thumb.width == self.thumb_width
+        assert message.video.thumb.height == self.thumb_height
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -119,9 +120,9 @@ class TestVideo(object):
         assert isinstance(message.video.thumb, PhotoSize)
         assert isinstance(message.video.thumb.file_id, str)
         assert message.video.thumb.file_id != ''
-        assert message.video.thumb.width == video.thumb.width
-        assert message.video.thumb.height == video.thumb.height
-        assert message.video.thumb.file_size == video.thumb.file_size
+        assert message.video.thumb.width == 51  # This seems odd that it's not self.thumb_width
+        assert message.video.thumb.height == 90  # Ditto
+        assert message.video.thumb.file_size == 645  # same
 
         assert message.caption == self.caption
 

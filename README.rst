@@ -5,15 +5,17 @@
 
 We have made you a wrapper you can't refuse
 
+We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
+
 *Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
+   :target: https://pypi.org/project/python-telegram-bot/
    :alt: PyPi Package Version
 
 .. image:: https://img.shields.io/pypi/pyversions/python-telegram-bot.svg
-   :target: https://pypi.python.org/pypi/python-telegram-bot
-   :alt: Supported python versions
+   :target: https://pypi.org/project/python-telegram-bot/
+   :alt: Supported Python versions
 
 .. image:: https://www.cpu.re/static/python-telegram-bot/downloads.svg
    :target: https://www.cpu.re/static/python-telegram-bot/downloads-by-python-version.txt
@@ -31,8 +33,8 @@ We have made you a wrapper you can't refuse
    :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
    :alt: Travis CI Status
 
-.. image:: https://img.shields.io/appveyor/ci/Eldinnie/python-telegram-bot/master.svg?logo=appveyor
-   :target: https://ci.appveyor.com/project/Eldinnie/python-telegram-bot
+.. image:: https://img.shields.io/appveyor/ci/python-telegram-bot/python-telegram-bot/master.svg?logo=appveyor
+   :target: https://ci.appveyor.com/project/python-telegram-bot/python-telegram-bot
    :alt: AppVeyor CI Status
 
 
@@ -43,6 +45,10 @@ We have made you a wrapper you can't refuse
 .. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
    :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
    :alt: Median time to resolve an issue
+
+.. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
+   :target: https://www.codacy.com/app/python-telegram-bot/python-telegram-bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=python-telegram-bot/python-telegram-bot&amp;utm_campaign=Badge_Grade
+   :alt: Code quality
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg
    :target: https://telegram.me/pythontelegrambotgroup
@@ -83,7 +89,6 @@ Introduction
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
 It's compatible with Python versions 2.7, 3.3+ and `PyPy <http://pypy.org/>`_.
-It also works with `Google App Engine <https://cloud.google.com/appengine>`_.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -93,7 +98,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API 3.4 are supported.
+All types and methods of the Telegram Bot API **4.1** are supported.
 
 ==========
 Installing

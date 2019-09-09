@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
-from telegram import TelegramObject
+from telegram import TelegramObject, PhotoSize
 
 
 class Audio(TelegramObject):
@@ -32,6 +32,8 @@ class Audio(TelegramObject):
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size.
+        thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
+            which the music file belongs
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -42,6 +44,8 @@ class Audio(TelegramObject):
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size.
+        thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
+            which the music file belongs
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -54,6 +58,7 @@ class Audio(TelegramObject):
                  title=None,
                  mime_type=None,
                  file_size=None,
+                 thumb=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -64,6 +69,7 @@ class Audio(TelegramObject):
         self.title = title
         self.mime_type = mime_type
         self.file_size = file_size
+        self.thumb = thumb
         self.bot = bot
 
         self._id_attrs = (self.file_id,)
@@ -72,6 +78,8 @@ class Audio(TelegramObject):
     def de_json(cls, data, bot):
         if not data:
             return None
+
+        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
 
         return cls(bot=bot, **data)
 

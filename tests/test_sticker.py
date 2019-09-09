@@ -49,10 +49,11 @@ class TestSticker(object):
     emoji = '💪'
     width = 510
     height = 512
+    is_animated = False
     file_size = 39518
-    thumb_width = 90
-    thumb_heigth = 90
-    thumb_file_size = 3672
+    thumb_width = 319
+    thumb_height = 320
+    thumb_file_size = 21472
 
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
@@ -66,9 +67,10 @@ class TestSticker(object):
     def test_expected_values(self, sticker):
         assert sticker.width == self.width
         assert sticker.height == self.height
+        assert sticker.is_animated == self.is_animated
         assert sticker.file_size == self.file_size
         assert sticker.thumb.width == self.thumb_width
-        assert sticker.thumb.height == self.thumb_heigth
+        assert sticker.thumb.height == self.thumb_height
         assert sticker.thumb.file_size == self.thumb_file_size
 
     @flaky(3, 1)
@@ -81,6 +83,7 @@ class TestSticker(object):
         assert message.sticker.file_id != ''
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
+        assert message.sticker.is_animated == sticker.is_animated
         assert message.sticker.file_size == sticker.file_size
 
         assert isinstance(message.sticker.thumb, PhotoSize)
@@ -132,6 +135,7 @@ class TestSticker(object):
         assert message.sticker.file_id != ''
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
+        assert message.sticker.is_animated == sticker.is_animated
         assert message.sticker.file_size == sticker.file_size
 
         assert isinstance(message.sticker.thumb, PhotoSize)
@@ -146,6 +150,7 @@ class TestSticker(object):
             'file_id': 'not a file id',
             'width': self.width,
             'height': self.height,
+            'is_animated': self.is_animated,
             'thumb': sticker.thumb.to_dict(),
             'emoji': self.emoji,
             'file_size': self.file_size
@@ -155,6 +160,7 @@ class TestSticker(object):
         assert json_sticker.file_id == 'not a file id'
         assert json_sticker.width == self.width
         assert json_sticker.height == self.height
+        assert json_sticker.is_animated == self.is_animated
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
         assert json_sticker.thumb == sticker.thumb
@@ -174,6 +180,7 @@ class TestSticker(object):
         assert sticker_dict['file_id'] == sticker.file_id
         assert sticker_dict['width'] == sticker.width
         assert sticker_dict['height'] == sticker.height
+        assert sticker_dict['is_animated'] == sticker.is_animated
         assert sticker_dict['file_size'] == sticker.file_size
         assert sticker_dict['thumb'] == sticker.thumb.to_dict()
 
@@ -194,11 +201,11 @@ class TestSticker(object):
             bot.send_sticker(chat_id)
 
     def test_equality(self, sticker):
-        a = Sticker(sticker.file_id, self.width, self.height)
-        b = Sticker(sticker.file_id, self.width, self.height)
-        c = Sticker(sticker.file_id, 0, 0)
-        d = Sticker('', self.width, self.height)
-        e = PhotoSize(sticker.file_id, self.width, self.height)
+        a = Sticker(sticker.file_id, self.width, self.height, self.is_animated)
+        b = Sticker(sticker.file_id, self.width, self.height, self.is_animated)
+        c = Sticker(sticker.file_id, 0, 0, False)
+        d = Sticker('', self.width, self.height, self.is_animated)
+        e = PhotoSize(sticker.file_id, self.width, self.height, self.is_animated)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -224,8 +231,9 @@ def sticker_set(bot):
 
 class TestStickerSet(object):
     title = 'Test stickers'
+    is_animated = True
     contains_masks = False
-    stickers = [Sticker('file_id', 512, 512)]
+    stickers = [Sticker('file_id', 512, 512, True)]
     name = 'NOTAREALNAME'
 
     def test_de_json(self, bot):
@@ -233,6 +241,7 @@ class TestStickerSet(object):
         json_dict = {
             'name': name,
             'title': self.title,
+            'is_animated': self.is_animated,
             'contains_masks': self.contains_masks,
             'stickers': [x.to_dict() for x in self.stickers]
         }
@@ -240,36 +249,35 @@ class TestStickerSet(object):
 
         assert sticker_set.name == name
         assert sticker_set.title == self.title
+        assert sticker_set.is_animated == self.is_animated
         assert sticker_set.contains_masks == self.contains_masks
         assert sticker_set.stickers == self.stickers
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_bot_methods_1(self, bot, chat_id):
+        with open('tests/data/telegram_sticker.png', 'rb') as f:
+            file = bot.upload_sticker_file(95205500, f)
+        assert file
+        assert bot.add_sticker_to_set(chat_id, 'test_by_{0}'.format(bot.username),
+                                      file.file_id, '😄')
+
     def test_sticker_set_to_dict(self, sticker_set):
         sticker_set_dict = sticker_set.to_dict()
 
         assert isinstance(sticker_set_dict, dict)
         assert sticker_set_dict['name'] == sticker_set.name
         assert sticker_set_dict['title'] == sticker_set.title
+        assert sticker_set_dict['is_animated'] == sticker_set.is_animated
         assert sticker_set_dict['contains_masks'] == sticker_set.contains_masks
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
-    @flaky(3, 1)
-    @pytest.mark.timeout(10)
-    def test_bot_methods_1(self, bot, sticker_set):
-        with open('tests/data/telegram_sticker.png', 'rb') as f:
-            file = bot.upload_sticker_file(95205500, f)
-        assert file
-        assert bot.add_sticker_to_set(95205500, sticker_set.name, file.file_id, '😄')
-
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_2(self, bot, sticker_set):
         file_id = sticker_set.stickers[0].file_id
         assert bot.set_sticker_position_in_set(file_id, 1)
 
-    @pytest.mark.skipif(os.getenv('APPVEYOR'), reason='No Sticker(set) for Appveyor bot (''yet)')
     @flaky(10, 1)
     @pytest.mark.timeout(10)
     def test_bot_methods_3(self, bot, sticker_set):
@@ -285,10 +293,10 @@ class TestStickerSet(object):
         assert sticker.get_file()
 
     def test_equality(self):
-        a = StickerSet(self.name, self.title, self.contains_masks, self.stickers)
-        b = StickerSet(self.name, self.title, self.contains_masks, self.stickers)
-        c = StickerSet(self.name, None, None, None)
-        d = StickerSet('blah', self.title, self.contains_masks, self.stickers)
+        a = StickerSet(self.name, self.title, self.is_animated, self.contains_masks, self.stickers)
+        b = StickerSet(self.name, self.title, self.is_animated, self.contains_masks, self.stickers)
+        c = StickerSet(self.name, None, None, None, None)
+        d = StickerSet('blah', self.title, self.is_animated, self.contains_masks, self.stickers)
         e = Audio(self.name, 0, None, None)
 
         assert a == b

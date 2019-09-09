@@ -7,13 +7,14 @@ environment:
     # isn't covered by this document) at the time of writing.
 
     - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python37"
 
 branches:
   only:
   - master
+  - /^[vV]\d+$/
 
 skip_branch_with_pr: true
 
@@ -26,7 +27,6 @@ install:
   - "python --version"
   # We need wheel installed to build wheels
   - "pip install -U codecov pytest-cov"
-  - "pip install -U wheel"
   - "pip install -r requirements.txt"
   - "pip install -r requirements-dev.txt"
 

@@ -21,9 +21,9 @@
 import sys
 from html import escape
 
-from telegram import (Audio, Contact, Document, Chat, Location, PhotoSize, Sticker, TelegramObject,
-                      User, Video, Voice, Venue, MessageEntity, Game, Invoice, SuccessfulPayment,
-                      VideoNote)
+from telegram import (Animation, Audio, Contact, Document, Chat, Location, PhotoSize, Sticker,
+                      TelegramObject, User, Video, Voice, Venue, MessageEntity, Game, Invoice,
+                      SuccessfulPayment, VideoNote, PassportData, Poll, InlineKeyboardMarkup)
 from telegram import ParseMode
 from telegram.utils.helpers import escape_markdown, to_timestamp, from_timestamp
 
@@ -62,6 +62,9 @@ class Message(TelegramObject):
             to use properly.
         audio (:class:`telegram.Audio`): Optional. Information about the file.
         document (:class:`telegram.Document`): Optional. Information about the file.
+        animation (:class:`telegram.Animation`) Optional. Information about the file.
+            For backward compatibility, when this field is set, the document field will also be
+            set.
         game (:class:`telegram.Game`): Optional. Information about the game.
         photo (List[:class:`telegram.PhotoSize`]): Optional. Available sizes of the photo.
         sticker (:class:`telegram.Sticker`): Optional. Information about the sticker.
@@ -70,7 +73,8 @@ class Message(TelegramObject):
         video_note (:class:`telegram.VideoNote`): Optional. Information about the video message.
         new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
             the chat. (the bot itself may be one of these members).
-        caption (:obj:`str`): Optional. Caption for the document, photo or video, 0-200 characters.
+        caption (:obj:`str`): Optional. Caption for the document, photo or video, 0-1024
+            characters.
         contact (:class:`telegram.Contact`): Optional. Information about the contact.
         location (:class:`telegram.Location`): Optional. Information about the location.
         venue (:class:`telegram.Venue`): Optional. Information about the venue.
@@ -95,8 +99,15 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`): Optional. Signature of the post author for messages
             forwarded from channels.
+        forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from users
+            who disallow adding a link to their account in forwarded messages.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages
             in channels.
+        passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
+        poll (:class:`telegram.Poll`): Optional. Message is a native poll,
+            information about the poll.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
@@ -112,6 +123,8 @@ class Message(TelegramObject):
             channel, information about the original channel.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
+        forward_sender_name	(:obj:`str`, optional): Sender's name for messages forwarded from users
+            who disallow adding a link to their account in forwarded messages.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
@@ -134,6 +147,9 @@ class Message(TelegramObject):
             about the file.
         document (:class:`telegram.Document`, optional): Message is a general file, information
             about the file.
+        animation (:class:`telegram.Animation`, optional): Message is an animation, information
+            about the animation. For backward compatibility, when this field is set, the document
+            field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
         photo (List[:class:`telegram.PhotoSize`], optional): Message is a photo, available
             sizes of the photo.
@@ -147,7 +163,8 @@ class Message(TelegramObject):
         new_chat_members (List[:class:`telegram.User`], optional): New members that were added to
             the group or supergroup and information about them (the bot itself may be one of these
             members).
-        caption (:obj:`str`, optional): Caption for the document, photo or video, 0-200 characters.
+        caption (:obj:`str`, optional): Caption for the document, photo or video, 0-1024
+            characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
@@ -192,17 +209,24 @@ class Message(TelegramObject):
             forwarded from channels.
         author_signature (:obj:`str`, optional): Signature of the post author for messages
             in channels.
+        passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
+        poll (:class:`telegram.Poll`, optional): Message is a native poll,
+            information about the poll.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message. login_url buttons are represented as ordinary url buttons.
+
     """
 
     _effective_attachment = _UNDEFINED
 
-    ATTACHMENT_TYPES = ['audio', 'game', 'document', 'photo', 'sticker', 'video', 'voice',
-                        'video_note', 'contact', 'location', 'venue', 'invoice',
+    ATTACHMENT_TYPES = ['audio', 'game', 'animation', 'document', 'photo', 'sticker', 'video',
+                        'voice', 'video_note', 'contact', 'location', 'venue', 'invoice',
                         'successful_payment']
-    MESSAGE_TYPES = ['text', 'new_chat_members', 'new_chat_title', 'new_chat_photo',
-                     'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
-                     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id',
-                     'pinned_message'] + ATTACHMENT_TYPES
+    MESSAGE_TYPES = ['text', 'new_chat_members', 'left_chat_member', 'new_chat_title',
+                     'new_chat_photo', 'delete_chat_photo', 'group_chat_created',
+                     'supergroup_chat_created', 'channel_chat_created', 'migrate_to_chat_id',
+                     'migrate_from_chat_id', 'pinned_message',
+                     'passport_data'] + ATTACHMENT_TYPES
 
     def __init__(self,
                  message_id,
@@ -247,6 +271,11 @@ class Message(TelegramObject):
                  author_signature=None,
                  media_group_id=None,
                  connected_website=None,
+                 animation=None,
+                 passport_data=None,
+                 poll=None,
+                 forward_sender_name=None,
+                 reply_markup=None,
                  bot=None,
                  **kwargs):
         # Required
@@ -291,9 +320,13 @@ class Message(TelegramObject):
         self.successful_payment = successful_payment
         self.connected_website = connected_website
         self.forward_signature = forward_signature
+        self.forward_sender_name = forward_sender_name
         self.author_signature = author_signature
         self.media_group_id = media_group_id
-
+        self.animation = animation
+        self.passport_data = passport_data
+        self.poll = poll
+        self.reply_markup = reply_markup
         self.bot = bot
 
         self._id_attrs = (self.message_id,)
@@ -302,6 +335,14 @@ class Message(TelegramObject):
     def chat_id(self):
         """:obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`."""
         return self.chat.id
+
+    @property
+    def link(self):
+        """:obj:`str`: Convenience property. If the chat of the message is a supergroup or a
+        channel and has a :attr:`Chat.username`, returns a t.me link of the message."""
+        if self.chat.type in (Chat.SUPERGROUP, Chat.CHANNEL) and self.chat.username:
+            return "https://t.me/{}/{}".format(self.chat.username, self.message_id)
+        return None
 
     @classmethod
     def de_json(cls, data, bot):
@@ -322,6 +363,7 @@ class Message(TelegramObject):
         data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
+        data['animation'] = Animation.de_json(data.get('animation'), bot)
         data['game'] = Game.de_json(data.get('game'), bot)
         data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
         data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
@@ -337,6 +379,9 @@ class Message(TelegramObject):
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
+        data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
+        data['poll'] = Poll.de_json(data.get('poll'), bot)
+        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
 
         return cls(bot=bot, **data)
 
@@ -346,6 +391,7 @@ class Message(TelegramObject):
         :class:`telegram.Audio`
             or :class:`telegram.Contact`
             or :class:`telegram.Document`
+            or :class:`telegram.Animation`
             or :class:`telegram.Game`
             or :class:`telegram.Invoice`
             or :class:`telegram.Location`
@@ -543,6 +589,23 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_document(self.chat_id, *args, **kwargs)
 
+    def reply_animation(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_animation(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        self._quote(kwargs)
+        return self.bot.send_animation(self.chat_id, *args, **kwargs)
+
     def reply_sticker(self, *args, **kwargs):
         """Shortcut for::
 
@@ -662,6 +725,23 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_contact(self.chat_id, *args, **kwargs)
 
+    def reply_poll(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_poll(update.message.chat_id, *args, **kwargs)
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the photo is sent as an actual reply
+                to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter
+                will be ignored. Default: ``True`` in group chats and ``False`` in private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        self._quote(kwargs)
+        return self.bot.send_poll(self.chat_id, *args, **kwargs)
+
     def forward(self, chat_id, disable_notification=False):
         """Shortcut for::
 
@@ -691,7 +771,7 @@ class Message(TelegramObject):
         Note:
             You can only edit messages that the bot sent itself,
             therefore this method can only be used on the
-            return value of the ``bot.send_*`` family of methods..
+            return value of the ``bot.send_*`` family of methods.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the edited message.
@@ -719,6 +799,27 @@ class Message(TelegramObject):
         """
         return self.bot.edit_message_caption(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
+    def edit_media(self, media, *args, **kwargs):
+        """Shortcut for::
+
+                    bot.edit_message_media(chat_id=message.chat_id,
+                                             message_id=message.message_id,
+                                             *args,
+                                             **kwargs)
+
+                Note:
+                    You can only edit messages that the bot sent itself,
+                    therefore this method can only be used on the
+                    return value of the ``bot.send_*`` family of methods.
+
+                Returns:
+                    :class:`telegram.Message`: On success, instance representing the edited
+                    message.
+
+                """
+        return self.bot.edit_message_media(
+            chat_id=self.chat_id, message_id=self.message_id, media=media, *args, **kwargs)
 
     def edit_reply_markup(self, *args, **kwargs):
         """Shortcut for::
@@ -777,7 +878,7 @@ class Message(TelegramObject):
             entity_text = self.text.encode('utf-16-le')
             entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
 
-        return entity_text.decode('utf-16-le')
+            return entity_text.decode('utf-16-le')
 
     def parse_caption_entity(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -802,7 +903,7 @@ class Message(TelegramObject):
             entity_text = self.caption.encode('utf-16-le')
             entity_text = entity_text[entity.offset * 2:(entity.offset + entity.length) * 2]
 
-        return entity_text.decode('utf-16-le')
+            return entity_text.decode('utf-16-le')
 
     def parse_entities(self, types=None):
         """
@@ -868,6 +969,9 @@ class Message(TelegramObject):
 
     @staticmethod
     def _parse_html(message_text, entities, urled=False):
+        if message_text is None:
+            return None
+
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -879,7 +983,9 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '<a href="{}">{}</a>'.format(entity.url, text)
-            elif (entity.type == MessageEntity.URL) and urled:
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
+            elif entity.type == MessageEntity.URL and urled:
                 insert = '<a href="{0}">{0}</a>'.format(text)
             elif entity.type == MessageEntity.BOLD:
                 insert = '<b>' + text + '</b>'
@@ -962,6 +1068,9 @@ class Message(TelegramObject):
 
     @staticmethod
     def _parse_markdown(message_text, entities, urled=False):
+        if message_text is None:
+            return None
+
         if not sys.maxunicode == 0xffff:
             message_text = message_text.encode('utf-16-le')
 
@@ -973,7 +1082,9 @@ class Message(TelegramObject):
 
             if entity.type == MessageEntity.TEXT_LINK:
                 insert = '[{}]({})'.format(text, entity.url)
-            elif (entity.type == MessageEntity.URL) and urled:
+            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
+            elif entity.type == MessageEntity.URL and urled:
                 insert = '[{0}]({0})'.format(text)
             elif entity.type == MessageEntity.BOLD:
                 insert = '*' + text + '*'
