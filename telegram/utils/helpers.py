@@ -179,10 +179,7 @@ def extract_urls(message):
     all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in results.items())
 
     # Remove exact duplicates, in a way that is compliant with legacy python
-    urls = OrderedDict()
-    for k in all_urls:
-        urls[k] = None
-    urls = urls.keys()
+    urls = OrderedDict.fromkeys(all_urls).keys()
 
     # Remove dublicates that only differ in a trailing slash. Keep the ones with slash.
     # Strip trailing slash from URL so we can compare them for equality
