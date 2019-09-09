@@ -159,8 +159,8 @@ def extract_urls(message):
     message entities and the media caption. Distinct links are returned in order of appearance,
     while links in the text take precedence over ones in the media caption.
 
-    Note: Exact duplicates are removed, but there may still be URLs that link
-    to the same resource.
+    Note:
+        Exact duplicates are removed, but there may still be URLs that link to the same resource.
 
     Args:
         message (:obj:`telegram.Message`) The message to extract from
@@ -176,12 +176,13 @@ def extract_urls(message):
 
     all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in results.items())
 
-    # Strip trailing slash from URL so we can compare them for equality
-    stripped_urls = (x.rstrip('/') for x in all_urls)
-
     # Remove exact duplicates, in a way that is compliant with legacy python
-    urls = OrderedDict({k: None for k in stripped_urls})
-    return list(urls.keys())
+    urls = OrderedDict({k: None for k in all_urls}).keys()
+
+    # Remove dublicates that only differ in a trailing slash. Keep the ones with slash.
+    # Strip trailing slash from URL so we can compare them for equality
+    stripped_urls = [x.rstrip('/') for x in urls]
+    return [url for url in urls if (stripped_urls.count(url) == 1 or url[-1] == '/')]
 
 
 def enocde_conversations_to_json(conversations):

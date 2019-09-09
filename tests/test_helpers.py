@@ -51,7 +51,7 @@ class TestHelpers(object):
         result = helpers.extract_urls(test_message)
 
         assert len(result) == 2
-        assert (test_entities[0]['url'][:-1] == result[0])
+        assert (test_entities[0]['url'] == result[0])
         assert (test_entities[2]['url'] == result[1])
 
     def test_extract_urls_caption(self):
@@ -71,7 +71,7 @@ class TestHelpers(object):
 
         assert len(results) == 1
         assert results[0] == 'https://stackoverflow.com/questions/520031/whats-the-' \
-                             'cleanest-way-to-extract-urls-from-a-string-using-python'
+                             'cleanest-way-to-extract-urls-from-a-string-using-python/'
 
     def test_effective_message_type(self):
 
