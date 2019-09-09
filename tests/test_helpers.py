@@ -48,30 +48,34 @@ class TestHelpers(object):
                                chat=None,
                                text=test_text,
                                entities=[MessageEntity(**e) for e in test_entities])
-        result = helpers.extract_urls(test_message)
+        results = helpers.extract_urls(test_message)
 
-        assert len(result) == 2
-        assert (test_entities[0]['url'] == result[0])
-        assert (test_entities[2]['url'] == result[1])
+        assert len(results) == 2
+        assert (test_entities[0]['url'] == results[0])
+        assert (test_entities[2]['url'] == results[1])
 
     def test_extract_urls_caption(self):
         test_entities = [{
-            'length': 109, 'offset': 11, 'type': 'url'
+            'length': 6, 'offset': 0, 'type': 'text_link',
+            'url': 'http://github.com/'
+        }, {
+            'length': 17, 'offset': 23, 'type': 'url'
+        }, {
+            'length': 14, 'offset': 43, 'type': 'text_link',
+            'url': 'http://google.com'
         }]
-        caption = "Taken from https://stackoverflow.com/questions/520031/whats" \
-                  "-the-cleanest-way-to-extract-urls-from-a-string-using-python/"
+        caption = 'Github can be found at http://github.com. Google is here.'
         test_message = Message(message_id=1,
                                from_user=None,
                                date=None,
                                chat=None,
                                caption=caption,
-                               caption_entities=[MessageEntity(**e) for e in test_entities]
-                               )
+                               caption_entities=[MessageEntity(**e) for e in test_entities])
         results = helpers.extract_urls(test_message)
 
-        assert len(results) == 1
-        assert results[0] == 'https://stackoverflow.com/questions/520031/whats-the-' \
-                             'cleanest-way-to-extract-urls-from-a-string-using-python/'
+        assert len(results) == 2
+        assert (test_entities[0]['url'] == results[0])
+        assert (test_entities[2]['url'] == results[1])
 
     def test_effective_message_type(self):
 
