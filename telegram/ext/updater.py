@@ -102,13 +102,13 @@ class Updater(object):
                  base_url=None,
                  workers=4,
                  bot=None,
-                 dispatcher=None,
                  private_key=None,
                  private_key_password=None,
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
-                 use_context=False):
+                 use_context=False,
+                 dispatcher=None):
 
         if dispatcher is None:
             if (token is None) and (bot is None):
