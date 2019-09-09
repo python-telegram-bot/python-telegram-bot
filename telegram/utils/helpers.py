@@ -27,7 +27,6 @@ from html import escape
 
 import re
 import signal
-from collections import OrderedDict
 from datetime import datetime
 
 try:
@@ -179,7 +178,9 @@ def extract_urls(message):
     all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in results.items())
 
     # Remove exact duplicates, in a way that is compliant with legacy python
-    urls = OrderedDict.fromkeys(all_urls).keys()
+    seen = set()
+    seen_add = seen.add
+    urls = [x for x in all_urls if not (x in seen or seen_add(x))]
 
     # Remove dublicates that only differ in a trailing slash. Keep the ones with slash.
     # Strip trailing slash from URL so we can compare them for equality
