@@ -1514,7 +1514,8 @@ class Bot(TelegramObject):
         calling get_file again.
 
         Args:
-            file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` |          \
+            file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
+                     :class:`telegram.ChatPhoto` | :class:`telegram.Document` |                   \
                      :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |                    \
                      :class:`telegram.Video` | :class:`telegram.VideoNote` |                      \
                      :class:`telegram.Voice`):
