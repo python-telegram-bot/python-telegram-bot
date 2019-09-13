@@ -228,6 +228,7 @@ class Chat(TelegramObject):
 
     def set_permissions(self, *args, **kwargs):
         """Shortcut for::
+
                 bot.set_chat_permissions(update.message.chat.id, *args, **kwargs)
 
         Returns:
