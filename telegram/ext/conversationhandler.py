@@ -57,11 +57,6 @@ class ConversationHandler(Handler):
     a regular text message is expected. You could use this for a ``/cancel`` command or to let the
     user know their message was not recognized.
 
-    The fourth, optional collection of handlers, a ``list`` named :attr:`timed_out_behavior` is
-    used if the wait for ``run_async`` takes longer than defined in :attr:`run_async_timeout`.
-    For example, you can let the user know that they should wait for a bit before they can
-    continue.
-
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning ``None`` by
     default), the state will not change. If an entry point callback function returns None,
@@ -86,7 +81,7 @@ class ConversationHandler(Handler):
             ID.
         conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
             is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 (default), there will be no timeout. when it's triggered. The last
+            this value is 0 (default), there will be no timeout. When it's triggered, the last
             received update will be handled by ALL the handler's who's `check_update` method
             returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
