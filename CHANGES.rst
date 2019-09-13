@@ -2,6 +2,30 @@
 Changelog
 =========
 
+Version 12.1.0
+================
+*Released 2019-09-13*
+
+**Major changes:**
+
+- Bot API 4.4 support (`#1464`_, `#1510`_)
+- Add `get_file` method to `Animation` & `ChatPhoto`. Add, `get_small_file` & `get_big_file`
+  methods to `ChatPhoto` (`#1489`_)
+- Tools for deep linking (`#1049`_)
+
+**Minor changes and/or bug fixes:**
+
+- Documentation fixes (`#1500`_, `#1499`_)
+- Improved examples (`#1502`_)
+
+.. _`#1464`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1464
+.. _`#1502`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1502
+.. _`#1499`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1499
+.. _`#1500`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1500
+.. _`#1049`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1049
+.. _`#1489`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1489
+.. _`#1510`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1510
+
 Version 12.0.0
 ================
 *Released 2019-08-29*
