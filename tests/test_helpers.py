@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pytest
 
 from telegram import Sticker
 from telegram import Update
@@ -30,6 +31,36 @@ class TestHelpers(object):
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
 
         assert expected_str == helpers.escape_markdown(test_str)
+
+    def test_create_deep_linked_url(self):
+        username = 'JamesTheMock'
+
+        payload = "hello"
+        expected = "https://t.me/{}?start={}".format(username, payload)
+        actual = helpers.create_deep_linked_url(username, payload)
+        assert expected == actual
+
+        expected = "https://t.me/{}?startgroup={}".format(username, payload)
+        actual = helpers.create_deep_linked_url(username, payload, group=True)
+        assert expected == actual
+
+        payload = ""
+        expected = "https://t.me/{}".format(username)
+        assert expected == helpers.create_deep_linked_url(username)
+        assert expected == helpers.create_deep_linked_url(username, payload)
+        payload = None
+        assert expected == helpers.create_deep_linked_url(username, payload)
+
+        with pytest.raises(ValueError):
+            helpers.create_deep_linked_url(username, 'text with spaces')
+
+        with pytest.raises(ValueError):
+            helpers.create_deep_linked_url(username, '0' * 65)
+
+        with pytest.raises(ValueError):
+            helpers.create_deep_linked_url(None, None)
+        with pytest.raises(ValueError):  # too short username (4 is minimum)
+            helpers.create_deep_linked_url("abc", None)
 
     def test_effective_message_type(self):
 

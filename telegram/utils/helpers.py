@@ -147,6 +147,55 @@ def effective_message_type(entity):
     return None
 
 
+def create_deep_linked_url(bot_username, payload=None, group=False):
+    """
+    Creates a deep-linked URL for this ``bot_username`` with the specified ``payload``.
+    See  https://core.telegram.org/bots#deep-linking to learn more.
+
+    The ``payload`` may consist of the following characters: ``A-Z, a-z, 0-9, _, -``
+
+    Note:
+        Works well in conjunction with
+        ``CommandHandler("start", callback, filters = Filters.regex('payload'))``
+
+    Examples:
+        ``create_deep_linked_url(bot.get_me().username, "some-params")``
+
+    Args:
+        bot_username (:obj:`str`): The username to link to
+        payload (:obj:`str`, optional): Parameters to encode in the created URL
+        group (:obj:`bool`, optional): If `True` the user is prompted to select a group to add the
+            bot to. If `False`, opens a one-on-one conversation with the bot. Defaults to `False`.
+
+    Returns:
+        :obj:`str`: An URL to start the bot with specific parameters
+    """
+    if bot_username is None or len(bot_username) <= 3:
+        raise ValueError("You must provide a valid bot_username.")
+
+    base_url = 'https://t.me/{}'.format(bot_username)
+    if not payload:
+        return base_url
+
+    if len(payload) > 64:
+        raise ValueError("The deep-linking payload must not exceed 64 characters.")
+
+    if not re.match(r'^[A-Za-z0-9_-]+$', payload):
+        raise ValueError("Only the following characters are allowed for deep-linked "
+                         "URLs: A-Z, a-z, 0-9, _ and -")
+
+    if group:
+        key = 'startgroup'
+    else:
+        key = 'start'
+
+    return '{0}?{1}={2}'.format(
+        base_url,
+        key,
+        payload
+    )
+
+
 def enocde_conversations_to_json(conversations):
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
     JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
