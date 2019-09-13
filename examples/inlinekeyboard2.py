@@ -29,28 +29,42 @@ ONE, TWO, THREE, FOUR = range(4)
 
 
 def start(update, context):
+    """Send message on `/start`."""
+    # Get user that sent /start and log his name
     user = update.message.from_user
     logger.info("User %s started the conversation.", user.first_name)
+    # Build InlineKeyboard where each button has a displayed text
+    # and a string as callback_data
+    # The keyboard is a list of button rows, where each row is in turn
+    # a list (henc `[[...]]`).
     keyboard = [
         [InlineKeyboardButton("1", callback_data=str(ONE)),
          InlineKeyboardButton("2", callback_data=str(TWO))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
+    # Send message with text and appended InlineKeyboard
     update.message.reply_text(
         "Start handler, Choose a route",
         reply_markup=reply_markup
     )
+    # Tell CosversationHandler that we're in State `FIRST` now
     return FIRST
 
 
 def start_over(update, context):
+    """Prompt same text & keyboard as `start` does but not as new message"""
+    # Get CallbackQuery from Update
     query = update.callback_query
+    # Get Bot from CallbackContext
     bot = context.bot
     keyboard = [
         [InlineKeyboardButton("1", callback_data=str(ONE)),
          InlineKeyboardButton("2", callback_data=str(TWO))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
+    # Instead of sending a new message, edit the message that
+    # originated the CallbackQuery. This gives the feeling of an
+    # interactive menu.
     bot.edit_message_text(
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
@@ -61,6 +75,7 @@ def start_over(update, context):
 
 
 def one(update, context):
+    """Show new choice of buttons"""
     query = update.callback_query
     bot = context.bot
     keyboard = [
@@ -78,6 +93,7 @@ def one(update, context):
 
 
 def two(update, context):
+    """Show new choice of buttons"""
     query = update.callback_query
     bot = context.bot
     keyboard = [
@@ -95,6 +111,7 @@ def two(update, context):
 
 
 def three(update, context):
+    """Show new choice of buttons"""
     query = update.callback_query
     bot = context.bot
     keyboard = [
@@ -108,10 +125,12 @@ def three(update, context):
         text="Third CallbackQueryHandler. Do want to start over?",
         reply_markup=reply_markup
     )
+    # Transfer to conversation state `SECOND`
     return SECOND
 
 
 def four(update, context):
+    """Show new choice of buttons"""
     query = update.callback_query
     bot = context.bot
     keyboard = [
@@ -129,6 +148,8 @@ def four(update, context):
 
 
 def end(update, context):
+    """Returns `ConversationHandler.END`, which tells the
+    ConversationHandler that the conversation is over"""
     query = update.callback_query
     bot = context.bot
     bot.edit_message_text(
@@ -151,7 +172,12 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Add conversation handler with the states FIRST and SECOND
+    # Setup conversation handler with the states FIRST and SECOND
+    # Use the pattern parameter to pass CallbackQueryies with specific
+    # data pattern to the corresponding handlers.
+    # ^ means "start of line/string"
+    # $ means "end of line/string"
+    # So ^ABC$ will only allow 'ABC'
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
@@ -165,6 +191,8 @@ def main():
         fallbacks=[CommandHandler('start', start)]
     )
 
+    # Add conversationhandler to dispatcher it will be used for handling
+    # updates
     dp.add_handler(conv_handler)
 
     # log all errors
