@@ -2,6 +2,16 @@
 Changelog
 =========
 
+Version 12.1.1
+==============
+*Released 2019-09-18*
+
+**Hot fix release**
+
+Fixed regression in the vendored urllib3 (`#1517`_).
+
+.. _`#1517`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1517
+
 Version 12.1.0
 ================
 *Released 2019-09-13*
