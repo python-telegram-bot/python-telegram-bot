@@ -36,7 +36,7 @@ def start(update, context):
     # Build InlineKeyboard where each button has a displayed text
     # and a string as callback_data
     # The keyboard is a list of button rows, where each row is in turn
-    # a list (henc `[[...]]`).
+    # a list (hence `[[...]]`).
     keyboard = [
         [InlineKeyboardButton("1", callback_data=str(ONE)),
          InlineKeyboardButton("2", callback_data=str(TWO))]
@@ -47,7 +47,7 @@ def start(update, context):
         "Start handler, Choose a route",
         reply_markup=reply_markup
     )
-    # Tell CosversationHandler that we're in State `FIRST` now
+    # Tell ConversationHandler that we're in state `FIRST` now
     return FIRST
 
 
@@ -173,7 +173,7 @@ def main():
     dp = updater.dispatcher
 
     # Setup conversation handler with the states FIRST and SECOND
-    # Use the pattern parameter to pass CallbackQueryies with specific
+    # Use the pattern parameter to pass CallbackQueries with specific
     # data pattern to the corresponding handlers.
     # ^ means "start of line/string"
     # $ means "end of line/string"
@@ -191,7 +191,7 @@ def main():
         fallbacks=[CommandHandler('start', start)]
     )
 
-    # Add conversationhandler to dispatcher it will be used for handling
+    # Add ConversationHandler to dispatcher that will be used for handling
     # updates
     dp.add_handler(conv_handler)
 
