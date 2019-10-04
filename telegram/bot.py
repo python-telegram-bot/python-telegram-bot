@@ -3439,12 +3439,10 @@ class Bot(TelegramObject):
         return Poll.de_json(result, self)
 
     def to_dict(self):
-        data = {'id': self.id, 'username': self.username}
+        data = {'id': self.id, 'username': self.username, 'first_name': self.username}
 
         if self.first_name:
             data['first_name'] = self.first_name
-        else:
-            data['first_name'] = ''
 
         if self.last_name:
             data['last_name'] = self.last_name
