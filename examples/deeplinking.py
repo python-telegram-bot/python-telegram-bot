@@ -30,7 +30,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-# Define constants the will allow us to reuse the deep-linking parameters.
+# Define constants that will allow us to reuse the deep-linking parameters.
 CHECK_THIS_OUT = 'check-this-out'
 USING_ENTITIES = 'using-entities-here'
 SO_COOL = 'so-cool'
