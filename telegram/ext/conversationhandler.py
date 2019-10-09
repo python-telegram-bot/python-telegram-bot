@@ -20,6 +20,7 @@
 
 import logging
 import warnings
+from threading import Lock
 
 from telegram import Update
 from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
@@ -162,7 +163,9 @@ class ConversationHandler(Handler):
         Set by dispatcher"""
 
         self.timeout_jobs = dict()
+        self.timeout_jobs_lock = Lock()
         self.conversations = dict()
+        self.conversations_lock = Lock()
 
         self.logger = logging.getLogger(__name__)
 
@@ -240,7 +243,8 @@ class ConversationHandler(Handler):
             return None
 
         key = self._get_key(update)
-        state = self.conversations.get(key)
+        with self.conversations_lock:
+            state = self.conversations.get(key)
 
         # Resolve promises
         if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], Promise):
@@ -259,7 +263,8 @@ class ConversationHandler(Handler):
                     if res is None and old_state is None:
                         res = self.END
                     self.update_state(res, key)
-                    state = self.conversations.get(key)
+                    with self.conversations_lock:
+                        state = self.conversations.get(key)
             else:
                 handlers = self.states.get(self.WAITING, [])
                 for handler in handlers:
@@ -319,46 +324,62 @@ class ConversationHandler(Handler):
         """
         conversation_key, handler, check_result = check_result
         new_state = handler.handle_update(update, dispatcher, check_result, context)
-        timeout_job = self.timeout_jobs.pop(conversation_key, None)
 
-        if timeout_job is not None:
-            timeout_job.schedule_removal()
-        if self.conversation_timeout and new_state != self.END:
-            self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
-                self._trigger_timeout, self.conversation_timeout,
-                context=_ConversationTimeoutContext(conversation_key, update, dispatcher))
+        with self.timeout_jobs_lock:
+            # Remove the old timeout job (if present)
+            # TODO: should this be called before the child handle_update? the timeout could be called while the child
+            #       is computing
+            timeout_job = self.timeout_jobs.pop(conversation_key, None)
+
+            if timeout_job is not None:
+                timeout_job.schedule_removal()
+
+            if self.conversation_timeout and new_state != self.END:
+                # Add the new timeout job
+                self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
+                    self._trigger_timeout, self.conversation_timeout,
+                    context=_ConversationTimeoutContext(conversation_key, update, dispatcher))
 
         self.update_state(new_state, conversation_key)
 
     def update_state(self, new_state, key):
         if new_state == self.END:
-            if key in self.conversations:
-                # If there is no key in conversations, nothing is done.
-                del self.conversations[key]
-                if self.persistent:
-                    self.persistence.update_conversation(self.name, key, None)
+            with self.conversations_lock:
+                if key in self.conversations:
+                    # If there is no key in conversations, nothing is done.
+                    del self.conversations[key]
+                    if self.persistent:
+                        self.persistence.update_conversation(self.name, key, None)
 
         elif isinstance(new_state, Promise):
-            self.conversations[key] = (self.conversations.get(key), new_state)
-            if self.persistent:
-                self.persistence.update_conversation(self.name, key,
-                                                     (self.conversations.get(key), new_state))
+            with self.conversations_lock:
+                self.conversations[key] = (self.conversations.get(key), new_state)
+                if self.persistent:
+                    self.persistence.update_conversation(self.name, key,
+                                                        (self.conversations.get(key), new_state))
 
         elif new_state is not None:
-            self.conversations[key] = new_state
-            if self.persistent:
-                self.persistence.update_conversation(self.name, key, new_state)
+            with self.conversations_lock:
+                self.conversations[key] = new_state
+                if self.persistent:
+                    self.persistence.update_conversation(self.name, key, new_state)
 
     def _trigger_timeout(self, context, job=None):
         self.logger.debug('conversation timeout was triggered!')
 
         # Backward compatibility with bots that do not use CallbackContext
         if isinstance(context, CallbackContext):
-            context = context.job.context
-        else:
-            context = job.context
+            job = context.job
 
-        del self.timeout_jobs[context.conversation_key]
+        context = job.context
+
+        with self.timeout_jobs_lock:
+            found_job = self.timeout_jobs[context.conversation_key]
+            if found_job is not job:
+                # The timeout has been canceled in handle_update
+                return
+            del self.timeout_jobs[context.conversation_key]
+
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
             check = handler.check_update(context.update)
