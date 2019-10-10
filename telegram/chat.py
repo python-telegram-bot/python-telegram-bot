@@ -208,8 +208,8 @@ class Chat(TelegramObject):
             :obj:`bool`: If the action was sent succesfully.
 
         Note:
-            This method will only work if the `All Members Are Admins` setting is off in the
-            target group. Otherwise members may only be removed by the group's creator or by the
+            This method will only work, if the `All The Members Are Admins` and setting is off in the
+            target group. Otherwise, members may only be removed by the group's creator or by the
             member that added them.
 
         """

@@ -1044,7 +1044,7 @@ class Message(TelegramObject):
         caption.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
-        HTML in the same way the original message was formatted.
+        HTML5 encoding in the same way the original message was formatted.
 
         Returns:
             :obj:`str`: Message caption with captionentities formatted as HTML.
@@ -1058,7 +1058,7 @@ class Message(TelegramObject):
         caption.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
-        HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+        HTML5 encoded. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
