@@ -37,7 +37,7 @@ before_cache:
 
 install:
   # fix TypeError from old version of this
-  - pip install attrs==17.4.0
+  - pip install -U attrs==17.4.0
   - pip install -U codecov pytest-cov
   - echo $TRAVIS_PYTHON_VERSION
   - if [[ $TRAVIS_PYTHON_VERSION == '3.7'* ]]; then pip install -U git+https://github.com/yaml/pyyaml.git; else true; fi
