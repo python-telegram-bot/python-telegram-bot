@@ -36,17 +36,18 @@ before_cache:
   - rm -f $HOME/.pre-commit/pre-commit.log
 
 install:
+  # fix TypeError from old version of this
   - pip install -U codecov pytest-cov
   - echo $TRAVIS_PYTHON_VERSION
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.7'* ]]; then pip install -U git+https://github.com/yaml/pyyaml.git; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.7'* ]]; then pip install -U git+https://github.com/yaml/pyyaml.git; else true; fi
   - pip install -U -r requirements.txt
   - pip install -U -r requirements-dev.txt
-  - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; fi
+  - if [[ $TRAVIS_PYTHON_VERSION != 'pypy'* ]]; then pip install ujson; else true; fi
 
 script:
-  - if [[ $TEST_OFFICIAL != 'true' ]]; then pytest -v -m nocoverage; fi
-  - if [[ $TEST_OFFICIAL != 'true' ]]; then pytest -v -m "not nocoverage" --cov; fi
-  - if [[ $TEST_OFFICIAL == 'true' ]]; then pytest -v tests/test_official.py; fi
+  - if [[ $TEST_OFFICIAL != 'true' ]]; then pytest -v -m nocoverage; else true; fi
+  - if [[ $TEST_OFFICIAL != 'true' ]]; then pytest -v -m "not nocoverage" --cov; else true; fi
+  - if [[ $TEST_OFFICIAL == 'true' ]]; then pytest -v tests/test_official.py; else true; fi
 
 after_success:
   - coverage combine
