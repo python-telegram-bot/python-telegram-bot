@@ -17,7 +17,6 @@ matrix:
   allow_failures:
     - python: pypy2.7-5.10.0
     - python: pypy3.5-5.10.1
-    - env: TEST_OFFICIAL=true
 
 dist: trusty
 sudo: false
