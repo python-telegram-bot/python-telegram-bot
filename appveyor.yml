@@ -26,9 +26,9 @@ install:
   # Check that we have the expected version and architecture for Python
   - "python --version"
   # We need wheel installed to build wheels
+  # fix TypeError from old version of this
   - "pip install attrs==17.4.0"
   - "pip install -U codecov pytest-cov"
-  - "pip install pytest==5.2.0"
   - "pip install -r requirements.txt"
   - "pip install -r requirements-dev.txt"
 
