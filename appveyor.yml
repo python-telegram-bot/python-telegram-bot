@@ -28,6 +28,7 @@ install:
   # We need wheel installed to build wheels
   - "pip install attrs==17.4.0"
   - "pip install -U codecov pytest-cov"
+  - "pip install pytest==5.2.0"
   - "pip install -r requirements.txt"
   - "pip install -r requirements-dev.txt"
 
