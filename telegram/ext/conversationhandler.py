@@ -323,17 +323,17 @@ class ConversationHandler(Handler):
 
         """
         conversation_key, handler, check_result = check_result
-        new_state = handler.handle_update(update, dispatcher, check_result, context)
 
         with self.timeout_jobs_lock:
             # Remove the old timeout job (if present)
-            # TODO: should this be called before the child handle_update? the timeout could be called while the child
-            #       is computing
             timeout_job = self.timeout_jobs.pop(conversation_key, None)
 
             if timeout_job is not None:
                 timeout_job.schedule_removal()
 
+        new_state = handler.handle_update(update, dispatcher, check_result, context)
+
+        with self.timeout_jobs_lock:
             if self.conversation_timeout and new_state != self.END:
                 # Add the new timeout job
                 self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
