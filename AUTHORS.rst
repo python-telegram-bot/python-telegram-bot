@@ -72,6 +72,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
+- `syntx <https://github.com/syntx>`_
 - `thodnev <https://github.com/thodnev>`_
 - `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_

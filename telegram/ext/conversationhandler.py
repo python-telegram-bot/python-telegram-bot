@@ -64,6 +64,20 @@ class ConversationHandler(Handler):
     To end the conversation, the callback function must return :attr:`END` or ``-1``. To
     handle the conversation timeout, use handler :attr:`TIMEOUT` or ``-2``.
 
+    Note:
+        In each of the described collections of handlers, a handler may in turn be a
+        :class:`ConversationHandler`. In that case, the nested :class:`ConversationHandler` should
+        have the attribute :attr:`map_to_parent` which allows to return to the parent conversation
+        at specified states within the nested conversation.
+
+        Note that the keys in :attr:`map_to_parent` must not appear as keys in :attr:`states`
+        attribute or else the latter will be ignored. You may map :attr:`END` to one of the parents
+        states to continue the parent conversation after this has ended or even map a state to
+        :attr:`END` to end the *parent* conversation from within the nested one. For an example on
+        nested :class:`ConversationHandler` s, see our `examples`_.
+
+    .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples
+
     Attributes:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
             trigger the start of the conversation.
@@ -88,6 +102,9 @@ class ConversationHandler(Handler):
             persistence
         persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
             saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
+        map_to_parent (Dict[:obj:`object`, :obj:`object`]): Optional. A :obj:`dict` that can be
+            used to instruct a nested conversationhandler to transition into a mapped state on
+            its parent conversationhandler in place of a specified nested state.
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -119,6 +136,9 @@ class ConversationHandler(Handler):
             persistence
         persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
             saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
+        map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
+            used to instruct a nested conversationhandler to transition into a mapped state on
+            its parent conversationhandler in place of a specified nested state.
 
     Raises:
         ValueError
@@ -142,7 +162,8 @@ class ConversationHandler(Handler):
                  per_message=False,
                  conversation_timeout=None,
                  name=None,
-                 persistent=False):
+                 persistent=False,
+                 map_to_parent=None):
 
         self.entry_points = entry_points
         self.states = states
@@ -160,6 +181,7 @@ class ConversationHandler(Handler):
         self.persistence = None
         """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
         Set by dispatcher"""
+        self.map_to_parent = map_to_parent
 
         self.timeout_jobs = dict()
         self.conversations = dict()
@@ -328,7 +350,11 @@ class ConversationHandler(Handler):
                 self._trigger_timeout, self.conversation_timeout,
                 context=_ConversationTimeoutContext(conversation_key, update, dispatcher))
 
-        self.update_state(new_state, conversation_key)
+        if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
+            self.update_state(self.END, conversation_key)
+            return self.map_to_parent.get(new_state)
+        else:
+            self.update_state(new_state, conversation_key)
 
     def update_state(self, new_state, key):
         if new_state == self.END:
