@@ -7,12 +7,12 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+   runs-on: ${{matrix.os}}
     strategy:
       max-parallel: 4
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v1
@@ -25,11 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-    - name: Lint with flake8
-      if: matrix.python-version != 2.7
-      run:
-        # run it with our configuration
-        flake8
     - name: initialize the added urllib3
       run: 
         git submodule update --init --recursive
