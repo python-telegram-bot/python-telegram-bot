@@ -1,20 +1,36 @@
-name: Python package
-
 on:
   pull_request:
     branches:
     - master
 
 jobs:
-  build:
-   runs-on: ${{matrix.os}}
-   strategy:
+  flake_job:
+    name: Running flake8 
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # running flake, using our setup.cfg file
+        flake8
+    
+  test_jobs:
+    name: Python package
+    needs: [flake_job]
+    runs-on: ${{matrix.os}}
+    strategy:
       max-parallel: 4
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
-   steps:
+    steps:
       - uses: actions/checkout@v1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
