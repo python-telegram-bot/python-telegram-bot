@@ -1,4 +1,4 @@
-name: Python package
+name: Testing your PR
 on:
   pull_request:
     branches:
@@ -22,7 +22,7 @@ jobs:
         flake8
     
   test_jobs:
-    name: Python package
+    name: Running pytest
     needs: [flake_job]
     runs-on: ${{matrix.os}}
     strategy:
