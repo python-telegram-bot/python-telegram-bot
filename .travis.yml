@@ -14,6 +14,8 @@ matrix:
       dist: xenial
     - python: pypy3.5-5.10.1
       dist: xenial
+    - python: 3.8-dev
+      dist: xenial
   allow_failures:
     - python: pypy2.7-5.10.0
     - python: pypy3.5-5.10.1

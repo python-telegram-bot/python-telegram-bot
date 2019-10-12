@@ -2,7 +2,7 @@ environment:
 
   matrix:
     # For Python versions available on Appveyor, see
-    # http://www.appveyor.com/docs/installed-software#python
+    # https://www.appveyor.com/docs/windows-images-software/#python
     # The list here is complete (excluding Python 2.6, which
     # isn't covered by this document) at the time of writing.
 
@@ -10,6 +10,7 @@ environment:
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
     - PYTHON: "C:\\Python37"
+    # - PYTHON: "C:\\Python38"
 
 branches:
   only:
