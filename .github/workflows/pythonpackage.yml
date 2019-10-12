@@ -25,13 +25,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
-    - name: initialize the added urllib3
-      run: 
-        git submodule update --init --recursive
     - name: Lint with flake8
       run:
         # run it with our configuration
         flake8
+    - name: initialize the added urllib3
+      run: 
+        git submodule update --init --recursive
     - name: Test with pytest
       run: |
         pytest
