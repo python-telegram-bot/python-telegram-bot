@@ -28,7 +28,7 @@ jobs:
     - name: Lint with flake8
       run:
         # run it with our configuration
-        flake8 --config 
+        flake8
     - name: Test with pytest
       run: |
         pytest
