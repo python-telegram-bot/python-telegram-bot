@@ -26,6 +26,7 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
     - name: Lint with flake8
+      if: ${{ matrix.python-version }} != 2.7
       run:
         # run it with our configuration
         flake8
