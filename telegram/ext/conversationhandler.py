@@ -163,9 +163,9 @@ class ConversationHandler(Handler):
         Set by dispatcher"""
 
         self.timeout_jobs = dict()
-        self.timeout_jobs_lock = Lock()
+        self._timeout_jobs_lock = Lock()
         self.conversations = dict()
-        self.conversations_lock = Lock()
+        self._conversations_lock = Lock()
 
         self.logger = logging.getLogger(__name__)
 
@@ -243,7 +243,7 @@ class ConversationHandler(Handler):
             return None
 
         key = self._get_key(update)
-        with self.conversations_lock:
+        with self._conversations_lock:
             state = self.conversations.get(key)
 
         # Resolve promises
@@ -263,7 +263,7 @@ class ConversationHandler(Handler):
                     if res is None and old_state is None:
                         res = self.END
                     self.update_state(res, key)
-                    with self.conversations_lock:
+                    with self._conversations_lock:
                         state = self.conversations.get(key)
             else:
                 handlers = self.states.get(self.WAITING, [])
@@ -324,7 +324,7 @@ class ConversationHandler(Handler):
         """
         conversation_key, handler, check_result = check_result
 
-        with self.timeout_jobs_lock:
+        with self._timeout_jobs_lock:
             # Remove the old timeout job (if present)
             timeout_job = self.timeout_jobs.pop(conversation_key, None)
 
@@ -333,7 +333,7 @@ class ConversationHandler(Handler):
 
         new_state = handler.handle_update(update, dispatcher, check_result, context)
 
-        with self.timeout_jobs_lock:
+        with self._timeout_jobs_lock:
             if self.conversation_timeout and new_state != self.END:
                 # Add the new timeout job
                 self.timeout_jobs[conversation_key] = dispatcher.job_queue.run_once(
@@ -344,7 +344,7 @@ class ConversationHandler(Handler):
 
     def update_state(self, new_state, key):
         if new_state == self.END:
-            with self.conversations_lock:
+            with self._conversations_lock:
                 if key in self.conversations:
                     # If there is no key in conversations, nothing is done.
                     del self.conversations[key]
@@ -352,14 +352,14 @@ class ConversationHandler(Handler):
                         self.persistence.update_conversation(self.name, key, None)
 
         elif isinstance(new_state, Promise):
-            with self.conversations_lock:
+            with self._conversations_lock:
                 self.conversations[key] = (self.conversations.get(key), new_state)
                 if self.persistent:
                     self.persistence.update_conversation(self.name, key,
-                                                        (self.conversations.get(key), new_state))
+                                                         (self.conversations.get(key), new_state))
 
         elif new_state is not None:
-            with self.conversations_lock:
+            with self._conversations_lock:
                 self.conversations[key] = new_state
                 if self.persistent:
                     self.persistence.update_conversation(self.name, key, new_state)
@@ -373,7 +373,7 @@ class ConversationHandler(Handler):
 
         context = job.context
 
-        with self.timeout_jobs_lock:
+        with self._timeout_jobs_lock:
             found_job = self.timeout_jobs[context.conversation_key]
             if found_job is not job:
                 # The timeout has been canceled in handle_update
