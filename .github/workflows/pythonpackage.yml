@@ -30,4 +30,4 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
-      - continue-on-error: True
+        continue-on-error: True
