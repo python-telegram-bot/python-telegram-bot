@@ -3,26 +3,9 @@ on:
   pull_request:
     branches:
     - master
-jobs:
-  flake_job:
-    name: Running flake8 
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # running flake, using our setup.cfg file
-        flake8
-    
+jobs:  
   test_jobs:
     name: Running pytest
-    needs: [flake_job]
     runs-on: ${{matrix.os}}
     strategy:
       max-parallel: 4
@@ -44,21 +27,7 @@ jobs:
       - name: initialize the added urllib3
         run: 
           git submodule update --init --recursive
-      - name: printing variables
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-          JOB_CONTEXT: ${{ toJson(job) }}
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: 
-          echo "$GITHUB_CONTEXT"
-          echo "$JOB_CONTEXt"
-          echo "$STEPS_CONTEXT"
-          echo "$RUNNER_CONTEXT"
-          echo "$STRATEGY_CONTEXT"
-          echo "$MATRIX_CONTEXT"
       - name: Test with pytest
         run: |
           pytest
+      - continue-on-error: True
