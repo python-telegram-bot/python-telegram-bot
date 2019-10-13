@@ -29,7 +29,7 @@ from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import to_float_timestamp
+from telegram.utils.helpers import to_float_timestamp, UTC
 
 
 class Days(object):
@@ -191,7 +191,8 @@ class JobQueue(object):
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
                 :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
                 or change it to a repeating job.
-            time (:obj:`datetime.time`): Time of day at which the job should run.
+            time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
+                (``time.tzinfo``) is ``None``, UTC will be assumed.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -213,6 +214,7 @@ class JobQueue(object):
                   interval=datetime.timedelta(days=1),
                   repeat=True,
                   days=days,
+                  tzinfo=time.tzinfo,
                   context=context,
                   name=name,
                   job_queue=self)
@@ -260,8 +262,7 @@ class JobQueue(object):
 
             if job.enabled:
                 try:
-                    # TODO: set timezone for checking weekday
-                    current_week_day = datetime.date.today().weekday()
+                    current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
                     if any(day == current_week_day for day in job.days):
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
@@ -358,6 +359,9 @@ class Job(object):
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
         days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should run.
             Defaults to ``Days.EVERY_DAY``
+        tzinfo (:obj:`datetime.tzinfo`, optional): timezone associated to this job. Used when
+            checking the day of the week to determine whether a job should run (only relevant when
+            ``days is not Days.EVERY_DAY``). Defaults to UTC.
         job_queue (:class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
 
@@ -369,6 +373,7 @@ class Job(object):
                  repeat=True,
                  context=None,
                  days=Days.EVERY_DAY,
+                 tzinfo=UTC,
                  name=None,
                  job_queue=None):
 
@@ -383,6 +388,7 @@ class Job(object):
 
         self._days = None
         self.days = days
+        self.tzinfo = tzinfo
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 

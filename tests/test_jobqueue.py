@@ -28,6 +28,7 @@ from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.helpers import UtcOffsetTimezone
 
 
 @pytest.fixture(scope='function')
@@ -219,14 +220,31 @@ class TestJobQueue(object):
         assert job_queue._queue.get(False)[0] == pytest.approx(expected_time)
 
     def test_run_daily(self, job_queue):
-        delta, now = 0.5, time.time()
+        delta, now = 0.1, time.time()
         time_of_day = (dtm.datetime.utcfromtimestamp(now) + dtm.timedelta(seconds=delta)).time()
         expected_time = now + 60 * 60 * 24 + delta
 
         job_queue.run_daily(self.job_run_once, time_of_day)
-        sleep(0.6)
+        sleep(0.2)
         assert self.result == 1
         assert job_queue._queue.get(False)[0] == pytest.approx(expected_time)
+
+    def test_run_daily_with_timezone(self, job_queue):
+        """test that the weekday is retrieved based on the job's timezone
+        we create a timezone that is---approximately (see below)---UTC+24, and set it to run
+        on (UTC-)tomorrow's weekday at the current time of day.
+        """
+        delta, now = 0.1, dtm.datetime.utcnow()
+        # must subtract one minute because the UTC offset has to be strictly less than 24h
+        # thus this test will xpass if run in the interval [00:00, 00:01) UTC time
+        # (because target time will be 23:59 UTC, so local and target weekday will be the same)
+        target_datetime = now + dtm.timedelta(days=1, seconds=delta - 60)
+        target_tzinfo = UtcOffsetTimezone(dtm.timedelta(days=1, minutes=-1))
+        target_time = target_datetime.time().replace(tzinfo=target_tzinfo)
+        target_weekday = target_datetime.date().weekday()
+        job_queue.run_daily(self.job_run_once, time=target_time, days=(target_weekday,))
+        sleep(delta + 0.1)
+        assert self.result == 1
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)

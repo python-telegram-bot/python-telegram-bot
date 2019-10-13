@@ -53,43 +53,42 @@ def escape_markdown(text):
 # -------- date/time related helpers --------
 # TODO: add generic specification of UTC for naive datetimes to docs
 
-# hardcoded UTC timezone object (`datetime.timezone` isn't available in py2)
-def _utc():
-    # writing as internal class to "enforce" singleton
-    class UTCClass(dtm.tzinfo):
-        def tzname(self, dt):
-            return 'UTC'
-
-        def utcoffset(self, dt):
-            return dtm.timedelta(0)
-
-        def dst(self, dt):
-            return dtm.timedelta(0)
-
-    return UTCClass()
-
-
-# select UTC datetime.tzinfo object based on python version
-UTC = dtm.timezone.utc if hasattr(dtm, 'timezone') else _utc()
-
-# _datetime_to_float_timestamp
-# Not using future.backports.datetime here as datetime value might be an input from the user,
-# making every isinstace() call more delicate. So we just use our own compat layer.
-if hasattr(dtm.datetime, 'timestamp'):
+if hasattr(dtm, 'timezone'):
     # Python 3.3+
     def _datetime_to_float_timestamp(dt_obj):
         if dt_obj.tzinfo is None:
             dt_obj = dt_obj.replace(tzinfo=UTC)
         return dt_obj.timestamp()
+
+    UtcOffsetTimezone = dtm.timezone
+    UTC = dtm.timezone.utc
 else:
     # Python < 3.3 (incl 2.7)
+
+    # hardcoded timezone class (`datetime.timezone` isn't available in py2)
+    class UtcOffsetTimezone(dtm.tzinfo):
+        def __init__(self, offset):
+            self.offset = offset
+
+        def tzname(self, dt):
+            return 'UTC +{}'.format(self.offset)
+
+        def utcoffset(self, dt):
+            return self.offset
+
+        def dst(self, dt):
+            return dtm.timedelta(0)
+
+    UTC = UtcOffsetTimezone(dtm.timedelta(0))
     EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=UTC)
     NAIVE_EPOCH_DT = EPOCH_DT.replace(tzinfo=None)
 
+    # _datetime_to_float_timestamp
+    # Not using future.backports.datetime here as datetime value might be an input from the user,
+    # making every isinstace() call more delicate. So we just use our own compat layer.
     def _datetime_to_float_timestamp(dt_obj):
         epoch_dt = EPOCH_DT if dt_obj.tzinfo is not None else NAIVE_EPOCH_DT
         return (dt_obj - epoch_dt).total_seconds()
-
 
 _datetime_to_float_timestamp.__doc__ = \
     """Converts a datetime object to a float timestamp (with sub-second precision).
