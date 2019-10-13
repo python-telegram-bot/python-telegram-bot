@@ -12,7 +12,7 @@ jobs:
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7]
         os: [ubuntu-latest, windows-latest, macOS-latest]
-
+      fail-fast: False
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python ${{ matrix.python-version }}
@@ -30,4 +30,3 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
-        continue-on-error: True
