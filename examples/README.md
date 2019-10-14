@@ -2,7 +2,6 @@
 
 In this folder there are small examples to show what a bot written with `python-telegram-bot` looks like. Some bots focus on one specific aspect of the Telegram Bot API while others focus on one of the mechanics of this library. Except for the [`echobot.py`](#pure-api) example, they all use the high-level framework this library provides with the [`telegram.ext`](https://python-telegram-bot.readthedocs.io/en/latest/telegram.ext.html) submodule.
 
-All examples are licensed under the [CC0 License](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/LICENSE.txt) and are therefore fully dedicated to the public domain. You can use them as the base for your own bots without worrying about copyrights.
 
 ### [`echobot2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/echobot2.py) 
 This is probably the base for most of the bots made with `python-telegram-bot`. It simply replies to each text message with a message that contains the same text.
