@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: PR Example
+        run: npm install @actions/core && npm install @actions/github
         uses: Poolitzer/notifier-action@master
         with:
           notify-message: GET THE FUCK AWAY FROM THE EXAMPLES
