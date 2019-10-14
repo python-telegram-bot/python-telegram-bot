@@ -1,7 +1,7 @@
 on:
   pull_request:
     types: [opened, edited]
-    paths: examples/'*.py'
+    paths: examples/**
 jobs:
   job:
     runs-on: ubuntu-latest
