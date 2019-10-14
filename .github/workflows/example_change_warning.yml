@@ -1,6 +1,7 @@
 on:
   pull_request:
-    paths: examples/**
+    types: [opened]
+    paths: examples/'*.py'
 jobs:
   job:
     runs-on: ubuntu-latest
@@ -8,5 +9,5 @@ jobs:
       - name: PR Example
         uses: Poolitzer/notifier-action@master
         with:
-          notify-message: GET THE FUCK AWAY FROM THE EXAMPLE
+          notify-message: Guys, GUYS! Someone changed the example. Think about that before you merge!
           repo-token: ${{ secrets.GITHUB_TOKEN }}
