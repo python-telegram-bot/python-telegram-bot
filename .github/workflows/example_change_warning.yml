@@ -1,0 +1,11 @@
+on:
+  pull_request:
+    paths: examples/**
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR Example
+        uses: Poolitzer/notifier-action@master
+        with:
+          notify-message: GET THE FUCK AWAY FROM THE EXAMPLES
