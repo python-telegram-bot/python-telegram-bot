@@ -5,8 +5,9 @@ on:
 jobs:
   job:
     runs-on: ubuntu-latest
+    name: about example change
     steps:
-      - name: about example change
+      - name: running the check
         uses: Poolitzer/notifier-action@master
         with:
           notify-message: Guys, GUYS! Someone changed the example. Think about that before you merge!
