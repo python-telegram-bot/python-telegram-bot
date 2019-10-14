@@ -9,4 +9,4 @@ jobs:
         uses: Poolitzer/notifier-action@master
         with:
           notify-message: GET THE FUCK AWAY FROM THE EXAMPLE
-          repo-token: ${{ secrets.FUCK }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
