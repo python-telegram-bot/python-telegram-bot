@@ -1,6 +1,6 @@
 on:
   pull_request:
-    types: [opened]
+    types: [opened, edited]
     paths: examples/'*.py'
 jobs:
   job:
