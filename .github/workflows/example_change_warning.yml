@@ -1,12 +1,12 @@
+name: Warning maintainers
 on:
   pull_request:
-    types: [opened, edited]
     paths: examples/**
 jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-      - name: PR Example
+      - name: about example change
         uses: Poolitzer/notifier-action@master
         with:
           notify-message: Guys, GUYS! Someone changed the example. Think about that before you merge!
