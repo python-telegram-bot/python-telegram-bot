@@ -97,12 +97,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         # Optional
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         if video_width:
             self.video_width = video_width
         if video_height:

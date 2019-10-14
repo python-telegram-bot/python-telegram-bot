@@ -65,8 +65,7 @@ class TelegramObject(object):
                        '_credentials',
                        '_decrypted_credentials',
                        '_decrypted_data',
-                       '_decrypted_secret',
-                       '_explicit_parse_mode'):
+                       '_decrypted_secret'):
                 continue
 
             value = self.__dict__[key]

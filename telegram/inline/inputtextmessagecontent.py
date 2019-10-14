@@ -52,10 +52,5 @@ class InputTextMessageContent(InputMessageContent):
         # Required
         self.message_text = message_text
         # Optionals
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         self.disable_web_page_preview = disable_web_page_preview

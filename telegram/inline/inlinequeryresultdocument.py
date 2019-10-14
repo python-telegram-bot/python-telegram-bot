@@ -94,12 +94,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         # Optionals
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         if description:
             self.description = description
         if reply_markup:

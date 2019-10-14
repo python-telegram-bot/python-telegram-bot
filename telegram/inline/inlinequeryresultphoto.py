@@ -97,12 +97,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
             self.description = description
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         if reply_markup:
             self.reply_markup = reply_markup
         if input_message_content:

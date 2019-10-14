@@ -123,6 +123,9 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
+        if data.get('media') and (data['media'].parse_mode is DEFAULT_NONE):
+            data['media'].parse_mode = self.default_parse_mode
+
         result = self._request.post(url, data, timeout=timeout)
 
         if result is True:
@@ -995,6 +998,10 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'media': media}
 
+        for m in data['media']:
+            if m.parse_mode is DEFAULT_NONE:
+                m.parse_mode = self.default_parse_mode
+
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if disable_notification:
@@ -1465,11 +1472,11 @@ class Bot(TelegramObject):
         url = '{0}/answerInlineQuery'.format(self.base_url)
 
         for res in results:
-            if res._has_parse_mode and not res._explicit_parse_mode:
+            if res._has_parse_mode and res.parse_mode is DEFAULT_NONE:
                 res.parse_mode = self.default_parse_mode
             if res._has_input_message_content and res.input_message_content:
                 if (res.input_message_content._has_parse_mode
-                        and not res.input_message_content._explicit_parse_mode):
+                        and res.input_message_content.parse_mode is DEFAULT_NONE):
                     res.input_message_content.parse_mode = self.default_parse_mode
         results = [res.to_dict() for res in results]
 

@@ -105,12 +105,7 @@ class InputMediaAnimation(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         if width:
             self.width = width
         if height:
@@ -156,12 +151,7 @@ class InputMediaPhoto(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
 
 
 class InputMediaVideo(InputMedia):
@@ -233,12 +223,7 @@ class InputMediaVideo(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         if width:
             self.width = width
         if height:
@@ -316,12 +301,7 @@ class InputMediaAudio(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
         if duration:
             self.duration = duration
         if performer:
@@ -380,9 +360,4 @@ class InputMediaDocument(InputMedia):
 
         if caption:
             self.caption = caption
-        if parse_mode is DEFAULT_NONE:
-            self._explicit_parse_mode = False
-            self.parse_mode = None
-        else:
-            self._explicit_parse_mode = True
-            self.parse_mode = parse_mode
+        self.parse_mode = parse_mode
