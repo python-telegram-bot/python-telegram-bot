@@ -6,11 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: npm ci
+      - name: install node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm install
       - uses: Poolitzer/notifier-action@master
         with:
           notify-message: GET THE FUCK AWAY FROM THE EXAMPLES
           repo-token: ceeb7ab97d08dd577d6e303640df11e0f1ad2b3f
-      - run: npm install
-      - run: npm test
        
