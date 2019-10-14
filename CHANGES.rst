@@ -2,6 +2,33 @@
 Changelog
 =========
 
+Version 12.2.0
+==============
+
+**New features:**
+
+- Nested ConversationHandlers (`#1512`_).
+
+**Minor changes, CI improvments or bug fixes:**
+
+- Fix CI failures due to non-backward compat attrs depndency (`#1540`_).
+- travis.yaml: TEST_OFFICIAL removed from allowed_failures.
+- Fix typos in examples (`#1537`_).
+- Fix Bot.to_dict to use proper first_name (`#1525`_).
+- Refactor ``test_commandhandler.py`` (`#1408`_).
+- Add Python 3.8 (RC version) to Travis testing matrix (`#1543`_).
+- test_bot.py: Add to_dict test (`#1544`_).
+- Flake config moved into setup.cfg (`#1546`_).
+
+.. _`#1512`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1512
+.. _`#1540`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1540
+.. _`#1537`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1537
+.. _`#1525`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1525
+.. _`#1408`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1408
+.. _`#1543`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1543
+.. _`#1544`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1544
+.. _`#1546`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1546
+
 Version 12.1.1
 ==============
 *Released 2019-09-18*
