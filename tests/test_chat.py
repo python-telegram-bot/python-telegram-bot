@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Chat, ChatAction
+from telegram import Chat, ChatAction, ChatPermissions
 from telegram import User
 
 
@@ -28,7 +28,8 @@ def chat(bot):
     return Chat(TestChat.id, TestChat.title, TestChat.type, username=TestChat.username,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot, sticker_set_name=TestChat.sticker_set_name,
-                can_set_sticker_set=TestChat.can_set_sticker_set)
+                can_set_sticker_set=TestChat.can_set_sticker_set,
+                permissions=TestChat.permissions)
 
 
 class TestChat(object):
@@ -39,6 +40,11 @@ class TestChat(object):
     all_members_are_administrators = False
     sticker_set_name = 'stickers'
     can_set_sticker_set = False
+    permissions = ChatPermissions(
+        can_send_messages=True,
+        can_change_info=False,
+        can_invite_users=True,
+    )
 
     def test_de_json(self, bot):
         json_dict = {
@@ -48,7 +54,8 @@ class TestChat(object):
             'username': self.username,
             'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
-            'can_set_sticker_set': self.can_set_sticker_set
+            'can_set_sticker_set': self.can_set_sticker_set,
+            'permissions': self.permissions.to_dict()
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -59,6 +66,7 @@ class TestChat(object):
         assert chat.all_members_are_administrators == self.all_members_are_administrators
         assert chat.sticker_set_name == self.sticker_set_name
         assert chat.can_set_sticker_set == self.can_set_sticker_set
+        assert chat.permissions == self.permissions
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -69,6 +77,7 @@ class TestChat(object):
         assert chat_dict['type'] == chat.type
         assert chat_dict['username'] == chat.username
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
+        assert chat_dict['permissions'] == chat.permissions.to_dict()
 
     def test_link(self, chat):
         assert chat.link == 'https://t.me/{}'.format(chat.username)
@@ -132,6 +141,15 @@ class TestChat(object):
 
         monkeypatch.setattr('telegram.Bot.unban_chat_member', test)
         assert chat.unban_member(42)
+
+    def test_set_permissions(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            chat_id = args[1] == chat.id
+            permissions = args[2] == self.permissions
+            return chat_id and permissions
+
+        monkeypatch.setattr('telegram.Bot.set_chat_permissions', test)
+        assert chat.set_permissions(self.permissions)
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):

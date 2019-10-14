@@ -43,6 +43,10 @@ class TestConversationHandler(object):
     # and then we can start coding!
     END, THIRSTY, BREWING, DRINKING, CODING = range(-1, 4)
 
+    # Drinking state definitions (nested)
+    # At first we're holding the cup.  Then we sip coffee, and last we swallow it
+    HOLDING, SIPPING, SWALLOWING, REPLENISHING, STOPPING = map(chr, range(ord('a'), ord('f')))
+
     current_state, entry_points, states, fallbacks = None, None, None, None
     group = Chat(0, Chat.GROUP)
     second_group = Chat(1, Chat.GROUP)
@@ -68,6 +72,43 @@ class TestConversationHandler(object):
         }
         self.fallbacks = [CommandHandler('eat', self.start)]
         self.is_timeout = False
+
+        # for nesting tests
+        self.nested_states = {
+            self.THIRSTY: [CommandHandler('brew', self.brew), CommandHandler('wait', self.start)],
+            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
+            self.CODING: [
+                CommandHandler('keepCoding', self.code),
+                CommandHandler('gettingThirsty', self.start),
+                CommandHandler('drinkMore', self.drink)
+            ],
+        }
+        self.drinking_entry_points = [CommandHandler('hold', self.hold)]
+        self.drinking_states = {
+            self.HOLDING: [CommandHandler('sip', self.sip)],
+            self.SIPPING: [CommandHandler('swallow', self.swallow)],
+            self.SWALLOWING: [CommandHandler('hold', self.hold)]
+        }
+        self.drinking_fallbacks = [CommandHandler('replenish', self.replenish),
+                                   CommandHandler('stop', self.stop),
+                                   CommandHandler('end', self.end),
+                                   CommandHandler('startCoding', self.code),
+                                   CommandHandler('drinkMore', self.drink)]
+        self.drinking_entry_points.extend(self.drinking_fallbacks)
+
+        # Map nested states to parent states:
+        self.drinking_map_to_parent = {
+            # Option 1 - Map a fictional internal state to an external parent state
+            self.REPLENISHING: self.BREWING,
+            # Option 2 - Map a fictional internal state to the END state on the parent
+            self.STOPPING: self.END,
+            # Option 3 - Map the internal END state to an external parent state
+            self.END: self.CODING,
+            # Option 4 - Map an external state to the same external parent state
+            self.CODING: self.CODING,
+            # Option 5 - Map an external state to the internal entry point
+            self.DRINKING: self.DRINKING
+        }
 
     # State handlers
     def _set_state(self, update, state):
@@ -102,6 +143,23 @@ class TestConversationHandler(object):
 
     def passout2(self, bot, update):
         self.is_timeout = True
+
+    # Drinking actions (nested)
+
+    def hold(self, bot, update):
+        return self._set_state(update, self.HOLDING)
+
+    def sip(self, bot, update):
+        return self._set_state(update, self.SIPPING)
+
+    def swallow(self, bot, update):
+        return self._set_state(update, self.SWALLOWING)
+
+    def replenish(self, bot, update):
+        return self._set_state(update, self.REPLENISHING)
+
+    def stop(self, bot, update):
+        return self._set_state(update, self.STOPPING)
 
     # Tests
     def test_per_all_false(self):
@@ -609,3 +667,108 @@ class TestConversationHandler(object):
             "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
             " since inline queries have no chat context."
         )
+
+    def test_nested_conversation_handler(self, dp, bot, user1, user2):
+        self.nested_states[self.DRINKING] = [ConversationHandler(
+                                             entry_points=self.drinking_entry_points,
+                                             states=self.drinking_states,
+                                             fallbacks=self.drinking_fallbacks,
+                                             map_to_parent=self.drinking_map_to_parent)]
+        handler = ConversationHandler(entry_points=self.entry_points,
+                                      states=self.nested_states,
+                                      fallbacks=self.fallbacks)
+        dp.add_handler(handler)
+
+        # User one, starts the state machine.
+        message = Message(0, user1, None, self.group, text='/start', bot=bot,
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))])
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.THIRSTY
+
+        # The user is thirsty and wants to brew coffee.
+        message.text = '/brew'
+        message.entities[0].length = len('/brew')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.BREWING
+
+        # Lets pour some coffee.
+        message.text = '/pourCoffee'
+        message.entities[0].length = len('/pourCoffee')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.DRINKING
+
+        # The user is holding the cup
+        message.text = '/hold'
+        message.entities[0].length = len('/hold')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.HOLDING
+
+        # The user is sipping coffee
+        message.text = '/sip'
+        message.entities[0].length = len('/sip')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.SIPPING
+
+        # The user is swallowing
+        message.text = '/swallow'
+        message.entities[0].length = len('/swallow')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.SWALLOWING
+
+        # The user is holding the cup again
+        message.text = '/hold'
+        message.entities[0].length = len('/hold')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.HOLDING
+
+        # The user wants to replenish the coffee supply
+        message.text = '/replenish'
+        message.entities[0].length = len('/replenish')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.REPLENISHING
+        assert handler.conversations[(0, user1.id)] == self.BREWING
+
+        # The user wants to drink their coffee again
+        message.text = '/pourCoffee'
+        message.entities[0].length = len('/pourCoffee')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.DRINKING
+
+        # The user is now ready to start coding
+        message.text = '/startCoding'
+        message.entities[0].length = len('/startCoding')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.CODING
+
+        # The user decides it's time to drink again
+        message.text = '/drinkMore'
+        message.entities[0].length = len('/drinkMore')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.DRINKING
+
+        # The user is holding their cup
+        message.text = '/hold'
+        message.entities[0].length = len('/hold')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.HOLDING
+
+        # The user wants to end with the drinking and go back to coding
+        message.text = '/end'
+        message.entities[0].length = len('/end')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.END
+        assert handler.conversations[(0, user1.id)] == self.CODING
+
+        # The user wants to drink once more
+        message.text = '/drinkMore'
+        message.entities[0].length = len('/drinkMore')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.DRINKING
+
+        # The user wants to stop altogether
+        message.text = '/stop'
+        message.entities[0].length = len('/stop')
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.STOPPING
+        assert handler.conversations.get((0, user1.id)) is None

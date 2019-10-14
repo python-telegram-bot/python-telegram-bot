@@ -16,8 +16,14 @@ A common task for a bot is to ask information from the user. In v5.0 of this lib
 ### [`conversationbot2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot2.py)
 A more complex example of a bot that uses the `ConversationHandler`. It is also more confusing. Good thing there is a [fancy state diagram](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/conversationbot2.png) for this one, too!
 
+### [`nestedconversationbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/nestedconversationbot.py)
+A even more complex example of a bot that uses the nested `ConversationHandler`s. While it's certainly not that complex that you couldn't built it without nested `ConversationHanldler`s, it gives a good impression on how to work with them. Of course, there is a [fancy state diagram](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/nestedconversationbot.png) for this example, too!
+
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
 This example sheds some light on inline keyboards, callback queries and message editing.
+
+### [`inlinekeyboard2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py)
+A more complex example about inline keyboards, callback queries and message editing. This example showcases how an interactive menu could be build using inline keyboards.
 
 ### [`inlinebot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py)
 A basic example of an [inline bot](https://core.telegram.org/bots/inline). Don't forget to enable inline mode with [@BotFather](https://telegram.me/BotFather).
