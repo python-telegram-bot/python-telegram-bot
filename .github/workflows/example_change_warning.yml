@@ -5,7 +5,7 @@ jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-      - name: install:
+      - name: install
         run: npm install @actions/core && npm install @actions/github
       - name: PR Example
         uses: Poolitzer/notifier-action@master
