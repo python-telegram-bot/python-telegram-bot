@@ -5,6 +5,8 @@ jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-      - name: ESLint (JS/TS) Action 
-        uses: iCrawl/action-eslint@v1
-       
+      - name: PR Example
+        uses: Poolitzer/notifier-action@master
+        with:
+          notify-message: GET THE FUCK AWAY FROM THE EXAMPLES
+          repo-token: ceeb7ab97d08dd577d6e303640df11e0f1ad2b3f
