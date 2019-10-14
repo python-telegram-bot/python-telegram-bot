@@ -5,10 +5,12 @@ jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-      - name: install
-        run: npm install @actions/core && npm install @actions/github
-      - name: PR Example
-        uses: Poolitzer/notifier-action@master
+      - uses: actions/checkout@v1
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - uses: Poolitzer/notifier-action@master
         with:
           notify-message: GET THE FUCK AWAY FROM THE EXAMPLES
           repo-token: ceeb7ab97d08dd577d6e303640df11e0f1ad2b3f
+       
