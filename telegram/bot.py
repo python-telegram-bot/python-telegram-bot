@@ -34,6 +34,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from future.utils import string_types
 
+from telegram import constants
 from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos, File,
                       ReplyMarkup, TelegramObject, WebhookInfo, GameHighScore, StickerSet,
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
@@ -42,7 +43,7 @@ from telegram.error import InvalidToken, TelegramError
 from telegram.utils.helpers import to_timestamp
 from telegram.utils.request import Request
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+		logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 def info(func):
@@ -252,6 +253,32 @@ class Bot(TelegramObject):
             data['parse_mode'] = parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
+
+        if len(data['text']) > constants.MAX_MESSAGE_LENGTH:
+            msg = data['text']            
+            sub_msgs = []
+ 
+            while len(msg):
+                split_point = msg[:constants.MAX_MESSAGE_LENGTH].rfind('\n')
+                if split_point != -1:
+                    sub_msgs.append(msg[:split_point])
+                    msg = msg[split_point+1:]
+                else:
+                    split_point = msg[:constants.MAX_MESSAGE_LENGTH].rfind('. ')
+                    if split_point != -1:
+                        sub_msgs.append(msg[:split_point+1])
+                        msg = msg[split_point+2:]
+                    else:
+                        sub_msgs.append(msg[:constants.MAX_MESSAGE_LENGTH])
+                        msg = msg[constants.MAX_MESSAGE_LENGTH:]
+ 
+            for send_msg in sub_msgs[:-1]:
+                data['text'] = send_msg
+                self._message(url, data, disable_notification=disable_notification,
+                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
+                              timeout=timeout, **kwargs)
+                             
+            data['text'] = sub_msgs[-1]
 
         return self._message(url, data, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
