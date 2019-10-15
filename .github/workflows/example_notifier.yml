@@ -1,0 +1,14 @@
+name: Warning maintainers
+on:
+  pull_request:
+    paths: examples/**
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    name: about example change
+    steps:
+      - name: running the check
+        uses: Poolitzer/notifier-action@master
+        with:
+          notify-message: Hey there. Relax, I am just a little warning for the maintainers to release directly after merging your PR, otherwise we have broken examples and people might get confused :)
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
