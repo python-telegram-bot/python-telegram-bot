@@ -43,7 +43,7 @@ jobs:
           BOTS: ${{ secrets.BOTS }}
       - name: Test with pytest (coverage)
         run: |
-          pytest -v -m "not nocoverage"
+          pytest -v -m "not nocoverage" --cov
         continue-on-error: True
         env:
           JOB_INDEX: ${{ strategy.job-index }}
@@ -58,7 +58,6 @@ jobs:
       - name: Submit coverage
         run: |
           if [ "$CODECOV_TOKEN" != "" ]; then
-             coverage combine
              codecov -F Github -t $CODECOV_TOKEN
           fi
         env:
