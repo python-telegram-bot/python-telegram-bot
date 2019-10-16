@@ -15,20 +15,25 @@ Setting things up
       $ git clone https://github.com/<your username>/python-telegram-bot --recursive
       $ cd python-telegram-bot
 
-3. Add a track to the original repository:
+3. Initialize submodules
+
+   .. code-block:: bash
+
+      $ git submodule update --init --recursive
+
+4. Add a track to the original repository:
 
    .. code-block:: bash
 
       $ git remote add upstream https://github.com/python-telegram-bot/python-telegram-bot
 
-4. Install dependencies:
+5. Install dependencies:
 
    .. code-block:: bash
 
       $ pip install -r requirements.txt -r requirements-dev.txt
 
-
-5. Install pre-commit hooks:
+6. Install pre-commit hooks:
 
    .. code-block:: bash
 
