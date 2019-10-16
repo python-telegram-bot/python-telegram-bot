@@ -29,7 +29,7 @@ def terminal_summary_wrapper(original, plugin_name):
     text = fold_plugins[plugin_name]
 
     def pytest_terminal_summary(terminalreporter):
-        terminalreporter.write('##[group] pytest - plugin.{}\n{}\n'.format(plugin_name, text))
+        terminalreporter.write('##[group] {}\n'.format(text))
         original(terminalreporter)
         terminalreporter.write('##[endgroup]')
 
@@ -46,23 +46,17 @@ def pytest_configure(config):
 
 terminal = None
 previous_name = None
-failed = set()
-durations = defaultdict(int)
 
 
 def _get_name(location):
-    return '{}::{}'.format(location[0], location[2].split('.')[0].split('[')[0])
+    if location[0].startswith('tests/'):
+        return location[0][6:]
+    return location[0]
 
 
-@pytest.hookimpl(hookwrapper=True, tryfirst=True)
-def pytest_runtest_makereport(item, call):
-    outcome = yield
-    rep = outcome.get_result()
-    name = _get_name(item.location)
-    durations[name] += rep.duration
-    if rep.failed:
-        global failed
-        failed.add(name)
+@pytest.mark.trylast
+def pytest_itemcollected(item):
+    item._nodeid = item._nodeid.split('::', 1)[1]
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
@@ -78,15 +72,9 @@ def pytest_runtest_protocol(item, nextitem):
 
     if previous_name is None or previous_name != name:
         previous_name = name
-        terminal.write('\n##[group] pytest - {}'.format(name.split('::')[1]))
-        terminal.write(name)
+        terminal.write('\n##[group] {}'.format(name))
 
     yield
 
     if nextitem is None or _get_name(nextitem.location) != name:
-        global failed
-        if name in failed:
-            terminal.write('')
-        else:
-            terminal.write('\n\n##[endgroup]'.format(name.split('::')[1]))
-        time.sleep(0.001)  # Tiny sleep so travis hopefully doesn't mangle the log
+        terminal.write('\n##[endgroup]')
