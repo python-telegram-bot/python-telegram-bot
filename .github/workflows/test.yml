@@ -37,6 +37,7 @@ jobs:
       - name: Test with pytest (no coverage)
         run: |
           pytest -v -m nocoverage
+          exit $?
         continue-on-error: True
         env:
           JOB_INDEX: ${{ strategy.job-index }}
@@ -44,6 +45,7 @@ jobs:
       - name: Test with pytest (coverage)
         run: |
           pytest -v -m "not nocoverage" --cov
+          exit $?
         continue-on-error: True
         env:
           JOB_INDEX: ${{ strategy.job-index }}
@@ -52,6 +54,7 @@ jobs:
       - name: Compare to official api
         run: |
           pytest -v tests/test_official.py
+          exit $?
         continue-on-error: True
         if: matrix.run-official
 
