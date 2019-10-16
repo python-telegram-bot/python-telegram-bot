@@ -34,22 +34,18 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
-      - name: Test with pytest (no coverage)
+      - name: Test with pytest
         run: |
           pytest -v -m nocoverage
-          exit $?
-        continue-on-error: True
-        env:
-          JOB_INDEX: ${{ strategy.job-index }}
-          BOTS: ${{ secrets.BOTS }}
-      - name: Test with pytest (coverage)
-        run: |
+          nocov_exit=$?
           pytest -v -m "not nocoverage" --cov
-          exit $?
-        continue-on-error: True
+          cov_exit=$?
+          global_exit=$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
+          exit ${global_exit}
         env:
           JOB_INDEX: ${{ strategy.job-index }}
           BOTS: ${{ secrets.BOTS }}
+        shell: bash
 
       - name: Compare to official api
         run: |
@@ -57,8 +53,8 @@ jobs:
           exit $?
         env:
           TEST_OFFICIAL: "true"
-        continue-on-error: True
         if: matrix.run-official
+        shell: bash
 
       - name: Submit coverage
         run: |
