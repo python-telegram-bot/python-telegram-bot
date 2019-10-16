@@ -613,6 +613,53 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert not self.is_timeout
 
+    def test_conversation_timeout_cancel_conflict(self, dp, bot, user1):
+        # Start state machine, wait half the timeout,
+        # then call a callback that takes more than the timeout
+        # t=0 /start (timeout=.5)
+        # t=.25 /slowbrew (sleep .5)
+        # |  t=.5 original timeout (should not execute)
+        # |  t=.75 /slowbrew returns (timeout=1.25)
+        # t=1.25 timeout
+
+        def slowbrew(_bot, update):
+            sleep(0.25)
+            # Let's give to the original timeout a chance to execute
+            dp.job_queue.tick()
+            sleep(0.25)
+            # By returning None we do not override the conversation state so
+            # we can see if the timeout has been executed
+
+        states = self.states
+        states[self.THIRSTY].append(CommandHandler('slowbrew', slowbrew))
+        states.update({ConversationHandler.TIMEOUT: [
+            MessageHandler(None, self.passout2)
+        ]})
+
+        handler = ConversationHandler(entry_points=self.entry_points, states=states,
+                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
+        dp.add_handler(handler)
+
+        # CommandHandler timeout
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
+                                                  length=len('/start'))],
+                          bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        sleep(0.25)
+        dp.job_queue.tick()
+        message.text = '/slowbrew'
+        message.entities[0].length = len('/slowbrew')
+        dp.process_update(Update(update_id=0, message=message))
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is not None
+        assert not self.is_timeout
+
+        sleep(0.5)
+        dp.job_queue.tick()
+        assert handler.conversations.get((self.group.id, user1.id)) is None
+        assert self.is_timeout
+
     def test_per_message_warning_is_only_shown_once(self, recwarn):
         ConversationHandler(
             entry_points=self.entry_points,
