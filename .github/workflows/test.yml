@@ -58,7 +58,7 @@ jobs:
       - name: Submit coverage
         run: |
           if [ "$CODECOV_TOKEN" != "" ]; then
-             codecov -F Github -t $CODECOV_TOKEN
+             codecov -F github -t $CODECOV_TOKEN --name "${{ matrix.os }}-${{ matrix.python-version }}"
           fi
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
