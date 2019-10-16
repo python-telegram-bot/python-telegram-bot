@@ -55,6 +55,8 @@ jobs:
         run: |
           pytest -v tests/test_official.py
           exit $?
+        env:
+          TEST_OFFICIAL: "true"
         continue-on-error: True
         if: matrix.run-official
 
