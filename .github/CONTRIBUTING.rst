@@ -25,7 +25,7 @@ Setting things up
 
    .. code-block:: bash
 
-      $ sudo pip install -r requirements.txt -r requirements-dev.txt
+      $ pip install -r requirements.txt -r requirements-dev.txt
 
 
 5. Install pre-commit hooks:
