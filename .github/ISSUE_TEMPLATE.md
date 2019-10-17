@@ -11,26 +11,41 @@ Please note, we only support the latest version of python-telegram-bot and
 master branch. Please make sure to upgrade & recreate the issue on the latest
 version prior to opening an issue.
 -->
+
 ### Steps to reproduce
+
 1.
-
 2.
-
 3.
 
 ### Expected behaviour
-Tell us what should happen
+
+<!-- Tell us what should happen (after this line) -->
 
 ### Actual behaviour
-Tell us what happens instead
+
+<!-- Tell us what happens instead (after this line) -->
 
 ### Configuration
+
 **Operating System:**
 
+```
+
+```
 
 **Version of Python, python-telegram-bot & dependencies:**
 
-``$ python -m telegram``
+<!-- Execute `python -m telegram` and paste the output in the code block below -->
+
+```
+
+```
 
 ### Logs
-Insert logs here (if necessary)
+
+<!-- Insert logs in the code block below (if necessary) -->
+
+```
+
+```
