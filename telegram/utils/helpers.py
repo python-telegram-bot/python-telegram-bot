@@ -29,11 +29,6 @@ import re
 import signal
 from datetime import datetime
 
-try:
-    from html import escape as escape_html  # noqa: F401
-except ImportError:
-    from cgi import escape as escape_html  # noqa: F401
-
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
 _signames = {v: k
              for k, v in reversed(sorted(vars(signal).items()))
