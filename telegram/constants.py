@@ -17,7 +17,8 @@
 """Constants in the Telegram network.
 
 The following constants were extracted from the
-`Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_.
+`Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_ and
+`Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
     MAX_MESSAGE_LENGTH (:obj:`int`): 4096
