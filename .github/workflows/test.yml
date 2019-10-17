@@ -45,7 +45,7 @@ jobs:
         env:
           JOB_INDEX: ${{ strategy.job-index }}
           BOTS: ${{ secrets.BOTS }}
-        shell: bash
+        shell: bash --noprofile --norc {0}
 
       - name: Compare to official api
         run: |
