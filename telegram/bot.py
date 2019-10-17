@@ -21,6 +21,7 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+import inspect
 
 try:
     import ujson as json
@@ -39,7 +40,7 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
                       Location, Venue, Contact, InputFile, Poll)
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
+from telegram.utils.helpers import to_timestamp, Defaults, DEFAULT_NONE
 from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -87,10 +88,43 @@ class Bot(TelegramObject):
 
     """
 
+    def __new__(cls, *args, **kwargs):
+        # Handle default_... kwargs for bot methods
+        # Transform default_x=y kwargs into Defaults.x=y
+        defaults = Defaults()
+        for kwarg in list(kwargs.keys()):
+            if kwarg.startswith('default_'):
+                setattr(defaults, kwarg[8:], kwargs[kwarg])
+                del kwargs[kwarg]
+
+        # Make an instance of the class
+        instance = super(Bot, cls).__new__(cls)
+
+        # For each method ...
+        for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
+            # ... get kwargs
+            argspec = inspect.getargspec(method)
+            kwarg_names = argspec.args[-len(argspec.defaults or []):]
+            # ... check if Defaults has a attribute that matches the kwarg name
+            needs_default = [
+                kwarg_name for kwarg_name in kwarg_names if kwarg_name in defaults.__dict__.keys()
+            ]
+            # ... make a dict of kwarg name and the default value
+            default_kwargs = {
+                kwarg_name: getattr(defaults, kwarg_name) for kwarg_name in needs_default
+            }
+            # ... apply the defaults using a partial
+            if default_kwargs:
+                setattr(instance, method_name, functools.partial(method, **default_kwargs))
+
+        return instance
+
     def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
                  private_key_password=None, default_parse_mode=None):
         self.token = self._validate_token(token)
-        self.default_parse_mode = default_parse_mode
+
+        # Gather default
+        self.defaults = Defaults(parse_mode=default_parse_mode)
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -124,7 +158,7 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup
 
         if data.get('media') and (data['media'].parse_mode is DEFAULT_NONE):
-            data['media'].parse_mode = self.default_parse_mode
+            data['media'].parse_mode = self.defaults.parse_mode
 
         result = self._request.post(url, data, timeout=timeout)
 
@@ -212,7 +246,7 @@ class Bot(TelegramObject):
     def send_message(self,
                      chat_id,
                      text,
-                     parse_mode=DEFAULT_NONE,
+                     parse_mode=None,
                      disable_web_page_preview=None,
                      disable_notification=False,
                      reply_to_message_id=None,
@@ -256,8 +290,6 @@ class Bot(TelegramObject):
 
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
@@ -358,7 +390,7 @@ class Bot(TelegramObject):
                    reply_to_message_id=None,
                    reply_markup=None,
                    timeout=20,
-                   parse_mode=DEFAULT_NONE,
+                   parse_mode=None,
                    **kwargs):
         """Use this method to send photos.
 
@@ -409,8 +441,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
@@ -428,7 +458,7 @@ class Bot(TelegramObject):
                    reply_to_message_id=None,
                    reply_markup=None,
                    timeout=20,
-                   parse_mode=DEFAULT_NONE,
+                   parse_mode=None,
                    thumb=None,
                    **kwargs):
         """
@@ -498,8 +528,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = InputFile(thumb, attach=True)
@@ -519,7 +547,7 @@ class Bot(TelegramObject):
                       reply_to_message_id=None,
                       reply_markup=None,
                       timeout=20,
-                      parse_mode=DEFAULT_NONE,
+                      parse_mode=None,
                       thumb=None,
                       **kwargs):
         """Use this method to send general files.
@@ -577,8 +605,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
         if thumb:
             if InputFile.is_file(thumb):
                 thumb = InputFile(thumb, attach=True)
@@ -653,7 +679,7 @@ class Bot(TelegramObject):
                    timeout=20,
                    width=None,
                    height=None,
-                   parse_mode=DEFAULT_NONE,
+                   parse_mode=None,
                    supports_streaming=None,
                    thumb=None,
                    **kwargs):
@@ -719,8 +745,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
         if supports_streaming:
             data['supports_streaming'] = supports_streaming
         if width:
@@ -816,7 +840,7 @@ class Bot(TelegramObject):
                        height=None,
                        thumb=None,
                        caption=None,
-                       parse_mode=DEFAULT_NONE,
+                       parse_mode=None,
                        disable_notification=False,
                        reply_to_message_id=None,
                        reply_markup=None,
@@ -885,8 +909,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
@@ -902,7 +924,7 @@ class Bot(TelegramObject):
                    reply_to_message_id=None,
                    reply_markup=None,
                    timeout=20,
-                   parse_mode=DEFAULT_NONE,
+                   parse_mode=None,
                    **kwargs):
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -958,8 +980,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,
@@ -1000,7 +1020,7 @@ class Bot(TelegramObject):
 
         for m in data['media']:
             if m.parse_mode is DEFAULT_NONE:
-                m.parse_mode = self.default_parse_mode
+                m.parse_mode = self.defaults.parse_mode
 
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
@@ -1473,11 +1493,11 @@ class Bot(TelegramObject):
 
         for res in results:
             if res._has_parse_mode and res.parse_mode is DEFAULT_NONE:
-                res.parse_mode = self.default_parse_mode
+                res.parse_mode = self.defaults.parse_mode
             if res._has_input_message_content and res.input_message_content:
                 if (res.input_message_content._has_parse_mode
                         and res.input_message_content.parse_mode is DEFAULT_NONE):
-                    res.input_message_content.parse_mode = self.default_parse_mode
+                    res.input_message_content.parse_mode = self.defaults.parse_mode
         results = [res.to_dict() for res in results]
 
         data = {'inline_query_id': inline_query_id, 'results': results}
@@ -1725,7 +1745,7 @@ class Bot(TelegramObject):
                           chat_id=None,
                           message_id=None,
                           inline_message_id=None,
-                          parse_mode=DEFAULT_NONE,
+                          parse_mode=None,
                           disable_web_page_preview=None,
                           reply_markup=None,
                           timeout=None,
@@ -1775,8 +1795,6 @@ class Bot(TelegramObject):
             data['inline_message_id'] = inline_message_id
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
         if disable_web_page_preview:
             data['disable_web_page_preview'] = disable_web_page_preview
 
@@ -1790,7 +1808,7 @@ class Bot(TelegramObject):
                              caption=None,
                              reply_markup=None,
                              timeout=None,
-                             parse_mode=DEFAULT_NONE,
+                             parse_mode=None,
                              **kwargs):
         """
         Use this method to edit captions of messages sent by the bot or via the bot
@@ -1836,8 +1854,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if parse_mode:
             data['parse_mode'] = parse_mode
-        elif self.default_parse_mode and (parse_mode is DEFAULT_NONE):
-            data['parse_mode'] = self.default_parse_mode
         if chat_id:
             data['chat_id'] = chat_id
         if message_id:

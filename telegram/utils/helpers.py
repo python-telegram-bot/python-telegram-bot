@@ -258,6 +258,21 @@ def decode_user_chat_data_from_json(data):
     return tmp
 
 
+class Defaults:
+    """Convenience Class to gather all parameters with a (user defined) default value
+
+    Attributes:
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width toxt or URLs in your bot's message.
+
+    Parameters:
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width toxt or URLs in your bot's message.
+    """
+    def __init__(self, parse_mode=None):
+        self.parse_mode = parse_mode
+
+
 class DefaultValue:
     """Wrapper for immutable default arguments that allows to check, if the default value was set
     explicitly. Usage::

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+import functools
 from io import BytesIO
 
 import pytest
@@ -142,8 +143,15 @@ class TestPhoto(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_default_parse_mode_1(self, bot, chat_id, photo_file, thumb, photo):
-        bot.default_parse_mode = 'Markdown'
+    def test_send_photo_default_parse_mode_1(self,
+                                             monkeypatch,
+                                             bot,
+                                             chat_id,
+                                             photo_file,
+                                             thumb,
+                                             photo):
+        monkeypatch.setattr('telegram.Bot.send_photo', functools.partial(bot.send_photo,
+                            **{'parse_mode': 'Markdown'}))
 
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -152,12 +160,17 @@ class TestPhoto(object):
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
-        bot.default_parse_mode = None
-
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_default_parse_mode_2(self, bot, chat_id, photo_file, thumb, photo):
-        bot.default_parse_mode = 'Markdown'
+    def test_send_photo_default_parse_mode_2(self,
+                                             monkeypatch,
+                                             bot,
+                                             chat_id,
+                                             photo_file,
+                                             thumb,
+                                             photo):
+        monkeypatch.setattr('telegram.Bot.send_photo', functools.partial(bot.send_photo,
+                            **{'parse_mode': 'Markdown'}))
 
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -166,12 +179,17 @@ class TestPhoto(object):
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-        bot.default_parse_mode = None
-
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_photo_default_parse_mode_3(self, bot, chat_id, photo_file, thumb, photo):
-        bot.default_parse_mode = 'Markdown'
+    def test_send_photo_default_parse_mode_3(self,
+                                             monkeypatch,
+                                             bot,
+                                             chat_id,
+                                             photo_file,
+                                             thumb,
+                                             photo):
+        monkeypatch.setattr('telegram.Bot.send_photo', functools.partial(bot.send_photo,
+                            **{'parse_mode': 'Markdown'}))
 
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -179,8 +197,6 @@ class TestPhoto(object):
                                  parse_mode='HTML')
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
-
-        bot.default_parse_mode = None
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
