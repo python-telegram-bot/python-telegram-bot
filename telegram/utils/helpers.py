@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions."""
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 try:
     import ujson as json
@@ -175,12 +175,17 @@ def extract_urls(message):
     results = message.parse_entities(types=types)
     results.update(message.parse_caption_entities(types=types))
 
-    all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in results.items())
+    # Sort results by order of appearence, i.e. the MessageEntity offset
+    sorted_results = sorted(results.items(), key=lambda e: e[0].offset)
+
+    # Get the actual urls
+    all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in sorted_results)
 
     # Remove exact duplicates, in a way that is compliant with legacy python
-    seen = set()
-    seen_add = seen.add
-    urls = [x for x in all_urls if not (x in seen or seen_add(x))]
+    urls = OrderedDict()
+    for k in all_urls:
+        urls[k] = None
+    urls = urls.keys()
 
     # Remove dublicates that only differ in a trailing slash. Keep the ones with slash.
     # Strip trailing slash from URL so we can compare them for equality
