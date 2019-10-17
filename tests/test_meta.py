@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
-import sys
-from platform import python_implementation
 
 import pytest
 
@@ -30,17 +28,12 @@ def call_pre_commit_hook(hook_id):
 
 @pytest.mark.nocoverage
 @pytest.mark.parametrize('hook_id', argvalues=('yapf', 'flake8', 'pylint'))
-@pytest.mark.skipif(not (os.getenv('TRAVIS') or os.getenv('APPVEYOR')), reason='Not running in CI')
-@pytest.mark.skipif(not sys.version_info[:2] == (3, 6) or python_implementation() != 'CPython',
-                    reason='Only running pre-commit-hooks on newest tested python version, '
-                           'as they are slow and consistent across platforms.')
+@pytest.mark.skipif(not os.getenv('TEST_PRE_COMMIT', False), reason='TEST_PRE_COMMIT not enabled')
 def test_pre_commit_hook(hook_id):
     assert call_pre_commit_hook(hook_id) == 0  # pragma: no cover
 
 
 @pytest.mark.nocoverage
-@pytest.mark.skipif(
-    not sys.version_info[:2] in ((3, 6), (2, 7)) or python_implementation() != 'CPython',
-    reason='Only testing build on 2.7 and 3.6')
+@pytest.mark.skipif(not os.getenv('TEST_BUILD', False), reason='TEST_BUILD not enabled')
 def test_build():
     assert os.system('python setup.py bdist_dumb') == 0  # pragma: no cover
