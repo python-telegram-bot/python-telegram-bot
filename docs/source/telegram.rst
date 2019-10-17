@@ -32,6 +32,7 @@ telegram package
     telegram.inputmediavideo
     telegram.keyboardbutton
     telegram.location
+    telegram.loginurl
     telegram.message
     telegram.messageentity
     telegram.parsemode
@@ -141,8 +142,4 @@ Passport
     telegram.encryptedpassportelement
     telegram.encryptedcredentials
 
-telegram.utils
---------------
-
-.. toctree::
-    telegram.utils
+.. include:: telegram.utils.rst

@@ -1514,7 +1514,8 @@ class Bot(TelegramObject):
         calling get_file again.
 
         Args:
-            file_id (:obj:`str` | :class:`telegram.Audio` | :class:`telegram.Document` |          \
+            file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
+                     :class:`telegram.ChatPhoto` | :class:`telegram.Document` |                   \
                      :class:`telegram.PhotoSize` | :class:`telegram.Sticker` |                    \
                      :class:`telegram.Video` | :class:`telegram.VideoNote` |                      \
                      :class:`telegram.Voice`):
@@ -3438,7 +3439,7 @@ class Bot(TelegramObject):
         return Poll.de_json(result, self)
 
     def to_dict(self):
-        data = {'id': self.id, 'username': self.username, 'first_name': self.username}
+        data = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
 
         if self.last_name:
             data['last_name'] = self.last_name

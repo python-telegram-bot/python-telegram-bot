@@ -103,9 +103,9 @@ def precheckout_callback(update, context):
         query.answer(ok=True)
 
 
-# finally, after contacting to the payment provider...
+# finally, after contacting the payment provider...
 def successful_payment_callback(update, context):
-    # do something after successful receive of payment?
+    # do something after successfully receiving payment?
     update.message.reply_text("Thank you for your payment!")
 
 

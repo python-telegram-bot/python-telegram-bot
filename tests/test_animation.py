@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import os
 import pytest
 from flaky import flaky
 
-from telegram import PhotoSize, Animation, Voice
+from telegram import PhotoSize, Animation, Voice, TelegramError
 
 
 @pytest.fixture(scope='function')
@@ -42,6 +43,9 @@ class TestAnimation(object):
     width = 320
     height = 180
     duration = 1
+    # animation_file_url = 'https://python-telegram-bot.org/static/testfiles/game.gif'
+    # Shortened link, the above one is cached with the wrong duration.
+    animation_file_url = 'http://bit.ly/2L18jua'
     file_name = 'game.gif.mp4'
     mime_type = 'video/mp4'
     file_size = 4127
@@ -72,19 +76,51 @@ class TestAnimation(object):
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
-        assert message.animation.thumb.width == 320
-        assert message.animation.thumb.height == 180
+        assert message.animation.thumb.width == self.width
+        assert message.animation.thumb.height == self.height
 
     @flaky(3, 1)
-    def test_resend(self, bot, chat_id, animation):
-        message = bot.send_animation(chat_id, animation.file_id)
+    @pytest.mark.timeout(10)
+    def test_get_and_download(self, bot, animation):
+        new_file = bot.get_file(animation.file_id)
+
+        assert new_file.file_size == self.file_size
+        assert new_file.file_id == animation.file_id
+        assert new_file.file_path.startswith('https://')
+
+        new_file.download('game.gif')
+
+        assert os.path.isfile('game.gif')
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_send_animation_url_file(self, bot, chat_id, animation):
+        message = bot.send_animation(chat_id=chat_id, animation=self.animation_file_url,
+                                     caption=self.caption)
+
+        assert message.caption == self.caption
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
-        assert message.animation.file_id != ''
-        assert message.animation.file_name == animation.file_name
+        assert message.animation.file_id is not None
+        assert message.animation.duration == animation.duration
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_resend(self, bot, chat_id, animation):
+        message = bot.send_animation(chat_id, animation.file_id)
+
+        assert message.animation == animation
+
+    def test_send_with_animation(self, monkeypatch, bot, chat_id, animation):
+        def test(_, url, data, **kwargs):
+            return data['animation'] == animation.file_id
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        message = bot.send_animation(animation=animation, chat_id=chat_id)
+        assert message
 
     def test_de_json(self, bot, animation):
         json_dict = {
@@ -116,6 +152,31 @@ class TestAnimation(object):
         assert animation_dict['file_name'] == animation.file_name
         assert animation_dict['mime_type'] == animation.mime_type
         assert animation_dict['file_size'] == animation.file_size
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_error_send_empty_file(self, bot, chat_id):
+        animation_file = open(os.devnull, 'rb')
+
+        with pytest.raises(TelegramError):
+            bot.send_animation(chat_id=chat_id, animation=animation_file)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    def test_error_send_empty_file_id(self, bot, chat_id):
+        with pytest.raises(TelegramError):
+            bot.send_animation(chat_id=chat_id, animation='')
+
+    def test_error_send_without_required_args(self, bot, chat_id):
+        with pytest.raises(TypeError):
+            bot.send_animation(chat_id=chat_id)
+
+    def test_get_file_instance_method(self, monkeypatch, animation):
+        def test(*args, **kwargs):
+            return args[1] == animation.file_id
+
+        monkeypatch.setattr('telegram.Bot.get_file', test)
+        assert animation.get_file()
 
     def test_equality(self):
         a = Animation(self.animation_file_id, self.height, self.width, self.duration)
