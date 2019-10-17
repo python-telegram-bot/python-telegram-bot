@@ -16,9 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import time
-from collections import defaultdict
-
 import _pytest.config
 import pytest
 

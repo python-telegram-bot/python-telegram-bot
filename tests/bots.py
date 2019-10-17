@@ -54,8 +54,8 @@ if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
 
 
 def get(name, fallback):
-    # If we have TOKEN, PAYMENT_PROVIDER_TOKEN, CHAT_ID, SUPER_GROUP_ID, CHANNEL_ID, BOT_NAME, or BOT_USERNAME
-    # in the environment, then use that
+    # If we have TOKEN, PAYMENT_PROVIDER_TOKEN, CHAT_ID, SUPER_GROUP_ID,
+    # CHANNEL_ID, BOT_NAME, or BOT_USERNAME in the environment, then use that
     val = os.getenv(name.upper())
     if val:
         return val
