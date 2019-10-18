@@ -120,6 +120,10 @@ def to_float_timestamp(t, reference_timestamp=None):
             :obj:`int`, indicating "seconds from ``reference_t``"). Defaults to now (the time at
             which this function is called).
 
+            If ``t`` is given as an absolute representation of date & time (i.e. a
+            ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
+            value should be ``None``. If this is not the case, a ``ValueError`` will be raised.
+
     Returns:
         (float | None) The return value depends on the type of argument ``t``. If ``t`` is
             given as a time increment (i.e. as a obj:`int`, :obj:`float` or
@@ -138,6 +142,9 @@ def to_float_timestamp(t, reference_timestamp=None):
 
     if reference_timestamp is None:
         reference_timestamp = time.time()
+    else:
+        if isinstance(t, dtm.datetime):
+            raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
 
     if t is None:
         return None
