@@ -161,32 +161,32 @@ def to_float_timestamp(t, reference_timestamp=None):
     raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
 
 
-def to_timestamp(t, *args, **kwargs):
+def to_timestamp(dt_obj, reference_timestamp=None):
     """
     Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
     down to the nearest integer).
 
     See the documentation for :func:`to_float_timestamp` for more details.
     """
-    return int(to_float_timestamp(t, *args, **kwargs)) if t is not None else None
+    return int(to_float_timestamp(dt_obj, reference_timestamp)) if dt_obj is not None else None
 
 
-def from_timestamp(timestamp):
+def from_timestamp(unixtime):
     """
     Converts an (integer) unix timestamp to a naive datetime object in UTC.
     ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
 
     Args:
-        timestamp (int): integer POSIX timestamp
+        unixtime (int): integer POSIX timestamp
 
     Returns:
         equivalent :obj:`datetime.datetime` value in naive UTC if ``timestamp`` is not
         ``None``; else ``None``
     """
-    if timestamp is None:
+    if unixtime is None:
         return None
 
-    return dtm.datetime.utcfromtimestamp(timestamp)
+    return dtm.datetime.utcfromtimestamp(unixtime)
 
 # -------- end --------
 
