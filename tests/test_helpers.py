@@ -36,7 +36,7 @@ class TestHelpers(object):
     def test_extract_urls_entities(self):
         test_entities = [{
             'length': 6, 'offset': 0, 'type': 'text_link',
-            'url': 'http://github.com/'
+            'url': 'http://github.com'
         }, {
             'length': 17, 'offset': 23, 'type': 'url'
         }, {
@@ -59,7 +59,7 @@ class TestHelpers(object):
     def test_extract_urls_caption(self):
         test_entities = [{
             'length': 6, 'offset': 0, 'type': 'text_link',
-            'url': 'http://github.com/'
+            'url': 'http://github.com'
         }, {
             'length': 17, 'offset': 23, 'type': 'url'
         }, {

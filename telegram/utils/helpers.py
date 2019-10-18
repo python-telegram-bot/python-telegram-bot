@@ -155,8 +155,7 @@ def extract_urls(message):
 
     Note:
         For exact duplicates, only the first appearence will be kept, but there may still be URLs
-        that link to the same resource. If two URLs differ only in (a) trailing slash(es), the one
-        with slash(es) will be kept.
+        that link to the same resource.
 
     Args:
         message (:obj:`telegram.Message`) The message to extract from
@@ -180,12 +179,7 @@ def extract_urls(message):
     urls = OrderedDict()
     for k in all_urls:
         urls[k] = None
-    urls = urls.keys()
-
-    # Remove dublicates that only differ in a trailing slash. Keep the ones with slash.
-    # Strip trailing slash from URL so we can compare them for equality
-    stripped_urls = [x.rstrip('/') for x in urls]
-    return [url for url in urls if (stripped_urls.count(url) == 1 or url[-1] == '/')]
+    return list(urls.keys())
 
 
 def create_deep_linked_url(bot_username, payload=None, group=False):
