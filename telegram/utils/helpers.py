@@ -57,16 +57,16 @@ if hasattr(dtm, 'timezone'):
     # Python 3.3+
     def _datetime_to_float_timestamp(dt_obj):
         if dt_obj.tzinfo is None:
-            dt_obj = dt_obj.replace(tzinfo=UTC)
+            dt_obj = dt_obj.replace(tzinfo=_UTC)
         return dt_obj.timestamp()
 
-    UtcOffsetTimezone = dtm.timezone
-    UTC = dtm.timezone.utc
+    _UtcOffsetTimezone = dtm.timezone
+    _UTC = dtm.timezone.utc
 else:
     # Python < 3.3 (incl 2.7)
 
     # hardcoded timezone class (`datetime.timezone` isn't available in py2)
-    class UtcOffsetTimezone(dtm.tzinfo):
+    class _UtcOffsetTimezone(dtm.tzinfo):
         def __init__(self, offset):
             self.offset = offset
 
@@ -79,8 +79,8 @@ else:
         def dst(self, dt):
             return dtm.timedelta(0)
 
-    UTC = UtcOffsetTimezone(dtm.timedelta(0))
-    EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=UTC)
+    _UTC = _UtcOffsetTimezone(dtm.timedelta(0))
+    EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=_UTC)
     NAIVE_EPOCH_DT = EPOCH_DT.replace(tzinfo=None)
 
     # _datetime_to_float_timestamp
@@ -146,14 +146,16 @@ def to_float_timestamp(t, reference_timestamp=None):
     elif isinstance(t, Number):
         return reference_timestamp + t
     elif isinstance(t, dtm.time):
-        reference_dt = dtm.datetime.fromtimestamp(reference_timestamp, tz=t.tzinfo) if t.tzinfo \
-            else dtm.datetime.utcfromtimestamp(reference_timestamp)  # assume UTC for naive
-        reference_date, reference_time = reference_dt.date(), reference_dt.timetz()
+        if t.tzinfo is not None:
+            reference_dt = dtm.datetime.fromtimestamp(reference_timestamp, tz=t.tzinfo)
+        else:
+            reference_dt = dtm.datetime.utcfromtimestamp(reference_timestamp)  # assume UTC
+        reference_date = reference_dt.date()
+        reference_time = reference_dt.timetz()
         if reference_time > t:  # if the time of day has passed today, use tomorrow
             reference_date += dtm.timedelta(days=1)
-        t = dtm.datetime.combine(reference_date, t)
-
-    if isinstance(t, dtm.datetime):
+        return _datetime_to_float_timestamp(dtm.datetime.combine(reference_date, t))
+    elif isinstance(t, dtm.datetime):
         return _datetime_to_float_timestamp(t)
 
     raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
@@ -161,8 +163,9 @@ def to_float_timestamp(t, reference_timestamp=None):
 
 def to_timestamp(t, *args, **kwargs):
     """
-    Converts a time object to an integer UNIX timestamp.
-    Returns the corresponding float timestamp truncated down to the nearest integer.
+    Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
+    down to the nearest integer).
+
     See the documentation for :func:`to_float_timestamp` for more details.
     """
     return int(to_float_timestamp(t, *args, **kwargs)) if t is not None else None

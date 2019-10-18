@@ -28,7 +28,7 @@ from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import UtcOffsetTimezone
+from telegram.utils.helpers import _UtcOffsetTimezone
 
 
 @pytest.fixture(scope='function')
@@ -239,7 +239,7 @@ class TestJobQueue(object):
         # thus this test will xpass if run in the interval [00:00, 00:01) UTC time
         # (because target time will be 23:59 UTC, so local and target weekday will be the same)
         target_datetime = now + dtm.timedelta(days=1, seconds=delta - 60)
-        target_tzinfo = UtcOffsetTimezone(dtm.timedelta(days=1, minutes=-1))
+        target_tzinfo = _UtcOffsetTimezone(dtm.timedelta(days=1, minutes=-1))
         target_time = target_datetime.time().replace(tzinfo=target_tzinfo)
         target_weekday = target_datetime.date().weekday()
         job_queue.run_daily(self.job_run_once, time=target_time, days=(target_weekday,))
