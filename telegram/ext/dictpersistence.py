@@ -191,7 +191,7 @@ class DictPersistence(BasePersistence):
             pass
         else:
             self._bot_data = {}
-        return self.bot_data.copy()
+        return deepcopy(self.bot_data)
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty

@@ -173,7 +173,7 @@ class PicklePersistence(BasePersistence):
             self.bot_data = data
         else:
             self.load_singlefile()
-        return self.bot_data.copy()
+        return deepcopy(self.bot_data)
 
     def get_conversations(self, name):
         """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
