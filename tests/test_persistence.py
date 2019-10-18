@@ -730,11 +730,9 @@ class TestPickelPersistence(object):
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data() == {}
         assert pickle_persistence_2.get_chat_data() == {}
-        assert pickle_persistence_2.get_bot_datae()['my_test3'] == 'Working3!'
+        assert pickle_persistence_2.get_bot_data()['my_test3'] == 'Working3!'
 
     def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
-        os.remove('pickletest_user_data')
-        os.remove('pickletest_chat_data')
         os.remove('pickletest_bot_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
         dp = u.dispatcher
@@ -756,9 +754,7 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_bot_data() == {}
 
     def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
-        os.remove('pickletest_user_data')
         os.remove('pickletest_chat_data')
-        os.remove('pickletest_bot_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_user)
         dp = u.dispatcher
         u.running = True
