@@ -20,6 +20,7 @@
 """This module contains an object that represents a Telegram Chat."""
 
 from telegram import TelegramObject, ChatPhoto
+from .chatpermissions import ChatPermissions
 
 
 class Chat(TelegramObject):
@@ -32,12 +33,13 @@ class Chat(TelegramObject):
         username (:obj:`str`): Optional. Username.
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
-        all_members_are_administrators (:obj:`bool`): Optional.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
-        description (:obj:`str`): Optional. Description, for supergroups and channel chats.
+        description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Chat invite link, for supergroups and channel chats.
         pinned_message (:class:`telegram.Message`): Optional. Pinned message, for supergroups.
             Returned only in get_chat.
+        permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
+            for groups and supergroups. Returned only in getChat.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
             sticker set.
@@ -54,15 +56,15 @@ class Chat(TelegramObject):
             available.
         first_name(:obj:`str`, optional): First name of the other party in a private chat.
         last_name(:obj:`str`, optional): Last name of the other party in a private chat.
-        all_members_are_administrators (:obj:`bool`, optional): True if a group has `All Members
-            Are Admins` enabled.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo. Returned only in getChat.
-        description (:obj:`str`, optional): Description, for supergroups and channel chats.
+        description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in get_chat.
         invite_link (:obj:`str`, optional): Chat invite link, for supergroups and channel chats.
             Returned only in get_chat.
         pinned_message (:class:`telegram.Message`, optional): Pinned message, for supergroups.
             Returned only in get_chat.
+        permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
+            for groups and supergroups. Returned only in getChat.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of Group sticker set.
             Returned only in get_chat.
@@ -88,12 +90,12 @@ class Chat(TelegramObject):
                  username=None,
                  first_name=None,
                  last_name=None,
-                 all_members_are_administrators=None,
                  bot=None,
                  photo=None,
                  description=None,
                  invite_link=None,
                  pinned_message=None,
+                 permissions=None,
                  sticker_set_name=None,
                  can_set_sticker_set=None,
                  **kwargs):
@@ -105,11 +107,13 @@ class Chat(TelegramObject):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
-        self.all_members_are_administrators = all_members_are_administrators
+        # TODO: Remove (also from tests), when Telegram drops this completely
+        self.all_members_are_administrators = kwargs.get('all_members_are_administrators')
         self.photo = photo
         self.description = description
         self.invite_link = invite_link
         self.pinned_message = pinned_message
+        self.permissions = permissions
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
 
@@ -132,6 +136,7 @@ class Chat(TelegramObject):
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
         from telegram import Message
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
 
         return cls(bot=bot, **data)
 
@@ -220,6 +225,17 @@ class Chat(TelegramObject):
 
         """
         return self.bot.unban_chat_member(self.id, *args, **kwargs)
+
+    def set_permissions(self, *args, **kwargs):
+        """Shortcut for::
+
+                bot.set_chat_permissions(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+        :obj:`bool`: If the action was sent successfully.
+
+    """
+        return self.bot.set_chat_permissions(self.id, *args, **kwargs)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
