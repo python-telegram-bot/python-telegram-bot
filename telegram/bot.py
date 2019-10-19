@@ -92,10 +92,9 @@ class Bot(TelegramObject):
         # Handle default_... kwargs for bot methods
         # Transform default_x=y kwargs into Defaults.x=y
         defaults = Defaults()
-        for kwarg in list(kwargs.keys()):
+        for kwarg in kwargs.keys():
             if kwarg.startswith('default_'):
                 setattr(defaults, kwarg[8:], kwargs[kwarg])
-                del kwargs[kwarg]
 
         # Make an instance of the class
         instance = super(Bot, cls).__new__(cls)
