@@ -21,7 +21,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def msg(bot, update):
+def msg(update, context):
     # If we received any passport data
     passport_data = update.message.passport_data
     if passport_data:
@@ -77,9 +77,9 @@ def msg(bot, update):
                     actual_file.download()
 
 
-def error(bot, update, error):
+def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
