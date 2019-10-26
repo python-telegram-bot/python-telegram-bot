@@ -38,8 +38,7 @@ class _ConversationTimeoutContext(object):
 class ConversationHandler(Handler):
     """
     A handler to hold a conversation with a single user by managing four collections of other
-    handlers. Note that neither posts in Telegram Channels, nor group interactions with multiple
-    users are managed by instances of this class.
+    handlers.
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
