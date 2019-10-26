@@ -272,6 +272,17 @@ class Defaults:
     def __init__(self, parse_mode=None):
         self.parse_mode = parse_mode
 
+    def __hash__(self):
+        return hash((self.parse_mode))
+
+    def __eq__(self, other):
+        if isinstance(other, Defaults):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class DefaultValue:
     """Wrapper for immutable default arguments that allows to check, if the default value was set

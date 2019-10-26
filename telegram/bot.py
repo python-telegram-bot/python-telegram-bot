@@ -22,6 +22,7 @@
 
 import functools
 import inspect
+from decorator import decorate
 
 try:
     import ujson as json
@@ -58,18 +59,17 @@ def info(func):
     return decorator
 
 
-def log(func):
+def log(func, *args, **kwargs):
     logger = logging.getLogger(func.__module__)
 
-    @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         logger.debug('Entering: %s', func.__name__)
-        result = func(self, *args, **kwargs)
+        result = func(*args, **kwargs)
         logger.debug(result)
         logger.debug('Exiting: %s', func.__name__)
         return result
 
-    return decorator
+    return decorate(func, decorator)
 
 
 class Bot(TelegramObject):

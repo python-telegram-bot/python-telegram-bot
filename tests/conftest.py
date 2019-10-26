@@ -30,6 +30,7 @@ import pytest
 from telegram import Bot, Message, User, Chat, MessageEntity, Update, \
     InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery, ChosenInlineResult
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
+from telegram.utils.helpers import Defaults
 from tests.bots import get_bot
 
 TRAVIS = os.getenv('TRAVIS', False)
@@ -50,6 +51,28 @@ def bot_info():
 @pytest.fixture(scope='session')
 def bot(bot_info):
     return make_bot(bot_info)
+
+
+DEFAULT_BOTS = {}
+@pytest.fixture(scope='function')
+def default_bot(request, bot_info):
+    param = request.param if hasattr(request, 'param') else {}
+
+    # allow both `default_parse_mode` and `parse_mode`
+    for kwarg in param.keys():
+        if kwarg.startswith('default_'):
+            value = param.pop(kwarg)
+            param[kwarg[8:]] = value
+    def_param = {'default_' + k: v for (k, v) in param.items()}
+
+    defaults = Defaults(**param)
+    default_bot = DEFAULT_BOTS.get(defaults)
+    if default_bot:
+        return default_bot
+    else:
+        default_bot = make_bot(bot_info, **def_param)
+        DEFAULT_BOTS[defaults] = default_bot
+        return default_bot
 
 
 @pytest.fixture(scope='session')
@@ -151,8 +174,8 @@ def pytest_configure(config):
         # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
-def make_bot(bot_info):
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY)
+def make_bot(bot_info, **kwargs):
+    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')

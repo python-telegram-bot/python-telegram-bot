@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
-import functools
 
 import pytest
 from flaky import flaky
@@ -125,42 +124,36 @@ class TestDocument(object):
 
         assert message
 
-    flaky(3, 1)
+    @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_document_default_parse_mode_1(self, monkeypatch, bot, chat_id, document):
-        monkeypatch.setattr('telegram.Bot.send_document', functools.partial(bot.send_document,
-                            **{'parse_mode': 'Markdown'}))
-
+    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    def test_send_document_default_parse_mode_1(self, default_bot, chat_id, document):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = bot.send_document(chat_id, document, caption=test_markdown_string)
+        message = default_bot.send_document(chat_id, document, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_document_default_parse_mode_2(self, monkeypatch, bot, chat_id, document):
-        monkeypatch.setattr('telegram.Bot.send_document', functools.partial(bot.send_document,
-                            **{'parse_mode': 'Markdown'}))
-
+    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = bot.send_document(chat_id, document, caption=test_markdown_string,
-                                    parse_mode=None)
+        message = default_bot.send_document(chat_id, document, caption=test_markdown_string,
+                                            parse_mode=None)
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_send_document_default_parse_mode_3(self, monkeypatch, bot, chat_id, document):
-        monkeypatch.setattr('telegram.Bot.send_document', functools.partial(bot.send_document,
-                            **{'parse_mode': 'Markdown'}))
-
+    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = bot.send_document(chat_id, document, caption=test_markdown_string,
-                                    parse_mode='HTML')
+        message = default_bot.send_document(chat_id, document, caption=test_markdown_string,
+                                            parse_mode='HTML')
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 

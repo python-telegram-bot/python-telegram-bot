@@ -153,30 +153,30 @@ class TestChat(object):
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test'
+            return args[0] == chat.id and args[1] == 'test'
 
-        monkeypatch.setattr('telegram.Bot.send_message', test)
+        monkeypatch.setattr(chat.bot, 'send_message', test)
         assert chat.send_message('test')
 
     def test_instance_method_send_photo(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_photo'
+            return args[0] == chat.id and args[1] == 'test_photo'
 
-        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        monkeypatch.setattr(chat.bot, 'send_photo', test)
         assert chat.send_photo('test_photo')
 
     def test_instance_method_send_audio(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_audio'
+            return args[0] == chat.id and args[1] == 'test_audio'
 
-        monkeypatch.setattr('telegram.Bot.send_audio', test)
+        monkeypatch.setattr(chat.bot, 'send_audio', test)
         assert chat.send_audio('test_audio')
 
     def test_instance_method_send_document(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_document'
+            return args[0] == chat.id and args[1] == 'test_document'
 
-        monkeypatch.setattr('telegram.Bot.send_document', test)
+        monkeypatch.setattr(chat.bot, 'send_document', test)
         assert chat.send_document('test_document')
 
     def test_instance_method_send_sticker(self, monkeypatch, chat):
@@ -188,9 +188,9 @@ class TestChat(object):
 
     def test_instance_method_send_video(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_video'
+            return args[0] == chat.id and args[1] == 'test_video'
 
-        monkeypatch.setattr('telegram.Bot.send_video', test)
+        monkeypatch.setattr(chat.bot, 'send_video', test)
         assert chat.send_video('test_video')
 
     def test_instance_method_send_video_note(self, monkeypatch, chat):
@@ -202,16 +202,16 @@ class TestChat(object):
 
     def test_instance_method_send_voice(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_voice'
+            return args[0] == chat.id and args[1] == 'test_voice'
 
-        monkeypatch.setattr('telegram.Bot.send_voice', test)
+        monkeypatch.setattr(chat.bot, 'send_voice', test)
         assert chat.send_voice('test_voice')
 
     def test_instance_method_send_animation(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_animation'
+            return args[0] == chat.id and args[1] == 'test_animation'
 
-        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        monkeypatch.setattr(chat.bot, 'send_animation', test)
         assert chat.send_animation('test_animation')
 
     def test_instance_method_send_poll(self, monkeypatch, chat):

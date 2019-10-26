@@ -19,7 +19,6 @@
 import os
 import sys
 import time
-import functools
 from datetime import datetime
 from platform import python_implementation
 
@@ -311,31 +310,29 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_edit_message_text_default_parse_mode(self, monkeypatch, bot, message):
-        monkeypatch.setattr('telegram.Bot.edit_message_text',
-                            functools.partial(bot.edit_message_text, **{'parse_mode': 'Markdown'}))
-
+    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    def test_edit_message_text_default_parse_mode(self, default_bot, message):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
-                                        message_id=message.message_id,
-                                        disable_web_page_preview=True)
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id,
+                                                disable_web_page_preview=True)
         assert message.text_markdown == test_markdown_string
         assert message.text == test_string
 
-        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
-                                        message_id=message.message_id, parse_mode=None,
-                                        disable_web_page_preview=True)
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id, parse_mode=None,
+                                                disable_web_page_preview=True)
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
-        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
-                                        message_id=message.message_id,
-                                        disable_web_page_preview=True)
-        message = bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
-                                        message_id=message.message_id, parse_mode='HTML',
-                                        disable_web_page_preview=True)
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id,
+                                                disable_web_page_preview=True)
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id, parse_mode='HTML',
+                                                disable_web_page_preview=True)
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
@@ -355,32 +352,31 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    def test_edit_message_caption_default_parse_mode(self, monkeypatch, bot, media_message):
-        monkeypatch.setattr('telegram.Bot.edit_message_caption',
-                            functools.partial(bot.edit_message_caption,
-                                              **{'parse_mode': 'Markdown'}))
-
+    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = bot.edit_message_caption(caption=test_markdown_string,
-                                           chat_id=media_message.chat_id,
-                                           message_id=media_message.message_id)
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
-        message = bot.edit_message_caption(caption=test_markdown_string,
-                                           chat_id=media_message.chat_id,
-                                           message_id=media_message.message_id, parse_mode=None)
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id,
+                                                   parse_mode=None)
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-        message = bot.edit_message_caption(caption=test_markdown_string,
-                                           chat_id=media_message.chat_id,
-                                           message_id=media_message.message_id)
-        message = bot.edit_message_caption(caption=test_markdown_string,
-                                           chat_id=media_message.chat_id,
-                                           message_id=media_message.message_id, parse_mode='HTML')
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id)
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id,
+                                                   parse_mode='HTML')
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
@@ -784,21 +780,21 @@ class TestBot(object):
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
 
-    def test_send_message_default_parse_mode(self, monkeypatch, bot, chat_id):
-        monkeypatch.setattr('telegram.Bot.send_message', functools.partial(bot.send_message,
-                            **{'parse_mode': 'Markdown'}))
-
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    def test_send_message_default_parse_mode(self, default_bot, chat_id):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = bot.send_message(chat_id, test_markdown_string)
+        message = default_bot.send_message(chat_id, test_markdown_string)
         assert message.text_markdown == test_markdown_string
         assert message.text == test_string
 
-        message = bot.send_message(chat_id, test_markdown_string, parse_mode=None)
+        message = default_bot.send_message(chat_id, test_markdown_string, parse_mode=None)
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
 
-        message = bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
+        message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
