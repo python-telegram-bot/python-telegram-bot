@@ -926,6 +926,7 @@ officedocument.wordprocessingml.document")``-
                 are allowed.
             caption (:obj:`bool`): Optional. Whether the caption should be used instead of text.
                 Default is ``False``.
+
         """
 
         def __init__(self, list_, caption=False):
