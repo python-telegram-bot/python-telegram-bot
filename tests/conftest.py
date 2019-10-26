@@ -59,7 +59,7 @@ def default_bot(request, bot_info):
     param = request.param if hasattr(request, 'param') else {}
 
     # allow both `default_parse_mode` and `parse_mode`
-    for kwarg in param.keys():
+    for kwarg in list(param.keys()):
         if kwarg.startswith('default_'):
             value = param.pop(kwarg)
             param[kwarg[8:]] = value
