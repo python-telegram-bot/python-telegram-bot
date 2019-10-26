@@ -604,6 +604,16 @@ class TestFilters(object):
         update.message.from_user.language_code = 'da'
         assert f(update)
 
+    def test_msg_in_filter(self, update):
+        update.message.text = 'test'
+        update.message.caption = 'caption'
+
+        assert Filters.msg_in(['test'])(update)
+        assert Filters.msg_in(['caption'], caption=True)(update)
+
+        assert not Filters.msg_in(['test'], caption=True)(update)
+        assert not Filters.msg_in(['caption'])(update)
+
     def test_and_filters(self, update):
         update.message.text = 'test'
         update.message.forward_date = datetime.datetime.now()
