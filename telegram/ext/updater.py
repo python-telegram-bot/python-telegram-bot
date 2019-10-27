@@ -58,9 +58,10 @@ class Updater(object):
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
         use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
-        default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
+        default_parse_mode (:obj:`str`): Optional. Default parse mode used if not set explicitly in
             method call. See the constants in :class:`telegram.ParseMode` for the available modes.
-
+        default_disable_notification (:obj:`bool`): Optional. Default setting for the
+            `disable_notification` parameter used if not set explicitly in method call.
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
         base_url (:obj:`str`, optional): Base_url for the bot.
@@ -85,6 +86,8 @@ class Updater(object):
             store data that should be persistent over restarts.
         default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
             method call. See the constants in :class:`telegram.ParseMode` for the available modes.
+        default_disable_notification (:obj:`bool`, optional): Default setting for the
+            `disable_notification` parameter used if not set explicitly in method call.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -107,6 +110,7 @@ class Updater(object):
                  request_kwargs=None,
                  persistence=None,
                  default_parse_mode=None,
+                 default_disable_notification=None,
                  use_context=False):
 
         if (token is None) and (bot is None):
@@ -140,7 +144,8 @@ class Updater(object):
             self._request = Request(**request_kwargs)
             self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
                            private_key_password=private_key_password,
-                           default_parse_mode=default_parse_mode)
+                           default_parse_mode=default_parse_mode,
+                           default_disable_notification=default_disable_notification)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue()

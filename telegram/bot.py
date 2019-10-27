@@ -85,6 +85,8 @@ class Bot(TelegramObject):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
             method call. See the constants in :class:`telegram.ParseMode` for the available modes.
+        default_disable_notification (:obj:`bool`, optional): Default setting for the
+            `disable_notification` parameter used if not set explicitly in method call.
 
     """
 
@@ -118,12 +120,20 @@ class Bot(TelegramObject):
 
         return instance
 
-    def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
-                 private_key_password=None, default_parse_mode=None):
+    def __init__(self,
+                 token,
+                 base_url=None,
+                 base_file_url=None,
+                 request=None,
+                 private_key=None,
+                 private_key_password=None,
+                 default_parse_mode=None,
+                 default_disable_notification=None):
         self.token = self._validate_token(token)
 
         # Gather default
-        self.defaults = Defaults(parse_mode=default_parse_mode)
+        self.defaults = Defaults(parse_mode=default_parse_mode,
+                                 disable_notification=default_disable_notification)
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'

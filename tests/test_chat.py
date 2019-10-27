@@ -181,9 +181,9 @@ class TestChat(object):
 
     def test_instance_method_send_sticker(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_sticker'
+            return args[0] == chat.id and args[1] == 'test_sticker'
 
-        monkeypatch.setattr('telegram.Bot.send_sticker', test)
+        monkeypatch.setattr(chat.bot, 'send_sticker', test)
         assert chat.send_sticker('test_sticker')
 
     def test_instance_method_send_video(self, monkeypatch, chat):
@@ -195,9 +195,9 @@ class TestChat(object):
 
     def test_instance_method_send_video_note(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_video_note'
+            return args[0] == chat.id and args[1] == 'test_video_note'
 
-        monkeypatch.setattr('telegram.Bot.send_video_note', test)
+        monkeypatch.setattr(chat.bot, 'send_video_note', test)
         assert chat.send_video_note('test_video_note')
 
     def test_instance_method_send_voice(self, monkeypatch, chat):
@@ -216,9 +216,9 @@ class TestChat(object):
 
     def test_instance_method_send_poll(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_poll'
+            return args[0] == chat.id and args[1] == 'test_poll'
 
-        monkeypatch.setattr('telegram.Bot.send_poll', test)
+        monkeypatch.setattr(chat.bot, 'send_poll', test)
         assert chat.send_poll('test_poll')
 
     def test_equality(self):
