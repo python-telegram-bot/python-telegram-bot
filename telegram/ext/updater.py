@@ -62,6 +62,9 @@ class Updater(object):
             method call. See the constants in :class:`telegram.ParseMode` for the available modes.
         default_disable_notification (:obj:`bool`): Optional. Default setting for the
             `disable_notification` parameter used if not set explicitly in method call.
+        default_disable_web_page_preview (:obj:`bool`): Optional. Default setting for the
+            `disable_web_page_preview` parameter used if not set explicitly in method call.
+
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
         base_url (:obj:`str`, optional): Base_url for the bot.
@@ -88,6 +91,8 @@ class Updater(object):
             method call. See the constants in :class:`telegram.ParseMode` for the available modes.
         default_disable_notification (:obj:`bool`, optional): Default setting for the
             `disable_notification` parameter used if not set explicitly in method call.
+        default_disable_web_page_preview (:obj:`bool`, optional): Default setting for the
+            `disable_web_page_preview` parameter used if not set explicitly in method call.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -111,6 +116,7 @@ class Updater(object):
                  persistence=None,
                  default_parse_mode=None,
                  default_disable_notification=None,
+                 default_disable_web_page_preview=None,
                  use_context=False):
 
         if (token is None) and (bot is None):
@@ -145,7 +151,8 @@ class Updater(object):
             self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
                            private_key_password=private_key_password,
                            default_parse_mode=default_parse_mode,
-                           default_disable_notification=default_disable_notification)
+                           default_disable_notification=default_disable_notification,
+                           default_disable_web_page_preview=default_disable_web_page_preview)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue()

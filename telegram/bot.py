@@ -87,6 +87,8 @@ class Bot(TelegramObject):
             method call. See the constants in :class:`telegram.ParseMode` for the available modes.
         default_disable_notification (:obj:`bool`, optional): Default setting for the
             `disable_notification` parameter used if not set explicitly in method call.
+        default_disable_web_page_preview (:obj:`bool`, optional): Default setting for the
+            `disable_web_page_preview` parameter used if not set explicitly in method call.
 
     """
 
@@ -128,12 +130,14 @@ class Bot(TelegramObject):
                  private_key=None,
                  private_key_password=None,
                  default_parse_mode=None,
-                 default_disable_notification=None):
+                 default_disable_notification=None,
+                 default_disable_web_page_preview=None):
         self.token = self._validate_token(token)
 
         # Gather default
         self.defaults = Defaults(parse_mode=default_parse_mode,
-                                 disable_notification=default_disable_notification)
+                                 disable_notification=default_disable_notification,
+                                 disable_web_page_preview=None)
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'

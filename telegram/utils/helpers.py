@@ -266,19 +266,24 @@ class Defaults:
             bold, italic, fixed-width toxt or URLs in your bot's message.
         disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
             receive a notification with no sound.
+        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
+            message.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width toxt or URLs in your bot's message.
         disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
             receive a notification with no sound.
+        disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
+            message.
     """
-    def __init__(self, parse_mode=None, disable_notification=None):
+    def __init__(self, parse_mode=None, disable_notification=None, disable_web_page_preview=None):
         self.parse_mode = parse_mode
         self.disable_notification = disable_notification
+        self.disable_web_page_preview = disable_web_page_preview
 
     def __hash__(self):
-        return hash((self.parse_mode, self.disable_notification))
+        return hash((self.parse_mode, self.disable_notification, self.disable_web_page_preview))
 
     def __eq__(self, other):
         if isinstance(other, Defaults):
