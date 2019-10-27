@@ -1,0 +1,73 @@
+name: Testing your PR
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7]
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            python-version: 3.7
+            test-official: True
+            test-build: True
+            test-pre-commit: True
+          - os: windows-latest
+            python-version: 3.7
+            test-build: True
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v1
+      - name: Initialize vendored libs
+        run:
+          git submodule update --init --recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U codecov pytest-cov
+          pip install ujson
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Test with pytest
+        run: |
+          pytest -v -m nocoverage
+          nocov_exit=$?
+          pytest -v -m "not nocoverage" --cov
+          cov_exit=$?
+          global_exit=$(( nocov_exit > cov_exit ? nocov_exit : cov_exit ))
+          exit ${global_exit}
+        env:
+          JOB_INDEX: ${{ strategy.job-index }}
+          BOTS: ${{ secrets.BOTS }}
+          TEST_BUILD: ${{ matrix.test-build }}
+          TEST_PRE_COMMIT: ${{ matrix.test-pre-commit }}
+        shell: bash --noprofile --norc {0}
+
+      - name: Compare to official api
+        run: |
+          pytest -v tests/test_official.py
+          exit $?
+        env:
+          TEST_OFFICIAL: "true"
+        if: matrix.test-official
+        shell: bash --noprofile --norc {0}
+
+      - name: Submit coverage
+        run: |
+          if [ "$CODECOV_TOKEN" != "" ]; then
+             codecov -F github -t $CODECOV_TOKEN --name "${{ matrix.os }}-${{ matrix.python-version }}"
+          fi
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        shell: bash
