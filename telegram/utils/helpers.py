@@ -258,42 +258,6 @@ def decode_user_chat_data_from_json(data):
     return tmp
 
 
-class Defaults:
-    """Convenience Class to gather all parameters with a (user defined) default value
-
-    Attributes:
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width toxt or URLs in your bot's message.
-        disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
-            receive a notification with no sound.
-        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
-            message.
-
-    Parameters:
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width toxt or URLs in your bot's message.
-        disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-            receive a notification with no sound.
-        disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
-            message.
-    """
-    def __init__(self, parse_mode=None, disable_notification=None, disable_web_page_preview=None):
-        self.parse_mode = parse_mode
-        self.disable_notification = disable_notification
-        self.disable_web_page_preview = disable_web_page_preview
-
-    def __hash__(self):
-        return hash((self.parse_mode, self.disable_notification, self.disable_web_page_preview))
-
-    def __eq__(self, other):
-        if isinstance(other, Defaults):
-            return self.__dict__ == other.__dict__
-        return False
-
-    def __ne__(self, other):
-        return not self == other
-
-
 class DefaultValue:
     """Wrapper for immutable default arguments that allows to check, if the default value was set
     explicitly. Usage::
@@ -349,3 +313,55 @@ class DefaultValue:
 
 DEFAULT_NONE = DefaultValue(None)
 """:class:`DefaultValue`: Default `None`"""
+
+
+class Defaults:
+    """Convenience Class to gather all parameters with a (user defined) default value
+
+    Attributes:
+        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width toxt or URLs in your bot's message.
+        disable_notification (:obj:`bool`): Optional. Sends the message silently. Users will
+            receive a notification with no sound.
+        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in this
+            message.
+        timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
+            read timeout from the server (instead of the one specified during creation of the
+            connection pool).
+
+    Parameters:
+        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+            bold, italic, fixed-width toxt or URLs in your bot's message.
+        disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+            receive a notification with no sound.
+        disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
+            message.
+        timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
+            read timeout from the server (instead of the one specified during creation of the
+            connection pool).
+    """
+    def __init__(self,
+                 parse_mode=None,
+                 disable_notification=None,
+                 disable_web_page_preview=None,
+                 # Timeout needs special treatment, since the bot methods have two different
+                 # default values for timeout (None and 20s)
+                 timeout=DEFAULT_NONE):
+        self.parse_mode = parse_mode
+        self.disable_notification = disable_notification
+        self.disable_web_page_preview = disable_web_page_preview
+        self.timeout = timeout
+
+    def __hash__(self):
+        return hash((self.parse_mode,
+                     self.disable_notification,
+                     self.disable_web_page_preview,
+                     self.timeout))
+
+    def __eq__(self, other):
+        if isinstance(other, Defaults):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self == other

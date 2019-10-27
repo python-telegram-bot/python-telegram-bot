@@ -28,7 +28,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
-from telegram.utils.helpers import get_signal_name
+from telegram.utils.helpers import get_signal_name, DEFAULT_NONE
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
@@ -58,12 +58,6 @@ class Updater(object):
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
         use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
-        default_parse_mode (:obj:`str`): Optional. Default parse mode used if not set explicitly in
-            method call. See the constants in :class:`telegram.ParseMode` for the available modes.
-        default_disable_notification (:obj:`bool`): Optional. Default setting for the
-            `disable_notification` parameter used if not set explicitly in method call.
-        default_disable_web_page_preview (:obj:`bool`): Optional. Default setting for the
-            `disable_web_page_preview` parameter used if not set explicitly in method call.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -93,6 +87,8 @@ class Updater(object):
             `disable_notification` parameter used if not set explicitly in method call.
         default_disable_web_page_preview (:obj:`bool`, optional): Default setting for the
             `disable_web_page_preview` parameter used if not set explicitly in method call.
+        default_timeout (:obj:`int` | :obj:`float`, optional): Default setting for the
+            `timeout` parameter used if not set explicitly in method call.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -117,6 +113,7 @@ class Updater(object):
                  default_parse_mode=None,
                  default_disable_notification=None,
                  default_disable_web_page_preview=None,
+                 default_timeout=DEFAULT_NONE,
                  use_context=False):
 
         if (token is None) and (bot is None):
@@ -152,7 +149,8 @@ class Updater(object):
                            private_key_password=private_key_password,
                            default_parse_mode=default_parse_mode,
                            default_disable_notification=default_disable_notification,
-                           default_disable_web_page_preview=default_disable_web_page_preview)
+                           default_disable_web_page_preview=default_disable_web_page_preview,
+                           default_timeout=default_timeout)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue()

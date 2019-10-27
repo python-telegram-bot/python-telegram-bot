@@ -77,9 +77,9 @@ class TestPreCheckoutQuery(object):
 
     def test_answer(self, monkeypatch, pre_checkout_query):
         def test(*args, **kwargs):
-            return args[1] == pre_checkout_query.id
+            return args[0] == pre_checkout_query.id
 
-        monkeypatch.setattr('telegram.Bot.answer_pre_checkout_query', test)
+        monkeypatch.setattr(pre_checkout_query.bot, 'answer_pre_checkout_query', test)
         assert pre_checkout_query.answer()
 
     def test_equality(self):

@@ -80,9 +80,9 @@ class TestCallbackQuery(object):
 
     def test_answer(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
-            return args[1] == callback_query.id
+            return args[0] == callback_query.id
 
-        monkeypatch.setattr('telegram.Bot.answerCallbackQuery', test)
+        monkeypatch.setattr(callback_query.bot, 'answerCallbackQuery', test)
         # TODO: PEP8
         assert callback_query.answer()
 

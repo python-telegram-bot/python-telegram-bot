@@ -103,10 +103,10 @@ class TestUser(object):
         assert user.link is None
 
     def test_get_profile_photos(self, monkeypatch, user):
-        def test(_, *args, **kwargs):
+        def test(*args, **kwargs):
             return args[0] == user.id
 
-        monkeypatch.setattr('telegram.Bot.get_user_profile_photos', test)
+        monkeypatch.setattr(user.bot, 'get_user_profile_photos', test)
         assert user.get_profile_photos()
 
     def test_instance_method_send_message(self, monkeypatch, user):

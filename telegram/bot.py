@@ -89,6 +89,8 @@ class Bot(TelegramObject):
             `disable_notification` parameter used if not set explicitly in method call.
         default_disable_web_page_preview (:obj:`bool`, optional): Default setting for the
             `disable_web_page_preview` parameter used if not set explicitly in method call.
+        default_timeout (:obj:`int` | :obj:`float`, optional): Default setting for the
+            `timeout` parameter used if not set explicitly in method call.
 
     """
 
@@ -114,7 +116,9 @@ class Bot(TelegramObject):
             ]
             # ... make a dict of kwarg name and the default value
             default_kwargs = {
-                kwarg_name: getattr(defaults, kwarg_name) for kwarg_name in needs_default
+                kwarg_name: getattr(defaults, kwarg_name) for kwarg_name in needs_default if (
+                    getattr(defaults, kwarg_name) is not DEFAULT_NONE
+                )
             }
             # ... apply the defaults using a partial
             if default_kwargs:
@@ -131,13 +135,17 @@ class Bot(TelegramObject):
                  private_key_password=None,
                  default_parse_mode=None,
                  default_disable_notification=None,
-                 default_disable_web_page_preview=None):
+                 default_disable_web_page_preview=None,
+                 # Timeout needs special treatment, since the bot methods have two different
+                 # default values for timeout (None and 20s)
+                 default_timeout=DEFAULT_NONE):
         self.token = self._validate_token(token)
 
         # Gather default
         self.defaults = Defaults(parse_mode=default_parse_mode,
                                  disable_notification=default_disable_notification,
-                                 disable_web_page_preview=None)
+                                 disable_web_page_preview=default_disable_web_page_preview,
+                                 timeout=default_timeout)
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'

@@ -63,9 +63,9 @@ class TestShippingQuery(object):
 
     def test_answer(self, monkeypatch, shipping_query):
         def test(*args, **kwargs):
-            return args[1] == shipping_query.id
+            return args[0] == shipping_query.id
 
-        monkeypatch.setattr('telegram.Bot.answer_shipping_query', test)
+        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', test)
         assert shipping_query.answer()
 
     def test_equality(self):
