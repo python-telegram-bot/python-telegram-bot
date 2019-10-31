@@ -117,7 +117,7 @@ class File(TelegramObject):
         else:
             if custom_path:
                 filename = custom_path
-            elif file_path:
+            elif self.file_path:
                 filename = basename(self.file_path)
             else:
                 filename = getcwd()
