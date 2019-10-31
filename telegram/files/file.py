@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram File."""
 from base64 import b64decode
 from os.path import basename
+from os import getcwd
 
 from future.backports.urllib import parse as urllib_parse
 
@@ -116,8 +117,10 @@ class File(TelegramObject):
         else:
             if custom_path:
                 filename = custom_path
-            else:
+            elif file_path:
                 filename = basename(self.file_path)
+            else:
+                filename = getcwd()
 
             buf = self.bot.request.retrieve(url, timeout=timeout)
             if self._credentials:
