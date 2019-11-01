@@ -103,15 +103,13 @@ class BaseFilter(object):
             self.name = self.__class__.__name__
         return self.name
 
-    def filter(self, update):
+    def filter(self, message):
         """This method must be overwritten.
 
-        Note:
-            If :attr:`update_filter` is false then the first argument is `message` and of
-            type :class:`telegram.Message`.
-
         Args:
-            update (:class:`telegram.Update`): The update that is tested.
+            message (:class:`telegram.Message`): The message that is tested. If
+            :attr:`update_filter` is True update is `update` of type
+            :class:`telegram.Update`.
 
         Returns:
             :obj:`dict` or :obj:`bool`
