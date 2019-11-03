@@ -120,7 +120,7 @@ class File(TelegramObject):
             elif self.file_path:
                 filename = basename(self.file_path)
             else:
-                filename = os.path.join(os.getcwd(), self.file_path)
+                filename = os.path.join(os.getcwd(), self.file_id)
 
             buf = self.bot.request.retrieve(url, timeout=timeout)
             if self._credentials:
