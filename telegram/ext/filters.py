@@ -108,7 +108,7 @@ class BaseFilter(object):
 
         Args:
             message (:class:`telegram.Message`): The message that is tested. If
-            :attr:`update_filter` is True update is `update` of type
+            :attr:`update_filter` is True, message is an instance of
             :class:`telegram.Update`.
 
         Returns:
