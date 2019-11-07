@@ -46,5 +46,4 @@ class InlineQueryResultGame(InlineQueryResult):
         self.id = id
         self.game_short_name = game_short_name
 
-        if reply_markup:
-            self.reply_markup = reply_markup
+        self.reply_markup = reply_markup
