@@ -278,23 +278,57 @@ class Filters(object):
 
         Args:
             pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+            caption (:obj:`bool`): Optional. Whether the caption should be used instead of text.
+                    Default is ``False``.
         """
 
         data_filter = True
 
-        def __init__(self, pattern):
+        def __init__(self, pattern, caption=False):
             if isinstance(pattern, string_types):
                 pattern = re.compile(pattern)
             self.pattern = pattern
-            self.name = 'Filters.regex({})'.format(self.pattern)
+            self.caption = caption
+            self.name = 'Filters.regex({}, caption={!r})'.format(self.pattern, self.caption)
 
         def filter(self, message):
             """"""  # remove method from docs
-            if message.text:
-                match = self.pattern.search(message.text)
+            if self.caption:
+                text = message.caption
+            else:
+                text = message.text
+
+            if text:
+                match = self.pattern.search(text)
                 if match:
                     return {'matches': [match]}
                 return {}
+            return {}
+
+        @classmethod
+        def message_in(cls, list_, caption=False):
+            """Convenience method.
+            Filters messages to only allow those whose text/caption appears in a given list.
+
+            Examples:
+                A simple usecase is to allow only messages that were send by a custom
+                :class:`telegram.ReplyKeyboardMarkup`::
+
+                    buttons = ['Start', 'Settings', 'Back']
+                    markup = ReplyKeyboardMarkup.from_column(buttons)
+                    ...
+                    MessageHandler(Filters.regex.message_in(buttons), callback_method)
+
+            Args:
+                list_ (List[:obj:`str`]): Which messages to allow through. Only exact matches
+                    are allowed.
+                caption (:obj:`bool`): Optional. Whether the caption should be used instead of
+                    text. Default is ``False``.
+
+            """
+            filter = Filters.regex(r'^{}\Z'.format('\Z|^'.join(list_)), caption)
+            filter.name = 'Filters.regex.message_in({!r}, caption={!r})'.format(list_, caption)
+            return filter
 
     class _Reply(BaseFilter):
         name = 'Filters.reply'
@@ -908,39 +942,6 @@ officedocument.wordprocessingml.document")``-
             """"""  # remove method from docs
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
-
-    class msg_in(BaseFilter):
-        """Filters messages to only allow those whose text/caption appears in a given list.
-
-        Examples:
-            A simple usecase is to allow only messages that were send by a custom
-            :class:`telegram.ReplyKeyboardMarkup`::
-
-                buttons = ['Start', 'Settings', 'Back']
-                markup = ReplyKeyboardMarkup.from_column(buttons)
-                ...
-                MessageHandler(Filters.msg_in(buttons), callback_method)
-
-        Args:
-            list_ (List[:obj:`str`]): Which messages to allow through. Only exact matches
-                are allowed.
-            caption (:obj:`bool`): Optional. Whether the caption should be used instead of text.
-                Default is ``False``.
-
-        """
-
-        def __init__(self, list_, caption=False):
-            self.list_ = list_
-            self.caption = caption
-            self.name = 'Filters.msg_in({!r}, caption={!r})'.format(self.list_, self.caption)
-
-        def filter(self, message):
-            if self.caption:
-                txt = message.caption
-            else:
-                txt = message.text
-
-            return txt in self.list_
 
     class _UpdateType(BaseFilter):
         update_filter = True

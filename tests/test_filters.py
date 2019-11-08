@@ -75,7 +75,9 @@ class TestFilters(object):
         assert Filters.regex(r'.\b[lo]{2}ve python')(update)
 
         update.message.text = None
+        update.message.caption = 'fail'
         assert not Filters.regex(r'fail')(update)
+        assert Filters.regex(r'fail', caption=True)(update)
 
     def test_filters_regex_multiple(self, update):
         SRE_TYPE = type(re.match("", ""))
@@ -246,6 +248,16 @@ class TestFilters(object):
         update.message.text = 'nothig'
         result = filter(update)
         assert result
+
+    def test_filters_regex_message_in(self, update):
+        update.message.text = 'test'
+        update.message.caption = 'caption'
+
+        assert Filters.regex.message_in(['test'])(update)
+        assert Filters.regex.message_in(['caption'], caption=True)(update)
+
+        assert not Filters.regex.message_in(['test'], caption=True)(update)
+        assert not Filters.regex.message_in(['caption'])(update)
 
     def test_filters_reply(self, update):
         another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
@@ -603,16 +615,6 @@ class TestFilters(object):
         assert not f(update)
         update.message.from_user.language_code = 'da'
         assert f(update)
-
-    def test_msg_in_filter(self, update):
-        update.message.text = 'test'
-        update.message.caption = 'caption'
-
-        assert Filters.msg_in(['test'])(update)
-        assert Filters.msg_in(['caption'], caption=True)(update)
-
-        assert not Filters.msg_in(['test'], caption=True)(update)
-        assert not Filters.msg_in(['caption'])(update)
 
     def test_and_filters(self, update):
         update.message.text = 'test'
