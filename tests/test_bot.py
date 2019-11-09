@@ -114,6 +114,7 @@ class TestBot(object):
     @pytest.mark.timeout(10)
     def test_delete_message(self, bot, chat_id):
         message = bot.send_message(chat_id, text='will be deleted')
+        time.sleep(2)
 
         assert bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
