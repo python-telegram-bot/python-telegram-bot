@@ -33,11 +33,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -U codecov pytest-cov
-          pip install ujson
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -U codecov pytest-cov
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
 
       - name: Test with pytest
         run: |

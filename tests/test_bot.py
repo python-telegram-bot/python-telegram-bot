@@ -114,13 +114,14 @@ class TestBot(object):
     @pytest.mark.timeout(10)
     def test_delete_message(self, bot, chat_id):
         message = bot.send_message(chat_id, text='will be deleted')
+        time.sleep(2)
 
         assert bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_message_old_message(self, bot, chat_id):
-        with pytest.raises(TelegramError, match='Message to delete not found'):
+        with pytest.raises(BadRequest):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
