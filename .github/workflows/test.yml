@@ -15,7 +15,6 @@ jobs:
         include:
           - os: ubuntu-latest
             python-version: 3.7
-            test-official: True
             test-build: True
             test-pre-commit: True
           - os: windows-latest
@@ -53,15 +52,6 @@ jobs:
           TEST_PRE_COMMIT: ${{ matrix.test-pre-commit }}
         shell: bash --noprofile --norc {0}
 
-      - name: Compare to official api
-        run: |
-          pytest -v tests/test_official.py
-          exit $?
-        env:
-          TEST_OFFICIAL: "true"
-        if: matrix.test-official
-        shell: bash --noprofile --norc {0}
-
       - name: Submit coverage
         run: |
           if [ "$CODECOV_TOKEN" != "" ]; then
@@ -70,3 +60,33 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         shell: bash
+  test_official:
+    name: test-official
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.7]
+        os: [ubuntu-latest]
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v1
+      - name: Initialize vendored libs
+        run:
+          git submodule update --init --recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+      - name: Compare to official api
+        run: |
+          pytest -v tests/test_official.py
+          exit $?
+        env:
+          TEST_OFFICIAL: "true"
+        shell: bash --noprofile --norc {0}
+
