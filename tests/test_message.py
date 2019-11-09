@@ -57,7 +57,7 @@ def message(bot):
                                   [PhotoSize('game_photo_id', 30, 30), ])},
                     {'photo': [PhotoSize('photo_id', 50, 50)],
                      'caption': 'photo_file'},
-                    {'sticker': Sticker('sticker_id', 50, 50)},
+                    {'sticker': Sticker('sticker_id', 50, 50, True)},
                     {'video': Video('video_id', 12, 12, 12),
                      'caption': 'video_file'},
                     {'voice': Voice('voice_id', 5)},

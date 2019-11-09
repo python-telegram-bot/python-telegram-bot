@@ -69,6 +69,7 @@ target/
 *.sublime*
 
 # unitests files
+game.gif
 telegram.mp3
 telegram.mp4
 telegram2.mp4

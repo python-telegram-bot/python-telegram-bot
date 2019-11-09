@@ -26,6 +26,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
+- `Dmitry Grigoryev <https://github.com/icecom-dg>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `Emilio Molinari <https://github.com/xates>`_
@@ -67,10 +68,12 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Poolitzer <https://github.com/Poolitzer>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
+- `syntx <https://github.com/syntx>`_
 - `thodnev <https://github.com/thodnev>`_
 - `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
@@ -78,5 +81,6 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Vorobjev Simon <https://github.com/simonvorobjev>`_
 - `Wagner Macedo <https://github.com/wagnerluis1982>`_
 - `wjt <https://github.com/wjt>`_
+- `zeshuaro <https://github.com/zeshuaro>`_
 
 Please add yourself here alphabetically when you submit your first pull request.
