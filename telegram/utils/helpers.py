@@ -106,7 +106,7 @@ def to_float_timestamp(t, reference_timestamp=None):
     ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
 
     Args:
-        t (int | float | datetime.timedelta | datetime.datetime | datetime.time | None):
+        t (int | float | datetime.timedelta | datetime.datetime | datetime.time):
             Time value to convert. The semantics of this parameter will depend on its type:
 
             * :obj:`int` or :obj:`float` will be interpreted as "seconds from ``reference_t``"
@@ -135,20 +135,16 @@ def to_float_timestamp(t, reference_timestamp=None):
             Finally, if it is a time of the day without date (i.e. a :obj:`datetime.time`
             object), the return value is the nearest future occurrence of that time of day.
 
-            If ``t`` is ``None``, ``None`` is returned (to facilitate formulating HTTP requests
-            when the object to be serialized has a ``date`` which is ``None`` without having to
-            check explicitly).
+    Raises:
+        TypeError: if `t`'s type is not one of those described above
     """
 
     if reference_timestamp is None:
         reference_timestamp = time.time()
-    else:
-        if isinstance(t, dtm.datetime):
-            raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
+    elif isinstance(t, dtm.datetime):
+        raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
 
-    if t is None:
-        return None
-    elif isinstance(t, dtm.timedelta):
+    if isinstance(t, dtm.timedelta):
         return reference_timestamp + t.total_seconds()
     elif isinstance(t, Number):
         return reference_timestamp + t
