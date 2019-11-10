@@ -84,6 +84,12 @@ class TestJobQueue(object):
         sleep(0.02)
         assert self.result == 1
 
+    def test_run_once_no_time_spec(self, job_queue):
+        # test that an appropiate exception is raised if a job is attempted to be scheduled
+        # without specifying a time
+        with pytest.raises(ValueError):
+            job_queue.run_once(self.job_run_once, when=None)
+
     def test_job_with_context(self, job_queue):
         job_queue.run_once(self.job_run_once_with_context, 0.01, context=5)
         sleep(0.02)
@@ -213,7 +219,7 @@ class TestJobQueue(object):
 
     def test_time_unit_dt_time_tomorrow(self, job_queue):
         # Testing running at a specific time that has passed today. Since we can't wait a day, we
-        # test if the jobs next_t has been calculated correctly
+        # test if the job's next scheduled execution time has been calculated correctly
         delta, now = -2, time.time()
         when = (dtm.datetime.utcfromtimestamp(now) + dtm.timedelta(seconds=delta)).time()
         expected_time = now + delta + 60 * 60 * 24
