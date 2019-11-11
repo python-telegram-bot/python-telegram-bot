@@ -80,14 +80,14 @@ else:
             return dtm.timedelta(0)
 
     _UTC = _UtcOffsetTimezone(dtm.timedelta(0))
-    EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=_UTC)
-    NAIVE_EPOCH_DT = EPOCH_DT.replace(tzinfo=None)
+    __EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=_UTC)
+    __NAIVE_EPOCH_DT = __EPOCH_DT.replace(tzinfo=None)
 
     # _datetime_to_float_timestamp
     # Not using future.backports.datetime here as datetime value might be an input from the user,
     # making every isinstace() call more delicate. So we just use our own compat layer.
     def _datetime_to_float_timestamp(dt_obj):
-        epoch_dt = EPOCH_DT if dt_obj.tzinfo is not None else NAIVE_EPOCH_DT
+        epoch_dt = __EPOCH_DT if dt_obj.tzinfo is not None else __NAIVE_EPOCH_DT
         return (dt_obj - epoch_dt).total_seconds()
 
 _datetime_to_float_timestamp.__doc__ = \
