@@ -615,7 +615,7 @@ class TestBot(object):
             assert bot.restrict_chat_member(channel_id,
                                             95205500,
                                             chat_permissions,
-                                            until_date=dtm.utcnow())
+                                            until_date=dtm.datetime.utcnow())
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
