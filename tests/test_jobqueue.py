@@ -20,11 +20,11 @@ import datetime as dtm
 import os
 import sys
 import time
-from queue import Queue
 from time import sleep
 
 import pytest
 from flaky import flaky
+from queue import Queue
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
@@ -84,6 +84,18 @@ class TestJobQueue(object):
         sleep(0.02)
         assert self.result == 1
 
+    def test_run_once_timezone(self, job_queue, timezone):
+        """Test the correct handling of aware datetimes.
+        Set the target datetime to utcnow + x hours (naive) with the timezone set to utc + x hours,
+        which is equivalent to now.
+        """
+        # we're parametrizing this with two different UTC offsets to exclude the possibility
+        # of an xpass when the test is run in a timezone with the same UTC offset
+        when = (dtm.datetime.utcnow() + timezone.utcoffset(None)).replace(tzinfo=timezone)
+        job_queue.run_once(self.job_run_once, when)
+        sleep(0.001)
+        assert self.result == 1
+
     def test_run_once_no_time_spec(self, job_queue):
         # test that an appropiate exception is raised if a job is attempted to be scheduled
         # without specifying a time
@@ -105,6 +117,13 @@ class TestJobQueue(object):
         sleep(0.15)
         assert self.result == 0
         sleep(0.07)
+        assert self.result == 1
+
+    def test_run_repeating_first_timezone(self, job_queue, timezone):
+        """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
+        first = (dtm.datetime.utcnow() + timezone.utcoffset(None)).replace(tzinfo=timezone)
+        job_queue.run_repeating(self.job_run_once, 0.05, first=first)
+        sleep(0.001)
         assert self.result == 1
 
     def test_multiple(self, job_queue):
@@ -230,29 +249,39 @@ class TestJobQueue(object):
     def test_run_daily(self, job_queue):
         delta, now = 0.1, time.time()
         time_of_day = (dtm.datetime.utcfromtimestamp(now) + dtm.timedelta(seconds=delta)).time()
-        expected_time = now + 60 * 60 * 24 + delta
+        expected_reschedule_time = now + delta + 24 * 60 * 60
 
         job_queue.run_daily(self.job_run_once, time_of_day)
         sleep(0.2)
         assert self.result == 1
-        assert job_queue._queue.get(False)[0] == pytest.approx(expected_time)
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
 
     def test_run_daily_with_timezone(self, job_queue):
         """test that the weekday is retrieved based on the job's timezone
-        we create a timezone that is---approximately (see below)---UTC+24, and set it to run
-        on (UTC-)tomorrow's weekday at the current time of day.
+        We set a job to run at the current UTC time of day (plus a small delay buffer) with a
+        timezone that is---approximately (see below)---UTC +24, and set it to run on the weekday
+        after the current UTC weekday. The job should therefore be executed now (because in UTC+24,
+        the time of day is the same as the current weekday is the one after the current UTC
+        weekday).
         """
-        delta, now = 0.1, dtm.datetime.utcnow()
+        now = time.time()
+        utcnow = dtm.datetime.utcfromtimestamp(now)
+        delta = 0.1
+
         # must subtract one minute because the UTC offset has to be strictly less than 24h
         # thus this test will xpass if run in the interval [00:00, 00:01) UTC time
         # (because target time will be 23:59 UTC, so local and target weekday will be the same)
-        target_datetime = now + dtm.timedelta(days=1, seconds=delta - 60)
         target_tzinfo = _UtcOffsetTimezone(dtm.timedelta(days=1, minutes=-1))
-        target_time = target_datetime.time().replace(tzinfo=target_tzinfo)
+        target_datetime = (utcnow + dtm.timedelta(days=1, minutes=-1, seconds=delta)).replace(
+            tzinfo=target_tzinfo)
+        target_time = target_datetime.timetz()
         target_weekday = target_datetime.date().weekday()
+        expected_reschedule_time = now + delta + 24 * 60 * 60
+
         job_queue.run_daily(self.job_run_once, time=target_time, days=(target_weekday,))
         sleep(delta + 0.1)
         assert self.result == 1
+        assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
 
     def test_warnings(self, job_queue):
         j = Job(self.job_run_once, repeat=False)
