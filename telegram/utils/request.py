@@ -168,7 +168,7 @@ class Request(object):
         """
 
         try:
-            decoded_s = json_data.decode('utf-8')
+            decoded_s = json_data.decode('utf-8', 'backslashreplace')
             data = json.loads(decoded_s)
         except UnicodeDecodeError:
             logging.getLogger(__name__).debug(

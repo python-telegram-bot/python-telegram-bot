@@ -120,7 +120,7 @@ class TestSticker(object):
         message = bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
         if PY2:
-            assert sticker.emoji == self.emoji.decode('utf-8')
+            assert sticker.emoji == self.emoji.decode('utf-8', 'backslashreplace')
         else:
             assert sticker.emoji == self.emoji
 

@@ -88,7 +88,7 @@ def decrypt(secret, hash, data):
 
 def decrypt_json(secret, hash, data):
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
-    return json.loads(decrypt(secret, hash, data).decode('utf-8'))
+    return json.loads(decrypt(secret, hash, data).decode('utf-8', 'backslashreplace'))
 
 
 class EncryptedCredentials(TelegramObject):
