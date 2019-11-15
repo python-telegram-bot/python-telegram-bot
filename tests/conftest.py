@@ -27,9 +27,11 @@ from time import sleep
 
 import pytest
 
-from telegram import Bot, Message, User, Chat, MessageEntity, Update, \
-    InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery, ChosenInlineResult
+from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
+                      InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
+                      ChosenInlineResult)
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
+from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
 
 TRAVIS = os.getenv('TRAVIS', False)
@@ -258,3 +260,13 @@ def get_false_update_fixture_decorator_params():
 @pytest.fixture(scope='function', **get_false_update_fixture_decorator_params())
 def false_update(request):
     return Update(update_id=1, **request.param)
+
+
+@pytest.fixture(params=[1, 2], ids=lambda h: 'UTC +{hour:0>2}:00'.format(hour=h))
+def utc_offset(request):
+    return datetime.timedelta(hours=request.param)
+
+
+@pytest.fixture()
+def timezone(utc_offset):
+    return _UtcOffsetTimezone(utc_offset)
