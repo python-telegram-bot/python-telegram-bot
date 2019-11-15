@@ -909,6 +909,39 @@ officedocument.wordprocessingml.document")``-
             return message.from_user.language_code and any(
                 [message.from_user.language_code.startswith(x) for x in self.lang])
 
+    class msg_in(BaseFilter):
+        """Filters messages to only allow those whose text/caption appears in a given list.
+
+        Examples:
+            A simple usecase is to allow only messages that were send by a custom
+            :class:`telegram.ReplyKeyboardMarkup`::
+
+                buttons = ['Start', 'Settings', 'Back']
+                markup = ReplyKeyboardMarkup.from_column(buttons)
+                ...
+                MessageHandler(Filters.msg_in(buttons), callback_method)
+
+        Args:
+            list_ (List[:obj:`str`]): Which messages to allow through. Only exact matches
+                are allowed.
+            caption (:obj:`bool`): Optional. Whether the caption should be used instead of text.
+                Default is ``False``.
+
+        """
+
+        def __init__(self, list_, caption=False):
+            self.list_ = list_
+            self.caption = caption
+            self.name = 'Filters.msg_in({!r}, caption={!r})'.format(self.list_, self.caption)
+
+        def filter(self, message):
+            if self.caption:
+                txt = message.caption
+            else:
+                txt = message.text
+
+            return txt in self.list_
+
     class _UpdateType(BaseFilter):
         update_filter = True
 

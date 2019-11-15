@@ -40,6 +40,8 @@ def job_queue(bot, _dp):
 
 
 @pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
+@pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
+                    reason="On windows precise timings are not accurate.")
 @flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue(object):
     result = 0

@@ -42,7 +42,8 @@ class JobQueue(object):
     Attributes:
         _queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
         bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
-            DEPRECATED: Use set_dispatcher instead.
+            DEPRECATED: Use :attr:`set_dispatcher` instead.
+
     """
 
     def __init__(self, bot=None):
@@ -68,6 +69,13 @@ class JobQueue(object):
         self._running = False
 
     def set_dispatcher(self, dispatcher):
+        """Set the dispatcher to be used by this JobQueue. Use this instead of passing a
+        :class:`telegram.Bot` to the JobQueue, which is deprecated.
+
+        Args:
+            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
+
+        """
         self._dispatcher = dispatcher
 
     def _put(self, job, next_t=None, last_t=None):
