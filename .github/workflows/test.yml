@@ -3,6 +3,8 @@ on:
   pull_request:
     branches:
       - master
+  schedule:
+    - cron: 7 3 * * *
 
 jobs:
   pytest:
