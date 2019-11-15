@@ -4,8 +4,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: 0 2 * * *
-  
+    - cron: 7 3 * * *
 
 jobs:
   pytest:
