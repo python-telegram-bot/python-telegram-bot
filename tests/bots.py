@@ -52,7 +52,7 @@ if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
     try:
         BOTS = json.loads(base64.b64decode(BOTS).decode('utf-8'))
     except UnicodeDecodeError:
-        BOTS = json.loads(base64.b64decode(BOTS).decode('utf-8', 'backslashreplace'))
+        BOTS = json.loads(base64.b64decode(BOTS).decode('utf-8', 'ignore'))
     JOB_INDEX = int(JOB_INDEX)
 
 

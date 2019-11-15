@@ -133,7 +133,7 @@ request = http.request('GET', 'https://core.telegram.org/bots/api')
 try:
     soup = BeautifulSoup(request.data.decode('utf-8'), 'html.parser')
 except UnicodeDecodeError:
-    soup = BeautifulSoup(request.data.decode('utf-8', 'backslashreplace'), 'html.parser')
+    soup = BeautifulSoup(request.data.decode('utf-8', 'ignore'), 'html.parser')
 
 
 for thing in soup.select('h4 > a.anchor'):
