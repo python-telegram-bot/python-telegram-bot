@@ -19,7 +19,7 @@
 import os
 import sys
 import time
-from datetime import datetime
+import datetime as dtm
 from platform import python_implementation
 
 import pytest
@@ -108,7 +108,7 @@ class TestBot(object):
 
         assert message.text == message.text
         assert message.forward_from.username == message.from_user.username
-        assert isinstance(message.forward_date, datetime)
+        assert isinstance(message.forward_date, dtm.datetime)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -615,7 +615,7 @@ class TestBot(object):
             assert bot.restrict_chat_member(channel_id,
                                             95205500,
                                             chat_permissions,
-                                            until_date=datetime.now())
+                                            until_date=dtm.datetime.utcnow())
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
