@@ -27,8 +27,9 @@ from time import sleep
 
 import pytest
 
-from telegram import Bot, Message, User, Chat, MessageEntity, Update, \
-    InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery, ChosenInlineResult
+from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
+                      InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
+                      ChosenInlineResult)
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
 from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot

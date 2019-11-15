@@ -20,11 +20,11 @@ import datetime as dtm
 import os
 import sys
 import time
+from queue import Queue
 from time import sleep
 
 import pytest
 from flaky import flaky
-from queue import Queue
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
