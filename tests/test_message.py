@@ -313,15 +313,15 @@ class TestMessage(object):
                                                            message.message_id)
         message.chat.username = None
         message.chat.type = Chat.GROUP
-        assert message.link == 'https://t.me/{}/{}'.format(message.chat.id,
-                                                           message.message_id)
+        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
+                                                             message.message_id)
 
         message.chat.type = Chat.SUPERGROUP
-        assert message.link == 'https://t.me/{}/{}'.format(message.chat.id,
-                                                           message.message_id)
+        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
+                                                             message.message_id)
         message.chat.type = Chat.CHANNEL
-        assert message.link == 'https://t.me/{}/{}'.format(message.chat.id,
-                                                           message.message_id)
+        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
+                                                             message.message_id)
         message.chat.type = Chat.PRIVATE
         assert message.link is None
 
