@@ -58,8 +58,8 @@ class TestHelpers(object):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5, tzinfo=timezone)
-        assert (helpers.to_float_timestamp(datetime) ==
-                1573431976.1 - timezone.utcoffset(None).total_seconds())
+        assert (helpers.to_float_timestamp(datetime)
+                == 1573431976.1 - timezone.utcoffset(None).total_seconds())
 
     def test_to_float_timestamp_absolute_no_reference(self):
         """A reference timestamp is only relevant for relative time specifications"""
@@ -94,8 +94,8 @@ class TestHelpers(object):
         # first test that naive time is assumed to be utc:
         assert helpers.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
         # test that by setting the timezone the timestamp changes accordingly:
-        assert (helpers.to_float_timestamp(time_of_day.replace(tzinfo=timezone), ref_t) ==
-                pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
+        assert (helpers.to_float_timestamp(time_of_day.replace(tzinfo=timezone), ref_t)
+                == pytest.approx(ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))))
 
     @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
     def test_to_float_timestamp_default_reference(self, time_spec):
