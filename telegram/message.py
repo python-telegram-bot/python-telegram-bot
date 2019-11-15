@@ -344,7 +344,7 @@ class Message(TelegramObject):
             if self.chat.username:
                 to_link = self.chat.username
             else:
-                to_link = f"c/{self.chat.id}"
+                to_link = "c/{}".format(self.chat.id)
             return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
