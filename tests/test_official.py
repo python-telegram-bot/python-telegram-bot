@@ -132,7 +132,6 @@ http = urllib3.PoolManager(
 request = http.request('GET', 'https://core.telegram.org/bots/api')
 soup = BeautifulSoup(request.data.decode('utf-8'), 'html.parser')
 
-
 for thing in soup.select('h4 > a.anchor'):
     # Methods and types don't have spaces in them, luckily all other sections of the docs do
     # TODO: don't depend on that
