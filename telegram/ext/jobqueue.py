@@ -29,6 +29,7 @@ from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
+from telegram.utils.helpers import to_float_timestamp, _UTC
 
 
 class Days(object):
@@ -78,30 +79,29 @@ class JobQueue(object):
         """
         self._dispatcher = dispatcher
 
-    def _put(self, job, next_t=None, last_t=None):
-        if next_t is None:
-            next_t = job.interval
-            if next_t is None:
-                raise ValueError('next_t is None')
+    def _put(self, job, time_spec=None, previous_t=None):
+        """
+        Enqueues the job, scheduling its next run at the correct time.
 
-        if isinstance(next_t, datetime.datetime):
-            next_t = (next_t - datetime.datetime.now()).total_seconds()
+        Args:
+            job (telegram.ext.Job): job to enqueue
+            time_spec (optional):
+                Specification of the time for which the job should be scheduled. The precise
+                semantics of this parameter depend on its type (see
+                :func:`telegram.ext.JobQueue.run_repeating` for details).
+                Defaults to now + ``job.interval``.
+            previous_t (optional):
+                Time at which the job last ran (``None`` if it hasn't run yet).
 
-        elif isinstance(next_t, datetime.time):
-            next_datetime = datetime.datetime.combine(datetime.date.today(), next_t)
+        """
+        # get time at which to run:
+        time_spec = time_spec or job.interval
+        if time_spec is None:
+            raise ValueError("no time specification given for scheduling non-repeating job")
+        next_t = to_float_timestamp(time_spec, reference_timestamp=previous_t)
 
-            if datetime.datetime.now().time() > next_t:
-                next_datetime += datetime.timedelta(days=1)
-
-            next_t = (next_datetime - datetime.datetime.now()).total_seconds()
-
-        elif isinstance(next_t, datetime.timedelta):
-            next_t = next_t.total_seconds()
-
-        next_t += last_t or time.time()
-
-        self.logger.debug('Putting job %s with t=%f', job.name, next_t)
-
+        # enqueue:
+        self.logger.debug('Putting job %s with t=%f', job.name, time_spec)
         self._queue.put((next_t, job))
 
         # Wake up the loop if this job should be executed next
@@ -141,7 +141,7 @@ class JobQueue(object):
 
         """
         job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
-        self._put(job, next_t=when)
+        self._put(job, time_spec=when)
         return job
 
     def run_repeating(self, callback, interval, first=None, context=None, name=None):
@@ -192,7 +192,7 @@ class JobQueue(object):
                   context=context,
                   name=name,
                   job_queue=self)
-        self._put(job, next_t=first)
+        self._put(job, time_spec=first)
         return job
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):
@@ -203,7 +203,8 @@ class JobQueue(object):
                 job. It should take ``bot, job`` as parameters, where ``job`` is the
                 :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
                 or change it to a repeating job.
-            time (:obj:`datetime.time`): Time of day at which the job should run.
+            time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
+                (``time.tzinfo``) is ``None``, UTC will be assumed.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -225,10 +226,11 @@ class JobQueue(object):
                   interval=datetime.timedelta(days=1),
                   repeat=True,
                   days=days,
+                  tzinfo=time.tzinfo,
                   context=context,
                   name=name,
                   job_queue=self)
-        self._put(job, next_t=time)
+        self._put(job, time_spec=time)
         return job
 
     def _set_next_peek(self, t):
@@ -272,7 +274,7 @@ class JobQueue(object):
 
             if job.enabled:
                 try:
-                    current_week_day = datetime.datetime.now().weekday()
+                    current_week_day = datetime.datetime.now(job.tzinfo).date().weekday()
                     if any(day == current_week_day for day in job.days):
                         self.logger.debug('Running job %s', job.name)
                         job.run(self._dispatcher)
@@ -284,7 +286,7 @@ class JobQueue(object):
                 self.logger.debug('Skipping disabled job %s', job.name)
 
             if job.repeat and not job.removed:
-                self._put(job, last_t=t)
+                self._put(job, previous_t=t)
             else:
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
@@ -358,10 +360,11 @@ class Job(object):
             It should take ``bot, job`` as parameters, where ``job`` is the
             :class:`telegram.ext.Job` instance. It can be used to access it's :attr:`context`
             or change it to a repeating job.
-        interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The interval in
-            which the job will run. If it is an :obj:`int` or a :obj:`float`, it will be
-            interpreted as seconds. If you don't set this value, you must set :attr:`repeat` to
-            ``False`` and specify :attr:`next_t` when you put the job into the job queue.
+        interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The time
+            interval between executions of the job. If it is an :obj:`int` or a :obj:`float`,
+            it will be interpreted as seconds. If you don't set this value, you must set
+            :attr:`repeat` to ``False`` and specify :attr:`time_spec` when you put the job into
+            the job queue.
         repeat (:obj:`bool`, optional): If this job should be periodically execute its callback
             function (``True``) or only once (``False``). Defaults to ``True``.
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
@@ -371,7 +374,9 @@ class Job(object):
             Defaults to ``Days.EVERY_DAY``
         job_queue (:class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
             Only optional for backward compatibility with ``JobQueue.put()``.
-
+        tzinfo (:obj:`datetime.tzinfo`, optional): timezone associated to this job. Used when
+            checking the day of the week to determine whether a job should run (only relevant when
+            ``days is not Days.EVERY_DAY``). Defaults to UTC.
     """
 
     def __init__(self,
@@ -381,19 +386,21 @@ class Job(object):
                  context=None,
                  days=Days.EVERY_DAY,
                  name=None,
-                 job_queue=None):
+                 job_queue=None,
+                 tzinfo=_UTC):
 
         self.callback = callback
         self.context = context
         self.name = name or callback.__name__
 
-        self._repeat = repeat
+        self._repeat = None
         self._interval = None
         self.interval = interval
         self.repeat = repeat
 
         self._days = None
         self.days = days
+        self.tzinfo = tzinfo
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 

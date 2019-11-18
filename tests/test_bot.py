@@ -19,7 +19,7 @@
 import os
 import sys
 import time
-from datetime import datetime
+import datetime as dtm
 from platform import python_implementation
 
 import pytest
@@ -108,19 +108,20 @@ class TestBot(object):
 
         assert message.text == message.text
         assert message.forward_from.username == message.from_user.username
-        assert isinstance(message.forward_date, datetime)
+        assert isinstance(message.forward_date, dtm.datetime)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_message(self, bot, chat_id):
         message = bot.send_message(chat_id, text='will be deleted')
+        time.sleep(2)
 
         assert bot.delete_message(chat_id=chat_id, message_id=message.message_id) is True
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_delete_message_old_message(self, bot, chat_id):
-        with pytest.raises(TelegramError, match='Message to delete not found'):
+        with pytest.raises(BadRequest):
             # Considering that the first message is old enough
             bot.delete_message(chat_id=chat_id, message_id=1)
 
@@ -614,7 +615,7 @@ class TestBot(object):
             assert bot.restrict_chat_member(channel_id,
                                             95205500,
                                             chat_permissions,
-                                            until_date=datetime.now())
+                                            until_date=dtm.datetime.utcnow())
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
