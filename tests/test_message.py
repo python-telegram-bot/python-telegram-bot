@@ -304,15 +304,25 @@ class TestMessage(object):
         assert message.chat_id == message.chat.id
 
     def test_link(self, message):
-        assert message.link is None
         message.chat.username = 'username'
-        message.chat.type = 'supergroup'
+        message.chat.type = Chat.SUPERGROUP
         assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
                                                            message.message_id)
-        message.chat.type = 'channel'
+        message.chat.type = Chat.CHANNEL
         assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
                                                            message.message_id)
-        message.chat.type = 'private'
+        message.chat.username = None
+        message.chat.type = Chat.GROUP
+        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
+                                                             message.message_id)
+
+        message.chat.type = Chat.SUPERGROUP
+        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
+                                                             message.message_id)
+        message.chat.type = Chat.CHANNEL
+        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
+                                                             message.message_id)
+        message.chat.type = Chat.PRIVATE
         assert message.link is None
 
     def test_effective_attachment(self, message_params):
