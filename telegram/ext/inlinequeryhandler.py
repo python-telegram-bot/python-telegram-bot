@@ -138,6 +138,7 @@ class InlineQueryHandler(Handler):
                         return match
             else:
                 return True
+        return False
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
         optional_args = super(InlineQueryHandler, self).collect_optional_args(dispatcher,
