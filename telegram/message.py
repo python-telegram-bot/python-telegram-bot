@@ -742,13 +742,14 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_poll(self.chat_id, *args, **kwargs)
 
-    def forward(self, chat_id, disable_notification=False):
+    def forward(self, chat_id, *args, **kwargs):
         """Shortcut for::
 
             bot.forward_message(chat_id=chat_id,
                                 from_chat_id=update.message.chat_id,
-                                disable_notification=disable_notification,
-                                message_id=update.message.message_id)
+                                message_id=update.message.message_id,
+                                *args,
+                                **kwargs)
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message forwarded.
@@ -757,8 +758,9 @@ class Message(TelegramObject):
         return self.bot.forward_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
-            disable_notification=disable_notification,
-            message_id=self.message_id)
+            message_id=self.message_id,
+            *args,
+            **kwargs)
 
     def edit_text(self, *args, **kwargs):
         """Shortcut for::

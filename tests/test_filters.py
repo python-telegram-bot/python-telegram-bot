@@ -27,7 +27,7 @@ import re
 
 @pytest.fixture(scope='function')
 def update():
-    return Update(0, Message(0, User(0, 'Testuser', False), datetime.datetime.now(),
+    return Update(0, Message(0, User(0, 'Testuser', False), datetime.datetime.utcnow(),
                              Chat(0, 'private')))
 
 
@@ -138,7 +138,7 @@ class TestFilters(object):
         assert isinstance(matches, list)
         assert len(matches) == 2
         assert all([type(res) == SRE_TYPE for res in matches])
-        update.message.forward_date = datetime.datetime.now()
+        update.message.forward_date = datetime.datetime.utcnow()
         result = filter(update)
         assert result
         assert isinstance(result, dict)
@@ -248,7 +248,7 @@ class TestFilters(object):
         assert result
 
     def test_filters_reply(self, update):
-        another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.now(),
+        another_message = Message(1, User(1, 'TestOther', False), datetime.datetime.utcnow(),
                                   Chat(0, 'private'))
         update.message.text = 'test'
         assert not Filters.reply(update)
@@ -475,7 +475,7 @@ class TestFilters(object):
 
     def test_filters_forwarded(self, update):
         assert not Filters.forwarded(update)
-        update.message.forward_date = datetime.datetime.now()
+        update.message.forward_date = datetime.datetime.utcnow()
         assert Filters.forwarded(update)
 
     def test_filters_game(self, update):
@@ -604,9 +604,19 @@ class TestFilters(object):
         update.message.from_user.language_code = 'da'
         assert f(update)
 
+    def test_msg_in_filter(self, update):
+        update.message.text = 'test'
+        update.message.caption = 'caption'
+
+        assert Filters.msg_in(['test'])(update)
+        assert Filters.msg_in(['caption'], caption=True)(update)
+
+        assert not Filters.msg_in(['test'], caption=True)(update)
+        assert not Filters.msg_in(['caption'])(update)
+
     def test_and_filters(self, update):
         update.message.text = 'test'
-        update.message.forward_date = datetime.datetime.now()
+        update.message.forward_date = datetime.datetime.utcnow()
         assert (Filters.text & Filters.forwarded)(update)
         update.message.text = '/test'
         assert not (Filters.text & Filters.forwarded)(update)
@@ -615,7 +625,7 @@ class TestFilters(object):
         assert not (Filters.text & Filters.forwarded)(update)
 
         update.message.text = 'test'
-        update.message.forward_date = datetime.datetime.now()
+        update.message.forward_date = datetime.datetime.utcnow()
         assert (Filters.text & Filters.forwarded & Filters.private)(update)
 
     def test_or_filters(self, update):
@@ -630,7 +640,7 @@ class TestFilters(object):
 
     def test_and_or_filters(self, update):
         update.message.text = 'test'
-        update.message.forward_date = datetime.datetime.now()
+        update.message.forward_date = datetime.datetime.utcnow()
         assert (Filters.text & (Filters.status_update | Filters.forwarded))(update)
         update.message.forward_date = False
         assert not (Filters.text & (Filters.forwarded | Filters.status_update))(update)

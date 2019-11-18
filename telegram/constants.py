@@ -17,7 +17,8 @@
 """Constants in the Telegram network.
 
 The following constants were extracted from the
-`Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_.
+`Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_ and
+`Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
     MAX_MESSAGE_LENGTH (:obj:`int`): 4096
@@ -25,6 +26,7 @@ Attributes:
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
     MAX_FILESIZE_DOWNLOAD (:obj:`int`): In bytes (20MB)
     MAX_FILESIZE_UPLOAD (:obj:`int`): In bytes (50MB)
+    MAX_PHOTOSIZE_UPLOAD (:obj:`int`): In bytes (10MB)
     MAX_MESSAGES_PER_SECOND_PER_CHAT (:obj:`int`): `1`. Telegram may allow short bursts that go
         over this limit, but eventually you'll begin receiving 429 errors.
     MAX_MESSAGES_PER_SECOND (:obj:`int`): 30
@@ -47,6 +49,7 @@ MAX_CAPTION_LENGTH = 1024
 SUPPORTED_WEBHOOK_PORTS = [443, 80, 88, 8443]
 MAX_FILESIZE_DOWNLOAD = int(20E6)  # (20MB)
 MAX_FILESIZE_UPLOAD = int(50E6)  # (50MB)
+MAX_PHOTOSIZE_UPLOAD = int(10E6)  # (10MB)
 MAX_MESSAGES_PER_SECOND_PER_CHAT = 1
 MAX_MESSAGES_PER_SECOND = 30
 MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
