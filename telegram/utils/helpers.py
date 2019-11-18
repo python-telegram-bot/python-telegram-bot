@@ -174,22 +174,24 @@ def to_timestamp(dt_obj, reference_timestamp=None):
     return int(to_float_timestamp(dt_obj, reference_timestamp)) if dt_obj is not None else None
 
 
-def from_timestamp(unixtime):
+def from_timestamp(unixtime, tzinfo=_UTC):
     """
-    Converts an (integer) unix timestamp to a naive datetime object in UTC.
+    Converts an (integer) unix timestamp to a timezone aware datetime object.
     ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
 
     Args:
         unixtime (int): integer POSIX timestamp
+        tzinfo (:obj:`datetime.tzinfo`, optional): The timezone, the timestamp is to be converted
+            to. Default to UTC.
 
     Returns:
-        equivalent :obj:`datetime.datetime` value in naive UTC if ``timestamp`` is not
+        timezone aware equivalent :obj:`datetime.datetime` value if ``timestamp`` is not
         ``None``; else ``None``
     """
     if unixtime is None:
         return None
 
-    return dtm.datetime.utcfromtimestamp(unixtime)
+    return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
 
 # -------- end --------
 
