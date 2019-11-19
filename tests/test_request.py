@@ -28,7 +28,7 @@ def test_parse_illegal_callback_data():
     Clients can send arbitrary bytes in callback data.
     Make sure the correct error is raised in this case.
     """
-    server_response = b'{"invalid utf-8": "\x80"}'
+    server_response = b'{"ok":true, "result": [{"invalid utf-8": "\x80\x9c"}]}'
 
     with pytest.raises(TelegramError, match='Server response could not be decoded using UTF-8'):
         Request._parse(server_response)
