@@ -24,6 +24,7 @@ from threading import Thread, Lock, current_thread, Event
 from time import sleep
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
+from healthcheck import TornadoHandler, HealthCheck
 
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
@@ -153,6 +154,15 @@ class Updater(object):
         self.running = False
         self.is_idle = False
         self.httpd = None
+        # add healthcheck
+        self.health = HealthCheck()
+        self.additional_tornado_handlers = [
+            (
+                "/healthcheck",
+                TornadoHandler, dict(checker=self.health)
+            )
+        ]
+
         self.__lock = Lock()
         self.__threads = []
 
@@ -371,6 +381,9 @@ class Updater(object):
 
         # Create Tornado app instance
         app = WebhookAppClass(url_path, self.bot, self.update_queue)
+
+        # add healthcheck handler
+        app.add_handlers(r".*", self.additional_tornado_handlers)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate
