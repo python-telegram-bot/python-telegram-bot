@@ -191,7 +191,10 @@ def from_timestamp(unixtime, tzinfo=_UTC):
     if unixtime is None:
         return None
 
-    return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
+    if tzinfo is not None:
+        return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
+    else:
+        return dtm.datetime.utcfromtimestamp(unixtime)
 
 # -------- end --------
 
