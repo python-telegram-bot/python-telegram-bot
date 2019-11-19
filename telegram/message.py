@@ -346,8 +346,8 @@ class Message(TelegramObject):
             else:
                 # this way, we remove the potential minus
                 id_to_link = abs(int(self.chat.id))
-                # we still have to remove the leading 100 if its a basic group
-                if self.chat.type == Chat.GROUP:
+                # we still have to remove the leading 100 if its a super group/channel
+                if self.chat.type != Chat.GROUP:
                     id_to_link = int(str(id_to_link)[3:])
                 to_link = "c/{}".format(id_to_link)
             return "https://t.me/{}/{}".format(to_link, self.message_id)

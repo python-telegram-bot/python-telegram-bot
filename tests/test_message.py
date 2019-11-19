@@ -304,6 +304,7 @@ class TestMessage(object):
         assert message.chat_id == message.chat.id
 
     def test_link(self, message):
+        # with username
         message.chat.username = 'username'
         message.chat.type = Chat.SUPERGROUP
         assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
@@ -311,17 +312,22 @@ class TestMessage(object):
         message.chat.type = Chat.CHANNEL
         assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
                                                            message.message_id)
+        message.chat.type = Chat.PRIVATE
+        assert message.link is None
+        # without username
         message.chat.username = None
+        # the id has to start with a leading - for supergroups/channels
+        message.chat.id = -3
         message.chat.type = Chat.GROUP
-        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
-                                                             message.message_id)
-
+        # - isn't supposed to be there in the link though
+        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
+        # the id has to start with a leading -100 for supergroups/channels
+        message.chat.id = -1003
         message.chat.type = Chat.SUPERGROUP
-        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
-                                                             message.message_id)
+        # -100 isn't supposed to be there in the link though
+        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
         message.chat.type = Chat.CHANNEL
-        assert message.link == 'https://t.me/c/{}/{}'.format(message.chat.id,
-                                                             message.message_id)
+        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
         message.chat.type = Chat.PRIVATE
         assert message.link is None
 
