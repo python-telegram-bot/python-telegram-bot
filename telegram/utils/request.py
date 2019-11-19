@@ -167,7 +167,7 @@ class Request(object):
 
         """
 
-        decoded_s = json_data.decode('utf-8', 'ignore')
+        decoded_s = json_data.decode('utf-8', 'replace')
         try:
             data = json.loads(decoded_s)
         except ValueError:
