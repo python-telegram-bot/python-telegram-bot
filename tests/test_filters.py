@@ -43,9 +43,25 @@ class TestFilters(object):
 
     def test_filters_text(self, update):
         update.message.text = 'test'
-        assert Filters.text(update)
+        assert (Filters.text)(update)
         update.message.text = '/test'
-        assert not Filters.text(update)
+        assert not (Filters.text)(update)
+
+    def test_filters_text_iterable(self, update):
+        update.message.text = 'test'
+        assert Filters.text({'test', 'test1'})(update)
+        assert not Filters.text(['test1', 'test2'])(update)
+
+    def test_filters_caption(self, update):
+        update.message.caption = 'test'
+        assert (Filters.caption)(update)
+        update.message.caption = None
+        assert not (Filters.caption)(update)
+
+    def test_filters_caption_iterable(self, update):
+        update.message.caption = 'test'
+        assert Filters.caption({'test', 'test1'})(update)
+        assert not Filters.caption(['test1', 'test2'])(update)
 
     def test_filters_command(self, update):
         update.message.text = 'test'

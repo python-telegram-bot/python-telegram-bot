@@ -22,7 +22,7 @@ import re
 
 from future.utils import string_types
 
-from telegram import Chat
+from telegram import Chat, Update
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
@@ -236,11 +236,81 @@ class Filters(object):
     class _Text(BaseFilter):
         name = 'Filters.text'
 
+        class _TextIterable(BaseFilter):
+
+            def __init__(self, iterable):
+                self.iterable = iterable
+                self.name = 'Filters.text({})'.format(iterable)
+
+            def filter(self, message):
+                if message.text and not message.text.startswith('/'):
+                    return message.text in self.iterable
+                return False
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                if self.update_filter:
+                    return self.filter(update)
+                else:
+                    return self.filter(update.effective_message)
+            else:
+                return self._TextIterable(update)
+
         def filter(self, message):
             return bool(message.text and not message.text.startswith('/'))
 
     text = _Text()
-    """Text Messages."""
+    """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
+    whose text is appearing in the given iterable.
+
+    Examples:
+        A simple usecase is to allow only messages that were send by a custom
+        :class:`telegram.ReplyKeyboardMarkup`::
+
+            buttons = ['Start', 'Settings', 'Back']
+            markup = ReplyKeyboardMarkup.from_column(buttons)
+            ...
+            MessageHandler(Filters.text(buttons), callback_method)
+
+    Args:
+        update (Iterable[:obj:`str`], optional): Which messages to allow. Only exact matches
+            are allowed. If not specified, will allow any text message.
+    """
+
+    class _Caption(BaseFilter):
+        name = 'Filters.caption'
+
+        class _CaptionIterable(BaseFilter):
+
+            def __init__(self, iterable):
+                self.iterable = iterable
+                self.name = 'Filters.caption({})'.format(iterable)
+
+            def filter(self, message):
+                if message.caption:
+                    return message.caption in self.iterable
+                return False
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                if self.update_filter:
+                    return self.filter(update)
+                else:
+                    return self.filter(update.effective_message)
+            else:
+                return self._CaptionIterable(update)
+
+        def filter(self, message):
+            return bool(message.caption)
+
+    caption = _Caption()
+    """Messages with a caption. If an iterable of strings is passed, it filters messages to only
+    allow those whose caption is appearing in the given iterable.
+
+    Args:
+        update (Iterable[:obj:`str`], optional): Which captions to allow. Only exact matches
+            are allowed. If not specified, will allow any message with a caption.
+    """
 
     class _Command(BaseFilter):
         name = 'Filters.command'
