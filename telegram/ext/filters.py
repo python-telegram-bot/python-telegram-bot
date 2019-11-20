@@ -944,8 +944,10 @@ officedocument.wordprocessingml.document")``-
 
     class _UpdateType(BaseFilter):
         update_filter = True
+        name = 'Filters.update'
 
         class _Message(BaseFilter):
+            name = 'Filters.update.message'
             update_filter = True
 
             def filter(self, update):
@@ -954,6 +956,7 @@ officedocument.wordprocessingml.document")``-
         message = _Message()
 
         class _EditedMessage(BaseFilter):
+            name = 'Filters.update.edited_message'
             update_filter = True
 
             def filter(self, update):
@@ -962,6 +965,7 @@ officedocument.wordprocessingml.document")``-
         edited_message = _EditedMessage()
 
         class _Messages(BaseFilter):
+            name = 'Filters.update.messages'
             update_filter = True
 
             def filter(self, update):
@@ -970,6 +974,7 @@ officedocument.wordprocessingml.document")``-
         messages = _Messages()
 
         class _ChannelPost(BaseFilter):
+            name = 'Filters.update.channel_post'
             update_filter = True
 
             def filter(self, update):
@@ -979,6 +984,7 @@ officedocument.wordprocessingml.document")``-
 
         class _EditedChannelPost(BaseFilter):
             update_filter = True
+            name = 'Filters.update.edited_channel_post'
 
             def filter(self, update):
                 return update.edited_channel_post is not None
@@ -987,6 +993,7 @@ officedocument.wordprocessingml.document")``-
 
         class _ChannelPosts(BaseFilter):
             update_filter = True
+            name = 'Filters.update.channel_posts'
 
             def filter(self, update):
                 return update.channel_post is not None or update.edited_channel_post is not None
