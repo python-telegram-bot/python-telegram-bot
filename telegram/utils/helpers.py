@@ -194,7 +194,7 @@ def from_timestamp(unixtime, tzinfo=_UTC):
     if tzinfo is not None:
         return dtm.datetime.fromtimestamp(unixtime, tz=tzinfo)
     else:
-        return dtm.datetime.utcfromtimestamp(unixtime)
+        return dtm.datetime.fromtimestamp(unixtime, tz=_UTC)
 
 # -------- end --------
 

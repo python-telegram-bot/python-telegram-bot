@@ -26,7 +26,7 @@ from telegram import Update
 from telegram import User
 from telegram.message import Message
 from telegram.utils import helpers
-from telegram.utils.helpers import _UtcOffsetTimezone, _datetime_to_float_timestamp
+from telegram.utils.helpers import _UtcOffsetTimezone, _datetime_to_float_timestamp, _UTC
 
 
 # sample time specification values categorised into absolute / delta / time-of-day
@@ -114,8 +114,8 @@ class TestHelpers(object):
         assert helpers.to_timestamp(None) is None
 
     def test_from_timestamp_naive(self):
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=dtm.timezone.utc)
-        assert helpers.from_timestamp(1573431976) == datetime
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=_UTC)
+        assert helpers.from_timestamp(1573431976, tzinfo=None) == datetime
 
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
