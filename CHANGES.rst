@@ -2,6 +2,16 @@
 Changelog
 =========
 
+Version 12.4.0
+==============
+*Yet to be released*
+
+**Minor changes, CI improvements or bug fixes:**
+
+- Convert `Filters.user` from a message filter to an update filter (`#1634`_). This may lead to some handlers receiving more updates than before.
+
+.. _`#1634`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1634
+
 Version 12.2.0
 ==============
 
