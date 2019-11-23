@@ -77,17 +77,10 @@ class InlineQueryResultArticle(InlineQueryResult):
         self.input_message_content = input_message_content
 
         # Optional
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if url:
-            self.url = url
-        if hide_url:
-            self.hide_url = hide_url
-        if description:
-            self.description = description
-        if thumb_url:
-            self.thumb_url = thumb_url
-        if thumb_width:
-            self.thumb_width = thumb_width
-        if thumb_height:
-            self.thumb_height = thumb_height
+        self.reply_markup = reply_markup
+        self.url = url
+        self.hide_url = hide_url
+        self.description = description
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height
