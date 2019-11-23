@@ -317,7 +317,7 @@ class PrefixHandler(CommandHandler):
             self.command = [command.lower()]
         else:
             self.command = command
-        self.command = [x.lower() + y.lower() for x in self.prefix for y in self.command]
+        self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -334,7 +334,7 @@ class PrefixHandler(CommandHandler):
 
             if message.text:
                 text_list = message.text.split()
-                if text_list[0].lower() not in self.command:
+                if text_list[0].lower() not in self._commands:
                     return None
                 filter_result = self.filters(update)
                 if filter_result:
