@@ -777,7 +777,8 @@ officedocument.wordprocessingml.document")``-
     """Messages sent in a group chat."""
 
     class user(BaseFilter):
-        """Filters messages to allow only those which are from specified user ID.
+        """Filters updates to allow only those which are from specified user ID. Will only work
+        with updates that have an :attr:`telegram.Update.effective_user`.
 
         Examples:
             ``MessageHandler(Filters.user(1234), callback_method)``
@@ -791,6 +792,7 @@ officedocument.wordprocessingml.document")``-
             ValueError: If chat_id and username are both present, or neither is.
 
         """
+        update_filter = True
 
         def __init__(self, user_id=None, username=None):
             if not (bool(user_id) ^ bool(username)):
@@ -806,14 +808,14 @@ officedocument.wordprocessingml.document")``-
             else:
                 self.usernames = [user.replace('@', '') for user in username]
 
-        def filter(self, message):
+        def filter(self, update):
             """"""  # remove method from docs
             if self.user_ids is not None:
-                return bool(message.from_user and message.from_user.id in self.user_ids)
+                return bool(update.effective_user and update.effective_user.id in self.user_ids)
             else:
                 # self.usernames is not None
-                return bool(message.from_user and message.from_user.username
-                            and message.from_user.username in self.usernames)
+                return bool(update.effective_user and update.effective_user.username
+                            and update.effective_user.username in self.usernames)
 
     class chat(BaseFilter):
         """Filters messages to allow only those which are from specified chat ID.
