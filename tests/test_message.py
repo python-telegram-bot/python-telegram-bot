@@ -303,32 +303,30 @@ class TestMessage(object):
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
-    def test_link(self, message):
-        # with username
+    @pytest.mark.parametrize('type', argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_username(self, message, type):
         message.chat.username = 'username'
-        message.chat.type = Chat.SUPERGROUP
+        message.chat.type = type
         assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
                                                            message.message_id)
-        message.chat.type = Chat.CHANNEL
-        assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
-                                                           message.message_id)
-        message.chat.type = Chat.PRIVATE
-        assert message.link is None
-        # without username
+
+    @pytest.mark.parametrize('type, id', argvalues=[
+        (Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003), (Chat.GROUP, -3)
+    ])
+    def test_link_with_id(self, message, type, id):
         message.chat.username = None
-        # the id has to start with a leading - for supergroups/channels
-        message.chat.id = -3
-        message.chat.type = Chat.GROUP
-        # - isn't supposed to be there in the link though
+        message.chat.id = id
+        message.chat.type = type
+        # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
-        # the id has to start with a leading -100 for supergroups/channels
-        message.chat.id = -1003
-        message.chat.type = Chat.SUPERGROUP
-        # -100 isn't supposed to be there in the link though
-        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
-        message.chat.type = Chat.CHANNEL
-        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
+
+    @pytest.mark.parametrize('id, username', argvalues=[
+        (None, 'username'), (-3, None)
+    ])
+    def test_link_private_chats(self, message, id, username):
         message.chat.type = Chat.PRIVATE
+        message.chat.id = id
+        message.chat.username = username
         assert message.link is None
 
     def test_effective_attachment(self, message_params):
