@@ -311,7 +311,7 @@ class Filters(object):
     allow those whose caption is appearing in the given iterable.
 
     Examples:
-        ``MessageHandler(Filters.user(1234), callback_method)``
+        ``MessageHandler(Filters.caption, callback_method)``
 
     Args:
         update (Iterable[:obj:`str`], optional): Which captions to allow. Only exact matches
