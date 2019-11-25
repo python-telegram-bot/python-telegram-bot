@@ -264,8 +264,11 @@ class Filters(object):
     whose text is appearing in the given iterable.
 
     Examples:
-        A simple usecase is to allow only messages that were send by a custom
-        :class:`telegram.ReplyKeyboardMarkup`::
+        To allow any text message, simply use
+        ``MessageHandler(Filters.text, callback_method)``.
+
+        A simple usecase for passing an iterable is to allow only messages that were send by a
+        custom :class:`telegram.ReplyKeyboardMarkup`::
 
             buttons = ['Start', 'Settings', 'Back']
             markup = ReplyKeyboardMarkup.from_column(buttons)
@@ -306,6 +309,9 @@ class Filters(object):
     caption = _Caption()
     """Messages with a caption. If an iterable of strings is passed, it filters messages to only
     allow those whose caption is appearing in the given iterable.
+
+    Examples:
+        ``MessageHandler(Filters.user(1234), callback_method)``
 
     Args:
         update (Iterable[:obj:`str`], optional): Which captions to allow. Only exact matches
