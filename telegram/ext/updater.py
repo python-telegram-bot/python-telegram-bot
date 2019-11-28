@@ -288,9 +288,14 @@ class Updater(object):
         self.logger.debug('Bootstrap done')
 
         def polling_action_cb():
-            updates = self.bot.get_updates(
-                self.last_update_id, timeout=timeout, read_latency=read_latency,
-                allowed_updates=allowed_updates)
+            try:
+                updates = self.bot.get_updates(
+                    self.last_update_id, timeout=timeout, read_latency=read_latency,
+                    allowed_updates=allowed_updates)
+            except TelegramError as te:
+                self.logger.warning('Trying to skip a malformed update which caused %s', te)
+                updates = list()
+                self.last_update_id += 1
 
             if updates:
                 if not self.running:
