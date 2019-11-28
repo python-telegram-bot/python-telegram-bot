@@ -42,6 +42,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `JASON0916 <https://github.com/JASON0916>`_
 - `jeffffc <https://github.com/jeffffc>`_
 - `Jelle Besseling <https://github.com/pingiun>`_
+- `Jerry Xiao <https://github.com/isjerryxiao>`_
 - `jh0ker <https://github.com/jh0ker>`_
 - `jlmadurga <https://github.com/jlmadurga>`_
 - `John Yong <https://github.com/whipermr5>`_
