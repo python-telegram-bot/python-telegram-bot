@@ -77,9 +77,10 @@ class File(TelegramObject):
     def download(self, custom_path=None, out=None, timeout=None):
         """
         Download this file. By default, the file is saved in the current working directory with its
-        original filename as reported by Telegram. If a :attr:`custom_path` is supplied, it will be
-        saved to that path instead. If :attr:`out` is defined, the file contents will be saved to
-        that object using the ``out.write`` method.
+        original filename as reported by Telegram. If the file has no filename, it the file ID will
+        be used as filename. If a :attr:`custom_path` is supplied, it will be saved to that path
+        instead. If :attr:`out` is defined, the file contents will be saved to that object using
+        the ``out.write`` method.
 
         Note:
             :attr:`custom_path` and :attr:`out` are mutually exclusive.
