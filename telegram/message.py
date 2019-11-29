@@ -344,11 +344,12 @@ class Message(TelegramObject):
             if self.chat.username:
                 to_link = self.chat.username
             else:
-                # this way, we remove the potential minus
-                id_to_link = abs(int(self.chat.id))
-                # we still have to remove the leading 100 if its a super group/channel
                 if self.chat.type != Chat.GROUP:
-                    id_to_link = int(str(id_to_link)[3:])
+                    # Get rid of leading -100 for supergroups
+                    id_to_link = str(self.chat.id)[4:]
+                else:
+                    # Get rid of leading minus for regular groups
+                    id_to_link = str(self.chat.id)[1:]
                 to_link = "c/{}".format(id_to_link)
             return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
