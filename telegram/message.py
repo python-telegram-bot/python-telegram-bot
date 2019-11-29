@@ -338,10 +338,20 @@ class Message(TelegramObject):
 
     @property
     def link(self):
-        """:obj:`str`: Convenience property. If the chat of the message is a supergroup or a
-        channel and has a :attr:`Chat.username`, returns a t.me link of the message."""
-        if self.chat.type in (Chat.SUPERGROUP, Chat.CHANNEL) and self.chat.username:
-            return "https://t.me/{}/{}".format(self.chat.username, self.message_id)
+        """:obj:`str`: Convenience property. If the chat of the message is not
+        a private chat, returns a t.me link of the message."""
+        if self.chat.type != Chat.PRIVATE:
+            if self.chat.username:
+                to_link = self.chat.username
+            else:
+                if self.chat.type != Chat.GROUP:
+                    # Get rid of leading -100 for supergroups
+                    id_to_link = str(self.chat.id)[4:]
+                else:
+                    # Get rid of leading minus for regular groups
+                    id_to_link = str(self.chat.id)[1:]
+                to_link = "c/{}".format(id_to_link)
+            return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
     @classmethod
