@@ -483,6 +483,9 @@ class Message(TelegramObject):
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
 
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
         """
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
@@ -500,6 +503,9 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
         """
 
         kwargs['parse_mode'] = ParseMode.MARKDOWN
@@ -520,6 +526,9 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
         """
 
         kwargs['parse_mode'] = ParseMode.HTML
