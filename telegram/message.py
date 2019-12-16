@@ -482,7 +482,7 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
-        
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
 
@@ -503,7 +503,7 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
-        
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
@@ -526,7 +526,7 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
-        
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
