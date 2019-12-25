@@ -599,6 +599,11 @@ class TestFilters(object):
         update.message.passport_data = 'test'
         assert Filters.passport_data(update)
 
+    def test_filters_poll(self, update):
+        assert not Filters.poll(update)
+        update.message.poll = 'test'
+        assert Filters.poll(update)
+
     def test_language_filter_single(self, update):
         update.message.from_user.language_code = 'en_US'
         assert (Filters.language('en_US'))(update)
