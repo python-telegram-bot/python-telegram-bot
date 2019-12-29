@@ -62,6 +62,7 @@ class Updater(object):
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
         base_url (:obj:`str`, optional): Base_url for the bot.
+        base_file_url (:obj:`str`, optional): Base_file_url for the bot.
         workers (:obj:`int`, optional): Amount of threads in the thread pool for functions
             decorated with ``@run_async``.
         bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance. If a pre-initialized
@@ -95,6 +96,7 @@ class Updater(object):
     def __init__(self,
                  token=None,
                  base_url=None,
+                 base_file_url=None,
                  workers=4,
                  bot=None,
                  private_key=None,
@@ -133,7 +135,7 @@ class Updater(object):
             if 'con_pool_size' not in request_kwargs:
                 request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
-            self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
+            self.bot = Bot(token, base_url, base_file_url, request=self._request, private_key=private_key,
                            private_key_password=private_key_password)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
