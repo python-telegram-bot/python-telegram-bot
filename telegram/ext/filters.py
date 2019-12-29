@@ -243,7 +243,7 @@ class Filters(object):
                 self.name = 'Filters.text({})'.format(iterable)
 
             def filter(self, message):
-                if message.text and not message.text.startswith('/'):
+                if message.text:
                     return message.text in self.iterable
                 return False
 
@@ -257,7 +257,7 @@ class Filters(object):
                 return self._TextIterable(update)
 
         def filter(self, message):
-            return bool(message.text and not message.text.startswith('/'))
+            return bool(message.text)
 
     text = _Text()
     """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
