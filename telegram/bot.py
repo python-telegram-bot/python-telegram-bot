@@ -1073,8 +1073,9 @@ class Bot(TelegramObject):
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -1082,9 +1083,8 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1704,21 +1704,21 @@ class Bot(TelegramObject):
         bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername)
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             text (:obj:`str`): New text of the message.
-            parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
-                italic, fixed-width text or inline URLs in your bot's message. See the constants in
-                :class:`telegram.ParseMode` for the available modes.
+            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
+                show bold, italic, fixed-width text or inline URLs in your bot's message. See the
+                constants in :class:`telegram.ParseMode` for the available modes.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1764,8 +1764,9 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername)
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -1774,9 +1775,8 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1829,17 +1829,17 @@ class Bot(TelegramObject):
         returned.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`, optional): Unique identifier for the target chat or
-                username of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1877,15 +1877,15 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
