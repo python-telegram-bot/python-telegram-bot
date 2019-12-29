@@ -135,7 +135,8 @@ class Updater(object):
             if 'con_pool_size' not in request_kwargs:
                 request_kwargs['con_pool_size'] = con_pool_size
             self._request = Request(**request_kwargs)
-            self.bot = Bot(token, base_url, base_file_url, request=self._request, private_key=private_key,
+            self.bot = Bot(token, base_url=base_url, base_file_url=base_file_url,
+                           request=self._request, private_key=private_key,
                            private_key_password=private_key_password)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
