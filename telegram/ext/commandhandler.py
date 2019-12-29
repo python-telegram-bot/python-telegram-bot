@@ -140,8 +140,8 @@ class CommandHandler(Handler):
             if not re.match(r'^[\da-z_]{1,32}$', comm):
                 raise ValueError('Command is not a valid bot command')
 
-        if filters:
-            self.filters = Filters.update.messages & filters
+        if self.filters:
+            self.filters = Filters.update.messages & self.filters
         else:
             self.filters = Filters.update.messages
 

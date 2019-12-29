@@ -83,10 +83,13 @@ class BaseFilter(object):
     data_filter = False
 
     def __call__(self, update):
-        if self.update_filter:
-            return self.filter(update)
-        else:
-            return self.filter(update.effective_message)
+        try:
+            if self.update_filter:
+                return self.filter(update)
+            else:
+                return self.filter(update.effective_message)
+        except AttributeError:
+            return False
 
     def __and__(self, other):
         return MergedFilter(self, and_filter=other)
@@ -357,6 +360,7 @@ class Filters(object):
         """
 
         data_filter = True
+        update_filter = True
 
         def __init__(self, pattern):
             if isinstance(pattern, string_types):
@@ -364,12 +368,23 @@ class Filters(object):
             self.pattern = pattern
             self.name = 'Filters.regex({})'.format(self.pattern)
 
-        def filter(self, message):
+        def filter(self, update):
             """"""  # remove method from docs
-            if message.text:
-                match = self.pattern.search(message.text)
+            if update.message and update.message.text:
+                text = update.message.text
+            elif update.callback_query and update.callback_query.data:
+                text = update.callback_query.data
+            elif update.inline_query and update.inline_query.data:
+                text = update.inline_query.data
+            elif update.poll and update.poll.question:
+                text = update.poll.question
+
+            if text:
+                match = self.pattern.search(text)
                 if match:
                     return {'matches': [match]}
+                return {}
+            else:
                 return {}
 
     class _Reply(BaseFilter):

@@ -164,8 +164,7 @@ class MessageHandler(Handler):
             :obj:`bool`
 
         """
-        if isinstance(update, Update) and update.effective_message:
-            return self.filters(update)
+        return isinstance(update, Update) and update.effective_message
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         if isinstance(check_result, dict):

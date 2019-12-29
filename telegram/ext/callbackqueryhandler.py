@@ -104,13 +104,15 @@ class CallbackQueryHandler(Handler):
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 filters=None):
         super(CallbackQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            filters=filters)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)

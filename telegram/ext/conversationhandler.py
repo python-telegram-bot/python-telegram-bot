@@ -163,11 +163,13 @@ class ConversationHandler(Handler):
                  conversation_timeout=None,
                  name=None,
                  persistent=False,
-                 map_to_parent=None):
+                 map_to_parent=None,
+                 filters=None):
 
         self.entry_points = entry_points
         self.states = states
         self.fallbacks = fallbacks
+        self.filters = filters
 
         self.allow_reentry = allow_reentry
         self.per_user = per_user
@@ -289,7 +291,7 @@ class ConversationHandler(Handler):
             else:
                 handlers = self.states.get(self.WAITING, [])
                 for handler in handlers:
-                    check = handler.check_update(update)
+                    check = handler.check_update_filters(update)
                     if check is not None and check is not False:
                         return key, handler, check
                 return None
@@ -301,7 +303,7 @@ class ConversationHandler(Handler):
         # Search entry points for a match
         if state is None or self.allow_reentry:
             for entry_point in self.entry_points:
-                check = entry_point.check_update(update)
+                check = entry_point.check_update_filters(update)
                 if check is not None and check is not False:
                     handler = entry_point
                     break
@@ -315,7 +317,7 @@ class ConversationHandler(Handler):
             handlers = self.states.get(state)
 
             for candidate in (handlers or []):
-                check = candidate.check_update(update)
+                check = candidate.check_update_filters(update)
                 if check is not None and check is not False:
                     handler = candidate
                     break
@@ -323,7 +325,7 @@ class ConversationHandler(Handler):
             # Find a fallback handler if all other handlers fail
             else:
                 for fallback in self.fallbacks:
-                    check = fallback.check_update(update)
+                    check = fallback.check_update_filters(update)
                     if check is not None and check is not False:
                         handler = fallback
                         break
@@ -407,7 +409,7 @@ class ConversationHandler(Handler):
 
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
-            check = handler.check_update(context.update)
+            check = handler.check_update_filters(context.update)
             if check is not None and check is not False:
                 handler.handle_update(context.update, context.dispatcher, check)
         self.update_state(self.END, context.conversation_key)

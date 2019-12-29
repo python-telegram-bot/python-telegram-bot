@@ -32,6 +32,8 @@ class Handler(object):
             the callback function.
         pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
             the callback function.
+        filters (:obj:`Filter`): Only allow updates with these Filters. See
+            :mod:`telegram.ext.filters` for a full list of all available filters.
 
     Note:
         :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
@@ -67,6 +69,14 @@ class Handler(object):
         pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``chat_data`` will be passed to the callback function. Default is ``False``.
             DEPRECATED: Please switch to context based callbacks.
+        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
+            :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
+            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            operators (& for and, | for or, ~ for not). Default is
+            :attr:`telegram.ext.filters.Filters.update`. This defaults to all message_type updates
+            being: ``message``, ``edited_message``, ``channel_post`` and ``edited_channel_post``.
+            If you don't want or need any of those pass ``~Filters.update.*`` in the filter
+            argument.
 
     """
 
@@ -75,17 +85,20 @@ class Handler(object):
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 filters=None):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self.filters = filters
 
     def check_update(self, update):
         """
         This method is called to determine if an update should be handled by
-        this handler instance. It should always be overridden.
+        this handler instance *not taking in account :attr:`filters`*. It should always be
+        overridden.
 
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
@@ -97,6 +110,31 @@ class Handler(object):
 
         """
         raise NotImplementedError
+
+    def check_update_filters(self, update):
+        """
+        This method is called to determine if an update should be handled by
+        this handler instance *while also taking in account :attr:`filters`*. It builds upon
+        :attr:`check_update`.
+
+        Args:
+            update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
+
+        Returns:
+            Either ``None`` or ``False`` if the update should not be handled. Otherwise an object
+            that will be passed to :attr:`handle_update` and :attr:`collect_additional_context`
+            when the update gets handled.
+
+        """
+        if self.filters:
+            print('checking filters')
+            if self.filters(update):
+                print('checking handler')
+                return self.check_update(update)
+            else:
+                return False
+        else:
+            return self.check_update(update)
 
     def handle_update(self, update, dispatcher, check_result, context=None):
         """

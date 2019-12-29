@@ -365,7 +365,7 @@ class Dispatcher(object):
         for group in self.groups:
             try:
                 for handler in self.handlers[group]:
-                    check = handler.check_update(update)
+                    check = handler.check_update_filters(update)
                     if check is not None and check is not False:
                         if not context and self.use_context:
                             context = CallbackContext.from_update(update, self)

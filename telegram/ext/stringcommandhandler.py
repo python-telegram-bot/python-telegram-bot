@@ -72,11 +72,13 @@ class StringCommandHandler(Handler):
                  callback,
                  pass_args=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_job_queue=False,
+                 filters=None):
         super(StringCommandHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue)
+            pass_job_queue=pass_job_queue,
+            filters=filters)
         self.command = command
         self.pass_args = pass_args
 

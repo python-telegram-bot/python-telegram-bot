@@ -64,11 +64,13 @@ class TypeHandler(Handler):
                  callback,
                  strict=False,
                  pass_update_queue=False,
-                 pass_job_queue=False):
+                 pass_job_queue=False,
+                 filters=None):
         super(TypeHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue)
+            pass_job_queue=pass_job_queue,
+            filters=filters)
         self.type = type
         self.strict = strict
 
