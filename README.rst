@@ -108,7 +108,7 @@ You can install or upgrade python-telegram-bot with:
 
 .. code:: shell
 
-    $ pip install python-telegram-bot --upgrade
+    $ pip3 install python-telegram-bot --upgrade
 
 Or you can install from source with:
 
@@ -116,7 +116,7 @@ Or you can install from source with:
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot --recursive
     $ cd python-telegram-bot
-    $ python setup.py install
+    $ python3 setup.py install
     
 In case you have a previously cloned local repository already, you should initialize the added urllib3 submodule before installing with:
 
