@@ -377,7 +377,7 @@ class Job(object):
             Only optional for backward compatibility with ``JobQueue.put()``.
         tzinfo (:obj:`datetime.tzinfo`, optional): timezone associated to this job. Used when
             checking the day of the week to determine whether a job should run (only relevant when
-            ``days is not Days.EVERY_DAY``); also used when :attr:`next_t` is retrieved. 
+            ``days is not Days.EVERY_DAY``); also used when :attr:`next_t` is retrieved.
             Defaults to UTC.
     """
 
@@ -482,7 +482,6 @@ class Job(object):
 
         """
         return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
-
 
     @property
     def repeat(self):
