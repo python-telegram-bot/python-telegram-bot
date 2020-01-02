@@ -485,7 +485,7 @@ class Job(object):
 
     @next_t.setter
     def next_t(self, next_t):
-        self._next_t = next_t 
+        self._next_t = next_t
 
     @property
     def repeat(self):

@@ -334,7 +334,7 @@ class TestJobQueue(object):
 
         job1 = job_queue.run_once(self.job_run_once, 0.05, name='run_once job')
         job2 = job_queue.run_once(self.job_run_once, 0.05, name='canceled run_once job')
-        job3 = job_queue.run_repeating(self.job_run_once, 0.02, name='repeatable job')
+        job_queue.run_repeating(self.job_run_once, 0.02, name='repeatable job')
 
         sleep(0.03)
         job2.schedule_removal()
@@ -344,11 +344,11 @@ class TestJobQueue(object):
                 t = dtm.datetime.fromtimestamp(t, job.tzinfo)
 
                 if job.removed:
-                    assert job.next_t == None
+                    assert job.next_t is None
                 else:
                     assert job.next_t == t
 
         sleep(0.03)
 
-        assert job1.next_t == None
-        assert job2.next_t == None
+        assert job1.next_t is None
+        assert job2.next_t is None
