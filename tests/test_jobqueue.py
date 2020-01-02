@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 import datetime as dtm
 import os
 import sys
@@ -325,3 +326,29 @@ class TestJobQueue(object):
         sleep(0.03)
 
         assert self.result == 0
+
+    def test_job_next_t_property(self, job_queue):
+        # Testing:
+        # - next_t values match values from self._queue.queue (for run_once and run_repeating jobs)
+        # - next_t equals None if job is removed or if it's already ran
+
+        job1 = job_queue.run_once(self.job_run_once, 0.05, name='run_once job')
+        job2 = job_queue.run_once(self.job_run_once, 0.05, name='canceled run_once job')
+        job3 = job_queue.run_repeating(self.job_run_once, 0.02, name='repeatable job')
+
+        sleep(0.03)
+        job2.schedule_removal()
+
+        with job_queue._queue.mutex:
+            for t, job in job_queue._queue.queue:
+                t = dtm.datetime.fromtimestamp(t, job.tzinfo)
+
+                if job.removed:
+                    assert job.next_t == None
+                else:
+                    assert job.next_t == t
+
+        sleep(0.03)
+
+        assert job1.next_t == None
+        assert job2.next_t == None

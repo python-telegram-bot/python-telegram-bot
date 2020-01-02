@@ -103,7 +103,7 @@ class JobQueue(object):
         # enqueue:
         self.logger.debug('Putting job %s with t=%f', job.name, time_spec)
         self._queue.put((next_t, job))
-        job._next_t = next_t
+        job.next_t = next_t
 
         # Wake up the loop if this job should be executed next
         self._set_next_peek(next_t)
@@ -289,6 +289,7 @@ class JobQueue(object):
             if job.repeat and not job.removed:
                 self._put(job, previous_t=t)
             else:
+                job.next_t = None
                 self.logger.debug('Dropping non-repeating or removed job %s', job.name)
 
     def start(self):
@@ -377,8 +378,7 @@ class Job(object):
             Only optional for backward compatibility with ``JobQueue.put()``.
         tzinfo (:obj:`datetime.tzinfo`, optional): timezone associated to this job. Used when
             checking the day of the week to determine whether a job should run (only relevant when
-            ``days is not Days.EVERY_DAY``); also used when :attr:`next_t` is retrieved.
-            Defaults to UTC.
+            ``days is not Days.EVERY_DAY``). Defaults to UTC.
     """
 
     def __init__(self,
@@ -478,10 +478,14 @@ class Job(object):
         """
         ::obj:`datetime.datetime`: Datetime for the next job execution.
             Datetime is localized according to :attr:`tzinfo`.
-            If job is removed it equals to ``None``.
+            If job is removed or already ran it equals to ``None``.
 
         """
         return datetime.datetime.fromtimestamp(self._next_t, self.tzinfo) if self._next_t else None
+
+    @next_t.setter
+    def next_t(self, next_t):
+        self._next_t = next_t 
 
     @property
     def repeat(self):
