@@ -80,15 +80,9 @@ class InlineQueryResultLocation(InlineQueryResult):
         self.title = title
 
         # Optionals
-        if live_period:
-            self.live_period = live_period
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
-        if thumb_url:
-            self.thumb_url = thumb_url
-        if thumb_width:
-            self.thumb_width = thumb_width
-        if thumb_height:
-            self.thumb_height = thumb_height
+        self.live_period = live_period
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height

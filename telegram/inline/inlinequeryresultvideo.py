@@ -94,19 +94,11 @@ class InlineQueryResultVideo(InlineQueryResult):
         self.title = title
 
         # Optional
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if video_width:
-            self.video_width = video_width
-        if video_height:
-            self.video_height = video_height
-        if video_duration:
-            self.video_duration = video_duration
-        if description:
-            self.description = description
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.video_width = video_width
+        self.video_height = video_height
+        self.video_duration = video_duration
+        self.description = description
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

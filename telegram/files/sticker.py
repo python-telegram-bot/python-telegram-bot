@@ -28,6 +28,7 @@ class Sticker(TelegramObject):
         file_id (:obj:`str`): Unique identifier for this file.
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
+        is_animated (:obj:`bool`): True, if the sticker is animated.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
             format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
@@ -41,6 +42,7 @@ class Sticker(TelegramObject):
         file_id (:obj:`str`): Unique identifier for this file.
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
+        is_animated (:obj:`bool`): True, if the sticker is animated.
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .webp or .jpg
             format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
@@ -58,6 +60,7 @@ class Sticker(TelegramObject):
                  file_id,
                  width,
                  height,
+                 is_animated,
                  thumb=None,
                  emoji=None,
                  file_size=None,
@@ -69,6 +72,7 @@ class Sticker(TelegramObject):
         self.file_id = str(file_id)
         self.width = int(width)
         self.height = int(height)
+        self.is_animated = is_animated
         # Optionals
         self.thumb = thumb
         self.emoji = emoji
@@ -123,20 +127,23 @@ class StickerSet(TelegramObject):
     Attributes:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
+        is_animated (:obj:`bool`): True, if the sticker set contains animated stickers.
         contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
 
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
+        is_animated (:obj:`bool`): True, if the sticker set contains animated stickers.
         contains_masks (:obj:`bool`): True, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
 
     """
 
-    def __init__(self, name, title, contains_masks, stickers, bot=None, **kwargs):
+    def __init__(self, name, title, is_animated, contains_masks, stickers, bot=None, **kwargs):
         self.name = name
         self.title = title
+        self.is_animated = is_animated
         self.contains_masks = contains_masks
         self.stickers = stickers
 

@@ -338,10 +338,20 @@ class Message(TelegramObject):
 
     @property
     def link(self):
-        """:obj:`str`: Convenience property. If the chat of the message is a supergroup or a
-        channel and has a :attr:`Chat.username`, returns a t.me link of the message."""
-        if self.chat.type in (Chat.SUPERGROUP, Chat.CHANNEL) and self.chat.username:
-            return "https://t.me/{}/{}".format(self.chat.username, self.message_id)
+        """:obj:`str`: Convenience property. If the chat of the message is not
+        a private chat, returns a t.me link of the message."""
+        if self.chat.type != Chat.PRIVATE:
+            if self.chat.username:
+                to_link = self.chat.username
+            else:
+                if self.chat.type != Chat.GROUP:
+                    # Get rid of leading -100 for supergroups
+                    id_to_link = str(self.chat.id)[4:]
+                else:
+                    # Get rid of leading minus for regular groups
+                    id_to_link = str(self.chat.id)[1:]
+                to_link = "c/{}".format(id_to_link)
+            return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
     @classmethod
@@ -473,6 +483,9 @@ class Message(TelegramObject):
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
 
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
         """
         self._quote(kwargs)
         return self.bot.send_message(self.chat_id, *args, **kwargs)
@@ -490,6 +503,9 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
         """
 
         kwargs['parse_mode'] = ParseMode.MARKDOWN
@@ -510,6 +526,9 @@ class Message(TelegramObject):
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: ``True`` in group chats and ``False`` in
                 private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
         """
 
         kwargs['parse_mode'] = ParseMode.HTML
@@ -742,13 +761,14 @@ class Message(TelegramObject):
         self._quote(kwargs)
         return self.bot.send_poll(self.chat_id, *args, **kwargs)
 
-    def forward(self, chat_id, disable_notification=False):
+    def forward(self, chat_id, *args, **kwargs):
         """Shortcut for::
 
             bot.forward_message(chat_id=chat_id,
                                 from_chat_id=update.message.chat_id,
-                                disable_notification=disable_notification,
-                                message_id=update.message.message_id)
+                                message_id=update.message.message_id,
+                                *args,
+                                **kwargs)
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message forwarded.
@@ -757,8 +777,9 @@ class Message(TelegramObject):
         return self.bot.forward_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
-            disable_notification=disable_notification,
-            message_id=self.message_id)
+            message_id=self.message_id,
+            *args,
+            **kwargs)
 
     def edit_text(self, *args, **kwargs):
         """Shortcut for::
@@ -865,7 +886,7 @@ class Message(TelegramObject):
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-            be an entity that belongs to this message.
+                be an entity that belongs to this message.
 
         Returns:
             :obj:`str`: The text of the given entity
@@ -890,7 +911,7 @@ class Message(TelegramObject):
 
         Args:
             entity (:class:`telegram.MessageEntity`): The entity to extract the text from. It must
-            be an entity that belongs to this message.
+                be an entity that belongs to this message.
 
         Returns:
             :obj:`str`: The text of the given entity

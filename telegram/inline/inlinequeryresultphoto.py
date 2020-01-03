@@ -86,19 +86,11 @@ class InlineQueryResultPhoto(InlineQueryResult):
         self.thumb_url = thumb_url
 
         # Optionals
-        if photo_width:
-            self.photo_width = int(photo_width)
-        if photo_height:
-            self.photo_height = int(photo_height)
-        if title:
-            self.title = title
-        if description:
-            self.description = description
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.photo_width = int(photo_width)if photo_width is not None else None
+        self.photo_height = int(photo_height) if photo_height is not None else None
+        self.title = title
+        self.description = description
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

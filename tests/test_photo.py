@@ -317,7 +317,7 @@ class TestPhoto(object):
         b = PhotoSize(photo.file_id, self.width, self.height)
         c = PhotoSize(photo.file_id, 0, 0)
         d = PhotoSize('', self.width, self.height)
-        e = Sticker(photo.file_id, self.width, self.height)
+        e = Sticker(photo.file_id, self.width, self.height, False)
 
         assert a == b
         assert hash(a) == hash(b)

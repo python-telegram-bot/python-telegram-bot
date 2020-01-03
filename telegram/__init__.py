@@ -23,6 +23,7 @@ from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatmember import ChatMember
+from .chatpermissions import ChatPermissions
 from .files.photosize import PhotoSize
 from .files.audio import Audio
 from .files.voice import Voice
@@ -125,8 +126,8 @@ from .version import __version__  # noqa: F401
 __author__ = 'devs@python-telegram-bot.org'
 
 __all__ = [
-    'Audio', 'Bot', 'Chat', 'ChatMember', 'ChatAction', 'ChosenInlineResult', 'CallbackQuery',
-    'Contact', 'Document', 'File', 'ForceReply', 'InlineKeyboardButton',
+    'Audio', 'Bot', 'Chat', 'ChatMember', 'ChatPermissions', 'ChatAction', 'ChosenInlineResult',
+    'CallbackQuery', 'Contact', 'Document', 'File', 'ForceReply', 'InlineKeyboardButton',
     'InlineKeyboardMarkup', 'InlineQuery', 'InlineQueryResult', 'InlineQueryResult',
     'InlineQueryResultArticle', 'InlineQueryResultAudio', 'InlineQueryResultCachedAudio',
     'InlineQueryResultCachedDocument', 'InlineQueryResultCachedGif',
