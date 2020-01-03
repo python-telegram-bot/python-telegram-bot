@@ -29,7 +29,7 @@ from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import _UtcOffsetTimezone
+from telegram.utils.helpers import _UtcOffsetTimezone, _UTC
 
 
 @pytest.fixture(scope='function')
@@ -359,7 +359,7 @@ class TestJobQueue(object):
         assert job1.next_t is None
         assert job2.next_t is None
 
-        t = dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=12)))
+        t = dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=12)))
         job1.next_t = t
-        job1.tzinfo = dtm.timezone.utc
+        job1.tzinfo = _UTC
         assert job1.next_t == t.replace(tzinfo=job.tzinfo)
