@@ -28,7 +28,7 @@ class ChatMember(TelegramObject):
     Attributes:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat.
-        custom_title (:obj:`str`): Optionl. Custom title for owner and administrators.
+        custom_title (:obj:`str`): Optional. Custom title for owner and administrators.
         until_date (:class:`datetime.datetime`): Optional. Date when restrictions will be lifted
             for this user.
         can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
