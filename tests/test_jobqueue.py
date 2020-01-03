@@ -294,17 +294,20 @@ class TestJobQueue(object):
         with pytest.raises(ValueError, match='can not be'):
             j.interval = None
         j.repeat = False
-        with pytest.raises(ValueError, match='must be of type'):
+        with pytest.raises(TypeError, match='must be of type'):
             j.interval = 'every 3 minutes'
         j.interval = 15
         assert j.interval_seconds == 15
 
-        with pytest.raises(ValueError, match='argument should be of type'):
+        with pytest.raises(TypeError, match='argument should be of type'):
             j.days = 'every day'
-        with pytest.raises(ValueError, match='The elements of the'):
+        with pytest.raises(TypeError, match='The elements of the'):
             j.days = ('mon', 'wed')
         with pytest.raises(ValueError, match='from 0 up to and'):
             j.days = (0, 6, 12, 14)
+
+        with pytest.raises(TypeError, match='argument should be one of the'):
+            j.next_t = 'tomorrow'
 
     def test_get_jobs(self, job_queue):
         job1 = job_queue.run_once(self.job_run_once, 10, name='name1')
@@ -337,7 +340,7 @@ class TestJobQueue(object):
         job2 = job_queue.run_once(self.job_run_once, 0.06, name='canceled run_once job')
         job_queue.run_repeating(self.job_run_once, 0.04, name='repeatable job')
 
-        sleep(0.045)
+        sleep(0.05)
         job2.schedule_removal()
 
         with job_queue._queue.mutex:

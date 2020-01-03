@@ -459,8 +459,8 @@ class Job(object):
             raise ValueError("The 'interval' can not be 'None' when 'repeat' is set to 'True'")
 
         if not (interval is None or isinstance(interval, (Number, datetime.timedelta))):
-            raise ValueError("The 'interval' must be of type 'datetime.timedelta',"
-                             " 'int' or 'float'")
+            raise TypeError("The 'interval' must be of type 'datetime.timedelta',"
+                            " 'int' or 'float'")
 
         self._interval = interval
 
@@ -489,9 +489,9 @@ class Job(object):
             # Set timezone to UTC in case datetime is in local timezone.
             next_t = next_t.replace(tzinfo=datetime.timezone.utc)
             next_t = to_float_timestamp(next_t)
-        elif not (isinstance(next_t, float) or next_t is None):
-            raise TypeError("The 'next_t' argument should be of type 'float' "
-                            "or 'datetime.datetime' or 'NoneType'")
+        elif not (isinstance(next_t, Number) or next_t is None):
+            raise TypeError("The 'next_t' argument should be one of the following types: "
+                            "'float', 'int', 'datetime.datetime' or 'NoneType'")
 
         self._next_t = next_t
 
