@@ -48,7 +48,7 @@ def set_timer(update, context):
         # args[0] should contain the time for the timer in seconds
         due = int(context.args[0])
         if due < 0:
-            update.message.reply_text('Sorry we can not go back to future!')
+            update.message.reply_text('Sorry we can not go back to the past!')
             return
 
         # Add job to queue and stop current one if there is a timer already
