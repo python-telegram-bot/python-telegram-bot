@@ -331,12 +331,13 @@ class TestJobQueue(object):
         # Testing:
         # - next_t values match values from self._queue.queue (for run_once and run_repeating jobs)
         # - next_t equals None if job is removed or if it's already ran
+        # - next_t setter for 'datetime.datetime' values
 
-        job1 = job_queue.run_once(self.job_run_once, 0.05, name='run_once job')
-        job2 = job_queue.run_once(self.job_run_once, 0.05, name='canceled run_once job')
-        job_queue.run_repeating(self.job_run_once, 0.02, name='repeatable job')
+        job1 = job_queue.run_once(self.job_run_once, 0.06, name='run_once job')
+        job2 = job_queue.run_once(self.job_run_once, 0.06, name='canceled run_once job')
+        job_queue.run_repeating(self.job_run_once, 0.04, name='repeatable job')
 
-        sleep(0.03)
+        sleep(0.045)
         job2.schedule_removal()
 
         with job_queue._queue.mutex:
@@ -348,7 +349,14 @@ class TestJobQueue(object):
                 else:
                     assert job.next_t == t
 
-        sleep(0.03)
+        assert self.result == 1
+        sleep(0.02)
 
+        assert self.result == 2
         assert job1.next_t is None
         assert job2.next_t is None
+
+        t = dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=12)))
+        job1.next_t = t
+        job1.tzinfo = dtm.timezone.utc
+        assert job1.next_t == t.replace(tzinfo=job.tzinfo)

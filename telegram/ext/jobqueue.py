@@ -485,6 +485,14 @@ class Job(object):
 
     @next_t.setter
     def next_t(self, next_t):
+        if isinstance(next_t, datetime.datetime):
+            # Set timezone to UTC in case datetime is in local timezone.
+            next_t = next_t.replace(tzinfo=datetime.timezone.utc)
+            next_t = to_float_timestamp(next_t)
+        elif not (isinstance(next_t, float) or next_t is None):
+            raise TypeError("The 'next_t' argument should be of type 'float' "
+                            "or 'datetime.datetime' or 'NoneType'")
+
         self._next_t = next_t
 
     @property
@@ -506,10 +514,10 @@ class Job(object):
     @days.setter
     def days(self, days):
         if not isinstance(days, tuple):
-            raise ValueError("The 'days' argument should be of type 'tuple'")
+            raise TypeError("The 'days' argument should be of type 'tuple'")
 
         if not all(isinstance(day, int) for day in days):
-            raise ValueError("The elements of the 'days' argument should be of type 'int'")
+            raise TypeError("The elements of the 'days' argument should be of type 'int'")
 
         if not all(0 <= day <= 6 for day in days):
             raise ValueError("The elements of the 'days' argument should be from 0 up to and "
