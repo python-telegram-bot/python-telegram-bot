@@ -487,7 +487,7 @@ class Job(object):
     def next_t(self, next_t):
         if isinstance(next_t, datetime.datetime):
             # Set timezone to UTC in case datetime is in local timezone.
-            next_t = next_t.replace(tzinfo=_UTC)
+            next_t = next_t.astimezone(_UTC)
             next_t = to_float_timestamp(next_t)
         elif not (isinstance(next_t, Number) or next_t is None):
             raise TypeError("The 'next_t' argument should be one of the following types: "

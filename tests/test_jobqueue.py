@@ -29,7 +29,7 @@ from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import _UtcOffsetTimezone, _UTC
+from telegram.utils.helpers import _UtcOffsetTimezone
 
 
 @pytest.fixture(scope='function')
@@ -334,7 +334,6 @@ class TestJobQueue(object):
         # Testing:
         # - next_t values match values from self._queue.queue (for run_once and run_repeating jobs)
         # - next_t equals None if job is removed or if it's already ran
-        # - next_t setter for 'datetime.datetime' values
 
         job1 = job_queue.run_once(self.job_run_once, 0.06, name='run_once job')
         job2 = job_queue.run_once(self.job_run_once, 0.06, name='canceled run_once job')
@@ -359,7 +358,12 @@ class TestJobQueue(object):
         assert job1.next_t is None
         assert job2.next_t is None
 
+    def test_job_next_t_setter(self, job_queue):
+        # Testing next_t setter for 'datetime.datetime' values
+
+        job = job_queue.run_once(self.job_run_once, 0.05)
+
         t = dtm.datetime.now(tz=_UtcOffsetTimezone(dtm.timedelta(hours=12)))
-        job1.next_t = t
-        job1.tzinfo = _UTC
-        assert job1.next_t == t.replace(tzinfo=job.tzinfo)
+        job.next_t = t
+        job.tzinfo = _UtcOffsetTimezone(dtm.timedelta(hours=5))
+        assert job.next_t == t.astimezone(job.tzinfo)
