@@ -2836,7 +2836,12 @@ class Bot(TelegramObject):
         return result
 
     @log
-    def set_chat_administrator_custom_title(self, chat_id, user_id, custom_title, timeout=None, **kwargs):
+    def set_chat_administrator_custom_title(self,
+                                            chat_id,
+                                            user_id,
+                                            custom_title,
+                                            timeout=None,
+                                            **kwargs):
         """
         Use this method to set custom title for owner or administrators. The bot must be an
         administrator in the supergroup for this to work. Returns True on success.
