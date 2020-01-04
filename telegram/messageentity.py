@@ -105,8 +105,12 @@ class MessageEntity(TelegramObject):
     """:obj:`str`: 'text_link'"""
     TEXT_MENTION = 'text_mention'
     """:obj:`str`: 'text_mention'"""
+    UNDERLINE = 'underline'
+    """:obj:`str`: 'underline'"""
+    STRIKETHROUGH = 'strikethrough'
+    """:obj:`str`: 'strikethrough'"""
     ALL_TYPES = [
         MENTION, HASHTAG, CASHTAG, PHONE_NUMBER, BOT_COMMAND, URL,
-        EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
+        EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION, UNDERLINE, STRIKETHROUGH
     ]
     """List[:obj:`str`]: List of all the types."""

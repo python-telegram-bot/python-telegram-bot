@@ -123,12 +123,22 @@ class TestMessage(object):
                      {'length': 12, 'offset': 38, 'type': 'text_mention',
                       'user': User(123456789, 'mentioned user', False)},
                      {'length': 3, 'offset': 55, 'type': 'pre'},
-                     {'length': 17, 'offset': 60, 'type': 'url'},
-                     {'length': 36, 'offset': 82, 'type': 'italic'},
-                     {'length': 24, 'offset': 87, 'type': 'code'},
-                     {'length': 4, 'offset': 97, 'type': 'bold'}]
-    test_text = ('Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com '
-                 'and bold nested in code nested in italic.')
+                     {'length': 17, 'offset': 60, 'type': 'url'}]
+    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
+    test_entities_nested = [{'length': 4, 'offset': 10, 'type': 'bold'},
+                            {'length': 7, 'offset': 16, 'type': 'italic'},
+                            {'length': 4, 'offset': 25, 'type': 'code'},
+                            {'length': 5, 'offset': 31, 'type': 'text_link',
+                             'url': 'http://github.com/'},
+                            {'length': 12, 'offset': 38, 'type': 'text_mention',
+                             'user': User(123456789, 'mentioned user', False)},
+                            {'length': 3, 'offset': 55, 'type': 'pre'},
+                            {'length': 17, 'offset': 60, 'type': 'url'},
+                            {'length': 36, 'offset': 82, 'type': 'italic'},
+                            {'length': 24, 'offset': 87, 'type': 'code'},
+                            {'length': 4, 'offset': 97, 'type': 'bold'}]
+    test_text_nested = ('Test for <bold, ita_lic, code, links, text-mention and pre. '
+                        'http://google.com and bold nested in code nested in italic.')
     test_message = Message(message_id=1,
                            from_user=None,
                            date=None,
@@ -137,6 +147,16 @@ class TestMessage(object):
                            entities=[MessageEntity(**e) for e in test_entities],
                            caption=test_text,
                            caption_entities=[MessageEntity(**e) for e in test_entities])
+    test_message_nested = Message(message_id=1,
+                                  from_user=None,
+                                  date=None,
+                                  chat=None,
+                                  text=test_text_nested,
+                                  entities=[MessageEntity(**e) for e in test_entities_nested],
+                                  caption=test_text_nested,
+                                  caption_entities=[
+                                      MessageEntity(**e) for e in test_entities_nested
+                                  ])
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -147,6 +167,8 @@ class TestMessage(object):
         assert message['date'] == message.date
         assert message['chat_id'] == message.chat_id
         assert message['no_key'] is None
+
+    # START WORKING HERE
 
     def test_parse_entity(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
@@ -189,7 +211,7 @@ class TestMessage(object):
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>pre</pre>. http://google.com '
                             'and <i>bold <code>nested in <b>code</b> nested in</code> italic</i>.')
-        text_html = self.test_message.text_html
+        text_html = self.test_message_nested.text_html
         assert text_html == test_html_string
 
     def test_text_html_empty(self, message):
@@ -203,27 +225,42 @@ class TestMessage(object):
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>pre</pre>. <a href="http://google.com">http://google.com</a> '
                             'and <i>bold <code>nested in <b>code</b> nested in</code> italic</i>.')
-        text_html = self.test_message.text_html_urled
+        text_html = self.test_message_nested.text_html_urled
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com and _bold `nested in *code* nested in` italic_.')
+                          'http://google.com')
         text_markdown = self.test_message.text_markdown
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_v2_simple(self):
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text\-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google\.com and _bold `nested in *code* nested in` italic_.')
+        text_markdown = self.test_message_nested.text_markdown_v2
         assert text_markdown == test_md_string
 
     def test_text_markdown_empty(self, message):
         message.text = None
         message.caption = "test"
         assert message.text_markdown is None
+        assert message.text_markdown_v2 is None
 
     def test_text_markdown_urled(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com) and _bold `nested in *code* '
-                          'nested in` italic_.')
+                          '[http://google.com](http://google.com)')
         text_markdown = self.test_message.text_markdown_urled
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_urled_v2(self):
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text\-mention](tg://user?id=123456789) and ```pre```. '
+                          '[http://google\.com](http://google.com) and _bold `nested in *code* '
+                          'nested in` italic_.')
+        text_markdown = self.test_message_nested.text_markdown_urled_v2
         assert text_markdown == test_md_string
 
     def test_text_html_emoji(self):
@@ -248,7 +285,7 @@ class TestMessage(object):
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>pre</pre>. http://google.com '
                             'and <i>bold <code>nested in <b>code</b> nested in</code> italic</i>.')
-        caption_html = self.test_message.caption_html
+        caption_html = self.test_message_nested.caption_html
         assert caption_html == test_html_string
 
     def test_caption_html_empty(self, message):
@@ -262,27 +299,42 @@ class TestMessage(object):
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>pre</pre>. <a href="http://google.com">http://google.com</a> '
                             'and <i>bold <code>nested in <b>code</b> nested in</code> italic</i>.')
-        caption_html = self.test_message.caption_html_urled
+        caption_html = self.test_message_nested.caption_html_urled
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com and _bold `nested in *code* nested in` italic_.')
+                          'http://google.com')
         caption_markdown = self.test_message.caption_markdown
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_v2_simple(self):
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text\-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google\.com and _bold `nested in *code* nested in` italic_.')
+        caption_markdown = self.test_message_nested.caption_markdown_v2
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_empty(self, message):
         message.text = "test"
         message.caption = None
         assert message.caption_markdown is None
+        assert message.caption_markdown_v2 is None
 
     def test_caption_markdown_urled(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com) and _bold `nested in *code* '
-                          'nested in` italic_.')
+                          '[http://google.com](http://google.com)')
         caption_markdown = self.test_message.caption_markdown_urled
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_urled_v2(self):
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text\-mention](tg://user?id=123456789) and ```pre```. '
+                          '[http://google\.com](http://google.com) and _bold `nested in *code* '
+                          'nested in` italic_.')
+        caption_markdown = self.test_message_nested.caption_markdown_urled_v2
         assert caption_markdown == test_md_string
 
     def test_caption_html_emoji(self):
@@ -368,7 +420,7 @@ class TestMessage(object):
     def test_reply_markdown(self, monkeypatch, message):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com and _bold `nested in *code* nested in` italic_.')
+                          'http://google.com')
 
         def test(*args, **kwargs):
             cid = args[1] == message.chat_id
@@ -390,6 +442,31 @@ class TestMessage(object):
                                       reply_to_message_id=message.message_id,
                                       quote=True)
 
+    def test_reply_markdown_v2(self, monkeypatch, message):
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
+                          '[text\-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google\.com and _bold `nested in *code* nested in` italic_.')
+
+        def test(*args, **kwargs):
+            cid = args[1] == message.chat_id
+            markdown_text = args[2] == test_md_string
+            markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN_V2
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, markdown_text, reply, markdown_enabled])
+
+        text_markdown = self.test_message_nested.text_markdown_v2
+        assert text_markdown == test_md_string
+
+        monkeypatch.setattr('telegram.Bot.send_message', test)
+        assert message.reply_markdown_v2(self.test_message_nested.text_markdown_v2)
+        assert message.reply_markdown_v2(self.test_message_nested.text_markdown_v2, quote=True)
+        assert message.reply_markdown_v2(self.test_message_nested.text_markdown_v2,
+                                         reply_to_message_id=message.message_id,
+                                         quote=True)
+
     def test_reply_html(self, monkeypatch, message):
         test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
                             '<a href="http://github.com/">links</a>, '
@@ -407,13 +484,13 @@ class TestMessage(object):
                 reply = True
             return all([cid, html_text, reply, html_enabled])
 
-        text_html = self.test_message.text_html
+        text_html = self.test_message_nested.text_html
         assert text_html == test_html_string
 
         monkeypatch.setattr('telegram.Bot.send_message', test)
-        assert message.reply_html(self.test_message.text_html)
-        assert message.reply_html(self.test_message.text_html, quote=True)
-        assert message.reply_html(self.test_message.text_html,
+        assert message.reply_html(self.test_message_nested.text_html)
+        assert message.reply_html(self.test_message_nested.text_html, quote=True)
+        assert message.reply_html(self.test_message_nested.text_html,
                                   reply_to_message_id=message.message_id,
                                   quote=True)
 

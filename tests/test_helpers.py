@@ -24,6 +24,7 @@ import pytest
 from telegram import Sticker
 from telegram import Update
 from telegram import User
+from telegram import MessageEntity
 from telegram.message import Message
 from telegram.utils import helpers
 from telegram.utils.helpers import _UtcOffsetTimezone, _datetime_to_float_timestamp
@@ -45,6 +46,30 @@ class TestHelpers(object):
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'
 
         assert expected_str == helpers.escape_markdown(test_str)
+
+    def test_escape_markdown_v2(self):
+        test_str = 'a_b*c[d]e (fg) h~I`>JK#L+MN -O|p{qr}s.t! u'
+        expected_str = 'a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\|p\{qr\}s\.t\! u'
+
+        assert expected_str == helpers.escape_markdown(test_str, version=2)
+
+    def test_escape_markdown_v2_monospaced(self):
+
+        test_str = 'mono/pre: `abc` \int (some stuff)'
+        expected_str = 'mono/pre: \`abc\` \\\int (some stuff)'
+
+        assert expected_str == helpers.escape_markdown(test_str, version=2,
+                                                       entity_type=MessageEntity.PRE)
+        assert expected_str == helpers.escape_markdown(test_str, version=2,
+                                                       entity_type=MessageEntity.CODE)
+
+    def test_escape_markdown_v2_text_link(self):
+
+        test_str = 'https://url.containing/funny)charac\\ters'
+        expected_str = r'https://url.containing/funny\)charac\\ters'
+
+        assert expected_str == helpers.escape_markdown(test_str, version=2,
+                                                       entity_type=MessageEntity.TEXT_LINK)
 
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
@@ -188,3 +213,8 @@ class TestHelpers(object):
         expected = '[the name](tg://user?id=1)'
 
         assert expected == helpers.mention_markdown(1, 'the name')
+
+    def test_mention_markdown_2(self):
+        expected = r'[the\_name](tg://user?id=1)'
+
+        assert expected == helpers.mention_markdown(1, 'the_name')
