@@ -26,6 +26,9 @@ class Audio(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         duration (:obj:`int`): Duration of the audio in seconds.
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
@@ -38,6 +41,8 @@ class Audio(TelegramObject):
 
     Args:
         file_id (:obj:`str`): Unique identifier for this file.
+        file_unique_id (:obj:`str`): Unique and the same over time and
+            for different bots file identifier.
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
@@ -53,6 +58,7 @@ class Audio(TelegramObject):
 
     def __init__(self,
                  file_id,
+                 file_unique_id,
                  duration,
                  performer=None,
                  title=None,
@@ -63,6 +69,7 @@ class Audio(TelegramObject):
                  **kwargs):
         # Required
         self.file_id = str(file_id)
+        self.file_unique_id = str(file_unique_id)
         self.duration = int(duration)
         # Optionals
         self.performer = performer
@@ -72,7 +79,7 @@ class Audio(TelegramObject):
         self.thumb = thumb
         self.bot = bot
 
-        self._id_attrs = (self.file_id,)
+        self._id_attrs = (self.file_id, self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):

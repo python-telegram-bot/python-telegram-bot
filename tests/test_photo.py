@@ -59,11 +59,15 @@ class TestPhoto(object):
         # Make sure file has been uploaded.
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
+        assert isinstance(photo.file_unique_id, str)
         assert photo.file_id != ''
+        assert photo.file_unique_id != ''
 
         assert isinstance(thumb, PhotoSize)
         assert isinstance(thumb.file_id, str)
+        assert isinstance(thumb.file_unique_id, str)
         assert thumb.file_id != ''
+        assert thumb.file_unique_id != ''
 
     def test_expected_values(self, photo, thumb):
         assert photo.width == self.width
@@ -81,14 +85,18 @@ class TestPhoto(object):
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
+        assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
+        assert message.photo[0].file_unique_id != ''
         assert message.photo[0].width == thumb.width
         assert message.photo[0].height == thumb.height
         assert message.photo[0].file_size == thumb.file_size
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
+        assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
+        assert message.photo[1].file_unique_id != ''
         assert message.photo[1].width == photo.width
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
@@ -102,14 +110,18 @@ class TestPhoto(object):
                                  parse_mode='Markdown')
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
+        assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
+        assert message.photo[0].file_unique_id != ''
         assert message.photo[0].width == thumb.width
         assert message.photo[0].height == thumb.height
         assert message.photo[0].file_size == thumb.file_size
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
+        assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
+        assert message.photo[1].file_unique_id != ''
         assert message.photo[1].width == photo.width
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
@@ -124,14 +136,18 @@ class TestPhoto(object):
                                  parse_mode='HTML')
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
+        assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
+        assert message.photo[0].file_unique_id != ''
         assert message.photo[0].width == thumb.width
         assert message.photo[0].height == thumb.height
         assert message.photo[0].file_size == thumb.file_size
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
+        assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
+        assert message.photo[1].file_unique_id != ''
         assert message.photo[1].width == photo.width
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
@@ -146,6 +162,7 @@ class TestPhoto(object):
 
         assert new_file.file_size == photo.file_size
         assert new_file.file_id == photo.file_id
+        assert new_file.file_unique_id == photo.file_unique_id
         assert new_file.file_path.startswith('https://') is True
 
         new_file.download('telegram.jpg')
@@ -159,14 +176,18 @@ class TestPhoto(object):
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
+        assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
+        assert message.photo[0].file_unique_id != ''
         assert message.photo[0].width == thumb.width
         assert message.photo[0].height == thumb.height
         assert message.photo[0].file_size == thumb.file_size
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
+        assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
+        assert message.photo[1].file_unique_id != ''
         assert message.photo[1].width == photo.width
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
@@ -181,7 +202,9 @@ class TestPhoto(object):
 
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
+        assert isinstance(photo.file_unique_id, str)
         assert photo.file_id != ''
+        assert photo.file_unique_id != ''
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -193,7 +216,9 @@ class TestPhoto(object):
 
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
+        assert isinstance(photo.file_unique_id, str)
         assert photo.file_id != ''
+        assert photo.file_unique_id != ''
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -208,7 +233,9 @@ class TestPhoto(object):
 
         assert isinstance(photo, PhotoSize)
         assert isinstance(photo.file_id, str)
+        assert isinstance(photo.file_unique_id, str)
         assert photo.file_id != ''
+        assert photo.file_unique_id != ''
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -231,7 +258,9 @@ class TestPhoto(object):
         message = bot.send_photo(chat_id, photo=raw_bytes)
         photo = message.photo[-1]
         assert isinstance(photo.file_id, str)
+        assert isinstance(photo.file_unique_id, str)
         assert photo.file_id != ''
+        assert photo.file_unique_id != ''
         assert isinstance(photo, PhotoSize)
         assert photo.width == 1280
         assert photo.height == 720
@@ -254,14 +283,18 @@ class TestPhoto(object):
 
         assert isinstance(message.photo[0], PhotoSize)
         assert isinstance(message.photo[0].file_id, str)
+        assert isinstance(message.photo[0].file_unique_id, str)
         assert message.photo[0].file_id != ''
+        assert message.photo[0].file_unique_id != ''
         assert message.photo[0].width == thumb.width
         assert message.photo[0].height == thumb.height
         assert message.photo[0].file_size == thumb.file_size
 
         assert isinstance(message.photo[1], PhotoSize)
         assert isinstance(message.photo[1].file_id, str)
+        assert isinstance(message.photo[1].file_unique_id, str)
         assert message.photo[1].file_id != ''
+        assert message.photo[1].file_unique_id != ''
         assert message.photo[1].width == photo.width
         assert message.photo[1].height == photo.height
         assert message.photo[1].file_size == photo.file_size
@@ -269,6 +302,7 @@ class TestPhoto(object):
     def test_de_json(self, bot, photo):
         json_dict = {
             'file_id': photo.file_id,
+            'file_unique_id': photo.file_unique_id,
             'width': self.width,
             'height': self.height,
             'file_size': self.file_size
@@ -276,6 +310,7 @@ class TestPhoto(object):
         json_photo = PhotoSize.de_json(json_dict, bot)
 
         assert json_photo.file_id == photo.file_id
+        assert json_photo.file_unique_id == photo.file_unique_id
         assert json_photo.width == self.width
         assert json_photo.height == self.height
         assert json_photo.file_size == self.file_size
@@ -285,6 +320,7 @@ class TestPhoto(object):
 
         assert isinstance(photo_dict, dict)
         assert photo_dict['file_id'] == photo.file_id
+        assert photo_dict['file_unique_id'] == photo.file_unique_id
         assert photo_dict['width'] == photo.width
         assert photo_dict['height'] == photo.height
         assert photo_dict['file_size'] == photo.file_size
@@ -313,11 +349,11 @@ class TestPhoto(object):
         assert photo.get_file()
 
     def test_equality(self, photo):
-        a = PhotoSize(photo.file_id, self.width, self.height)
-        b = PhotoSize(photo.file_id, self.width, self.height)
-        c = PhotoSize(photo.file_id, 0, 0)
-        d = PhotoSize('', self.width, self.height)
-        e = Sticker(photo.file_id, self.width, self.height, False)
+        a = PhotoSize(photo.file_id, photo.file_unique_id, self.width, self.height)
+        b = PhotoSize(photo.file_id, photo.file_unique_id, self.width, self.height)
+        c = PhotoSize(photo.file_id, photo.file_unique_id, 0, 0)
+        d = PhotoSize('', '', self.width, self.height)
+        e = Sticker(photo.file_id, photo.file_unique_id, self.width, self.height, False)
 
         assert a == b
         assert hash(a) == hash(b)
