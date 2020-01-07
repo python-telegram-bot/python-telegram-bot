@@ -220,11 +220,14 @@ class TestSticker(object):
             bot.send_sticker(chat_id)
 
     def test_equality(self, sticker):
-        a = Sticker(sticker.file_id, sticker.file_unique_id,, self.width, self.height, self.is_animated)
-        b = Sticker(sticker.file_id, sticker.file_unique_id,, self.width, self.height, self.is_animated)
-        c = Sticker(sticker.file_id, sticker.file_unique_id,, 0, 0, False)
+        a = Sticker(sticker.file_id, sticker.file_unique_id, self.width,
+                    self.height, self.is_animated)
+        b = Sticker(sticker.file_id, sticker.file_unique_id, self.width,
+                    self.height, self.is_animated)
+        c = Sticker(sticker.file_id, sticker.file_unique_id, 0, 0, False)
         d = Sticker('', '', self.width, self.height, self.is_animated)
-        e = PhotoSize(sticker.file_id, sticker.file_unique_id,, self.width, self.height, self.is_animated)
+        e = PhotoSize(sticker.file_id, sticker.file_unique_id, self.width,
+                      self.height, self.is_animated)
 
         assert a == b
         assert hash(a) == hash(b)

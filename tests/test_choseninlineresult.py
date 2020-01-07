@@ -74,7 +74,7 @@ class TestChosenInlineResult(object):
         b = ChosenInlineResult(self.result_id, user, 'Query', '')
         c = ChosenInlineResult(self.result_id, user, '', '')
         d = ChosenInlineResult('', user, 'Query', '')
-        e = Voice(self.result_id, 0)
+        e = Voice(self.result_id, 'unique_id', 0)
 
         assert a == b
         assert hash(a) == hash(b)

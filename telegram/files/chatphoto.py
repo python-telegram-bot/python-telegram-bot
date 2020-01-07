@@ -63,7 +63,8 @@ class ChatPhoto(TelegramObject):
 
         self.bot = bot
 
-        self._id_attrs = (self.small_file_id, self.big_file_id)
+        self._id_attrs = (self.small_file_id, self.small_file_unique_id,
+                          self.big_file_id, self.big_file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):

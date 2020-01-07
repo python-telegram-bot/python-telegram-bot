@@ -337,8 +337,9 @@ class TestPassport(object):
         # TODO: Actually download a passport file in a test
         selfie = passport_data.decrypted_data[1].selfie
 
+        # NOTE: file_unique_id is not used in the get_file method, so it is passed directly
         def get_file(*args, **kwargs):
-            return File(args[1])
+            return File(args[1], selfie.file_unique_id)
 
         monkeypatch.setattr('telegram.Bot.get_file', get_file)
         file = selfie.get_file()

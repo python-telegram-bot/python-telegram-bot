@@ -136,7 +136,7 @@ class TestCallbackQuery(object):
         b = CallbackQuery(self.id, self.from_user, 'chat')
         c = CallbackQuery(self.id, None, '')
         d = CallbackQuery('', None, 'chat')
-        e = Audio(self.id, 1)
+        e = Audio(self.id, 'unique_id', 1)
 
         assert a == b
         assert hash(a) == hash(b)
