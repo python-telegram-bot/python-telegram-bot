@@ -48,8 +48,9 @@ class CallbackContext(object):
 
             Warning:
                 When a group chat migrates to a supergroup, its chat id will change and the
-                ``chat_data`` needs to be transferred. For details see https://git.io/Jexkz for
-                details.
+                ``chat_data`` needs to be transferred. For details see our `wiki page
+                <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
+                Storing-user--and-chat-related-data#chat-migration>`_.
 
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
