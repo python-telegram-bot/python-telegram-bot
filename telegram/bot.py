@@ -3587,6 +3587,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`promote_chat_member`"""
     setChatPermissions = set_chat_permissions
     """Alias for :attr:`set_chat_permissions`"""
+    setChatAdministratorCustomTitle = set_chat_administrator_custom_title
+    """Alias for :attr:`set_chat_administrator_custom_title"""
     exportChatInviteLink = export_chat_invite_link
     """Alias for :attr:`export_chat_invite_link`"""
     setChatPhoto = set_chat_photo
