@@ -80,7 +80,7 @@ class TestContact(object):
         b = Contact(self.phone_number, self.first_name)
         c = Contact(self.phone_number, '')
         d = Contact('', self.first_name)
-        e = Voice('', 0)
+        e = Voice('', 'unique_id', 0)
 
         assert a == b
         assert hash(a) == hash(b)

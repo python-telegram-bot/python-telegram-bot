@@ -55,7 +55,7 @@ class TestShippingOption(object):
         b = ShippingOption(self.id, self.title, self.prices)
         c = ShippingOption(self.id, '', [])
         d = ShippingOption(0, self.title, self.prices)
-        e = Voice(self.id, 0)
+        e = Voice(self.id, 'someid', 0)
 
         assert a == b
         assert hash(a) == hash(b)

@@ -45,11 +45,16 @@ class TestVoice(object):
     caption = u'Test *voice*'
     voice_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
 
+    voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
+    voice_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+
     def test_creation(self, voice):
         # Make sure file has been uploaded.
         assert isinstance(voice, Voice)
         assert isinstance(voice.file_id, str)
+        assert isinstance(voice.file_unique_id, str)
         assert voice.file_id != ''
+        assert voice.file_unique_id != ''
 
     def test_expected_values(self, voice):
         assert voice.duration == self.duration
@@ -65,7 +70,9 @@ class TestVoice(object):
 
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)
+        assert isinstance(message.voice.file_unique_id, str)
         assert message.voice.file_id != ''
+        assert message.voice.file_unique_id != ''
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
@@ -78,6 +85,7 @@ class TestVoice(object):
 
         assert new_file.file_size == voice.file_size
         assert new_file.file_id == voice.file_id
+        assert new_file.file_unique_id == voice.file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.ogg')
@@ -91,7 +99,9 @@ class TestVoice(object):
 
         assert isinstance(message.voice, Voice)
         assert isinstance(message.voice.file_id, str)
+        assert isinstance(message.voice.file_unique_id, str)
         assert message.voice.file_id != ''
+        assert message.voice.file_unique_id != ''
         assert message.voice.duration == voice.duration
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
@@ -113,7 +123,8 @@ class TestVoice(object):
 
     def test_de_json(self, bot):
         json_dict = {
-            'file_id': 'not a file id',
+            'file_id': self.voice_file_id,
+            'file_unique_id': self.voice_file_unique_id,
             'duration': self.duration,
             'caption': self.caption,
             'mime_type': self.mime_type,
@@ -121,7 +132,8 @@ class TestVoice(object):
         }
         json_voice = Voice.de_json(json_dict, bot)
 
-        assert json_voice.file_id == 'not a file id'
+        assert json_voice.file_id == self.voice_file_id
+        assert json_voice.file_unique_id == self.voice_file_unique_id
         assert json_voice.duration == self.duration
         assert json_voice.mime_type == self.mime_type
         assert json_voice.file_size == self.file_size
@@ -131,6 +143,7 @@ class TestVoice(object):
 
         assert isinstance(voice_dict, dict)
         assert voice_dict['file_id'] == voice.file_id
+        assert voice_dict['file_unique_id'] == voice.file_unique_id
         assert voice_dict['duration'] == voice.duration
         assert voice_dict['mime_type'] == voice.mime_type
         assert voice_dict['file_size'] == voice.file_size
@@ -159,11 +172,11 @@ class TestVoice(object):
         assert voice.get_file()
 
     def test_equality(self, voice):
-        a = Voice(voice.file_id, self.duration)
-        b = Voice(voice.file_id, self.duration)
-        c = Voice(voice.file_id, 0)
-        d = Voice('', self.duration)
-        e = Audio(voice.file_id, self.duration)
+        a = Voice(voice.file_id, voice.file_unique_id, self.duration)
+        b = Voice(voice.file_id, voice.file_unique_id, self.duration)
+        c = Voice(voice.file_id, voice.file_unique_id, 0)
+        d = Voice('', '', self.duration)
+        e = Audio(voice.file_id, voice.file_unique_id, self.duration)
 
         assert a == b
         assert hash(a) == hash(b)

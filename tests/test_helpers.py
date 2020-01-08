@@ -186,7 +186,8 @@ class TestHelpers(object):
         assert helpers.effective_message_type(test_message) == 'text'
         test_message.text = None
 
-        test_message = build_test_message(sticker=Sticker('sticker_id', 50, 50, False))
+        test_message = build_test_message(sticker=Sticker('sticker_id', 'unique_id',
+                                          50, 50, False))
         assert helpers.effective_message_type(test_message) == 'sticker'
         test_message.sticker = None
 
