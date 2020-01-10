@@ -138,8 +138,6 @@ class Dispatcher(object):
         else:
             self.persistence = None
 
-        self.job_queue = job_queue
-
         self.handlers = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
