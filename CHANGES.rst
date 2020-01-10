@@ -25,6 +25,7 @@ Version 12.3.0
 - Fix deprecation warning with Py3.8 by vendored urllib3 (`#1618`_).
 - Simplify assignements for optional arguments (`#1600`_)
 - Allow private groups for `Message.link` (`#1619`_).
+- Fix wrong signature call for `ConversationHandler.TIMEOUT` handlers (`#1653`_).
 
 .. _`#1631`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1558
 .. _`#1506`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1506
@@ -47,6 +48,7 @@ Version 12.3.0
 .. _`#1618`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1618
 .. _`#1600`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1600
 .. _`#1619`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1619
+.. _`#1653`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1653
 
 Version 12.2.0
 ==============
