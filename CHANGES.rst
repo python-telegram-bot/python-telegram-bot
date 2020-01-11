@@ -4,7 +4,7 @@ Changelog
 
 Version 12.3.0
 ==============
-*Released 20XX-XX-XX*
+*Released 2020-01-11*
 
 **New features:**
 
@@ -17,11 +17,11 @@ Version 12.3.0
 
 **Minor changes, CI improvments or bug fixes:**
 
-- Documentation fixes (`#1558`_, `#1569`_, `#1579`_, `#1572`_, `#1566`_, `#1577`_).
+- Documentation fixes (`#1558`_, `#1569`_, `#1579`_, `#1572`_, `#1566`_, `#1577`_, `#1656`_).
 - Add mutex protection on `ConversationHandler` (`#1533`_).
 - Add `MAX_PHOTOSIZE_UPLOAD` constant (`#1560`_).
 - Add args and kwargs to `Message.forward()` (`#1574`_).
-- Transfer to GitHub Actions CI (`#1555`_, `#1556`_, `#1605`_, `#1606`_, `#1607`_, `#1612`_, `#1615`_).
+- Transfer to GitHub Actions CI (`#1555`_, `#1556`_, `#1605`_, `#1606`_, `#1607`_, `#1612`_, `#1615`_, `#1645`_).
 - Fix deprecation warning with Py3.8 by vendored urllib3 (`#1618`_).
 - Simplify assignements for optional arguments (`#1600`_)
 - Allow private groups for `Message.link` (`#1619`_).
@@ -49,6 +49,8 @@ Version 12.3.0
 .. _`#1600`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1600
 .. _`#1619`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1619
 .. _`#1653`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1653
+.. _`#1656`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1656
+.. _`#1645`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1645
 
 Version 12.2.0
 ==============
