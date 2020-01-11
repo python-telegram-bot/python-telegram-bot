@@ -255,12 +255,12 @@ class TestMessage(object):
         text_markdown = self.test_message.text_markdown_urled
         assert text_markdown == test_md_string
 
-    def test_text_markdown_urled_v2(self):
+    def test_text_markdown_v2_urled(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text\-mention](tg://user?id=123456789) and ```pre```. '
                           '[http://google\.com](http://google.com) and _bold `nested in *code* '
                           'nested in` italic_.')
-        text_markdown = self.test_message_nested.text_markdown_urled_v2
+        text_markdown = self.test_message_nested.text_markdown_v2_urled
         assert text_markdown == test_md_string
 
     def test_text_html_emoji(self):
@@ -329,12 +329,12 @@ class TestMessage(object):
         caption_markdown = self.test_message.caption_markdown_urled
         assert caption_markdown == test_md_string
 
-    def test_caption_markdown_urled_v2(self):
+    def test_caption_markdown_v2_urled(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
                           '[text\-mention](tg://user?id=123456789) and ```pre```. '
                           '[http://google\.com](http://google.com) and _bold `nested in *code* '
                           'nested in` italic_.')
-        caption_markdown = self.test_message_nested.caption_markdown_urled_v2
+        caption_markdown = self.test_message_nested.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
 
     def test_caption_html_emoji(self):

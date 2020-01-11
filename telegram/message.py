@@ -1290,7 +1290,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
     @property
-    def text_markdown_urled_v2(self):
+    def text_markdown_v2_urled(self):
         """Creates an Markdown-formatted string from the markup entities found in the message
         using :class:`telegram.ParseMode.MARKDOWN_V2`.
 
@@ -1347,7 +1347,7 @@ class Message(TelegramObject):
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
 
     @property
-    def caption_markdown_urled_v2(self):
+    def caption_markdown_v2_urled(self):
         """Creates an Markdown-formatted string from the markup entities found in the message's
         caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
 
