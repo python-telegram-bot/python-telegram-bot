@@ -95,7 +95,8 @@ class JobQueue(object):
 
         """
         # get time at which to run:
-        time_spec = time_spec or job.interval
+        if time_spec is None:
+            time_spec = job.interval
         if time_spec is None:
             raise ValueError("no time specification given for scheduling non-repeating job")
         next_t = to_float_timestamp(time_spec, reference_timestamp=previous_t)
