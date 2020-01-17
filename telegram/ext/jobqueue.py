@@ -116,7 +116,7 @@ class JobQueue(object):
                 job. Callback signature for context based API:
 
                     ``def callback(CallbackContext)``
-                
+
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
@@ -156,7 +156,7 @@ class JobQueue(object):
                 job. Callback signature for context based API:
 
                     ``def callback(CallbackContext)``
-                
+
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
@@ -210,7 +210,7 @@ class JobQueue(object):
                 job. Callback signature for context based API:
 
                     ``def callback(CallbackContext)``
-                
+
                 ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
                 its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
@@ -370,7 +370,7 @@ class Job(object):
             Callback signature for context based API:
 
                 ``def callback(CallbackContext)``
-            
+
             a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
             its ``job.context`` or change it to a repeating job.
         interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The time
