@@ -178,14 +178,14 @@ class ConversationHandler(Handler):
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
         self.persistent = persistent
-        self.persistence = None
+        self._persistence = None
         """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
         Set by dispatcher"""
         self.map_to_parent = map_to_parent
 
         self.timeout_jobs = dict()
         self._timeout_jobs_lock = Lock()
-        self.conversations = dict()
+        self._conversations = dict()
         self._conversations_lock = Lock()
 
         self.logger = logging.getLogger(__name__)
@@ -224,6 +224,32 @@ class ConversationHandler(Handler):
                     warnings.warn("If 'per_chat=True', 'InlineQueryHandler' can not be used, "
                                   "since inline queries have no chat context.")
                     break
+
+    @property
+    def persistence(self):
+        return self._persistence
+
+    @persistence.setter
+    def persistence(self, persistence):
+        self._persistence = persistence
+        # Set persistence for nested conversations
+        for handlers in self.states.values():
+            for handler in handlers:
+                if isinstance(handler, ConversationHandler):
+                    handler.persistence = self.persistence
+
+    @property
+    def conversations(self):
+        return self._conversations
+
+    @conversations.setter
+    def conversations(self, value):
+        self._conversations = value
+        # Set conversations for nested conversations
+        for handlers in self.states.values():
+            for handler in handlers:
+                if isinstance(handler, ConversationHandler):
+                    handler.conversations = self.persistence.get_conversations(handler.name)
 
     def _get_key(self, update):
         chat = update.effective_chat
