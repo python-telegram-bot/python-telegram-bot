@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
 import os
-import sys
 import re
 from collections import defaultdict
 from queue import Queue

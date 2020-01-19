@@ -23,7 +23,6 @@
 from telegram.utils import promise
 
 import functools
-import sys
 import time
 import threading
 import queue as q

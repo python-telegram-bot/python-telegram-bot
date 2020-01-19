@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
 import os
-import sys
 import time
 from queue import Queue
 from time import sleep
