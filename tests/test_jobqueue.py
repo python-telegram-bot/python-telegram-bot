@@ -313,7 +313,6 @@ class TestJobQueue(object):
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
 
-    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
     def test_bot_in_init_deprecation(self, bot):
         with pytest.warns(TelegramDeprecationWarning):
             JobQueue(bot)
