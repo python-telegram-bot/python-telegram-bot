@@ -303,16 +303,30 @@ class TestMessage(object):
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
-    def test_link(self, message):
-        assert message.link is None
+    @pytest.mark.parametrize('type', argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_username(self, message, type):
         message.chat.username = 'username'
-        message.chat.type = 'supergroup'
+        message.chat.type = type
         assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
                                                            message.message_id)
-        message.chat.type = 'channel'
-        assert message.link == 'https://t.me/{}/{}'.format(message.chat.username,
-                                                           message.message_id)
-        message.chat.type = 'private'
+
+    @pytest.mark.parametrize('type, id', argvalues=[
+        (Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003), (Chat.GROUP, -3)
+    ])
+    def test_link_with_id(self, message, type, id):
+        message.chat.username = None
+        message.chat.id = id
+        message.chat.type = type
+        # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
+        assert message.link == 'https://t.me/c/{}/{}'.format(3, message.message_id)
+
+    @pytest.mark.parametrize('id, username', argvalues=[
+        (None, 'username'), (-3, None)
+    ])
+    def test_link_private_chats(self, message, id, username):
+        message.chat.type = Chat.PRIVATE
+        message.chat.id = id
+        message.chat.username = username
         assert message.link is None
 
     def test_effective_attachment(self, message_params):

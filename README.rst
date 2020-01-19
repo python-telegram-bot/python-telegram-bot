@@ -29,14 +29,9 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://travis-ci.org/python-telegram-bot/python-telegram-bot.svg?branch=master
-   :target: https://travis-ci.org/python-telegram-bot/python-telegram-bot
-   :alt: Travis CI Status
-
-.. image:: https://img.shields.io/appveyor/ci/python-telegram-bot/python-telegram-bot/master.svg?logo=appveyor
-   :target: https://ci.appveyor.com/project/python-telegram-bot/python-telegram-bot
-   :alt: AppVeyor CI Status
-
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/Testing%20your%20PR/badge.svg?event=schedule
+   :target: https://github.com/python-telegram-bot/python-telegram-bot/
+   :alt: Github Actions workflow
 
 .. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot

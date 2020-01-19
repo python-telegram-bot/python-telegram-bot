@@ -58,7 +58,5 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         self.sticker_file_id = sticker_file_id
 
         # Optionals
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
