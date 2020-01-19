@@ -52,9 +52,12 @@ def escape_markdown(text):
 # -------- date/time related helpers --------
 # TODO: add generic specification of UTC for naive datetimes to docs
 
-    def _datetime_to_float_timestamp(dt_obj):
-    """Converts a datetime object to a float timestamp (with sub-second precision).
-    If the datetime object is timezone-naive, it is assumed to be in UTC."""
+def _datetime_to_float_timestamp(dt_obj):
+    """
+    Converts a datetime object to a float timestamp (with sub-second precision).
+    If the datetime object is timezone-naive, it is assumed to be in UTC.
+    """
+
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
         return dt_obj.timestamp()
