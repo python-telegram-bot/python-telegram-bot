@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import logging
 from telegram import Update
-from future.utils import bytes_to_native_str
 from threading import Lock
 try:
     import ujson as json
@@ -101,7 +100,7 @@ class WebhookHandler(tornado.web.RequestHandler):
     def post(self):
         self.logger.debug('Webhook triggered')
         self._validate_post()
-        json_string = bytes_to_native_str(self.request.body)
+        json_string = self.request.body.decode()
         data = json.loads(json_string)
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)

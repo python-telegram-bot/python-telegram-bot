@@ -22,7 +22,6 @@ from time import sleep
 
 import pytest
 from flaky import flaky
-from future.utils import PY2
 
 from telegram import Sticker, PhotoSize, TelegramError, StickerSet, Audio, MaskPosition
 
@@ -119,10 +118,7 @@ class TestSticker(object):
         server_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
         message = bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
-        if PY2:
-            assert sticker.emoji == self.emoji.decode('utf-8')
-        else:
-            assert sticker.emoji == self.emoji
+        assert sticker.emoji == self.emoji
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

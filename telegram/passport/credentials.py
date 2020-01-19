@@ -28,7 +28,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA512, SHA256, Hash, SHA1
-from future.utils import bord
 
 from telegram import TelegramObject, TelegramError
 
@@ -83,7 +82,7 @@ def decrypt(secret, hash, data):
         # Raise a error that is caught inside telegram.PassportData and transformed into a warning
         raise TelegramDecryptionError("Hashes are not equal! {} != {}".format(data_hash, hash))
     # Return data without padding
-    return data[bord(data[0]):]
+    return data[data[0]:]
 
 
 def decrypt_json(secret, hash, data):

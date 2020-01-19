@@ -24,7 +24,6 @@ from platform import python_implementation
 
 import pytest
 from flaky import flaky
-from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
@@ -638,7 +637,7 @@ class TestBot(object):
     def test_export_chat_invite_link(self, bot, channel_id):
         # Each link is unique apparently
         invite_link = bot.export_chat_invite_link(channel_id)
-        assert isinstance(invite_link, string_types)
+        assert isinstance(invite_link, str)
         assert invite_link != ''
 
     @flaky(3, 1)

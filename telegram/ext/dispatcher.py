@@ -29,8 +29,6 @@ from collections import defaultdict
 
 from queue import Queue, Empty
 
-from future.builtins import range
-
 from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
 from telegram.ext.callbackcontext import CallbackContext

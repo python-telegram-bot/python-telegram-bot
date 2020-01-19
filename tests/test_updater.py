@@ -35,7 +35,6 @@ except ImportError:
     from urllib.error import HTTPError
 
 import pytest
-from future.builtins import bytes
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
