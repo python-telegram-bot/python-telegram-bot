@@ -1,7 +1,6 @@
 language: python
 matrix:
   include:
-    - python: 2.7
     - python: 3.5
     - python: 3.6
     - python: 3.7
@@ -10,14 +9,11 @@ matrix:
     - python: 3.7
       dist: xenial
       env: TEST_OFFICIAL=true
-    - python: pypy2.7-5.10.0
-      dist: xenial
     - python: pypy3.5-5.10.1
       dist: xenial
     - python: 3.8-dev
       dist: xenial
   allow_failures:
-    - python: pypy2.7-5.10.0
     - python: pypy3.5-5.10.1
 
 dist: trusty
