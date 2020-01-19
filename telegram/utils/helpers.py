@@ -60,7 +60,7 @@ def _datetime_to_float_timestamp(dt_obj):
 
     if dt_obj.tzinfo is None:
         dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
-        return dt_obj.timestamp()
+    return dt_obj.timestamp()
 
 
 def to_float_timestamp(t, reference_timestamp=None):
