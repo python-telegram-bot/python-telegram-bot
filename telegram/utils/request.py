@@ -274,7 +274,7 @@ class Request(object):
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            data (dict[str, str|int]): A dict of key/value pairs. Note: On py2.7 value is unicode.
+            data (dict[str, str|int]): A dict of key/value pairs.
             timeout (:obj:`int` | :obj:`float`): If this value is specified, use it as the read
                 timeout from the server (instead of the one specified during creation of the
                 connection pool).
