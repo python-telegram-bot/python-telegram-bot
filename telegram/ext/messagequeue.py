@@ -26,10 +26,7 @@ import functools
 import sys
 import time
 import threading
-if sys.version_info.major > 2:
-    import queue as q
-else:
-    import Queue as q
+import queue as q
 
 
 class DelayQueueError(RuntimeError):
