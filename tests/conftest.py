@@ -31,7 +31,6 @@ from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
-from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
 
 TRAVIS = os.getenv('TRAVIS', False)
@@ -269,4 +268,4 @@ def utc_offset(request):
 
 @pytest.fixture()
 def timezone(utc_offset):
-    return _UtcOffsetTimezone(utc_offset)
+    return datetime.timezone(utc_offset)

@@ -29,7 +29,7 @@ from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import to_float_timestamp, _UTC
+from telegram.utils.helpers import to_float_timestamp
 
 
 class Days(object):
@@ -387,7 +387,7 @@ class Job(object):
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=_UTC):
+                 tzinfo=datetime.timezone.utc):
 
         self.callback = callback
         self.context = context
