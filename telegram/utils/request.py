@@ -22,7 +22,6 @@ import os
 import socket
 import sys
 import warnings
-from builtins import str  # For PY2
 
 try:
     import ujson as json
