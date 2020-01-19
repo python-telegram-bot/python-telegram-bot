@@ -26,13 +26,8 @@ from random import randrange
 from threading import Thread, Event
 from time import sleep
 
-try:
-    # python2
-    from urllib2 import urlopen, Request, HTTPError
-except ImportError:
-    # python3
-    from urllib.request import Request, urlopen
-    from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 import pytest
 
