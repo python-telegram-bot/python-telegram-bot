@@ -77,12 +77,8 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         self.title = title
 
         # Optionals
-        if description:
-            self.description = description
-        if caption:
-            self.caption = caption
+        self.description = description
+        self.caption = caption
         self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

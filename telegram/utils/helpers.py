@@ -17,7 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions."""
+
+import datetime as dtm  # dtm = "DateTime Module"
+import time
+
 from collections import defaultdict
+from numbers import Number
 
 try:
     import ujson as json
@@ -27,7 +32,6 @@ from html import escape
 
 import re
 import signal
-from datetime import datetime
 
 # From https://stackoverflow.com/questions/2549939/get-signal-names-from-numbers-in-python
 _signames = {v: k
@@ -40,54 +44,154 @@ def get_signal_name(signum):
     return _signames[signum]
 
 
-# Not using future.backports.datetime here as datetime value might be an input from the user,
-# making every isinstace() call more delicate. So we just use our own compat layer.
-if hasattr(datetime, 'timestamp'):
-    # Python 3.3+
-    def _timestamp(dt_obj):
-        return dt_obj.timestamp()
-else:
-    # Python < 3.3 (incl 2.7)
-    from time import mktime
-
-    def _timestamp(dt_obj):
-        return mktime(dt_obj.timetuple())
-
-
 def escape_markdown(text):
     """Helper function to escape telegram markup symbols."""
     escape_chars = '\*_`\['
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
 
-def to_timestamp(dt_obj):
+# -------- date/time related helpers --------
+# TODO: add generic specification of UTC for naive datetimes to docs
+
+if hasattr(dtm, 'timezone'):
+    # Python 3.3+
+    def _datetime_to_float_timestamp(dt_obj):
+        if dt_obj.tzinfo is None:
+            dt_obj = dt_obj.replace(tzinfo=_UTC)
+        return dt_obj.timestamp()
+
+    _UtcOffsetTimezone = dtm.timezone
+    _UTC = dtm.timezone.utc
+else:
+    # Python < 3.3 (incl 2.7)
+
+    # hardcoded timezone class (`datetime.timezone` isn't available in py2)
+    class _UtcOffsetTimezone(dtm.tzinfo):
+        def __init__(self, offset):
+            self.offset = offset
+
+        def tzname(self, dt):
+            return 'UTC +{}'.format(self.offset)
+
+        def utcoffset(self, dt):
+            return self.offset
+
+        def dst(self, dt):
+            return dtm.timedelta(0)
+
+    _UTC = _UtcOffsetTimezone(dtm.timedelta(0))
+    __EPOCH_DT = dtm.datetime.fromtimestamp(0, tz=_UTC)
+    __NAIVE_EPOCH_DT = __EPOCH_DT.replace(tzinfo=None)
+
+    # _datetime_to_float_timestamp
+    # Not using future.backports.datetime here as datetime value might be an input from the user,
+    # making every isinstace() call more delicate. So we just use our own compat layer.
+    def _datetime_to_float_timestamp(dt_obj):
+        epoch_dt = __EPOCH_DT if dt_obj.tzinfo is not None else __NAIVE_EPOCH_DT
+        return (dt_obj - epoch_dt).total_seconds()
+
+_datetime_to_float_timestamp.__doc__ = \
+    """Converts a datetime object to a float timestamp (with sub-second precision).
+If the datetime object is timezone-naive, it is assumed to be in UTC."""
+
+
+def to_float_timestamp(t, reference_timestamp=None):
     """
+    Converts a given time object to a float POSIX timestamp.
+    Used to convert different time specifications to a common format. The time object
+    can be relative (i.e. indicate a time increment, or a time of day) or absolute.
+    Any objects from the :module:`datetime` module that are timezone-naive will be assumed
+    to be in UTC.
+
+    ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
+
     Args:
-        dt_obj (:class:`datetime.datetime`):
+        t (int | float | datetime.timedelta | datetime.datetime | datetime.time):
+            Time value to convert. The semantics of this parameter will depend on its type:
+
+            * :obj:`int` or :obj:`float` will be interpreted as "seconds from ``reference_t``"
+            * :obj:`datetime.timedelta` will be interpreted as
+              "time increment from ``reference_t``"
+            * :obj:`datetime.datetime` will be interpreted as an absolute date/time value
+            * :obj:`datetime.time` will be interpreted as a specific time of day
+
+        reference_timestamp (float, optional): POSIX timestamp that indicates the absolute time
+            from which relative calculations are to be performed (e.g. when ``t`` is given as an
+            :obj:`int`, indicating "seconds from ``reference_t``"). Defaults to now (the time at
+            which this function is called).
+
+            If ``t`` is given as an absolute representation of date & time (i.e. a
+            ``datetime.datetime`` object), ``reference_timestamp`` is not relevant and so its
+            value should be ``None``. If this is not the case, a ``ValueError`` will be raised.
 
     Returns:
-        int:
+        (float | None) The return value depends on the type of argument ``t``. If ``t`` is
+            given as a time increment (i.e. as a obj:`int`, :obj:`float` or
+            :obj:`datetime.timedelta`), then the return value will be ``reference_t`` + ``t``.
 
+            Else if it is given as an absolute date/time value (i.e. a :obj:`datetime.datetime`
+            object), the equivalent value as a POSIX timestamp will be returned.
+
+            Finally, if it is a time of the day without date (i.e. a :obj:`datetime.time`
+            object), the return value is the nearest future occurrence of that time of day.
+
+    Raises:
+        TypeError: if `t`'s type is not one of those described above
     """
-    if not dt_obj:
-        return None
 
-    return int(_timestamp(dt_obj))
+    if reference_timestamp is None:
+        reference_timestamp = time.time()
+    elif isinstance(t, dtm.datetime):
+        raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
+
+    if isinstance(t, dtm.timedelta):
+        return reference_timestamp + t.total_seconds()
+    elif isinstance(t, Number):
+        return reference_timestamp + t
+    elif isinstance(t, dtm.time):
+        if t.tzinfo is not None:
+            reference_dt = dtm.datetime.fromtimestamp(reference_timestamp, tz=t.tzinfo)
+        else:
+            reference_dt = dtm.datetime.utcfromtimestamp(reference_timestamp)  # assume UTC
+        reference_date = reference_dt.date()
+        reference_time = reference_dt.timetz()
+        if reference_time > t:  # if the time of day has passed today, use tomorrow
+            reference_date += dtm.timedelta(days=1)
+        return _datetime_to_float_timestamp(dtm.datetime.combine(reference_date, t))
+    elif isinstance(t, dtm.datetime):
+        return _datetime_to_float_timestamp(t)
+
+    raise TypeError('Unable to convert {} object to timestamp'.format(type(t).__name__))
+
+
+def to_timestamp(dt_obj, reference_timestamp=None):
+    """
+    Wrapper over :func:`to_float_timestamp` which returns an integer (the float value truncated
+    down to the nearest integer).
+
+    See the documentation for :func:`to_float_timestamp` for more details.
+    """
+    return int(to_float_timestamp(dt_obj, reference_timestamp)) if dt_obj is not None else None
 
 
 def from_timestamp(unixtime):
     """
+    Converts an (integer) unix timestamp to a naive datetime object in UTC.
+    ``None`` s are left alone (i.e. ``from_timestamp(None)`` is ``None``).
+
     Args:
-        unixtime (int):
+        unixtime (int): integer POSIX timestamp
 
     Returns:
-        datetime.datetime:
-
+        equivalent :obj:`datetime.datetime` value in naive UTC if ``timestamp`` is not
+        ``None``; else ``None``
     """
-    if not unixtime:
+    if unixtime is None:
         return None
 
-    return datetime.utcfromtimestamp(unixtime)
+    return dtm.datetime.utcfromtimestamp(unixtime)
+
+# -------- end --------
 
 
 def mention_html(user_id, name):

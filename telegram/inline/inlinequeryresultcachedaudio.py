@@ -69,10 +69,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         self.audio_file_id = audio_file_id
 
         # Optionals
-        if caption:
-            self.caption = caption
+        self.caption = caption
         self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

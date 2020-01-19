@@ -78,12 +78,8 @@ class InlineQueryResultVoice(InlineQueryResult):
         self.title = title
 
         # Optional
-        if voice_duration:
-            self.voice_duration = voice_duration
-        if caption:
-            self.caption = caption
+        self.voice_duration = voice_duration
+        self.caption = caption
         self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

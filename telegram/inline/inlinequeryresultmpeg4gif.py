@@ -87,18 +87,11 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         self.thumb_url = thumb_url
 
         # Optional
-        if mpeg4_width:
-            self.mpeg4_width = mpeg4_width
-        if mpeg4_height:
-            self.mpeg4_height = mpeg4_height
-        if mpeg4_duration:
-            self.mpeg4_duration = mpeg4_duration
-        if title:
-            self.title = title
-        if caption:
-            self.caption = caption
+        self.mpeg4_width = mpeg4_width
+        self.mpeg4_height = mpeg4_height
+        self.mpeg4_duration = mpeg4_duration
+        self.title = title
+        self.caption = caption
         self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
