@@ -31,17 +31,6 @@ if sys.version_info.major > 2:
 else:
     import Queue as q
 
-# We need to count < 1s intervals, so the most accurate timer is needed
-# Starting from Python 3.3 we have time.perf_counter which is the clock
-#  with the highest resolution available to the system, so let's use it there.
-# In Python 2.7, there's no perf_counter yet, so fallback on what we have:
-#  on Windows, the best available is time.clock while time.time is on
-#  another platforms (M. Lutz, "Learning Python," 4ed, p.630-634)
-if sys.version_info.major == 3 and sys.version_info.minor >= 3:
-    curtime = time.perf_counter  # pylint: disable=E1101
-else:
-    curtime = time.clock if sys.platform[:3] == 'win' else time.time
-
 
 class DelayQueueError(RuntimeError):
     """Indicates processing errors."""
@@ -114,7 +103,7 @@ class DelayQueue(threading.Thread):
             if self.__exit_req:
                 return  # shutdown thread
             # delay routine
-            now = curtime()
+            now = time.perf_counter()
             t_delta = now - self.time_limit  # calculate early to improve perf.
             if times and t_delta > times[-1]:
                 # if last call was before the limit time-window
