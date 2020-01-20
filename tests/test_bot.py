@@ -473,14 +473,13 @@ class TestBot(object):
     @pytest.mark.parametrize('default_bot', [{'default_quote': True}], indirect=True)
     def test_get_chat_default_quote(self, default_bot, super_group_id):
         message = default_bot.send_message(super_group_id, text="test_get_chat_default_quote")
-        default_bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
-                                     disable_notification=True)
+        assert default_bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
+                                            disable_notification=True)
 
         chat = default_bot.get_chat(super_group_id)
-        chat.pinned_message == message
         assert chat.pinned_message.default_quote is True
 
-        default_bot.unpinChatMessage(super_group_id)
+        assert default_bot.unpinChatMessage(super_group_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
