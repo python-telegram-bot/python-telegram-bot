@@ -1519,6 +1519,10 @@ class Bot(TelegramObject):
                 if (res.input_message_content._has_parse_mode
                         and res.input_message_content.parse_mode is DEFAULT_NONE):
                     res.input_message_content.parse_mode = self.defaults.parse_mode
+                if (res.input_message_content._has_disable_web_page_preview
+                        and res.input_message_content.disable_web_page_preview is DEFAULT_NONE):
+                    res.input_message_content.disable_web_page_preview = \
+                        self.defaults.disable_web_page_preview
         results = [res.to_dict() for res in results]
 
         data = {'inline_query_id': inline_query_id, 'results': results}

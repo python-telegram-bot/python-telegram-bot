@@ -32,3 +32,7 @@ class InputMessageContent(TelegramObject):
     @property
     def _has_parse_mode(self):
         return hasattr(self, 'parse_mode')
+
+    @property
+    def _has_disable_web_page_preview(self):
+        return hasattr(self, 'disable_web_page_preview')

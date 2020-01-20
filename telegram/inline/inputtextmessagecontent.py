@@ -47,7 +47,7 @@ class InputTextMessageContent(InputMessageContent):
     def __init__(self,
                  message_text,
                  parse_mode=DEFAULT_NONE,
-                 disable_web_page_preview=None,
+                 disable_web_page_preview=DEFAULT_NONE,
                  **kwargs):
         # Required
         self.message_text = message_text
