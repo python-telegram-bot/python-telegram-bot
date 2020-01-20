@@ -101,7 +101,10 @@ class CallbackQuery(TelegramObject):
         data = super(CallbackQuery, cls).de_json(data, bot)
 
         data['from_user'] = User.de_json(data.get('from'), bot)
-        data['message'] = Message.de_json(data.get('message'), bot)
+        message = data.get('message')
+        if message:
+            message['default_quote'] = data.get('default_quote')
+        data['message'] = Message.de_json(message, bot)
 
         return cls(bot=bot, **data)
 

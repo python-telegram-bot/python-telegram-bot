@@ -91,6 +91,8 @@ class Bot(TelegramObject):
             `disable_web_page_preview` parameter used if not set explicitly in method call.
         default_timeout (:obj:`int` | :obj:`float`, optional): Default setting for the
             `timeout` parameter used if not set explicitly in method call.
+        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
+            :attr:`telegram.Message.reply_text` and friends.
 
     """
 
@@ -136,6 +138,7 @@ class Bot(TelegramObject):
                  default_parse_mode=None,
                  default_disable_notification=None,
                  default_disable_web_page_preview=None,
+                 default_quote=None,
                  # Timeout needs special treatment, since the bot methods have two different
                  # default values for timeout (None and 20s)
                  default_timeout=DEFAULT_NONE):
@@ -145,7 +148,8 @@ class Bot(TelegramObject):
         self.defaults = Defaults(parse_mode=default_parse_mode,
                                  disable_notification=default_disable_notification,
                                  disable_web_page_preview=default_disable_web_page_preview,
-                                 timeout=default_timeout)
+                                 timeout=default_timeout,
+                                 quote=default_quote)
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -185,6 +189,8 @@ class Bot(TelegramObject):
 
         if result is True:
             return result
+
+        result['default_quote'] = self.defaults.quote
 
         return Message.de_json(result, self)
 
@@ -1049,6 +1055,9 @@ class Bot(TelegramObject):
             data['disable_notification'] = disable_notification
 
         result = self._request.post(url, data, timeout=timeout)
+
+        for res in result:
+            res['default_quote'] = self.defaults.quote
 
         return [Message.de_json(res, self) for res in result]
 
@@ -2063,6 +2072,9 @@ class Bot(TelegramObject):
         else:
             self.logger.debug('No new updates found.')
 
+        for u in result:
+            u['default_quote'] = self.defaults.quote
+
         return [Update.de_json(u, self) for u in result]
 
     @log
@@ -2237,6 +2249,8 @@ class Bot(TelegramObject):
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
+
+        result['default_quote'] = self.defaults.quote
 
         return Chat.de_json(result, self)
 

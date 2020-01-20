@@ -89,6 +89,8 @@ class Updater(object):
             `disable_web_page_preview` parameter used if not set explicitly in method call.
         default_timeout (:obj:`int` | :obj:`float`, optional): Default setting for the
             `timeout` parameter used if not set explicitly in method call.
+        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
+            :attr:`telegram.Message.reply_text` and friends.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -114,6 +116,7 @@ class Updater(object):
                  default_disable_notification=None,
                  default_disable_web_page_preview=None,
                  default_timeout=DEFAULT_NONE,
+                 default_quote=None,
                  use_context=False):
 
         if (token is None) and (bot is None):
@@ -150,7 +153,8 @@ class Updater(object):
                            default_parse_mode=default_parse_mode,
                            default_disable_notification=default_disable_notification,
                            default_disable_web_page_preview=default_disable_web_page_preview,
-                           default_timeout=default_timeout)
+                           default_timeout=default_timeout,
+                           default_quote=default_quote)
         self.user_sig_handler = user_sig_handler
         self.update_queue = Queue()
         self.job_queue = JobQueue()
@@ -171,6 +175,9 @@ class Updater(object):
         self.httpd = None
         self.__lock = Lock()
         self.__threads = []
+
+        # Just for passing to WebhookAppClass
+        self._default_quote = default_quote
 
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper, name="Bot:{}:{}".format(self.bot.id, name),
@@ -386,7 +393,8 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue,
+                              default_quote=self._default_quote)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate

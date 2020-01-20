@@ -432,6 +432,9 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`): Optional. If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
+        quote (:obj:`bool`): Optional. If set to ``True``, the reply is sent as an actual reply to
+            the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: ``True`` in group chats and ``False`` in private chats.
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
@@ -443,6 +446,9 @@ class Defaults:
         timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
             read timeout from the server (instead of the one specified during creation of the
             connection pool).
+        quote (:obj:`bool`, opitonal): If set to ``True``, the reply is sent as an actual reply to
+            the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            be ignored. Default: ``True`` in group chats and ``False`` in private chats.
     """
     def __init__(self,
                  parse_mode=None,
@@ -450,17 +456,20 @@ class Defaults:
                  disable_web_page_preview=None,
                  # Timeout needs special treatment, since the bot methods have two different
                  # default values for timeout (None and 20s)
-                 timeout=DEFAULT_NONE):
+                 timeout=DEFAULT_NONE,
+                 quote=None):
         self.parse_mode = parse_mode
         self.disable_notification = disable_notification
         self.disable_web_page_preview = disable_web_page_preview
         self.timeout = timeout
+        self.quote = quote
 
     def __hash__(self):
         return hash((self.parse_mode,
                      self.disable_notification,
                      self.disable_web_page_preview,
-                     self.timeout))
+                     self.timeout,
+                     self.quote))
 
     def __eq__(self, other):
         if isinstance(other, Defaults):

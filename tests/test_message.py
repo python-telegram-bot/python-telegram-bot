@@ -94,7 +94,8 @@ def message(bot):
                     {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
                         'text': 'start', 'url': 'http://google.com'}, {
                         'text': 'next', 'callback_data': 'abcd'}],
-                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}}
+                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}},
+                    {'default_quote': True}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -103,7 +104,8 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group', 'passport_data', 'poll', 'reply_markup'])
+                     'photo_from_media_group', 'passport_data', 'poll', 'reply_markup',
+                     'default_quote'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -652,6 +654,27 @@ class TestMessage(object):
 
         monkeypatch.setattr(message.bot, 'delete_message', test)
         assert message.delete()
+
+    def test_default_quote(self, message):
+        kwargs = {}
+
+        message.default_quote = False
+        message._quote(kwargs)
+        assert 'reply_to_message_id' not in kwargs
+
+        message.default_quote = True
+        message._quote(kwargs)
+        assert 'reply_to_message_id' in kwargs
+
+        kwargs = {}
+        message.default_quote = None
+        message.chat.type = Chat.PRIVATE
+        message._quote(kwargs)
+        assert 'reply_to_message_id' not in kwargs
+
+        message.chat.type = Chat.GROUP
+        message._quote(kwargs)
+        assert 'reply_to_message_id' in kwargs
 
     def test_equality(self):
         id = 1

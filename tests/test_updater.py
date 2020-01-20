@@ -221,6 +221,30 @@ class TestUpdater(object):
         assert q.get(False) == update
         updater.stop()
 
+    def test_webhook_default_quote(self, monkeypatch, updater):
+        updater._default_quote = True
+        q = Queue()
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port for travis
+        updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN')
+        sleep(.2)
+
+        # Now, we send an update to the server via urlopen
+        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                           text='Webhook'))
+        self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
+        sleep(.2)
+        # assert q.get(False) == update
+        assert q.get(False).message.default_quote is True
+        updater.stop()
+
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError(''),)],
                              ids=('TelegramError',))
