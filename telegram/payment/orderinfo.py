@@ -45,6 +45,8 @@ class OrderInfo(TelegramObject):
         self.email = email
         self.shipping_address = shipping_address
 
+        self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:

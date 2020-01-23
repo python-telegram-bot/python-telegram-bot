@@ -79,6 +79,17 @@ class ChatPermissions(TelegramObject):
         self.can_invite_users = can_invite_users
         self.can_pin_messages = can_pin_messages
 
+        self._id_attrs = (
+            self.can_send_messages,
+            self.can_send_media_messages,
+            self.can_send_polls,
+            self.can_send_other_messages,
+            self.can_add_web_page_previews,
+            self.can_change_info,
+            self.can_invite_users,
+            self.can_pin_messages
+        )
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:

@@ -41,6 +41,8 @@ class GameHighScore(TelegramObject):
         self.user = user
         self.score = score
 
+        self._id_attrs = (self.position, self.user, self.score)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:

@@ -50,6 +50,14 @@ class Invoice(TelegramObject):
         self.currency = currency
         self.total_amount = total_amount
 
+        self._id_attrs = (
+            self.title,
+            self.description,
+            self.start_parameter,
+            self.currency,
+            self.total_amount,
+        )
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:

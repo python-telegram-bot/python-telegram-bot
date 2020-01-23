@@ -40,6 +40,8 @@ class UserProfilePhotos(TelegramObject):
         self.total_count = int(total_count)
         self.photos = photos
 
+        self._id_attrs = (self.total_count, self.photos)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
@@ -59,3 +61,6 @@ class UserProfilePhotos(TelegramObject):
             data['photos'].append([x.to_dict() for x in photo])
 
         return data
+
+    def __hash__(self):
+        return hash(tuple(tuple(p for p in photo) for photo in self.photos))

@@ -40,6 +40,8 @@ class PollOption(TelegramObject):
         self.text = text
         self.voter_count = voter_count
 
+        self._id_attrs = (self.text,)
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:

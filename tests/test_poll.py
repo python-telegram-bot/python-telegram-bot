@@ -49,6 +49,21 @@ class TestPollOption(object):
         assert poll_option_dict['text'] == poll_option.text
         assert poll_option_dict['voter_count'] == poll_option.voter_count
 
+    def test_equality(self):
+        a = PollOption('text', 1)
+        b = PollOption('text', 2)
+        c = PollOption('text_1', 1)
+        d = Poll(123, 'question', ['O1', 'O2'], False)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
 
 @pytest.fixture(scope='class')
 def poll():
@@ -90,3 +105,18 @@ class TestPoll(object):
         assert poll_dict['question'] == poll.question
         assert poll_dict['options'] == [o.to_dict() for o in poll.options]
         assert poll_dict['is_closed'] == poll.is_closed
+
+    def test_equality(self):
+        a = Poll(123, 'question', ['o1', 'o2'], False)
+        b = Poll(123, 'question?', ['o1.1', 'o2.2'], True)
+        c = Poll(456, 'question?', ['o1.1', 'o2.2'], True)
+        d = PollOption('Text', 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

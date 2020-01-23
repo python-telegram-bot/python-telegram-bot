@@ -43,3 +43,5 @@ class InputLocationMessageContent(InputMessageContent):
         self.latitude = latitude
         self.longitude = longitude
         self.live_period = live_period
+
+        self._id_attrs = (self.latitude, self.longitude, self.live_period)

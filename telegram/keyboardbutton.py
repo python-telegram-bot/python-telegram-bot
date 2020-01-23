@@ -54,3 +54,5 @@ class KeyboardButton(TelegramObject):
         # Optionals
         self.request_contact = request_contact
         self.request_location = request_location
+
+        self._id_attrs = (self.text, self.request_contact, self.request_location)

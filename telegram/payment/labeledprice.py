@@ -41,3 +41,5 @@ class LabeledPrice(TelegramObject):
     def __init__(self, label, amount, **kwargs):
         self.label = label
         self.amount = amount
+
+        self._id_attrs = (self.label, self.amount)

@@ -57,3 +57,10 @@ class InputVenueMessageContent(InputMessageContent):
         # Optionals
         self.foursquare_id = foursquare_id
         self.foursquare_type = foursquare_type
+
+        self._id_attrs = (
+            self.latitude,
+            self.longitude,
+            self.title,
+            self.address
+        )

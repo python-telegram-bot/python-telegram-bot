@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InputVenueMessageContent
+from telegram import InputVenueMessageContent, Location
 
 
 @pytest.fixture(scope='class')
@@ -62,3 +62,18 @@ class TestInputVenueMessageContent(object):
                 == input_venue_message_content.foursquare_id)
         assert (input_venue_message_content_dict['foursquare_type']
                 == input_venue_message_content.foursquare_type)
+
+    def test_equality(self):
+        a = InputVenueMessageContent(123, 456, 'title', 'address')
+        b = InputVenueMessageContent(123, 456, 'title', 'address', foursquare_id=123)
+        c = InputVenueMessageContent(456, 123, 'title', 'address', foursquare_id=123)
+        d = Location(123, 456)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)

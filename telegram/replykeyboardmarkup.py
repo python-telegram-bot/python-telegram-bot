@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from telegram import ReplyMarkup
+from .keyboardbutton import KeyboardButton
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):
@@ -66,7 +67,16 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                  selective=False,
                  **kwargs):
         # Required
-        self.keyboard = keyboard
+        self.keyboard = []
+        for row in keyboard:
+            r = []
+            for button in row:
+                if hasattr(button, 'to_dict'):
+                    r.append(button)  # telegram.KeyboardButton
+                else:
+                    r.append(KeyboardButton(button))  # str
+            self.keyboard.append(r)
+
         # Optionals
         self.resize_keyboard = bool(resize_keyboard)
         self.one_time_keyboard = bool(one_time_keyboard)
@@ -213,3 +223,22 @@ class ReplyKeyboardMarkup(ReplyMarkup):
                    one_time_keyboard=one_time_keyboard,
                    selective=selective,
                    **kwargs)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if len(self.keyboard) != len(other.keyboard):
+                return False
+            for idx, row in enumerate(self.keyboard):
+                if len(row) != len(other.keyboard[idx]):
+                    return False
+                for jdx, button in enumerate(row):
+                    if button != other.keyboard[idx][jdx]:
+                        return False
+            return True
+        return super(ReplyKeyboardMarkup, self).__eq__(other)  # pylint: disable=no-member
+
+    def __hash__(self):
+        return hash((
+            tuple(tuple(button for button in row) for row in self.keyboard),
+            self.resize_keyboard, self.one_time_keyboard, self.selective
+        ))

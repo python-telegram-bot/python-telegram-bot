@@ -49,3 +49,5 @@ class ForceReply(ReplyMarkup):
         self.force_reply = bool(force_reply)
         # Optionals
         self.selective = bool(selective)
+
+        self._id_attrs = (self.force_reply, self.selective)
