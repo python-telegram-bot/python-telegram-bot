@@ -55,21 +55,34 @@ def poll():
     return Poll(TestPoll.id,
                 TestPoll.question,
                 TestPoll.options,
-                TestPoll.is_closed)
+                TestPoll.total_voter_count,
+                TestPoll.is_closed,
+                TestPoll.is_anonymous,
+                TestPoll.type,
+                TestPoll.allows_multiple_answers
+                )
 
 
 class TestPoll(object):
     id = 'id'
     question = 'Test?'
     options = [PollOption('test', 10), PollOption('test2', 11)]
+    total_voter_count = 0
     is_closed = True
+    is_anonymous = False
+    type = Poll.REGULAR
+    allows_multiple_answers = True
 
     def test_de_json(self):
         json_dict = {
             'id': self.id,
             'question': self.question,
             'options': [o.to_dict() for o in self.options],
-            'is_closed': self.is_closed
+            'total_voter_count': self.total_voter_count,
+            'is_closed': self.is_closed,
+            'is_anonymous': self.is_anonymous,
+            'type': self.type,
+            'allows_multiple_answers': self.allows_multiple_answers
         }
         poll = Poll.de_json(json_dict, None)
 
@@ -80,7 +93,11 @@ class TestPoll(object):
         assert poll.options[0].voter_count == self.options[0].voter_count
         assert poll.options[1].text == self.options[1].text
         assert poll.options[1].voter_count == self.options[1].voter_count
+        assert poll.total_voter_count == self.total_voter_count
         assert poll.is_closed == self.is_closed
+        assert poll.is_anonymous == self.is_anonymous
+        assert poll.type == self.type
+        assert poll.allows_multiple_answers == self.allows_multiple_answers
 
     def test_to_dict(self, poll):
         poll_dict = poll.to_dict()
@@ -89,4 +106,8 @@ class TestPoll(object):
         assert poll_dict['id'] == poll.id
         assert poll_dict['question'] == poll.question
         assert poll_dict['options'] == [o.to_dict() for o in poll.options]
+        assert poll_dict['total_voter_count'] == poll.total_voter_count
         assert poll_dict['is_closed'] == poll.is_closed
+        assert poll_dict['is_anonymous'] == poll.is_anonymous
+        assert poll_dict['type'] == poll.type
+        assert poll_dict['allows_multiple_answers'] == poll.allows_multiple_answers

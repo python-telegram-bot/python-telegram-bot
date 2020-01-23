@@ -20,24 +20,28 @@
 import pytest
 
 from telegram import KeyboardButton
+from telegram.keyboardbuttonpolltype import KeyboardButtonPollType
 
 
 @pytest.fixture(scope='class')
 def keyboard_button():
     return KeyboardButton(TestKeyboardButton.text,
                           request_location=TestKeyboardButton.request_location,
-                          request_contact=TestKeyboardButton.request_contact)
+                          request_contact=TestKeyboardButton.request_contact,
+                          request_poll=TestKeyboardButton.request_poll)
 
 
 class TestKeyboardButton(object):
     text = 'text'
     request_location = True
     request_contact = True
+    request_poll = KeyboardButtonPollType("quiz")
 
     def test_expected_values(self, keyboard_button):
         assert keyboard_button.text == self.text
         assert keyboard_button.request_location == self.request_location
         assert keyboard_button.request_contact == self.request_contact
+        assert keyboard_button.request_poll == self.request_poll
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -46,3 +50,4 @@ class TestKeyboardButton(object):
         assert keyboard_button_dict['text'] == keyboard_button.text
         assert keyboard_button_dict['request_location'] == keyboard_button.request_location
         assert keyboard_button_dict['request_contact'] == keyboard_button.request_contact
+        assert keyboard_button_dict['request_poll'] == keyboard_button.request_poll.to_dict()

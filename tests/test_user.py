@@ -29,7 +29,10 @@ def json_dict():
         'first_name': TestUser.first_name,
         'last_name': TestUser.last_name,
         'username': TestUser.username,
-        'language_code': TestUser.language_code
+        'language_code': TestUser.language_code,
+        'can_join_groups': TestUser.can_join_groups,
+        'can_read_all_group_messages': TestUser.can_read_all_group_messages,
+        'supports_inline_queries': TestUser.supports_inline_queries
     }
 
 
@@ -37,7 +40,9 @@ def json_dict():
 def user(bot):
     return User(id=TestUser.id, first_name=TestUser.first_name, is_bot=TestUser.is_bot,
                 last_name=TestUser.last_name, username=TestUser.username,
-                language_code=TestUser.language_code, bot=bot)
+                language_code=TestUser.language_code, can_join_groups=TestUser.can_join_groups,
+                can_read_all_group_messages=TestUser.can_read_all_group_messages,
+                supports_inline_queries=TestUser.supports_inline_queries, bot=bot)
 
 
 class TestUser(object):
@@ -47,6 +52,9 @@ class TestUser(object):
     last_name = u'last\u2022name'
     username = 'username'
     language_code = 'en_us'
+    can_join_groups = True
+    can_read_all_group_messages = True
+    supports_inline_queries = False
 
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)
@@ -57,6 +65,9 @@ class TestUser(object):
         assert user.last_name == self.last_name
         assert user.username == self.username
         assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
 
     def test_de_json_without_username(self, json_dict, bot):
         del json_dict['username']
@@ -69,6 +80,9 @@ class TestUser(object):
         assert user.last_name == self.last_name
         assert user.username is None
         assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
 
     def test_de_json_without_username_and_last_name(self, json_dict, bot):
         del json_dict['username']
@@ -82,6 +96,9 @@ class TestUser(object):
         assert user.last_name is None
         assert user.username is None
         assert user.language_code == self.language_code
+        assert user.can_join_groups == self.can_join_groups
+        assert user.can_read_all_group_messages == self.can_read_all_group_messages
+        assert user.supports_inline_queries == self.supports_inline_queries
 
     def test_name(self, user):
         assert user.name == '@username'
