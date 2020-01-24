@@ -38,9 +38,11 @@ try:
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
     from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
 except ImportError:  # pragma: no cover
-    warnings.warn("python-telegram-bot wasn't properly installed. Please refer to README.rst on "
-                  "how to properly install.")
-    raise
+    import urllib3
+    import urllib3.contrib.appengine as appengine
+    from urllib3.connection import HTTPConnection
+    from urllib3.util.timeout import Timeout
+    from urllib3.fields import RequestField
 
 from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,

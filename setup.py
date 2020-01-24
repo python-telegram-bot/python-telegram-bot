@@ -3,6 +3,8 @@
 
 import codecs
 import os
+import sys
+
 from setuptools import setup, find_packages
 
 
@@ -18,6 +20,13 @@ def requirements():
 
 
 packages = find_packages(exclude=['tests*'])
+requirements = requirements()
+
+# Allow for a package install to not use the vendored urllib3
+if '--with-urllib3' in sys.argv:
+    sys.argv.remove('--with-urllib3')
+    requirements.append('urllib3')
+    packages = [package for package in packages if 'urllib3' not in package]
 
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
     fn = os.path.join('telegram', 'version.py')
@@ -35,7 +44,7 @@ with codecs.open('README.rst', 'r', 'utf-8') as fd:
           description="We have made you a wrapper you can't refuse",
           long_description=fd.read(),
           packages=packages,
-          install_requires=requirements(),
+          install_requires=requirements,
           extras_require={
               'json': 'ujson',
               'socks': 'PySocks'
