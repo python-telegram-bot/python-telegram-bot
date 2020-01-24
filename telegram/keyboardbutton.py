@@ -44,14 +44,14 @@ class KeyboardButton(TelegramObject):
             when the button is pressed. Available in private chats only.
         request_poll (:class:`KeyboardButtonPollType`, optional): If specified, the user will be
             asked to create a poll and send it to the bot when the button is pressed. Available in
-             private chats only.
+            private chats only.
 
     Note:
         :attr:`request_contact` and :attr:`request_location` options will only work in Telegram
         versions released after 9 April, 2016. Older clients will ignore them.
 
         :attr:`request_poll` option will only work in Telegram versions released after 23 January,
-         2020. Older clients will receive unsupported message.
+        2020. Older clients will receive unsupported message.
 
     """
 
