@@ -42,7 +42,7 @@ class KeyboardButton(TelegramObject):
             a contact when the button is pressed. Available in private chats only.
         request_location (:obj:`bool`, optional): If True, the user's current location will be sent
             when the button is pressed. Available in private chats only.
-        request_poll  (:class:`KeyboardButtonPollType`, optional): If specified, the user will be
+        request_poll (:class:`KeyboardButtonPollType`, optional): If specified, the user will be
             asked to create a poll and send it to the bot when the button is pressed. Available in
              private chats only.
 

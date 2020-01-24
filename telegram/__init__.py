@@ -38,6 +38,7 @@ from .files.videonote import VideoNote
 from .chataction import ChatAction
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbutton import KeyboardButton
+from .keyboardbuttonpolltype import KeyboardButtonPollType
 from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove
@@ -48,7 +49,7 @@ from .files.file import File
 from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .games.game import Game
-from .poll import Poll, PollOption
+from .poll import Poll, PollOption, PollAnswer
 from .loginurl import LoginUrl
 from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
@@ -156,5 +157,5 @@ __all__ = [
     'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError',
     'PassportElementErrorSelfie', 'PassportElementErrorTranslationFile',
     'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified', 'Poll',
-    'PollOption', 'LoginUrl'
+    'PollOption', 'PollAnswer', 'LoginUrl', 'KeyboardButtonPollType'
 ]

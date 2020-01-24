@@ -31,6 +31,7 @@ telegram package
     telegram.inputmediaphoto
     telegram.inputmediavideo
     telegram.keyboardbutton
+    telegram.keyboardbuttonpolltype
     telegram.location
     telegram.loginurl
     telegram.message
@@ -38,6 +39,7 @@ telegram package
     telegram.parsemode
     telegram.photosize
     telegram.poll
+    telegram.pollanswer
     telegram.polloption
     telegram.replykeyboardremove
     telegram.replykeyboardmarkup
