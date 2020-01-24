@@ -231,15 +231,6 @@ class JobQueue(object):
             :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
             queue.
 
-        Notes:
-             This method runs the function every monthly at the given date. To set
-             a monthly job at the end of every month, you can invoke using the following:
-
-             ``job_queue.run_monthly(callback, when, 31, context=context, day_is_strict=False)``
-
-             This would mean that on the months whereby the date does not exist (E.g April 31st),
-             the job would get scheduled on the last day of the month instead (i.e April 30th).
-
         """
         if 1 <= day <= 31:
             next_dt = self._get_next_month_date(day, day_is_strict, when)

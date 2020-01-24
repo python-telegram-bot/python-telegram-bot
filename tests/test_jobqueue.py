@@ -296,15 +296,8 @@ class TestJobQueue(object):
         expected_reschedule_time = now + delta
 
         day = date_time.day
-        next_job_day = date_time + dtm.timedelta(calendar.monthrange(
-            date_time.year, date_time.month)[1])
         expected_reschedule_time += calendar.monthrange(date_time.year,
                                                         date_time.month)[1] * 24 * 60 * 60
-        if next_job_day.day != day:
-            # account for when next month does not have the specified date
-            day_difference = day - next_job_day.day
-            next_job_day += dtm.timedelta(day_difference)
-            expected_reschedule_time += day_difference * 24 * 60 * 60
 
         job_queue.run_monthly(self.job_run_once, time_of_day, day)
         sleep(0.2)
@@ -320,19 +313,9 @@ class TestJobQueue(object):
         day = date_time.day
         date_time += dtm.timedelta(calendar.monthrange(date_time.year,
                                                        date_time.month)[1] - day)
-        # next job should be scheduled on last day of month if day_is_strict is True
+        # next job should be scheduled on last day of month if day_is_strict is False
         expected_reschedule_time += (calendar.monthrange(date_time.year,
                                                          date_time.month)[1] - day) * 24 * 60 * 60
-
-        if day == calendar.monthrange(date_time.year, date_time.month)[1]:
-            # next job should be scheduled at the end of the next month if this test is run on
-            # the last day of month
-            days_to_last_day = calendar.monthrange(date_time.year + 1
-                                                   if date_time.month == 12
-                                                   else date_time.year,
-                                                   1 if date_time.month == 12
-                                                   else date_time.month + 1)[1]
-            expected_reschedule_time += days_to_last_day * 24 * 60 * 60
 
         job_queue.run_monthly(self.job_run_once, time_of_day, 31, day_is_strict=False)
         assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
@@ -358,16 +341,8 @@ class TestJobQueue(object):
         target_time = target_datetime.timetz()
         target_day = target_datetime.day
         expected_reschedule_time = now + delta
-
-        next_job_day = target_datetime + dtm.timedelta(calendar.monthrange(
-            target_datetime.year,
-            target_datetime.month)[1])
         expected_reschedule_time += calendar.monthrange(target_datetime.year,
                                                         target_datetime.month)[1] * 24 * 60 * 60
-        if next_job_day.day != target_day:
-            day_difference = target_day - next_job_day.day
-            next_job_day += dtm.timedelta(day_difference)
-            expected_reschedule_time += day_difference * 24 * 60 * 60
 
         job_queue.run_monthly(self.job_run_once, target_time, target_day)
         sleep(delta + 0.1)
