@@ -55,12 +55,12 @@ class PollAnswer(TelegramObject):
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
-        option_ids (List[:obj:`id`]): Identifiers of answer options, chosen by the user.
+        option_ids (List[:obj:`int`]): Identifiers of answer options, chosen by the user.
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
-        option_ids (List[:obj:`id`]): 0-based identifiers of answer options, chosen by the user.
+        option_ids (List[:obj:`int`]): 0-based identifiers of answer options, chosen by the user.
             May be empty if the user retracted their vote.
 
     """
@@ -92,10 +92,10 @@ class Poll(TelegramObject):
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, 1-255 characters.
         options (List[:class:`PollOption`]): List of poll options.
-        total_voter_count (:obj:`int`): Total number of users that voted in the poll
+        total_voter_count (:obj:`int`): Total number of users that voted in the poll.
         is_closed (:obj:`bool`): True, if the poll is closed.
         is_anonymous (:obj:`bool`): True, if the poll is anonymous.
-        type (:obj:`str`): Poll type, currently can be :attr:REGULAR or :attr:QUIZ.
+        type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): True, if the poll allows multiple answers.
         correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
 
@@ -105,7 +105,7 @@ class Poll(TelegramObject):
         options (List[:class:`PollOption`]): List of poll options.
         is_closed (:obj:`bool`): True, if the poll is closed.
         is_anonymous (:obj:`bool`): True, if the poll is anonymous.
-        type (:obj:`str`): Poll type, currently can be :attr:REGULAR or :attr:QUIZ.
+        type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): True, if the poll allows multiple answers.
         correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer option.
             Available only for polls in the quiz mode, which are closed, or was sent (not
@@ -147,7 +147,7 @@ class Poll(TelegramObject):
 
         return data
 
-    QUIZ = "quiz"
-    """:obj:`str`: 'quiz'"""
     REGULAR = "regular"
     """:obj:`str`: 'regular'"""
+    QUIZ = "quiz"
+    """:obj:`str`: 'quiz'"""
