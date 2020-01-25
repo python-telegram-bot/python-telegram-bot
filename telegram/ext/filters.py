@@ -1036,6 +1036,22 @@ officedocument.wordprocessingml.document")``-
 
         channel_posts = _ChannelPosts()
 
+        class _Poll(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.poll
+
+        poll = _Poll()
+
+        class _PollAnswer(BaseFilter):
+            update_filter = True
+
+            def filter(self, update):
+                return update.poll_answer
+
+        poll_answer = _PollAnswer()
+
         def filter(self, update):
             return self.messages(update) or self.channel_posts(update)
 
@@ -1057,4 +1073,6 @@ officedocument.wordprocessingml.document")``-
             :attr:`telegram.Update.edited_channel_post`
         channel_posts: Updates with either :attr:`telegram.Update.channel_post` or
             :attr:`telegram.Update.edited_channel_post`
+        poll: Updates with :attr:`telegram.Update.poll`
+        poll_answer: Updates with :attr:`telegram.Update.poll_answer`
     """
