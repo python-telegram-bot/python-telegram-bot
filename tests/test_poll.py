@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Poll, PollOption
+from telegram import Poll, PollOption, PollAnswer, User
 
 
 @pytest.fixture(scope="class")
@@ -48,6 +48,38 @@ class TestPollOption(object):
         assert isinstance(poll_option_dict, dict)
         assert poll_option_dict['text'] == poll_option.text
         assert poll_option_dict['voter_count'] == poll_option.voter_count
+
+
+@pytest.fixture(scope="class")
+def poll_answer():
+    return PollAnswer(poll_id=TestPollAnswer.poll_id, user=TestPollAnswer.user,
+                      option_ids=TestPollAnswer.poll_id)
+
+
+class TestPollAnswer(object):
+    poll_id = 'id'
+    user = User(1, '', False)
+    option_ids = [2]
+
+    def test_de_json(self):
+        json_dict = {
+            'poll_id': self.poll_id,
+            'user': self.user.to_dict(),
+            'option_ids': self.option_ids
+        }
+        poll_answer = PollAnswer.de_json(json_dict, None)
+
+        assert poll_answer.poll_id == self.poll_id
+        assert poll_answer.user == self.user
+        assert poll_answer.option_ids == self.option_ids
+
+    def test_to_dict(self, poll_answer):
+        poll_answer_dict = poll_answer.to_dict()
+
+        assert isinstance(poll_answer_dict, dict)
+        assert poll_answer_dict['poll_id'] == poll_answer.poll_id
+        assert poll_answer_dict['user'] == poll_answer.user.to_dict()
+        assert poll_answer_dict['option_ids'] == poll_answer.option_ids
 
 
 @pytest.fixture(scope='class')

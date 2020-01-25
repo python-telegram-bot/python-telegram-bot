@@ -139,7 +139,7 @@ __all__ = [
     'InlineQueryResultPhoto', 'InlineQueryResultVenue', 'InlineQueryResultVideo',
     'InlineQueryResultVoice', 'InlineQueryResultGame', 'InputContactMessageContent', 'InputFile',
     'InputLocationMessageContent', 'InputMessageContent', 'InputTextMessageContent',
-    'InputVenueMessageContent', 'KeyboardButton', 'Location', 'EncryptedCredentials',
+    'InputVenueMessageContent', 'Location', 'EncryptedCredentials',
     'PassportFile', 'EncryptedPassportElement', 'PassportData', 'Message', 'MessageEntity',
     'ParseMode', 'PhotoSize', 'ReplyKeyboardRemove', 'ReplyKeyboardMarkup', 'ReplyMarkup',
     'Sticker', 'TelegramError', 'TelegramObject', 'Update', 'User', 'UserProfilePhotos', 'Venue',
@@ -157,5 +157,5 @@ __all__ = [
     'InputMediaAudio', 'InputMediaDocument', 'TelegramDecryptionError',
     'PassportElementErrorSelfie', 'PassportElementErrorTranslationFile',
     'PassportElementErrorTranslationFiles', 'PassportElementErrorUnspecified', 'Poll',
-    'PollOption', 'PollAnswer', 'LoginUrl', 'KeyboardButtonPollType'
+    'PollOption', 'PollAnswer', 'LoginUrl', 'KeyboardButton', 'KeyboardButtonPollType',
 ]
