@@ -3388,7 +3388,8 @@ class Bot(TelegramObject):
             options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
             is_anonymous (:obj:`bool`, optional): True, if the poll needs to be anonymous,
                 defaults to True.
-            type (:obj:`str`, optional): Poll type, “quiz” or “regular”, defaults to “regular”.
+            type (:obj:`str`, optional): Poll type, :attr:`telegram.Poll.QUIZ` or
+                :attr:`telegram.Poll.REGULAR`, defaults to :attr:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): True, if the poll allows multiple
                 answers, ignored for polls in quiz mode, defaults to False
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
@@ -3419,12 +3420,15 @@ class Bot(TelegramObject):
         data = {
             'chat_id': chat_id,
             'question': question,
-            'options': options,
-            'is_anonymous': is_anonymous,
-            'type': type,
-            'allows_multiple_answers': allows_multiple_answers
+            'options': options
         }
 
+        if is_anonymous:
+            data['is_anonymous'] = is_anonymous
+        if type:
+            data['type'] = type
+        if allows_multiple_answers:
+            data['allows_multiple_answers'] = allows_multiple_answers
         if correct_option_id:
             data['correct_option_id'] = correct_option_id
         if is_closed:

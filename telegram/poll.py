@@ -78,10 +78,7 @@ class PollAnswer(TelegramObject):
 
         data['user'] = User.de_json(data.get('user'), bot)
 
-    def to_dict(self):
-        data = super(PollAnswer, self).to_dict()
-
-        return data
+        return cls(**data)
 
 
 class Poll(TelegramObject):
@@ -123,9 +120,7 @@ class Poll(TelegramObject):
         self.is_anonymous = is_anonymous
         self.type = type
         self.allows_multiple_answers = allows_multiple_answers
-
-        if correct_option_id:
-            self.correct_option_id = correct_option_id
+        self.correct_option_id = correct_option_id
 
         self._id_attrs = (self.id,)
 
