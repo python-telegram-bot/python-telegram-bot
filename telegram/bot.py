@@ -455,10 +455,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the
-                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
-                is passed as a string or file_id.
+            thumb (`filelike object`, optional): Thumbnail of the file sent.
+                The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 320.
+                Ignored if the file is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -538,10 +538,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the
-                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
-                is passed as a string or file_id.
+            thumb (`filelike object`, optional): Thumbnail of the file sent.
+                The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 320.
+                Ignored if the file is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -676,10 +676,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the
-                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
-                is passed as a string or file_id.
+            thumb (`filelike object`, optional): Thumbnail of the file sent.
+                The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 320.
+                Ignored if the file is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -755,10 +755,10 @@ class Bot(TelegramObject):
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
                 JSON-serialized object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object`, optional): Thumbnail of the
-                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
-                is passed as a string or file_id.
+            thumb (`filelike object`, optional): Thumbnail of the file sent.
+                The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 320.
+                Ignored if the file is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -820,10 +820,10 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (`filelike object`, optional): Thumbnail of the
-                file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
-                is passed as a string or file_id.
+            thumb (`filelike object`, optional): Thumbnail of the file sent.
+                The thumbnail should be in JPEG format and less than 200 kB in size.
+                A thumbnail's width and height should not exceed 320.
+                Ignored if the file is passed as a string or file_id.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id), 0-1024 characters.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
