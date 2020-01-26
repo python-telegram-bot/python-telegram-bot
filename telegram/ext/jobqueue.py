@@ -102,7 +102,7 @@ class JobQueue(object):
         next_t = to_float_timestamp(time_spec, reference_timestamp=previous_t)
 
         # enqueue:
-        self.logger.debug('Putting job %s with t=%f', job.name, time_spec)
+        self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
 
         # Wake up the loop if this job should be executed next
