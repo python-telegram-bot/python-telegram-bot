@@ -744,6 +744,16 @@ class TestFilters(object):
         assert Filters.update.channel_posts(update)
         assert Filters.update(update)
 
+    def test_update_type_poll(self, update):
+        update.poll = True
+        assert Filters.update.poll(update)
+        assert Filters.update(update)
+
+    def test_update_type_poll_answer(self, update):
+        update.poll_answer = True
+        assert Filters.update.poll_answer(update)
+        assert Filters.update(update)
+
     def test_merged_short_circuit_and(self, update):
         update.message.text = '/test'
 
