@@ -956,6 +956,15 @@ officedocument.wordprocessingml.document")``-
     passport_data = _PassportData()
     """Messages that contain a :class:`telegram.PassportData`"""
 
+    class _Poll(BaseFilter):
+        name = 'Filters.poll'
+
+        def filter(self, message):
+            return bool(message.poll)
+
+    poll = _Poll()
+    """Messages that contain a :class:`telegram.Poll`."""
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 
