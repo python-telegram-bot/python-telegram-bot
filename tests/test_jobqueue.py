@@ -119,6 +119,11 @@ class TestJobQueue(object):
         sleep(0.07)
         assert self.result == 1
 
+    def test_run_repeating_first_immediate(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.1, first=0)
+        sleep(0.05)
+        assert self.result == 1
+
     def test_run_repeating_first_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
         first = (dtm.datetime.utcnow() + timezone.utcoffset(None)).replace(tzinfo=timezone)
