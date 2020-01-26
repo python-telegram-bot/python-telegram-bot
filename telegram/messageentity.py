@@ -37,7 +37,7 @@ class MessageEntity(TelegramObject):
         type (:obj:`str`): Type of the entity. Can be mention (@username), hashtag, bot_command,
             url, email, bold (bold text), italic (italic text), code (monowidth string), pre
             (monowidth block), text_link (for clickable text URLs), text_mention (for users
-            without usernames).
+            without usernames), strikethrough (striked text).
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For "text_link" only, url that will be opened after usertaps on
@@ -105,8 +105,11 @@ class MessageEntity(TelegramObject):
     """:obj:`str`: 'text_link'"""
     TEXT_MENTION = 'text_mention'
     """:obj:`str`: 'text_mention'"""
+    STRIKETHROUGH = 'strikethrough'
+    """:obj:`str`: 'strikethrough'"""
     ALL_TYPES = [
         MENTION, HASHTAG, CASHTAG, PHONE_NUMBER, BOT_COMMAND, URL,
-        EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION
+        EMAIL, BOLD, ITALIC, CODE, PRE, TEXT_LINK, TEXT_MENTION,
+        STRIKETHROUGH
     ]
     """List[:obj:`str`]: List of all the types."""
