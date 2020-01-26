@@ -43,6 +43,8 @@ If you have an idea for something to do, first check if it's already been filed 
 
 Another great way to start contributing is by writing tests. Tests are really important because they help prevent developers from accidentally breaking existing code, allowing them to build cool things faster. If you're interested in helping out, let the development team know by posting to the `developers' mailing list`_, and we'll help you get started.
 
+That being said, we want to mention that we are very hesistant about adding new requirements to our projects. If you intend to do this, please state this in an issue and get a verification from one of the maintainers.
+
 Instructions for making a code change
 #####################################
 
