@@ -45,11 +45,11 @@ class TestFilters(object):
         update.message.text = 'test'
         assert (Filters.text)(update)
         update.message.text = '/test'
-        assert not (Filters.text)(update)
+        assert (Filters.text)(update)
 
     def test_filters_text_iterable(self, update):
-        update.message.text = 'test'
-        assert Filters.text({'test', 'test1'})(update)
+        update.message.text = '/test'
+        assert Filters.text({'/test', 'test1'})(update)
         assert not Filters.text(['test1', 'test2'])(update)
 
     def test_filters_caption(self, update):
@@ -630,7 +630,7 @@ class TestFilters(object):
         update.message.forward_date = datetime.datetime.utcnow()
         assert (Filters.text & Filters.forwarded)(update)
         update.message.text = '/test'
-        assert not (Filters.text & Filters.forwarded)(update)
+        assert (Filters.text & Filters.forwarded)(update)
         update.message.text = 'test'
         update.message.forward_date = None
         assert not (Filters.text & Filters.forwarded)(update)
