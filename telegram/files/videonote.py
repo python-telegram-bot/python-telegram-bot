@@ -67,7 +67,7 @@ class VideoNote(TelegramObject):
         self.file_size = file_size
         self.bot = bot
 
-        self._id_attrs = (self.file_id, self.file_unique_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):

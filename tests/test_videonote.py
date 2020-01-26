@@ -169,7 +169,7 @@ class TestVideoNote(object):
 
     def test_equality(self, video_note):
         a = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
-        b = VideoNote(video_note.file_id, video_note.file_unique_id, self.length, self.duration)
+        b = VideoNote('', video_note.file_unique_id, self.length, self.duration)
         c = VideoNote(video_note.file_id, video_note.file_unique_id, 0, 0)
         d = VideoNote('', '', self.length, self.duration)
         e = Voice(video_note.file_id, video_note.file_unique_id, self.duration)

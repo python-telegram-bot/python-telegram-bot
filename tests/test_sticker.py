@@ -222,7 +222,7 @@ class TestSticker(object):
     def test_equality(self, sticker):
         a = Sticker(sticker.file_id, sticker.file_unique_id, self.width,
                     self.height, self.is_animated)
-        b = Sticker(sticker.file_id, sticker.file_unique_id, self.width,
+        b = Sticker('', sticker.file_unique_id, self.width,
                     self.height, self.is_animated)
         c = Sticker(sticker.file_id, sticker.file_unique_id, 0, 0, False)
         d = Sticker('', '', self.width, self.height, self.is_animated)

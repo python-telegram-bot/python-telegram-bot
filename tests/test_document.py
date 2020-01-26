@@ -186,7 +186,7 @@ class TestDocument(object):
 
     def test_equality(self, document):
         a = Document(document.file_id, document.file_unique_id)
-        b = Document(document.file_id, document.file_unique_id)
+        b = Document('', document.file_unique_id)
         d = Document('', '')
         e = Voice(document.file_id, document.file_unique_id, 0)
 

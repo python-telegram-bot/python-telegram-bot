@@ -132,7 +132,7 @@ class TestFile(object):
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)
-        b = File(self.file_id, self.file_unique_id, bot)
+        b = File('', self.file_unique_id, bot)
         c = File(self.file_id, self.file_unique_id, None)
         d = File('', '', bot)
         e = Voice(self.file_id, self.file_unique_id, 0)

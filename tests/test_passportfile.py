@@ -57,7 +57,7 @@ class TestPassportFile(object):
 
     def test_equality(self):
         a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)
-        b = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)
+        b = PassportFile('', self.file_unique_id, self.file_size, self.file_date)
         c = PassportFile(self.file_id, self.file_unique_id, '', '')
         d = PassportFile('', '', self.file_size, self.file_date)
         e = PassportElementError('source', 'type', 'message')

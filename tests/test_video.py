@@ -212,7 +212,7 @@ class TestVideo(object):
 
     def test_equality(self, video):
         a = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
-        b = Video(video.file_id, video.file_unique_id, self.width, self.height, self.duration)
+        b = Video('', video.file_unique_id, self.width, self.height, self.duration)
         c = Video(video.file_id, video.file_unique_id, 0, 0, 0)
         d = Video('', '', self.width, self.height, self.duration)
         e = Voice(video.file_id, video.file_unique_id, self.duration)

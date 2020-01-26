@@ -193,7 +193,7 @@ class TestAnimation(object):
     def test_equality(self):
         a = Animation(self.animation_file_id, self.animation_file_unique_id,
                       self.height, self.width, self.duration)
-        b = Animation(self.animation_file_id, self.animation_file_unique_id,
+        b = Animation('', self.animation_file_unique_id,
                       self.height, self.width, self.duration)
         d = Animation('', '', 0, 0, 0)
         e = Voice(self.animation_file_id, self.animation_file_unique_id, 0)

@@ -63,7 +63,7 @@ class PassportFile(TelegramObject):
         self.bot = bot
         self._credentials = credentials
 
-        self._id_attrs = (self.file_id, self.file_unique_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):

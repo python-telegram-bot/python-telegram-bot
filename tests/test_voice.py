@@ -173,7 +173,7 @@ class TestVoice(object):
 
     def test_equality(self, voice):
         a = Voice(voice.file_id, voice.file_unique_id, self.duration)
-        b = Voice(voice.file_id, voice.file_unique_id, self.duration)
+        b = Voice('', voice.file_unique_id, self.duration)
         c = Voice(voice.file_id, voice.file_unique_id, 0)
         d = Voice('', '', self.duration)
         e = Audio(voice.file_id, voice.file_unique_id, self.duration)
