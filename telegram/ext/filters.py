@@ -241,7 +241,7 @@ class Filters(object):
                 self.name = 'Filters.text({})'.format(iterable)
 
             def filter(self, message):
-                if message.text and not message.text.startswith('/'):
+                if message.text:
                     return message.text in self.iterable
                 return False
 
@@ -255,7 +255,7 @@ class Filters(object):
                 return self._TextIterable(update)
 
         def filter(self, message):
-            return bool(message.text and not message.text.startswith('/'))
+            return bool(message.text)
 
     text = _Text()
     """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
@@ -954,6 +954,15 @@ officedocument.wordprocessingml.document")``-
     passport_data = _PassportData()
     """Messages that contain a :class:`telegram.PassportData`"""
 
+    class _Poll(BaseFilter):
+        name = 'Filters.poll'
+
+        def filter(self, message):
+            return bool(message.poll)
+
+    poll = _Poll()
+    """Messages that contain a :class:`telegram.Poll`."""
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 
@@ -985,8 +994,10 @@ officedocument.wordprocessingml.document")``-
 
     class _UpdateType(BaseFilter):
         update_filter = True
+        name = 'Filters.update'
 
         class _Message(BaseFilter):
+            name = 'Filters.update.message'
             update_filter = True
 
             def filter(self, update):
@@ -995,6 +1006,7 @@ officedocument.wordprocessingml.document")``-
         message = _Message()
 
         class _EditedMessage(BaseFilter):
+            name = 'Filters.update.edited_message'
             update_filter = True
 
             def filter(self, update):
@@ -1003,6 +1015,7 @@ officedocument.wordprocessingml.document")``-
         edited_message = _EditedMessage()
 
         class _Messages(BaseFilter):
+            name = 'Filters.update.messages'
             update_filter = True
 
             def filter(self, update):
@@ -1011,6 +1024,7 @@ officedocument.wordprocessingml.document")``-
         messages = _Messages()
 
         class _ChannelPost(BaseFilter):
+            name = 'Filters.update.channel_post'
             update_filter = True
 
             def filter(self, update):
@@ -1020,6 +1034,7 @@ officedocument.wordprocessingml.document")``-
 
         class _EditedChannelPost(BaseFilter):
             update_filter = True
+            name = 'Filters.update.edited_channel_post'
 
             def filter(self, update):
                 return update.edited_channel_post is not None
@@ -1028,6 +1043,7 @@ officedocument.wordprocessingml.document")``-
 
         class _ChannelPosts(BaseFilter):
             update_filter = True
+            name = 'Filters.update.channel_posts'
 
             def filter(self, update):
                 return update.channel_post is not None or update.edited_channel_post is not None

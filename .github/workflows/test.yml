@@ -5,6 +5,9 @@ on:
       - master
   schedule:
     - cron: 7 3 * * *
+  push:
+    branches: 
+      - master
 
 jobs:
   pytest:
@@ -87,6 +90,7 @@ jobs:
         run: |
           pytest -v tests/test_official.py
           exit $?
+        continue-on-error: True
         env:
           TEST_OFFICIAL: "true"
         shell: bash --noprofile --norc {0}
