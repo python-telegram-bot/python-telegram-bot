@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
 
-from telegram.utils.helpers import enocde_conversations_to_json
+from telegram.utils.helpers import encode_conversations_to_json
 
 try:
     import ujson as json
@@ -774,7 +774,7 @@ class TestDictPersistence(object):
         dict_persistence.update_conversation('name3', (1, 2), 3)
         assert dict_persistence.conversations == conversations_two
         assert dict_persistence.conversations_json != conversations_json
-        assert dict_persistence.conversations_json == enocde_conversations_to_json(
+        assert dict_persistence.conversations_json == encode_conversations_to_json(
             conversations_two)
 
     def test_with_handler(self, bot, update):
