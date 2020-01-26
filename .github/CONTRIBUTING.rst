@@ -238,6 +238,6 @@ break the API classes. For example:
 .. _`developers' mailing list`: mailto:devs@python-telegram-bot.org
 .. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
 .. _`sphinx`: http://sphinx-doc.org
-.. _`Google Python Style Guide`: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
-.. _`Google Python Style Docstrings`: http://sphinx-doc.org/latest/ext/example_google.html
+.. _`Google Python Style Guide`: http://google.github.io/styleguide/pyguide.html
+.. _`Google Python Style Docstrings`: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _AUTHORS.rst: ../AUTHORS.rst
