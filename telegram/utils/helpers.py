@@ -20,7 +20,7 @@
 import datetime as dtm  # dtm = "DateTime Module"
 import time
 
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 from numbers import Number
 
 try:
@@ -272,17 +272,24 @@ def extract_urls(message):
     results = message.parse_entities(types=types)
     results.update(message.parse_caption_entities(types=types))
 
-    # Sort results by order of appearence, i.e. the MessageEntity offset
-    sorted_results = sorted(results.items(), key=lambda e: e[0].offset)
-
     # Get the actual urls
-    all_urls = (v if k.type == MessageEntity.URL else k.url for k, v in sorted_results)
+    for k in results:
+        if k.type == MessageEntity.TEXT_LINK:
+            results[k] = k.url
 
-    # Remove exact duplicates, in a way that is compliant with legacy python
-    urls = OrderedDict()
-    for k in all_urls:
-        urls[k] = None
-    return list(urls.keys())
+    # Remove exact duplicates and keep the first appearance
+    filtered_results = {}
+    for k, v in results.items():
+        if not filtered_results.get(v):
+            filtered_results[v] = k
+        else:
+            if k.offset < filtered_results[v].offset:
+                filtered_results[v] = k
+
+    # Sort results by order of appearence, i.e. the MessageEntity offset
+    sorted_results = sorted(filtered_results.items(), key=lambda e: e[1].offset)
+
+    return [k for k, v in sorted_results]
 
 
 def create_deep_linked_url(bot_username, payload=None, group=False):

@@ -54,7 +54,7 @@ class TestHelpers(object):
         }, {
             'length': 17, 'offset': 23, 'type': 'url'
         }, {
-            'length': 14, 'offset': 43, 'type': 'text_link',
+            'length': 14, 'offset': 42, 'type': 'text_link',
             'url': 'http://google.com'
         }]
         test_text = 'Github can be found at http://github.com. Google is here.'
@@ -77,7 +77,7 @@ class TestHelpers(object):
         }, {
             'length': 17, 'offset': 23, 'type': 'url'
         }, {
-            'length': 14, 'offset': 43, 'type': 'text_link',
+            'length': 14, 'offset': 42, 'type': 'text_link',
             'url': 'http://google.com'
         }]
         caption = 'Github can be found at http://github.com. Google is here.'
@@ -92,6 +92,29 @@ class TestHelpers(object):
         assert len(results) == 2
         assert (test_entities[0]['url'] == results[0])
         assert (test_entities[2]['url'] == results[1])
+
+    def test_extract_urls_order(self):
+        test_entities = [{
+            'length': 6, 'offset': 0, 'type': 'text_link',
+            'url': 'http://github.com'
+        }, {
+            'length': 17, 'offset': 27, 'type': 'text_link',
+            'url': 'http://google.com'
+        }, {
+            'length': 17, 'offset': 55, 'type': 'url'
+        }]
+        test_text = 'Github can not be found at http://google.com. It is at http://github.com.'
+        test_message = Message(message_id=1,
+                               from_user=None,
+                               date=None,
+                               chat=None,
+                               text=test_text,
+                               entities=[MessageEntity(**e) for e in test_entities])
+        results = helpers.extract_urls(test_message)
+
+        assert len(results) == 2
+        assert (test_entities[0]['url'] == results[0])
+        assert (test_entities[1]['url'] == results[1])
 
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
