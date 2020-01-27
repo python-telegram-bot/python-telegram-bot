@@ -116,6 +116,39 @@ class TestHelpers(object):
         assert (test_entities[0]['url'] == results[0])
         assert (test_entities[1]['url'] == results[1])
 
+    def test_extract_message_links(self):
+        test_entities = [{
+            'length': 17, 'offset': 0, 'type': 'url',
+        }, {
+            'length': 15, 'offset': 18, 'type': 'url',
+        }, {
+            'length': 18, 'offset': 34, 'type': 'url',
+        }]
+        test_text = 'https://google.de http://t.me/123 https://t.me/c/123'
+        test_message = Message(message_id=1,
+                               from_user=None,
+                               date=None,
+                               chat=None,
+                               text=test_text,
+                               entities=[MessageEntity(**e) for e in test_entities])
+
+        results = helpers.extract_message_links(test_message)
+        assert len(results) == 2
+        assert (results[0] == 'http://t.me/123')
+        assert (results[1] == 'https://t.me/c/123')
+
+        results = helpers.extract_message_links(test_message, private_only=True)
+        assert len(results) == 1
+        assert (results[0] == 'https://t.me/c/123')
+
+        results = helpers.extract_message_links(test_message, public_only=True)
+        assert len(results) == 1
+        assert (results[0] == 'http://t.me/123')
+
+    def test_extract_message_links_value_error(self):
+        with pytest.raises(ValueError):
+            helpers.extract_message_links(None, public_only=True, private_only=True)
+
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.

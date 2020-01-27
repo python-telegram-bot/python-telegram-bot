@@ -261,7 +261,7 @@ def extract_urls(message):
         that link to the same resource.
 
     Args:
-        message (:obj:`telegram.Message`) The message to extract from
+        message (:obj:`telegram.Message`): The message to extract from
 
     Returns:
         :obj:`list`: A list of URLs contained in the message
@@ -290,6 +290,49 @@ def extract_urls(message):
     sorted_results = sorted(filtered_results.items(), key=lambda e: e[1].offset)
 
     return [k for k, v in sorted_results]
+
+
+def extract_message_links(message, private_only=False, public_only=False):
+    """
+    Extracts all message links that are contained in a message. This includes message entities and
+    the media caption, i.e. while of course only text *or* caption is present this works for both.
+    Distinct links are returned in order of appearance.
+
+    Note:
+        For exact duplicates, only the first appearence will be kept, but there may still be URLs
+        that link to the same message.
+
+    Args:
+        message (:obj:`telegram.Message`): The message to extract from
+        private_only (:obj:`bool`): If ``True`` only links to messages in private groups are
+            extracted. Defaults to ``False``.
+        public_only (:obj:`bool`): If ``True`` only links to messages in public groups are
+            extracted. Defaults to ``False``.
+
+    Returns:
+        :obj:`list`: A list of message links contained in the message
+    """
+    if private_only and public_only:
+        raise ValueError('Only one of the optional arguments may be set to True.')
+
+    if private_only:
+        urls = [
+            url for url in extract_urls(message)
+            if url.startswith('https://t.me/c/') or url.startswith('http://t.me/c/')
+        ]
+    elif public_only:
+        urls = [
+            url for url in extract_urls(message)
+            if ((url.startswith('https://t.me') or url.startswith('http://t.me'))
+                and '://t.me/c/' not in url)
+        ]
+    else:
+        urls = [
+            url for url in extract_urls(message)
+            if url.startswith('https://t.me') or url.startswith('http://t.me')
+        ]
+
+    return urls
 
 
 def create_deep_linked_url(bot_username, payload=None, group=False):
