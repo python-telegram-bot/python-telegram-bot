@@ -316,23 +316,16 @@ def extract_message_links(message, private_only=False, public_only=False):
         raise ValueError('Only one of the optional arguments may be set to True.')
 
     if private_only:
-        urls = [
-            url for url in extract_urls(message)
-            if url.startswith('https://t.me/c/') or url.startswith('http://t.me/c/')
-        ]
+        # links to private massages are of the form t.me/c/chat_id/message_id
+        pattern = re.compile(r't.me\/c\/[0-9]+\/[0-9]+')
     elif public_only:
-        urls = [
-            url for url in extract_urls(message)
-            if ((url.startswith('https://t.me') or url.startswith('http://t.me'))
-                and '://t.me/c/' not in url)
-        ]
+        # links to private massages are of the form t.me/group_name/message_id
+        # group names consist of a-z, 0-9 and underscore with at least 5 characters
+        pattern = re.compile(r't.me\/[a-z0-9\_]{5,}\/[0-9]+')
     else:
-        urls = [
-            url for url in extract_urls(message)
-            if url.startswith('https://t.me') or url.startswith('http://t.me')
-        ]
+        pattern = re.compile(r't.me\/(c\/[0-9]+|[a-z0-9\_]{5,})\/[0-9]+')
 
-    return urls
+    return [url for url in extract_urls(message) if re.search(pattern, url)]
 
 
 def create_deep_linked_url(bot_username, payload=None, group=False):
