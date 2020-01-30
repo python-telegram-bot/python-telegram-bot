@@ -300,7 +300,7 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     )
 
 
-def enocde_conversations_to_json(conversations):
+def encode_conversations_to_json(conversations):
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
     JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
 

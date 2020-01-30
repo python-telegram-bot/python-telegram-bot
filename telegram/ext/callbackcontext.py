@@ -44,7 +44,14 @@ class CallbackContext(object):
 
     Attributes:
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
-            update from the same chat it will be the same ``dict``.
+            update from the same chat id it will be the same ``dict``.
+
+            Warning:
+                When a group chat migrates to a supergroup, its chat id will change and the
+                ``chat_data`` needs to be transferred. For details see our `wiki page
+                <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
+                Storing-user--and-chat-related-data#chat-migration>`_.
+
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
         matches (List[:obj:`re match object`], optional): If the associated update originated from
@@ -79,6 +86,11 @@ class CallbackContext(object):
         self.matches = None
         self.error = None
         self.job = None
+
+    @property
+    def dispatcher(self):
+        """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
+        return self._dispatcher
 
     @property
     def chat_data(self):
