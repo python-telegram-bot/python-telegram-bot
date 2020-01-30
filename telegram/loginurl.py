@@ -54,13 +54,11 @@ class LoginUrl(TelegramObject):
     """
 
     def __init__(self, url, forward_text=None, bot_username=None, request_write_access=None):
+        # Required
         self.url = url
-
-        if forward_text:
-            self.forward_text = forward_text
-        if bot_username:
-            self.bot_username = bot_username
-        if request_write_access:
-            self.request_write_access = request_write_access
+        # Optional
+        self.forward_text = forward_text
+        self.bot_username = bot_username
+        self.request_write_access = request_write_access
 
         self._id_attrs = (self.url,)

@@ -108,6 +108,7 @@ class TestSticker(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, sticker):
         message = bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 

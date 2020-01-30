@@ -141,6 +141,7 @@ class TestPhoto(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_get_and_download(self, bot, photo):
         new_file = bot.getFile(photo.file_id)
 

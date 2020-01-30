@@ -108,6 +108,7 @@ class TestDocument(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_send_resend(self, bot, chat_id, document):
         message = bot.send_document(chat_id=chat_id, document=document.file_id)
 

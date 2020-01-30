@@ -86,20 +86,13 @@ class InlineKeyboardButton(TelegramObject):
         self.text = text
 
         # Optionals
-        if url:
-            self.url = url
-        if login_url:
-            self.login_url = login_url
-        if callback_data:
-            self.callback_data = callback_data
-        if switch_inline_query:
-            self.switch_inline_query = switch_inline_query
-        if switch_inline_query_current_chat:
-            self.switch_inline_query_current_chat = switch_inline_query_current_chat
-        if callback_game:
-            self.callback_game = callback_game
-        if pay:
-            self.pay = pay
+        self.url = url
+        self.login_url = login_url
+        self.callback_data = callback_data
+        self.switch_inline_query = switch_inline_query
+        self.switch_inline_query_current_chat = switch_inline_query_current_chat
+        self.callback_game = callback_game
+        self.pay = pay
 
     @classmethod
     def de_json(cls, data, bot):

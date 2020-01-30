@@ -72,13 +72,8 @@ class InlineQueryResultCachedGif(InlineQueryResult):
         self.gif_file_id = gif_file_id
 
         # Optionals
-        if title:
-            self.title = title
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.title = title
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
