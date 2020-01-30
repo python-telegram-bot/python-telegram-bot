@@ -96,6 +96,7 @@ class TestVideoNote(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, video_note):
         message = bot.send_video_note(chat_id, video_note.file_id)
 
