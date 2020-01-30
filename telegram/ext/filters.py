@@ -22,7 +22,7 @@ import re
 
 from future.utils import string_types
 
-from telegram import Chat
+from telegram import Chat, Update
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
@@ -236,11 +236,87 @@ class Filters(object):
     class _Text(BaseFilter):
         name = 'Filters.text'
 
+        class _TextIterable(BaseFilter):
+
+            def __init__(self, iterable):
+                self.iterable = iterable
+                self.name = 'Filters.text({})'.format(iterable)
+
+            def filter(self, message):
+                if message.text:
+                    return message.text in self.iterable
+                return False
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                if self.update_filter:
+                    return self.filter(update)
+                else:
+                    return self.filter(update.effective_message)
+            else:
+                return self._TextIterable(update)
+
         def filter(self, message):
-            return bool(message.text and not message.text.startswith('/'))
+            return bool(message.text)
 
     text = _Text()
-    """Text Messages."""
+    """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
+    whose text is appearing in the given iterable.
+
+    Examples:
+        To allow any text message, simply use
+        ``MessageHandler(Filters.text, callback_method)``.
+
+        A simple usecase for passing an iterable is to allow only messages that were send by a
+        custom :class:`telegram.ReplyKeyboardMarkup`::
+
+            buttons = ['Start', 'Settings', 'Back']
+            markup = ReplyKeyboardMarkup.from_column(buttons)
+            ...
+            MessageHandler(Filters.text(buttons), callback_method)
+
+    Args:
+        update (Iterable[:obj:`str`], optional): Which messages to allow. Only exact matches
+            are allowed. If not specified, will allow any text message.
+    """
+
+    class _Caption(BaseFilter):
+        name = 'Filters.caption'
+
+        class _CaptionIterable(BaseFilter):
+
+            def __init__(self, iterable):
+                self.iterable = iterable
+                self.name = 'Filters.caption({})'.format(iterable)
+
+            def filter(self, message):
+                if message.caption:
+                    return message.caption in self.iterable
+                return False
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                if self.update_filter:
+                    return self.filter(update)
+                else:
+                    return self.filter(update.effective_message)
+            else:
+                return self._CaptionIterable(update)
+
+        def filter(self, message):
+            return bool(message.caption)
+
+    caption = _Caption()
+    """Messages with a caption. If an iterable of strings is passed, it filters messages to only
+    allow those whose caption is appearing in the given iterable.
+
+    Examples:
+        ``MessageHandler(Filters.caption, callback_method)``
+
+    Args:
+        update (Iterable[:obj:`str`], optional): Which captions to allow. Only exact matches
+            are allowed. If not specified, will allow any message with a caption.
+    """
 
     class _Command(BaseFilter):
         name = 'Filters.command'
@@ -880,6 +956,15 @@ officedocument.wordprocessingml.document")``-
     passport_data = _PassportData()
     """Messages that contain a :class:`telegram.PassportData`"""
 
+    class _Poll(BaseFilter):
+        name = 'Filters.poll'
+
+        def filter(self, message):
+            return bool(message.poll)
+
+    poll = _Poll()
+    """Messages that contain a :class:`telegram.Poll`."""
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 
@@ -911,8 +996,10 @@ officedocument.wordprocessingml.document")``-
 
     class _UpdateType(BaseFilter):
         update_filter = True
+        name = 'Filters.update'
 
         class _Message(BaseFilter):
+            name = 'Filters.update.message'
             update_filter = True
 
             def filter(self, update):
@@ -921,6 +1008,7 @@ officedocument.wordprocessingml.document")``-
         message = _Message()
 
         class _EditedMessage(BaseFilter):
+            name = 'Filters.update.edited_message'
             update_filter = True
 
             def filter(self, update):
@@ -929,6 +1017,7 @@ officedocument.wordprocessingml.document")``-
         edited_message = _EditedMessage()
 
         class _Messages(BaseFilter):
+            name = 'Filters.update.messages'
             update_filter = True
 
             def filter(self, update):
@@ -937,6 +1026,7 @@ officedocument.wordprocessingml.document")``-
         messages = _Messages()
 
         class _ChannelPost(BaseFilter):
+            name = 'Filters.update.channel_post'
             update_filter = True
 
             def filter(self, update):
@@ -946,6 +1036,7 @@ officedocument.wordprocessingml.document")``-
 
         class _EditedChannelPost(BaseFilter):
             update_filter = True
+            name = 'Filters.update.edited_channel_post'
 
             def filter(self, update):
                 return update.edited_channel_post is not None
@@ -954,6 +1045,7 @@ officedocument.wordprocessingml.document")``-
 
         class _ChannelPosts(BaseFilter):
             update_filter = True
+            name = 'Filters.update.channel_posts'
 
             def filter(self, update):
                 return update.channel_post is not None or update.edited_channel_post is not None

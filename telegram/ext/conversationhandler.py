@@ -38,8 +38,7 @@ class _ConversationTimeoutContext(object):
 class ConversationHandler(Handler):
     """
     A handler to hold a conversation with a single user by managing four collections of other
-    handlers. Note that neither posts in Telegram Channels, nor group interactions with multiple
-    users are managed by instances of this class.
+    handlers.
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
@@ -394,8 +393,10 @@ class ConversationHandler(Handler):
         self.logger.debug('conversation timeout was triggered!')
 
         # Backward compatibility with bots that do not use CallbackContext
+        callback_context = None
         if isinstance(context, CallbackContext):
             job = context.job
+            callback_context = context
 
         context = job.context
 
@@ -410,5 +411,5 @@ class ConversationHandler(Handler):
         for handler in handlers:
             check = handler.check_update(context.update)
             if check is not None and check is not False:
-                handler.handle_update(context.update, context.dispatcher, check)
+                handler.handle_update(context.update, context.dispatcher, check, callback_context)
         self.update_state(self.END, context.conversation_key)
