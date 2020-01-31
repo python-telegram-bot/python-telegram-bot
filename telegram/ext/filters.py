@@ -22,7 +22,7 @@ import re
 
 from future.utils import string_types
 
-from telegram import Chat, Update
+from telegram import Chat, Update, MessageEntity
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
@@ -322,10 +322,11 @@ class Filters(object):
         name = 'Filters.command'
 
         def filter(self, message):
-            return bool(message.text and message.text.startswith('/'))
+            return (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
+                    and message.entities[0].offset == 0)
 
     command = _Command()
-    """Messages starting with ``/``."""
+    """Messages starting with a :attr:`telegram.MessageEntity.BOT_COMMAND`."""
 
     class regex(BaseFilter):
         """
