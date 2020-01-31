@@ -113,6 +113,14 @@ Here's how to make a one-off code change.
 
         $ pytest -v
 
+     To run ``test_official`` (particularly useful if you made API changes), run
+
+     .. code-block::
+
+        $ export TEST_OFFICIAL=True
+
+     prior to running the tests.
+
    - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 
      .. code-block:: bash
