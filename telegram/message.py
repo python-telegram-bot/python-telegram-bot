@@ -344,13 +344,8 @@ class Message(TelegramObject):
             if self.chat.username:
                 to_link = self.chat.username
             else:
-                if self.chat.type != Chat.GROUP:
-                    # Get rid of leading -100 for supergroups
-                    id_to_link = str(self.chat.id)[4:]
-                else:
-                    # Get rid of leading minus for regular groups
-                    id_to_link = str(self.chat.id)[1:]
-                to_link = "c/{}".format(id_to_link)
+                # Get rid of leading -100 for supergroups
+                to_link = "c/{}".format(str(self.chat.id)[4:])
             return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
