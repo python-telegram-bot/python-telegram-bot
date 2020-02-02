@@ -481,38 +481,6 @@ class Filters(object):
         ``Filters.document`` for all document messages.
 
     Attributes:
-        category: This Filter filters documents by their category in the mime-type attribute.
-
-            Example:
-                ``Filters.documents.category('audio/')`` filters all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'. The following
-                attributes can be used as a shortcut like: ``Filters.document.audio``
-
-        application:
-        audio:
-        image:
-        video:
-        text:
-        mime_type: This Filter filters documents by their mime-type attribute.
-
-            Example:
-                ``Filters.documents.mime_type('audio/mpeg')`` filters all audio in mp3 format. The
-                following attributes can be used as a shortcut like: ``Filters.document.jpg``
-        apk:
-        doc:
-        docx:
-        exe:
-        gif:
-        jpg:
-        mp3:
-        pdf:
-        py:
-        svg:
-        txt:
-        targz:
-        wav:
-        xml:
-        zip:
         category: This Filter filters documents by their category in the mime-type attribute
 
             Note:
