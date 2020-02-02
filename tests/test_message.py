@@ -311,8 +311,7 @@ class TestMessage(object):
                                                            message.message_id)
 
     @pytest.mark.parametrize('type, id', argvalues=[
-        (Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003), (Chat.GROUP, -3)
-    ])
+        (Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)])
     def test_link_with_id(self, message, type, id):
         message.chat.username = None
         message.chat.id = id
@@ -327,6 +326,8 @@ class TestMessage(object):
         message.chat.type = Chat.PRIVATE
         message.chat.id = id
         message.chat.username = username
+        assert message.link is None
+        message.chat.type = Chat.GROUP
         assert message.link is None
 
     def test_effective_attachment(self, message_params):

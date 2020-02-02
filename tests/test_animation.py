@@ -109,6 +109,7 @@ class TestAnimation(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
+    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, animation):
         message = bot.send_animation(chat_id, animation.file_id)
 

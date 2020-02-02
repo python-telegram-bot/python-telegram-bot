@@ -95,13 +95,14 @@ class JobQueue(object):
 
         """
         # get time at which to run:
-        time_spec = time_spec or job.interval
+        if time_spec is None:
+            time_spec = job.interval
         if time_spec is None:
             raise ValueError("no time specification given for scheduling non-repeating job")
         next_t = to_float_timestamp(time_spec, reference_timestamp=previous_t)
 
         # enqueue:
-        self.logger.debug('Putting job %s with t=%f', job.name, time_spec)
+        self.logger.debug('Putting job %s with t=%s', job.name, time_spec)
         self._queue.put((next_t, job))
 
         # Wake up the loop if this job should be executed next
@@ -112,9 +113,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its
-                ``job.context`` or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -149,9 +153,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its
-                ``Job.context`` or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -200,9 +207,12 @@ class JobQueue(object):
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. It should take ``bot, job`` as parameters, where ``job`` is the
-                :class:`telegram.ext.Job` instance. It can be used to access its ``Job.context``
-                or change it to a repeating job.
+                job. Callback signature for context based API:
+
+                    ``def callback(CallbackContext)``
+
+                ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+                its ``job.context`` or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
@@ -357,9 +367,12 @@ class Job(object):
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            It should take ``bot, job`` as parameters, where ``job`` is the
-            :class:`telegram.ext.Job` instance. It can be used to access it's :attr:`context`
-            or change it to a repeating job.
+            Callback signature for context based API:
+
+                ``def callback(CallbackContext)``
+
+            a ``context.job`` is the :class:`telegram.ext.Job` instance. It can be used to access
+            its ``job.context`` or change it to a repeating job.
         interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`, optional): The time
             interval between executions of the job. If it is an :obj:`int` or a :obj:`float`,
             it will be interpreted as seconds. If you don't set this value, you must set

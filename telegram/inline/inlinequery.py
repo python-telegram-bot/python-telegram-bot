@@ -35,7 +35,7 @@ class InlineQuery(TelegramObject):
         from_user (:class:`telegram.User`): Sender.
         location (:class:`telegram.Location`): Optional. Sender location, only for bots that
             request user location.
-        query (:obj:`str`): Text of the query (up to 512 characters).
+        query (:obj:`str`): Text of the query (up to 256 characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
 
     Args:
@@ -43,7 +43,7 @@ class InlineQuery(TelegramObject):
         from_user (:class:`telegram.User`): Sender.
         location (:class:`telegram.Location`, optional): Sender location, only for bots that
             request user location.
-        query (:obj:`str`): Text of the query (up to 512 characters).
+        query (:obj:`str`): Text of the query (up to 256 characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.

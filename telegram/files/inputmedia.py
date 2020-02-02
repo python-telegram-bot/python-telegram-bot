@@ -44,7 +44,7 @@ class InputMediaAnimation(InputMedia):
             Lastly you can pass an existing :class:`telegram.Animation` object to send.
         thumb (`filelike object`): Optional. Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
         caption (:obj:`str`): Optional. Caption of the animation to be sent, 0-1024 characters.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
@@ -61,7 +61,7 @@ class InputMediaAnimation(InputMedia):
             Lastly you can pass an existing :class:`telegram.Animation` object to send.
         thumb (`filelike object`, optional): Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
         caption (:obj:`str`, optional): Caption of the animation to be sent, 0-1024 characters.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
@@ -170,7 +170,7 @@ class InputMediaVideo(InputMedia):
             for streaming.
         thumb (`filelike object`): Optional. Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
 
     Args:
@@ -188,7 +188,7 @@ class InputMediaVideo(InputMedia):
             for streaming.
         thumb (`filelike object`, optional): Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
 
     Note:
@@ -250,7 +250,7 @@ class InputMediaAudio(InputMedia):
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
         thumb (`filelike object`): Optional. Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
 
     Args:
@@ -267,7 +267,7 @@ class InputMediaAudio(InputMedia):
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
         thumb (`filelike object`, optional): Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
 
     Note:
@@ -323,7 +323,7 @@ class InputMediaDocument(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
         thumb (`filelike object`): Optional. Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
 
     Args:
@@ -336,7 +336,7 @@ class InputMediaDocument(InputMedia):
             in :class:`telegram.ParseMode` for the available modes.
         thumb (`filelike object`, optional): Thumbnail of the
             file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-            A thumbnail's width and height should not exceed 90. Ignored if the file is not
+            A thumbnail's width and height should not exceed 320. Ignored if the file is not
             is passed as a string or file_id.
     """
 
