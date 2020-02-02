@@ -138,8 +138,6 @@ class Dispatcher(object):
         else:
             self.persistence = None
 
-        self.job_queue = job_queue
-
         self.handlers = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
@@ -161,6 +159,10 @@ class Dispatcher(object):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
+
+    @property
+    def exception_event(self):
+        return self.__exception_event
 
     def _init_async_threads(self, base_name, workers):
         base_name = '{}_'.format(base_name) if base_name else ''

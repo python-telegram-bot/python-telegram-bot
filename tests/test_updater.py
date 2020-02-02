@@ -39,7 +39,7 @@ from future.builtins import bytes
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater
+from telegram.ext import Updater, Dispatcher, BasePersistence
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
@@ -369,7 +369,7 @@ class TestUpdater(object):
         with pytest.raises(ValueError):
             Updater(token='123:abcd', bot=bot)
 
-    def test_no_token_or_bot(self):
+    def test_no_token_or_bot_or_dispatcher(self):
         with pytest.raises(ValueError):
             Updater()
 
@@ -377,3 +377,26 @@ class TestUpdater(object):
         bot = Bot('123:zyxw')
         with pytest.raises(ValueError):
             Updater(bot=bot, private_key=b'key')
+
+    def test_mutual_exclude_bot_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        bot = Bot('123:zyxw')
+        with pytest.raises(ValueError):
+            Updater(bot=bot, dispatcher=dispatcher)
+
+    def test_mutual_exclude_persistence_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        persistence = BasePersistence()
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, persistence=persistence)
+
+    def test_mutual_exclude_workers_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, workers=8)
+
+    def test_mutual_exclude_use_context_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        use_context = not dispatcher.use_context
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, use_context=use_context)

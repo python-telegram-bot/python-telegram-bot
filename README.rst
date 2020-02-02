@@ -83,7 +83,7 @@ Introduction
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 2.7, 3.3+ and `PyPy <http://pypy.org/>`_.
+It's compatible with Python versions 3.5+ and `PyPy <http://pypy.org/>`_.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -137,9 +137,9 @@ Other references:
 Learning by example
 -------------------
 
-We believe that the best way to learn and understand this simple package is by example. So here
-are some examples for you to review. Even if it's not your approach for learning, please take a
-look at ``echobot2``, it is de facto the base for most of the bots out there. Best of all,
+We believe that the best way to learn this package is by example. Here
+are some examples for you to review. Even if it is not your approach for learning, please take a
+look at ``echobot2``, it is the de facto base for most of the bots out there. Best of all,
 the code for these examples are released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
