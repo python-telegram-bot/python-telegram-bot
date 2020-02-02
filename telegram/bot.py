@@ -3429,7 +3429,7 @@ class Bot(TelegramObject):
             'options': options
         }
 
-        if is_anonymous:
+        if not is_anonymous:
             data['is_anonymous'] = is_anonymous
         if type:
             data['type'] = type

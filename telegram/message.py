@@ -880,6 +880,22 @@ class Message(TelegramObject):
         return self.bot.delete_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def stop(self, *args, **kwargs):
+        """Shortcut for::
+
+             bot.stop_poll(chat_id=message.chat_id,
+                           message_id=message.message_id,
+                           *args,
+                           **kwargs)
+
+        Returns:
+            :class:`telegram.Poll`: On success, the stopped Poll with the
+                final results is returned.
+
+        """
+        return self.bot.stop_poll(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def parse_entity(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
