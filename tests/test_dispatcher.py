@@ -393,7 +393,7 @@ class TestDispatcher(object):
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert increment == ["error", "error"]
+        assert increment == ["error", "error", "error"]
 
     def test_flow_stop_in_error_handler(self, dp, bot):
         passed = []
