@@ -447,8 +447,8 @@ class Dispatcher(object):
                 raise ValueError(
                     "Conversationhandler {} can not be persistent if dispatcher has no "
                     "persistence".format(handler.name))
-            handler.conversations = self.persistence.get_conversations(handler.name)
             handler.persistence = self.persistence
+            handler.conversations = self.persistence.get_conversations(handler.name)
 
         if group not in self.handlers:
             self.handlers[group] = list()

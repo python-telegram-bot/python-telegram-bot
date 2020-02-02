@@ -59,7 +59,8 @@ def user_data():
 @pytest.fixture(scope='function')
 def conversations():
     return {'name1': {(123, 123): 3, (456, 654): 4},
-            'name2': {(123, 321): 1, (890, 890): 2}}
+            'name2': {(123, 321): 1, (890, 890): 2},
+            'name3': {(123, 321): 1, (890, 890): 2}}
 
 
 @pytest.fixture(scope="function")
@@ -806,6 +807,56 @@ class TestPickelPersistence(object):
         assert ch.conversations[ch._get_key(update)] == 0
         assert ch.conversations == pickle_persistence.conversations['name2']
 
+    def test_with_nested_conversationHandler(self, dp, update, good_pickle_files,
+                                             pickle_persistence):
+        dp.persistence = pickle_persistence
+        dp.use_context = True
+        NEXT2, NEXT3 = range(1, 3)
+
+        def start(update, context):
+            return NEXT2
+
+        start = CommandHandler('start', start)
+
+        def next(update, context):
+            return NEXT2
+
+        next = MessageHandler(None, next)
+
+        def next2(update, context):
+            return ConversationHandler.END
+
+        next2 = MessageHandler(None, next2)
+
+        nested_ch = ConversationHandler(
+            [next],
+            {NEXT2: [next2]},
+            [],
+            name='name3',
+            persistent=True,
+            map_to_parent={ConversationHandler.END: ConversationHandler.END},
+        )
+
+        ch = ConversationHandler([start], {NEXT2: [nested_ch], NEXT3: []}, [], name='name2',
+                                 persistent=True)
+        dp.add_handler(ch)
+        assert ch.conversations[ch._get_key(update)] == 1
+        assert nested_ch.conversations[nested_ch._get_key(update)] == 1
+        dp.process_update(update)
+        assert ch._get_key(update) not in ch.conversations
+        assert nested_ch._get_key(update) not in nested_ch.conversations
+        update.message.text = '/start'
+        update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
+        dp.process_update(update)
+        assert ch.conversations[ch._get_key(update)] == 1
+        assert ch.conversations == pickle_persistence.conversations['name2']
+        assert nested_ch._get_key(update) not in nested_ch.conversations
+        dp.process_update(update)
+        assert ch.conversations[ch._get_key(update)] == 1
+        assert ch.conversations == pickle_persistence.conversations['name2']
+        assert nested_ch.conversations[nested_ch._get_key(update)] == 1
+        assert nested_ch.conversations == pickle_persistence.conversations['name3']
+
     @classmethod
     def teardown_class(cls):
         try:
@@ -836,6 +887,7 @@ def bot_data_json(bot_data):
 @pytest.fixture(scope='function')
 def conversations_json(conversations):
     return """{"name1": {"[123, 123]": 3, "[456, 654]": 4}, "name2":
+              {"[123, 321]": 1, "[890, 890]": 2}, "name3":
               {"[123, 321]": 1, "[890, 890]": 2}}"""
 
 
@@ -964,8 +1016,8 @@ class TestDictPersistence(object):
         assert dict_persistence.bot_data_json == json.dumps(bot_data_two)
 
         conversations_two = conversations.copy()
-        conversations_two.update({'name3': {(1, 2): 3}})
-        dict_persistence.update_conversation('name3', (1, 2), 3)
+        conversations_two.update({'name4': {(1, 2): 3}})
+        dict_persistence.update_conversation('name4', (1, 2), 3)
         assert dict_persistence.conversations == conversations_two
         assert dict_persistence.conversations_json != conversations_json
         assert dict_persistence.conversations_json == encode_conversations_to_json(
@@ -1046,3 +1098,53 @@ class TestDictPersistence(object):
         dp.process_update(update)
         assert ch.conversations[ch._get_key(update)] == 0
         assert ch.conversations == dict_persistence.conversations['name2']
+
+    def test_with_nested_conversationHandler(self, dp, update, conversations_json):
+        dict_persistence = DictPersistence(conversations_json=conversations_json)
+        dp.persistence = dict_persistence
+        dp.use_context = True
+        NEXT2, NEXT3 = range(1, 3)
+
+        def start(update, context):
+            return NEXT2
+
+        start = CommandHandler('start', start)
+
+        def next(update, context):
+            return NEXT2
+
+        next = MessageHandler(None, next)
+
+        def next2(update, context):
+            return ConversationHandler.END
+
+        next2 = MessageHandler(None, next2)
+
+        nested_ch = ConversationHandler(
+            [next],
+            {NEXT2: [next2]},
+            [],
+            name='name3',
+            persistent=True,
+            map_to_parent={ConversationHandler.END: ConversationHandler.END},
+        )
+
+        ch = ConversationHandler([start], {NEXT2: [nested_ch], NEXT3: []}, [], name='name2',
+                                 persistent=True)
+        dp.add_handler(ch)
+        assert ch.conversations[ch._get_key(update)] == 1
+        assert nested_ch.conversations[nested_ch._get_key(update)] == 1
+        dp.process_update(update)
+        assert ch._get_key(update) not in ch.conversations
+        assert nested_ch._get_key(update) not in nested_ch.conversations
+        update.message.text = '/start'
+        update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 6)]
+        dp.process_update(update)
+        assert ch.conversations[ch._get_key(update)] == 1
+        assert ch.conversations == dict_persistence.conversations['name2']
+        assert nested_ch._get_key(update) not in nested_ch.conversations
+        dp.process_update(update)
+        assert ch.conversations[ch._get_key(update)] == 1
+        assert ch.conversations == dict_persistence.conversations['name2']
+        assert nested_ch.conversations[nested_ch._get_key(update)] == 1
+        assert nested_ch.conversations == dict_persistence.conversations['name3']
