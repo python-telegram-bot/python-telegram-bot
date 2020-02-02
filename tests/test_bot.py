@@ -663,6 +663,8 @@ class TestBot(object):
         assert bot.set_chat_description(channel_id, 'Time: ' + str(time.time()))
 
     # TODO: Add bot to group to test there too
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
     def test_pin_and_unpin_message(self, bot, super_group_id):
         message = bot.send_message(super_group_id, text="test_pin_message")
         assert bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
