@@ -335,11 +335,14 @@ class Dispatcher(object):
                 if self.persistence.store_bot_data:
                     try:
                         self.persistence.update_bot_data(self.bot_data)
-                    except Exception:
-                        message = 'Saving bot data raised an error and an ' \
-                                  'uncaught error was raised while handling ' \
-                                  'the error with an error_handler'
-                        self.logger.exception(message)
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving bot data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
                 if self.persistence.store_chat_data and update.effective_chat:
                     chat_id = update.effective_chat.id
                     try:
