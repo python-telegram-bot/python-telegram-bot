@@ -339,18 +339,13 @@ class Message(TelegramObject):
     @property
     def link(self):
         """:obj:`str`: Convenience property. If the chat of the message is not
-        a private chat, returns a t.me link of the message."""
-        if self.chat.type != Chat.PRIVATE:
+        a private chat or normal group, returns a t.me link of the message."""
+        if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
             if self.chat.username:
                 to_link = self.chat.username
             else:
-                if self.chat.type != Chat.GROUP:
-                    # Get rid of leading -100 for supergroups
-                    id_to_link = str(self.chat.id)[4:]
-                else:
-                    # Get rid of leading minus for regular groups
-                    id_to_link = str(self.chat.id)[1:]
-                to_link = "c/{}".format(id_to_link)
+                # Get rid of leading -100 for supergroups
+                to_link = "c/{}".format(str(self.chat.id)[4:])
             return "https://t.me/{}/{}".format(to_link, self.message_id)
         return None
 
