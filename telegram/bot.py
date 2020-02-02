@@ -163,7 +163,7 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
-        if data.get('media') and (data['media'].parse_mode is DEFAULT_NONE):
+        if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
             if self.defaults:
                 data['media'].parse_mode = self.defaults.parse_mode
             else:
@@ -1031,7 +1031,7 @@ class Bot(TelegramObject):
         data = {'chat_id': chat_id, 'media': media}
 
         for m in data['media']:
-            if m.parse_mode is DEFAULT_NONE:
+            if m.parse_mode == DEFAULT_NONE:
                 if self.defaults:
                     m.parse_mode = self.defaults.parse_mode
                 else:
@@ -1511,17 +1511,17 @@ class Bot(TelegramObject):
         url = '{0}/answerInlineQuery'.format(self.base_url)
 
         for res in results:
-            if res._has_parse_mode and res.parse_mode is DEFAULT_NONE:
+            if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
                 res.parse_mode = self.defaults.parse_mode
             if res._has_input_message_content and res.input_message_content:
                 if (res.input_message_content._has_parse_mode
-                        and res.input_message_content.parse_mode is DEFAULT_NONE):
+                        and res.input_message_content.parse_mode == DEFAULT_NONE):
                     if self.defaults:
                         res.input_message_content.parse_mode = self.defaults.parse_mode
                     else:
                         res.input_message_content.parse_mode = None
                 if (res.input_message_content._has_disable_web_page_preview
-                        and res.input_message_content.disable_web_page_preview is DEFAULT_NONE):
+                        and res.input_message_content.disable_web_page_preview == DEFAULT_NONE):
                     if self.defaults:
                         res.input_message_content.disable_web_page_preview = \
                             self.defaults.disable_web_page_preview
