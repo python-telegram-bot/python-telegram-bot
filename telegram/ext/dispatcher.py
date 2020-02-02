@@ -79,6 +79,7 @@ class Dispatcher(object):
             decorator.
         user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
         chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts
 
@@ -121,8 +122,8 @@ class Dispatcher(object):
                           TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
-        """:obj:`dict`: A dictionary handlers can use to store data for the user."""
         self.chat_data = defaultdict(dict)
+        self.bot_data = {}
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence should be based on telegram.ext.BasePersistence")
@@ -135,6 +136,10 @@ class Dispatcher(object):
                 self.chat_data = self.persistence.get_chat_data()
                 if not isinstance(self.chat_data, defaultdict):
                     raise ValueError("chat_data must be of type defaultdict")
+            if self.persistence.store_bot_data:
+                self.bot_data = self.persistence.get_bot_data()
+                if not isinstance(self.bot_data, dict):
+                    raise ValueError("bot_data must be of type dict")
         else:
             self.persistence = None
 
@@ -327,6 +332,17 @@ class Dispatcher(object):
 
             """
             if self.persistence and isinstance(update, Update):
+                if self.persistence.store_bot_data:
+                    try:
+                        self.persistence.update_bot_data(self.bot_data)
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving bot data raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
                 if self.persistence.store_chat_data and update.effective_chat:
                     chat_id = update.effective_chat.id
                     try:
@@ -456,9 +472,11 @@ class Dispatcher(object):
                 self.groups.remove(group)
 
     def update_persistence(self):
-        """Update :attr:`user_data` and :attr:`chat_data` in :attr:`persistence`.
+        """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
         """
         if self.persistence:
+            if self.persistence.store_bot_data:
+                self.persistence.update_bot_data(self.bot_data)
             if self.persistence.store_chat_data:
                 for chat_id in self.chat_data:
                     self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])

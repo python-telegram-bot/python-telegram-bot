@@ -88,6 +88,7 @@ class TestRegexHandler(object):
                           and isinstance(context.job_queue, JobQueue)
                           and isinstance(context.user_data, dict)
                           and isinstance(context.chat_data, dict)
+                          and isinstance(context.bot_data, dict)
                           and isinstance(update.message, Message))
 
     def callback_context_pattern(self, update, context):

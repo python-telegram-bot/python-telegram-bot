@@ -80,7 +80,8 @@ class TestStringCommandHandler(object):
                           and isinstance(context.update_queue, Queue)
                           and isinstance(context.job_queue, JobQueue)
                           and context.user_data is None
-                          and context.chat_data is None)
+                          and context.chat_data is None
+                          and isinstance(context.bot_data, dict))
 
     def callback_context_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']

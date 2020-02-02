@@ -90,6 +90,7 @@ class TestCallbackQueryHandler(object):
                           and isinstance(context.job_queue, JobQueue)
                           and isinstance(context.user_data, dict)
                           and context.chat_data is None
+                          and isinstance(context.bot_data, dict)
                           and isinstance(update.callback_query, CallbackQuery))
 
     def callback_context_pattern(self, update, context):

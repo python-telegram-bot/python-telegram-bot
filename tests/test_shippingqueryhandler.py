@@ -88,6 +88,7 @@ class TestShippingQueryHandler(object):
                           and isinstance(context.job_queue, JobQueue)
                           and isinstance(context.user_data, dict)
                           and context.chat_data is None
+                          and isinstance(context.bot_data, dict)
                           and isinstance(update.shipping_query, ShippingQuery))
 
     def test_basic(self, dp, shiping_query):

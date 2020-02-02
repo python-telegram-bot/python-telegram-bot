@@ -43,6 +43,8 @@ class CallbackContext(object):
          that you think you added will not be present.
 
     Attributes:
+        bot_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update it will be the same ``dict``.
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same chat id it will be the same ``dict``.
 
@@ -80,6 +82,7 @@ class CallbackContext(object):
             raise ValueError('CallbackContext should not be used with a non context aware '
                              'dispatcher!')
         self._dispatcher = dispatcher
+        self._bot_data = dispatcher.bot_data
         self._chat_data = None
         self._user_data = None
         self.args = None
@@ -91,6 +94,15 @@ class CallbackContext(object):
     def dispatcher(self):
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
+
+    @property
+    def bot_data(self):
+        return self._bot_data
+
+    @bot_data.setter
+    def bot_data(self, value):
+        raise AttributeError("You can not assign a new value to bot_data, see "
+                             "https://git.io/fjxKe")
 
     @property
     def chat_data(self):
@@ -119,6 +131,7 @@ class CallbackContext(object):
     @classmethod
     def from_update(cls, update, dispatcher):
         self = cls(dispatcher)
+
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user

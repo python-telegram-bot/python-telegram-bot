@@ -87,6 +87,7 @@ class TestChosenInlineResultHandler(object):
                           and isinstance(context.job_queue, JobQueue)
                           and isinstance(context.user_data, dict)
                           and context.chat_data is None
+                          and isinstance(context.bot_data, dict)
                           and isinstance(update.chosen_inline_result, ChosenInlineResult))
 
     def test_basic(self, dp, chosen_inline_result):

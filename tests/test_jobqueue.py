@@ -76,6 +76,7 @@ class TestJobQueue(object):
                 and context.job.context == 2
                 and context.chat_data is None
                 and context.user_data is None
+                and isinstance(context.bot_data, dict)
                 and context.job_queue is context.job.job_queue):
             self.result += 1
 

@@ -25,6 +25,8 @@ class BasePersistence(object):
 
     All relevant methods must be overwritten. This means:
 
+    * If :attr:`store_bot_data` is ``True`` you must overwrite :meth:`get_bot_data` and
+      :meth:`update_bot_data`.
     * If :attr:`store_chat_data` is ``True`` you must overwrite :meth:`get_chat_data` and
       :meth:`update_chat_data`.
     * If :attr:`store_user_data` is ``True`` you must overwrite :meth:`get_user_data` and
@@ -38,17 +40,22 @@ class BasePersistence(object):
             persistence class.
         store_chat_data (:obj:`bool`): Optional. Whether chat_data should be saved by this
             persistence class.
+        store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
+            persistence class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
             persistence class. Default is ``True``.
         store_chat_data (:obj:`bool`, optional): Whether chat_data should be saved by this
             persistence class. Default is ``True`` .
+        store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
+            persistence class. Default is ``True`` .
     """
 
-    def __init__(self, store_user_data=True, store_chat_data=True):
+    def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
+        self.store_bot_data = store_bot_data
 
     def get_user_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
@@ -67,6 +74,16 @@ class BasePersistence(object):
 
         Returns:
             :obj:`defaultdict`: The restored chat data.
+        """
+        raise NotImplementedError
+
+    def get_bot_data(self):
+        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        persistence object. It should return the bot_data if stored, or an empty
+        ``dict``.
+
+        Returns:
+            :obj:`defaultdict`: The restored bot data.
         """
         raise NotImplementedError
 
@@ -111,7 +128,16 @@ class BasePersistence(object):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [user_id].
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.chat_data` [chat_id].
+        """
+        raise NotImplementedError
+
+    def update_bot_data(self, data):
+        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+        handled an update.
+
+        Args:
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
         """
         raise NotImplementedError
 
