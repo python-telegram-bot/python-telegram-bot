@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python Telegram Bot'
-copyright = u'2015-2018, Leandro Toledo'
+copyright = u'2015-2020, Leandro Toledo'
 author = u'Leandro Toledo'
 
 # The version info for the project you're documenting, acts as replacement for

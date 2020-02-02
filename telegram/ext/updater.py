@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -62,6 +62,7 @@ class Updater(object):
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
         base_url (:obj:`str`, optional): Base_url for the bot.
+        base_file_url (:obj:`str`, optional): Base_file_url for the bot.
         workers (:obj:`int`, optional): Amount of threads in the thread pool for functions
             decorated with ``@run_async`` (ignored if `dispatcher` argument is used).
         bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance (ignored if
@@ -111,7 +112,8 @@ class Updater(object):
                  persistence=None,
                  defaults=None,
                  use_context=False,
-                 dispatcher=None):
+                 dispatcher=None,
+                 base_file_url=None):
 
         if dispatcher is None:
             if (token is None) and (bot is None):
@@ -153,20 +155,24 @@ class Updater(object):
                 if 'con_pool_size' not in request_kwargs:
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
-                self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
-                               private_key_password=private_key_password, defaults=defaults)
+                self.bot = Bot(token,
+                               base_url,
+                               base_file_url=base_file_url,
+                               request=self._request,
+                               private_key=private_key,
+                               private_key_password=private_key_password,
+                               defaults=defaults)
             self.update_queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
             self.persistence = persistence
-            self.dispatcher = Dispatcher(
-                self.bot,
-                self.update_queue,
-                job_queue=self.job_queue,
-                workers=workers,
-                exception_event=self.__exception_event,
-                persistence=persistence,
-                use_context=use_context)
+            self.dispatcher = Dispatcher(self.bot,
+                                         self.update_queue,
+                                         job_queue=self.job_queue,
+                                         workers=workers,
+                                         exception_event=self.__exception_event,
+                                         persistence=persistence,
+                                         use_context=use_context)
             self.job_queue.set_dispatcher(self.dispatcher)
         else:
             con_pool_size = dispatcher.workers + 4
@@ -194,8 +200,10 @@ class Updater(object):
         self._default_quote = defaults.default_quote if defaults else None
 
     def _init_thread(self, target, name, *args, **kwargs):
-        thr = Thread(target=self._thread_wrapper, name="Bot:{}:{}".format(self.bot.id, name),
-                     args=(target,) + args, kwargs=kwargs)
+        thr = Thread(target=self._thread_wrapper,
+                     name="Bot:{}:{}".format(self.bot.id, name),
+                     args=(target,) + args,
+                     kwargs=kwargs)
         thr.start()
         self.__threads.append(thr)
 
@@ -325,9 +333,10 @@ class Updater(object):
         self.logger.debug('Bootstrap done')
 
         def polling_action_cb():
-            updates = self.bot.get_updates(
-                self.last_update_id, timeout=timeout, read_latency=read_latency,
-                allowed_updates=allowed_updates)
+            updates = self.bot.get_updates(self.last_update_id,
+                                           timeout=timeout,
+                                           read_latency=read_latency,
+                                           allowed_updates=allowed_updates)
 
             if updates:
                 if not self.running:
@@ -429,12 +438,11 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(
-                max_retries=bootstrap_retries,
-                clean=clean,
-                webhook_url=webhook_url,
-                cert=open(cert, 'rb'),
-                allowed_updates=allowed_updates)
+            self._bootstrap(max_retries=bootstrap_retries,
+                            clean=clean,
+                            webhook_url=webhook_url,
+                            cert=open(cert, 'rb'),
+                            allowed_updates=allowed_updates)
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -445,7 +453,12 @@ class Updater(object):
     def _gen_webhook_url(listen, port, url_path):
         return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
 
-    def _bootstrap(self, max_retries, clean, webhook_url, allowed_updates, cert=None,
+    def _bootstrap(self,
+                   max_retries,
+                   clean,
+                   webhook_url,
+                   allowed_updates,
+                   cert=None,
                    bootstrap_interval=5):
         retries = [0]
 
@@ -461,15 +474,16 @@ class Updater(object):
             return False
 
         def bootstrap_set_webhook():
-            self.bot.set_webhook(
-                url=webhook_url, certificate=cert, allowed_updates=allowed_updates)
+            self.bot.set_webhook(url=webhook_url,
+                                 certificate=cert,
+                                 allowed_updates=allowed_updates)
             return False
 
         def bootstrap_onerr_cb(exc):
             if not isinstance(exc, Unauthorized) and (max_retries < 0 or retries[0] < max_retries):
                 retries[0] += 1
-                self.logger.warning('Failed bootstrap phase; try=%s max_retries=%s',
-                                    retries[0], max_retries)
+                self.logger.warning('Failed bootstrap phase; try=%s max_retries=%s', retries[0],
+                                    max_retries)
             else:
                 self.logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
                 raise exc

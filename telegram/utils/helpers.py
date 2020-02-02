@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -100,7 +100,7 @@ def to_float_timestamp(t, reference_timestamp=None):
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
-    Any objects from the :module:`datetime` module that are timezone-naive will be assumed
+    Any objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC.
 
     ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).

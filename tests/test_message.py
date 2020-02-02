@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -313,8 +313,7 @@ class TestMessage(object):
                                                            message.message_id)
 
     @pytest.mark.parametrize('type, id', argvalues=[
-        (Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003), (Chat.GROUP, -3)
-    ])
+        (Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)])
     def test_link_with_id(self, message, type, id):
         message.chat.username = None
         message.chat.id = id
@@ -329,6 +328,8 @@ class TestMessage(object):
         message.chat.type = Chat.PRIVATE
         message.chat.id = id
         message.chat.username = username
+        assert message.link is None
+        message.chat.type = Chat.GROUP
         assert message.link is None
 
     def test_effective_attachment(self, message_params):
