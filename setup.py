@@ -23,10 +23,11 @@ packages = find_packages(exclude=['tests*'])
 requirements = requirements()
 
 # Allow for a package install to not use the vendored urllib3
-if '--with-urllib3' in sys.argv:
-    sys.argv.remove('--with-urllib3')
-    requirements.append('urllib3')
-    packages = [package for package in packages if 'urllib3' not in package]
+UPSTREAM_URLLIB3_FLAG = '--with-upstream-urllib3'
+if UPSTREAM_URLLIB3_FLAG in sys.argv:
+    sys.argv.remove(UPSTREAM_URLLIB3_FLAG)
+    requirements.append('urllib3 >= 1.19.1')
+    packages = [x for x in packages if not x.startswith('telegram.vendor.ptb_urllib3')]
 
 with codecs.open('README.rst', 'r', 'utf-8') as fd:
     fn = os.path.join('telegram', 'version.py')
