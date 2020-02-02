@@ -30,8 +30,8 @@ import pytest
 from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
-from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
-from telegram.utils.helpers import Defaults, _UtcOffsetTimezone
+from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
+from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
 
 TRAVIS = os.getenv('TRAVIS', False)
@@ -69,14 +69,13 @@ def default_bot(request, bot_info):
         if kwarg.startswith('default_'):
             value = param.pop(kwarg)
             param[kwarg[8:]] = value
-    def_param = {'default_' + k: v for (k, v) in param.items()}
 
     defaults = Defaults(**param)
     default_bot = DEFAULT_BOTS.get(defaults)
     if default_bot:
         return default_bot
     else:
-        default_bot = make_bot(bot_info, **def_param)
+        default_bot = make_bot(bot_info, **{'defaults': defaults})
         DEFAULT_BOTS[defaults] = default_bot
         return default_bot
 

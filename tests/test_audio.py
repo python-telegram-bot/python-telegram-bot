@@ -136,7 +136,7 @@ class TestAudio(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [], indirect=True)
     def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file, thumb_file):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -147,7 +147,7 @@ class TestAudio(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [], indirect=True)
     def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file, thumb_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -158,7 +158,7 @@ class TestAudio(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [], indirect=True)
     def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file, thumb_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 

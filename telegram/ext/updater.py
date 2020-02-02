@@ -28,7 +28,7 @@ from queue import Queue
 from telegram import Bot, TelegramError
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
-from telegram.utils.helpers import get_signal_name, DEFAULT_NONE
+from telegram.utils.helpers import get_signal_name
 from telegram.utils.request import Request
 from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 
@@ -86,16 +86,8 @@ class Updater(object):
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
-        default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
-            method call. See the constants in :class:`telegram.ParseMode` for the available modes.
-        default_disable_notification (:obj:`bool`, optional): Default setting for the
-            `disable_notification` parameter used if not set explicitly in method call.
-        default_disable_web_page_preview (:obj:`bool`, optional): Default setting for the
-            `disable_web_page_preview` parameter used if not set explicitly in method call.
-        default_timeout (:obj:`int` | :obj:`float`, optional): Default setting for the
-            `timeout` parameter used if not set explicitly in method call.
-        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
-            :attr:`telegram.Message.reply_text` and friends.
+        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
+            be used if not set explicitly in the bot methods.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -117,11 +109,7 @@ class Updater(object):
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
-                 default_parse_mode=None,
-                 default_disable_notification=None,
-                 default_disable_web_page_preview=None,
-                 default_timeout=DEFAULT_NONE,
-                 default_quote=None,
+                 defaults=None,
                  use_context=False,
                  dispatcher=None):
 
@@ -166,12 +154,7 @@ class Updater(object):
                     request_kwargs['con_pool_size'] = con_pool_size
                 self._request = Request(**request_kwargs)
                 self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
-                               private_key_password=private_key_password,
-                               default_parse_mode=default_parse_mode,
-                               default_disable_notification=default_disable_notification,
-                               default_disable_web_page_preview=default_disable_web_page_preview,
-                               default_timeout=default_timeout,
-                               default_quote=default_quote)
+                               private_key_password=private_key_password, defaults=defaults)
             self.update_queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
@@ -208,7 +191,7 @@ class Updater(object):
         self.__threads = []
 
         # Just for passing to WebhookAppClass
-        self._default_quote = default_quote
+        self._default_quote = defaults.default_quote if defaults else None
 
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper, name="Bot:{}:{}".format(self.bot.id, name),

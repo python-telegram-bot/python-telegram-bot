@@ -311,7 +311,7 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [], indirect=True)
     def test_edit_message_text_default_parse_mode(self, default_bot, message):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -353,7 +353,7 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [], indirect=True)
     def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -470,7 +470,7 @@ class TestBot(object):
     # TODO: Add bot to group to test there too
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_quote': True}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
     def test_get_chat_default_quote(self, default_bot, super_group_id):
         message = default_bot.send_message(super_group_id, text="test_get_chat_default_quote")
         assert default_bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
@@ -797,7 +797,7 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_parse_mode': 'Markdown'}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [], indirect=True)
     def test_send_message_default_parse_mode(self, default_bot, chat_id):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -816,7 +816,7 @@ class TestBot(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [{'default_quote': True}], indirect=True)
+    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
     def test_send_message_default_quote(self, default_bot, chat_id):
         message = default_bot.send_message(chat_id, 'test')
         assert message.default_quote is True

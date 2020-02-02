@@ -41,7 +41,7 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
                       Location, Venue, Contact, InputFile, Poll)
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import to_timestamp, Defaults, DEFAULT_NONE
+from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
 from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -83,29 +83,22 @@ class Bot(TelegramObject):
             :obj:`telegram.utils.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
-        default_parse_mode (:obj:`str`, optional): Default parse mode used if not set explicitly in
-            method call. See the constants in :class:`telegram.ParseMode` for the available modes.
-        default_disable_notification (:obj:`bool`, optional): Default setting for the
-            `disable_notification` parameter used if not set explicitly in method call.
-        default_disable_web_page_preview (:obj:`bool`, optional): Default setting for the
-            `disable_web_page_preview` parameter used if not set explicitly in method call.
-        default_timeout (:obj:`int` | :obj:`float`, optional): Default setting for the
-            `timeout` parameter used if not set explicitly in method call.
-        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
-            :attr:`telegram.Message.reply_text` and friends.
+        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
+            be used if not set explicitly in the bot methods.
 
     """
 
     def __new__(cls, *args, **kwargs):
         # Handle default_... kwargs for bot methods
         # Transform default_x=y kwargs into Defaults.x=y
-        defaults = Defaults()
-        for kwarg in kwargs.keys():
-            if kwarg.startswith('default_'):
-                setattr(defaults, kwarg[8:], kwargs[kwarg])
+        defaults = kwargs.get('defaults')
 
         # Make an instance of the class
         instance = super(Bot, cls).__new__(cls)
+
+        if not defaults:
+            return instance
+        print(defaults, defaults.parse_mode)
 
         # For each method ...
         for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
@@ -116,6 +109,7 @@ class Bot(TelegramObject):
             needs_default = [
                 kwarg_name for kwarg_name in kwarg_names if kwarg_name in defaults.__dict__.keys()
             ]
+            print(needs_default)
             # ... make a dict of kwarg name and the default value
             default_kwargs = {
                 kwarg_name: getattr(defaults, kwarg_name) for kwarg_name in needs_default if (
@@ -135,21 +129,11 @@ class Bot(TelegramObject):
                  request=None,
                  private_key=None,
                  private_key_password=None,
-                 default_parse_mode=None,
-                 default_disable_notification=None,
-                 default_disable_web_page_preview=None,
-                 default_quote=None,
-                 # Timeout needs special treatment, since the bot methods have two different
-                 # default values for timeout (None and 20s)
-                 default_timeout=DEFAULT_NONE):
+                 defaults=None):
         self.token = self._validate_token(token)
 
         # Gather default
-        self.defaults = Defaults(parse_mode=default_parse_mode,
-                                 disable_notification=default_disable_notification,
-                                 disable_web_page_preview=default_disable_web_page_preview,
-                                 timeout=default_timeout,
-                                 quote=default_quote)
+        self.defaults = defaults
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -183,14 +167,18 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup
 
         if data.get('media') and (data['media'].parse_mode is DEFAULT_NONE):
-            data['media'].parse_mode = self.defaults.parse_mode
+            if self.defaults:
+                data['media'].parse_mode = self.defaults.parse_mode
+            else:
+                data['media'].parse_mode = None
 
         result = self._request.post(url, data, timeout=timeout)
 
         if result is True:
             return result
 
-        result['default_quote'] = self.defaults.quote
+        if self.defaults:
+            result['default_quote'] = self.defaults.quote
 
         return Message.de_json(result, self)
 
@@ -1047,7 +1035,10 @@ class Bot(TelegramObject):
 
         for m in data['media']:
             if m.parse_mode is DEFAULT_NONE:
-                m.parse_mode = self.defaults.parse_mode
+                if self.defaults:
+                    m.parse_mode = self.defaults.parse_mode
+                else:
+                    m.parse_mode = None
 
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
@@ -1056,8 +1047,9 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=timeout)
 
-        for res in result:
-            res['default_quote'] = self.defaults.quote
+        if self.defaults:
+            for res in result:
+                res['default_quote'] = self.defaults.quote
 
         return [Message.de_json(res, self) for res in result]
 
@@ -1527,11 +1519,18 @@ class Bot(TelegramObject):
             if res._has_input_message_content and res.input_message_content:
                 if (res.input_message_content._has_parse_mode
                         and res.input_message_content.parse_mode is DEFAULT_NONE):
-                    res.input_message_content.parse_mode = self.defaults.parse_mode
+                    if self.defaults:
+                        res.input_message_content.parse_mode = self.defaults.parse_mode
+                    else:
+                        res.input_message_content.parse_mode = None
                 if (res.input_message_content._has_disable_web_page_preview
                         and res.input_message_content.disable_web_page_preview is DEFAULT_NONE):
-                    res.input_message_content.disable_web_page_preview = \
-                        self.defaults.disable_web_page_preview
+                    if self.defaults:
+                        res.input_message_content.disable_web_page_preview = \
+                            self.defaults.disable_web_page_preview
+                    else:
+                        res.input_message_content.disable_web_page_preview = None
+
         results = [res.to_dict() for res in results]
 
         data = {'inline_query_id': inline_query_id, 'results': results}
@@ -2072,8 +2071,9 @@ class Bot(TelegramObject):
         else:
             self.logger.debug('No new updates found.')
 
-        for u in result:
-            u['default_quote'] = self.defaults.quote
+        if self.defaults:
+            for u in result:
+                u['default_quote'] = self.defaults.quote
 
         return [Update.de_json(u, self) for u in result]
 
@@ -2250,7 +2250,8 @@ class Bot(TelegramObject):
 
         result = self._request.post(url, data, timeout=timeout)
 
-        result['default_quote'] = self.defaults.quote
+        if self.defaults:
+            result['default_quote'] = self.defaults.quote
 
         return Chat.de_json(result, self)
 
