@@ -47,7 +47,7 @@ def start(update, context):
     reply_text = "Hi! My name is Doctor Botter."
     if context.user_data:
         reply_text += " You already told me your {}. Why don't you tell me something more " \
-                      "about yourself? Or change enything I " \
+                      "about yourself? Or change anything I " \
                       "already know.".format(", ".join(context.user_data.keys()))
     else:
         reply_text += " I will hold a more complex conversation with you. Why don't you tell me " \

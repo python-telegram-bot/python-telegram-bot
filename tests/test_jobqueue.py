@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -76,6 +76,7 @@ class TestJobQueue(object):
                 and context.job.context == 2
                 and context.chat_data is None
                 and context.user_data is None
+                and isinstance(context.bot_data, dict)
                 and context.job_queue is context.job.job_queue):
             self.result += 1
 
@@ -117,6 +118,11 @@ class TestJobQueue(object):
         sleep(0.15)
         assert self.result == 0
         sleep(0.07)
+        assert self.result == 1
+
+    def test_run_repeating_first_immediate(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.1, first=0)
+        sleep(0.05)
         assert self.result == 1
 
     def test_run_repeating_first_timezone(self, job_queue, timezone):
