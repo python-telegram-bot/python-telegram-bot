@@ -101,7 +101,6 @@ class Updater(object):
     def __init__(self,
                  token=None,
                  base_url=None,
-                 base_file_url=None,
                  workers=4,
                  bot=None,
                  private_key=None,
@@ -110,7 +109,8 @@ class Updater(object):
                  request_kwargs=None,
                  persistence=None,
                  use_context=False,
-                 dispatcher=None):
+                 dispatcher=None,
+                 base_file_url=None):
 
         if dispatcher is None:
             if (token is None) and (bot is None):
