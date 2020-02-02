@@ -3395,7 +3395,7 @@ class Bot(TelegramObject):
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode
             is_closed (:obj:`bool`, optional): Pass True, if the poll needs to be immediately
-                closed
+                closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
