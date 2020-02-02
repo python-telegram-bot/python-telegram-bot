@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -100,7 +100,7 @@ def to_float_timestamp(t, reference_timestamp=None):
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
-    Any objects from the :module:`datetime` module that are timezone-naive will be assumed
+    Any objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC.
 
     ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
@@ -300,7 +300,7 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     )
 
 
-def enocde_conversations_to_json(conversations):
+def encode_conversations_to_json(conversations):
     """Helper method to encode a conversations dict (that uses tuples as keys) to a
     JSON-serializable way. Use :attr:`_decode_conversations_from_json` to decode.
 

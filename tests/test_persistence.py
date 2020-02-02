@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
 
-from telegram.utils.helpers import enocde_conversations_to_json
+from telegram.utils.helpers import encode_conversations_to_json
 
 try:
     import ujson as json
@@ -774,7 +774,7 @@ class TestDictPersistence(object):
         dict_persistence.update_conversation('name3', (1, 2), 3)
         assert dict_persistence.conversations == conversations_two
         assert dict_persistence.conversations_json != conversations_json
-        assert dict_persistence.conversations_json == enocde_conversations_to_json(
+        assert dict_persistence.conversations_json == encode_conversations_to_json(
             conversations_two)
 
     def test_with_handler(self, bot, update):

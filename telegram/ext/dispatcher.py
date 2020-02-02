@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -138,8 +138,6 @@ class Dispatcher(object):
         else:
             self.persistence = None
 
-        self.job_queue = job_queue
-
         self.handlers = {}
         """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups = []
@@ -161,6 +159,10 @@ class Dispatcher(object):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
+
+    @property
+    def exception_event(self):
+        return self.__exception_event
 
     def _init_async_threads(self, base_name, workers):
         base_name = '{}_'.format(base_name) if base_name else ''
@@ -395,7 +397,8 @@ class Dispatcher(object):
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
 
-        TL;DR: Order and priority counts. 0 or 1 handlers per group will be used.
+        TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
+        update with :class:`telegram.ext.DispatcherHandlerStop`.
 
         A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
