@@ -89,8 +89,7 @@ class Bot(TelegramObject):
     """
 
     def __new__(cls, *args, **kwargs):
-        # Handle default_... kwargs for bot methods
-        # Transform default_x=y kwargs into Defaults.x=y
+        # Get default values from kwargs
         defaults = kwargs.get('defaults')
 
         # Make an instance of the class
@@ -98,7 +97,6 @@ class Bot(TelegramObject):
 
         if not defaults:
             return instance
-        print(defaults, defaults.parse_mode)
 
         # For each method ...
         for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
@@ -109,7 +107,6 @@ class Bot(TelegramObject):
             needs_default = [
                 kwarg_name for kwarg_name in kwarg_names if kwarg_name in defaults.__dict__.keys()
             ]
-            print(needs_default)
             # ... make a dict of kwarg name and the default value
             default_kwargs = {
                 kwarg_name: getattr(defaults, kwarg_name) for kwarg_name in needs_default if (
