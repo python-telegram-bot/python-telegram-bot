@@ -178,13 +178,9 @@ class Request(object):
 
         """
 
+        decoded_s = json_data.decode('utf-8', 'replace')
         try:
-            decoded_s = json_data.decode('utf-8')
             data = json.loads(decoded_s)
-        except UnicodeDecodeError:
-            logging.getLogger(__name__).debug(
-                'Logging raw invalid UTF-8 response:\n%r', json_data)
-            raise TelegramError('Server response could not be decoded using UTF-8')
         except ValueError:
             raise TelegramError('Invalid server response')
 

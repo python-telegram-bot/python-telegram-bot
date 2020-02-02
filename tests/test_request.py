@@ -23,12 +23,22 @@ from telegram import TelegramError
 from telegram.utils.request import Request
 
 
-def test_parse_illegal_callback_data():
+def test_replaced_unprintable_char():
     """
     Clients can send arbitrary bytes in callback data.
     Make sure the correct error is raised in this case.
     """
-    server_response = b'{"invalid utf-8": "\x80"}'
+    server_response = b'{"invalid utf-8": "\x80", "result": "KUKU"}'
 
-    with pytest.raises(TelegramError, match='Server response could not be decoded using UTF-8'):
+    assert Request._parse(server_response) == 'KUKU'
+
+
+def test_parse_illegal_json():
+    """
+    Clients can send arbitrary bytes in callback data.
+    Make sure the correct error is raised in this case.
+    """
+    server_response = b'{"invalid utf-8": "\x80", result: "KUKU"}'
+
+    with pytest.raises(TelegramError, match='Invalid server response'):
         Request._parse(server_response)
