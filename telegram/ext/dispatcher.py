@@ -397,7 +397,8 @@ class Dispatcher(object):
     def add_handler(self, handler, group=DEFAULT_GROUP):
         """Register a handler.
 
-        TL;DR: Order and priority counts. 0 or 1 handlers per group will be used.
+        TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
+        update with :class:`telegram.ext.DispatcherHandlerStop`.
 
         A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
