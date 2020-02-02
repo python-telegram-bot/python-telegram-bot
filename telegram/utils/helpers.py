@@ -411,9 +411,6 @@ class DefaultValue:
     def __bool__(self):
         return bool(self.value)
 
-    # For Python 2.x
-    __nonzero__ = __bool__
-
 
 DEFAULT_NONE = DefaultValue(None)
 """:class:`DefaultValue`: Default `None`"""
@@ -458,18 +455,63 @@ class Defaults:
                  # default values for timeout (None and 20s)
                  timeout=DEFAULT_NONE,
                  quote=None):
-        self.parse_mode = parse_mode
-        self.disable_notification = disable_notification
-        self.disable_web_page_preview = disable_web_page_preview
-        self.timeout = timeout
-        self.quote = quote
+        self._parse_mode = parse_mode
+        self._disable_notification = disable_notification
+        self._disable_web_page_preview = disable_web_page_preview
+        self._timeout = timeout
+        self._quote = quote
+
+    @property
+    def parse_mode(self):
+        return self._parse_mode
+
+    @parse_mode.setter
+    def parse_mode(self, value):
+        raise AttributeError("You can not assign a new value to defaults after because it would "
+                             "not have any effect.")
+
+    @property
+    def disable_notification(self):
+        return self._disable_notification
+
+    @disable_notification.setter
+    def disable_notification(self, value):
+        raise AttributeError("You can not assign a new value to defaults after because it would "
+                             "not have any effect.")
+
+    @property
+    def disable_web_page_preview(self):
+        return self._disable_web_page_preview
+
+    @disable_web_page_preview.setter
+    def disable_web_page_preview(self, value):
+        raise AttributeError("You can not assign a new value to defaults after because it would "
+                             "not have any effect.")
+
+    @property
+    def timeout(self):
+        return self._timeout
+
+    @timeout.setter
+    def timeout(self, value):
+        raise AttributeError("You can not assign a new value to defaults after because it would "
+                             "not have any effect.")
+
+    @property
+    def quote(self):
+        return self._quote
+
+    @quote.setter
+    def quote(self, value):
+        raise AttributeError("You can not assign a new value to defaults after because it would "
+                             "not have any effect.")
 
     def __hash__(self):
-        return hash((self.parse_mode,
-                     self.disable_notification,
-                     self.disable_web_page_preview,
-                     self.timeout,
-                     self.quote))
+        return hash((self._parse_mode,
+                     self._disable_notification,
+                     self._disable_web_page_preview,
+                     self._timeout,
+                     self._quote))
 
     def __eq__(self, other):
         if isinstance(other, Defaults):
