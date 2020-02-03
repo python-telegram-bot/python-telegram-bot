@@ -21,7 +21,7 @@ Version 12.4.0
 - Add ``disptacher`` argument to ``Updater`` to allow passing a customized ``Dispatcher`` (`#1484`_)
 - Add missing names for ``Filters`` (`#1632`_)
 - Documentation fixes (`#1624`_, `#1647`_, `#1669`_, `#1703`_, `#1718`_, `#1734`_, `#1740`_, `#1642`_, `#1739`_, `#1746`_)
-- CI improvements (`#1716`_, `#1731`_, `#1738`_, `#1748`_, `#1749`_)
+- CI improvements (`#1716`_, `#1731`_, `#1738`_, `#1748`_, `#1749`_, `#1750`_)
 - Fix spelling issue for ``encode_conversations_to_json`` (`#1661`_)
 - Remove double assignement of ``Dispatcher.job_queue`` (`#1698`_)
 - Expose dispatcher as property for ``CallbackContext`` (`#1684`_)
@@ -33,6 +33,7 @@ Version 12.4.0
 - Improve handling of non-decodable server responses (`#1623`_)
 - Fix download for files without ``file_path`` (`#1591`_)
 
+.. _`#1750`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1750
 .. _`#1591`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1591
 .. _`#1490`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1490
 .. _`#1749`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1749
