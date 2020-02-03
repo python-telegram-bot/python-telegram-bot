@@ -8,7 +8,7 @@ Version 12.4.0
 
 **New features:**
 
-- Set default values for arguments appearing repeatedly (`#1490`_)
+- Set default values for arguments appearing repeatedly. We also have a `code snippet for the new defaults`_. (`#1490`_)
 - Store data in ``CallbackContext.bot_data`` to access it in every callback. Also persists. (`#1325`_)
 - ``Filters.poll`` allows only messages containing a poll (`#1673`_)
 
@@ -33,6 +33,7 @@ Version 12.4.0
 - Improve handling of non-decodable server responses (`#1623`_)
 - Fix download for files without ``file_path`` (`#1591`_)
 
+.. _`code snippet for the new defaults`: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Code-snippets#use-default-values
 .. _`#1750`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1750
 .. _`#1591`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1591
 .. _`#1490`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1490
