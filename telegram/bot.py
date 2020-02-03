@@ -105,7 +105,8 @@ class Bot(TelegramObject):
             kwarg_names = argspec.args[-len(argspec.defaults or []):]
             # ... check if Defaults has a attribute that matches the kwarg name
             needs_default = [
-                kwarg_name for kwarg_name in kwarg_names if kwarg_name in defaults.__dict__.keys()
+                kwarg_name for kwarg_name in kwarg_names
+                if '_' + kwarg_name in defaults.__dict__.keys()
             ]
             # ... make a dict of kwarg name and the default value
             default_kwargs = {

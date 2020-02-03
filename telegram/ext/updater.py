@@ -197,7 +197,7 @@ class Updater(object):
         self.__threads = []
 
         # Just for passing to WebhookAppClass
-        self._default_quote = defaults.default_quote if defaults else None
+        self._default_quote = defaults.quote if defaults else None
 
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper,
