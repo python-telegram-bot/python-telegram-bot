@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -105,6 +105,7 @@ def dp(_dp):
         _dp.update_queue.get(False)
     _dp.chat_data = defaultdict(dict)
     _dp.user_data = defaultdict(dict)
+    _dp.bot_data = {}
     _dp.persistence = None
     _dp.handlers = {}
     _dp.groups = []

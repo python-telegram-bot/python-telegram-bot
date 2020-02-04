@@ -68,6 +68,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Poolitzer <https://github.com/Poolitzer>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Riko Naka <https://github.com/rikonaka>`_
 - `Rizlas <https://github.com/rizlas>`_
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sascha <https://github.com/saschalalala>`_

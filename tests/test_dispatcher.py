@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -121,6 +121,7 @@ class TestDispatcher(object):
             def __init__(self):
                 self.store_user_data = False
                 self.store_chat_data = False
+                self.store_bot_data = False
 
         with pytest.raises(TypeError,
                            match='persistence should be based on telegram.ext.BasePersistence'):
@@ -351,6 +352,13 @@ class TestDispatcher(object):
                 super(BasePersistence, self).__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
+                self.store_bot_data = True
+
+            def get_bot_data(self):
+                return dict()
+
+            def update_bot_data(self, data):
+                raise Exception
 
             def get_chat_data(self):
                 return defaultdict(dict)
@@ -384,7 +392,7 @@ class TestDispatcher(object):
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert increment == ["error", "error"]
+        assert increment == ["error", "error", "error"]
 
     def test_flow_stop_in_error_handler(self, dp, bot):
         passed = []
