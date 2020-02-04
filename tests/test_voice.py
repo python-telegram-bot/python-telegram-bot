@@ -115,7 +115,7 @@ class TestVoice(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [], indirect=True)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_1(self, default_bot, chat_id, voice):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -126,7 +126,7 @@ class TestVoice(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [], indirect=True)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_2(self, default_bot, chat_id, voice):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -137,7 +137,7 @@ class TestVoice(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.parametrize('default_bot', [], indirect=True)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
     def test_send_voice_default_parse_mode_3(self, default_bot, chat_id, voice):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
