@@ -55,11 +55,8 @@ def escape_markdown(text, version=1, entity_type=None):
         entity_type (:obj:`str`, optional): For the entity types ``PRE``, ``CODE`` and the link
             part of ``TEXT_LINKS``, only certain characters need to be escaped in ``MarkdownV2``.
             See the official API documentation for details. Only valid in combination with
-            ``version=2``.
+            ``version=2``, will be ignored else.
     """
-    if entity_type and int(version) != 2:
-        raise ValueError('entity_type can only be used with MarkdownV2!')
-
     if int(version) == 1:
         escape_chars = '\*_`\['
     elif int(version) == 2:

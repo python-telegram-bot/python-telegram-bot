@@ -1191,7 +1191,9 @@ class Message(TelegramObject):
                                                    version=version)
 
                 if entity.type == MessageEntity.TEXT_LINK:
-                    insert = '[{}]({})'.format(text, entity.url)
+                    # Links need special escaping. Also can't have entities nested within
+                    insert = '[{}]({})'.format(text, escape_markdown(entity.url, version=version,
+                                               entity_type=MessageEntity.TEXT_LINK))
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
                     insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
                 elif entity.type == MessageEntity.URL and urled:
@@ -1201,9 +1203,13 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.ITALIC:
                     insert = '_' + text + '_'
                 elif entity.type == MessageEntity.CODE:
-                    insert = '`' + text + '`'
+                    # Monospace needs special escaping. Also can't have entities nested within
+                    insert = '`' + escape_markdown(orig_text, version=version,
+                                                   entity_type=MessageEntity.CODE) + '`'
                 elif entity.type == MessageEntity.PRE:
-                    insert = '```' + text + '```'
+                    # Monospace needs special escaping. Also can't have entities nested within
+                    insert = '```' + escape_markdown(orig_text, version=version,
+                                                     entity_type=MessageEntity.PRE) + '```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
                         raise ValueError('Underline entities are not supported for Markdown '
