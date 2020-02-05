@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -38,9 +38,20 @@ try:
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
     from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
 except ImportError:  # pragma: no cover
-    warnings.warn("python-telegram-bot wasn't properly installed. Please refer to README.rst on "
-                  "how to properly install.")
-    raise
+    try:
+        import urllib3
+        import urllib3.contrib.appengine as appengine
+        from urllib3.connection import HTTPConnection
+        from urllib3.util.timeout import Timeout
+        from urllib3.fields import RequestField
+        warnings.warn('python-telegram-bot is using upstream urllib3. This is allowed but not '
+                      'supported by python-telegram-bot maintainers.')
+    except ImportError:
+        warnings.warn(
+            "python-telegram-bot wasn't properly installed. Please refer to README.rst on "
+            "how to properly install.")
+        raise
+
 
 from telegram import (InputFile, TelegramError, InputMedia)
 from telegram.error import (Unauthorized, NetworkError, TimedOut, BadRequest, ChatMigrated,
@@ -167,13 +178,9 @@ class Request(object):
 
         """
 
+        decoded_s = json_data.decode('utf-8', 'replace')
         try:
-            decoded_s = json_data.decode('utf-8')
             data = json.loads(decoded_s)
-        except UnicodeDecodeError:
-            logging.getLogger(__name__).debug(
-                'Logging raw invalid UTF-8 response:\n%r', json_data)
-            raise TelegramError('Server response could not be decoded using UTF-8')
         except ValueError:
             raise TelegramError('Invalid server response')
 

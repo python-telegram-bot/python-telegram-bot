@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -43,8 +43,17 @@ class CallbackContext(object):
          that you think you added will not be present.
 
     Attributes:
+        bot_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
+            update it will be the same ``dict``.
         chat_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
-            update from the same chat it will be the same ``dict``.
+            update from the same chat id it will be the same ``dict``.
+
+            Warning:
+                When a group chat migrates to a supergroup, its chat id will change and the
+                ``chat_data`` needs to be transferred. For details see our `wiki page
+                <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
+                Storing-user--and-chat-related-data#chat-migration>`_.
+
         user_data (:obj:`dict`, optional): A dict that can be used to keep any data in. For each
             update from the same user it will be the same ``dict``.
         matches (List[:obj:`re match object`], optional): If the associated update originated from
@@ -73,12 +82,27 @@ class CallbackContext(object):
             raise ValueError('CallbackContext should not be used with a non context aware '
                              'dispatcher!')
         self._dispatcher = dispatcher
+        self._bot_data = dispatcher.bot_data
         self._chat_data = None
         self._user_data = None
         self.args = None
         self.matches = None
         self.error = None
         self.job = None
+
+    @property
+    def dispatcher(self):
+        """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
+        return self._dispatcher
+
+    @property
+    def bot_data(self):
+        return self._bot_data
+
+    @bot_data.setter
+    def bot_data(self, value):
+        raise AttributeError("You can not assign a new value to bot_data, see "
+                             "https://git.io/fjxKe")
 
     @property
     def chat_data(self):
@@ -107,6 +131,7 @@ class CallbackContext(object):
     @classmethod
     def from_update(cls, update, dispatcher):
         self = cls(dispatcher)
+
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user
