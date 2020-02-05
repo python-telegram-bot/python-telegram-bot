@@ -260,7 +260,6 @@ class JobQueue(object):
 
         """
         dt = datetime.datetime.now(tz=when.tzinfo or _UTC)
-        next_dt = dt
         dt_time = dt.time().replace(tzinfo=when.tzinfo)
         if calendar.monthrange(dt.year, dt.month)[1] < day:
             # if the day does not exist in the current month (e.g Feb 31st)
@@ -303,9 +302,13 @@ class JobQueue(object):
                             else dt.year,
                             1 if dt.month == 12
                             else dt.month + 1)[1] + day)
+            else:
+                next_dt = dt
 
         next_dt = next_dt.replace(hour=when.hour, minute=when.minute, second=when.second,
                                   microsecond=when.microsecond)
+        if hasattr(next_dt, 'fold'):
+            next_dt = next_dt.replace(fold=when.fold)
         return next_dt
 
     def run_daily(self, callback, time, days=Days.EVERY_DAY, context=None, name=None):

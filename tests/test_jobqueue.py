@@ -305,7 +305,8 @@ class TestJobQueue(object):
         assert job_queue._queue.get(False)[0] == pytest.approx(expected_reschedule_time)
 
     def test_run_monthly_and_not_strict(self, job_queue):
-        delta, now = 0.1, time.time()
+        delta, now = 0.1, dtm.datetime(dtm.datetime.utcnow().year, 2, 1, 0, 0).replace(
+            tzinfo=dtm.timezone.utc).timestamp()
         date_time = dtm.datetime.utcfromtimestamp(now)
         time_of_day = (date_time + dtm.timedelta(seconds=delta)).time()
         expected_reschedule_time = now + delta
