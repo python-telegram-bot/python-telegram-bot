@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -328,6 +328,13 @@ class TestSendMediaGroup(object):
         assert len(messages) == 2
         assert all([isinstance(mes, Message) for mes in messages])
         assert all([mes.media_group_id == messages[0].media_group_id for mes in messages])
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
+    def test_send_media_group_default_quote(self, default_bot, chat_id, media_group):
+        messages = default_bot.send_media_group(chat_id, media_group)
+        assert all([mes.default_quote is True for mes in messages])
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -74,6 +74,14 @@ class TestUpdate(object):
         update = Update.de_json(None, bot)
 
         assert update is None
+
+    def test_de_json_default_quote(self, bot):
+        json_dict = {'update_id': TestUpdate.update_id}
+        json_dict['message'] = message.to_dict()
+        json_dict['default_quote'] = True
+        update = Update.de_json(json_dict, bot)
+
+        assert update.message.default_quote is True
 
     def test_to_dict(self, update):
         update_dict = update.to_dict()

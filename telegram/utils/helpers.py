@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -100,7 +100,7 @@ def to_float_timestamp(t, reference_timestamp=None):
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
-    Any objects from the :module:`datetime` module that are timezone-naive will be assumed
+    Any objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC.
 
     ``None`` s are left alone (i.e. ``to_float_timestamp(None)`` is ``None``).
@@ -360,3 +360,57 @@ def decode_user_chat_data_from_json(data):
                 pass
             tmp[user][key] = value
     return tmp
+
+
+class DefaultValue:
+    """Wrapper for immutable default arguments that allows to check, if the default value was set
+    explicitly. Usage::
+
+        DefaultOne = DefaultValue(1)
+        def f(arg=DefaultOne):
+            if arg is DefaultOne:
+                print('`arg` is the default')
+                arg = arg.value
+            else:
+                print('`arg` was set explicitly')
+            print('`arg` = ' + str(arg))
+
+    This yields::
+
+        >>> f()
+        `arg` is the default
+        `arg` = 1
+        >>> f(1)
+        `arg` was set explicitly
+        `arg` = 1
+        >>> f(2)
+        `arg` was set explicitly
+        `arg` = 2
+
+    Also allows to evaluate truthiness::
+
+        default = DefaultValue(value)
+        if default:
+            ...
+
+    is equivalent to::
+
+        default = DefaultValue(value)
+        if value:
+            ...
+
+    Attributes:
+        value (:obj:`obj`): The value of the default argument
+
+    Args:
+        value (:obj:`obj`): The value of the default argument
+    """
+    def __init__(self, value=None):
+        self.value = value
+
+    def __bool__(self):
+        return bool(self.value)
+
+
+DEFAULT_NONE = DefaultValue(None)
+""":class:`DefaultValue`: Default `None`"""

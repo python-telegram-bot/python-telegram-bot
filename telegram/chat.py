@@ -2,7 +2,7 @@
 # pylint: disable=C0103,W0622
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -135,7 +135,10 @@ class Chat(TelegramObject):
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
         from telegram import Message
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        pinned_message = data.get('pinned_message')
+        if pinned_message:
+            pinned_message['default_quote'] = data.get('default_quote')
+        data['pinned_message'] = Message.de_json(pinned_message, bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
 
         return cls(bot=bot, **data)

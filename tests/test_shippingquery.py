@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -63,9 +63,9 @@ class TestShippingQuery(object):
 
     def test_answer(self, monkeypatch, shipping_query):
         def test(*args, **kwargs):
-            return args[1] == shipping_query.id
+            return args[0] == shipping_query.id
 
-        monkeypatch.setattr('telegram.Bot.answer_shipping_query', test)
+        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', test)
         assert shipping_query.answer()
 
     def test_equality(self):
