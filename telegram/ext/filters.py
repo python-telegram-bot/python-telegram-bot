@@ -249,10 +249,7 @@ class Filters(object):
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._TextIterable(update)
 
@@ -296,10 +293,7 @@ class Filters(object):
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._CaptionIterable(update)
 
@@ -333,10 +327,7 @@ class Filters(object):
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._CommandOnlyStart(update)
 
