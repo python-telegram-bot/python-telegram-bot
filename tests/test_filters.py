@@ -63,13 +63,22 @@ class TestFilters(object):
         assert Filters.caption({'test', 'test1'})(update)
         assert not Filters.caption(['test1', 'test2'])(update)
 
-    def test_filters_command(self, update):
+    def test_filters_command_default(self, update):
         update.message.text = 'test'
         assert not Filters.command(update)
         update.message.text = '/test'
         assert not Filters.command(update)
+        # Only accept commands at the beginning
+        update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 3, 5)]
+        assert not Filters.command(update)
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
         assert Filters.command(update)
+
+    def test_filters_command_anywhere(self, update):
+        update.message.text = 'test /cmd'
+        assert not (Filters.command(False))(update)
+        update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 5, 4)]
+        assert (Filters.command(False))(update)
 
     def test_filters_regex(self, update):
         SRE_TYPE = type(re.match("", ""))
