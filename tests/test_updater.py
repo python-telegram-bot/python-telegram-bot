@@ -79,8 +79,8 @@ class TestUpdater(object):
         def test(*args, **kwargs):
             raise error
 
-        monkeypatch.setattr('telegram.Bot.get_updates', test)
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'get_updates', test)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         updater.dispatcher.add_error_handler(self.error_handler)
         updater.start_polling(0.01)
 
@@ -99,8 +99,8 @@ class TestUpdater(object):
             raise error
 
         with caplog.at_level(logging.DEBUG):
-            monkeypatch.setattr('telegram.Bot.get_updates', test)
-            monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+            monkeypatch.setattr(updater.bot, 'get_updates', test)
+            monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
             updater.dispatcher.add_error_handler(self.error_handler)
             updater.start_polling(0.01)
             assert self.err_handler_called.wait(1) is not True
@@ -127,8 +127,8 @@ class TestUpdater(object):
             event.set()
             raise error
 
-        monkeypatch.setattr('telegram.Bot.get_updates', test)
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'get_updates', test)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         updater.dispatcher.add_error_handler(self.error_handler)
         updater.start_polling(0.01)
 
@@ -144,8 +144,8 @@ class TestUpdater(object):
 
     def test_webhook(self, monkeypatch, updater):
         q = Queue()
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
@@ -182,8 +182,8 @@ class TestUpdater(object):
             updater.stop()
 
     def test_webhook_ssl(self, monkeypatch, updater):
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port for travis
         tg_err = False
@@ -204,8 +204,8 @@ class TestUpdater(object):
 
     def test_webhook_no_ssl(self, monkeypatch, updater):
         q = Queue()
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
@@ -221,18 +221,42 @@ class TestUpdater(object):
         assert q.get(False) == update
         updater.stop()
 
+    def test_webhook_default_quote(self, monkeypatch, updater):
+        updater._default_quote = True
+        q = Queue()
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port for travis
+        updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN')
+        sleep(.2)
+
+        # Now, we send an update to the server via urlopen
+        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                           text='Webhook'))
+        self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
+        sleep(.2)
+        # assert q.get(False) == update
+        assert q.get(False).message.default_quote is True
+        updater.stop()
+
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError(''),)],
                              ids=('TelegramError',))
     def test_bootstrap_retries_success(self, monkeypatch, updater, error):
         retries = 2
 
-        def attempt(_, *args, **kwargs):
+        def attempt(*args, **kwargs):
             if self.attempts < retries:
                 self.attempts += 1
                 raise error
 
-        monkeypatch.setattr('telegram.Bot.set_webhook', attempt)
+        monkeypatch.setattr(updater.bot, 'set_webhook', attempt)
 
         updater.running = True
         updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
@@ -246,11 +270,11 @@ class TestUpdater(object):
     def test_bootstrap_retries_error(self, monkeypatch, updater, error, attempts):
         retries = 1
 
-        def attempt(_, *args, **kwargs):
+        def attempt(*args, **kwargs):
             self.attempts += 1
             raise error
 
-        monkeypatch.setattr('telegram.Bot.set_webhook', attempt)
+        monkeypatch.setattr(updater.bot, 'set_webhook', attempt)
 
         updater.running = True
         with pytest.raises(type(error)):

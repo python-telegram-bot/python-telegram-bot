@@ -360,3 +360,57 @@ def decode_user_chat_data_from_json(data):
                 pass
             tmp[user][key] = value
     return tmp
+
+
+class DefaultValue:
+    """Wrapper for immutable default arguments that allows to check, if the default value was set
+    explicitly. Usage::
+
+        DefaultOne = DefaultValue(1)
+        def f(arg=DefaultOne):
+            if arg is DefaultOne:
+                print('`arg` is the default')
+                arg = arg.value
+            else:
+                print('`arg` was set explicitly')
+            print('`arg` = ' + str(arg))
+
+    This yields::
+
+        >>> f()
+        `arg` is the default
+        `arg` = 1
+        >>> f(1)
+        `arg` was set explicitly
+        `arg` = 1
+        >>> f(2)
+        `arg` was set explicitly
+        `arg` = 2
+
+    Also allows to evaluate truthiness::
+
+        default = DefaultValue(value)
+        if default:
+            ...
+
+    is equivalent to::
+
+        default = DefaultValue(value)
+        if value:
+            ...
+
+    Attributes:
+        value (:obj:`obj`): The value of the default argument
+
+    Args:
+        value (:obj:`obj`): The value of the default argument
+    """
+    def __init__(self, value=None):
+        self.value = value
+
+    def __bool__(self):
+        return bool(self.value)
+
+
+DEFAULT_NONE = DefaultValue(None)
+""":class:`DefaultValue`: Default `None`"""

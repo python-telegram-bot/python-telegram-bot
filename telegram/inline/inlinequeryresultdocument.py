@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultDocument(InlineQueryResult):
@@ -82,7 +83,7 @@ class InlineQueryResultDocument(InlineQueryResult):
                  thumb_url=None,
                  thumb_width=None,
                  thumb_height=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultDocument, self).__init__('document', id)

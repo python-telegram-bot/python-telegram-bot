@@ -103,73 +103,73 @@ class TestUser(object):
         assert user.link is None
 
     def test_get_profile_photos(self, monkeypatch, user):
-        def test(_, *args, **kwargs):
+        def test(*args, **kwargs):
             return args[0] == user.id
 
-        monkeypatch.setattr('telegram.Bot.get_user_profile_photos', test)
+        monkeypatch.setattr(user.bot, 'get_user_profile_photos', test)
         assert user.get_profile_photos()
 
     def test_instance_method_send_message(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test'
+            return args[0] == user.id and args[1] == 'test'
 
-        monkeypatch.setattr('telegram.Bot.send_message', test)
+        monkeypatch.setattr(user.bot, 'send_message', test)
         assert user.send_message('test')
 
     def test_instance_method_send_photo(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_photo'
+            return args[0] == user.id and args[1] == 'test_photo'
 
-        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        monkeypatch.setattr(user.bot, 'send_photo', test)
         assert user.send_photo('test_photo')
 
     def test_instance_method_send_audio(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_audio'
+            return args[0] == user.id and args[1] == 'test_audio'
 
-        monkeypatch.setattr('telegram.Bot.send_audio', test)
+        monkeypatch.setattr(user.bot, 'send_audio', test)
         assert user.send_audio('test_audio')
 
     def test_instance_method_send_document(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_document'
+            return args[0] == user.id and args[1] == 'test_document'
 
-        monkeypatch.setattr('telegram.Bot.send_document', test)
+        monkeypatch.setattr(user.bot, 'send_document', test)
         assert user.send_document('test_document')
 
     def test_instance_method_send_sticker(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_sticker'
+            return args[0] == user.id and args[1] == 'test_sticker'
 
-        monkeypatch.setattr('telegram.Bot.send_sticker', test)
+        monkeypatch.setattr(user.bot, 'send_sticker', test)
         assert user.send_sticker('test_sticker')
 
     def test_instance_method_send_video(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_video'
+            return args[0] == user.id and args[1] == 'test_video'
 
-        monkeypatch.setattr('telegram.Bot.send_video', test)
+        monkeypatch.setattr(user.bot, 'send_video', test)
         assert user.send_video('test_video')
 
     def test_instance_method_send_video_note(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_video_note'
+            return args[0] == user.id and args[1] == 'test_video_note'
 
-        monkeypatch.setattr('telegram.Bot.send_video_note', test)
+        monkeypatch.setattr(user.bot, 'send_video_note', test)
         assert user.send_video_note('test_video_note')
 
     def test_instance_method_send_voice(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_voice'
+            return args[0] == user.id and args[1] == 'test_voice'
 
-        monkeypatch.setattr('telegram.Bot.send_voice', test)
+        monkeypatch.setattr(user.bot, 'send_voice', test)
         assert user.send_voice('test_voice')
 
     def test_instance_method_send_animation(self, monkeypatch, user):
         def test(*args, **kwargs):
-            return args[1] == user.id and args[2] == 'test_animation'
+            return args[0] == user.id and args[1] == 'test_animation'
 
-        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        monkeypatch.setattr(user.bot, 'send_animation', test)
         assert user.send_animation('test_animation')
 
     def test_mention_html(self, user):

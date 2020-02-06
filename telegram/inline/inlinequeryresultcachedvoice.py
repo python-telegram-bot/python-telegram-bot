@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedVoice."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultCachedVoice(InlineQueryResult):
@@ -64,7 +65,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultCachedVoice, self).__init__('voice', id)

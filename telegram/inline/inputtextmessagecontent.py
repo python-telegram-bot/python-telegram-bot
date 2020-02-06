@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
 from telegram import InputMessageContent
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InputTextMessageContent(InputMessageContent):
@@ -43,7 +44,11 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    def __init__(self, message_text, parse_mode=None, disable_web_page_preview=None, **kwargs):
+    def __init__(self,
+                 message_text,
+                 parse_mode=DEFAULT_NONE,
+                 disable_web_page_preview=DEFAULT_NONE,
+                 **kwargs):
         # Required
         self.message_text = message_text
         # Optionals
