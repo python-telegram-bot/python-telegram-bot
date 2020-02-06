@@ -593,6 +593,9 @@ class TestFilters(object):
         f.user_ids = 2
         assert f(update)
 
+        with pytest.raises(ValueError, match='user_id or username'):
+            f.usernames = 'user'
+
     def test_filters_user_change_username(self, update):
         f = Filters.user(username='user')
         update.message.from_user.username = 'user'
@@ -601,6 +604,9 @@ class TestFilters(object):
         assert not f(update)
         f.usernames = 'User'
         assert f(update)
+
+        with pytest.raises(ValueError, match='user_id or username'):
+            f.user_ids = 1
 
     def test_filters_chat(self):
         with pytest.raises(ValueError, match='chat_id or username'):
