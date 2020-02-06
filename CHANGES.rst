@@ -15,6 +15,7 @@ Version 12.4.0
 **Major changes:**
 
 - ``Filters.text`` now accepts messages that start with a slash, because ``CommandHandler`` checks for ``MessageEntity.BOT_COMMAND`` since v12. This might lead to your MessageHandlers receiving more updates than before (`#1680`_).
+- ``Filters.command`` new checks for ``MessageEntity.BOT_COMMAND`` instead of just a leading slash. Also by ``Filters.command(False)`` you can now filters for messages containing a command `anywhere` in the text (`#1744`_).
 
 **Minor changes, CI improvements or bug fixes:**
 
@@ -34,6 +35,7 @@ Version 12.4.0
 - Fix download for files without ``file_path`` (`#1591`_)
 
 .. _`wiki page for the new defaults`: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Adding-defaults-to-your-bot
+.. _`#1744`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1744
 .. _`#1752`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1752
 .. _`#1750`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1750
 .. _`#1591`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1591
