@@ -563,6 +563,10 @@ class TestFilters(object):
         with pytest.raises(ValueError, match='user_id or username'):
             Filters.user()
 
+    def test_filters_user_empty_args(self, update):
+        assert not Filters.user(user_id=[])(update)
+        assert not Filters.user(username=[])(update)
+
     def test_filters_user_id(self, update):
         assert not Filters.user(user_id=1)(update)
         update.message.from_user.id = 1
