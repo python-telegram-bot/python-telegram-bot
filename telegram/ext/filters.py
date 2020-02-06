@@ -881,31 +881,35 @@ officedocument.wordprocessingml.document")``-
 
         @property
         def user_ids(self):
-            return self._user_ids
+            with self._user_ids_lock:
+                return self._user_ids
 
         @user_ids.setter
         def user_ids(self, user_id):
-            if (user_id is None) == (self.usernames is None):
-                raise ValueError('One and only one of user_id or username must be used')
-            if isinstance(user_id, int):
-                self._user_ids = [user_id]
-            else:
-                self._user_ids = user_id
+            with self._user_ids_lock:
+                if (user_id is None) == (self.usernames is None):
+                    raise ValueError('One and only one of user_id or username must be used')
+                if isinstance(user_id, int):
+                    self._user_ids = [user_id]
+                else:
+                    self._user_ids = user_id
 
         @property
         def usernames(self):
-            return self._usernames
+            with self._usernames_lock:
+                return self._usernames
 
         @usernames.setter
         def usernames(self, username):
-            if (username is None) == (self.user_ids is None):
-                raise ValueError('One and only one of user_id or username must be used')
-            if username is None:
-                self._usernames = username
-            elif isinstance(username, str):
-                self._usernames = [username.replace('@', '')]
-            else:
-                self._usernames = [user.replace('@', '') for user in username]
+            with self._usernames_lock:
+                if (username is None) == (self.user_ids is None):
+                    raise ValueError('One and only one of user_id or username must be used')
+                if username is None:
+                    self._usernames = username
+                elif isinstance(username, str):
+                    self._usernames = [username.replace('@', '')]
+                else:
+                    self._usernames = [user.replace('@', '') for user in username]
 
         def filter(self, message):
             """"""  # remove method from docs
