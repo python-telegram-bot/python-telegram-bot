@@ -869,15 +869,15 @@ officedocument.wordprocessingml.document")``-
             if (user_id is None) == (username is None):
                 raise ValueError('One and only one of user_id or username must be used')
 
+            self._user_ids_lock = Lock()
+            self._usernames_lock = Lock()
+
             # Initialize in a way that will not fail the first setter calls
             self._user_ids = user_id
             self._usernames = username
             # Actually initialize
             self.user_ids = user_id
             self.usernames = username
-
-            self._user_ids_lock = Lock()
-            self._usernames_lock = Lock()
 
         @property
         def user_ids(self):
@@ -886,9 +886,9 @@ officedocument.wordprocessingml.document")``-
 
         @user_ids.setter
         def user_ids(self, user_id):
+            if (user_id is None) == (self.usernames is None):
+                raise ValueError('One and only one of user_id or username must be used')
             with self._user_ids_lock:
-                if (user_id is None) == (self.usernames is None):
-                    raise ValueError('One and only one of user_id or username must be used')
                 if isinstance(user_id, int):
                     self._user_ids = [user_id]
                 else:
@@ -901,9 +901,9 @@ officedocument.wordprocessingml.document")``-
 
         @usernames.setter
         def usernames(self, username):
+            if (username is None) == (self.user_ids is None):
+                raise ValueError('One and only one of user_id or username must be used')
             with self._usernames_lock:
-                if (username is None) == (self.user_ids is None):
-                    raise ValueError('One and only one of user_id or username must be used')
                 if username is None:
                     self._usernames = username
                 elif isinstance(username, str):
@@ -913,10 +913,9 @@ officedocument.wordprocessingml.document")``-
 
         def filter(self, message):
             """"""  # remove method from docs
-            with self._user_ids_lock:
-                if self.user_ids is not None:
-                    return bool(message.from_user and message.from_user.id in self.user_ids)
-            with self._usernames_lock:
+            if self.user_ids is not None:
+                return bool(message.from_user and message.from_user.id in self.user_ids)
+            else:
                 # self.usernames is not None
                 return bool(message.from_user and message.from_user.username
                             and message.from_user.username in self.usernames)
