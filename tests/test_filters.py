@@ -562,6 +562,24 @@ class TestFilters(object):
         assert Filters.user(username=['user1', 'user', 'user2'])(update)
         assert not Filters.user(username=['@username', '@user_2'])(update)
 
+    def test_filters_user_change_id(self, update):
+        f = Filters.user(user_id=1)
+        update.message.from_user.id = 1
+        assert f(update)
+        update.message.from_user.id = 2
+        assert not f(update)
+        f.user_ids = 2
+        assert f(update)
+
+    def test_filters_user_change_username(self, update):
+        f = Filters.user(username='user')
+        update.message.from_user.username = 'user'
+        assert f(update)
+        update.message.from_user.username = 'User'
+        assert not f(update)
+        f.usernames = 'User'
+        assert f(update)
+
     def test_filters_chat(self):
         with pytest.raises(ValueError, match='chat_id or username'):
             Filters.chat(chat_id=-1, username='chat')

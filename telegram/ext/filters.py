@@ -21,6 +21,7 @@
 import re
 
 from future.utils import string_types
+from threading import Lock
 
 from telegram import Chat, Update
 
@@ -826,6 +827,10 @@ officedocument.wordprocessingml.document")``-
         Examples:
             ``MessageHandler(Filters.user(1234), callback_method)``
 
+        Attributes:
+            user_id(List[:obj:`int`], optional): Which user ID(s) to allow through.
+            username(List[:obj:`str`], optional): Which username(s) (without leading '@') to allow
+                through.
         Args:
             user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow through.
             username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
@@ -837,24 +842,53 @@ officedocument.wordprocessingml.document")``-
         """
 
         def __init__(self, user_id=None, username=None):
-            if not (bool(user_id) ^ bool(username)):
+            if (user_id is None) == (username is None):
                 raise ValueError('One and only one of user_id or username must be used')
-            if user_id is not None and isinstance(user_id, int):
-                self.user_ids = [user_id]
+
+            # Initialize in a way that will not fail the first setter calls
+            self._user_ids = user_id
+            self._usernames = username
+            # Actually initialize
+            self.user_ids = user_id
+            self.usernames = username
+
+            self._user_ids_lock = Lock()
+            self._usernames_lock = Lock()
+
+        @property
+        def user_ids(self):
+            return self._user_ids
+
+        @user_ids.setter
+        def user_ids(self, user_id):
+            if (user_id is None) == (self.usernames is None):
+                raise ValueError('One and only one of user_id or username must be used')
+            if isinstance(user_id, int):
+                self._user_ids = [user_id]
             else:
-                self.user_ids = user_id
+                self._user_ids = user_id
+
+        @property
+        def usernames(self):
+            return self._usernames
+
+        @usernames.setter
+        def usernames(self, username):
+            if (username is None) == (self.user_ids is None):
+                raise ValueError('One and only one of user_id or username must be used')
             if username is None:
-                self.usernames = username
-            elif isinstance(username, string_types):
-                self.usernames = [username.replace('@', '')]
+                self._usernames = username
+            elif isinstance(username, str):
+                self._usernames = [username.replace('@', '')]
             else:
-                self.usernames = [user.replace('@', '') for user in username]
+                self._usernames = [user.replace('@', '') for user in username]
 
         def filter(self, message):
             """"""  # remove method from docs
-            if self.user_ids is not None:
-                return bool(message.from_user and message.from_user.id in self.user_ids)
-            else:
+            with self._user_ids_lock:
+                if self.user_ids is not None:
+                    return bool(message.from_user and message.from_user.id in self.user_ids)
+            with self._usernames_lock:
                 # self.usernames is not None
                 return bool(message.from_user and message.from_user.username
                             and message.from_user.username in self.usernames)
