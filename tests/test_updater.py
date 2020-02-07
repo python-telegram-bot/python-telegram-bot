@@ -20,6 +20,7 @@ import logging
 import os
 import signal
 import sys
+from flaky import flaky
 from functools import partial
 from queue import Queue
 from random import randrange
@@ -281,6 +282,7 @@ class TestUpdater(object):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
+    @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
