@@ -238,10 +238,8 @@ class TestBot(object):
                                        switch_pm_text='switch pm',
                                        switch_pm_parameter='start_pm')
 
-    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_answer_inline_query_default_parse_mode(self, monkeypatch, bot, default_bot):
+    def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         def test(_, url, data, *args, **kwargs):
-            print(data)
             return data == {'cache_time': 300,
                             'results': [{'title': 'test_result', 'id': '123', 'type': 'document',
                                          'document_url': 'https://raw.githubusercontent.com/'
@@ -269,6 +267,29 @@ class TestBot(object):
                                        next_offset='42',
                                        switch_pm_text='switch pm',
                                        switch_pm_parameter='start_pm')
+
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
+        def test(_, url, data, *args, **kwargs):
+            return data == {'cache_time': 300,
+                            'results': [{'title': 'test_result', 'id': '123', 'type': 'document',
+                                         'document_url': 'https://raw.githubusercontent.com/'
+                                         'python-telegram-bot/logos/master/logo/png/'
+                                         'ptb-logo_240.png', 'mime_type': 'image/png',
+                                         'caption': 'ptb_logo', 'parse_mode': 'Markdown'}],
+                            'next_offset': '42', 'switch_pm_parameter': 'start_pm',
+                            'inline_query_id': 1234, 'is_personal': True,
+                            'switch_pm_text': 'switch pm'}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        results = [InlineQueryResultDocument(
+            id='123',
+            document_url='https://raw.githubusercontent.com/python-telegram-bot/logos/master/'
+                         'logo/png/ptb-logo_240.png',
+            title='test_result',
+            mime_type='image/png',
+            caption='ptb_logo',
+        )]
 
         assert default_bot.answer_inline_query(1234,
                                                results=results,
