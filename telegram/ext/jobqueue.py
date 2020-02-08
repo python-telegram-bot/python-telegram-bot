@@ -279,29 +279,26 @@ class JobQueue(object):
                 next_dt = dt + datetime.timedelta(day - dt.day)
             elif dt.day > day or (dt.day == day and dt_time > when):
                 # run next month if day has already passed
-                next_dt = dt + datetime.timedelta(days=calendar.monthrange(
-                                                  dt.year, dt.month)[1] - dt.day + day)
+                next_year = dt.year + 1 if dt.month == 12 else dt.year
+                next_month = 1 if dt.month == 12 else dt.month + 1
                 # do not need to account for Dec - Jan because they both have 31 days
-                next_month_has_date = next_dt.month - dt.month == 1
-                if next_month_has_date is False and day_is_strict is False:
+                next_month_has_date = calendar.monthrange(next_year, next_month)[1] >= day
+                if next_month_has_date:
+                    next_dt = dt + datetime.timedelta(days=calendar.monthrange(
+                                                      dt.year, dt.month)[1] - dt.day + day)
+                elif day_is_strict is False:
                     # schedule in the next month last date if day is not strict
                     next_dt = dt + datetime.timedelta(days=calendar.monthrange(
                                                       dt.year, dt.month)[1] - dt.day
-                                                      + calendar.monthrange(dt.year + 1
-                                                                            if dt.month == 12
-                                                                            else dt.year,
-                                                                            1 if dt.month == 12
-                                                                            else dt.month + 1)[1])
-                elif next_month_has_date is False and day_is_strict:
+                                                      + calendar.monthrange(next_year,
+                                                                            next_month)[1])
+                elif day_is_strict:
                     # schedule the subsequent month if day is strict
                     next_dt = dt + datetime.timedelta(
                         days=calendar.monthrange(dt.year, dt.month)[1]
                         - dt.day + calendar.monthrange(
-                            dt.year + 1 if
-                            dt.month == 12
-                            else dt.year,
-                            1 if dt.month == 12
-                            else dt.month + 1)[1] + day)
+                            next_year,
+                            next_month)[1] + day)
             else:
                 next_dt = dt
 
