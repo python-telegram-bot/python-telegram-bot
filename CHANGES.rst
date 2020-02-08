@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 12.4.1
+==============
+*Released 2020-02-08*
+
+This is a quick release for `#1744`_ which was accidently left out of v12.4.0 though mentioned in the
+release notes.
+
+
 Version 12.4.0
 ==============
 *Released 2020-02-08*
