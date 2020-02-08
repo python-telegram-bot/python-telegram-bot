@@ -1512,7 +1512,10 @@ class Bot(TelegramObject):
 
         for res in results:
             if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
-                res.parse_mode = self.defaults.parse_mode
+                if self.defaults:
+                    res.parse_mode = self.defaults.parse_mode
+                else:
+                    res.parse_mode = None
             if res._has_input_message_content and res.input_message_content:
                 if (res.input_message_content._has_parse_mode
                         and res.input_message_content.parse_mode == DEFAULT_NONE):
