@@ -85,9 +85,7 @@ class PicklePersistence(BasePersistence):
                 self.user_data = defaultdict(dict, all['user_data'])
                 self.chat_data = defaultdict(dict, all['chat_data'])
                 # For backwards compatibility with files not containing bot data
-                self.bot_data = all.get('bot_data')
-                if self.bot_data is None:
-                    self.bot_data = {}
+                self.bot_data = all.get('bot_data', {})
                 self.conversations = all['conversations']
         except IOError:
             self.conversations = {}
