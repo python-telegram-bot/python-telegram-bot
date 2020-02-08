@@ -281,7 +281,6 @@ class JobQueue(object):
                 # run next month if day has already passed
                 next_year = dt.year + 1 if dt.month == 12 else dt.year
                 next_month = 1 if dt.month == 12 else dt.month + 1
-                # do not need to account for Dec - Jan because they both have 31 days
                 next_month_has_date = calendar.monthrange(next_year, next_month)[1] >= day
                 if next_month_has_date:
                     next_dt = dt + datetime.timedelta(days=calendar.monthrange(
