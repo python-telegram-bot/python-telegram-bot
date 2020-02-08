@@ -3435,7 +3435,7 @@ class Bot(TelegramObject):
             data['type'] = type
         if allows_multiple_answers:
             data['allows_multiple_answers'] = allows_multiple_answers
-        if correct_option_id:
+        if correct_option_id is not None:
             data['correct_option_id'] = correct_option_id
         if is_closed:
             data['is_closed'] = is_closed
