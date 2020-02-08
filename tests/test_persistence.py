@@ -336,6 +336,23 @@ def good_pickle_files(user_data, chat_data, bot_data, conversations):
 
 
 @pytest.fixture(scope='function')
+def pickle_files_wo_bot_data(user_data, chat_data, conversations):
+    all = {'user_data': user_data, 'chat_data': chat_data, 'conversations': conversations}
+    with open('pickletest_user_data', 'wb') as f:
+        pickle.dump(user_data, f)
+    with open('pickletest_chat_data', 'wb') as f:
+        pickle.dump(chat_data, f)
+    with open('pickletest_conversations', 'wb') as f:
+        pickle.dump(conversations, f)
+    with open('pickletest', 'wb') as f:
+        pickle.dump(all, f)
+    yield True
+    for name in ['pickletest_user_data', 'pickletest_chat_data',
+                 'pickletest_conversations', 'pickletest']:
+        os.remove(name)
+
+
+@pytest.fixture(scope='function')
 def update(bot):
     user = User(id=321, first_name='test_user', is_bot=False)
     chat = Chat(id=123, type='group')
@@ -446,6 +463,54 @@ class TestPickelPersistence(object):
         assert conversation2[(890, 890)] == 2
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
+
+    def test_with_multi_file_wo_bot_data(self, pickle_persistence, pickle_files_wo_bot_data):
+        user_data = pickle_persistence.get_user_data()
+        assert isinstance(user_data, defaultdict)
+        assert user_data[12345]['test1'] == 'test2'
+        assert user_data[67890][3] == 'test4'
+        assert user_data[54321] == {}
+
+        chat_data = pickle_persistence.get_chat_data()
+        assert isinstance(chat_data, defaultdict)
+        assert chat_data[-12345]['test1'] == 'test2'
+        assert chat_data[-67890][3] == 'test4'
+        assert chat_data[-54321] == {}
+
+        bot_data = pickle_persistence.get_bot_data()
+        assert isinstance(bot_data, dict)
+        assert not bot_data.keys()
+
+        conversation1 = pickle_persistence.get_conversations('name1')
+        assert isinstance(conversation1, dict)
+        assert conversation1[(123, 123)] == 3
+        assert conversation1[(456, 654)] == 4
+        with pytest.raises(KeyError):
+            conversation1[(890, 890)]
+        conversation2 = pickle_persistence.get_conversations('name2')
+        assert isinstance(conversation1, dict)
+        assert conversation2[(123, 321)] == 1
+        assert conversation2[(890, 890)] == 2
+        with pytest.raises(KeyError):
+            conversation2[(123, 123)]
+
+    def test_with_single_file_wo_bot_data(self, pickle_persistence, pickle_files_wo_bot_data):
+        pickle_persistence.single_file = True
+        user_data = pickle_persistence.get_user_data()
+        assert isinstance(user_data, defaultdict)
+        assert user_data[12345]['test1'] == 'test2'
+        assert user_data[67890][3] == 'test4'
+        assert user_data[54321] == {}
+
+        chat_data = pickle_persistence.get_chat_data()
+        assert isinstance(chat_data, defaultdict)
+        assert chat_data[-12345]['test1'] == 'test2'
+        assert chat_data[-67890][3] == 'test4'
+        assert chat_data[-54321] == {}
+
+        bot_data = pickle_persistence.get_bot_data()
+        assert isinstance(bot_data, dict)
+        assert not bot_data.keys()
 
     def test_updating_multi_file(self, pickle_persistence, good_pickle_files):
         user_data = pickle_persistence.get_user_data()
@@ -659,7 +724,7 @@ class TestPickelPersistence(object):
             if not context.chat_data == {}:
                 pytest.fail()
             if not context.bot_data == bot_data:
-                pytest.failt()
+                pytest.fail()
             context.user_data['test1'] = 'test2'
             context.chat_data['test3'] = 'test4'
             context.bot_data['test1'] = 'test0'
