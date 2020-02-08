@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Update."""
 
 from telegram import (Message, TelegramObject, InlineQuery, ChosenInlineResult,
-                      CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll)
+                      CallbackQuery, ShippingQuery, PreCheckoutQuery, Poll, User, Chat)
 
 
 class Update(TelegramObject):
@@ -105,7 +105,7 @@ class Update(TelegramObject):
         self._id_attrs = (self.update_id,)
 
     @property
-    def effective_user(self):
+    def effective_user(self) -> User:
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
             is. Will be ``None`` for :attr:`channel_post` and :attr:`poll`.
@@ -141,7 +141,7 @@ class Update(TelegramObject):
         return user
 
     @property
-    def effective_chat(self):
+    def effective_chat(self) -> Chat:
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
@@ -173,7 +173,7 @@ class Update(TelegramObject):
         return chat
 
     @property
-    def effective_message(self):
+    def effective_message(self) -> Message:
         """
         :class:`telegram.Message`: The message included in this update, no matter what kind of
             update this is. Will be ``None`` for :attr:`inline_query`,
