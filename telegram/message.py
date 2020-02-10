@@ -975,6 +975,9 @@ class Message(TelegramObject):
         if types is None:
             types = MessageEntity.ALL_TYPES
 
+        if 'url' in types:
+            types.remove('url')
+
         return {
             entity: self.parse_entity(entity)
             for entity in self.entities if entity.type in types
