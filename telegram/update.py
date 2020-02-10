@@ -211,16 +211,31 @@ class Update(TelegramObject):
 
         data = super(Update, cls).de_json(data, bot)
 
-        data['message'] = Message.de_json(data.get('message'), bot)
-        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
+        message = data.get('message')
+        if message:
+            message['default_quote'] = data.get('default_quote')
+        data['message'] = Message.de_json(message, bot)
+        edited_message = data.get('edited_message')
+        if edited_message:
+            edited_message['default_quote'] = data.get('default_quote')
+        data['edited_message'] = Message.de_json(edited_message, bot)
         data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
         data['chosen_inline_result'] = ChosenInlineResult.de_json(
             data.get('chosen_inline_result'), bot)
-        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
+        callback_query = data.get('callback_query')
+        if callback_query:
+            callback_query['default_quote'] = data.get('default_quote')
+        data['callback_query'] = CallbackQuery.de_json(callback_query, bot)
         data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
         data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)
-        data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
-        data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
+        channel_post = data.get('channel_post')
+        if channel_post:
+            channel_post['default_quote'] = data.get('default_quote')
+        data['channel_post'] = Message.de_json(channel_post, bot)
+        edited_channel_post = data.get('edited_channel_post')
+        if edited_channel_post:
+            edited_channel_post['default_quote'] = data.get('default_quote')
+        data['edited_channel_post'] = Message.de_json(edited_channel_post, bot)
         data['poll'] = Poll.de_json(data.get('poll'), bot)
 
         return cls(**data)

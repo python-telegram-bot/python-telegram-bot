@@ -1,4 +1,4 @@
-name: Testing your PR
+name: GitHub Actions
 on:
   pull_request:
     branches:

@@ -94,7 +94,8 @@ def message(bot):
                     {'text': 'a text message', 'reply_markup': {'inline_keyboard': [[{
                         'text': 'start', 'url': 'http://google.com'}, {
                         'text': 'next', 'callback_data': 'abcd'}],
-                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}}
+                        [{'text': 'Cancel', 'callback_data': 'Cancel'}]]}},
+                    {'quote': True}
                 ],
                 ids=['forwarded_user', 'forwarded_channel', 'reply', 'edited', 'text',
                      'caption_entities', 'audio', 'document', 'animation', 'game', 'photo',
@@ -103,7 +104,8 @@ def message(bot):
                      'group_created', 'supergroup_created', 'channel_created', 'migrated_to',
                      'migrated_from', 'pinned', 'invoice', 'successful_payment',
                      'connected_website', 'forward_signature', 'author_signature',
-                     'photo_from_media_group', 'passport_data', 'poll', 'reply_markup'])
+                     'photo_from_media_group', 'passport_data', 'poll', 'reply_markup',
+                     'default_quote'])
 def message_params(bot, request):
     return Message(message_id=TestMessage.id,
                    from_user=TestMessage.from_user,
@@ -343,15 +345,15 @@ class TestMessage(object):
 
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
-            text = args[2] == 'test'
+            id = args[0] == message.chat_id
+            text = args[1] == 'test'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
             return id and text and reply
 
-        monkeypatch.setattr('telegram.Bot.send_message', test)
+        monkeypatch.setattr(message.bot, 'send_message', test)
         assert message.reply_text('test')
         assert message.reply_text('test', quote=True)
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
@@ -362,8 +364,8 @@ class TestMessage(object):
                           'http://google.com')
 
         def test(*args, **kwargs):
-            cid = args[1] == message.chat_id
-            markdown_text = args[2] == test_md_string
+            cid = args[0] == message.chat_id
+            markdown_text = args[1] == test_md_string
             markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -374,7 +376,7 @@ class TestMessage(object):
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
 
-        monkeypatch.setattr('telegram.Bot.send_message', test)
+        monkeypatch.setattr(message.bot, 'send_message', test)
         assert message.reply_markdown(self.test_message.text_markdown)
         assert message.reply_markdown(self.test_message.text_markdown, quote=True)
         assert message.reply_markdown(self.test_message.text_markdown,
@@ -388,8 +390,8 @@ class TestMessage(object):
                             '<pre>pre</pre>. http://google.com')
 
         def test(*args, **kwargs):
-            cid = args[1] == message.chat_id
-            html_text = args[2] == test_html_string
+            cid = args[0] == message.chat_id
+            html_text = args[1] == test_html_string
             html_enabled = kwargs['parse_mode'] == ParseMode.HTML
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -400,7 +402,7 @@ class TestMessage(object):
         text_html = self.test_message.text_html
         assert text_html == test_html_string
 
-        monkeypatch.setattr('telegram.Bot.send_message', test)
+        monkeypatch.setattr(message.bot, 'send_message', test)
         assert message.reply_html(self.test_message.text_html)
         assert message.reply_html(self.test_message.text_html, quote=True)
         assert message.reply_html(self.test_message.text_html,
@@ -409,7 +411,7 @@ class TestMessage(object):
 
     def test_reply_media_group(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             media = kwargs['media'] == 'reply_media_group'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -417,13 +419,13 @@ class TestMessage(object):
                 reply = True
             return id and media and reply
 
-        monkeypatch.setattr('telegram.Bot.send_media_group', test)
+        monkeypatch.setattr(message.bot, 'send_media_group', test)
         assert message.reply_media_group(media='reply_media_group')
         assert message.reply_media_group(media='reply_media_group', quote=True)
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             photo = kwargs['photo'] == 'test_photo'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -431,13 +433,13 @@ class TestMessage(object):
                 reply = True
             return id and photo and reply
 
-        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        monkeypatch.setattr(message.bot, 'send_photo', test)
         assert message.reply_photo(photo='test_photo')
         assert message.reply_photo(photo='test_photo', quote=True)
 
     def test_reply_audio(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             audio = kwargs['audio'] == 'test_audio'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -445,13 +447,13 @@ class TestMessage(object):
                 reply = True
             return id and audio and reply
 
-        monkeypatch.setattr('telegram.Bot.send_audio', test)
+        monkeypatch.setattr(message.bot, 'send_audio', test)
         assert message.reply_audio(audio='test_audio')
         assert message.reply_audio(audio='test_audio', quote=True)
 
     def test_reply_document(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             document = kwargs['document'] == 'test_document'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -459,13 +461,13 @@ class TestMessage(object):
                 reply = True
             return id and document and reply
 
-        monkeypatch.setattr('telegram.Bot.send_document', test)
+        monkeypatch.setattr(message.bot, 'send_document', test)
         assert message.reply_document(document='test_document')
         assert message.reply_document(document='test_document', quote=True)
 
     def test_reply_animation(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             animation = kwargs['animation'] == 'test_animation'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -473,13 +475,13 @@ class TestMessage(object):
                 reply = True
             return id and animation and reply
 
-        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        monkeypatch.setattr(message.bot, 'send_animation', test)
         assert message.reply_animation(animation='test_animation')
         assert message.reply_animation(animation='test_animation', quote=True)
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             sticker = kwargs['sticker'] == 'test_sticker'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -487,13 +489,13 @@ class TestMessage(object):
                 reply = True
             return id and sticker and reply
 
-        monkeypatch.setattr('telegram.Bot.send_sticker', test)
+        monkeypatch.setattr(message.bot, 'send_sticker', test)
         assert message.reply_sticker(sticker='test_sticker')
         assert message.reply_sticker(sticker='test_sticker', quote=True)
 
     def test_reply_video(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             video = kwargs['video'] == 'test_video'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -501,13 +503,13 @@ class TestMessage(object):
                 reply = True
             return id and video and reply
 
-        monkeypatch.setattr('telegram.Bot.send_video', test)
+        monkeypatch.setattr(message.bot, 'send_video', test)
         assert message.reply_video(video='test_video')
         assert message.reply_video(video='test_video', quote=True)
 
     def test_reply_video_note(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             video_note = kwargs['video_note'] == 'test_video_note'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -515,13 +517,13 @@ class TestMessage(object):
                 reply = True
             return id and video_note and reply
 
-        monkeypatch.setattr('telegram.Bot.send_video_note', test)
+        monkeypatch.setattr(message.bot, 'send_video_note', test)
         assert message.reply_video_note(video_note='test_video_note')
         assert message.reply_video_note(video_note='test_video_note', quote=True)
 
     def test_reply_voice(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             voice = kwargs['voice'] == 'test_voice'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -529,13 +531,13 @@ class TestMessage(object):
                 reply = True
             return id and voice and reply
 
-        monkeypatch.setattr('telegram.Bot.send_voice', test)
+        monkeypatch.setattr(message.bot, 'send_voice', test)
         assert message.reply_voice(voice='test_voice')
         assert message.reply_voice(voice='test_voice', quote=True)
 
     def test_reply_location(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             location = kwargs['location'] == 'test_location'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -543,13 +545,13 @@ class TestMessage(object):
                 reply = True
             return id and location and reply
 
-        monkeypatch.setattr('telegram.Bot.send_location', test)
+        monkeypatch.setattr(message.bot, 'send_location', test)
         assert message.reply_location(location='test_location')
         assert message.reply_location(location='test_location', quote=True)
 
     def test_reply_venue(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             venue = kwargs['venue'] == 'test_venue'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -557,13 +559,13 @@ class TestMessage(object):
                 reply = True
             return id and venue and reply
 
-        monkeypatch.setattr('telegram.Bot.send_venue', test)
+        monkeypatch.setattr(message.bot, 'send_venue', test)
         assert message.reply_venue(venue='test_venue')
         assert message.reply_venue(venue='test_venue', quote=True)
 
     def test_reply_contact(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_contact'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -571,13 +573,13 @@ class TestMessage(object):
                 reply = True
             return id and contact and reply
 
-        monkeypatch.setattr('telegram.Bot.send_contact', test)
+        monkeypatch.setattr(message.bot, 'send_contact', test)
         assert message.reply_contact(contact='test_contact')
         assert message.reply_contact(contact='test_contact', quote=True)
 
     def test_reply_poll(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[1] == message.chat_id
+            id = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_poll'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
@@ -585,7 +587,7 @@ class TestMessage(object):
                 reply = True
             return id and contact and reply
 
-        monkeypatch.setattr('telegram.Bot.send_poll', test)
+        monkeypatch.setattr(message.bot, 'send_poll', test)
         assert message.reply_poll(contact='test_poll')
         assert message.reply_poll(contact='test_poll', quote=True)
 
@@ -600,7 +602,7 @@ class TestMessage(object):
                 notification = True
             return chat_id and from_chat and message_id and notification
 
-        monkeypatch.setattr('telegram.Bot.forward_message', test)
+        monkeypatch.setattr(message.bot, 'forward_message', test)
         assert message.forward(123456)
         assert message.forward(123456, disable_notification=True)
         assert not message.forward(635241)
@@ -612,7 +614,7 @@ class TestMessage(object):
             text = kwargs['text'] == 'test'
             return chat_id and message_id and text
 
-        monkeypatch.setattr('telegram.Bot.edit_message_text', test)
+        monkeypatch.setattr(message.bot, 'edit_message_text', test)
         assert message.edit_text(text='test')
 
     def test_edit_caption(self, monkeypatch, message):
@@ -622,7 +624,7 @@ class TestMessage(object):
             caption = kwargs['caption'] == 'new caption'
             return chat_id and message_id and caption
 
-        monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
+        monkeypatch.setattr(message.bot, 'edit_message_caption', test)
         assert message.edit_caption(caption='new caption')
 
     def test_edit_media(self, monkeypatch, message):
@@ -632,7 +634,7 @@ class TestMessage(object):
             media = kwargs['media'] == 'my_media'
             return chat_id and message_id and media
 
-        monkeypatch.setattr('telegram.Bot.edit_message_media', test)
+        monkeypatch.setattr(message.bot, 'edit_message_media', test)
         assert message.edit_media('my_media')
 
     def test_edit_reply_markup(self, monkeypatch, message):
@@ -642,7 +644,7 @@ class TestMessage(object):
             reply_markup = kwargs['reply_markup'] == [['1', '2']]
             return chat_id and message_id and reply_markup
 
-        monkeypatch.setattr('telegram.Bot.edit_message_reply_markup', test)
+        monkeypatch.setattr(message.bot, 'edit_message_reply_markup', test)
         assert message.edit_reply_markup(reply_markup=[['1', '2']])
 
     def test_delete(self, monkeypatch, message):
@@ -651,8 +653,29 @@ class TestMessage(object):
             message_id = kwargs['message_id'] == message.message_id
             return chat_id and message_id
 
-        monkeypatch.setattr('telegram.Bot.delete_message', test)
+        monkeypatch.setattr(message.bot, 'delete_message', test)
         assert message.delete()
+
+    def test_default_quote(self, message):
+        kwargs = {}
+
+        message.default_quote = False
+        message._quote(kwargs)
+        assert 'reply_to_message_id' not in kwargs
+
+        message.default_quote = True
+        message._quote(kwargs)
+        assert 'reply_to_message_id' in kwargs
+
+        kwargs = {}
+        message.default_quote = None
+        message.chat.type = Chat.PRIVATE
+        message._quote(kwargs)
+        assert 'reply_to_message_id' not in kwargs
+
+        message.chat.type = Chat.GROUP
+        message._quote(kwargs)
+        assert 'reply_to_message_id' in kwargs
 
     def test_equality(self):
         id = 1

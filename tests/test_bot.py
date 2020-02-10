@@ -27,9 +27,10 @@ from flaky import flaky
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice, ChatPermissions, Poll)
+                      ShippingOption, LabeledPrice, ChatPermissions, Poll,
+                      InlineQueryResultDocument)
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
-from telegram.utils.helpers import from_timestamp
+from telegram.utils.helpers import from_timestamp, escape_markdown
 
 BASE_TIME = time.time()
 HIGHSCORE_DELTA = 1450000000
@@ -236,6 +237,67 @@ class TestBot(object):
                                        switch_pm_text='switch pm',
                                        switch_pm_parameter='start_pm')
 
+    def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
+        def test(_, url, data, *args, **kwargs):
+            return data == {'cache_time': 300,
+                            'results': [{'title': 'test_result', 'id': '123', 'type': 'document',
+                                         'document_url': 'https://raw.githubusercontent.com/'
+                                         'python-telegram-bot/logos/master/logo/png/'
+                                         'ptb-logo_240.png', 'mime_type': 'image/png',
+                                         'caption': 'ptb_logo'}],
+                            'next_offset': '42', 'switch_pm_parameter': 'start_pm',
+                            'inline_query_id': 1234, 'is_personal': True,
+                            'switch_pm_text': 'switch pm'}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        results = [InlineQueryResultDocument(
+            id='123',
+            document_url='https://raw.githubusercontent.com/python-telegram-bot/logos/master/'
+                         'logo/png/ptb-logo_240.png',
+            title='test_result',
+            mime_type='image/png',
+            caption='ptb_logo',
+        )]
+
+        assert bot.answer_inline_query(1234,
+                                       results=results,
+                                       cache_time=300,
+                                       is_personal=True,
+                                       next_offset='42',
+                                       switch_pm_text='switch pm',
+                                       switch_pm_parameter='start_pm')
+
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
+        def test(_, url, data, *args, **kwargs):
+            return data == {'cache_time': 300,
+                            'results': [{'title': 'test_result', 'id': '123', 'type': 'document',
+                                         'document_url': 'https://raw.githubusercontent.com/'
+                                         'python-telegram-bot/logos/master/logo/png/'
+                                         'ptb-logo_240.png', 'mime_type': 'image/png',
+                                         'caption': 'ptb_logo', 'parse_mode': 'Markdown'}],
+                            'next_offset': '42', 'switch_pm_parameter': 'start_pm',
+                            'inline_query_id': 1234, 'is_personal': True,
+                            'switch_pm_text': 'switch pm'}
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        results = [InlineQueryResultDocument(
+            id='123',
+            document_url='https://raw.githubusercontent.com/python-telegram-bot/logos/master/'
+                         'logo/png/ptb-logo_240.png',
+            title='test_result',
+            mime_type='image/png',
+            caption='ptb_logo',
+        )]
+
+        assert default_bot.answer_inline_query(1234,
+                                               results=results,
+                                               cache_time=300,
+                                               is_personal=True,
+                                               next_offset='42',
+                                               switch_pm_text='switch pm',
+                                               switch_pm_parameter='start_pm')
+
     @flaky(3, 1)
     @pytest.mark.timeout(10)
     def test_get_user_profile_photos(self, bot, chat_id):
@@ -308,6 +370,34 @@ class TestBot(object):
 
         assert message.text == 'new_text'
 
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_edit_message_text_default_parse_mode(self, default_bot, message):
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id,
+                                                disable_web_page_preview=True)
+        assert message.text_markdown == test_markdown_string
+        assert message.text == test_string
+
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id, parse_mode=None,
+                                                disable_web_page_preview=True)
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id,
+                                                disable_web_page_preview=True)
+        message = default_bot.edit_message_text(text=test_markdown_string, chat_id=message.chat_id,
+                                                message_id=message.message_id, parse_mode='HTML',
+                                                disable_web_page_preview=True)
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
     @pytest.mark.skip(reason='need reference to an inline message')
     def test_edit_message_text_inline(self):
         pass
@@ -321,6 +411,36 @@ class TestBot(object):
         assert message.caption == 'new_caption'
 
     # edit_message_media is tested in test_inputmedia
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_edit_message_caption_default_parse_mode(self, default_bot, media_message):
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id,
+                                                   parse_mode=None)
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id)
+        message = default_bot.edit_message_caption(caption=test_markdown_string,
+                                                   chat_id=media_message.chat_id,
+                                                   message_id=media_message.message_id,
+                                                   parse_mode='HTML')
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -407,6 +527,20 @@ class TestBot(object):
         assert chat.type == 'supergroup'
         assert chat.title == '>>> telegram.Bot(test)'
         assert chat.id == int(super_group_id)
+
+    # TODO: Add bot to group to test there too
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
+    def test_get_chat_default_quote(self, default_bot, super_group_id):
+        message = default_bot.send_message(super_group_id, text="test_get_chat_default_quote")
+        assert default_bot.pin_chat_message(chat_id=super_group_id, message_id=message.message_id,
+                                            disable_notification=True)
+
+        chat = default_bot.get_chat(super_group_id)
+        assert chat.pinned_message.default_quote is True
+
+        assert default_bot.unpinChatMessage(super_group_id)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -723,3 +857,29 @@ class TestBot(object):
         # Test file uploading
         with pytest.raises(OkException):
             bot.send_photo(chat_id, open('tests/data/telegram.jpg', 'rb'))
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_message_default_parse_mode(self, default_bot, chat_id):
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_message(chat_id, test_markdown_string)
+        assert message.text_markdown == test_markdown_string
+        assert message.text == test_string
+
+        message = default_bot.send_message(chat_id, test_markdown_string, parse_mode=None)
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+        message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
+        assert message.text == test_markdown_string
+        assert message.text_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
+    def test_send_message_default_quote(self, default_bot, chat_id):
+        message = default_bot.send_message(chat_id, 'test')
+        assert message.default_quote is True

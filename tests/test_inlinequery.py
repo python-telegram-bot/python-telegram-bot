@@ -63,9 +63,9 @@ class TestInlineQuery(object):
 
     def test_answer(self, monkeypatch, inline_query):
         def test(*args, **kwargs):
-            return args[1] == inline_query.id
+            return args[0] == inline_query.id
 
-        monkeypatch.setattr('telegram.Bot.answer_inline_query', test)
+        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', test)
         assert inline_query.answer()
 
     def test_equality(self):
