@@ -285,12 +285,6 @@ class JobQueue(object):
                 if next_month_has_date:
                     next_dt = dt + datetime.timedelta(days=calendar.monthrange(
                                                       dt.year, dt.month)[1] - dt.day + day)
-                elif day_is_strict is False:
-                    # schedule in the next month last date if day is not strict
-                    next_dt = dt + datetime.timedelta(days=calendar.monthrange(
-                                                      dt.year, dt.month)[1] - dt.day
-                                                      + calendar.monthrange(next_year,
-                                                                            next_month)[1])
                 elif day_is_strict:
                     # schedule the subsequent month if day is strict
                     next_dt = dt + datetime.timedelta(
@@ -298,6 +292,13 @@ class JobQueue(object):
                         - dt.day + calendar.monthrange(
                             next_year,
                             next_month)[1] + day)
+                else:
+                    # schedule in the next month last date if day is not strict
+                    next_dt = dt + datetime.timedelta(days=calendar.monthrange(
+                                                      dt.year, dt.month)[1] - dt.day
+                                                      + calendar.monthrange(next_year,
+                                                                            next_month)[1])
+
             else:
                 next_dt = dt
 
