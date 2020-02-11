@@ -4,12 +4,15 @@
 
 """
 Basic example for a bot that works with polls. Only 3 people are allowed to interact with each
-poll/quiz the bot generates.
+poll/quiz the bot generates. The preview command generates a closed poll/quiz, excatly like the
+one the user sends the bot
 """
 import logging
 
-from telegram import Poll, ParseMode
-from telegram.ext import Updater, CommandHandler, PollAnswerHandler, PollHandler
+from telegram import (Poll, ParseMode, KeyboardButton, KeyboardButtonPollType,
+                      ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram.ext import (Updater, CommandHandler, PollAnswerHandler, PollHandler, MessageHandler,
+                          Filters)
 from telegram.utils.helpers import mention_html
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,7 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 def start(update, context):
-    update.message.reply_text('Please select /poll to get a Poll or /quiz to get a Quiz')
+    update.message.reply_text('Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
+                              ' to generate a preview for your poll')
 
 
 def poll(update, context):
@@ -77,8 +81,37 @@ def receive_quiz_answer(update, context):
         context.bot.stop_poll(quiz_data["chat_id"], quiz_data["message_id"])
 
 
+def preview(update, context):
+    # using this without a type lets the user chooses what he wants (quiz or poll)
+    button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
+    message = "Press the button to let the bot generate a preview for your poll"
+    # using one_time_keyboard to hide the keyboard
+    update.effective_message.reply_text(message,
+                                        reply_markup=ReplyKeyboardMarkup(button,
+                                                                         one_time_keyboard=True))
+
+
+def receive_poll(update, context):
+    actual_poll = update.effective_message.poll
+    # turning the object to a dict to pass it as parameters later on
+    poll_dict = actual_poll.to_dict()
+    # deleting unwanted parameters
+    del poll_dict['total_voter_count']
+    del poll_dict['id']
+    del poll_dict['is_closed']
+    # we need to replace the generated PollOption dicts with an string list
+    temp_list = []
+    for option in poll_dict['options']:
+        temp_list.append(option['text'])
+    poll_dict['options'] = temp_list
+    # with is_closed true, the poll/quiz is immediately closed
+    update.effective_message.reply_poll(**poll_dict, is_closed=True,
+                                        reply_markup=ReplyKeyboardRemove())
+
+
 def help_handler(update, context):
-    update.message.reply_text("Use /quiz or /poll to test this bot.")
+    update.message.reply_text("Use /quiz, /poll or /preview to test this "
+                              "bot.")
 
 
 def main():
@@ -86,13 +119,15 @@ def main():
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater("TOKEN", use_context=True)
-
-    updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(CommandHandler('poll', poll))
-    updater.dispatcher.add_handler(PollAnswerHandler(receive_poll_answer))
-    updater.dispatcher.add_handler(CommandHandler('quiz', quiz))
-    updater.dispatcher.add_handler(PollHandler(receive_quiz_answer))
-    updater.dispatcher.add_handler(CommandHandler('help', help_handler))
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('poll', poll))
+    dp.add_handler(PollAnswerHandler(receive_poll_answer))
+    dp.add_handler(CommandHandler('quiz', quiz))
+    dp.add_handler(PollHandler(receive_quiz_answer))
+    dp.add_handler(CommandHandler('preview', preview))
+    dp.add_handler(MessageHandler(Filters.poll, receive_poll))
+    dp.add_handler(CommandHandler('help', help_handler))
 
     # Start the Bot
     updater.start_polling()
