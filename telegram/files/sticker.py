@@ -42,7 +42,8 @@ class Sticker(TelegramObject):
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
         file_unique_id (:obj:`str`): Unique and the same over time and
             for different bots file identifier.
         width (:obj:`int`): Sticker width.

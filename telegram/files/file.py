@@ -44,7 +44,8 @@ class File(TelegramObject):
         file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
         file_unique_id (:obj:`str`): Unique and the same over time and
             for different bots file identifier.
         file_size (:obj:`int`, optional): Optional. File size, if known.

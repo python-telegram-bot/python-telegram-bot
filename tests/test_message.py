@@ -168,8 +168,6 @@ class TestMessage(object):
         assert message['chat_id'] == message.chat_id
         assert message['no_key'] is None
 
-    # START WORKING HERE
-
     def test_parse_entity(self):
         text = (b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
                 b'\\u200d\\U0001f467\\U0001f431http://google.com').decode('unicode-escape')

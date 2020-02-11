@@ -2849,8 +2849,8 @@ class Bot(TelegramObject):
                                             timeout=None,
                                             **kwargs):
         """
-        Use this method to set custom title for owner or administrators. The bot must be an
-        administrator in the supergroup for this to work. Returns True on success.
+        Use this method to set a custom title for administrators promoted by the bot in a
+        supergroup. The bot must be an administrator for this to work. Returns True on success.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -3594,7 +3594,7 @@ class Bot(TelegramObject):
     setChatPermissions = set_chat_permissions
     """Alias for :attr:`set_chat_permissions`"""
     setChatAdministratorCustomTitle = set_chat_administrator_custom_title
-    """Alias for :attr:`set_chat_administrator_custom_title"""
+    """Alias for :attr:`set_chat_administrator_custom_title`"""
     exportChatInviteLink = export_chat_invite_link
     """Alias for :attr:`export_chat_invite_link`"""
     setChatPhoto = set_chat_photo

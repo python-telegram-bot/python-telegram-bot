@@ -115,13 +115,13 @@ class ChatMember(TelegramObject):
     RESTRICTED = 'restricted'
     """:obj:`str`: 'restricted'"""
 
-    def __init__(self, user, status, custom_title=None, until_date=None, can_be_edited=None,
+    def __init__(self, user, status, until_date=None, can_be_edited=None,
                  can_change_info=None, can_post_messages=None, can_edit_messages=None,
                  can_delete_messages=None, can_invite_users=None,
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, is_member=None, **kwargs):
+                 can_add_web_page_previews=None, is_member=None, custom_title=None, **kwargs):
         # Required
         self.user = user
         self.status = status

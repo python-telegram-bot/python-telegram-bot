@@ -100,9 +100,9 @@ class Chat(TelegramObject):
                  invite_link=None,
                  pinned_message=None,
                  permissions=None,
-                 slow_mode_delay=None,
                  sticker_set_name=None,
                  can_set_sticker_set=None,
+                 slow_mode_delay=None,
                  **kwargs):
         # Required
         self.id = int(id)
