@@ -880,7 +880,7 @@ class Message(TelegramObject):
         return self.bot.delete_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
-    def stop(self, *args, **kwargs):
+    def stop_poll(self, *args, **kwargs):
         """Shortcut for::
 
              bot.stop_poll(chat_id=message.chat_id,
