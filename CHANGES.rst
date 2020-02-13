@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 12.4.2
+==============
+*Released 2020-02-10*
+
+**Bug Fixes**
+
+- Pass correct parse_mode to InlineResults if bot.defaults is None (`#1763`_)
+- Make sure PP can read files that dont have bot_data (`#1760`_)
+
+.. _`#1763`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1763
+.. _`#1760`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1760
+
 Version 12.4.1
 ==============
 *Released 2020-02-08*
