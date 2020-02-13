@@ -261,17 +261,17 @@ class JobQueue(object):
         """
         dt = datetime.datetime.now(tz=when.tzinfo or _UTC)
         dt_time = dt.time().replace(tzinfo=when.tzinfo)
-        if calendar.monthrange(dt.year, dt.month)[1] < day:
+        days_in_current_month = calendar.monthrange(dt.year, dt.month)[1]
+        days_till_months_end = days_in_current_month - dt.day
+        if days_in_current_month < day:
             # if the day does not exist in the current month (e.g Feb 31st)
             if day_is_strict is False:
                 # set day as last day of month instead
-                next_dt = dt + datetime.timedelta(days=calendar.monthrange(
-                                                  dt.year, dt.month)[1] - dt.day)
+                next_dt = dt + datetime.timedelta(days=days_till_months_end)
             else:
                 # else set as day in subsequent month. Subsequent month is
                 # guaranteed to have the date, if current month does not have the date.
-                next_dt = dt + datetime.timedelta(days=calendar.monthrange(
-                                                  dt.year, dt.month)[1] - dt.day + day)
+                next_dt = dt + datetime.timedelta(days=days_till_months_end + day)
         else:
             # if the day exists in the current month
             if dt.day < day:
@@ -281,29 +281,27 @@ class JobQueue(object):
                 # run next month if day has already passed
                 next_year = dt.year + 1 if dt.month == 12 else dt.year
                 next_month = 1 if dt.month == 12 else dt.month + 1
-                next_month_has_date = calendar.monthrange(next_year, next_month)[1] >= day
+                days_in_next_month = calendar.monthrange(next_year, next_month)[1]
+                next_month_has_date = days_in_next_month >= day
                 if next_month_has_date:
-                    next_dt = dt + datetime.timedelta(days=calendar.monthrange(
-                                                      dt.year, dt.month)[1] - dt.day + day)
+                    next_dt = dt + datetime.timedelta(days=days_till_months_end + day)
                 elif day_is_strict:
                     # schedule the subsequent month if day is strict
                     next_dt = dt + datetime.timedelta(
-                        days=calendar.monthrange(dt.year, dt.month)[1]
-                        - dt.day + calendar.monthrange(
-                            next_year,
-                            next_month)[1] + day)
+                        days=days_till_months_end + days_in_next_month + day)
                 else:
                     # schedule in the next month last date if day is not strict
-                    next_dt = dt + datetime.timedelta(days=calendar.monthrange(
-                                                      dt.year, dt.month)[1] - dt.day
-                                                      + calendar.monthrange(next_year,
-                                                                            next_month)[1])
+                    next_dt = dt + datetime.timedelta(days=days_till_months_end
+                                                      + days_in_next_month)
 
             else:
+                # day is today but time has not yet come
                 next_dt = dt
 
+        # Set the correct time
         next_dt = next_dt.replace(hour=when.hour, minute=when.minute, second=when.second,
                                   microsecond=when.microsecond)
+        # fold is new in Py3.6
         if hasattr(next_dt, 'fold'):
             next_dt = next_dt.replace(fold=when.fold)
         return next_dt
