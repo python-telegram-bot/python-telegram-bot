@@ -65,7 +65,7 @@ def escape_markdown(text, version=1, entity_type=None):
         elif entity_type == 'text_link':
             escape_chars = ')\\\\'
         else:
-            escape_chars = '_*\[\]()~`>\#\+\-|{}.!'
+            escape_chars = '_*\[\]()~`>\#\+\-=|{}\.!'
     else:
         raise ValueError('Markdown version musst be either 1 or 2!')
 
