@@ -132,7 +132,7 @@ def main():
     dp.add_handler(CommandHandler('quiz', quiz))
     dp.add_handler(PollHandler(receive_quiz_answer))
     dp.add_handler(CommandHandler('preview', preview))
-    dp.add_handler(MessageHandler(Filters.update.poll, receive_poll))
+    dp.add_handler(MessageHandler(Filters.poll, receive_poll))
     dp.add_handler(CommandHandler('help', help_handler))
 
     # Start the Bot

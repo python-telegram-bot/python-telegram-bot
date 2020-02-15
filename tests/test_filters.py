@@ -766,11 +766,6 @@ class TestFilters(object):
         assert Filters.update.channel_posts(update)
         assert Filters.update(update)
 
-    def test_update_type_poll(self, update):
-        update.message.poll = True
-        assert Filters.update.poll(update)
-        assert Filters.update(update)
-
     def test_merged_short_circuit_and(self, update):
         update.message.text = '/test'
         update.message.entities = [MessageEntity(MessageEntity.BOT_COMMAND, 0, 5)]
