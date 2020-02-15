@@ -467,7 +467,6 @@ class TestMessage(object):
         assert text_markdown == test_md_string
 
         monkeypatch.setattr(message.bot, 'send_message', test)
-        print(self.test_message_v2.text_markdown_v2)
         assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
         assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2, quote=True)
         assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2,
