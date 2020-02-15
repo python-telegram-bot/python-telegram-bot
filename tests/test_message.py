@@ -245,15 +245,16 @@ class TestMessage(object):
         assert text_markdown == test_md_string
 
     def test_text_markdown_new_in_v2(self, message):
-        with pytest.raises(ValueError):
-            self.test_message_v2.text_markdown
-
         message.text = 'test'
+        message.entities = [MessageEntity(MessageEntity.BOLD, offset=0, length=4),
+                            MessageEntity(MessageEntity.ITALIC, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            assert message.text_markdown
+
         message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
         with pytest.raises(ValueError):
             message.text_markdown
 
-        message.text = 'test'
         message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
         with pytest.raises(ValueError):
             message.text_markdown
