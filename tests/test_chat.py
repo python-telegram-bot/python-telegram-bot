@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import Chat, ChatAction, ChatPermissions
-from telegram import User
+from telegram import User, Message
 
 
 @pytest.fixture(scope='class')
@@ -68,6 +68,22 @@ class TestChat(object):
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
 
+    def test_de_json_default_quote(self, bot):
+        json_dict = {
+            'id': self.id,
+            'type': self.type,
+            'pinned_message': Message(
+                message_id=123,
+                from_user=None,
+                date=None,
+                chat=None
+            ).to_dict(),
+            'default_quote': True
+        }
+        chat = Chat.de_json(json_dict, bot)
+
+        assert chat.pinned_message.default_quote is True
+
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
 
@@ -86,139 +102,139 @@ class TestChat(object):
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            id = args[1] == chat.id
+            id = args[0] == chat.id
             action = kwargs['action'] == ChatAction.TYPING
             return id and action
 
-        monkeypatch.setattr('telegram.Bot.send_chat_action', test)
+        monkeypatch.setattr(chat.bot, 'send_chat_action', test)
         assert chat.send_action(action=ChatAction.TYPING)
 
     def test_leave(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id
+            return args[0] == chat.id
 
-        monkeypatch.setattr('telegram.Bot.leave_chat', test)
+        monkeypatch.setattr(chat.bot, 'leave_chat', test)
         assert chat.leave()
 
     def test_get_administrators(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id
+            return args[0] == chat.id
 
-        monkeypatch.setattr('telegram.Bot.get_chat_administrators', test)
+        monkeypatch.setattr(chat.bot, 'get_chat_administrators', test)
         assert chat.get_administrators()
 
     def test_get_members_count(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id
+            return args[0] == chat.id
 
-        monkeypatch.setattr('telegram.Bot.get_chat_members_count', test)
+        monkeypatch.setattr(chat.bot, 'get_chat_members_count', test)
         assert chat.get_members_count()
 
     def test_get_member(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            chat_id = args[1] == chat.id
-            user_id = args[2] == 42
+            chat_id = args[0] == chat.id
+            user_id = args[1] == 42
             return chat_id and user_id
 
-        monkeypatch.setattr('telegram.Bot.get_chat_member', test)
+        monkeypatch.setattr(chat.bot, 'get_chat_member', test)
         assert chat.get_member(42)
 
     def test_kick_member(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            chat_id = args[1] == chat.id
-            user_id = args[2] == 42
+            chat_id = args[0] == chat.id
+            user_id = args[1] == 42
             until = kwargs['until_date'] == 43
             return chat_id and user_id and until
 
-        monkeypatch.setattr('telegram.Bot.kick_chat_member', test)
+        monkeypatch.setattr(chat.bot, 'kick_chat_member', test)
         assert chat.kick_member(42, until_date=43)
 
     def test_unban_member(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            chat_id = args[1] == chat.id
-            user_id = args[2] == 42
+            chat_id = args[0] == chat.id
+            user_id = args[1] == 42
             return chat_id and user_id
 
-        monkeypatch.setattr('telegram.Bot.unban_chat_member', test)
+        monkeypatch.setattr(chat.bot, 'unban_chat_member', test)
         assert chat.unban_member(42)
 
     def test_set_permissions(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            chat_id = args[1] == chat.id
-            permissions = args[2] == self.permissions
+            chat_id = args[0] == chat.id
+            permissions = args[1] == self.permissions
             return chat_id and permissions
 
-        monkeypatch.setattr('telegram.Bot.set_chat_permissions', test)
+        monkeypatch.setattr(chat.bot, 'set_chat_permissions', test)
         assert chat.set_permissions(self.permissions)
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test'
+            return args[0] == chat.id and args[1] == 'test'
 
-        monkeypatch.setattr('telegram.Bot.send_message', test)
+        monkeypatch.setattr(chat.bot, 'send_message', test)
         assert chat.send_message('test')
 
     def test_instance_method_send_photo(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_photo'
+            return args[0] == chat.id and args[1] == 'test_photo'
 
-        monkeypatch.setattr('telegram.Bot.send_photo', test)
+        monkeypatch.setattr(chat.bot, 'send_photo', test)
         assert chat.send_photo('test_photo')
 
     def test_instance_method_send_audio(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_audio'
+            return args[0] == chat.id and args[1] == 'test_audio'
 
-        monkeypatch.setattr('telegram.Bot.send_audio', test)
+        monkeypatch.setattr(chat.bot, 'send_audio', test)
         assert chat.send_audio('test_audio')
 
     def test_instance_method_send_document(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_document'
+            return args[0] == chat.id and args[1] == 'test_document'
 
-        monkeypatch.setattr('telegram.Bot.send_document', test)
+        monkeypatch.setattr(chat.bot, 'send_document', test)
         assert chat.send_document('test_document')
 
     def test_instance_method_send_sticker(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_sticker'
+            return args[0] == chat.id and args[1] == 'test_sticker'
 
-        monkeypatch.setattr('telegram.Bot.send_sticker', test)
+        monkeypatch.setattr(chat.bot, 'send_sticker', test)
         assert chat.send_sticker('test_sticker')
 
     def test_instance_method_send_video(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_video'
+            return args[0] == chat.id and args[1] == 'test_video'
 
-        monkeypatch.setattr('telegram.Bot.send_video', test)
+        monkeypatch.setattr(chat.bot, 'send_video', test)
         assert chat.send_video('test_video')
 
     def test_instance_method_send_video_note(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_video_note'
+            return args[0] == chat.id and args[1] == 'test_video_note'
 
-        monkeypatch.setattr('telegram.Bot.send_video_note', test)
+        monkeypatch.setattr(chat.bot, 'send_video_note', test)
         assert chat.send_video_note('test_video_note')
 
     def test_instance_method_send_voice(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_voice'
+            return args[0] == chat.id and args[1] == 'test_voice'
 
-        monkeypatch.setattr('telegram.Bot.send_voice', test)
+        monkeypatch.setattr(chat.bot, 'send_voice', test)
         assert chat.send_voice('test_voice')
 
     def test_instance_method_send_animation(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_animation'
+            return args[0] == chat.id and args[1] == 'test_animation'
 
-        monkeypatch.setattr('telegram.Bot.send_animation', test)
+        monkeypatch.setattr(chat.bot, 'send_animation', test)
         assert chat.send_animation('test_animation')
 
     def test_instance_method_send_poll(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            return args[1] == chat.id and args[2] == 'test_poll'
+            return args[0] == chat.id and args[1] == 'test_poll'
 
-        monkeypatch.setattr('telegram.Bot.send_poll', test)
+        monkeypatch.setattr(chat.bot, 'send_poll', test)
         assert chat.send_poll('test_poll')
 
     def test_equality(self):

@@ -71,8 +71,9 @@ class WebhookServer(object):
 
 class WebhookAppClass(tornado.web.Application):
 
-    def __init__(self, webhook_path, bot, update_queue):
-        self.shared_objects = {"bot": bot, "update_queue": update_queue}
+    def __init__(self, webhook_path, bot, update_queue, default_quote=None):
+        self.shared_objects = {"bot": bot, "update_queue": update_queue,
+                               "default_quote": default_quote}
         handlers = [
             (r"{0}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
@@ -91,9 +92,10 @@ class WebhookHandler(tornado.web.RequestHandler):
         super(WebhookHandler, self).__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
 
-    def initialize(self, bot, update_queue):
+    def initialize(self, bot, update_queue, default_quote=None):
         self.bot = bot
         self.update_queue = update_queue
+        self._default_quote = default_quote
 
     def set_default_headers(self):
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
@@ -105,6 +107,7 @@ class WebhookHandler(tornado.web.RequestHandler):
         data = json.loads(json_string)
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)
+        data['default_quote'] = self._default_quote
         update = Update.de_json(data, self.bot)
         self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
         self.update_queue.put(update)

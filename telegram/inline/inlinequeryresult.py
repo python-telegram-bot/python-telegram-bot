@@ -41,3 +41,11 @@ class InlineQueryResult(TelegramObject):
         self.id = str(id)
 
         self._id_attrs = (self.id,)
+
+    @property
+    def _has_parse_mode(self):
+        return hasattr(self, 'parse_mode')
+
+    @property
+    def _has_input_message_content(self):
+        return hasattr(self, 'input_message_content')

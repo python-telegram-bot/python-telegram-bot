@@ -22,6 +22,7 @@ import pytest
 from flaky import flaky
 
 from telegram import PhotoSize, Animation, Voice, TelegramError
+from telegram.utils.helpers import escape_markdown
 
 
 @pytest.fixture(scope='function')
@@ -106,6 +107,39 @@ class TestAnimation(object):
         assert message.animation.duration == animation.duration
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_animation_default_parse_mode_1(self, default_bot, chat_id, animation_file):
+        test_string = 'Italic Bold Code'
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_animation(chat_id, animation_file, caption=test_markdown_string)
+        assert message.caption_markdown == test_markdown_string
+        assert message.caption == test_string
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_animation_default_parse_mode_2(self, default_bot, chat_id, animation_file):
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_animation(chat_id, animation_file, caption=test_markdown_string,
+                                             parse_mode=None)
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.timeout(10)
+    @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
+    def test_send_animation_default_parse_mode_3(self, default_bot, chat_id, animation_file):
+        test_markdown_string = '_Italic_ *Bold* `Code`'
+
+        message = default_bot.send_animation(chat_id, animation_file, caption=test_markdown_string,
+                                             parse_mode='HTML')
+        assert message.caption == test_markdown_string
+        assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)

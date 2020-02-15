@@ -30,7 +30,7 @@ import pytest
 from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
-from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
+from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
 from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
 
@@ -57,6 +57,21 @@ def bot_info():
 @pytest.fixture(scope='session')
 def bot(bot_info):
     return make_bot(bot_info)
+
+
+DEFAULT_BOTS = {}
+@pytest.fixture(scope='function')
+def default_bot(request, bot_info):
+    param = request.param if hasattr(request, 'param') else {}
+
+    defaults = Defaults(**param)
+    default_bot = DEFAULT_BOTS.get(defaults)
+    if default_bot:
+        return default_bot
+    else:
+        default_bot = make_bot(bot_info, **{'defaults': defaults})
+        DEFAULT_BOTS[defaults] = default_bot
+        return default_bot
 
 
 @pytest.fixture(scope='session')
@@ -159,8 +174,8 @@ def pytest_configure(config):
         # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
-def make_bot(bot_info):
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY)
+def make_bot(bot_info, **kwargs):
+    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')

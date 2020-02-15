@@ -87,6 +87,8 @@ class Updater(object):
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
+        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
+            be used if not set explicitly in the bot methods.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -108,6 +110,7 @@ class Updater(object):
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
+                 defaults=None,
                  use_context=False,
                  dispatcher=None,
                  base_file_url=None):
@@ -157,7 +160,8 @@ class Updater(object):
                                base_file_url=base_file_url,
                                request=self._request,
                                private_key=private_key,
-                               private_key_password=private_key_password)
+                               private_key_password=private_key_password,
+                               defaults=defaults)
             self.update_queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
@@ -191,6 +195,9 @@ class Updater(object):
         self.httpd = None
         self.__lock = Lock()
         self.__threads = []
+
+        # Just for passing to WebhookAppClass
+        self._default_quote = defaults.quote if defaults else None
 
     def _init_thread(self, target, name, *args, **kwargs):
         thr = Thread(target=self._thread_wrapper,
@@ -409,7 +416,8 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue,
+                              default_quote=self._default_quote)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate

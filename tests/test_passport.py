@@ -296,9 +296,9 @@ class TestPassport(object):
         selfie = passport_data.decrypted_data[1].selfie
 
         def get_file(*args, **kwargs):
-            return File(args[1])
+            return File(args[0])
 
-        monkeypatch.setattr('telegram.Bot.get_file', get_file)
+        monkeypatch.setattr(passport_data.bot, 'get_file', get_file)
         file = selfie.get_file()
         assert file.file_id == selfie.file_id
         assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash

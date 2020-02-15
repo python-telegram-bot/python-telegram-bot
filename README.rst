@@ -29,7 +29,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
    :alt: LGPLv3 License
 
-.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/Testing%20your%20PR/badge.svg?event=schedule
+.. image:: https://github.com/python-telegram-bot/python-telegram-bot/workflows/GitHub%20Actions/badge.svg?event=schedule
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 

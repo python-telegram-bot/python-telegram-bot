@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram File."""
 from base64 import b64decode
 from os.path import basename
+import os
 
 from future.backports.urllib import parse as urllib_parse
 
@@ -76,9 +77,10 @@ class File(TelegramObject):
     def download(self, custom_path=None, out=None, timeout=None):
         """
         Download this file. By default, the file is saved in the current working directory with its
-        original filename as reported by Telegram. If a :attr:`custom_path` is supplied, it will be
-        saved to that path instead. If :attr:`out` is defined, the file contents will be saved to
-        that object using the ``out.write`` method.
+        original filename as reported by Telegram. If the file has no filename, it the file ID will
+        be used as filename. If a :attr:`custom_path` is supplied, it will be saved to that path
+        instead. If :attr:`out` is defined, the file contents will be saved to that object using
+        the ``out.write`` method.
 
         Note:
             :attr:`custom_path` and :attr:`out` are mutually exclusive.
@@ -116,8 +118,10 @@ class File(TelegramObject):
         else:
             if custom_path:
                 filename = custom_path
-            else:
+            elif self.file_path:
                 filename = basename(self.file_path)
+            else:
+                filename = os.path.join(os.getcwd(), self.file_id)
 
             buf = self.bot.request.retrieve(url, timeout=timeout)
             if self._credentials:

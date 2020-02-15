@@ -53,13 +53,15 @@ class TestCallbackQuery(object):
                      'message': self.message.to_dict(),
                      'data': self.data,
                      'inline_message_id': self.inline_message_id,
-                     'game_short_name': self.game_short_name}
+                     'game_short_name': self.game_short_name,
+                     'default_quote': True}
         callback_query = CallbackQuery.de_json(json_dict, bot)
 
         assert callback_query.id == self.id
         assert callback_query.from_user == self.from_user
         assert callback_query.chat_instance == self.chat_instance
         assert callback_query.message == self.message
+        assert callback_query.message.default_quote is True
         assert callback_query.data == self.data
         assert callback_query.inline_message_id == self.inline_message_id
         assert callback_query.game_short_name == self.game_short_name
@@ -80,15 +82,15 @@ class TestCallbackQuery(object):
 
     def test_answer(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
-            return args[1] == callback_query.id
+            return args[0] == callback_query.id
 
-        monkeypatch.setattr('telegram.Bot.answerCallbackQuery', test)
+        monkeypatch.setattr(callback_query.bot, 'answerCallbackQuery', test)
         # TODO: PEP8
         assert callback_query.answer()
 
     def test_edit_message_text(self, monkeypatch, callback_query):
         def test(*args, **kwargs):
-            text = args[1] == 'test'
+            text = args[0] == 'test'
             try:
                 id = kwargs['inline_message_id'] == callback_query.inline_message_id
                 return id and text
@@ -97,7 +99,7 @@ class TestCallbackQuery(object):
                 message_id = kwargs['message_id'] == callback_query.message.message_id
                 return chat_id and message_id and text
 
-        monkeypatch.setattr('telegram.Bot.edit_message_text', test)
+        monkeypatch.setattr(callback_query.bot, 'edit_message_text', test)
         assert callback_query.edit_message_text(text='test')
         assert callback_query.edit_message_text('test')
 
@@ -112,7 +114,7 @@ class TestCallbackQuery(object):
                 message = kwargs['message_id'] == callback_query.message.message_id
                 return id and message and caption
 
-        monkeypatch.setattr('telegram.Bot.edit_message_caption', test)
+        monkeypatch.setattr(callback_query.bot, 'edit_message_caption', test)
         assert callback_query.edit_message_caption(caption='new caption')
         assert callback_query.edit_message_caption('new caption')
 
@@ -127,7 +129,7 @@ class TestCallbackQuery(object):
                 message = kwargs['message_id'] == callback_query.message.message_id
                 return id and message and reply_markup
 
-        monkeypatch.setattr('telegram.Bot.edit_message_reply_markup', test)
+        monkeypatch.setattr(callback_query.bot, 'edit_message_reply_markup', test)
         assert callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
         assert callback_query.edit_message_reply_markup([['1', '2']])
 
