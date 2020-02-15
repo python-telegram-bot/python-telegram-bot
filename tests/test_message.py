@@ -237,9 +237,9 @@ class TestMessage(object):
 
     def test_text_markdown_v2_simple(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
-                          '[links](http://github.com/abc\\\\\\)def), '
-                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```. '
-                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_.')
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
 
@@ -258,10 +258,10 @@ class TestMessage(object):
 
     def test_text_markdown_v2_urled(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
-                          '[links](http://github.com/abc\\\\\\)def), '
-                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```. '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
-                          'nested in* italic_.')
+                          'nested in* italic_\.')
         text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
 
@@ -314,8 +314,8 @@ class TestMessage(object):
     def test_caption_markdown_v2_simple(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\\)def), '
-                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```. '
-                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_.')
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
         caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
 
@@ -335,9 +335,9 @@ class TestMessage(object):
     def test_caption_markdown_v2_urled(self):
         test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\\)def), '
-                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```. '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
-                          'nested in* italic_.')
+                          'nested in* italic_\.')
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
 
@@ -448,8 +448,8 @@ class TestMessage(object):
                                       quote=True)
 
     def test_reply_markdown_v2(self, monkeypatch, message):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\\\`code`, '
-                          '[links](http://github.com/abc\\\\\\)def), '
+        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
 

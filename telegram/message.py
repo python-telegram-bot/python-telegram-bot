@@ -1036,7 +1036,7 @@ class Message(TelegramObject):
         }
 
     @staticmethod
-    def _parse_html(message_text, entities, urled=False, offset=None):
+    def _parse_html(message_text, entities, urled=False, offset=0):
         if message_text is None:
             return None
 
@@ -1086,8 +1086,7 @@ class Message(TelegramObject):
                 else:
                     insert = text
 
-                if offset is None:
-                    offset = 0
+                if offset == 0:
                     if sys.maxunicode == 0xffff:
                         html_text += escape(message_text[last_offset:entity.offset
                                                          - offset]) + insert
@@ -1104,7 +1103,7 @@ class Message(TelegramObject):
 
                 last_offset = entity.offset - offset + entity.length
 
-        if offset is None:
+        if offset == 0:
             if sys.maxunicode == 0xffff:
                 html_text += escape(message_text[last_offset:])
             else:
@@ -1172,7 +1171,7 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
     @staticmethod
-    def _parse_markdown(message_text, entities, urled=False, version=1, offset=None):
+    def _parse_markdown(message_text, entities, urled=False, version=1, offset=0):
         version = int(version)
 
         if message_text is None:
@@ -1242,8 +1241,7 @@ class Message(TelegramObject):
                 else:
                     insert = text
 
-                if offset is None:
-                    offset = 0
+                if offset == 0:
                     if sys.maxunicode == 0xffff:
                         markdown_text += escape_markdown(message_text[last_offset:entity.offset
                                                                       - offset],
@@ -1262,7 +1260,7 @@ class Message(TelegramObject):
 
                 last_offset = entity.offset - offset + entity.length
 
-        if offset is None:
+        if offset == 0:
             if sys.maxunicode == 0xffff:
                 markdown_text += escape_markdown(message_text[last_offset:], version=version)
             else:
