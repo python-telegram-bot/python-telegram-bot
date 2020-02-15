@@ -21,20 +21,24 @@ logger = logging.getLogger(__name__)
 
 
 def start(update, context):
+    """Inform user about what this bot can do"""
     update.message.reply_text('Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
                               ' to generate a preview for your poll')
 
 
 def poll(update, context):
+    """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
-    message = context.bot.send_poll(update.effective_user.id, "how are you?", questions,
+    message = context.bot.send_poll(update.effective_user.id, "How are you?", questions,
                                     is_anonymous=False, allows_multiple_answers=True)
+    # Save some info about the poll the bot_data for later use in receive_poll_answer
     payload = {message.poll.id: {"questions": questions, "message_id": message.message_id,
                                  "chat_id": update.effective_chat.id, "answers": 0}}
     context.bot_data.update(payload)
 
 
 def receive_poll_answer(update, context):
+    """Summarize a users poll vote"""
     answer = update.poll_answer
     poll_id = answer.poll_id
     try:
@@ -54,21 +58,25 @@ def receive_poll_answer(update, context):
                              "{} feels {}!".format(user_mention, answer_string),
                              parse_mode=ParseMode.HTML)
     context.bot_data[poll_id]["answers"] += 1
+    # Close poll after three participants voted
     if context.bot_data[poll_id]["answers"] == 3:
         context.bot.stop_poll(context.bot_data[poll_id]["chat_id"],
                               context.bot_data[poll_id]["message_id"])
 
 
 def quiz(update, context):
+    """Send a predefined poll"""
     questions = ["1", "2", "4", "20"]
     message = update.effective_message.reply_poll("How many eggs do you need for a cake?",
                                                   questions, type=Poll.QUIZ, correct_option_id=2)
+    # Save some info about the poll the bot_data for later use in receive_quiz_answer
     payload = {message.poll.id: {"chat_id": update.effective_chat.id,
                                  "message_id": message.message_id}}
     context.bot_data.update(payload)
 
 
 def receive_quiz_answer(update, context):
+    """Close quiz after three participants took it"""
     # the bot can receive closed poll updates we don't care about
     if update.poll.is_closed:
         return
@@ -82,6 +90,7 @@ def receive_quiz_answer(update, context):
 
 
 def preview(update, context):
+    """Ask user to create a poll and display a preview of it"""
     # using this without a type lets the user chooses what he wants (quiz or poll)
     button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
     message = "Press the button to let the bot generate a preview for your poll"
@@ -92,24 +101,21 @@ def preview(update, context):
 
 
 def receive_poll(update, context):
+    """On receiving polls, reply to it by a closed poll copying the received poll"""
     actual_poll = update.effective_message.poll
-    # turning the object to a dict to pass it as parameters later on
-    poll_dict = actual_poll.to_dict()
-    # deleting unwanted parameters
-    del poll_dict['total_voter_count']
-    del poll_dict['id']
-    del poll_dict['is_closed']
-    # we need to replace the generated PollOption dicts with an string list
-    temp_list = []
-    for option in poll_dict['options']:
-        temp_list.append(option['text'])
-    poll_dict['options'] = temp_list
-    # with is_closed true, the poll/quiz is immediately closed
-    update.effective_message.reply_poll(**poll_dict, is_closed=True,
-                                        reply_markup=ReplyKeyboardRemove())
+    # Only need to set the question and options, since all other parameters don't matter for
+    # a closed poll
+    update.effective_message.reply_poll(
+        question=actual_poll.question,
+        options=[o.text for o in actual_poll.options],
+        # with is_closed true, the poll/quiz is immediately closed
+        is_closed=True,
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 
 def help_handler(update, context):
+    """Display a help message"""
     update.message.reply_text("Use /quiz, /poll or /preview to test this "
                               "bot.")
 
@@ -126,7 +132,7 @@ def main():
     dp.add_handler(CommandHandler('quiz', quiz))
     dp.add_handler(PollHandler(receive_quiz_answer))
     dp.add_handler(CommandHandler('preview', preview))
-    dp.add_handler(MessageHandler(Filters.poll, receive_poll))
+    dp.add_handler(MessageHandler(Filters.update.poll, receive_poll))
     dp.add_handler(CommandHandler('help', help_handler))
 
     # Start the Bot
