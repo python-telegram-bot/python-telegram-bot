@@ -127,7 +127,8 @@ class TestMessage(object):
                      {'length': 3, 'offset': 55, 'type': 'pre'},
                      {'length': 17, 'offset': 60, 'type': 'url'}]
     test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
-    test_entities_v2 = [{'length': 4, 'offset': 10, 'type': 'bold'},
+    test_entities_v2 = [{'length': 4, 'offset': 0, 'type': 'underline'},
+                        {'length': 4, 'offset': 10, 'type': 'bold'},
                         {'length': 7, 'offset': 16, 'type': 'italic'},
                         {'length': 6, 'offset': 25, 'type': 'code'},
                         {'length': 5, 'offset': 33, 'type': 'text_link',
@@ -206,8 +207,8 @@ class TestMessage(object):
         assert message.parse_caption_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_text_html_simple(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>, '
-                            '<a href="http://github.com/abc\)def">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. http://google.com '
                             'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
@@ -220,8 +221,8 @@ class TestMessage(object):
         assert message.text_html is None
 
     def test_text_html_urled(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>, '
-                            '<a href="http://github.com/abc\)def">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
                             'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
@@ -236,12 +237,28 @@ class TestMessage(object):
         assert text_markdown == test_md_string
 
     def test_text_markdown_v2_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
+
+    def test_text_markdown_new_in_v2(self, message):
+        with pytest.raises(ValueError):
+            self.test_message_v2.text_markdown
+
+        message.text = 'test'
+        message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.text = 'test'
+        message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.entities = []
 
     def test_text_markdown_empty(self, message):
         message.text = None
@@ -257,7 +274,7 @@ class TestMessage(object):
         assert text_markdown == test_md_string
 
     def test_text_markdown_v2_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
@@ -282,8 +299,8 @@ class TestMessage(object):
         assert expected == message.text_markdown
 
     def test_caption_html_simple(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>, '
-                            '<a href="http://github.com/abc\)def">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. http://google.com '
                             'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
@@ -296,8 +313,8 @@ class TestMessage(object):
         assert message.caption_html is None
 
     def test_caption_html_urled(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>, '
-                            '<a href="http://github.com/abc\)def">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
                             'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
@@ -312,7 +329,7 @@ class TestMessage(object):
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_v2_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
@@ -333,7 +350,7 @@ class TestMessage(object):
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_v2_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
@@ -448,7 +465,7 @@ class TestMessage(object):
                                       quote=True)
 
     def test_reply_markdown_v2(self, monkeypatch, message):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `\\\`code`, '
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
                           '[links](http://github.com/abc\\\\\)def), '
                           '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
                           'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
@@ -474,8 +491,8 @@ class TestMessage(object):
                                          quote=True)
 
     def test_reply_html(self, monkeypatch, message):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>, '
-                            '<a href="http://github.com/abc\)def">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
                             '<pre>`\pre</pre>. http://google.com '
                             'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')

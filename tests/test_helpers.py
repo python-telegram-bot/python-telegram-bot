@@ -71,6 +71,10 @@ class TestHelpers(object):
         assert expected_str == helpers.escape_markdown(test_str, version=2,
                                                        entity_type=MessageEntity.TEXT_LINK)
 
+    def test_markdown_invalid_version(self):
+        with pytest.raises(ValueError):
+            helpers.escape_markdown('abc', version=-1)
+
     def test_to_float_timestamp_absolute_naive(self):
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
