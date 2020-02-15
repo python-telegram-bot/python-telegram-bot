@@ -109,6 +109,8 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        default_quote (:obj:`bool`): Optional. Default setting for the `quote` parameter of the
+            :attr:`reply_text` and friends.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -214,6 +216,8 @@ class Message(TelegramObject):
             information about the poll.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. login_url buttons are represented as ordinary url buttons.
+        default_quote (:obj:`bool`, optional): Default setting for the `quote` parameter of the
+            :attr:`reply_text` and friends.
 
     """
 
@@ -277,6 +281,7 @@ class Message(TelegramObject):
                  forward_sender_name=None,
                  reply_markup=None,
                  bot=None,
+                 default_quote=None,
                  **kwargs):
         # Required
         self.message_id = int(message_id)
@@ -328,6 +333,7 @@ class Message(TelegramObject):
         self.poll = poll
         self.reply_markup = reply_markup
         self.bot = bot
+        self.default_quote = default_quote
 
         self._id_attrs = (self.message_id,)
 
@@ -358,13 +364,22 @@ class Message(TelegramObject):
 
         data['from_user'] = User.de_json(data.get('from'), bot)
         data['date'] = from_timestamp(data['date'])
-        data['chat'] = Chat.de_json(data.get('chat'), bot)
+        chat = data.get('chat')
+        if chat:
+            chat['default_quote'] = data.get('default_quote')
+        data['chat'] = Chat.de_json(chat, bot)
         data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
         data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
         data['forward_from'] = User.de_json(data.get('forward_from'), bot)
-        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
+        forward_from_chat = data.get('forward_from_chat')
+        if forward_from_chat:
+            forward_from_chat['default_quote'] = data.get('default_quote')
+        data['forward_from_chat'] = Chat.de_json(forward_from_chat, bot)
         data['forward_date'] = from_timestamp(data.get('forward_date'))
-        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
+        reply_to_message = data.get('reply_to_message')
+        if reply_to_message:
+            reply_to_message['default_quote'] = data.get('default_quote')
+        data['reply_to_message'] = Message.de_json(reply_to_message, bot)
         data['edit_date'] = from_timestamp(data.get('edit_date'))
         data['audio'] = Audio.de_json(data.get('audio'), bot)
         data['document'] = Document.de_json(data.get('document'), bot)
@@ -381,7 +396,10 @@ class Message(TelegramObject):
         data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
         data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
         data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
+        pinned_message = data.get('pinned_message')
+        if pinned_message:
+            pinned_message['default_quote'] = data.get('default_quote')
+        data['pinned_message'] = Message.de_json(pinned_message, bot)
         data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
         data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
         data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
@@ -464,7 +482,8 @@ class Message(TelegramObject):
             del kwargs['quote']
 
         else:
-            if self.chat.type != Chat.PRIVATE:
+            if ((self.default_quote is None and self.chat.type != Chat.PRIVATE)
+               or self.default_quote):
                 kwargs['reply_to_message_id'] = self.message_id
 
     def reply_text(self, *args, **kwargs):

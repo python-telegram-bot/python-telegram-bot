@@ -339,9 +339,9 @@ class TestPassport(object):
 
         # NOTE: file_unique_id is not used in the get_file method, so it is passed directly
         def get_file(*args, **kwargs):
-            return File(args[1], selfie.file_unique_id)
+            return File(args[0], selfie.file_unique_id)
 
-        monkeypatch.setattr('telegram.Bot.get_file', get_file)
+        monkeypatch.setattr(passport_data.bot, 'get_file', get_file)
         file = selfie.get_file()
         assert file.file_id == selfie.file_id
         assert file.file_unique_id == selfie.file_unique_id

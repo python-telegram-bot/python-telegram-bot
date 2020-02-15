@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultCachedVideo."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultCachedVideo(InlineQueryResult):
@@ -68,7 +69,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultCachedVideo, self).__init__('video', id)
