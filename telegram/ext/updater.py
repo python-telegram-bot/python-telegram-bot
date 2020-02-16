@@ -91,7 +91,9 @@ class Updater(object):
             be used if not set explicitly in the bot methods.
 
     Note:
-        You must supply either a :attr:`bot` or a :attr:`token` argument.
+        * You must supply either a :attr:`bot` or a :attr:`token` argument.
+        * If you supply a :attr:`bot`, you will need to pass :attr:`defaults` to *both* the bot and
+          the :class:`telegram.ext.Updater`.
 
     Raises:
         ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
