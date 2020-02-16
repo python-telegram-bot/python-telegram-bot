@@ -24,6 +24,8 @@ class Handler(object):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        roles (:obj:`telegram.ext.Role`): Optional. A user role used to restrict access to the
+            handler.
         pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
@@ -51,6 +53,9 @@ class Handler(object):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        roles (:obj:`telegram.ext.Role`, optional): A user role used to restrict access to the
+            handler. Roles can be combined using bitwise operators (& for and, | for or, ~ for
+            not).
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -70,17 +75,34 @@ class Handler(object):
 
     """
 
+    def __new__(cls, *args, **kwargs):
+        instance = super(Handler, cls).__new__(cls)
+        check_update = instance.check_update
+
+        def check_update_with_filters(update):
+            if instance.roles:
+                if instance.roles(update):
+                    return check_update(update)
+                else:
+                    return False
+            return check_update(update)
+
+        instance.check_update = check_update_with_filters
+        return instance
+
     def __init__(self,
                  callback,
                  pass_update_queue=False,
                  pass_job_queue=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 roles=None):
         self.callback = callback
         self.pass_update_queue = pass_update_queue
         self.pass_job_queue = pass_job_queue
         self.pass_user_data = pass_user_data
         self.pass_chat_data = pass_chat_data
+        self.roles = roles
 
     def check_update(self, update):
         """

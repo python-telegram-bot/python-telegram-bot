@@ -44,6 +44,7 @@ from .messagequeue import DelayQueue
 from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .defaults import Defaults
+from .roles import Role, Roles
 
 __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'ChosenInlineResultHandler', 'CommandHandler', 'Handler', 'InlineQueryHandler',
@@ -52,4 +53,4 @@ __all__ = ('Dispatcher', 'JobQueue', 'Job', 'Updater', 'CallbackQueryHandler',
            'PreCheckoutQueryHandler', 'ShippingQueryHandler', 'MessageQueue', 'DelayQueue',
            'DispatcherHandlerStop', 'run_async', 'CallbackContext', 'BasePersistence',
            'PicklePersistence', 'DictPersistence', 'PrefixHandler', 'PollAnswerHandler',
-           'PollHandler', 'Defaults')
+           'PollHandler', 'Defaults', 'Role', 'Roles')

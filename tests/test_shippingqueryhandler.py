@@ -99,6 +99,19 @@ class TestShippingQueryHandler(object):
         dp.process_update(shiping_query)
         assert self.test_flag
 
+    def test_with_role(self, dp, shiping_query, role):
+        handler = ShippingQueryHandler(self.callback_basic, roles=role)
+        dp.add_handler(handler)
+
+        assert not handler.check_update(shiping_query)
+        dp.process_update(shiping_query)
+        assert not self.test_flag
+
+        role.user_ids = 1
+        assert handler.check_update(shiping_query)
+        dp.process_update(shiping_query)
+        assert self.test_flag
+
     def test_pass_user_or_chat_data(self, dp, shiping_query):
         handler = ShippingQueryHandler(self.callback_data_1,
                                        pass_user_data=True)

@@ -116,6 +116,13 @@ class TestCallbackQueryHandler(object):
         callback_query.callback_query.data = 'nothing here'
         assert not handler.check_update(callback_query)
 
+    def test_with_role(self, callback_query, role):
+        handler = CallbackQueryHandler(self.callback_basic, roles=role)
+        assert not handler.check_update(callback_query)
+
+        role.user_ids = 1
+        assert handler.check_update(callback_query)
+
     def test_with_passing_group_dict(self, dp, callback_query):
         handler = CallbackQueryHandler(self.callback_group,
                                        pattern='(?P<begin>.*)est(?P<end>.*)',

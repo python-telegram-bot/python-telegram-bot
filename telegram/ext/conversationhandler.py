@@ -105,6 +105,8 @@ class ConversationHandler(Handler):
         map_to_parent (Dict[:obj:`object`, :obj:`object`]): Optional. A :obj:`dict` that can be
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
+        roles (:obj:`telegram.ext.Role`): Optional. A user role used to restrict access to the
+            handler.
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
@@ -139,6 +141,9 @@ class ConversationHandler(Handler):
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a nested conversationhandler to transition into a mapped state on
             its parent conversationhandler in place of a specified nested state.
+        roles (:obj:`telegram.ext.Role`, optional): A user role used to restrict access to the
+            handler. Roles can be combined using bitwise operators (& for and, | for or, ~ for
+            not).
 
     Raises:
         ValueError
@@ -163,7 +168,8 @@ class ConversationHandler(Handler):
                  conversation_timeout=None,
                  name=None,
                  persistent=False,
-                 map_to_parent=None):
+                 map_to_parent=None,
+                 roles=None):
 
         self._entry_points = entry_points
         self._states = states
@@ -182,6 +188,7 @@ class ConversationHandler(Handler):
         """:obj:`telegram.ext.BasePersistance`: The persistence used to store conversations.
         Set by dispatcher"""
         self._map_to_parent = map_to_parent
+        self.roles = roles
 
         self.timeout_jobs = dict()
         self._timeout_jobs_lock = Lock()

@@ -272,6 +272,13 @@ class TestCommandHandler(BaseTest):
                                             filters=Filters.regex('one') & Filters.regex('two'))
         self._test_context_args_or_regex(cdp, handler, command)
 
+    def test_with_role(self, command, role):
+        handler = self.make_default_handler(roles=role)
+        assert not is_match(handler, make_command_update('/test'))
+
+        role.user_ids = 1
+        assert is_match(handler, make_command_update('/test'))
+
 
 # ----------------------------- PrefixHandler -----------------------------
 
@@ -421,3 +428,12 @@ class TestPrefixHandler(BaseTest):
                                             filters=Filters.regex('one') & Filters.regex(
                                                 'two'))
         self._test_context_args_or_regex(cdp, handler, prefix_message_text)
+
+    def test_with_role(self, dp, prefix, command, role):
+        handler = self.make_default_handler(roles=role)
+        dp.add_handler(handler)
+        text = prefix + command
+        assert not self.response(dp, make_message_update(text))
+
+        role.user_ids = 1
+        assert self.response(dp, make_message_update(text))

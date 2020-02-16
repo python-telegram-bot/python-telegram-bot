@@ -98,6 +98,18 @@ class TestPreCheckoutQueryHandler(object):
         dp.process_update(pre_checkout_query)
         assert self.test_flag
 
+    def test_with_role(self, dp, pre_checkout_query, role):
+        handler = PreCheckoutQueryHandler(self.callback_basic, roles=role)
+        dp.add_handler(handler)
+        assert not handler.check_update(pre_checkout_query)
+        dp.process_update(pre_checkout_query)
+        assert not self.test_flag
+
+        role.user_ids = 1
+        assert handler.check_update(pre_checkout_query)
+        dp.process_update(pre_checkout_query)
+        assert self.test_flag
+
     def test_pass_user_or_chat_data(self, dp, pre_checkout_query):
         handler = PreCheckoutQueryHandler(self.callback_data_1,
                                           pass_user_data=True)

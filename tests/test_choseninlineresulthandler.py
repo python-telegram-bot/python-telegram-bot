@@ -98,6 +98,13 @@ class TestChosenInlineResultHandler(object):
         dp.process_update(chosen_inline_result)
         assert self.test_flag
 
+    def test_with_role(self, chosen_inline_result, role):
+        handler = ChosenInlineResultHandler(self.callback_basic, roles=role)
+        assert not handler.check_update(chosen_inline_result)
+
+        role.user_ids = 1
+        assert handler.check_update(chosen_inline_result)
+
     def test_pass_user_or_chat_data(self, dp, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback_data_1,
                                             pass_user_data=True)

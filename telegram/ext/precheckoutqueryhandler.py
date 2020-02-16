@@ -27,6 +27,8 @@ class PreCheckoutQueryHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        roles (:obj:`telegram.ext.Role`): Optional. A user role used to restrict access to the
+            handler.
         pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
@@ -54,6 +56,9 @@ class PreCheckoutQueryHandler(Handler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        roles (:obj:`telegram.ext.Role`, optional): A user role used to restrict access to the
+            handler. Roles can be combined using bitwise operators (& for and, | for or, ~ for
+            not).
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             DEPRECATED: Please switch to context based callbacks.

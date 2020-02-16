@@ -30,7 +30,7 @@ import pytest
 from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
-from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
+from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults, Role
 from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
 
@@ -161,6 +161,11 @@ def class_thumb_file():
     f = open(u'tests/data/thumb.jpg', 'rb')
     yield f
     f.close()
+
+
+@pytest.fixture(scope='function')
+def role():
+    yield Role(0)
 
 
 def pytest_configure(config):

@@ -812,6 +812,23 @@ class TestConversationHandler(object):
             " since inline queries have no chat context."
         )
 
+    def test_conversationhandler_with_role(self, dp, bot, user1, role):
+        handler = ConversationHandler(entry_points=self.entry_points, states=self.states,
+                                      fallbacks=self.fallbacks, roles=role)
+        dp.add_handler(handler)
+
+        # User one, starts the state machine.
+        message = Message(0, user1, None, self.group, text='/start',
+                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
+                                                  offset=0, length=len('/start'))],
+                          bot=bot)
+        dp.process_update(Update(update_id=0, message=message))
+        assert user1.id not in self.current_state
+
+        role.user_ids = 123
+        dp.process_update(Update(update_id=0, message=message))
+        assert self.current_state[user1.id] == self.THIRSTY
+
     def test_nested_conversation_handler(self, dp, bot, user1, user2):
         self.nested_states[self.DRINKING] = [ConversationHandler(
             entry_points=self.drinking_entry_points,

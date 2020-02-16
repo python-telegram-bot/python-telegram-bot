@@ -34,6 +34,8 @@ class MessageHandler(Handler):
         filters (:obj:`Filter`): Only allow updates with these Filters. See
             :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
+        roles (:obj:`telegram.ext.Role`): Optional. A user role used to restrict access to the
+            handler.
         pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
@@ -75,6 +77,9 @@ class MessageHandler(Handler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        roles (:obj:`telegram.ext.Role`, optional): A user role used to restrict access to the
+            handler. Roles can be combined using bitwise operators (& for and, | for or, ~ for
+            not).
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -115,14 +120,16 @@ class MessageHandler(Handler):
                  pass_chat_data=False,
                  message_updates=None,
                  channel_post_updates=None,
-                 edited_updates=None):
+                 edited_updates=None,
+                 roles=None):
 
         super(MessageHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            roles=roles)
         if message_updates is False and channel_post_updates is False and edited_updates is False:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False')

@@ -32,6 +32,8 @@ class InlineQueryHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
+        roles (:obj:`telegram.ext.Role`): Optional. A user role used to restrict access to the
+            handler.
         pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
@@ -65,6 +67,9 @@ class InlineQueryHandler(Handler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        roles (:obj:`telegram.ext.Role`, optional): A user role used to restrict access to the
+            handler. Roles can be combined using bitwise operators (& for and, | for or, ~ for
+            not).
         pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
             ``update_queue`` will be passed to the callback function. It will be the ``Queue``
             instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
@@ -103,13 +108,15 @@ class InlineQueryHandler(Handler):
                  pass_groups=False,
                  pass_groupdict=False,
                  pass_user_data=False,
-                 pass_chat_data=False):
+                 pass_chat_data=False,
+                 roles=None):
         super(InlineQueryHandler, self).__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
             pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+            pass_chat_data=pass_chat_data,
+            roles=roles)
 
         if isinstance(pattern, string_types):
             pattern = re.compile(pattern)

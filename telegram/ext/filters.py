@@ -889,10 +889,12 @@ officedocument.wordprocessingml.document")``-
             if (user_id is None) == (self.usernames is None):
                 raise ValueError('One and only one of user_id or username must be used')
             with self._user_ids_lock:
-                if isinstance(user_id, int):
-                    self._user_ids = [user_id]
+                if user_id is None:
+                    self._user_ids = None
+                elif isinstance(user_id, int):
+                    self._user_ids = set([user_id])
                 else:
-                    self._user_ids = user_id
+                    self._user_ids = set(user_id)
 
         @property
         def usernames(self):
@@ -905,11 +907,11 @@ officedocument.wordprocessingml.document")``-
                 raise ValueError('One and only one of user_id or username must be used')
             with self._usernames_lock:
                 if username is None:
-                    self._usernames = username
+                    self._usernames = None
                 elif isinstance(username, str):
-                    self._usernames = [username.replace('@', '')]
+                    self._usernames = set([username.replace('@', '')])
                 else:
-                    self._usernames = [user.replace('@', '') for user in username]
+                    self._usernames = set([user.replace('@', '') for user in username])
 
         def filter(self, message):
             """"""  # remove method from docs

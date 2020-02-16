@@ -117,6 +117,13 @@ class TestRegexHandler(object):
         handler = RegexHandler('.*not in here.*', self.callback_basic)
         assert not handler.check_update(Update(0, message))
 
+    def test_with_role(self, message, role):
+        handler = RegexHandler('.*est.*', self.callback_basic, roles=role)
+        assert not handler.check_update(Update(0, message))
+
+        role.user_ids = 1
+        assert handler.check_update(Update(0, message))
+
     def test_with_passing_group_dict(self, dp, message):
         handler = RegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
                                pass_groups=True)

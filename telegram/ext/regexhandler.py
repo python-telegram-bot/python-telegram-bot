@@ -36,6 +36,8 @@ class RegexHandler(MessageHandler):
     Attributes:
         pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
+        roles (:obj:`telegram.ext.Role`): Optional. A user role used to restrict access to the
+            handler.
         pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
@@ -64,6 +66,9 @@ class RegexHandler(MessageHandler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        roles (:obj:`telegram.ext.Role`, optional): A user role used to restrict access to the
+            handler. Roles can be combined using bitwise operators (& for and, | for or, ~ for
+            not).
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -106,7 +111,8 @@ class RegexHandler(MessageHandler):
                  allow_edited=False,
                  message_updates=True,
                  channel_post_updates=False,
-                 edited_updates=False):
+                 edited_updates=False,
+                 roles=None):
         warnings.warn('RegexHandler is deprecated. See https://git.io/fxJuV for more info',
                       TelegramDeprecationWarning,
                       stacklevel=2)
@@ -118,7 +124,8 @@ class RegexHandler(MessageHandler):
                                            pass_chat_data=pass_chat_data,
                                            message_updates=message_updates,
                                            channel_post_updates=channel_post_updates,
-                                           edited_updates=edited_updates)
+                                           edited_updates=edited_updates,
+                                           roles=roles)
         self.pass_groups = pass_groups
         self.pass_groupdict = pass_groupdict
 
