@@ -852,13 +852,14 @@ officedocument.wordprocessingml.document")``-
             ``MessageHandler(Filters.user(1234), callback_method)``
 
         Attributes:
-            user_id(List[:obj:`int`], optional): Which user ID(s) to allow through.
-            username(List[:obj:`str`], optional): Which username(s) (without leading '@') to allow
+            user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
                 through.
         Args:
-            user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow through.
-            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
-                If username starts with '@' symbol, it will be ignored.
+            user_id(:obj:`int` | iterable(:obj:`int`), optional): Which user ID(s) to allow
+                through.
+            username(:obj:`str` | iterable(:obj:`str`), optional): Which username(s) to allow
+                through. If username starts with '@' symbol, it will be ignored.
 
         Raises:
             ValueError: If chat_id and username are both present, or neither is.
