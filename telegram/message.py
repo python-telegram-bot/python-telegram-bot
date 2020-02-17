@@ -1234,8 +1234,13 @@ class Message(TelegramObject):
                                                    entity_type=MessageEntity.CODE) + '`'
                 elif entity.type == MessageEntity.PRE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    insert = '```' + escape_markdown(orig_text, version=version,
-                                                     entity_type=MessageEntity.PRE) + '```'
+                    code = escape_markdown(orig_text, version=version,
+                                           entity_type=MessageEntity.PRE)
+                    if code.startswith('\\'):
+                        prefix = '```'
+                    else:
+                        prefix = '```\n'
+                    insert = prefix + code + '```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
                         raise ValueError('Underline entities are not supported for Markdown '

@@ -233,7 +233,7 @@ class TestMessage(object):
 
     def test_text_markdown_simple(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
                           'http://google.com/ab\_')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
@@ -271,7 +271,7 @@ class TestMessage(object):
 
     def test_text_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
                           '[http://google.com/ab_](http://google.com/ab_)')
         text_markdown = self.test_message.text_markdown_urled
         assert text_markdown == test_md_string
@@ -326,7 +326,7 @@ class TestMessage(object):
 
     def test_caption_markdown_simple(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
                           'http://google.com/ab\_')
         caption_markdown = self.test_message.caption_markdown
         assert caption_markdown == test_md_string
@@ -347,7 +347,7 @@ class TestMessage(object):
 
     def test_caption_markdown_urled(self):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
                           '[http://google.com/ab_](http://google.com/ab_)')
         caption_markdown = self.test_message.caption_markdown_urled
         assert caption_markdown == test_md_string
@@ -444,7 +444,7 @@ class TestMessage(object):
 
     def test_reply_markdown(self, monkeypatch, message):
         test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
-                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
                           'http://google.com/ab\_')
 
         def test(*args, **kwargs):
@@ -484,6 +484,7 @@ class TestMessage(object):
             return all([cid, markdown_text, reply, markdown_enabled])
 
         text_markdown = self.test_message_v2.text_markdown_v2
+        print('\n', test_md_string, '\n', text_markdown)
         assert text_markdown == test_md_string
 
         monkeypatch.setattr(message.bot, 'send_message', test)
