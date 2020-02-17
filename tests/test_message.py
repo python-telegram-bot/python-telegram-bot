@@ -484,7 +484,6 @@ class TestMessage(object):
             return all([cid, markdown_text, reply, markdown_enabled])
 
         text_markdown = self.test_message_v2.text_markdown_v2
-        print('\n', test_md_string, '\n', text_markdown)
         assert text_markdown == test_md_string
 
         monkeypatch.setattr(message.bot, 'send_message', test)
