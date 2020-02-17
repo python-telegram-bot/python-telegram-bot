@@ -119,14 +119,16 @@ class TestMessage(object):
     date = datetime.utcnow()
     chat = Chat(3, 'private')
     test_entities = [{'length': 4, 'offset': 10, 'type': 'bold'},
-                     {'length': 7, 'offset': 16, 'type': 'italic'},
+                     {'length': 3, 'offset': 16, 'type': 'italic'},
+                     {'length': 3, 'offset': 20, 'type': 'italic'},
                      {'length': 4, 'offset': 25, 'type': 'code'},
-                     {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
+                     {'length': 5, 'offset': 31, 'type': 'text_link',
+                      'url': 'http://github.com/ab_'},
                      {'length': 12, 'offset': 38, 'type': 'text_mention',
                       'user': User(123456789, 'mentioned user', False)},
                      {'length': 3, 'offset': 55, 'type': 'pre'},
-                     {'length': 17, 'offset': 60, 'type': 'url'}]
-    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
+                     {'length': 21, 'offset': 60, 'type': 'url'}]
+    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com/ab_'
     test_entities_v2 = [{'length': 4, 'offset': 0, 'type': 'underline'},
                         {'length': 4, 'offset': 10, 'type': 'bold'},
                         {'length': 7, 'offset': 16, 'type': 'italic'},
@@ -230,9 +232,9 @@ class TestMessage(object):
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google.com/ab\_')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
 
@@ -268,9 +270,9 @@ class TestMessage(object):
         assert message.text_markdown_v2 is None
 
     def test_text_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com)')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          '[http://google.com/ab_](http://google.com/ab_)')
         text_markdown = self.test_message.text_markdown_urled
         assert text_markdown == test_md_string
 
@@ -323,9 +325,9 @@ class TestMessage(object):
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google.com/ab\_')
         caption_markdown = self.test_message.caption_markdown
         assert caption_markdown == test_md_string
 
@@ -344,9 +346,9 @@ class TestMessage(object):
         assert message.caption_markdown_v2 is None
 
     def test_caption_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com)')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          '[http://google.com/ab_](http://google.com/ab_)')
         caption_markdown = self.test_message.caption_markdown_urled
         assert caption_markdown == test_md_string
 
@@ -441,9 +443,9 @@ class TestMessage(object):
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_markdown(self, monkeypatch, message):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```pre```. '
+                          'http://google.com/ab\_')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id

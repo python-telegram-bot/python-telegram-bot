@@ -1209,13 +1209,21 @@ class Message(TelegramObject):
                                                    version=version)
 
                 if entity.type == MessageEntity.TEXT_LINK:
-                    # Links need special escaping. Also can't have entities nested within
-                    insert = '[{}]({})'.format(text, escape_markdown(entity.url, version=version,
-                                               entity_type=MessageEntity.TEXT_LINK))
+                    if version == 1:
+                        url = entity.url
+                    else:
+                        # Links need special escaping. Also can't have entities nested within
+                        url = escape_markdown(entity.url, version=version,
+                                              entity_type=MessageEntity.TEXT_LINK)
+                    insert = '[{}]({})'.format(text, url)
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
                     insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
                 elif entity.type == MessageEntity.URL and urled:
-                    insert = '[{}]({})'.format(text, orig_text)
+                    if version == 1:
+                        link = orig_text
+                    else:
+                        link = text
+                    insert = '[{}]({})'.format(link, orig_text)
                 elif entity.type == MessageEntity.BOLD:
                     insert = '*' + text + '*'
                 elif entity.type == MessageEntity.ITALIC:
