@@ -828,13 +828,14 @@ officedocument.wordprocessingml.document")``-
             ``MessageHandler(Filters.user(1234), callback_method)``
 
         Attributes:
-            user_id(List[:obj:`int`], optional): Which user ID(s) to allow through.
-            username(List[:obj:`str`], optional): Which username(s) (without leading '@') to allow
+            user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
+            usernames(set(:obj:`str`), optional): Which username(s) (without leading '@') to allow
                 through.
         Args:
-            user_id(:obj:`int` | List[:obj:`int`], optional): Which user ID(s) to allow through.
-            username(:obj:`str` | List[:obj:`str`], optional): Which username(s) to allow through.
-                If username starts with '@' symbol, it will be ignored.
+            user_id(:obj:`int` | iterable(:obj:`int`), optional): Which user ID(s) to allow
+                through.
+            username(:obj:`str` | iterable(:obj:`str`), optional): Which username(s) to allow
+                through. If username starts with '@' symbol, it will be ignored.
 
         Raises:
             ValueError: If chat_id and username are both present, or neither is.
@@ -865,10 +866,12 @@ officedocument.wordprocessingml.document")``-
             if (user_id is None) == (self.usernames is None):
                 raise ValueError('One and only one of user_id or username must be used')
             with self._user_ids_lock:
-                if isinstance(user_id, int):
-                    self._user_ids = [user_id]
+                if user_id is None:
+                    self._user_ids = None
+                elif isinstance(user_id, int):
+                    self._user_ids = set([user_id])
                 else:
-                    self._user_ids = user_id
+                    self._user_ids = set(user_id)
 
         @property
         def usernames(self):
@@ -881,11 +884,11 @@ officedocument.wordprocessingml.document")``-
                 raise ValueError('One and only one of user_id or username must be used')
             with self._usernames_lock:
                 if username is None:
-                    self._usernames = username
+                    self._usernames = None
                 elif isinstance(username, str):
-                    self._usernames = [username.replace('@', '')]
+                    self._usernames = set([username.replace('@', '')])
                 else:
-                    self._usernames = [user.replace('@', '') for user in username]
+                    self._usernames = set([user.replace('@', '') for user in username])
 
         def filter(self, message):
             """"""  # remove method from docs
