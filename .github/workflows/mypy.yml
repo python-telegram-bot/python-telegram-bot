@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - master
+      - type_hinting_master
   push:
     branches:
       - master
