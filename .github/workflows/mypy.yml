@@ -4,9 +4,15 @@ on:
     branches:
       - master
       - type_hinting_master
+    paths:
+      - 'telegram/**'
+      - '**.py'
   push:
     branches:
       - master
+    paths:
+      - 'telegram/**'
+      - '**.py'
 jobs:
   build:
     runs-on: ubuntu-latest
