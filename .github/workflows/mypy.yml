@@ -1,0 +1,25 @@
+name: mypy
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies and mypy
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Verify mypy types
+      run: |
+        mypy --version
+        mypy telegram
