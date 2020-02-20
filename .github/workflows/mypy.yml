@@ -19,7 +19,28 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
+        pip install mypy==0.761
     - name: Verify mypy types
       run: |
         mypy --version
-        mypy telegram
+    - name: saving changed files in local json
+      uses: lots0logs/gh-action-get-changed-files@2.0.6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Running mypy on changed files
+      run: |
+        sudo apt install jq
+        echo $HOME
+        echo $HOME/files.json
+        for FILENAME  in $(jq '.[]' $HOME/files.json); do
+        FILENAME="${FILENAME:1}"
+        FILENAME="${FILENAME::-1}"
+        if [ ${FILENAME: -3} == ".py" ]
+        then
+        echo Testing $FILENAME
+        python -m mypy $FILENAME
+        else
+        echo Skipping $FILENAME
+        fi
+        done
+      shell: bash
