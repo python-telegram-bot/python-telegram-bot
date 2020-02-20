@@ -23,10 +23,11 @@ jobs:
     - name: Verify mypy types
       run: |
         mypy --version
-    - name: running mypy on the changed files
+    - name: saving changed files in local json
       uses: lots0logs/gh-action-get-changed-files@2.0.6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Running mypy on changed files
       run: |
         sudo apt install jq
         echo $HOME
