@@ -40,26 +40,31 @@ class Role(Filters.user):
     Warning:
         ``role_1 == role_2`` does not test for the hierarchical order of the roles, but in fact if
         both roles are the same object. To test for equality in terms of hierarchical order, i.e.
-        if both :attr:`parent_roles` and :attr:`user_ids` coincide, use :attr:`equals`.
+        if both :attr:`parent_roles` and :attr:`chat_ids` coincide, use :attr:`equals`.
 
     Attributes:
-        user_ids (set(:obj:`int`)): The ids of the users of this role. May be empty.
+        chat_ids (set(:obj:`int`)): The ids of the users/chats of this role. Updates
+            will only be parsed, if the id of :attr:`telegram.Update.effective_user` or
+            :attr:`telegram.Update.effective_chat` respectiveley is listed here. May be empty.
         parent_roles (set(:class:`telegram.ext.Role`)): Parent roles of this role. All the parent
             roles can do anything, this role can do. May be empty.
         name (:obj:`str`): A string representation of this role.
 
     Args:
-        user_ids (set(:obj:`int`), optional): The ids of the users of this role.
+        chat_ids (set(:obj:`int`), optional): The ids of the users/chats of this role. Updates
+            will only be parsed, if the id of :attr:`telegram.Update.effective_user` or
+            :attr:`telegram.Update.effective_chat` respectiveley is listed here.
         parent_roles (set(:class:`telegram.ext.Role`), optional): Parent roles of this role.
         name (:obj:`str`, optional): A name for this role.
 
     """
     update_filter = True
 
-    def __init__(self, user_ids=None, parent_role=None, name=None):
-        if user_ids is None:
-            user_ids = set()
-        super(Role, self).__init__(user_ids)
+    def __init__(self, chat_ids=None, parent_role=None, name=None):
+        if chat_ids is None:
+            chat_ids = set()
+        super(Role, self).__init__(chat_ids)
+        self.chat_ids = self.user_ids
         self.parent_roles = set()
         self._name = name
         if parent_role:
@@ -69,33 +74,38 @@ class Role(Filters.user):
     def name(self):
         if self._name:
             return 'Role({})'.format(self._name)
-        elif self.user_ids or self.usernames:
-            return 'Role({})'.format(self.user_ids or self.usernames)
+        elif self.chat_ids:
+            return 'Role({})'.format(self.chat_ids)
         else:
             return 'Role({})'
 
     def filter(self, update):
         user = update.effective_user
+        chat = update.effective_chat
         if user:
-            if user.id in self.user_ids:
+            if user.id in self.chat_ids:
                 return True
+        if chat:
+            if chat.id in self.chat_ids:
+                return True
+        if user or chat:
             return any([parent(update) for parent in self.parent_roles])
 
-    def add_member(self, user_id):
-        """Adds a user to this role. Will do nothing, if user is already present.
+    def add_member(self, chat_id):
+        """Adds a user/chat to this role. Will do nothing, if user/chat is already present.
 
         Args:
-            user_id (:obj:`int`): The users id
+            chat_id (:obj:`int`): The users/chats id
         """
-        self.user_ids.add(user_id)
+        self.chat_ids.add(chat_id)
 
-    def kick_member(self, user_id):
-        """Kicks a user to from role. Will do nothing, if user is not present.
+    def kick_member(self, chat_id):
+        """Kicks a user/chat to from role. Will do nothing, if user/chat is not present.
 
         Args:
-            user_id (:obj:`int`): The users id
+            chat_id (:obj:`int`): The users/chats id
         """
-        self.user_ids.discard(user_id)
+        self.chat_ids.discard(chat_id)
 
     def add_parent_role(self, parent_role):
         """Adds a parent role to this role. Will do nothing, if parent role is already present.
@@ -142,7 +152,7 @@ class Role(Filters.user):
         return not self == other
 
     def equals(self, other):
-        """Test if two roles are equal in terms of hierarchy. Returns ``True``, if the user_ids
+        """Test if two roles are equal in terms of hierarchy. Returns ``True``, if the chat_ids
         coincide and the parent roles are equal in terms of this method.
 
         Args:
@@ -157,13 +167,13 @@ class Role(Filters.user):
         for opr in other.parent_roles:
             if not any([opr.equals(pr) for pr in self.parent_roles]):
                 return False
-        return self.user_ids == other.user_ids
+        return self.chat_ids == other.chat_ids
 
     def __hash__(self):
         return id(self)
 
     def __deepcopy__(self, memo):
-        new_role = Role(user_ids=self.user_ids, name=self._name)
+        new_role = Role(chat_ids=self.chat_ids, name=self._name)
         memo[id(self)] = new_role
         for pr in self.parent_roles:
             new_role.add_parent_role(deepcopy(pr, memo))
@@ -172,7 +182,7 @@ class Role(Filters.user):
 
 class _chat_admins(Role):
     def __init__(self, bot):
-        super(_chat_admins, self).__init__([], name='chat_admins')
+        super(_chat_admins, self).__init__(name='chat_admins')
         self._bot = bot
 
     def filter(self, update):
@@ -185,7 +195,7 @@ class _chat_admins(Role):
 
 class _chat_creator(Role):
     def __init__(self, bot):
-        super(_chat_creator, self).__init__([], name='chat_creator')
+        super(_chat_creator, self).__init__(name='chat_creator')
         self._bot = bot
 
     def filter(self, update):
@@ -196,7 +206,7 @@ class _chat_creator(Role):
                 member = self._bot.get_chat_member(chat.id, user.id)
                 return member.status == ChatMember.CREATOR
             except TelegramError:
-                # user is not a chat member
+                # user is not a chat member or bot has no access
                 return False
 
 
@@ -274,30 +284,32 @@ class Roles(dict):
         """"""  # Remove method from docs
         raise NotImplementedError
 
-    def add_admin(self, user_id):
-        """Adds a user to the :attr:`ADMINS` role. Will do nothing if user is already present.
+    def add_admin(self, chat_id):
+        """Adds a user/chat to the :attr:`ADMINS` role. Will do nothing if user/chat is already
+        present.
 
         Args:
-            user_id (:obj:`int`): The users id
+            chat_id (:obj:`int`): The users id
         """
-        self.ADMINS.add_member(user_id)
+        self.ADMINS.add_member(chat_id)
 
-    def kick_admin(self, user_id):
-        """Kicks a user from the :attr:`ADMINS` role. Will do nothing if user is not present.
+    def kick_admin(self, chat_id):
+        """Kicks a user/chat from the :attr:`ADMINS` role. Will do nothing if user/chat is not
+        present.
 
         Args:
-            user_id (:obj:`int`): The users id
+            chat_id (:obj:`int`): The users/chats id
         """
-        self.ADMINS.kick_member(user_id)
+        self.ADMINS.kick_member(chat_id)
 
-    def add_role(self, name, user_ids=None, parent_role=None):
+    def add_role(self, name, chat_ids=None, parent_role=None):
         """Creates and registers a new role. :attr:`ADMINS` will automatically be added to
         roles parent roles, i.e. admins can do everyhing. The role can be accessed by it's
         name.
 
         Args:
             name (:obj:`str`, optional): A name for this role.
-            user_ids (set(:obj:`int`), optional): The ids of the users of this role.
+            chat_ids (set(:obj:`int`), optional): The ids of the users/chats of this role.
             parent_roles (set(:class:`telegram.ext.Role`), optional): Parent roles of this role.
 
         Raises:
@@ -305,7 +317,7 @@ class Roles(dict):
         """
         if name in self:
             raise ValueError('Role name is already taken.')
-        role = Role(user_ids=user_ids, parent_role=parent_role, name=name)
+        role = Role(chat_ids=chat_ids, parent_role=parent_role, name=name)
         self._setitem(name, role)
         role.add_parent_role(self.ADMINS)
 
@@ -339,7 +351,7 @@ class Roles(dict):
         memo[id(self)] = new_roles
         new_roles.ADMINS = deepcopy(self.ADMINS)
         for role in self.values():
-            new_roles.add_role(name=role._name, user_ids=role.user_ids)
+            new_roles.add_role(name=role._name, chat_ids=role.chat_ids)
             for pr in role.parent_roles:
                 new_roles[role._name].add_parent_role(deepcopy(pr, memo))
         return new_roles
@@ -357,7 +369,7 @@ class Roles(dict):
         def _encode_role_to_json(role, memo):
             id_ = id(role)
             if id_ not in memo:
-                inner_tmp = {'name': role._name, 'user_ids': sorted(role.user_ids)}
+                inner_tmp = {'name': role._name, 'chat_ids': sorted(role.chat_ids)}
                 inner_tmp['restored_from_persistence'] = role.restored_from_persistence
                 inner_tmp['parent_roles'] = [
                     _encode_role_to_json(pr, memo) for pr in role.parent_roles
@@ -387,7 +399,7 @@ class Roles(dict):
                 return memo[id_]
 
             tmp = memo[id_]
-            role = Role(name=tmp['name'], user_ids=tmp['user_ids'])
+            role = Role(name=tmp['name'], chat_ids=tmp['chat_ids'])
             role.restored_from_persistence = tmp['restored_from_persistence']
             for pid in tmp['parent_roles']:
                 role.add_parent_role(_decode_role_from_json(pid, memo))

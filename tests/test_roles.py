@@ -49,49 +49,49 @@ def role():
 class TestRole(object):
     def test_creation(self, parent_role):
         r = Role(parent_role=parent_role)
-        assert r.user_ids == set()
+        assert r.chat_ids == set()
         assert r.name == 'Role({})'
         assert r.parent_roles == set([parent_role])
 
         r = Role(1)
-        assert r.user_ids == set([1])
+        assert r.chat_ids == set([1])
         assert r.name == 'Role({1})'
         assert r.parent_roles == set()
 
         r = Role([1, 2])
-        assert r.user_ids == set([1, 2])
+        assert r.chat_ids == set([1, 2])
         assert r.name == 'Role({1, 2})'
         assert r.parent_roles == set()
 
         r = Role([1, 2], name='role')
-        assert r.user_ids == set([1, 2])
+        assert r.chat_ids == set([1, 2])
         assert r.name == 'Role(role)'
         assert r.parent_roles == set()
 
     def test_add_member(self, role):
-        assert role.user_ids == set()
+        assert role.chat_ids == set()
         role.add_member(1)
-        assert role.user_ids == set([1])
+        assert role.chat_ids == set([1])
         role.add_member(2)
-        assert role.user_ids == set([1, 2])
+        assert role.chat_ids == set([1, 2])
         role.add_member(1)
-        assert role.user_ids == set([1, 2])
+        assert role.chat_ids == set([1, 2])
 
     def test_kick_member(self, role):
-        assert role.user_ids == set()
+        assert role.chat_ids == set()
         role.add_member(1)
         role.add_member(2)
-        assert role.user_ids == set([1, 2])
+        assert role.chat_ids == set([1, 2])
         role.kick_member(1)
-        assert role.user_ids == set([2])
+        assert role.chat_ids == set([2])
         role.kick_member(1)
-        assert role.user_ids == set([2])
+        assert role.chat_ids == set([2])
         role.kick_member(2)
-        assert role.user_ids == set()
+        assert role.chat_ids == set()
 
     def test_add_remove_parent_role(self, role, parent_role):
         assert role.parent_roles == set()
-        parent_role_2 = Role(user_ids=456, name='pr2')
+        parent_role_2 = Role(chat_ids=456, name='pr2')
         role.add_parent_role(parent_role)
         assert role.parent_roles == set([parent_role])
         role.add_parent_role(parent_role_2)
@@ -160,15 +160,15 @@ class TestRole(object):
 
         assert role is not crole
         assert role.equals(crole)
-        assert role.user_ids is not crole.user_ids
-        assert role.user_ids == crole.user_ids
+        assert role.chat_ids is not crole.chat_ids
+        assert role.chat_ids == crole.chat_ids
         assert role.parent_roles is not crole.parent_roles
         parent = role.parent_roles.pop()
         cparent = crole.parent_roles.pop()
         assert parent is not cparent
         assert parent.equals(cparent)
 
-    def test_handler_simple(self, update, role, parent_role):
+    def test_handler_user(self, update, role, parent_role):
         handler = MessageHandler(role, None)
         assert not handler.check_update(update)
 
@@ -177,6 +177,21 @@ class TestRole(object):
 
         assert handler.check_update(update)
         update.message.from_user.id = 1
+        update.message.chat.id = 1
+        assert not handler.check_update(update)
+        role.add_parent_role(parent_role)
+        assert handler.check_update(update)
+
+    def test_handler_chat(self, update, role, parent_role):
+        handler = MessageHandler(role, None)
+        update.message.chat.id = 5
+        assert not handler.check_update(update)
+
+        role.add_member(5)
+        parent_role.add_member(6)
+
+        assert handler.check_update(update)
+        update.message.chat.id = 6
         assert not handler.check_update(update)
         role.add_parent_role(parent_role)
         assert handler.check_update(update)
@@ -208,8 +223,11 @@ class TestRole(object):
         handler = MessageHandler(role, None)
         role.add_member(0)
         update.message = None
-        update.channel_post = True
+        update.channel_post = Message(0, None, datetime.datetime.utcnow(), Chat(-1, 'channel'))
         assert not handler.check_update(update)
+
+        role.add_member(-1)
+        assert handler.check_update(update)
 
 
 class TestRoles(object):
@@ -224,15 +242,15 @@ class TestRoles(object):
         assert isinstance(roles._bot, Bot)
 
     def test_add_kick_admin(self, roles):
-        assert roles.ADMINS.user_ids == set()
+        assert roles.ADMINS.chat_ids == set()
         roles.add_admin(1)
-        assert roles.ADMINS.user_ids == set([1])
+        assert roles.ADMINS.chat_ids == set([1])
         roles.add_admin(2)
-        assert roles.ADMINS.user_ids == set([1, 2])
+        assert roles.ADMINS.chat_ids == set([1, 2])
         roles.kick_admin(1)
-        assert roles.ADMINS.user_ids == set([2])
+        assert roles.ADMINS.chat_ids == set([2])
         roles.kick_admin(2)
-        assert roles.ADMINS.user_ids == set()
+        assert roles.ADMINS.chat_ids == set()
 
     def test_equality(self, parent_role, roles, bot):
         roles2 = Roles(bot)
@@ -248,19 +266,19 @@ class TestRoles(object):
         assert roles == roles2
         # assert hash(roles) == hash(roles2)
 
-        roles.add_role('test_role', user_ids=123)
+        roles.add_role('test_role', chat_ids=123)
         assert roles != roles2
         # assert hash(roles) != hash(roles2)
 
-        roles2.add_role('test_role', user_ids=123)
+        roles2.add_role('test_role', chat_ids=123)
         assert roles == roles2
         # assert hash(roles) == hash(roles2)
 
-        roles.add_role('test_role_2', user_ids=456)
+        roles.add_role('test_role_2', chat_ids=456)
         assert roles != roles2
         # assert hash(roles) != hash(roles2)
 
-        roles2.add_role('test_role_2', user_ids=456)
+        roles2.add_role('test_role_2', chat_ids=456)
         assert roles == roles2
         # assert hash(roles) == hash(roles2)
 
@@ -301,18 +319,18 @@ class TestRoles(object):
         a = set([name for name in roles])
         assert a == set(['role{}'.format(k) for k in range(3)])
 
-        b = {name: role.user_ids for name, role in roles.items()}
+        b = {name: role.chat_ids for name, role in roles.items()}
         assert b == {'role{}'.format(k): set([k]) for k in range(3)}
 
         c = [name for name in roles.keys()]
         assert c == ['role{}'.format(k) for k in range(3)]
 
-        d = [r.user_ids for r in roles.values()]
+        d = [r.chat_ids for r in roles.values()]
         assert d == [set([k]) for k in range(3)]
 
     def test_deepcopy(self, roles, parent_role):
         roles.add_admin(123)
-        roles.add_role(name='test', user_ids=[1, 2], parent_role=parent_role)
+        roles.add_role(name='test', chat_ids=[1, 2], parent_role=parent_role)
         croles = deepcopy(roles)
 
         assert croles is not roles
@@ -324,7 +342,7 @@ class TestRoles(object):
     def test_add_remove_role(self, roles, parent_role):
         roles.add_role('role', parent_role=parent_role)
         role = roles['role']
-        assert role.user_ids == set()
+        assert role.chat_ids == set()
         assert role.parent_roles == set([parent_role, roles.ADMINS])
         assert role.name == 'Role(role)'
         assert roles.ADMINS in role.parent_roles
@@ -345,6 +363,7 @@ class TestRoles(object):
         handler = MessageHandler(roles['role'], None)
         assert handler.check_update(update)
         update.message.from_user.id = 1
+        update.message.chat.id = 1
         assert handler.check_update(update)
         roles.kick_admin(1)
         assert not handler.check_update(update)
@@ -411,9 +430,9 @@ class TestRoles(object):
         assert not handler.check_update(update)
 
     def test_json_encoding_decoding(self, roles, parent_role, bot):
-        roles.add_role('role_1', user_ids=[1, 2, 3])
-        roles.add_role('role_2', user_ids=[4, 5, 6], parent_role=parent_role)
-        roles.add_role('role_3', user_ids=[7, 8], parent_role=parent_role)
+        roles.add_role('role_1', chat_ids=[1, 2, 3])
+        roles.add_role('role_2', chat_ids=[4, 5, 6], parent_role=parent_role)
+        roles.add_role('role_3', chat_ids=[7, 8], parent_role=parent_role)
         roles.add_admin(9)
         roles.add_admin(10)
 
@@ -426,10 +445,10 @@ class TestRoles(object):
         assert isinstance(rroles._bot, Bot)
         for name in rroles:
             assert rroles[name] <= rroles.ADMINS
-        assert rroles.ADMINS.user_ids == set([9, 10])
-        assert rroles['role_1'].user_ids == set([1, 2, 3])
-        assert rroles['role_2'].user_ids == set([4, 5, 6])
-        assert rroles['role_3'].user_ids == set([7, 8])
+        assert rroles.ADMINS.chat_ids == set([9, 10])
+        assert rroles['role_1'].chat_ids == set([1, 2, 3])
+        assert rroles['role_2'].chat_ids == set([4, 5, 6])
+        assert rroles['role_3'].chat_ids == set([7, 8])
         for name in rroles:
             assert rroles[name] <= rroles.ADMINS
             assert rroles[name] < rroles.ADMINS
