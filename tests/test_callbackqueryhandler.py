@@ -120,7 +120,7 @@ class TestCallbackQueryHandler(object):
         handler = CallbackQueryHandler(self.callback_basic, roles=role)
         assert not handler.check_update(callback_query)
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert handler.check_update(callback_query)
 
     def test_with_passing_group_dict(self, dp, callback_query):

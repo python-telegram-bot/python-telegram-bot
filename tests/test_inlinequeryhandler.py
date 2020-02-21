@@ -125,7 +125,7 @@ class TestCallbackQueryHandler(object):
         handler = InlineQueryHandler(self.callback_basic, roles=role)
         assert not handler.check_update(inline_query)
 
-        role.user_ids = 2
+        role.chat_ids = 2
         assert handler.check_update(inline_query)
 
     def test_with_passing_group_dict(self, dp, inline_query):

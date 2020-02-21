@@ -102,7 +102,7 @@ class TestChosenInlineResultHandler(object):
         handler = ChosenInlineResultHandler(self.callback_basic, roles=role)
         assert not handler.check_update(chosen_inline_result)
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert handler.check_update(chosen_inline_result)
 
     def test_pass_user_or_chat_data(self, dp, chosen_inline_result):

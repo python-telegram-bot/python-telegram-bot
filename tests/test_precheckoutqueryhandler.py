@@ -105,7 +105,7 @@ class TestPreCheckoutQueryHandler(object):
         dp.process_update(pre_checkout_query)
         assert not self.test_flag
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert handler.check_update(pre_checkout_query)
         dp.process_update(pre_checkout_query)
         assert self.test_flag

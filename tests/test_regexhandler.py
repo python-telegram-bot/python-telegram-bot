@@ -121,7 +121,7 @@ class TestRegexHandler(object):
         handler = RegexHandler('.*est.*', self.callback_basic, roles=role)
         assert not handler.check_update(Update(0, message))
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert handler.check_update(Update(0, message))
 
     def test_with_passing_group_dict(self, dp, message):

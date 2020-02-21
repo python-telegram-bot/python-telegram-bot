@@ -107,7 +107,7 @@ class TestShippingQueryHandler(object):
         dp.process_update(shiping_query)
         assert not self.test_flag
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert handler.check_update(shiping_query)
         dp.process_update(shiping_query)
         assert self.test_flag

@@ -276,7 +276,7 @@ class TestCommandHandler(BaseTest):
         handler = self.make_default_handler(roles=role)
         assert not is_match(handler, make_command_update('/test'))
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert is_match(handler, make_command_update('/test'))
 
 
@@ -435,5 +435,5 @@ class TestPrefixHandler(BaseTest):
         text = prefix + command
         assert not self.response(dp, make_message_update(text))
 
-        role.user_ids = 1
+        role.chat_ids = 1
         assert self.response(dp, make_message_update(text))

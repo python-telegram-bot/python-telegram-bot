@@ -818,14 +818,14 @@ class TestConversationHandler(object):
         dp.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(0, user1, None, self.group, text='/start',
+        message = Message(0, user1, None, self.second_group, text='/start',
                           entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
                                                   offset=0, length=len('/start'))],
                           bot=bot)
         dp.process_update(Update(update_id=0, message=message))
         assert user1.id not in self.current_state
 
-        role.user_ids = 123
+        role.chat_ids = 123
         dp.process_update(Update(update_id=0, message=message))
         assert self.current_state[user1.id] == self.THIRSTY
 
