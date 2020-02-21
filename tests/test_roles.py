@@ -48,10 +48,16 @@ def role():
 
 class TestRole(object):
     def test_creation(self, parent_role):
-        r = Role(parent_role=parent_role)
+        r = Role(parent_roles=parent_role)
         assert r.chat_ids == set()
         assert r.name == 'Role({})'
         assert r.parent_roles == set([parent_role])
+
+        parent_role_2 = Role(name='parent_role_2')
+        r = Role(parent_roles=[parent_role, parent_role_2])
+        assert r.chat_ids == set()
+        assert r.name == 'Role({})'
+        assert r.parent_roles == set([parent_role, parent_role_2])
 
         r = Role(1)
         assert r.chat_ids == set([1])
@@ -336,7 +342,7 @@ class TestRoles(object):
 
     def test_deepcopy(self, roles, parent_role):
         roles.add_admin(123)
-        roles.add_role(name='test', chat_ids=[1, 2], parent_role=parent_role)
+        roles.add_role(name='test', chat_ids=[1, 2], parent_roles=parent_role)
         croles = deepcopy(roles)
 
         assert croles is not roles
@@ -346,7 +352,7 @@ class TestRoles(object):
         assert roles['test'].equals(croles['test'])
 
     def test_add_remove_role(self, roles, parent_role):
-        roles.add_role('role', parent_role=parent_role)
+        roles.add_role('role', parent_roles=parent_role)
         role = roles['role']
         assert role.chat_ids == set()
         assert role.parent_roles == set([parent_role, roles.ADMINS])
@@ -354,10 +360,7 @@ class TestRoles(object):
         assert roles.ADMINS in role.parent_roles
 
         with pytest.raises(ValueError, match='Role name is already taken.'):
-            roles.add_role('role', parent_role=parent_role)
-
-        role.restored_from_persistence = True
-        assert not roles.add_role('role', parent_role=parent_role)
+            roles.add_role('role', parent_roles=parent_role)
 
         roles.remove_role('role')
         assert not roles.get('role', None)
@@ -437,8 +440,8 @@ class TestRoles(object):
 
     def test_json_encoding_decoding(self, roles, parent_role, bot):
         roles.add_role('role_1', chat_ids=[1, 2, 3])
-        roles.add_role('role_2', chat_ids=[4, 5, 6], parent_role=parent_role)
-        roles.add_role('role_3', chat_ids=[7, 8], parent_role=parent_role)
+        roles.add_role('role_2', chat_ids=[4, 5, 6], parent_roles=parent_role)
+        roles.add_role('role_3', chat_ids=[7, 8], parent_roles=parent_role)
         roles.add_admin(9)
         roles.add_admin(10)
 

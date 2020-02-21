@@ -36,6 +36,7 @@ class TestCallbackContext(object):
         assert callback_context.chat_data is None
         assert callback_context.user_data is None
         assert callback_context.bot_data is cdp.bot_data
+        assert callback_context.roles is cdp.roles
         assert callback_context.bot is cdp.bot
         assert callback_context.job_queue is cdp.job_queue
         assert callback_context.update_queue is cdp.update_queue
@@ -49,6 +50,7 @@ class TestCallbackContext(object):
         assert callback_context.user_data == {}
         assert callback_context.bot_data is cdp.bot_data
         assert callback_context.bot is cdp.bot
+        assert callback_context.roles is cdp.roles
         assert callback_context.job_queue is cdp.job_queue
         assert callback_context.update_queue is cdp.update_queue
 
@@ -58,6 +60,7 @@ class TestCallbackContext(object):
         callback_context.chat_data['test'] = 'chat'
         callback_context.user_data['test'] = 'user'
 
+        assert callback_context_same_user_chat.roles is callback_context.roles
         assert callback_context_same_user_chat.bot_data is callback_context.bot_data
         assert callback_context_same_user_chat.chat_data is callback_context.chat_data
         assert callback_context_same_user_chat.user_data is callback_context.user_data
@@ -67,6 +70,7 @@ class TestCallbackContext(object):
 
         callback_context_other_user_chat = CallbackContext.from_update(update_other_user_chat, cdp)
 
+        assert callback_context_other_user_chat.roles is callback_context.roles
         assert callback_context_other_user_chat.bot_data is callback_context.bot_data
         assert callback_context_other_user_chat.chat_data is not callback_context.chat_data
         assert callback_context_other_user_chat.user_data is not callback_context.user_data
@@ -78,6 +82,7 @@ class TestCallbackContext(object):
         assert callback_context.user_data is None
         assert callback_context.bot_data is cdp.bot_data
         assert callback_context.bot is cdp.bot
+        assert callback_context.roles is cdp.roles
         assert callback_context.job_queue is cdp.job_queue
         assert callback_context.update_queue is cdp.update_queue
 
@@ -86,6 +91,7 @@ class TestCallbackContext(object):
         assert callback_context.chat_data is None
         assert callback_context.user_data is None
         assert callback_context.bot_data is cdp.bot_data
+        assert callback_context.roles is cdp.roles
         assert callback_context.bot is cdp.bot
         assert callback_context.job_queue is cdp.job_queue
         assert callback_context.update_queue is cdp.update_queue
@@ -101,6 +107,7 @@ class TestCallbackContext(object):
         assert callback_context.chat_data == {}
         assert callback_context.user_data == {}
         assert callback_context.bot_data is cdp.bot_data
+        assert callback_context.roles is cdp.roles
         assert callback_context.bot is cdp.bot
         assert callback_context.job_queue is cdp.job_queue
         assert callback_context.update_queue is cdp.update_queue

@@ -42,6 +42,8 @@ class BasePersistence(object):
             persistence class.
         store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
             persistence class.
+        store_roles (:obj:`bool`): Optional. Whether roles should be saved by this persistence
+            class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
@@ -50,12 +52,16 @@ class BasePersistence(object):
             persistence class. Default is ``True`` .
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is ``True`` .
+        store_roles (:obj:`bool`, optional): Whether roles should be saved by this persistence
+            class. Default is ``True``.
     """
 
-    def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True):
+    def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True,
+                 store_roles=True):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
+        self.store_roles = store_roles
 
     def get_user_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
@@ -84,6 +90,19 @@ class BasePersistence(object):
 
         Returns:
             :obj:`defaultdict`: The restored bot data.
+        """
+        raise NotImplementedError
+
+    def get_roles(self):
+        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        persistence object.
+
+        Warning:
+            The produced roles instance usually will have no bot assigned. Use
+            :attr:`telegram.ext.Roles.set_bot` to set it.
+
+        Returns:
+            :class:`telegram.ext.Roles`: The restored roles.
         """
         raise NotImplementedError
 
@@ -138,6 +157,15 @@ class BasePersistence(object):
 
         Args:
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
+        """
+        raise NotImplementedError
+
+    def update_roles(self, data):
+        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+        handled an update.
+
+        Args:
+            data (:class:`telegram.ext.Roles`): The :attr:`telegram.ext.dispatcher.roles` .
         """
         raise NotImplementedError
 

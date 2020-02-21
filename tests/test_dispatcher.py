@@ -25,7 +25,7 @@ import pytest
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEntity
 from telegram.ext import (MessageHandler, Filters, CommandHandler, CallbackContext,
-                          JobQueue, BasePersistence)
+                          JobQueue, BasePersistence, Roles)
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
@@ -350,10 +350,17 @@ class TestDispatcher(object):
 
         class OwnPersistence(BasePersistence):
             def __init__(self):
-                super(BasePersistence, self).__init__()
+                super(OwnPersistence, self).__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True
+                self.store_roles = True
+
+            def get_roles(self):
+                return Roles(None)
+
+            def update_roles(self, data):
+                raise Exception
 
             def get_bot_data(self):
                 return dict()
@@ -393,7 +400,7 @@ class TestDispatcher(object):
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
-        assert increment == ["error", "error", "error"]
+        assert increment == ["error", "error", "error", "error"]
 
     def test_flow_stop_in_error_handler(self, dp, bot):
         passed = []

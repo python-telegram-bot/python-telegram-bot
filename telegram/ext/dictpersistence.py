@@ -28,6 +28,7 @@ except ImportError:
     import json
 from collections import defaultdict
 from telegram.ext import BasePersistence
+from .roles import Roles
 
 
 class DictPersistence(BasePersistence):
@@ -40,6 +41,8 @@ class DictPersistence(BasePersistence):
             persistence class.
         store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
             persistence class.
+        store_roles (:obj:`bool`): Optional. Whether roles should be saved by this persistence
+            class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
@@ -48,6 +51,8 @@ class DictPersistence(BasePersistence):
             persistence class. Default is ``True``.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is ``True`` .
+        store_roles (:obj:`bool`, optional): Whether roles should be saved by this persistence
+            class. Default is ``True``.
         user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
@@ -56,6 +61,8 @@ class DictPersistence(BasePersistence):
             bot_data on creating this persistence. Default is ``""``.
         conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
+        roles_json (:obj:`str`, optional): Json string that will be used to reconstruct
+            roles on creating this persistence. Default is ``""``.
     """
 
     def __init__(self,
@@ -65,18 +72,23 @@ class DictPersistence(BasePersistence):
                  user_data_json='',
                  chat_data_json='',
                  bot_data_json='',
-                 conversations_json=''):
+                 conversations_json='',
+                 store_roles=True,
+                 roles_json=''):
         super(DictPersistence, self).__init__(store_user_data=store_user_data,
                                               store_chat_data=store_chat_data,
-                                              store_bot_data=store_bot_data)
+                                              store_bot_data=store_bot_data,
+                                              store_roles=store_roles)
         self._user_data = None
         self._chat_data = None
         self._bot_data = None
         self._conversations = None
+        self._roles = None
         self._user_data_json = None
         self._chat_data_json = None
         self._bot_data_json = None
         self._conversations_json = None
+        self._roles_json = None
         if user_data_json:
             try:
                 self._user_data = decode_user_chat_data_from_json(user_data_json)
@@ -104,6 +116,13 @@ class DictPersistence(BasePersistence):
                 self._conversations_json = conversations_json
             except (ValueError, AttributeError):
                 raise TypeError("Unable to deserialize conversations_json. Not valid JSON")
+
+        if roles_json:
+            try:
+                self._roles = Roles.decode_from_json(roles_json, None)
+                self._roles_json = roles_json
+            except (ValueError, AttributeError, TypeError):
+                raise TypeError("Unable to deserialize roles_json. Not valid JSON")
 
     @property
     def user_data(self):
@@ -143,6 +162,20 @@ class DictPersistence(BasePersistence):
             return self._bot_data_json
         else:
             return json.dumps(self.bot_data)
+
+    @property
+    def roles(self):
+        """:class:`telegram.ext.Roles`: The roles. Doesn't have a bot assigned. Use
+        :attr:`telegram.ext.Roles.set_bot` to set it."""
+        return self._roles
+
+    @property
+    def roles_json(self):
+        """:obj:`str`: The roles serialized as a JSON-string."""
+        if self._roles_json:
+            return self._roles_json
+        else:
+            return self._roles.encode_to_json()
 
     @property
     def conversations(self):
@@ -192,6 +225,25 @@ class DictPersistence(BasePersistence):
         else:
             self._bot_data = {}
         return deepcopy(self.bot_data)
+
+    def get_roles(self):
+        """Returns the roles created from the ``roles_json`` or an empty
+        :class:`telegram.ext.Roles` instance.
+
+        Warning:
+            The produced roles instance will have no bot assigned. Use
+            :attr:`telegram.ext.Roles.set_bot` to set it.
+
+        Returns:
+            :class:`telegram.ext.Roles`: The restored roles.
+        """
+        if self.roles:
+            pass
+        elif self._roles:
+            self._roles = Roles.decode_from_json(self._roles_json, None)
+        else:
+            self._roles = Roles(None)
+        return deepcopy(self.roles)
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -253,3 +305,14 @@ class DictPersistence(BasePersistence):
             return
         self._bot_data = data.copy()
         self._bot_data_json = None
+
+    def update_roles(self, data):
+        """Will update the roles (if changed).
+
+        Args:
+            data (:class:`telegram.ext.Roles`): The :attr:`telegram.ext.dispatcher.roles` .
+        """
+        if self._roles == data:
+            return
+        self._roles = deepcopy(data)
+        self._roles_json = None

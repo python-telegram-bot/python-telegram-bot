@@ -82,6 +82,7 @@ class CallbackContext(object):
             raise ValueError('CallbackContext should not be used with a non context aware '
                              'dispatcher!')
         self._dispatcher = dispatcher
+        self._roles = dispatcher.roles
         self._bot_data = dispatcher.bot_data
         self._chat_data = None
         self._user_data = None
@@ -94,6 +95,14 @@ class CallbackContext(object):
     def dispatcher(self):
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
+
+    @property
+    def roles(self):
+        return self._roles
+
+    @roles.setter
+    def roles(self, value):
+        raise AttributeError("You can not assign a new value to roles.")
 
     @property
     def bot_data(self):

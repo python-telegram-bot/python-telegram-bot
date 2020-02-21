@@ -29,12 +29,13 @@ import logging
 import os
 import pickle
 from collections import defaultdict
+from copy import deepcopy
 
 import pytest
 
 from telegram import Update, Message, User, Chat, MessageEntity
 from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageHandler, Filters, \
-    PicklePersistence, CommandHandler, DictPersistence, TypeHandler
+    PicklePersistence, CommandHandler, DictPersistence, TypeHandler, Roles, Role
 
 
 @pytest.fixture(autouse=True)
@@ -75,15 +76,26 @@ def conversations():
             'name3': {(123, 321): 1, (890, 890): 2}}
 
 
+@pytest.fixture(scope='function')
+def roles():
+    roles = Roles(None)
+    roles.add_admin(12345)
+    roles.add_role(name='parent_role', chat_ids=[456])
+    roles.add_role(name='role', chat_ids=[123], parent_roles=roles['parent_role'])
+    return roles
+
+
 @pytest.fixture(scope="function")
 def updater(bot, base_persistence):
     base_persistence.store_chat_data = False
     base_persistence.store_bot_data = False
     base_persistence.store_user_data = False
+    base_persistence.store_roles = False
     u = Updater(bot=bot, persistence=base_persistence)
     base_persistence.store_bot_data = True
     base_persistence.store_chat_data = True
     base_persistence.store_user_data = True
+    base_persistence.store_roles = True
     return u
 
 
@@ -123,7 +135,7 @@ class TestBasePersistence(object):
             dp.add_handler(ConversationHandler([], {}, [], persistent=True, name="My Handler"))
 
     def test_dispatcher_integration_init(self, bot, base_persistence, chat_data, user_data,
-                                         bot_data):
+                                         bot_data, roles):
         def get_user_data():
             return "test"
 
@@ -133,9 +145,13 @@ class TestBasePersistence(object):
         def get_bot_data():
             return "test"
 
+        def get_roles():
+            return "test"
+
         base_persistence.get_user_data = get_user_data
         base_persistence.get_chat_data = get_chat_data
         base_persistence.get_bot_data = get_bot_data
+        base_persistence.get_roles = get_roles
 
         with pytest.raises(ValueError, match="user_data must be of type defaultdict"):
             u = Updater(bot=bot, persistence=base_persistence)
@@ -158,6 +174,13 @@ class TestBasePersistence(object):
             return bot_data
 
         base_persistence.get_bot_data = get_bot_data
+        with pytest.raises(ValueError, match="roles must be of type Roles"):
+            u = Updater(bot=bot, persistence=base_persistence)
+
+        def get_roles():
+            return roles
+
+        base_persistence.get_roles = get_roles
         u = Updater(bot=bot, persistence=base_persistence)
         assert u.dispatcher.bot_data == bot_data
         assert u.dispatcher.chat_data == chat_data
@@ -166,7 +189,7 @@ class TestBasePersistence(object):
         assert u.dispatcher.chat_data[442233]['test5'] == 'test6'
 
     def test_dispatcher_integration_handlers(self, caplog, bot, base_persistence,
-                                             chat_data, user_data, bot_data):
+                                             chat_data, user_data, bot_data, roles):
         def get_user_data():
             return user_data
 
@@ -176,9 +199,13 @@ class TestBasePersistence(object):
         def get_bot_data():
             return bot_data
 
+        def get_roles():
+            return roles
+
         base_persistence.get_user_data = get_user_data
         base_persistence.get_chat_data = get_chat_data
         base_persistence.get_bot_data = get_bot_data
+        base_persistence.get_roles = get_roles
         # base_persistence.update_chat_data = lambda x: x
         # base_persistence.update_user_data = lambda x: x
         updater = Updater(bot=bot, persistence=base_persistence, use_context=True)
@@ -189,12 +216,16 @@ class TestBasePersistence(object):
                 pytest.fail('user_data corrupt')
             if not context.bot_data == bot_data:
                 pytest.fail('bot_data corrupt')
+            if not context.roles == roles:
+                pytest.fail('roles corrupt')
 
         def callback_known_chat(update, context):
             if not context.chat_data['test3'] == 'test4':
                 pytest.fail('chat_data corrupt')
             if not context.bot_data == bot_data:
                 pytest.fail('bot_data corrupt')
+            if not context.roles == roles:
+                pytest.fail('roles corrupt')
 
         def callback_unknown_user_or_chat(update, context):
             if not context.user_data == {}:
@@ -203,9 +234,12 @@ class TestBasePersistence(object):
                 pytest.fail('chat_data corrupt')
             if not context.bot_data == bot_data:
                 pytest.fail('bot_data corrupt')
+            if not context.roles == roles:
+                pytest.fail('roles corrupt')
             context.user_data[1] = 'test7'
             context.chat_data[2] = 'test8'
             context.bot_data['test0'] = 'test0'
+            context.roles.add_role(name='test0', chat_ids=[1, 2, 3])
 
         known_user = MessageHandler(Filters.user(user_id=12345), callback_known_user,
                                     pass_chat_data=True, pass_user_data=True)
@@ -249,14 +283,21 @@ class TestBasePersistence(object):
             if 54321 not in data:
                 pytest.fail()
 
+        def save_roles(data):
+            if 'test0' not in data:
+                pytest.fail()
+
         base_persistence.update_chat_data = save_chat_data
         base_persistence.update_user_data = save_user_data
         base_persistence.update_bot_data = save_bot_data
+        base_persistence.update_roles = save_roles
         dp.process_update(u)
 
         assert dp.user_data[54321][1] == 'test7'
         assert dp.chat_data[-987654][2] == 'test8'
         assert dp.bot_data['test0'] == 'test0'
+        assert dp.roles['test0'].equals(Role(name='test0', chat_ids=[1, 2, 3],
+                                             parent_roles=dp.roles.ADMINS))
 
     def test_persistence_dispatcher_arbitrary_update_types(self, dp, base_persistence, caplog):
         # Updates used with TypeHandler doesn't necessarily have the proper attributes for
@@ -280,6 +321,18 @@ def pickle_persistence():
                              store_user_data=True,
                              store_chat_data=True,
                              store_bot_data=True,
+                             store_roles=True,
+                             single_file=False,
+                             on_flush=False)
+
+
+@pytest.fixture(scope='function')
+def pickle_persistence_only_roles():
+    return PicklePersistence(filename='pickletest',
+                             store_user_data=False,
+                             store_chat_data=False,
+                             store_bot_data=False,
+                             store_roles=True,
                              single_file=False,
                              on_flush=False)
 
@@ -290,6 +343,7 @@ def pickle_persistence_only_bot():
                              store_user_data=False,
                              store_chat_data=False,
                              store_bot_data=True,
+                             store_roles=False,
                              single_file=False,
                              on_flush=False)
 
@@ -300,6 +354,7 @@ def pickle_persistence_only_chat():
                              store_user_data=False,
                              store_chat_data=True,
                              store_bot_data=False,
+                             store_roles=False,
                              single_file=False,
                              on_flush=False)
 
@@ -310,6 +365,7 @@ def pickle_persistence_only_user():
                              store_user_data=True,
                              store_chat_data=False,
                              store_bot_data=False,
+                             store_roles=False,
                              single_file=False,
                              on_flush=False)
 
@@ -317,22 +373,27 @@ def pickle_persistence_only_user():
 @pytest.fixture(scope='function')
 def bad_pickle_files():
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_bot_data',
-                 'pickletest_conversations', 'pickletest']:
+                 'pickletest_conversations', 'pickletest_roles', 'pickletest']:
         with open(name, 'w') as f:
             f.write('(())')
     yield True
+    for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_bot_data',
+                 'pickletest_conversations', 'pickletest_roles', 'pickletest']:
+        os.remove(name)
 
 
 @pytest.fixture(scope='function')
-def good_pickle_files(user_data, chat_data, bot_data, conversations):
+def good_pickle_files(user_data, chat_data, bot_data, conversations, roles):
     data = {'user_data': user_data, 'chat_data': chat_data,
-            'bot_data': bot_data, 'conversations': conversations}
+            'bot_data': bot_data, 'conversations': conversations, 'roles': roles.encode_to_json()}
     with open('pickletest_user_data', 'wb') as f:
         pickle.dump(user_data, f)
     with open('pickletest_chat_data', 'wb') as f:
         pickle.dump(chat_data, f)
     with open('pickletest_bot_data', 'wb') as f:
         pickle.dump(bot_data, f)
+    with open('pickletest_roles', 'wb') as f:
+        pickle.dump(roles.encode_to_json(), f)
     with open('pickletest_conversations', 'wb') as f:
         pickle.dump(conversations, f)
     with open('pickletest', 'wb') as f:
@@ -370,14 +431,22 @@ class TestPickelPersistence(object):
         assert pickle_persistence.get_chat_data() == defaultdict(dict)
         assert pickle_persistence.get_bot_data() == {}
         assert pickle_persistence.get_bot_data() == {}
+        assert pickle_persistence.get_roles() == Roles(None)
+        assert pickle_persistence.get_roles() == Roles(None)
         assert pickle_persistence.get_conversations('noname') == {}
         assert pickle_persistence.get_conversations('noname') == {}
 
     def test_no_files_present_single_file(self, pickle_persistence):
         pickle_persistence.single_file = True
         assert pickle_persistence.get_user_data() == defaultdict(dict)
+        assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_chat_data() == defaultdict(dict)
-        assert pickle_persistence.get_chat_data() == {}
+        assert pickle_persistence.get_chat_data() == defaultdict(dict)
+        assert pickle_persistence.get_bot_data() == {}
+        assert pickle_persistence.get_bot_data() == {}
+        assert pickle_persistence.get_roles() == Roles(None)
+        assert pickle_persistence.get_roles() == Roles(None)
+        assert pickle_persistence.get_conversations('noname') == {}
         assert pickle_persistence.get_conversations('noname') == {}
 
     def test_with_bad_multi_file(self, pickle_persistence, bad_pickle_files):
@@ -387,6 +456,8 @@ class TestPickelPersistence(object):
             pickle_persistence.get_chat_data()
         with pytest.raises(TypeError, match='pickletest_bot_data'):
             pickle_persistence.get_bot_data()
+        with pytest.raises(TypeError, match='pickletest_roles'):
+            pickle_persistence.get_roles()
         with pytest.raises(TypeError, match='pickletest_conversations'):
             pickle_persistence.get_conversations('name')
 
@@ -398,6 +469,8 @@ class TestPickelPersistence(object):
             pickle_persistence.get_chat_data()
         with pytest.raises(TypeError, match='pickletest'):
             pickle_persistence.get_bot_data()
+        with pytest.raises(TypeError, match='pickletest'):
+            pickle_persistence.get_roles()
         with pytest.raises(TypeError, match='pickletest'):
             pickle_persistence.get_conversations('name')
 
@@ -419,6 +492,15 @@ class TestPickelPersistence(object):
         assert bot_data['test1'] == 'test2'
         assert bot_data['test3']['test4'] == 'test5'
         assert 'test0' not in bot_data
+
+        roles = pickle_persistence.get_roles()
+        assert isinstance(roles, Roles)
+        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345))
+        assert roles['parent_role'].equals(Role(name='parent_role', chat_ids=456,
+                                                parent_roles=roles.ADMINS))
+        assert roles['role'].equals(Role(name='role', chat_ids=123,
+                                         parent_roles=[roles['parent_role'], roles.ADMINS]))
+        assert not roles.get('test', None)
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -452,6 +534,15 @@ class TestPickelPersistence(object):
         assert bot_data['test1'] == 'test2'
         assert bot_data['test3']['test4'] == 'test5'
         assert 'test0' not in bot_data
+
+        roles = pickle_persistence.get_roles()
+        assert isinstance(roles, Roles)
+        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345))
+        assert roles['parent_role'].equals(Role(name='parent_role', chat_ids=456,
+                                                parent_roles=roles.ADMINS))
+        assert roles['role'].equals(Role(name='role', chat_ids=123,
+                                         parent_roles=[roles['parent_role'], roles.ADMINS]))
+        assert not roles.get('test', None)
 
         conversation1 = pickle_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
@@ -542,6 +633,16 @@ class TestPickelPersistence(object):
             bot_data_test = pickle.load(f)
         assert bot_data_test == bot_data
 
+        roles = pickle_persistence.get_roles()
+        roles.add_role(name='new_role', chat_ids=10)
+        assert not pickle_persistence.roles == roles
+        pickle_persistence.update_roles(roles)
+        assert pickle_persistence.roles == roles
+        with open('pickletest_roles', 'rb') as f:
+            roles_test = pickle.load(f)
+            roles_test = Roles.decode_from_json(roles_test, None)
+        assert roles_test == roles
+
         conversation1 = pickle_persistence.get_conversations('name1')
         conversation1[(123, 123)] = 5
         assert not pickle_persistence.conversations['name1'] == conversation1
@@ -580,6 +681,16 @@ class TestPickelPersistence(object):
         with open('pickletest', 'rb') as f:
             bot_data_test = pickle.load(f)['bot_data']
         assert bot_data_test == bot_data
+
+        roles = pickle_persistence.get_roles()
+        roles.add_role(name='new_role', chat_ids=10)
+        assert not pickle_persistence.roles == roles
+        pickle_persistence.update_roles(roles)
+        assert pickle_persistence.roles == roles
+        with open('pickletest', 'rb') as f:
+            roles_test = pickle.load(f)['roles']
+            roles_test = Roles.decode_from_json(roles_test, None)
+        assert roles_test == roles
 
         conversation1 = pickle_persistence.get_conversations('name1')
         conversation1[(123, 123)] = 5
@@ -628,6 +739,18 @@ class TestPickelPersistence(object):
             bot_data_test = pickle.load(f)
         assert not bot_data_test == bot_data
 
+        roles = pickle_persistence.get_roles()
+        roles.add_role(name='new_role', chat_ids=10)
+        assert not pickle_persistence.roles == roles
+
+        pickle_persistence.update_roles(roles)
+        assert pickle_persistence.roles == roles
+
+        with open('pickletest_roles', 'rb') as f:
+            roles_test = pickle.load(f)
+            roles_test = Roles.decode_from_json(roles_test, None)
+        assert not roles_test == bot_data
+
         conversation1 = pickle_persistence.get_conversations('name1')
         conversation1[(123, 123)] = 5
         assert not pickle_persistence.conversations['name1'] == conversation1
@@ -651,6 +774,11 @@ class TestPickelPersistence(object):
         with open('pickletest_bot_data', 'rb') as f:
             bot_data_test = pickle.load(f)
         assert bot_data_test == bot_data
+
+        with open('pickletest_roles', 'rb') as f:
+            roles_test = pickle.load(f)
+            roles_test = Roles.decode_from_json(roles_test, None)
+        assert roles_test == roles
 
         with open('pickletest_conversations', 'rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f))
@@ -690,6 +818,18 @@ class TestPickelPersistence(object):
             bot_data_test = pickle.load(f)['bot_data']
         assert not bot_data_test == bot_data
 
+        roles = pickle_persistence.get_roles()
+        roles.add_role(name='new_role', chat_ids=10)
+        assert not pickle_persistence.roles == roles
+
+        pickle_persistence.update_roles(roles)
+        assert pickle_persistence.roles == roles
+
+        with open('pickletest', 'rb') as f:
+            roles_test = pickle.load(f)['roles']
+            roles_test = Roles.decode_from_json(roles_test, None)
+        assert not roles_test == bot_data
+
         conversation1 = pickle_persistence.get_conversations('name1')
         conversation1[(123, 123)] = 5
         assert not pickle_persistence.conversations['name1'] == conversation1
@@ -713,10 +853,16 @@ class TestPickelPersistence(object):
         assert bot_data_test == bot_data
 
         with open('pickletest', 'rb') as f:
+            roles_test = pickle.load(f)['roles']
+            roles_test = Roles.decode_from_json(roles_test, None)
+        assert roles_test == roles
+
+        with open('pickletest', 'rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f)['conversations'])
         assert conversations_test['name1'] == conversation1
 
-    def test_with_handler(self, bot, update, bot_data, pickle_persistence, good_pickle_files):
+    def test_with_handler(self, bot, update, bot_data, roles, pickle_persistence,
+                          good_pickle_files):
         u = Updater(bot=bot, persistence=pickle_persistence, use_context=True)
         dp = u.dispatcher
 
@@ -727,9 +873,12 @@ class TestPickelPersistence(object):
                 pytest.fail()
             if not context.bot_data == bot_data:
                 pytest.fail()
+            if not context.roles == roles:
+                pytest.fail()
             context.user_data['test1'] = 'test2'
             context.chat_data['test3'] = 'test4'
             context.bot_data['test1'] = 'test0'
+            context.roles.add_role(name='test2', chat_ids=[4, 5])
 
         def second(update, context):
             if not context.user_data['test1'] == 'test2':
@@ -737,6 +886,8 @@ class TestPickelPersistence(object):
             if not context.chat_data['test3'] == 'test4':
                 pytest.fail()
             if not context.bot_data['test1'] == 'test0':
+                pytest.fail()
+            if not context.roles['test2'].user_ids == set([4, 5]):
                 pytest.fail()
 
         h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
@@ -750,6 +901,7 @@ class TestPickelPersistence(object):
                                                  store_user_data=True,
                                                  store_chat_data=True,
                                                  store_bot_data=True,
+                                                 store_roles=True,
                                                  single_file=False,
                                                  on_flush=False)
         u = Updater(bot=bot, persistence=pickle_persistence_2)
@@ -763,7 +915,8 @@ class TestPickelPersistence(object):
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
-        dp.bot_data['test'] = 'Working3!'
+        dp.bot_data['my_test3'] = 'Working3!'
+        dp.roles.add_role(name='Working4!', chat_ids=[4, 5])
         u.signal_handler(signal.SIGINT, None)
         del (dp)
         del (u)
@@ -771,19 +924,48 @@ class TestPickelPersistence(object):
         pickle_persistence_2 = PicklePersistence(filename='pickletest',
                                                  store_user_data=True,
                                                  store_chat_data=True,
+                                                 store_bot_data=True,
+                                                 store_roles=True,
                                                  single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
-        assert pickle_persistence_2.get_bot_data()['test'] == 'Working3!'
+        assert pickle_persistence_2.get_bot_data()['my_test3'] == 'Working3!'
+        assert pickle_persistence_2.get_roles()['Working4!'].chat_ids == set([4, 5])
+
+    def test_flush_on_stop_only_roles(self, bot, update, pickle_persistence_only_roles):
+        u = Updater(bot=bot, persistence=pickle_persistence_only_roles)
+        dp = u.dispatcher
+        u.running = True
+        dp.user_data[4242424242]['my_test'] = 'Working!'
+        dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
+        dp.bot_data['test'] = 'Working3!'
+        dp.roles.add_role(name='Working5!', chat_ids=[4, 5])
+        u.signal_handler(signal.SIGINT, None)
+        del (dp)
+        del (u)
+        del (pickle_persistence_only_roles)
+        pickle_persistence_2 = PicklePersistence(filename='pickletest',
+                                                 store_user_data=False,
+                                                 store_chat_data=False,
+                                                 store_bot_data=False,
+                                                 store_roles=True,
+                                                 single_file=False,
+                                                 on_flush=False)
+        assert pickle_persistence_2.get_user_data() == {}
+        assert pickle_persistence_2.get_chat_data() == {}
+        assert pickle_persistence_2.get_bot_data() == {}
+        assert pickle_persistence_2.get_roles()['Working5!'].chat_ids == set([4, 5])
 
     def test_flush_on_stop_only_bot(self, bot, update, pickle_persistence_only_bot):
+        os.remove('pickletest_roles')
         u = Updater(bot=bot, persistence=pickle_persistence_only_bot)
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
         dp.bot_data['my_test3'] = 'Working3!'
+        dp.roles.add_role(name='Working4!', chat_ids=[4, 5])
         u.signal_handler(signal.SIGINT, None)
         del (dp)
         del (u)
@@ -792,11 +974,13 @@ class TestPickelPersistence(object):
                                                  store_user_data=False,
                                                  store_chat_data=False,
                                                  store_bot_data=True,
+                                                 store_roles=False,
                                                  single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data() == {}
         assert pickle_persistence_2.get_chat_data() == {}
         assert pickle_persistence_2.get_bot_data()['my_test3'] == 'Working3!'
+        assert pickle_persistence_2.get_roles() == Roles(None)
 
     def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
         u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
@@ -804,6 +988,8 @@ class TestPickelPersistence(object):
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
+        dp.bot_data['my_test3'] = 'Working3!'
+        dp.roles.add_role(name='Working4!', chat_ids=[4, 5])
         u.signal_handler(signal.SIGINT, None)
         del (dp)
         del (u)
@@ -812,11 +998,13 @@ class TestPickelPersistence(object):
                                                  store_user_data=False,
                                                  store_chat_data=True,
                                                  store_bot_data=False,
+                                                 store_roles=False,
                                                  single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data() == {}
         assert pickle_persistence_2.get_chat_data()[-4242424242]['my_test2'] == 'Working2!'
         assert pickle_persistence_2.get_bot_data() == {}
+        assert pickle_persistence_2.get_roles() == Roles(None)
 
     def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
         u = Updater(bot=bot, persistence=pickle_persistence_only_user)
@@ -824,6 +1012,8 @@ class TestPickelPersistence(object):
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
         dp.chat_data[-4242424242]['my_test2'] = 'Working2!'
+        dp.bot_data['my_test3'] = 'Working3!'
+        dp.roles.add_role(name='Working4!', chat_ids=[4, 5])
         u.signal_handler(signal.SIGINT, None)
         del (dp)
         del (u)
@@ -832,11 +1022,13 @@ class TestPickelPersistence(object):
                                                  store_user_data=True,
                                                  store_chat_data=False,
                                                  store_bot_data=False,
+                                                 store_roles=False,
                                                  single_file=False,
                                                  on_flush=False)
         assert pickle_persistence_2.get_user_data()[4242424242]['my_test'] == 'Working!'
         assert pickle_persistence_2.get_chat_data()[-4242424242] == {}
         assert pickle_persistence_2.get_bot_data() == {}
+        assert pickle_persistence_2.get_roles() == Roles(None)
 
     def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
         dp.persistence = pickle_persistence
@@ -943,18 +1135,25 @@ def conversations_json(conversations):
               {"[123, 321]": 1, "[890, 890]": 2}}"""
 
 
+@pytest.fixture(scope='function')
+def roles_json(roles):
+    return roles.encode_to_json()
+
+
 class TestDictPersistence(object):
     def test_no_json_given(self):
         dict_persistence = DictPersistence()
         assert dict_persistence.get_user_data() == defaultdict(dict)
         assert dict_persistence.get_chat_data() == defaultdict(dict)
         assert dict_persistence.get_bot_data() == {}
+        assert dict_persistence.get_roles() == Roles(None)
         assert dict_persistence.get_conversations('noname') == {}
 
     def test_bad_json_string_given(self):
         bad_user_data = 'thisisnojson99900()))('
         bad_chat_data = 'thisisnojson99900()))('
         bad_bot_data = 'thisisnojson99900()))('
+        bad_roles = 'thisisnojson99900()))('
         bad_conversations = 'thisisnojson99900()))('
         with pytest.raises(TypeError, match='user_data'):
             DictPersistence(user_data_json=bad_user_data)
@@ -962,6 +1161,8 @@ class TestDictPersistence(object):
             DictPersistence(chat_data_json=bad_chat_data)
         with pytest.raises(TypeError, match='bot_data'):
             DictPersistence(bot_data_json=bad_bot_data)
+        with pytest.raises(TypeError, match='roles'):
+            DictPersistence(roles_json=bad_roles)
         with pytest.raises(TypeError, match='conversations'):
             DictPersistence(conversations_json=bad_conversations)
 
@@ -969,6 +1170,7 @@ class TestDictPersistence(object):
         bad_user_data = '["this", "is", "json"]'
         bad_chat_data = '["this", "is", "json"]'
         bad_bot_data = '["this", "is", "json"]'
+        bad_roles = '["this", "is", "json"]'
         bad_conversations = '["this", "is", "json"]'
         with pytest.raises(TypeError, match='user_data'):
             DictPersistence(user_data_json=bad_user_data)
@@ -976,14 +1178,17 @@ class TestDictPersistence(object):
             DictPersistence(chat_data_json=bad_chat_data)
         with pytest.raises(TypeError, match='bot_data'):
             DictPersistence(bot_data_json=bad_bot_data)
+        with pytest.raises(TypeError, match='roles'):
+            DictPersistence(roles_json=bad_roles)
         with pytest.raises(TypeError, match='conversations'):
             DictPersistence(conversations_json=bad_conversations)
 
-    def test_good_json_input(self, user_data_json, chat_data_json, bot_data_json,
+    def test_good_json_input(self, user_data_json, chat_data_json, bot_data_json, roles_json,
                              conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
                                            bot_data_json=bot_data_json,
+                                           roles_json=roles_json,
                                            conversations_json=conversations_json)
         user_data = dict_persistence.get_user_data()
         assert isinstance(user_data, defaultdict)
@@ -1003,6 +1208,15 @@ class TestDictPersistence(object):
         assert bot_data['test3']['test4'] == 'test5'
         assert 'test6' not in bot_data
 
+        roles = dict_persistence.get_roles()
+        assert isinstance(roles, Roles)
+        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345))
+        assert roles['parent_role'].equals(Role(name='parent_role', chat_ids=456,
+                                                parent_roles=roles.ADMINS))
+        assert roles['role'].equals(Role(name='role', chat_ids=123,
+                                         parent_roles=[roles['parent_role'], roles.ADMINS]))
+        assert not roles.get('test', None)
+
         conversation1 = dict_persistence.get_conversations('name1')
         assert isinstance(conversation1, dict)
         assert conversation1[(123, 123)] == 3
@@ -1017,35 +1231,41 @@ class TestDictPersistence(object):
             conversation2[(123, 123)]
 
     def test_dict_outputs(self, user_data, user_data_json, chat_data, chat_data_json,
-                          bot_data, bot_data_json,
+                          bot_data, bot_data_json, roles, roles_json,
                           conversations, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
                                            bot_data_json=bot_data_json,
+                                           roles_json=roles_json,
                                            conversations_json=conversations_json)
         assert dict_persistence.user_data == user_data
         assert dict_persistence.chat_data == chat_data
         assert dict_persistence.bot_data == bot_data
+        assert dict_persistence.roles == roles
         assert dict_persistence.conversations == conversations
 
     @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
-    def test_json_outputs(self, user_data_json, chat_data_json, bot_data_json, conversations_json):
+    def test_json_outputs(self, user_data_json, chat_data_json, bot_data_json, roles_json,
+                          conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
                                            bot_data_json=bot_data_json,
+                                           roles_json=roles_json,
                                            conversations_json=conversations_json)
         assert dict_persistence.user_data_json == user_data_json
         assert dict_persistence.chat_data_json == chat_data_json
         assert dict_persistence.bot_data_json == bot_data_json
+        assert dict_persistence.roles_json == roles_json
         assert dict_persistence.conversations_json == conversations_json
 
     @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
     def test_json_changes(self, user_data, user_data_json, chat_data, chat_data_json,
-                          bot_data, bot_data_json,
+                          bot_data, bot_data_json, roles, roles_json,
                           conversations, conversations_json):
         dict_persistence = DictPersistence(user_data_json=user_data_json,
                                            chat_data_json=chat_data_json,
                                            bot_data_json=bot_data_json,
+                                           roles_json=roles_json,
                                            conversations_json=conversations_json)
         user_data_two = user_data.copy()
         user_data_two.update({4: {5: 6}})
@@ -1068,6 +1288,14 @@ class TestDictPersistence(object):
         assert dict_persistence.bot_data == bot_data_two
         assert dict_persistence.bot_data_json != bot_data_json
         assert dict_persistence.bot_data_json == json.dumps(bot_data_two)
+
+        roles_two = deepcopy(roles)
+        roles_two.add_role(name='role_two', chat_ids=[7, 8])
+        roles.add_role(name='role_two', chat_ids=[7, 8])
+        dict_persistence.update_roles(roles)
+        assert dict_persistence.roles == roles_two
+        assert dict_persistence.roles_json != roles_json
+        assert Roles.decode_from_json(dict_persistence.roles_json, None) == roles
 
         conversations_two = conversations.copy()
         conversations_two.update({'name4': {(1, 2): 3}})
@@ -1092,6 +1320,7 @@ class TestDictPersistence(object):
             context.user_data['test1'] = 'test2'
             context.chat_data[3] = 'test4'
             context.bot_data['test1'] = 'test2'
+            context.roles.add_role(name='test2', chat_ids=[4, 5])
 
         def second(update, context):
             if not context.user_data['test1'] == 'test2':
@@ -1099,6 +1328,8 @@ class TestDictPersistence(object):
             if not context.chat_data[3] == 'test4':
                 pytest.fail()
             if not context.bot_data['test1'] == 'test2':
+                pytest.fail()
+            if not context.roles['test2'].user_ids == set([4, 5]):
                 pytest.fail()
 
         h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)

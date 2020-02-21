@@ -37,6 +37,7 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.ext import BasePersistence
+from .roles import Roles
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 DEFAULT_GROUP = 0
@@ -80,6 +81,7 @@ class Dispatcher(object):
         user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
         chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
+        roles (:class:`telegram.ext.Roles`): An object you can use to restrict access to handlers.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts
 
@@ -124,6 +126,7 @@ class Dispatcher(object):
         self.user_data = defaultdict(dict)
         self.chat_data = defaultdict(dict)
         self.bot_data = {}
+        self.roles = Roles(self.bot)
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence should be based on telegram.ext.BasePersistence")
@@ -140,6 +143,11 @@ class Dispatcher(object):
                 self.bot_data = self.persistence.get_bot_data()
                 if not isinstance(self.bot_data, dict):
                     raise ValueError("bot_data must be of type dict")
+            if self.persistence.store_roles:
+                self.roles = self.persistence.get_roles()
+                if not isinstance(self.roles, Roles):
+                    raise ValueError("roles must be of type Roles")
+                self.roles.set_bot(self.bot_data)
         else:
             self.persistence = None
 
@@ -332,6 +340,17 @@ class Dispatcher(object):
 
             """
             if self.persistence and isinstance(update, Update):
+                if self.persistence.store_roles:
+                    try:
+                        self.persistence.update_roles(self.roles)
+                    except Exception as e:
+                        try:
+                            self.dispatch_error(update, e)
+                        except Exception:
+                            message = 'Saving roles raised an error and an ' \
+                                      'uncaught error was raised while handling ' \
+                                      'the error with an error_handler'
+                            self.logger.exception(message)
                 if self.persistence.store_bot_data:
                     try:
                         self.persistence.update_bot_data(self.bot_data)
@@ -472,9 +491,12 @@ class Dispatcher(object):
                 self.groups.remove(group)
 
     def update_persistence(self):
-        """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
+        """Update :attr:`user_data`, :attr:`chat_data`, :attr:`bot_data` and :attr:`roles` in
+        :attr:`persistence`.
         """
         if self.persistence:
+            if self.persistence.store_roles:
+                self.persistence.update_roles(self.roles)
             if self.persistence.store_bot_data:
                 self.persistence.update_bot_data(self.bot_data)
             if self.persistence.store_chat_data:

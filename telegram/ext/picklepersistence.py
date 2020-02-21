@@ -22,6 +22,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 from telegram.ext import BasePersistence
+from .roles import Roles
 
 
 class PicklePersistence(BasePersistence):
@@ -36,10 +37,12 @@ class PicklePersistence(BasePersistence):
             persistence class.
         store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
             persistence class.
-        single_file (:obj:`bool`): Optional. When ``False`` will store 3 sperate files of
-            `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
-            ``True``.
-        on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
+        store_roles (:obj:`bool`): Optional. Whether roles should be saved by this persistence
+            class.
+        single_file (:obj:`bool`): Optional. When ``False`` will store 5 sperate files of
+            `filename_bot_data`, `filename_user_data`, `filename_chat_data`,
+            `filename_conversations` and `filename_roles`. Default is ``True``.
+        on_flush (:obj:`bool`): Optional. When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When ``False`` will store data
             on any transaction *and* on call fo :meth:`flush`. Default is ``False``.
 
@@ -52,9 +55,11 @@ class PicklePersistence(BasePersistence):
             persistence class. Default is ``True``.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is ``True`` .
-        single_file (:obj:`bool`, optional): When ``False`` will store 3 sperate files of
-            `filename_user_data`, `filename_chat_data` and `filename_conversations`. Default is
-            ``True``.
+        store_roles (:obj:`bool`, optional): Whether roles should be saved by this persistence
+            class. Default is ``True``.
+        single_file (:obj:`bool`, optional): When ``False`` will store 5 sperate files of
+            `filename_bot_data`, `filename_user_data`, `filename_chat_data`,
+            `filename_conversations` and `filename_roles`. Default is ``True``.
         on_flush (:obj:`bool`, optional): When ``True`` will only save to file when :meth:`flush`
             is called and keep data in memory until that happens. When ``False`` will store data
             on any transaction *and* on call fo :meth:`flush`. Default is ``False``.
@@ -65,16 +70,19 @@ class PicklePersistence(BasePersistence):
                  store_chat_data=True,
                  store_bot_data=True,
                  single_file=True,
-                 on_flush=False):
+                 on_flush=False,
+                 store_roles=True):
         super(PicklePersistence, self).__init__(store_user_data=store_user_data,
                                                 store_chat_data=store_chat_data,
-                                                store_bot_data=store_bot_data)
+                                                store_bot_data=store_bot_data,
+                                                store_roles=store_roles)
         self.filename = filename
         self.single_file = single_file
         self.on_flush = on_flush
         self.user_data = None
         self.chat_data = None
         self.bot_data = None
+        self.roles = None
         self.conversations = None
 
     def load_singlefile(self):
@@ -86,12 +94,16 @@ class PicklePersistence(BasePersistence):
                 self.chat_data = defaultdict(dict, data['chat_data'])
                 # For backwards compatibility with files not containing bot data
                 self.bot_data = data.get('bot_data', {})
+                self.roles = all.get('roles', Roles(None))
+                if self.roles:
+                    self.roles = Roles.decode_from_json(self.roles, None)
                 self.conversations = data['conversations']
         except IOError:
             self.conversations = {}
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
+            self.roles = Roles(None)
         except pickle.UnpicklingError:
             raise TypeError("File {} does not contain valid pickle data".format(filename))
         except Exception:
@@ -111,7 +123,9 @@ class PicklePersistence(BasePersistence):
     def dump_singlefile(self):
         with open(self.filename, "wb") as f:
             data = {'conversations': self.conversations, 'user_data': self.user_data,
-                    'chat_data': self.chat_data, 'bot_data': self.bot_data}
+                    'chat_data': self.chat_data, 'bot_data': self.bot_data,
+                    # Roles have locks, so we just use the json encoding
+                    'roles': self.roles.encode_to_json()}
             pickle.dump(data, f)
 
     def dump_file(self, filename, data):
@@ -175,6 +189,31 @@ class PicklePersistence(BasePersistence):
         else:
             self.load_singlefile()
         return deepcopy(self.bot_data)
+
+    def get_roles(self):
+        """Returns the roles created from the pickle file if it exists or an empty
+        :class:`telegram.ext.Roles` instance.
+
+        Warning:
+            The produced roles instance usually will have no bot assigned. Use
+            :attr:`telegram.ext.Roles.set_bot` to set it.
+
+        Returns:
+            :class:`telegram.ext.Roles`: The restored roles.
+        """
+        if self.roles:
+            pass
+        elif not self.single_file:
+            filename = "{}_roles".format(self.filename)
+            data = self.load_file(filename)
+            if not data:
+                data = Roles(None)
+            else:
+                data = Roles.decode_from_json(data, None)
+            self.roles = data
+        else:
+            self.load_singlefile()
+        return deepcopy(self.roles)
 
     def get_conversations(self, name):
         """Returns the conversations from the pickle file if it exsists or an empty defaultdict.
@@ -269,11 +308,28 @@ class PicklePersistence(BasePersistence):
             else:
                 self.dump_singlefile()
 
+    def update_roles(self, data):
+        """Will update the roles (if changed) and depending on :attr:`on_flush` save the
+        pickle file.
+
+        Args:
+            data (:class:`telegram.ext.Roles`): The :attr:`telegram.ext.dispatcher.roles` .
+        """
+        if self.roles == data:
+            return
+        self.roles = deepcopy(data)
+        if not self.on_flush:
+            if not self.single_file:
+                filename = "{}_roles".format(self.filename)
+                self.dump_file(filename, self.roles.encode_to_json())
+            else:
+                self.dump_singlefile()
+
     def flush(self):
         """ Will save all data in memory to pickle file(s).
         """
         if self.single_file:
-            if self.user_data or self.chat_data or self.conversations:
+            if self.user_data or self.chat_data or self.conversations or self.roles:
                 self.dump_singlefile()
         else:
             if self.user_data:
@@ -282,5 +338,7 @@ class PicklePersistence(BasePersistence):
                 self.dump_file("{}_chat_data".format(self.filename), self.chat_data)
             if self.bot_data:
                 self.dump_file("{}_bot_data".format(self.filename), self.bot_data)
+            if self.roles:
+                self.dump_file("{}_roles".format(self.filename), self.roles.encode_to_json())
             if self.conversations:
                 self.dump_file("{}_conversations".format(self.filename), self.conversations)

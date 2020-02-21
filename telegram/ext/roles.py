@@ -51,23 +51,27 @@ class Role(Filters.user):
         name (:obj:`str`): A string representation of this role.
 
     Args:
-        chat_ids (set(:obj:`int`), optional): The ids of the users/chats of this role. Updates
-            will only be parsed, if the id of :attr:`telegram.Update.effective_user` or
-            :attr:`telegram.Update.effective_chat` respectiveley is listed here.
-        parent_roles (set(:class:`telegram.ext.Role`), optional): Parent roles of this role.
+        chat_ids (:obj:`int` | iterable(:obj:`int`), optional): The ids of the users/chats of this
+            role. Updates will only be parsed, if the id of :attr:`telegram.Update.effective_user`
+            or :attr:`telegram.Update.effective_chat` respectiveley is listed here.
+        parent_roles (:class:`telegram.ext.Role` | set(:class:`telegram.ext.Role`)), optional):
+            Parent roles of this role.
         name (:obj:`str`, optional): A name for this role.
 
     """
     update_filter = True
 
-    def __init__(self, chat_ids=None, parent_role=None, name=None):
+    def __init__(self, chat_ids=None, parent_roles=None, name=None):
         if chat_ids is None:
             chat_ids = set()
         super(Role, self).__init__(chat_ids)
-        self.parent_roles = set()
         self._name = name
-        if parent_role:
-            self.add_parent_role(parent_role)
+        self.parent_roles = set()
+        if isinstance(parent_roles, Role):
+            self.add_parent_role(parent_roles)
+        elif parent_roles is not None:
+            for pr in parent_roles:
+                self.add_parent_role(pr)
 
     @property
     def chat_ids(self):
@@ -227,8 +231,8 @@ class Roles(dict):
     Note:
         In fact, :class:`telegram.ext.Roles` inherits from :obj:`dict` and thus provides most
         methods needed for the common use cases. Methods that are *not* supported are:
-        ``__delitem``, ``__setitem__``, ``setdefault``, ``update``, ``pop``, ``popitem``, ``clear``
-        and ``copy``.
+        ``__delitem__``, ``__setitem__``, ``setdefault``, ``update``, ``pop``, ``popitem``,
+        ``clear`` and ``copy``.
         Please use :attr:`add_role` and :attr:`remove_role` instead.
 
     Attributes:
@@ -324,22 +328,24 @@ class Roles(dict):
         """
         self.ADMINS.kick_member(chat_id)
 
-    def add_role(self, name, chat_ids=None, parent_role=None):
+    def add_role(self, name, chat_ids=None, parent_roles=None):
         """Creates and registers a new role. :attr:`ADMINS` will automatically be added to
         roles parent roles, i.e. admins can do everyhing. The role can be accessed by it's
         name.
 
         Args:
             name (:obj:`str`, optional): A name for this role.
-            chat_ids (set(:obj:`int`), optional): The ids of the users/chats of this role.
-            parent_roles (set(:class:`telegram.ext.Role`), optional): Parent roles of this role.
+            chat_ids (:obj:`int` | iterable(:obj:`int`), optional): The ids of the users/chats of
+                this role.
+            parent_roles (:class:`telegram.ext.Role` | set(:class:`telegram.ext.Role`), optional):
+                Parent roles of this role.
 
         Raises:
             ValueError
         """
         if name in self:
             raise ValueError('Role name is already taken.')
-        role = Role(chat_ids=chat_ids, parent_role=parent_role, name=name)
+        role = Role(chat_ids=chat_ids, parent_roles=parent_roles, name=name)
         self._setitem(name, role)
         role.add_parent_role(self.ADMINS)
 
@@ -392,7 +398,6 @@ class Roles(dict):
             id_ = id(role)
             if id_ not in memo:
                 inner_tmp = {'name': role._name, 'chat_ids': sorted(role.chat_ids)}
-                inner_tmp['restored_from_persistence'] = role.restored_from_persistence
                 inner_tmp['parent_roles'] = [
                     _encode_role_to_json(pr, memo) for pr in role.parent_roles
                 ]
@@ -422,7 +427,6 @@ class Roles(dict):
 
             tmp = memo[id_]
             role = Role(name=tmp['name'], chat_ids=tmp['chat_ids'])
-            role.restored_from_persistence = tmp['restored_from_persistence']
             for pid in tmp['parent_roles']:
                 role.add_parent_role(_decode_role_from_json(pid, memo))
             return role
