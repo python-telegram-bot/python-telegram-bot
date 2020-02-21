@@ -172,6 +172,13 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, channel_post=message))
         assert handler.check_update(Update(0, edited_channel_post=message))
 
+    def test_with_role(self, message, role):
+        handler = MessageHandler(None, self.callback_basic, roles=role)
+        assert not handler.check_update(Update(0, message))
+
+        role.chat_ids = 1
+        assert handler.check_update(Update(0, message))
+
     def test_pass_user_or_chat_data(self, dp, message):
         handler = MessageHandler(None, self.callback_data_1,
                                  pass_user_data=True)
