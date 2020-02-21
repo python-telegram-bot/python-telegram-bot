@@ -18,6 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Role, which allows to restrict access to handlers."""
 
+try:
+    import ujson as json
+except ImportError:
+    import json
+
 from copy import deepcopy
 
 from telegram import ChatMember, TelegramError
@@ -113,7 +118,7 @@ class Role(Filters.user):
     def __lt__(self, other):
         # Test for hierarchical order
         if isinstance(other, Role):
-            return other in self.parent_roles
+            return any([other.equals(pr) for pr in self.parent_roles])
         return False
 
     def __le__(self, other):
@@ -123,7 +128,7 @@ class Role(Filters.user):
     def __gt__(self, other):
         # Test for hierarchical order
         if isinstance(other, Role):
-            return self in other.parent_roles
+            return any([self.equals(pr) for pr in other.parent_roles])
         return False
 
     def __ge__(self, other):
@@ -338,3 +343,61 @@ class Roles(dict):
             for pr in role.parent_roles:
                 new_roles[role._name].add_parent_role(deepcopy(pr, memo))
         return new_roles
+
+    def encode_to_json(self):
+        """Helper method to encode a roles object to a JSON-serializable way. Use
+        :attr:`decode_from_json` to decode.
+
+        Args:
+            roles (:class:`telegram.ext.Roles`): The roles object to transofrm to JSON.
+
+        Returns:
+            :obj:`str`: The JSON-serialized roles object
+        """
+        def _encode_role_to_json(role, memo):
+            id_ = id(role)
+            if id_ not in memo:
+                inner_tmp = {'name': role._name, 'user_ids': sorted(role.user_ids)}
+                inner_tmp['restored_from_persistence'] = role.restored_from_persistence
+                inner_tmp['parent_roles'] = [
+                    _encode_role_to_json(pr, memo) for pr in role.parent_roles
+                ]
+                memo[id_] = inner_tmp
+            return id_
+
+        tmp = {'admins': id(self.ADMINS), 'roles': [], 'memo': {}}
+        tmp['roles'] = [_encode_role_to_json(self[name], tmp['memo']) for name in self]
+        return json.dumps(tmp)
+
+    @staticmethod
+    def decode_from_json(json_string, bot):
+        """Helper method to decode a roles object to a JSON-string created with
+        :attr:`encode_roles_to_json`.
+
+        Args:
+            json_string (:obj:`str`): The roles object as JSON string.
+            bot (:class:`telegram.Bot`): The bot to be passed to the roles object.
+
+        Returns:
+            :class:`telegram.ext.Roles`: The roles object after decoding
+        """
+        def _decode_role_from_json(id_, memo):
+            id_ = str(id_)
+            if isinstance(memo[id_], Role):
+                return memo[id_]
+
+            tmp = memo[id_]
+            role = Role(name=tmp['name'], user_ids=tmp['user_ids'])
+            role.restored_from_persistence = tmp['restored_from_persistence']
+            for pid in tmp['parent_roles']:
+                role.add_parent_role(_decode_role_from_json(pid, memo))
+            return role
+
+        tmp = json.loads(json_string)
+        memo = tmp['memo']
+        roles = Roles(bot)
+        roles.ADMINS = _decode_role_from_json(tmp['admins'], memo)
+        for id_ in tmp['roles']:
+            role = _decode_role_from_json(id_, memo)
+            roles._setitem(role._name, role)
+        return roles

@@ -409,3 +409,29 @@ class TestRoles(object):
         handler = InlineQueryHandler(None, roles=roles.CHAT_CREATOR)
 
         assert not handler.check_update(update)
+
+    def test_json_encoding_decoding(self, roles, parent_role, bot):
+        roles.add_role('role_1', user_ids=[1, 2, 3])
+        roles.add_role('role_2', user_ids=[4, 5, 6], parent_role=parent_role)
+        roles.add_role('role_3', user_ids=[7, 8], parent_role=parent_role)
+        roles.add_admin(9)
+        roles.add_admin(10)
+
+        json_str = roles.encode_to_json()
+        assert isinstance(json_str, str)
+        assert json_str != ''
+
+        rroles = Roles.decode_from_json(json_str, bot)
+        assert rroles == roles
+        assert isinstance(rroles._bot, Bot)
+        for name in rroles:
+            assert rroles[name] <= rroles.ADMINS
+        assert rroles.ADMINS.user_ids == set([9, 10])
+        assert rroles['role_1'].user_ids == set([1, 2, 3])
+        assert rroles['role_2'].user_ids == set([4, 5, 6])
+        assert rroles['role_3'].user_ids == set([7, 8])
+        for name in rroles:
+            assert rroles[name] <= rroles.ADMINS
+            assert rroles[name] < rroles.ADMINS
+            assert rroles.ADMINS >= rroles[name]
+            assert rroles.ADMINS > rroles[name]
