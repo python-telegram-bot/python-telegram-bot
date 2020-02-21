@@ -42,6 +42,46 @@ class Role(Filters.user):
         both roles are the same object. To test for equality in terms of hierarchical order, i.e.
         if both :attr:`parent_roles` and :attr:`chat_ids` coincide, use :attr:`equals`.
 
+    Roles can be combined using bitwise operators:
+
+    And:
+
+        >>> (Roles(name='group_1') & Roles(name='user_2'))
+
+    Grants access only for ``user_2`` within the chat ``group_1``.
+
+    Or:
+
+        >>> (Roles(name='group_1') | Roles(name='user_2'))
+
+    Grants access for ``user_2`` and the whole chat ``group_1``.
+
+    Not:
+
+        >>> ~ Roles(name='user_1')
+
+    Grants access to everyone except ``user_1``
+
+    Note:
+        Negated roles do `not` exclude their parent roles. E.g. with
+
+            >>> ~ Roles(name='user_1', parent_roles=Role(name='user_2'))
+
+        ``user_2`` will still have access, where ``user_1`` is restricted.
+
+    Also works with more than two roles:
+
+        >>> (Roles(name='group_1') & (Roles(name='user_2') | Roles(name='user_3')))
+        >>> Roles(name='group_1') & (~ FRoles(name='user_2'))
+
+    Note:
+        Roles use the same short circuiting logic that pythons `and`, `or` and `not`.
+        This means that for example:
+
+            >>> Role(chat_ids=123) | Role(chat_ids=456)
+
+        With an update from user ``123``, will only ever evaluate the first role.
+
     Attributes:
         chat_ids (set(:obj:`int`)): The ids of the users/chats of this role. Updates
             will only be parsed, if the id of :attr:`telegram.Update.effective_user` or
@@ -72,6 +112,11 @@ class Role(Filters.user):
         elif parent_roles is not None:
             for pr in parent_roles:
                 self.add_parent_role(pr)
+        self._inverted = False
+
+    def __invert__(self):
+        self._inverted = True
+        return super(Role, self).__invert__()
 
     @property
     def chat_ids(self):
@@ -100,7 +145,13 @@ class Role(Filters.user):
             if chat.id in self.chat_ids:
                 return True
         if user or chat:
-            return any([parent(update) for parent in self.parent_roles])
+            if self._inverted:
+                # If this is an inverted role (i.e. ~role) and we arrived here, the user
+                # must not be excluded. In particular, we dont want to exclude the parents
+                # (see below). Since the output of this will be negated, return False
+                return False
+            else:
+                return any([parent(update) for parent in self.parent_roles])
 
     def add_member(self, chat_id):
         """Adds a user/chat to this role. Will do nothing, if user/chat is already present.

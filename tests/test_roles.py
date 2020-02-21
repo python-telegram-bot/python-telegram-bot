@@ -19,10 +19,11 @@
 import datetime
 
 import pytest
+import sys
 
 from copy import deepcopy
 from telegram import Message, User, InlineQuery, Update, ChatMember, Chat, TelegramError
-from telegram.ext import Role, Roles, MessageHandler, InlineQueryHandler, Filters
+from telegram.ext import Role, Roles, MessageHandler, InlineQueryHandler
 
 
 @pytest.fixture(scope='function')
@@ -211,23 +212,24 @@ class TestRole(object):
         role.add_member(0)
         r = Role(0)
 
-        handler = MessageHandler(role & (~r), None)
+        handler = MessageHandler(None, None, roles=role & (~r))
         assert not handler.check_update(update)
 
         r = Role(1)
-        handler = MessageHandler(role & r, None)
+        handler = MessageHandler(None, None, roles=role & r)
         assert not handler.check_update(update)
-        handler = MessageHandler(role | r, None)
+        handler = MessageHandler(None, None, roles=role | r)
         assert handler.check_update(update)
 
-    def test_handler_merged_filters(self, update, role):
+    def test_handler_allow_parent(self, update, role, parent_role):
         role.add_member(0)
+        parent_role.add_member(1)
+        role.add_parent_role(parent_role)
 
-        handler = MessageHandler(role & Filters.sticker, None)
+        handler = MessageHandler(None, None, roles=~role)
         assert not handler.check_update(update)
-        handler = MessageHandler(role | Filters.sticker, None)
-        assert handler.check_update(update)
-        handler = MessageHandler(role & Filters.all, None)
+        update.message.from_user.id = 1
+        update.message.chat.id = 1
         assert handler.check_update(update)
 
     def test_handler_without_user(self, update, role):
@@ -320,6 +322,7 @@ class TestRoles(object):
         with pytest.raises(NotImplementedError):
             roles.copy()
 
+    @pytest.mark.skipif(sys.version_info < (3, 6), reason="dicts are not ordered in py<=3.5")
     def test_dict_functionality(self, roles):
         roles.add_role('role0', 0)
         roles.add_role('role1', 1)
@@ -369,12 +372,24 @@ class TestRoles(object):
     def test_handler_admins(self, roles, update):
         roles.add_role('role', 0)
         roles.add_admin(1)
-        handler = MessageHandler(roles['role'], None)
+        handler = MessageHandler(None, None, roles=roles['role'])
         assert handler.check_update(update)
         update.message.from_user.id = 1
         update.message.chat.id = 1
         assert handler.check_update(update)
         roles.kick_admin(1)
+        assert not handler.check_update(update)
+
+    def test_handler_admins_merged(self, roles, update):
+        roles.add_role('role_1', 0)
+        roles.add_role('role_2', 1)
+        roles.add_admin(2)
+        handler = MessageHandler(None, None, roles=roles['role_1'] & ~roles['role_2'])
+        assert handler.check_update(update)
+        update.message.from_user.id = 2
+        update.message.chat.id = 2
+        assert handler.check_update(update)
+        roles.kick_admin(2)
         assert not handler.check_update(update)
 
     def test_chat_admins_simple(self, roles, update, monkeypatch):
@@ -383,7 +398,7 @@ class TestRoles(object):
                     ChatMember(User(1, 'TestUser1', False), 'creator')]
 
         monkeypatch.setattr(roles._bot, 'get_chat_administrators', admins)
-        handler = MessageHandler(roles.CHAT_ADMINS, None)
+        handler = MessageHandler(None, None, roles=roles.CHAT_ADMINS)
 
         update.message.from_user.id = 2
         assert not handler.check_update(update)
@@ -415,7 +430,7 @@ class TestRoles(object):
             raise TelegramError('User is not a member')
 
         monkeypatch.setattr(roles._bot, 'get_chat_member', member)
-        handler = MessageHandler(roles.CHAT_CREATOR, None)
+        handler = MessageHandler(None, None, roles=roles.CHAT_CREATOR)
 
         update.message.from_user.id = 0
         assert not handler.check_update(update)
