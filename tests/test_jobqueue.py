@@ -29,7 +29,7 @@ from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
 from telegram.utils.deprecate import TelegramDeprecationWarning
-from telegram.utils.helpers import _UtcOffsetTimezone
+from telegram.utils.helpers import _UtcOffsetTimezone, _UTC
 
 
 @pytest.fixture(scope='function')
@@ -367,3 +367,57 @@ class TestJobQueue(object):
         job.next_t = t
         job.tzinfo = _UtcOffsetTimezone(dtm.timedelta(hours=5))
         assert job.next_t == t.astimezone(job.tzinfo)
+
+    def test_passing_tzinfo_to_job(self, job_queue):
+        """Test that tzinfo is correctly passed to job with run_once, run_daily
+        and run_repeating methods"""
+
+        when_dt_tz_specific = dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)
+        when_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
+        job_once1 = job_queue.run_once(self.job_run_once, when_dt_tz_specific)
+        job_once2 = job_queue.run_once(self.job_run_once, when_dt_tz_utc)
+
+        when_time_tz_specific = (dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        when_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_once3 = job_queue.run_once(self.job_run_once, when_time_tz_specific)
+        job_once4 = job_queue.run_once(self.job_run_once, when_time_tz_utc)
+
+        first_dt_tz_specific = dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)
+        first_dt_tz_utc = dtm.datetime.now() + dtm.timedelta(seconds=2)
+        job_repeating1 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_dt_tz_specific)
+        job_repeating2 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_dt_tz_utc)
+
+        first_time_tz_specific = (dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        first_time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_repeating3 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_time_tz_specific)
+        job_repeating4 = job_queue.run_repeating(
+            self.job_run_once, 2, first=first_time_tz_utc)
+
+        time_tz_specific = (dtm.datetime.now(
+            tz=_UtcOffsetTimezone(dtm.timedelta(hours=12))
+        ) + dtm.timedelta(seconds=2)).timetz()
+        time_tz_utc = (dtm.datetime.now() + dtm.timedelta(seconds=2)).timetz()
+        job_daily1 = job_queue.run_daily(self.job_run_once, time_tz_specific)
+        job_daily2 = job_queue.run_daily(self.job_run_once, time_tz_utc)
+
+        assert job_once1.tzinfo == when_dt_tz_specific.tzinfo
+        assert job_once2.tzinfo == _UTC
+        assert job_once3.tzinfo == when_time_tz_specific.tzinfo
+        assert job_once4.tzinfo == _UTC
+        assert job_repeating1.tzinfo == first_dt_tz_specific.tzinfo
+        assert job_repeating2.tzinfo == _UTC
+        assert job_repeating3.tzinfo == first_time_tz_specific.tzinfo
+        assert job_repeating4.tzinfo == _UTC
+        assert job_daily1.tzinfo == time_tz_specific.tzinfo
+        assert job_daily2.tzinfo == _UTC

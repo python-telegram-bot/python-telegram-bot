@@ -131,6 +131,9 @@ class JobQueue(object):
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow.
 
+                If ``when`` is :obj:`datetime.datetime` or :obj:`datetime.datetime` type
+                then ``when.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
+
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
             name (:obj:`str`, optional): The name of the new job. Defaults to
@@ -141,7 +144,14 @@ class JobQueue(object):
             queue.
 
         """
-        job = Job(callback, repeat=False, context=context, name=name, job_queue=self)
+        tzinfo = when.tzinfo if isinstance(when, (datetime.datetime, datetime.time)) else None
+
+        job = Job(callback,
+                  repeat=False,
+                  context=context,
+                  name=name,
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=when)
         return job
 
@@ -171,6 +181,9 @@ class JobQueue(object):
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow.
 
+                If ``first`` is :obj:`datetime.datetime` or :obj:`datetime.datetime` type
+                then ``first.tzinfo`` will define ``Job.tzinfo``. Otherwise UTC will be assumed.
+
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
@@ -187,12 +200,15 @@ class JobQueue(object):
              to pin servers to UTC time, then time related behaviour can always be expected.
 
         """
+        tzinfo = first.tzinfo if isinstance(first, (datetime.datetime, datetime.time)) else None
+
         job = Job(callback,
                   interval=interval,
                   repeat=True,
                   context=context,
                   name=name,
-                  job_queue=self)
+                  job_queue=self,
+                  tzinfo=tzinfo)
         self._put(job, time_spec=first)
         return job
 
@@ -206,6 +222,7 @@ class JobQueue(object):
                 or change it to a repeating job.
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``time.tzinfo``) is ``None``, UTC will be assumed.
+                ``time.tzinfo`` also defines ``Job.tzinfo``.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run. Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -227,10 +244,10 @@ class JobQueue(object):
                   interval=datetime.timedelta(days=1),
                   repeat=True,
                   days=days,
-                  tzinfo=time.tzinfo,
                   context=context,
                   name=name,
-                  job_queue=self)
+                  job_queue=self,
+                  tzinfo=time.tzinfo)
         self._put(job, time_spec=time)
         return job
 
@@ -389,7 +406,7 @@ class Job(object):
                  days=Days.EVERY_DAY,
                  name=None,
                  job_queue=None,
-                 tzinfo=_UTC):
+                 tzinfo=None):
 
         self.callback = callback
         self.context = context
@@ -403,7 +420,7 @@ class Job(object):
 
         self._days = None
         self.days = days
-        self.tzinfo = tzinfo
+        self.tzinfo = tzinfo or _UTC
 
         self._job_queue = weakref.proxy(job_queue) if job_queue is not None else None
 
