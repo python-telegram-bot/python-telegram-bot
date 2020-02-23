@@ -25,20 +25,20 @@ from telegram import PassportElementErrorTranslationFiles, PassportElementErrorS
 @pytest.fixture(scope='class')
 def passport_element_error_translation_files():
     return PassportElementErrorTranslationFiles(
-        TestPassportElementErrorTranslationFiles.type,
+        TestPassportElementErrorTranslationFiles.type_,
         TestPassportElementErrorTranslationFiles.file_hashes,
         TestPassportElementErrorTranslationFiles.message)
 
 
 class TestPassportElementErrorTranslationFiles(object):
     source = 'translation_files'
-    type = 'test_type'
+    type_ = 'test_type'
     file_hashes = ['hash1', 'hash2']
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_translation_files):
         assert passport_element_error_translation_files.source == self.source
-        assert passport_element_error_translation_files.type == self.type
+        assert passport_element_error_translation_files.type == self.type_
         assert isinstance(passport_element_error_translation_files.file_hashes, list)
         assert passport_element_error_translation_files.file_hashes == self.file_hashes
         assert passport_element_error_translation_files.message == self.message
@@ -58,12 +58,12 @@ class TestPassportElementErrorTranslationFiles(object):
                 == passport_element_error_translation_files.message)
 
     def test_equality(self):
-        a = PassportElementErrorTranslationFiles(self.type, self.file_hashes, self.message)
-        b = PassportElementErrorTranslationFiles(self.type, self.file_hashes, self.message)
-        c = PassportElementErrorTranslationFiles(self.type, '', '')
+        a = PassportElementErrorTranslationFiles(self.type_, self.file_hashes, self.message)
+        b = PassportElementErrorTranslationFiles(self.type_, self.file_hashes, self.message)
+        c = PassportElementErrorTranslationFiles(self.type_, '', '')
         d = PassportElementErrorTranslationFiles('', self.file_hashes, '')
         e = PassportElementErrorTranslationFiles('', '', self.message)
-        f = PassportElementErrorSelfie(self.type, '', self.message)
+        f = PassportElementErrorSelfie(self.type_, '', self.message)
 
         assert a == b
         assert hash(a) == hash(b)

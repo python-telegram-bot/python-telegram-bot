@@ -25,31 +25,31 @@ from telegram import MessageEntity, User
 @pytest.fixture(scope="class",
                 params=MessageEntity.ALL_TYPES)
 def message_entity(request):
-    type = request.param
+    type_ = request.param
     url = None
-    if type == MessageEntity.TEXT_LINK:
+    if type_ == MessageEntity.TEXT_LINK:
         url = 't.me'
     user = None
-    if type == MessageEntity.TEXT_MENTION:
+    if type_ == MessageEntity.TEXT_MENTION:
         user = User(1, 'test_user', False)
     return MessageEntity(type, 1, 3, url=url, user=user)
 
 
 class TestMessageEntity(object):
-    type = 'url'
+    type_ = 'url'
     offset = 1
     length = 2
     url = 'url'
 
     def test_de_json(self, bot):
         json_dict = {
-            'type': self.type,
+            'type': self.type_,
             'offset': self.offset,
             'length': self.length
         }
         entity = MessageEntity.de_json(json_dict, bot)
 
-        assert entity.type == self.type
+        assert entity.type == self.type_
         assert entity.offset == self.offset
         assert entity.length == self.length
 

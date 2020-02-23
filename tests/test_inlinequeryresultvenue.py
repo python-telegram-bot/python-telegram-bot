@@ -26,7 +26,7 @@ from telegram import (InlineQueryResultVoice, InputTextMessageContent, InlineKey
 @pytest.fixture(scope='class')
 def inline_query_result_venue():
     return InlineQueryResultVenue(
-        TestInlineQueryResultVenue.id,
+        TestInlineQueryResultVenue.id_,
         TestInlineQueryResultVenue.latitude,
         TestInlineQueryResultVenue.longitude,
         TestInlineQueryResultVenue.title,
@@ -41,8 +41,8 @@ def inline_query_result_venue():
 
 
 class TestInlineQueryResultVenue(object):
-    id = 'id'
-    type = 'venue'
+    id_ = 'id'
+    type_ = 'venue'
     latitude = 'latitude'
     longitude = 'longitude'
     title = 'title'
@@ -56,8 +56,8 @@ class TestInlineQueryResultVenue(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_venue):
-        assert inline_query_result_venue.id == self.id
-        assert inline_query_result_venue.type == self.type
+        assert inline_query_result_venue.id == self.id_
+        assert inline_query_result_venue.type == self.type_
         assert inline_query_result_venue.latitude == self.latitude
         assert inline_query_result_venue.longitude == self.longitude
         assert inline_query_result_venue.title == self.title
@@ -96,14 +96,14 @@ class TestInlineQueryResultVenue(object):
                 == inline_query_result_venue.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultVenue(self.id, self.longitude, self.latitude, self.title,
+        a = InlineQueryResultVenue(self.id_, self.longitude, self.latitude, self.title,
                                    self.address)
-        b = InlineQueryResultVenue(self.id, self.longitude, self.latitude, self.title,
+        b = InlineQueryResultVenue(self.id_, self.longitude, self.latitude, self.title,
                                    self.address)
-        c = InlineQueryResultVenue(self.id, '', self.latitude, self.title, self.address)
+        c = InlineQueryResultVenue(self.id_, '', self.latitude, self.title, self.address)
         d = InlineQueryResultVenue('', self.longitude, self.latitude, self.title,
                                    self.address)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

@@ -28,7 +28,7 @@ from tests.test_passport import RAW_PASSPORT_DATA
 
 @pytest.fixture(scope='class')
 def message(bot):
-    return Message(TestMessage.id, TestMessage.from_user, TestMessage.date, TestMessage.chat,
+    return Message(TestMessage.id_, TestMessage.from_user, TestMessage.date, TestMessage.chat,
                    bot=bot)
 
 
@@ -107,14 +107,14 @@ def message(bot):
                      'photo_from_media_group', 'passport_data', 'poll', 'reply_markup',
                      'default_quote'])
 def message_params(bot, request):
-    return Message(message_id=TestMessage.id,
+    return Message(message_id=TestMessage.id_,
                    from_user=TestMessage.from_user,
                    date=TestMessage.date,
                    chat=TestMessage.chat, bot=bot, **request.param)
 
 
 class TestMessage(object):
-    id = 1
+    id_ = 1
     from_user = User(2, 'testuser', False)
     date = datetime.utcnow()
     chat = Chat(3, 'private')
@@ -345,13 +345,13 @@ class TestMessage(object):
 
     def test_reply_text(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             text = args[1] == 'test'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and text and reply
+            return id_ and text and reply
 
         monkeypatch.setattr(message.bot, 'send_message', test)
         assert message.reply_text('test')
@@ -411,13 +411,13 @@ class TestMessage(object):
 
     def test_reply_media_group(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             media = kwargs['media'] == 'reply_media_group'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and media and reply
+            return id_ and media and reply
 
         monkeypatch.setattr(message.bot, 'send_media_group', test)
         assert message.reply_media_group(media='reply_media_group')
@@ -425,13 +425,13 @@ class TestMessage(object):
 
     def test_reply_photo(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             photo = kwargs['photo'] == 'test_photo'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and photo and reply
+            return id_ and photo and reply
 
         monkeypatch.setattr(message.bot, 'send_photo', test)
         assert message.reply_photo(photo='test_photo')
@@ -439,13 +439,13 @@ class TestMessage(object):
 
     def test_reply_audio(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             audio = kwargs['audio'] == 'test_audio'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and audio and reply
+            return id_ and audio and reply
 
         monkeypatch.setattr(message.bot, 'send_audio', test)
         assert message.reply_audio(audio='test_audio')
@@ -453,13 +453,13 @@ class TestMessage(object):
 
     def test_reply_document(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             document = kwargs['document'] == 'test_document'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and document and reply
+            return id_ and document and reply
 
         monkeypatch.setattr(message.bot, 'send_document', test)
         assert message.reply_document(document='test_document')
@@ -467,13 +467,13 @@ class TestMessage(object):
 
     def test_reply_animation(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             animation = kwargs['animation'] == 'test_animation'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and animation and reply
+            return id_ and animation and reply
 
         monkeypatch.setattr(message.bot, 'send_animation', test)
         assert message.reply_animation(animation='test_animation')
@@ -481,13 +481,13 @@ class TestMessage(object):
 
     def test_reply_sticker(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             sticker = kwargs['sticker'] == 'test_sticker'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and sticker and reply
+            return id_ and sticker and reply
 
         monkeypatch.setattr(message.bot, 'send_sticker', test)
         assert message.reply_sticker(sticker='test_sticker')
@@ -495,13 +495,13 @@ class TestMessage(object):
 
     def test_reply_video(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             video = kwargs['video'] == 'test_video'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and video and reply
+            return id_ and video and reply
 
         monkeypatch.setattr(message.bot, 'send_video', test)
         assert message.reply_video(video='test_video')
@@ -509,13 +509,13 @@ class TestMessage(object):
 
     def test_reply_video_note(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             video_note = kwargs['video_note'] == 'test_video_note'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and video_note and reply
+            return id_ and video_note and reply
 
         monkeypatch.setattr(message.bot, 'send_video_note', test)
         assert message.reply_video_note(video_note='test_video_note')
@@ -523,13 +523,13 @@ class TestMessage(object):
 
     def test_reply_voice(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             voice = kwargs['voice'] == 'test_voice'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and voice and reply
+            return id_ and voice and reply
 
         monkeypatch.setattr(message.bot, 'send_voice', test)
         assert message.reply_voice(voice='test_voice')
@@ -537,13 +537,13 @@ class TestMessage(object):
 
     def test_reply_location(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             location = kwargs['location'] == 'test_location'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and location and reply
+            return id_ and location and reply
 
         monkeypatch.setattr(message.bot, 'send_location', test)
         assert message.reply_location(location='test_location')
@@ -551,13 +551,13 @@ class TestMessage(object):
 
     def test_reply_venue(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             venue = kwargs['venue'] == 'test_venue'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and venue and reply
+            return id_ and venue and reply
 
         monkeypatch.setattr(message.bot, 'send_venue', test)
         assert message.reply_venue(venue='test_venue')
@@ -565,13 +565,13 @@ class TestMessage(object):
 
     def test_reply_contact(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_contact'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and contact and reply
+            return id_ and contact and reply
 
         monkeypatch.setattr(message.bot, 'send_contact', test)
         assert message.reply_contact(contact='test_contact')
@@ -579,13 +579,13 @@ class TestMessage(object):
 
     def test_reply_poll(self, monkeypatch, message):
         def test(*args, **kwargs):
-            id = args[0] == message.chat_id
+            id_ = args[0] == message.chat_id
             contact = kwargs['contact'] == 'test_poll'
             if kwargs.get('reply_to_message_id'):
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return id and contact and reply
+            return id_ and contact and reply
 
         monkeypatch.setattr(message.bot, 'send_poll', test)
         assert message.reply_poll(contact='test_poll')
@@ -678,12 +678,12 @@ class TestMessage(object):
         assert 'reply_to_message_id' in kwargs
 
     def test_equality(self):
-        id = 1
-        a = Message(id, self.from_user, self.date, self.chat)
-        b = Message(id, self.from_user, self.date, self.chat)
-        c = Message(id, User(0, '', False), self.date, self.chat)
+        id_ = 1
+        a = Message(id_, self.from_user, self.date, self.chat)
+        b = Message(id_, self.from_user, self.date, self.chat)
+        c = Message(id_, User(0, '', False), self.date, self.chat)
         d = Message(0, self.from_user, self.date, self.chat)
-        e = Update(id)
+        e = Update(id_)
 
         assert a == b
         assert hash(a) == hash(b)

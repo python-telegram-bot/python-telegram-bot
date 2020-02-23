@@ -26,7 +26,7 @@ from telegram import (InlineQueryResultMpeg4Gif, InlineKeyboardButton, InlineQue
 @pytest.fixture(scope='class')
 def inline_query_result_mpeg4_gif():
     return InlineQueryResultMpeg4Gif(
-        TestInlineQueryResultMpeg4Gif.id,
+        TestInlineQueryResultMpeg4Gif.id_,
         TestInlineQueryResultMpeg4Gif.mpeg4_url,
         TestInlineQueryResultMpeg4Gif.thumb_url,
         mpeg4_width=TestInlineQueryResultMpeg4Gif.mpeg4_width,
@@ -40,8 +40,8 @@ def inline_query_result_mpeg4_gif():
 
 
 class TestInlineQueryResultMpeg4Gif(object):
-    id = 'id'
-    type = 'mpeg4_gif'
+    id_ = 'id'
+    type_ = 'mpeg4_gif'
     mpeg4_url = 'mpeg4 url'
     mpeg4_width = 10
     mpeg4_height = 15
@@ -54,8 +54,8 @@ class TestInlineQueryResultMpeg4Gif(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_mpeg4_gif):
-        assert inline_query_result_mpeg4_gif.type == self.type
-        assert inline_query_result_mpeg4_gif.id == self.id
+        assert inline_query_result_mpeg4_gif.type == self.type_
+        assert inline_query_result_mpeg4_gif.id == self.id_
         assert inline_query_result_mpeg4_gif.mpeg4_url == self.mpeg4_url
         assert inline_query_result_mpeg4_gif.mpeg4_width == self.mpeg4_width
         assert inline_query_result_mpeg4_gif.mpeg4_height == self.mpeg4_height
@@ -95,11 +95,11 @@ class TestInlineQueryResultMpeg4Gif(object):
                 == inline_query_result_mpeg4_gif.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultMpeg4Gif(self.id, self.mpeg4_url, self.thumb_url)
-        b = InlineQueryResultMpeg4Gif(self.id, self.mpeg4_url, self.thumb_url)
-        c = InlineQueryResultMpeg4Gif(self.id, '', self.thumb_url)
+        a = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumb_url)
+        b = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumb_url)
+        c = InlineQueryResultMpeg4Gif(self.id_, '', self.thumb_url)
         d = InlineQueryResultMpeg4Gif('', self.mpeg4_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

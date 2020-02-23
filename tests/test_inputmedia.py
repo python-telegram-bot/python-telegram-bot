@@ -83,7 +83,7 @@ def input_media_document(class_thumb_file):
 
 
 class TestInputMediaVideo(object):
-    type = "video"
+    type_ = "video"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     width = 3
@@ -93,7 +93,7 @@ class TestInputMediaVideo(object):
     supports_streaming = True
 
     def test_expected_values(self, input_media_video):
-        assert input_media_video.type == self.type
+        assert input_media_video.type == self.type_
         assert input_media_video.media == self.media
         assert input_media_video.caption == self.caption
         assert input_media_video.width == self.width
@@ -117,7 +117,7 @@ class TestInputMediaVideo(object):
     def test_with_video(self, video):  # noqa: F811
         # fixture found in test_video
         input_media_video = InputMediaVideo(video, caption="test 3")
-        assert input_media_video.type == self.type
+        assert input_media_video.type == self.type_
         assert input_media_video.media == video.file_id
         assert input_media_video.width == video.width
         assert input_media_video.height == video.height
@@ -127,19 +127,19 @@ class TestInputMediaVideo(object):
     def test_with_video_file(self, video_file):  # noqa: F811
         # fixture found in test_video
         input_media_video = InputMediaVideo(video_file, caption="test 3")
-        assert input_media_video.type == self.type
+        assert input_media_video.type == self.type_
         assert isinstance(input_media_video.media, InputFile)
         assert input_media_video.caption == "test 3"
 
 
 class TestInputMediaPhoto(object):
-    type = "photo"
+    type_ = "photo"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'Markdown'
 
     def test_expected_values(self, input_media_photo):
-        assert input_media_photo.type == self.type
+        assert input_media_photo.type == self.type_
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
@@ -154,20 +154,20 @@ class TestInputMediaPhoto(object):
     def test_with_photo(self, photo):  # noqa: F811
         # fixture found in test_photo
         input_media_photo = InputMediaPhoto(photo, caption="test 2")
-        assert input_media_photo.type == self.type
+        assert input_media_photo.type == self.type_
         assert input_media_photo.media == photo.file_id
         assert input_media_photo.caption == "test 2"
 
     def test_with_photo_file(self, photo_file):  # noqa: F811
         # fixture found in test_photo
         input_media_photo = InputMediaPhoto(photo_file, caption="test 2")
-        assert input_media_photo.type == self.type
+        assert input_media_photo.type == self.type_
         assert isinstance(input_media_photo.media, InputFile)
         assert input_media_photo.caption == "test 2"
 
 
 class TestInputMediaAnimation(object):
-    type = "animation"
+    type_ = "animation"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'Markdown'
@@ -176,7 +176,7 @@ class TestInputMediaAnimation(object):
     duration = 1
 
     def test_expected_values(self, input_media_animation):
-        assert input_media_animation.type == self.type
+        assert input_media_animation.type == self.type_
         assert input_media_animation.media == self.media
         assert input_media_animation.caption == self.caption
         assert input_media_animation.parse_mode == self.parse_mode
@@ -195,20 +195,20 @@ class TestInputMediaAnimation(object):
     def test_with_animation(self, animation):  # noqa: F811
         # fixture found in test_animation
         input_media_animation = InputMediaAnimation(animation, caption="test 2")
-        assert input_media_animation.type == self.type
+        assert input_media_animation.type == self.type_
         assert input_media_animation.media == animation.file_id
         assert input_media_animation.caption == "test 2"
 
     def test_with_animation_file(self, animation_file):  # noqa: F811
         # fixture found in test_animation
         input_media_animation = InputMediaAnimation(animation_file, caption="test 2")
-        assert input_media_animation.type == self.type
+        assert input_media_animation.type == self.type_
         assert isinstance(input_media_animation.media, InputFile)
         assert input_media_animation.caption == "test 2"
 
 
 class TestInputMediaAudio(object):
-    type = "audio"
+    type_ = "audio"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     duration = 3
@@ -217,7 +217,7 @@ class TestInputMediaAudio(object):
     parse_mode = 'HTML'
 
     def test_expected_values(self, input_media_audio):
-        assert input_media_audio.type == self.type
+        assert input_media_audio.type == self.type_
         assert input_media_audio.media == self.media
         assert input_media_audio.caption == self.caption
         assert input_media_audio.duration == self.duration
@@ -239,7 +239,7 @@ class TestInputMediaAudio(object):
     def test_with_audio(self, audio):  # noqa: F811
         # fixture found in test_audio
         input_media_audio = InputMediaAudio(audio, caption="test 3")
-        assert input_media_audio.type == self.type
+        assert input_media_audio.type == self.type_
         assert input_media_audio.media == audio.file_id
         assert input_media_audio.duration == audio.duration
         assert input_media_audio.performer == audio.performer
@@ -249,19 +249,19 @@ class TestInputMediaAudio(object):
     def test_with_audio_file(self, audio_file):  # noqa: F811
         # fixture found in test_audio
         input_media_audio = InputMediaAudio(audio_file, caption="test 3")
-        assert input_media_audio.type == self.type
+        assert input_media_audio.type == self.type_
         assert isinstance(input_media_audio.media, InputFile)
         assert input_media_audio.caption == "test 3"
 
 
 class TestInputMediaDocument(object):
-    type = "document"
+    type_ = "document"
     media = "NOTAREALFILEID"
     caption = "My Caption"
     parse_mode = 'HTML'
 
     def test_expected_values(self, input_media_document):
-        assert input_media_document.type == self.type
+        assert input_media_document.type == self.type_
         assert input_media_document.media == self.media
         assert input_media_document.caption == self.caption
         assert input_media_document.parse_mode == self.parse_mode
@@ -277,14 +277,14 @@ class TestInputMediaDocument(object):
     def test_with_document(self, document):  # noqa: F811
         # fixture found in test_document
         input_media_document = InputMediaDocument(document, caption="test 3")
-        assert input_media_document.type == self.type
+        assert input_media_document.type == self.type_
         assert input_media_document.media == document.file_id
         assert input_media_document.caption == "test 3"
 
     def test_with_document_file(self, document_file):  # noqa: F811
         # fixture found in test_document
         input_media_document = InputMediaDocument(document_file, caption="test 3")
-        assert input_media_document.type == self.type
+        assert input_media_document.type == self.type_
         assert isinstance(input_media_document.media, InputFile)
         assert input_media_document.caption == "test 3"
 

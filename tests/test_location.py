@@ -67,8 +67,8 @@ class TestLocation(object):
         def test(_, url, data, **kwargs):
             lat = data['latitude'] == location.latitude
             lon = data['longitude'] == location.longitude
-            id = data['inline_message_id'] == 1234
-            return lat and lon and id
+            id_ = data['inline_message_id'] == 1234
+            return lat and lon and id_
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         assert bot.edit_message_live_location(inline_message_id=1234, location=location)
@@ -76,8 +76,8 @@ class TestLocation(object):
     # TODO: Needs improvement with in inline sent live location.
     def test_stop_live_inline_message(self, monkeypatch, bot):
         def test(_, url, data, **kwargs):
-            id = data['inline_message_id'] == 1234
-            return id
+            id_ = data['inline_message_id'] == 1234
+            return id_
 
         monkeypatch.setattr('telegram.utils.request.Request.post', test)
         assert bot.stop_message_live_location(inline_message_id=1234)

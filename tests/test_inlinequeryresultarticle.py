@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardMarkup, InlineQueryResultAudio, InlineQueryR
 @pytest.fixture(scope='class')
 def inline_query_result_article():
     return InlineQueryResultArticle(
-        TestInlineQueryResultArticle.id,
+        TestInlineQueryResultArticle.id_,
         TestInlineQueryResultArticle.title,
         input_message_content=TestInlineQueryResultArticle.input_message_content,
         reply_markup=TestInlineQueryResultArticle.reply_markup,
@@ -39,8 +39,8 @@ def inline_query_result_article():
 
 
 class TestInlineQueryResultArticle(object):
-    id = 'id'
-    type = 'article'
+    id_ = 'id'
+    type_ = 'article'
     title = 'title'
     input_message_content = InputTextMessageContent('input_message_content')
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
@@ -52,8 +52,8 @@ class TestInlineQueryResultArticle(object):
     thumb_width = 15
 
     def test_expected_values(self, inline_query_result_article):
-        assert inline_query_result_article.type == self.type
-        assert inline_query_result_article.id == self.id
+        assert inline_query_result_article.type == self.type_
+        assert inline_query_result_article.id == self.id_
         assert inline_query_result_article.title == self.title
         assert (inline_query_result_article.input_message_content.to_dict()
                 == self.input_message_content.to_dict())
@@ -88,11 +88,11 @@ class TestInlineQueryResultArticle(object):
                 == inline_query_result_article.thumb_width)
 
     def test_equality(self):
-        a = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
-        b = InlineQueryResultArticle(self.id, self.title, self.input_message_content)
-        c = InlineQueryResultArticle(self.id, '', self.input_message_content)
+        a = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
+        b = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
+        c = InlineQueryResultArticle(self.id_, '', self.input_message_content)
         d = InlineQueryResultArticle('', self.title, self.input_message_content)
-        e = InlineQueryResultAudio(self.id, '', '')
+        e = InlineQueryResultAudio(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

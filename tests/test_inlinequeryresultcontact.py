@@ -26,7 +26,7 @@ from telegram import (InlineQueryResultVoice, InputTextMessageContent, InlineKey
 @pytest.fixture(scope='class')
 def inline_query_result_contact():
     return InlineQueryResultContact(
-        TestInlineQueryResultContact.id,
+        TestInlineQueryResultContact.id_,
         TestInlineQueryResultContact.phone_number,
         TestInlineQueryResultContact.first_name,
         last_name=TestInlineQueryResultContact.last_name,
@@ -38,8 +38,8 @@ def inline_query_result_contact():
 
 
 class TestInlineQueryResultContact(object):
-    id = 'id'
-    type = 'contact'
+    id_ = 'id'
+    type_ = 'contact'
     phone_number = 'phone_number'
     first_name = 'first_name'
     last_name = 'last_name'
@@ -50,8 +50,8 @@ class TestInlineQueryResultContact(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_contact):
-        assert inline_query_result_contact.id == self.id
-        assert inline_query_result_contact.type == self.type
+        assert inline_query_result_contact.id == self.id_
+        assert inline_query_result_contact.type == self.type_
         assert inline_query_result_contact.phone_number == self.phone_number
         assert inline_query_result_contact.first_name == self.first_name
         assert inline_query_result_contact.last_name == self.last_name
@@ -86,11 +86,11 @@ class TestInlineQueryResultContact(object):
                 == inline_query_result_contact.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultContact(self.id, self.phone_number, self.first_name)
-        b = InlineQueryResultContact(self.id, self.phone_number, self.first_name)
-        c = InlineQueryResultContact(self.id, '', self.first_name)
+        a = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)
+        b = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)
+        c = InlineQueryResultContact(self.id_, '', self.first_name)
         d = InlineQueryResultContact('', self.phone_number, self.first_name)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)
