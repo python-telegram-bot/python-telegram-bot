@@ -24,12 +24,12 @@ from telegram import LabeledPrice, ShippingOption, Voice
 
 @pytest.fixture(scope='class')
 def shipping_option():
-    return ShippingOption(TestShippingOption.id, TestShippingOption.title,
+    return ShippingOption(TestShippingOption.id_, TestShippingOption.title,
                           TestShippingOption.prices)
 
 
 class TestShippingOption(object):
-    id = 'id'
+    id_ = 'id'
     title = 'title'
     prices = [
         LabeledPrice('Fish Container', 100),
@@ -37,7 +37,7 @@ class TestShippingOption(object):
     ]
 
     def test_expected_values(self, shipping_option):
-        assert shipping_option.id == self.id
+        assert shipping_option.id == self.id_
         assert shipping_option.title == self.title
         assert shipping_option.prices == self.prices
 
@@ -51,11 +51,11 @@ class TestShippingOption(object):
         assert shipping_option_dict['prices'][1] == shipping_option.prices[1].to_dict()
 
     def test_equality(self):
-        a = ShippingOption(self.id, self.title, self.prices)
-        b = ShippingOption(self.id, self.title, self.prices)
-        c = ShippingOption(self.id, '', [])
+        a = ShippingOption(self.id_, self.title, self.prices)
+        b = ShippingOption(self.id_, self.title, self.prices)
+        c = ShippingOption(self.id_, '', [])
         d = ShippingOption(0, self.title, self.prices)
-        e = Voice(self.id, 0)
+        e = Voice(self.id_, 0)
 
         assert a == b
         assert hash(a) == hash(b)

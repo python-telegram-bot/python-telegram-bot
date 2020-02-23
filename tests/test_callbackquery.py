@@ -24,7 +24,7 @@ from telegram import CallbackQuery, User, Message, Chat, Audio
 
 @pytest.fixture(scope='class', params=['message', 'inline'])
 def callback_query(bot, request):
-    cbq = CallbackQuery(TestCallbackQuery.id,
+    cbq = CallbackQuery(TestCallbackQuery.id_,
                         TestCallbackQuery.from_user,
                         TestCallbackQuery.chat_instance,
                         data=TestCallbackQuery.data,
@@ -38,7 +38,7 @@ def callback_query(bot, request):
 
 
 class TestCallbackQuery(object):
-    id = 'id'
+    id_ = 'id'
     from_user = User(1, 'test_user', False)
     chat_instance = 'chat_instance'
     message = Message(3, User(5, 'bot', False), None, Chat(4, 'private'))
@@ -47,7 +47,7 @@ class TestCallbackQuery(object):
     game_short_name = 'the_game'
 
     def test_de_json(self, bot):
-        json_dict = {'id': self.id,
+        json_dict = {'id': self.id_,
                      'from': self.from_user.to_dict(),
                      'chat_instance': self.chat_instance,
                      'message': self.message.to_dict(),
@@ -57,7 +57,7 @@ class TestCallbackQuery(object):
                      'default_quote': True}
         callback_query = CallbackQuery.de_json(json_dict, bot)
 
-        assert callback_query.id == self.id
+        assert callback_query.id == self.id_
         assert callback_query.from_user == self.from_user
         assert callback_query.chat_instance == self.chat_instance
         assert callback_query.message == self.message
@@ -92,8 +92,8 @@ class TestCallbackQuery(object):
         def test(*args, **kwargs):
             text = args[0] == 'test'
             try:
-                id = kwargs['inline_message_id'] == callback_query.inline_message_id
-                return id and text
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and text
             except KeyError:
                 chat_id = kwargs['chat_id'] == callback_query.message.chat_id
                 message_id = kwargs['message_id'] == callback_query.message.message_id
@@ -107,12 +107,12 @@ class TestCallbackQuery(object):
         def test(*args, **kwargs):
             caption = kwargs['caption'] == 'new caption'
             try:
-                id = kwargs['inline_message_id'] == callback_query.inline_message_id
-                return id and caption
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and caption
             except KeyError:
-                id = kwargs['chat_id'] == callback_query.message.chat_id
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
                 message = kwargs['message_id'] == callback_query.message.message_id
-                return id and message and caption
+                return id_ and message and caption
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_caption', test)
         assert callback_query.edit_message_caption(caption='new caption')
@@ -122,23 +122,23 @@ class TestCallbackQuery(object):
         def test(*args, **kwargs):
             reply_markup = kwargs['reply_markup'] == [['1', '2']]
             try:
-                id = kwargs['inline_message_id'] == callback_query.inline_message_id
-                return id and reply_markup
+                id_ = kwargs['inline_message_id'] == callback_query.inline_message_id
+                return id_ and reply_markup
             except KeyError:
-                id = kwargs['chat_id'] == callback_query.message.chat_id
+                id_ = kwargs['chat_id'] == callback_query.message.chat_id
                 message = kwargs['message_id'] == callback_query.message.message_id
-                return id and message and reply_markup
+                return id_ and message and reply_markup
 
         monkeypatch.setattr(callback_query.bot, 'edit_message_reply_markup', test)
         assert callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
         assert callback_query.edit_message_reply_markup([['1', '2']])
 
     def test_equality(self):
-        a = CallbackQuery(self.id, self.from_user, 'chat')
-        b = CallbackQuery(self.id, self.from_user, 'chat')
-        c = CallbackQuery(self.id, None, '')
+        a = CallbackQuery(self.id_, self.from_user, 'chat')
+        b = CallbackQuery(self.id_, self.from_user, 'chat')
+        c = CallbackQuery(self.id_, None, '')
         d = CallbackQuery('', None, 'chat')
-        e = Audio(self.id, 1)
+        e = Audio(self.id_, 1)
 
         assert a == b
         assert hash(a) == hash(b)

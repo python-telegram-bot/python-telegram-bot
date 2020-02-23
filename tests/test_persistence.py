@@ -317,8 +317,8 @@ def bad_pickle_files():
 
 @pytest.fixture(scope='function')
 def good_pickle_files(user_data, chat_data, bot_data, conversations):
-    all = {'user_data': user_data, 'chat_data': chat_data,
-           'bot_data': bot_data, 'conversations': conversations}
+    data = {'user_data': user_data, 'chat_data': chat_data,
+            'bot_data': bot_data, 'conversations': conversations}
     with open('pickletest_user_data', 'wb') as f:
         pickle.dump(user_data, f)
     with open('pickletest_chat_data', 'wb') as f:
@@ -328,7 +328,7 @@ def good_pickle_files(user_data, chat_data, bot_data, conversations):
     with open('pickletest_conversations', 'wb') as f:
         pickle.dump(conversations, f)
     with open('pickletest', 'wb') as f:
-        pickle.dump(all, f)
+        pickle.dump(data, f)
     yield True
     for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_bot_data',
                  'pickletest_conversations', 'pickletest']:
@@ -337,7 +337,7 @@ def good_pickle_files(user_data, chat_data, bot_data, conversations):
 
 @pytest.fixture(scope='function')
 def pickle_files_wo_bot_data(user_data, chat_data, conversations):
-    all = {'user_data': user_data, 'chat_data': chat_data, 'conversations': conversations}
+    data = {'user_data': user_data, 'chat_data': chat_data, 'conversations': conversations}
     with open('pickletest_user_data', 'wb') as f:
         pickle.dump(user_data, f)
     with open('pickletest_chat_data', 'wb') as f:
@@ -345,7 +345,7 @@ def pickle_files_wo_bot_data(user_data, chat_data, conversations):
     with open('pickletest_conversations', 'wb') as f:
         pickle.dump(conversations, f)
     with open('pickletest', 'wb') as f:
-        pickle.dump(all, f)
+        pickle.dump(data, f)
     yield True
     for name in ['pickletest_user_data', 'pickletest_chat_data',
                  'pickletest_conversations', 'pickletest']:
