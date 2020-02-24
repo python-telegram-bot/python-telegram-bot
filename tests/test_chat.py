@@ -25,7 +25,7 @@ from telegram import User, Message
 
 @pytest.fixture(scope='class')
 def chat(bot):
-    return Chat(TestChat.id, TestChat.title, TestChat.type, username=TestChat.username,
+    return Chat(TestChat.id_, TestChat.title, TestChat.type_, username=TestChat.username,
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot, sticker_set_name=TestChat.sticker_set_name,
                 can_set_sticker_set=TestChat.can_set_sticker_set,
@@ -33,9 +33,9 @@ def chat(bot):
 
 
 class TestChat(object):
-    id = -28767330
+    id_ = -28767330
     title = 'ToledosPalaceBot - Group'
-    type = 'group'
+    type_ = 'group'
     username = 'username'
     all_members_are_administrators = False
     sticker_set_name = 'stickers'
@@ -48,9 +48,9 @@ class TestChat(object):
 
     def test_de_json(self, bot):
         json_dict = {
-            'id': self.id,
+            'id': self.id_,
             'title': self.title,
-            'type': self.type,
+            'type': self.type_,
             'username': self.username,
             'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
@@ -59,9 +59,9 @@ class TestChat(object):
         }
         chat = Chat.de_json(json_dict, bot)
 
-        assert chat.id == self.id
+        assert chat.id == self.id_
         assert chat.title == self.title
-        assert chat.type == self.type
+        assert chat.type == self.type_
         assert chat.username == self.username
         assert chat.all_members_are_administrators == self.all_members_are_administrators
         assert chat.sticker_set_name == self.sticker_set_name
@@ -70,8 +70,8 @@ class TestChat(object):
 
     def test_de_json_default_quote(self, bot):
         json_dict = {
-            'id': self.id,
-            'type': self.type,
+            'id': self.id_,
+            'type': self.type_,
             'pinned_message': Message(
                 message_id=123,
                 from_user=None,
@@ -102,9 +102,9 @@ class TestChat(object):
 
     def test_send_action(self, monkeypatch, chat):
         def test(*args, **kwargs):
-            id = args[0] == chat.id
+            id_ = args[0] == chat.id
             action = kwargs['action'] == ChatAction.TYPING
-            return id and action
+            return id_ and action
 
         monkeypatch.setattr(chat.bot, 'send_chat_action', test)
         assert chat.send_action(action=ChatAction.TYPING)
@@ -238,11 +238,11 @@ class TestChat(object):
         assert chat.send_poll('test_poll')
 
     def test_equality(self):
-        a = Chat(self.id, self.title, self.type)
-        b = Chat(self.id, self.title, self.type)
-        c = Chat(self.id, '', '')
-        d = Chat(0, self.title, self.type)
-        e = User(self.id, '', False)
+        a = Chat(self.id_, self.title, self.type_)
+        b = Chat(self.id_, self.title, self.type_)
+        c = Chat(self.id_, '', '')
+        d = Chat(0, self.title, self.type_)
+        e = User(self.id_, '', False)
 
         assert a == b
         assert hash(a) == hash(b)

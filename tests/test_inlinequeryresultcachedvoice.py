@@ -26,7 +26,7 @@ from telegram import (InlineQueryResultCachedVoice, InlineKeyboardButton, Inline
 @pytest.fixture(scope='class')
 def inline_query_result_cached_voice():
     return InlineQueryResultCachedVoice(
-        TestInlineQueryResultCachedVoice.id,
+        TestInlineQueryResultCachedVoice.id_,
         TestInlineQueryResultCachedVoice.voice_file_id,
         TestInlineQueryResultCachedVoice.title,
         caption=TestInlineQueryResultCachedVoice.caption,
@@ -36,8 +36,8 @@ def inline_query_result_cached_voice():
 
 
 class TestInlineQueryResultCachedVoice(object):
-    id = 'id'
-    type = 'voice'
+    id_ = 'id'
+    type_ = 'voice'
     voice_file_id = 'voice file id'
     title = 'title'
     caption = 'caption'
@@ -46,8 +46,8 @@ class TestInlineQueryResultCachedVoice(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_cached_voice):
-        assert inline_query_result_cached_voice.type == self.type
-        assert inline_query_result_cached_voice.id == self.id
+        assert inline_query_result_cached_voice.type == self.type_
+        assert inline_query_result_cached_voice.id == self.id_
         assert inline_query_result_cached_voice.voice_file_id == self.voice_file_id
         assert inline_query_result_cached_voice.title == self.title
         assert inline_query_result_cached_voice.caption == self.caption
@@ -78,11 +78,11 @@ class TestInlineQueryResultCachedVoice(object):
                 == inline_query_result_cached_voice.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultCachedVoice(self.id, self.voice_file_id, self.title)
-        b = InlineQueryResultCachedVoice(self.id, self.voice_file_id, self.title)
-        c = InlineQueryResultCachedVoice(self.id, '', self.title)
+        a = InlineQueryResultCachedVoice(self.id_, self.voice_file_id, self.title)
+        b = InlineQueryResultCachedVoice(self.id_, self.voice_file_id, self.title)
+        c = InlineQueryResultCachedVoice(self.id_, '', self.title)
         d = InlineQueryResultCachedVoice('', self.voice_file_id, self.title)
-        e = InlineQueryResultCachedAudio(self.id, '', '')
+        e = InlineQueryResultCachedAudio(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQuery
 @pytest.fixture(scope='class')
 def inline_query_result_document():
     return InlineQueryResultDocument(
-        TestInlineQueryResultDocument.id,
+        TestInlineQueryResultDocument.id_,
         TestInlineQueryResultDocument.document_url,
         TestInlineQueryResultDocument.title,
         TestInlineQueryResultDocument.mime_type,
@@ -41,8 +41,8 @@ def inline_query_result_document():
 
 
 class TestInlineQueryResultDocument(object):
-    id = 'id'
-    type = 'document'
+    id_ = 'id'
+    type_ = 'document'
     document_url = 'document url'
     title = 'title'
     caption = 'caption'
@@ -56,8 +56,8 @@ class TestInlineQueryResultDocument(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_document):
-        assert inline_query_result_document.id == self.id
-        assert inline_query_result_document.type == self.type
+        assert inline_query_result_document.id == self.id_
+        assert inline_query_result_document.type == self.type_
         assert inline_query_result_document.document_url == self.document_url
         assert inline_query_result_document.title == self.title
         assert inline_query_result_document.caption == self.caption
@@ -99,13 +99,13 @@ class TestInlineQueryResultDocument(object):
                 == inline_query_result_document.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultDocument(self.id, self.document_url, self.title,
+        a = InlineQueryResultDocument(self.id_, self.document_url, self.title,
                                       self.mime_type)
-        b = InlineQueryResultDocument(self.id, self.document_url, self.title,
+        b = InlineQueryResultDocument(self.id_, self.document_url, self.title,
                                       self.mime_type)
-        c = InlineQueryResultDocument(self.id, '', self.title, self.mime_type)
+        c = InlineQueryResultDocument(self.id_, '', self.title, self.mime_type)
         d = InlineQueryResultDocument('', self.document_url, self.title, self.mime_type)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

@@ -32,11 +32,6 @@ from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
 from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
 from tests.bots import get_bot
 
-TRAVIS = os.getenv('TRAVIS', False)
-
-if TRAVIS:
-    pytest_plugins = ['tests.travis_fold']
-
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
 
 if GITHUB_ACTION:
