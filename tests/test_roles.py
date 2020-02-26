@@ -49,10 +49,15 @@ def role():
 
 class TestRole(object):
     def test_creation(self, parent_role):
-        r = Role(parent_roles=parent_role)
+        r = Role(parent_roles=[parent_role, parent_role])
         assert r.chat_ids == set()
         assert r.name == 'Role({})'
         assert r.parent_roles == set([parent_role])
+
+        r = Role(child_roles=[parent_role, parent_role])
+        assert r.chat_ids == set()
+        assert r.name == 'Role({})'
+        assert r.child_roles == set([parent_role])
 
         parent_role_2 = Role(name='parent_role_2')
         r = Role(parent_roles=[parent_role, parent_role_2])
@@ -114,16 +119,40 @@ class TestRole(object):
         role.remove_parent_role(parent_role_2)
         assert role.parent_roles == set()
 
-        with pytest.raises(ValueError, match='You must not add a role is its own parent!'):
+        with pytest.raises(ValueError, match='You must not add a role as its own parent!'):
             role.add_parent_role(role)
 
-    def test_equality(self, role, parent_role):
+        parent_role.add_parent_role(role)
+        with pytest.raises(ValueError, match='You must not add a child role as a parent!'):
+            role.add_parent_role(parent_role)
+
+    def test_add_remove_child_role(self, role, parent_role):
+        assert role.child_roles == set()
+        parent_role_2 = Role(chat_ids=456, name='pr2')
+        role.add_child_role(parent_role)
+        assert role.child_roles == set([parent_role])
+        role.add_child_role(parent_role_2)
+        assert role.child_roles == set([parent_role, parent_role_2])
+
+        role.remove_child_role(parent_role)
+        assert role.child_roles == set([parent_role_2])
+        role.remove_child_role(parent_role_2)
+        assert role.child_roles == set()
+
+        with pytest.raises(ValueError, match='You must not add a role as its own child!'):
+            role.add_child_role(role)
+
+        parent_role.add_child_role(role)
+        with pytest.raises(ValueError, match='You must not add a parent role as a child!'):
+            role.add_child_role(parent_role)
+
+    def test_equals(self, role, parent_role):
         r = Role(name='test')
         r2 = Role(name='test')
         assert role.equals(parent_role)
-        role.add_parent_role(r)
+        role.add_child_role(r)
         assert not role.equals(parent_role)
-        parent_role.add_parent_role(r2)
+        parent_role.add_child_role(r2)
         assert role.equals(parent_role)
 
         role.add_member(1)
@@ -139,22 +168,34 @@ class TestRole(object):
         parent_role.kick_member(2)
         assert role.equals(parent_role)
 
+        r.add_member(1)
+        assert not role.equals(parent_role)
+        r2.add_member(1)
+        assert role.equals(parent_role)
+
     def test_comparison(self, role, parent_role):
-        parent_role_2 = Role(name='parent_role')
         assert not role < parent_role
         assert not parent_role < role
+        assert role <= role
+        assert role >= role
+        assert parent_role <= parent_role
+        assert parent_role >= parent_role
+
         role.add_parent_role(parent_role)
         assert role < parent_role
         assert role <= parent_role
         assert parent_role >= role
         assert parent_role > role
-        assert role < parent_role_2
-        assert role <= parent_role_2
-        assert parent_role_2 >= role
-        assert parent_role_2 > role
+
         role.remove_parent_role(parent_role)
         assert not role < parent_role
         assert not parent_role < role
+
+        role.add_parent_role(parent_role)
+        assert role < parent_role
+        assert role <= parent_role
+        assert parent_role >= role
+        assert parent_role > role
 
     def test_hash(self, role, parent_role):
         assert role != parent_role
@@ -168,6 +209,7 @@ class TestRole(object):
 
     def test_deepcopy(self, role, parent_role):
         role.add_parent_role(parent_role)
+        child = Role(name='cr', chat_ids=[1, 2, 3], parent_roles=role)
         crole = deepcopy(role)
 
         assert role is not crole
@@ -179,6 +221,9 @@ class TestRole(object):
         cparent = crole.parent_roles.pop()
         assert parent is not cparent
         assert parent.equals(cparent)
+        cchild = crole.child_roles.pop()
+        assert child is not cchild
+        assert child.equals(cchild)
 
     def test_handler_user(self, update, role, parent_role):
         handler = MessageHandler(role, None)
@@ -232,6 +277,17 @@ class TestRole(object):
         update.message.chat.id = 1
         assert handler.check_update(update)
 
+    def test_handler_exclude_children(self, update, role, parent_role):
+        role.add_parent_role(parent_role)
+        parent_role.add_member(0)
+        role.add_member(1)
+
+        handler = MessageHandler(None, None, roles=~parent_role)
+        assert not handler.check_update(update)
+        update.message.from_user.id = 1
+        update.message.chat.id = 1
+        assert not handler.check_update(update)
+
     def test_handler_without_user(self, update, role):
         handler = MessageHandler(role, None)
         role.add_member(0)
@@ -276,8 +332,11 @@ class TestRoles(object):
         assert roles.ADMINS.chat_ids == set()
 
     def test_equality(self, parent_role, roles, bot):
-        roles2 = Roles(bot)
         parent_role_2 = deepcopy(parent_role)
+        child_role = Role(name='child_role')
+        child_role_2 = deepcopy(child_role)
+
+        roles2 = Roles(bot)
         assert roles == roles2
 
         roles.add_admin(1)
@@ -299,9 +358,13 @@ class TestRoles(object):
         assert roles == roles2
 
         roles['test_role'].add_parent_role(parent_role)
+        roles2['test_role'].add_parent_role(parent_role_2)
+        assert roles == roles2
+
+        roles['test_role'].add_child_role(child_role)
         assert roles != roles2
 
-        roles2['test_role'].add_parent_role(parent_role_2)
+        roles2['test_role'].add_child_role(child_role_2)
         assert roles == roles2
 
     def test_raise_errors(self, roles):
@@ -345,14 +408,20 @@ class TestRoles(object):
 
     def test_deepcopy(self, roles, parent_role):
         roles.add_admin(123)
-        roles.add_role(name='test', chat_ids=[1, 2], parent_roles=parent_role)
+        child_role = Role(name='child_role')
+        roles.add_role(name='test', chat_ids=[1, 2], parent_roles=parent_role,
+                       child_roles=child_role)
+        roles.add_role(name='test2', chat_ids=[3, 4], child_roles=roles['test'])
         croles = deepcopy(roles)
 
         assert croles is not roles
         assert croles == roles
         assert roles.ADMINS is not croles.ADMINS
+        assert roles.ADMINS.equals(croles.ADMINS)
         assert roles['test'] is not croles['test']
         assert roles['test'].equals(croles['test'])
+        assert roles['test2'] is not croles['test2']
+        assert roles['test2'].equals(croles['test2'])
 
     def test_add_remove_role(self, roles, parent_role):
         roles.add_role('role', parent_roles=parent_role)
@@ -454,9 +523,11 @@ class TestRoles(object):
         assert not handler.check_update(update)
 
     def test_json_encoding_decoding(self, roles, parent_role, bot):
+        child_role = Role(name='child_role')
         roles.add_role('role_1', chat_ids=[1, 2, 3])
-        roles.add_role('role_2', chat_ids=[4, 5, 6], parent_roles=parent_role)
-        roles.add_role('role_3', chat_ids=[7, 8], parent_roles=parent_role)
+        roles.add_role('role_2', chat_ids=[4, 5, 6], parent_roles=parent_role,
+                       child_roles=child_role)
+        roles.add_role('role_3', chat_ids=[7, 8], parent_roles=parent_role, child_roles=child_role)
         roles.add_admin(9)
         roles.add_admin(10)
 
@@ -470,9 +541,15 @@ class TestRoles(object):
         for name in rroles:
             assert rroles[name] <= rroles.ADMINS
         assert rroles.ADMINS.chat_ids == set([9, 10])
+        assert rroles.ADMINS.equals(roles.ADMINS)
         assert rroles['role_1'].chat_ids == set([1, 2, 3])
+        assert rroles['role_1'].equals(Role(name='role_1', chat_ids=[1, 2, 3]))
         assert rroles['role_2'].chat_ids == set([4, 5, 6])
+        assert rroles['role_2'].equals(Role(name='role_2', chat_ids=[4, 5, 6],
+                                       parent_roles=parent_role, child_roles=child_role))
         assert rroles['role_3'].chat_ids == set([7, 8])
+        assert rroles['role_3'].equals(Role(name='role_3', chat_ids=[7, 8],
+                                            parent_roles=parent_role, child_roles=child_role))
         for name in rroles:
             assert rroles[name] <= rroles.ADMINS
             assert rroles[name] < rroles.ADMINS

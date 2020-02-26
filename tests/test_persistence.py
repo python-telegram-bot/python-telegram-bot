@@ -495,11 +495,11 @@ class TestPickelPersistence(object):
 
         roles = pickle_persistence.get_roles()
         assert isinstance(roles, Roles)
-        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345))
-        assert roles['parent_role'].equals(Role(name='parent_role', chat_ids=456,
-                                                parent_roles=roles.ADMINS))
-        assert roles['role'].equals(Role(name='role', chat_ids=123,
-                                         parent_roles=[roles['parent_role'], roles.ADMINS]))
+        pr = Role(name='parent_role', chat_ids=456)
+        r = Role(name='role', chat_ids=123, parent_roles=pr)
+        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345, child_roles=[r, pr]))
+        assert roles['parent_role'].equals(pr)
+        assert roles['role'].equals(r)
         assert not roles.get('test', None)
 
         conversation1 = pickle_persistence.get_conversations('name1')
@@ -537,11 +537,11 @@ class TestPickelPersistence(object):
 
         roles = pickle_persistence.get_roles()
         assert isinstance(roles, Roles)
-        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345))
-        assert roles['parent_role'].equals(Role(name='parent_role', chat_ids=456,
-                                                parent_roles=roles.ADMINS))
-        assert roles['role'].equals(Role(name='role', chat_ids=123,
-                                         parent_roles=[roles['parent_role'], roles.ADMINS]))
+        pr = Role(name='parent_role', chat_ids=456)
+        r = Role(name='role', chat_ids=123, parent_roles=pr)
+        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345, child_roles=[r, pr]))
+        assert roles['parent_role'].equals(pr)
+        assert roles['role'].equals(r)
         assert not roles.get('test', None)
 
         conversation1 = pickle_persistence.get_conversations('name1')
@@ -1210,11 +1210,11 @@ class TestDictPersistence(object):
 
         roles = dict_persistence.get_roles()
         assert isinstance(roles, Roles)
-        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345))
-        assert roles['parent_role'].equals(Role(name='parent_role', chat_ids=456,
-                                                parent_roles=roles.ADMINS))
-        assert roles['role'].equals(Role(name='role', chat_ids=123,
-                                         parent_roles=[roles['parent_role'], roles.ADMINS]))
+        pr = Role(name='parent_role', chat_ids=456)
+        r = Role(name='role', chat_ids=123, parent_roles=pr)
+        assert roles.ADMINS.equals(Role(name='admins', chat_ids=12345, child_roles=[r, pr]))
+        assert roles['parent_role'].equals(pr)
+        assert roles['role'].equals(r)
         assert not roles.get('test', None)
 
         conversation1 = dict_persistence.get_conversations('name1')
