@@ -384,7 +384,6 @@ def update(bot):
 
 class TestPickelPersistence(object):
     def test_no_files_present_multi_file(self, pickle_persistence):
-        print(os.getcwd())
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_chat_data() == defaultdict(dict)
