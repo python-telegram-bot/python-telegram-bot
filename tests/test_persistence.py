@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
 import sys
-import shutil
 import tempfile
 
 from telegram.utils.helpers import encode_conversations_to_json
@@ -39,33 +38,15 @@ from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageH
     PicklePersistence, CommandHandler, DictPersistence, TypeHandler
 
 
-def setup_module(module):
-    # Switch to a temporary directory so we don't have to worry about cleaning up files
-    module.orig_dir = os.getcwd()
-    temp_dir = tempfile.TemporaryDirectory()
-    os.chdir(temp_dir.name)
-
-
-def teardown_module(module):
-    # Go back to original directory
-    os.chdir(module.orig_dir)
-
-
 @pytest.fixture(autouse=True)
-def remove_files():
-    # Remove all files from disk after every test
-    # Only removes files in the current, temporary directory
-    # That way we don't need to keep track of what files currently exist
-    yield
-    for filename in os.listdir(os.getcwd()):
-        file_path = os.path.join(os.getcwd(), filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+def change_directory():
+    orig_dir = os.getcwd()
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # Switch to a temporary directory so we don't have to worry about cleaning up files
+        os.chdir(tmpdirname)
+        yield
+        # Go back to original directory
+        os.chdir(orig_dir)
 
 
 @pytest.fixture(scope="function")
