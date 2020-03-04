@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
 import sys
-import tempfile
 
 from telegram.utils.helpers import encode_conversations_to_json
 
@@ -39,14 +38,13 @@ from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageH
 
 
 @pytest.fixture(autouse=True)
-def change_directory():
+def change_directory(tmp_path):
     orig_dir = os.getcwd()
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        # Switch to a temporary directory so we don't have to worry about cleaning up files
-        os.chdir(tmpdirname)
-        yield
-        # Go back to original directory
-        os.chdir(orig_dir)
+    # Switch to a temporary directory so we don't have to worry about cleaning up files
+    os.chdir(tmp_path)
+    yield
+    # Go back to original directory
+    os.chdir(orig_dir)
 
 
 @pytest.fixture(scope="function")
