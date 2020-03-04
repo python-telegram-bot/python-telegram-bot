@@ -41,7 +41,8 @@ from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageH
 def change_directory(tmp_path):
     orig_dir = os.getcwd()
     # Switch to a temporary directory so we don't have to worry about cleaning up files
-    os.chdir(tmp_path)
+    # (str() for py<3.6)
+    os.chdir(str(tmp_path))
     yield
     # Go back to original directory
     os.chdir(orig_dir)
