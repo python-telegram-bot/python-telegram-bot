@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import signal
 import sys
+import shutil
+import tempfile
 
 from telegram.utils.helpers import encode_conversations_to_json
 
@@ -35,6 +37,35 @@ import pytest
 from telegram import Update, Message, User, Chat, MessageEntity
 from telegram.ext import BasePersistence, Updater, ConversationHandler, MessageHandler, Filters, \
     PicklePersistence, CommandHandler, DictPersistence, TypeHandler
+
+
+def setup_module(module):
+    # Switch to a temporary directory so we don't have to worry about cleaning up files
+    module.orig_dir = os.getcwd()
+    temp_dir = tempfile.TemporaryDirectory()
+    os.chdir(temp_dir.name)
+
+
+def teardown_module(module):
+    # Go back to original directory
+    os.chdir(module.orig_dir)
+
+
+@pytest.fixture(autouse=True)
+def remove_files():
+    # Remove all files from disk after every test
+    # Only removes files in the current, temporary directory
+    # That way we don't need to keep track of what files currently exist
+    yield
+    for filename in os.listdir(os.getcwd()):
+        file_path = os.path.join(os.getcwd(), filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
 @pytest.fixture(scope="function")
@@ -310,9 +341,6 @@ def bad_pickle_files():
         with open(name, 'w') as f:
             f.write('(())')
     yield True
-    for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_bot_data',
-                 'pickletest_conversations', 'pickletest']:
-        os.remove(name)
 
 
 @pytest.fixture(scope='function')
@@ -330,9 +358,6 @@ def good_pickle_files(user_data, chat_data, bot_data, conversations):
     with open('pickletest', 'wb') as f:
         pickle.dump(data, f)
     yield True
-    for name in ['pickletest_user_data', 'pickletest_chat_data', 'pickletest_bot_data',
-                 'pickletest_conversations', 'pickletest']:
-        os.remove(name)
 
 
 @pytest.fixture(scope='function')
@@ -347,9 +372,6 @@ def pickle_files_wo_bot_data(user_data, chat_data, conversations):
     with open('pickletest', 'wb') as f:
         pickle.dump(data, f)
     yield True
-    for name in ['pickletest_user_data', 'pickletest_chat_data',
-                 'pickletest_conversations', 'pickletest']:
-        os.remove(name)
 
 
 @pytest.fixture(scope='function')
@@ -362,6 +384,7 @@ def update(bot):
 
 class TestPickelPersistence(object):
     def test_no_files_present_multi_file(self, pickle_persistence):
+        print(os.getcwd())
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_chat_data() == defaultdict(dict)
@@ -776,9 +799,6 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_bot_data()['test'] == 'Working3!'
 
     def test_flush_on_stop_only_bot(self, bot, update, pickle_persistence_only_bot):
-        os.remove('pickletest_user_data')
-        os.remove('pickletest_chat_data')
-        os.remove('pickletest_bot_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_bot)
         dp = u.dispatcher
         u.running = True
@@ -800,7 +820,6 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_bot_data()['my_test3'] == 'Working3!'
 
     def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
-        os.remove('pickletest_bot_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
         dp = u.dispatcher
         u.running = True
@@ -821,7 +840,6 @@ class TestPickelPersistence(object):
         assert pickle_persistence_2.get_bot_data() == {}
 
     def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
-        os.remove('pickletest_chat_data')
         u = Updater(bot=bot, persistence=pickle_persistence_only_user)
         dp = u.dispatcher
         u.running = True
@@ -922,17 +940,6 @@ class TestPickelPersistence(object):
         assert ch.conversations == pickle_persistence.conversations['name2']
         assert nested_ch.conversations[nested_ch._get_key(update)] == 1
         assert nested_ch.conversations == pickle_persistence.conversations['name3']
-
-    @classmethod
-    def teardown_class(cls):
-        try:
-            for name in ['pickletest_user_data', 'pickletest_chat_data',
-                         'pickletest_bot_data',
-                         'pickletest_conversations',
-                         'pickletest']:
-                os.remove(name)
-        except Exception:
-            pass
 
 
 @pytest.fixture(scope='function')
