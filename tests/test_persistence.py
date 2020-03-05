@@ -104,12 +104,16 @@ class TestBasePersistence(object):
     def test_creation(self, base_persistence):
         assert base_persistence.store_chat_data
         assert base_persistence.store_user_data
+        assert base_persistence.store_bot_data
+        assert base_persistence.store_roles
         with pytest.raises(NotImplementedError):
             base_persistence.get_bot_data()
         with pytest.raises(NotImplementedError):
             base_persistence.get_chat_data()
         with pytest.raises(NotImplementedError):
             base_persistence.get_user_data()
+        with pytest.raises(NotImplementedError):
+            base_persistence.get_roles()
         with pytest.raises(NotImplementedError):
             base_persistence.get_conversations("test")
         with pytest.raises(NotImplementedError):
@@ -118,6 +122,8 @@ class TestBasePersistence(object):
             base_persistence.update_chat_data(None, None)
         with pytest.raises(NotImplementedError):
             base_persistence.update_user_data(None, None)
+        with pytest.raises(NotImplementedError):
+            base_persistence.update_roles(None)
         with pytest.raises(NotImplementedError):
             base_persistence.update_conversation(None, None, None)
 

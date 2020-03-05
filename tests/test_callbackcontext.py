@@ -132,6 +132,8 @@ class TestCallbackContext(object):
             callback_context.user_data = {}
         with pytest.raises(AttributeError):
             callback_context.chat_data = "test"
+        with pytest.raises(AttributeError):
+            callback_context.roles = "test"
 
     def test_dispatcher_attribute(self, cdp):
         callback_context = CallbackContext(cdp)

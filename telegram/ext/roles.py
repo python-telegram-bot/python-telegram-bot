@@ -101,7 +101,6 @@ class Role(Filters.user):
             roles can do anything, this role can do. May be empty.
         child_roles (set(:class:`telegram.ext.Role`)): Child roles of this role. This role can do
             anything, its child roles can do. May be empty.
-        name (:obj:`str`): A string representation of this role.
 
     Args:
         chat_ids (:obj:`int` | iterable(:obj:`int`), optional): The ids of the users/chats of this
@@ -120,7 +119,7 @@ class Role(Filters.user):
         if chat_ids is None:
             chat_ids = set()
         super(Role, self).__init__(chat_ids)
-        self._name = name
+        self.name = name
 
         self.parent_roles = set()
         if isinstance(parent_roles, Role):
@@ -149,15 +148,6 @@ class Role(Filters.user):
     @chat_ids.setter
     def chat_ids(self, chat_id):
         self.user_ids = chat_id
-
-    @property
-    def name(self):
-        if self._name:
-            return 'Role({})'.format(self._name)
-        elif self.chat_ids:
-            return 'Role({})'.format(self.chat_ids)
-        else:
-            return 'Role({})'
 
     def _filter_children(self, user, chat):
         # filters only downward
@@ -308,13 +298,21 @@ class Role(Filters.user):
         return id(self)
 
     def __deepcopy__(self, memo):
-        new_role = Role(chat_ids=self.chat_ids, name=self._name)
+        new_role = Role(chat_ids=self.chat_ids, name=self.name)
         memo[id(self)] = new_role
         for pr in self.parent_roles:
             new_role.add_parent_role(deepcopy(pr, memo))
         for cr in self.child_roles:
             new_role.add_child_role(deepcopy(cr, memo))
         return new_role
+
+    def __repr__(self):
+        if self.name:
+            return 'Role({})'.format(self.name)
+        elif self.chat_ids:
+            return 'Role({})'.format(self.chat_ids)
+        else:
+            return 'Role({})'
 
 
 class _chat_admins(Role):
@@ -523,12 +521,12 @@ class Roles(dict):
         for chat_id in self.ADMINS.chat_ids:
             new_roles.add_admin(chat_id)
         for role in self.values():
-            new_roles.add_role(name=role._name, chat_ids=role.chat_ids)
+            new_roles.add_role(name=role.name, chat_ids=role.chat_ids)
             for pr in role.parent_roles:
                 if pr is not self.ADMINS:
-                    new_roles[role._name].add_parent_role(deepcopy(pr, memo))
+                    new_roles[role.name].add_parent_role(deepcopy(pr, memo))
             for cr in role.child_roles:
-                new_roles[role._name].add_child_role(deepcopy(cr, memo))
+                new_roles[role.name].add_child_role(deepcopy(cr, memo))
         return new_roles
 
     def encode_to_json(self):
@@ -545,7 +543,7 @@ class Roles(dict):
             id_ = id(role)
             if id_ not in memo and id_ not in trace:
                 trace.append(id_)
-                inner_tmp = {'name': role._name, 'chat_ids': sorted(role.chat_ids)}
+                inner_tmp = {'name': role.name, 'chat_ids': sorted(role.chat_ids)}
                 inner_tmp['parent_roles'] = [
                     _encode_role_to_json(pr, memo, trace) for pr in role.parent_roles
                 ]
@@ -591,5 +589,5 @@ class Roles(dict):
         roles.ADMINS = _decode_role_from_json(tmp['admins'], memo)
         for id_ in tmp['roles']:
             role = _decode_role_from_json(id_, memo)
-            roles._setitem(role._name, role)
+            roles._setitem(role.name, role)
         return roles
