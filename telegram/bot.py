@@ -169,6 +169,9 @@ class Bot(TelegramObject):
             else:
                 data['media'].parse_mode = None
 
+        # Append parameters passed as kwargs to data
+        data.update(kwargs)
+
         result = self._request.post(url, data, timeout=timeout)
 
         if result is True:
