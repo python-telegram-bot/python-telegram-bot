@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Role, which allows to restrict access to handlers."""
+import time
 
 try:
     import ujson as json
@@ -320,27 +321,41 @@ class _chat_admins(Role):
     def __init__(self, bot):
         super(_chat_admins, self).__init__(name='chat_admins')
         self._bot = bot
+        self._cache = {}
+        self._timeout = 1800
 
     def filter(self, update):
         user = update.effective_user
         chat = update.effective_chat
         if user and chat:
-            admins = self._bot.get_chat_administrators(chat.id)
-            return user.id in [m.user.id for m in admins]
+            # Check for cached info first
+            if (self._cache.get(chat.id, None)
+                    and (time.time() - self._cache[chat.id][0]) < self._timeout):
+                return user.id in self._cache[chat.id][1]
+            admins = [m.user.id for m in self._bot.get_chat_administrators(chat.id)]
+            self._cache[chat.id] = (time.time(), admins)
+            return user.id in admins
 
 
 class _chat_creator(Role):
     def __init__(self, bot):
         super(_chat_creator, self).__init__(name='chat_creator')
         self._bot = bot
+        self._cache = {}
 
     def filter(self, update):
         user = update.effective_user
         chat = update.effective_chat
         if user and chat:
+            # Check for cached info first
+            if self._cache.get(chat.id, None):
+                return user.id == self._cache[chat.id]
             try:
                 member = self._bot.get_chat_member(chat.id, user.id)
-                return member.status == ChatMember.CREATOR
+                if member.status == ChatMember.CREATOR:
+                    self._cache[chat.id] = user.id
+                    return True
+                return False
             except TelegramError:
                 # user is not a chat member or bot has no access
                 return False
@@ -365,7 +380,7 @@ class Roles(dict):
             roles added to this instance will be child roles of :attr:`ADMINS`.
         CHAT_ADMINS (:class:`telegram.ext.Role`): Use this role to restrict access to admins of a
             chat. Handlers with this role wont handle updates that don't have an
-            ``effective_chat``.
+            ``effective_chat``. Admins are cached for each chat with a timeout of half an hour.
         CHAT_CREATOR (:class:`telegram.ext.Role`): Use this role to restrict access to the creator
             of a chat. Handlers with this role wont handle updates that don't have an
             ``effective_chat``.
