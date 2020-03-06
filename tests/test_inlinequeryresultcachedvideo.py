@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InputTextMessa
 @pytest.fixture(scope='class')
 def inline_query_result_cached_video():
     return InlineQueryResultCachedVideo(
-        TestInlineQueryResultCachedVideo.id,
+        TestInlineQueryResultCachedVideo.id_,
         TestInlineQueryResultCachedVideo.video_file_id,
         TestInlineQueryResultCachedVideo.title,
         caption=TestInlineQueryResultCachedVideo.caption,
@@ -37,8 +37,8 @@ def inline_query_result_cached_video():
 
 
 class TestInlineQueryResultCachedVideo(object):
-    id = 'id'
-    type = 'video'
+    id_ = 'id'
+    type_ = 'video'
     video_file_id = 'video file id'
     title = 'title'
     caption = 'caption'
@@ -48,8 +48,8 @@ class TestInlineQueryResultCachedVideo(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_cached_video):
-        assert inline_query_result_cached_video.type == self.type
-        assert inline_query_result_cached_video.id == self.id
+        assert inline_query_result_cached_video.type == self.type_
+        assert inline_query_result_cached_video.id == self.id_
         assert inline_query_result_cached_video.video_file_id == self.video_file_id
         assert inline_query_result_cached_video.title == self.title
         assert inline_query_result_cached_video.description == self.description
@@ -83,11 +83,11 @@ class TestInlineQueryResultCachedVideo(object):
                 == inline_query_result_cached_video.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
-        b = InlineQueryResultCachedVideo(self.id, self.video_file_id, self.title)
-        c = InlineQueryResultCachedVideo(self.id, '', self.title)
+        a = InlineQueryResultCachedVideo(self.id_, self.video_file_id, self.title)
+        b = InlineQueryResultCachedVideo(self.id_, self.video_file_id, self.title)
+        c = InlineQueryResultCachedVideo(self.id_, '', self.title)
         d = InlineQueryResultCachedVideo('', self.video_file_id, self.title)
-        e = InlineQueryResultCachedVoice(self.id, '', '')
+        e = InlineQueryResultCachedVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

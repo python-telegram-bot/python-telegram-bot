@@ -24,20 +24,20 @@ from telegram import PassportElementErrorFrontSide, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_front_side():
-    return PassportElementErrorFrontSide(TestPassportElementErrorFrontSide.type,
+    return PassportElementErrorFrontSide(TestPassportElementErrorFrontSide.type_,
                                          TestPassportElementErrorFrontSide.file_hash,
                                          TestPassportElementErrorFrontSide.message)
 
 
 class TestPassportElementErrorFrontSide(object):
     source = 'front_side'
-    type = 'test_type'
+    type_ = 'test_type'
     file_hash = 'file_hash'
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_front_side):
         assert passport_element_error_front_side.source == self.source
-        assert passport_element_error_front_side.type == self.type
+        assert passport_element_error_front_side.type == self.type_
         assert passport_element_error_front_side.file_hash == self.file_hash
         assert passport_element_error_front_side.message == self.message
 
@@ -55,12 +55,12 @@ class TestPassportElementErrorFrontSide(object):
                 == passport_element_error_front_side.message)
 
     def test_equality(self):
-        a = PassportElementErrorFrontSide(self.type, self.file_hash, self.message)
-        b = PassportElementErrorFrontSide(self.type, self.file_hash, self.message)
-        c = PassportElementErrorFrontSide(self.type, '', '')
+        a = PassportElementErrorFrontSide(self.type_, self.file_hash, self.message)
+        b = PassportElementErrorFrontSide(self.type_, self.file_hash, self.message)
+        c = PassportElementErrorFrontSide(self.type_, '', '')
         d = PassportElementErrorFrontSide('', self.file_hash, '')
         e = PassportElementErrorFrontSide('', '', self.message)
-        f = PassportElementErrorSelfie(self.type, self.file_hash, self.message)
+        f = PassportElementErrorSelfie(self.type_, self.file_hash, self.message)
 
         assert a == b
         assert hash(a) == hash(b)

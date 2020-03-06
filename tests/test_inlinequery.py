@@ -24,12 +24,12 @@ from telegram import User, Location, InlineQuery, Update
 
 @pytest.fixture(scope='class')
 def inline_query(bot):
-    return InlineQuery(TestInlineQuery.id, TestInlineQuery.from_user, TestInlineQuery.query,
+    return InlineQuery(TestInlineQuery.id_, TestInlineQuery.from_user, TestInlineQuery.query,
                        TestInlineQuery.offset, location=TestInlineQuery.location, bot=bot)
 
 
 class TestInlineQuery(object):
-    id = 1234
+    id_ = 1234
     from_user = User(1, 'First name', False)
     query = 'query text'
     offset = 'offset'
@@ -37,7 +37,7 @@ class TestInlineQuery(object):
 
     def test_de_json(self, bot):
         json_dict = {
-            'id': self.id,
+            'id': self.id_,
             'from': self.from_user.to_dict(),
             'query': self.query,
             'offset': self.offset,
@@ -45,7 +45,7 @@ class TestInlineQuery(object):
         }
         inline_query_json = InlineQuery.de_json(json_dict, bot)
 
-        assert inline_query_json.id == self.id
+        assert inline_query_json.id == self.id_
         assert inline_query_json.from_user == self.from_user
         assert inline_query_json.location == self.location
         assert inline_query_json.query == self.query
@@ -69,11 +69,11 @@ class TestInlineQuery(object):
         assert inline_query.answer()
 
     def test_equality(self):
-        a = InlineQuery(self.id, User(1, '', False), '', '')
-        b = InlineQuery(self.id, User(1, '', False), '', '')
-        c = InlineQuery(self.id, User(0, '', False), '', '')
+        a = InlineQuery(self.id_, User(1, '', False), '', '')
+        b = InlineQuery(self.id_, User(1, '', False), '', '')
+        c = InlineQuery(self.id_, User(0, '', False), '', '')
         d = InlineQuery(0, User(1, '', False), '', '')
-        e = Update(self.id)
+        e = Update(self.id_)
 
         assert a == b
         assert hash(a) == hash(b)

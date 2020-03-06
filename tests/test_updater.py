@@ -150,7 +150,7 @@ class TestUpdater(object):
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(
             ip,
             port,
@@ -186,7 +186,7 @@ class TestUpdater(object):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         tg_err = False
         try:
             updater._start_webhook(
@@ -210,7 +210,7 @@ class TestUpdater(object):
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(ip, port, webhook_url=None)
         sleep(.2)
 
@@ -230,7 +230,7 @@ class TestUpdater(object):
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(
             ip,
             port,

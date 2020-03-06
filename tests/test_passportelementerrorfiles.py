@@ -24,20 +24,20 @@ from telegram import PassportElementErrorFiles, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_files():
-    return PassportElementErrorFiles(TestPassportElementErrorFiles.type,
+    return PassportElementErrorFiles(TestPassportElementErrorFiles.type_,
                                      TestPassportElementErrorFiles.file_hashes,
                                      TestPassportElementErrorFiles.message)
 
 
 class TestPassportElementErrorFiles(object):
     source = 'files'
-    type = 'test_type'
+    type_ = 'test_type'
     file_hashes = ['hash1', 'hash2']
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_files):
         assert passport_element_error_files.source == self.source
-        assert passport_element_error_files.type == self.type
+        assert passport_element_error_files.type == self.type_
         assert isinstance(passport_element_error_files.file_hashes, list)
         assert passport_element_error_files.file_hashes == self.file_hashes
         assert passport_element_error_files.message == self.message
@@ -56,12 +56,12 @@ class TestPassportElementErrorFiles(object):
                 == passport_element_error_files.message)
 
     def test_equality(self):
-        a = PassportElementErrorFiles(self.type, self.file_hashes, self.message)
-        b = PassportElementErrorFiles(self.type, self.file_hashes, self.message)
-        c = PassportElementErrorFiles(self.type, '', '')
+        a = PassportElementErrorFiles(self.type_, self.file_hashes, self.message)
+        b = PassportElementErrorFiles(self.type_, self.file_hashes, self.message)
+        c = PassportElementErrorFiles(self.type_, '', '')
         d = PassportElementErrorFiles('', self.file_hashes, '')
         e = PassportElementErrorFiles('', '', self.message)
-        f = PassportElementErrorSelfie(self.type, '', self.message)
+        f = PassportElementErrorSelfie(self.type_, '', self.message)
 
         assert a == b
         assert hash(a) == hash(b)

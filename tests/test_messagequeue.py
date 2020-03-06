@@ -25,7 +25,6 @@ import pytest
 import telegram.ext.messagequeue as mq
 
 
-@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
 @pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
                     reason="On windows precise timings are not accurate.")
 class TestDelayQueue(object):
@@ -43,7 +42,7 @@ class TestDelayQueue(object):
                             autostart=True)
         assert dsp.is_alive() is True
 
-        for i in range(self.N):
+        for _ in range(self.N):
             dsp(self.call)
 
         starttime = mq.curtime()
