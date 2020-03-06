@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # flake8: noqa: E501
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -296,9 +296,9 @@ class TestPassport(object):
         selfie = passport_data.decrypted_data[1].selfie
 
         def get_file(*args, **kwargs):
-            return File(args[1])
+            return File(args[0])
 
-        monkeypatch.setattr('telegram.Bot.get_file', get_file)
+        monkeypatch.setattr(passport_data.bot, 'get_file', get_file)
         file = selfie.get_file()
         assert file.file_id == selfie.file_id
         assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash

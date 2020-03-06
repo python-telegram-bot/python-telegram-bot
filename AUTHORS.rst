@@ -26,7 +26,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
-- `Dmitry Grigoryev <https://github.com/icecom-dg>`_
+- `Eana Hufwe <https://github.com/blueset>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `Emilio Molinari <https://github.com/xates>`_
@@ -68,6 +68,8 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Poolitzer <https://github.com/Poolitzer>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `Riko Naka <https://github.com/rikonaka>`_
+- `Rizlas <https://github.com/rizlas>`_
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_

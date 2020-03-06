@@ -3,7 +3,7 @@
 # pylint: disable=E0611,E0213,E1102,C0103,E1101,W0613,R0913,R0904
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,8 @@
 """This module contains an object that represents a Telegram Bot."""
 
 import functools
+import inspect
+from decorator import decorate
 
 try:
     import ujson as json
@@ -39,7 +41,7 @@ from telegram import (User, Message, Update, Chat, ChatMember, UserProfilePhotos
                       PhotoSize, Audio, Document, Sticker, Video, Animation, Voice, VideoNote,
                       Location, Venue, Contact, InputFile, Poll)
 from telegram.error import InvalidToken, TelegramError
-from telegram.utils.helpers import to_timestamp
+from telegram.utils.helpers import to_timestamp, DEFAULT_NONE
 from telegram.utils.request import Request
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
@@ -57,18 +59,17 @@ def info(func):
     return decorator
 
 
-def log(func):
+def log(func, *args, **kwargs):
     logger = logging.getLogger(func.__module__)
 
-    @functools.wraps(func)
     def decorator(self, *args, **kwargs):
         logger.debug('Entering: %s', func.__name__)
-        result = func(self, *args, **kwargs)
+        result = func(*args, **kwargs)
         logger.debug(result)
         logger.debug('Exiting: %s', func.__name__)
         return result
 
-    return decorator
+    return decorate(func, decorator)
 
 
 class Bot(TelegramObject):
@@ -82,12 +83,54 @@ class Bot(TelegramObject):
             :obj:`telegram.utils.request.Request`.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
+        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
+            be used if not set explicitly in the bot methods.
 
     """
 
-    def __init__(self, token, base_url=None, base_file_url=None, request=None, private_key=None,
-                 private_key_password=None):
+    def __new__(cls, *args, **kwargs):
+        # Get default values from kwargs
+        defaults = kwargs.get('defaults')
+
+        # Make an instance of the class
+        instance = super(Bot, cls).__new__(cls)
+
+        if not defaults:
+            return instance
+
+        # For each method ...
+        for method_name, method in inspect.getmembers(instance, predicate=inspect.ismethod):
+            # ... get kwargs
+            argspec = inspect.getargspec(method)
+            kwarg_names = argspec.args[-len(argspec.defaults or []):]
+            # ... check if Defaults has a attribute that matches the kwarg name
+            needs_default = [
+                kwarg_name for kwarg_name in kwarg_names if hasattr(defaults, kwarg_name)
+            ]
+            # ... make a dict of kwarg name and the default value
+            default_kwargs = {
+                kwarg_name: getattr(defaults, kwarg_name) for kwarg_name in needs_default if (
+                    getattr(defaults, kwarg_name) is not DEFAULT_NONE
+                )
+            }
+            # ... apply the defaults using a partial
+            if default_kwargs:
+                setattr(instance, method_name, functools.partial(method, **default_kwargs))
+
+        return instance
+
+    def __init__(self,
+                 token,
+                 base_url=None,
+                 base_file_url=None,
+                 request=None,
+                 private_key=None,
+                 private_key_password=None,
+                 defaults=None):
         self.token = self._validate_token(token)
+
+        # Gather default
+        self.defaults = defaults
 
         if base_url is None:
             base_url = 'https://api.telegram.org/bot'
@@ -120,10 +163,19 @@ class Bot(TelegramObject):
             else:
                 data['reply_markup'] = reply_markup
 
+        if data.get('media') and (data['media'].parse_mode == DEFAULT_NONE):
+            if self.defaults:
+                data['media'].parse_mode = self.defaults.parse_mode
+            else:
+                data['media'].parse_mode = None
+
         result = self._request.post(url, data, timeout=timeout)
 
         if result is True:
             return result
+
+        if self.defaults:
+            result['default_quote'] = self.defaults.quote
 
         return Message.de_json(result, self)
 
@@ -457,7 +509,7 @@ class Bot(TelegramObject):
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                A thumbnail's width and height should not exceed 320. Ignored if the file is not
                 is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -540,7 +592,7 @@ class Bot(TelegramObject):
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                A thumbnail's width and height should not exceed 320. Ignored if the file is not
                 is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -678,7 +730,7 @@ class Bot(TelegramObject):
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                A thumbnail's width and height should not exceed 320. Ignored if the file is not
                 is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -757,7 +809,7 @@ class Bot(TelegramObject):
                 instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                A thumbnail's width and height should not exceed 320. Ignored if the file is not
                 is passed as a string or file_id.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -822,7 +874,7 @@ class Bot(TelegramObject):
             height (:obj:`int`, optional): Animation height.
             thumb (`filelike object`, optional): Thumbnail of the
                 file sent. The thumbnail should be in JPEG format and less than 200 kB in size.
-                A thumbnail's width and height should not exceed 90. Ignored if the file is not
+                A thumbnail's width and height should not exceed 320. Ignored if the file is not
                 is passed as a string or file_id.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id), 0-1024 characters.
@@ -978,12 +1030,23 @@ class Bot(TelegramObject):
 
         data = {'chat_id': chat_id, 'media': media}
 
+        for m in data['media']:
+            if m.parse_mode == DEFAULT_NONE:
+                if self.defaults:
+                    m.parse_mode = self.defaults.parse_mode
+                else:
+                    m.parse_mode = None
+
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if disable_notification:
             data['disable_notification'] = disable_notification
 
         result = self._request.post(url, data, timeout=timeout)
+
+        if self.defaults:
+            for res in result:
+                res['default_quote'] = self.defaults.quote
 
         return [Message.de_json(res, self) for res in result]
 
@@ -1073,8 +1136,9 @@ class Bot(TelegramObject):
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -1082,9 +1146,8 @@ class Bot(TelegramObject):
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1447,6 +1510,27 @@ class Bot(TelegramObject):
         """
         url = '{0}/answerInlineQuery'.format(self.base_url)
 
+        for res in results:
+            if res._has_parse_mode and res.parse_mode == DEFAULT_NONE:
+                if self.defaults:
+                    res.parse_mode = self.defaults.parse_mode
+                else:
+                    res.parse_mode = None
+            if res._has_input_message_content and res.input_message_content:
+                if (res.input_message_content._has_parse_mode
+                        and res.input_message_content.parse_mode == DEFAULT_NONE):
+                    if self.defaults:
+                        res.input_message_content.parse_mode = self.defaults.parse_mode
+                    else:
+                        res.input_message_content.parse_mode = None
+                if (res.input_message_content._has_disable_web_page_preview
+                        and res.input_message_content.disable_web_page_preview == DEFAULT_NONE):
+                    if self.defaults:
+                        res.input_message_content.disable_web_page_preview = \
+                            self.defaults.disable_web_page_preview
+                    else:
+                        res.input_message_content.disable_web_page_preview = None
+
         results = [res.to_dict() for res in results]
 
         data = {'inline_query_id': inline_query_id, 'results': results}
@@ -1704,21 +1788,21 @@ class Bot(TelegramObject):
         bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername)
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             text (:obj:`str`): New text of the message.
-            parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
-                italic, fixed-width text or inline URLs in your bot's message. See the constants in
-                :class:`telegram.ParseMode` for the available modes.
+            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
+                show bold, italic, fixed-width text or inline URLs in your bot's message. See the
+                constants in :class:`telegram.ParseMode` for the available modes.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1764,8 +1848,9 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername)
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -1774,9 +1859,8 @@ class Bot(TelegramObject):
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
                 constants in :class:`telegram.ParseMode` for the available modes.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1829,17 +1913,17 @@ class Bot(TelegramObject):
         returned.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`, optional): Unique identifier for the target chat or
-                username of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
             media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1877,15 +1961,15 @@ class Bot(TelegramObject):
         (for inline bots).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format @channelusername).
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
+                specified. Unique identifier for the target chat or username of the target channel
+                (in the format @channelusername).
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
+                object for an inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1940,10 +2024,10 @@ class Bot(TelegramObject):
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to 0,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
-            allowed_updates (List[:obj:`str`]), optional): List the types of updates you want your
-                bot to receive. For example, specify ["message", "edited_channel_post",
-                "callback_query"] to only receive updates of these types. See
-                :class:`telegram.Update` for a complete list of available update types.
+            allowed_updates (List[:obj:`str`]), optional): A JSON-serialized list the types of
+                updates you want your bot to receive. For example, specify ["message",
+                "edited_channel_post", "callback_query"] to only receive updates of these types.
+                See :class:`telegram.Update` for a complete list of available update types.
                 Specify an empty list to receive all updates regardless of type (default). If not
                 specified, the previous setting will be used. Please note that this parameter
                 doesn't affect updates created before the call to the get_updates, so unwanted
@@ -1987,6 +2071,10 @@ class Bot(TelegramObject):
         else:
             self.logger.debug('No new updates found.')
 
+        if self.defaults:
+            for u in result:
+                u['default_quote'] = self.defaults.quote
+
         return [Update.de_json(u, self) for u in result]
 
     @log
@@ -2020,14 +2108,14 @@ class Bot(TelegramObject):
                 connections to the webhook for update delivery, 1-100. Defaults to 40. Use lower
                 values to limit the load on your bot's server, and higher values to increase your
                 bot's throughput.
-            allowed_updates (List[:obj:`str`], optional): List the types of updates you want your
-                bot to receive. For example, specify ["message", "edited_channel_post",
-                "callback_query"] to only receive updates of these types. See
-                :class:`telegram.Update` for a complete list of available update types. Specify an
-                empty list to receive all updates regardless of type (default). If not specified,
-                the previous setting will be used. Please note that this parameter doesn't affect
-                updates created before the call to the set_webhook, so unwanted updates may be
-                received for a short period of time.
+            allowed_updates (List[:obj:`str`], optional): A JSON-serialized list the types of
+                updates you want your bot to receive. For example, specify ["message",
+                "edited_channel_post", "callback_query"] to only receive updates of these types.
+                See :class:`telegram.Update` for a complete list of available update types.
+                Specify an empty list to receive all updates regardless of type (default). If not
+                specified, the previous setting will be used. Please note that this parameter
+                doesn't affect updates created before the call to the set_webhook, so unwanted
+                updates may be received for a short period of time.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2041,11 +2129,16 @@ class Bot(TelegramObject):
                work.
             3. Ports currently supported for Webhooks: 443, 80, 88, 8443.
 
+            If you're having any trouble setting up webhooks, please check out this `guide to
+            Webhooks`_.
+
         Returns:
             :obj:`bool` On success, ``True`` is returned.
 
         Raises:
             :class:`telegram.TelegramError`
+
+        .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
         url_ = '{0}/setWebhook'.format(self.base_url)
@@ -2161,6 +2254,9 @@ class Bot(TelegramObject):
         data.update(kwargs)
 
         result = self._request.post(url, data, timeout=timeout)
+
+        if self.defaults:
+            result['default_quote'] = self.defaults.quote
 
         return Chat.de_json(result, self)
 
@@ -2481,8 +2577,9 @@ class Bot(TelegramObject):
             start_parameter (:obj:`str`): Unique deep-linking parameter that can be used to
                 generate this invoice when used as a start parameter.
             currency (:obj:`str`): Three-letter ISO 4217 currency code.
-            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list of components
-                (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.).
+            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a JSON-serialized list
+                of components (e.g. product price, tax, discount, delivery cost, delivery tax,
+                bonus, etc.).
             provider_data (:obj:`str` | :obj:`object`, optional): JSON-encoded data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
