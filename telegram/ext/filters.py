@@ -21,7 +21,7 @@
 import re
 
 from future.utils import string_types
-
+from typing import Optional
 from telegram import Chat, Update, MessageEntity
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
@@ -78,11 +78,11 @@ class BaseFilter(object):
             (depends on the handler).
     """
 
-    name = None
-    update_filter = False
-    data_filter = False
+    name: Optional[str] = None
+    update_filter: bool = False
+    data_filter: bool = False
 
-    def __call__(self, update):
+    def __call__(self, update: int) -> Optional[bool]:
         if self.update_filter:
             return self.filter(update)
         else:
