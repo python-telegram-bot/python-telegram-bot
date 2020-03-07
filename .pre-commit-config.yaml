@@ -6,8 +6,8 @@ repos:
         files: ^(telegram|tests)/.*\.py$
         args:
         - --diff
--   repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.5.0
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.9
     hooks:
     -   id: flake8
 -   repo: git://github.com/pre-commit/mirrors-pylint
