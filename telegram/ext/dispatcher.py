@@ -19,7 +19,6 @@
 """This module contains the Dispatcher class."""
 
 import logging
-import warnings
 import weakref
 from functools import wraps
 from threading import Thread, Lock, Event, current_thread, BoundedSemaphore
@@ -34,7 +33,6 @@ from future.builtins import range
 from telegram import TelegramError, Update
 from telegram.ext.handler import Handler
 from telegram.ext.callbackcontext import CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.promise import Promise
 from telegram.ext import BasePersistence
 
@@ -92,9 +90,6 @@ class Dispatcher(object):
             ``@run_async`` decorator. defaults to 4.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
 
     """
 
@@ -109,17 +104,11 @@ class Dispatcher(object):
                  workers=4,
                  exception_event=None,
                  job_queue=None,
-                 persistence=None,
-                 use_context=False):
+                 persistence=None):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
-        self.use_context = use_context
-
-        if not use_context:
-            warnings.warn('Old Handler API is deprecated - see https://git.io/fxJuV for details',
-                          TelegramDeprecationWarning, stacklevel=3)
 
         self.user_data = defaultdict(dict)
         self.chat_data = defaultdict(dict)
@@ -385,7 +374,7 @@ class Dispatcher(object):
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
-                        if not context and self.use_context:
+                        if not context:
                             context = CallbackContext.from_update(update, self)
                         handler.handle_update(update, self, check, context)
                         persist_update(update)
@@ -499,8 +488,6 @@ class Dispatcher(object):
 
                 The error that happened will be present in context.error.
 
-        Note:
-            See https://git.io/fxJuV for more info about switching to context based API.
         """
         self.error_handlers.append(callback)
 
@@ -524,10 +511,7 @@ class Dispatcher(object):
         """
         if self.error_handlers:
             for callback in self.error_handlers:
-                if self.use_context:
-                    callback(update, CallbackContext.from_error(update, error, self))
-                else:
-                    callback(self.bot, update, error)
+                callback(update, CallbackContext.from_error(update, error, self))
 
         else:
             self.logger.exception(

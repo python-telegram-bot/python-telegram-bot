@@ -181,7 +181,7 @@ class TestBasePersistence(object):
         base_persistence.get_bot_data = get_bot_data
         # base_persistence.update_chat_data = lambda x: x
         # base_persistence.update_user_data = lambda x: x
-        updater = Updater(bot=bot, persistence=base_persistence, use_context=True)
+        updater = Updater(bot=bot, persistence=base_persistence)
         dp = updater.dispatcher
 
         def callback_known_user(update, context):
@@ -207,12 +207,9 @@ class TestBasePersistence(object):
             context.chat_data[2] = 'test8'
             context.bot_data['test0'] = 'test0'
 
-        known_user = MessageHandler(Filters.user(user_id=12345), callback_known_user,
-                                    pass_chat_data=True, pass_user_data=True)
-        known_chat = MessageHandler(Filters.chat(chat_id=-67890), callback_known_chat,
-                                    pass_chat_data=True, pass_user_data=True)
-        unknown = MessageHandler(Filters.all, callback_unknown_user_or_chat, pass_chat_data=True,
-                                 pass_user_data=True)
+        known_user = MessageHandler(Filters.user(user_id=12345), callback_known_user)
+        known_chat = MessageHandler(Filters.chat(chat_id=-67890), callback_known_chat)
+        unknown = MessageHandler(Filters.all, callback_unknown_user_or_chat)
         dp.add_handler(known_user)
         dp.add_handler(known_chat)
         dp.add_handler(unknown)
@@ -717,7 +714,7 @@ class TestPickelPersistence(object):
         assert conversations_test['name1'] == conversation1
 
     def test_with_handler(self, bot, update, bot_data, pickle_persistence, good_pickle_files):
-        u = Updater(bot=bot, persistence=pickle_persistence, use_context=True)
+        u = Updater(bot=bot, persistence=pickle_persistence)
         dp = u.dispatcher
 
         def first(update, context):
@@ -739,8 +736,8 @@ class TestPickelPersistence(object):
             if not context.bot_data['test1'] == 'test0':
                 pytest.fail()
 
-        h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
-        h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
+        h1 = MessageHandler(None, first)
+        h2 = MessageHandler(None, second)
         dp.add_handler(h1)
         dp.process_update(update)
         del (dp)
@@ -840,7 +837,6 @@ class TestPickelPersistence(object):
 
     def test_with_conversationHandler(self, dp, update, good_pickle_files, pickle_persistence):
         dp.persistence = pickle_persistence
-        dp.use_context = True
         NEXT, NEXT2 = range(2)
 
         def start(update, context):
@@ -873,7 +869,6 @@ class TestPickelPersistence(object):
     def test_with_nested_conversationHandler(self, dp, update, good_pickle_files,
                                              pickle_persistence):
         dp.persistence = pickle_persistence
-        dp.use_context = True
         NEXT2, NEXT3 = range(1, 3)
 
         def start(update, context):
@@ -1079,7 +1074,7 @@ class TestDictPersistence(object):
 
     def test_with_handler(self, bot, update):
         dict_persistence = DictPersistence()
-        u = Updater(bot=bot, persistence=dict_persistence, use_context=True)
+        u = Updater(bot=bot, persistence=dict_persistence)
         dp = u.dispatcher
 
         def first(update, context):
@@ -1101,8 +1096,8 @@ class TestDictPersistence(object):
             if not context.bot_data['test1'] == 'test2':
                 pytest.fail()
 
-        h1 = MessageHandler(None, first, pass_user_data=True, pass_chat_data=True)
-        h2 = MessageHandler(None, second, pass_user_data=True, pass_chat_data=True)
+        h1 = MessageHandler(None, first)
+        h2 = MessageHandler(None, second)
         dp.add_handler(h1)
         dp.process_update(update)
         del (dp)
@@ -1123,7 +1118,6 @@ class TestDictPersistence(object):
     def test_with_conversationHandler(self, dp, update, conversations_json):
         dict_persistence = DictPersistence(conversations_json=conversations_json)
         dp.persistence = dict_persistence
-        dp.use_context = True
         NEXT, NEXT2 = range(2)
 
         def start(update, context):
@@ -1156,7 +1150,6 @@ class TestDictPersistence(object):
     def test_with_nested_conversationHandler(self, dp, update, conversations_json):
         dict_persistence = DictPersistence(conversations_json=conversations_json)
         dp.persistence = dict_persistence
-        dp.use_context = True
         NEXT2, NEXT3 = range(1, 3)
 
         def start(update, context):

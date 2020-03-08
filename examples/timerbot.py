@@ -85,9 +85,7 @@ def error(update, context):
 def main():
     """Run bot."""
     # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("TOKEN")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -95,11 +93,8 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", start))
-    dp.add_handler(CommandHandler("set", set_timer,
-                                  pass_args=True,
-                                  pass_job_queue=True,
-                                  pass_chat_data=True))
-    dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
+    dp.add_handler(CommandHandler("set", set_timer))
+    dp.add_handler(CommandHandler("unset", unset))
 
     # log all errors
     dp.add_error_handler(error)

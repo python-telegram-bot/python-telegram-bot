@@ -62,11 +62,11 @@ class TestUpdater(object):
         self.err_handler_called.clear()
         self.cb_handler_called.clear()
 
-    def error_handler(self, bot, update, error):
-        self.received = error.message
+    def error_handler(self, update, context):
+        self.received = context.error.message
         self.err_handler_called.set()
 
-    def callback(self, bot, update):
+    def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
 
@@ -420,9 +420,3 @@ class TestUpdater(object):
         dispatcher = Dispatcher(None, None)
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, workers=8)
-
-    def test_mutual_exclude_use_context_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
-        use_context = not dispatcher.use_context
-        with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, use_context=use_context)

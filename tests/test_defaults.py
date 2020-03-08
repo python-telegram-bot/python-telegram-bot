@@ -24,7 +24,7 @@ from telegram import User
 
 
 class TestDefault(object):
-    def test_data_assignment(self, cdp):
+    def test_data_assignment(self, dp):
         defaults = Defaults()
 
         with pytest.raises(AttributeError):

@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
 import os
-import sys
 import time
 from queue import Queue
 from time import sleep
@@ -27,7 +26,6 @@ import pytest
 from flaky import flaky
 
 from telegram.ext import JobQueue, Updater, Job, CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import _UtcOffsetTimezone
 
 
@@ -52,20 +50,20 @@ class TestJobQueue(object):
         self.result = 0
         self.job_time = 0
 
-    def job_run_once(self, bot, job):
+    def job_run_once(self, context):
         self.result += 1
 
-    def job_with_exception(self, bot, job):
+    def job_with_exception(self, context):
         raise Exception('Test Error')
 
-    def job_remove_self(self, bot, job):
+    def job_remove_self(self, context):
         self.result += 1
-        job.schedule_removal()
+        context.job.schedule_removal()
 
-    def job_run_once_with_context(self, bot, job):
-        self.result += job.context
+    def job_run_once_with_context(self, context):
+        self.result += context.job.context
 
-    def job_datetime_tests(self, bot, job):
+    def job_datetime_tests(self, context):
         self.job_time = time.time()
 
     def job_context_based_callback(self, context):
@@ -318,11 +316,6 @@ class TestJobQueue(object):
         assert job_queue.jobs() == (job1, job2, job3)
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
-
-    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
-    def test_bot_in_init_deprecation(self, bot):
-        with pytest.warns(TelegramDeprecationWarning):
-            JobQueue(bot)
 
     def test_context_based_callback(self, job_queue):
         job_queue.run_once(self.job_context_based_callback, 0.01, context=2)

@@ -56,22 +56,10 @@ class TestStringRegexHandler(object):
     def reset(self):
         self.test_flag = False
 
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
+    def callback_basic(self, update, context):
         test_update = isinstance(update, str)
-        self.test_flag = test_bot and test_update
-
-    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) or (update_queue is not None)
-
-    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) and (update_queue is not None)
-
-    def callback_group(self, bot, update, groups=None, groupdict=None):
-        if groups is not None:
-            self.test_flag = groups == ('t', ' message')
-        if groupdict is not None:
-            self.test_flag = groupdict == {'begin': 't', 'end': ' message'}
+        test_context = isinstance(context, CallbackContext)
+        self.test_flag = test_update and test_context
 
     def callback_context(self, update, context):
         self.test_flag = (isinstance(context, CallbackContext)
@@ -96,70 +84,20 @@ class TestStringRegexHandler(object):
 
         assert not handler.check_update('does not match')
 
-    def test_with_passing_group_dict(self, dp):
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
-                                     pass_groups=True)
-        dp.add_handler(handler)
-
-        dp.process_update('test message')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_group,
-                                     pass_groupdict=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('test message')
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp):
-        handler = StringRegexHandler('test', self.callback_queue_1,
-                                     pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update('test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringRegexHandler('test', self.callback_queue_1,
-                                     pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringRegexHandler('test', self.callback_queue_2,
-                                     pass_job_queue=True, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('test')
-        assert self.test_flag
-
     def test_other_update_types(self, false_update):
         handler = StringRegexHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, cdp):
-        handler = StringRegexHandler(r'(t)est(.*)', self.callback_context)
-        cdp.add_handler(handler)
+    def test_context_pattern(self, dp):
+        handler = StringRegexHandler(r'(t)est(.*)', self.callback_context_pattern)
+        dp.add_handler(handler)
 
-        cdp.process_update('test message')
+        dp.process_update('test message')
         assert self.test_flag
 
-    def test_context_pattern(self, cdp):
+        dp.remove_handler(handler)
         handler = StringRegexHandler(r'(t)est(.*)', self.callback_context_pattern)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update('test message')
-        assert self.test_flag
-
-        cdp.remove_handler(handler)
-        handler = StringRegexHandler(r'(t)est(.*)', self.callback_context_pattern)
-        cdp.add_handler(handler)
-
-        cdp.process_update('test message')
+        dp.process_update('test message')
         assert self.test_flag

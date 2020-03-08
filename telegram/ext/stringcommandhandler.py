@@ -33,12 +33,6 @@ class StringCommandHandler(Handler):
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
-        pass_args (:obj:`bool`): Determines whether the handler should be passed
-            ``args``.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -49,36 +43,12 @@ class StringCommandHandler(Handler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
-            arguments passed to the command as a keyword argument called ``args``. It will contain
-            a list of strings, which is the text following the command split on single or
-            consecutive whitespace characters. Default is ``False``
-            DEPRECATED: Please switch to context based callbacks.
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
 
     """
 
-    def __init__(self,
-                 command,
-                 callback,
-                 pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False):
-        super(StringCommandHandler, self).__init__(
-            callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue)
+    def __init__(self, command, callback):
+        super(StringCommandHandler, self).__init__(callback)
         self.command = command
-        self.pass_args = pass_args
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -94,14 +64,6 @@ class StringCommandHandler(Handler):
             args = update[1:].split(' ')
             if args[0] == self.command:
                 return args[1:]
-
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,
-                                                                                update,
-                                                                                check_result)
-        if self.pass_args:
-            optional_args['args'] = check_result
-        return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         context.args = check_result

@@ -78,9 +78,6 @@ class CallbackContext(object):
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
         """
-        if not dispatcher.use_context:
-            raise ValueError('CallbackContext should not be used with a non context aware '
-                             'dispatcher!')
         self._dispatcher = dispatcher
         self._bot_data = dispatcher.bot_data
         self._chat_data = None
@@ -131,11 +128,9 @@ class CallbackContext(object):
     @classmethod
     def from_update(cls, update, dispatcher):
         self = cls(dispatcher)
-
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user
-
             if chat:
                 self._chat_data = dispatcher.chat_data[chat.id]
             if user:

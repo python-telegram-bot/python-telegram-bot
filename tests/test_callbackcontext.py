@@ -23,36 +23,33 @@ from telegram.ext import CallbackContext
 
 
 class TestCallbackContext(object):
-    def test_non_context_dp(self, dp):
-        with pytest.raises(ValueError):
-            CallbackContext(dp)
 
-    def test_from_job(self, cdp):
-        job = cdp.job_queue.run_once(lambda x: x, 10)
+    def test_from_job(self, dp):
+        job = dp.job_queue.run_once(lambda x: x, 10)
 
-        callback_context = CallbackContext.from_job(job, cdp)
+        callback_context = CallbackContext.from_job(job, dp)
 
         assert callback_context.job is job
         assert callback_context.chat_data is None
         assert callback_context.user_data is None
-        assert callback_context.bot_data is cdp.bot_data
-        assert callback_context.bot is cdp.bot
-        assert callback_context.job_queue is cdp.job_queue
-        assert callback_context.update_queue is cdp.update_queue
+        assert callback_context.bot_data is dp.bot_data
+        assert callback_context.bot is dp.bot
+        assert callback_context.job_queue is dp.job_queue
+        assert callback_context.update_queue is dp.update_queue
 
-    def test_from_update(self, cdp):
+    def test_from_update(self, dp):
         update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
 
-        callback_context = CallbackContext.from_update(update, cdp)
+        callback_context = CallbackContext.from_update(update, dp)
 
         assert callback_context.chat_data == {}
         assert callback_context.user_data == {}
-        assert callback_context.bot_data is cdp.bot_data
-        assert callback_context.bot is cdp.bot
-        assert callback_context.job_queue is cdp.job_queue
-        assert callback_context.update_queue is cdp.update_queue
+        assert callback_context.bot_data is dp.bot_data
+        assert callback_context.bot is dp.bot
+        assert callback_context.job_queue is dp.job_queue
+        assert callback_context.update_queue is dp.update_queue
 
-        callback_context_same_user_chat = CallbackContext.from_update(update, cdp)
+        callback_context_same_user_chat = CallbackContext.from_update(update, dp)
 
         callback_context.bot_data['test'] = 'bot'
         callback_context.chat_data['test'] = 'chat'
@@ -65,48 +62,48 @@ class TestCallbackContext(object):
         update_other_user_chat = Update(0, message=Message(0, User(2, 'user', False),
                                                            None, Chat(2, 'chat')))
 
-        callback_context_other_user_chat = CallbackContext.from_update(update_other_user_chat, cdp)
+        callback_context_other_user_chat = CallbackContext.from_update(update_other_user_chat, dp)
 
         assert callback_context_other_user_chat.bot_data is callback_context.bot_data
         assert callback_context_other_user_chat.chat_data is not callback_context.chat_data
         assert callback_context_other_user_chat.user_data is not callback_context.user_data
 
-    def test_from_update_not_update(self, cdp):
-        callback_context = CallbackContext.from_update(None, cdp)
+    def test_from_update_not_update(self, dp):
+        callback_context = CallbackContext.from_update(None, dp)
 
         assert callback_context.chat_data is None
         assert callback_context.user_data is None
-        assert callback_context.bot_data is cdp.bot_data
-        assert callback_context.bot is cdp.bot
-        assert callback_context.job_queue is cdp.job_queue
-        assert callback_context.update_queue is cdp.update_queue
+        assert callback_context.bot_data is dp.bot_data
+        assert callback_context.bot is dp.bot
+        assert callback_context.job_queue is dp.job_queue
+        assert callback_context.update_queue is dp.update_queue
 
-        callback_context = CallbackContext.from_update('', cdp)
+        callback_context = CallbackContext.from_update('', dp)
 
         assert callback_context.chat_data is None
         assert callback_context.user_data is None
-        assert callback_context.bot_data is cdp.bot_data
-        assert callback_context.bot is cdp.bot
-        assert callback_context.job_queue is cdp.job_queue
-        assert callback_context.update_queue is cdp.update_queue
+        assert callback_context.bot_data is dp.bot_data
+        assert callback_context.bot is dp.bot
+        assert callback_context.job_queue is dp.job_queue
+        assert callback_context.update_queue is dp.update_queue
 
-    def test_from_error(self, cdp):
+    def test_from_error(self, dp):
         error = TelegramError('test')
 
         update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
 
-        callback_context = CallbackContext.from_error(update, error, cdp)
+        callback_context = CallbackContext.from_error(update, error, dp)
 
         assert callback_context.error is error
         assert callback_context.chat_data == {}
         assert callback_context.user_data == {}
-        assert callback_context.bot_data is cdp.bot_data
-        assert callback_context.bot is cdp.bot
-        assert callback_context.job_queue is cdp.job_queue
-        assert callback_context.update_queue is cdp.update_queue
+        assert callback_context.bot_data is dp.bot_data
+        assert callback_context.bot is dp.bot
+        assert callback_context.job_queue is dp.job_queue
+        assert callback_context.update_queue is dp.update_queue
 
-    def test_match(self, cdp):
-        callback_context = CallbackContext(cdp)
+    def test_match(self, dp):
+        callback_context = CallbackContext(dp)
 
         assert callback_context.match is None
 
@@ -114,10 +111,10 @@ class TestCallbackContext(object):
 
         assert callback_context.match == 'test'
 
-    def test_data_assignment(self, cdp):
+    def test_data_assignment(self, dp):
         update = Update(0, message=Message(0, User(1, 'user', False), None, Chat(1, 'chat')))
 
-        callback_context = CallbackContext.from_update(update, cdp)
+        callback_context = CallbackContext.from_update(update, dp)
 
         with pytest.raises(AttributeError):
             callback_context.chat_data = {"test": 123}
@@ -126,6 +123,6 @@ class TestCallbackContext(object):
         with pytest.raises(AttributeError):
             callback_context.chat_data = "test"
 
-    def test_dispatcher_attribute(self, cdp):
-        callback_context = CallbackContext(cdp)
-        assert callback_context.dispatcher == cdp
+    def test_dispatcher_attribute(self, dp):
+        callback_context = CallbackContext(dp)
+        assert callback_context.dispatcher == dp

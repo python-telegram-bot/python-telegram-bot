@@ -24,7 +24,7 @@ import pytest
 from telegram import (CallbackQuery, Chat, ChosenInlineResult, InlineQuery, Message,
                       PreCheckoutQuery, ShippingQuery, Update, User, MessageEntity)
 from telegram.ext import (ConversationHandler, CommandHandler, CallbackQueryHandler,
-                          MessageHandler, Filters, InlineQueryHandler, CallbackContext)
+                          MessageHandler, Filters, InlineQueryHandler)
 
 
 @pytest.fixture(scope='class')
@@ -116,66 +116,51 @@ class TestConversationHandler(object):
         return state
 
     # Actions
-    def start(self, bot, update):
-        if isinstance(update, Update):
-            return self._set_state(update, self.THIRSTY)
-        else:
-            return self._set_state(bot, self.THIRSTY)
+    def start(self, update, context):
+        return self._set_state(update, self.THIRSTY)
 
-    def end(self, bot, update):
+    def end(self, update, context):
         return self._set_state(update, self.END)
 
-    def start_end(self, bot, update):
+    def start_end(self, update, context):
         return self._set_state(update, self.END)
 
-    def start_none(self, bot, update):
+    def start_none(self, update, context):
         return self._set_state(update, None)
 
-    def brew(self, bot, update):
-        if isinstance(update, Update):
-            return self._set_state(update, self.BREWING)
-        else:
-            return self._set_state(bot, self.BREWING)
+    def brew(self, update, context):
+        return self._set_state(update, self.BREWING)
 
-    def drink(self, bot, update):
+    def drink(self, update, context):
         return self._set_state(update, self.DRINKING)
 
-    def code(self, bot, update):
+    def code(self, update, context):
         return self._set_state(update, self.CODING)
 
-    def passout(self, bot, update):
+    def passout(self, update, context):
         assert update.message.text == '/brew'
         assert isinstance(update, Update)
         self.is_timeout = True
 
-    def passout2(self, bot, update):
+    def passout2(self, update, context):
         assert isinstance(update, Update)
-        self.is_timeout = True
-
-    def passout_context(self, update, context):
-        assert update.message.text == '/brew'
-        assert isinstance(context, CallbackContext)
-        self.is_timeout = True
-
-    def passout2_context(self, update, context):
-        assert isinstance(context, CallbackContext)
         self.is_timeout = True
 
     # Drinking actions (nested)
 
-    def hold(self, bot, update):
+    def hold(self, update, context):
         return self._set_state(update, self.HOLDING)
 
-    def sip(self, bot, update):
+    def sip(self, update, context):
         return self._set_state(update, self.SIPPING)
 
-    def swallow(self, bot, update):
+    def swallow(self, update, context):
         return self._set_state(update, self.SWALLOWING)
 
-    def replenish(self, bot, update):
+    def replenish(self, update, context):
         return self._set_state(update, self.REPLENISHING)
 
-    def stop(self, bot, update):
+    def stop(self, update, context):
         return self._set_state(update, self.STOPPING)
 
     # Tests
@@ -345,13 +330,13 @@ class TestConversationHandler(object):
         assert handler.conversations[(user1.id,)] == self.DRINKING
 
     def test_conversation_handler_per_message(self, dp, bot, user1, user2):
-        def entry(bot, update):
+        def entry(update, context):
             return 1
 
-        def one(bot, update):
+        def one(update, context):
             return 2
 
-        def two(bot, update):
+        def two(update, context):
             return ConversationHandler.END
 
         handler = ConversationHandler(
@@ -396,7 +381,7 @@ class TestConversationHandler(object):
         assert len(handler.conversations) == 0
 
     def test_end_on_first_message_async(self, dp, bot, user1):
-        start_end_async = (lambda bot, update: dp.run_async(self.start_end, bot, update))
+        start_end_async = (lambda update, context: dp.run_async(self.start_end, update, context))
 
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', start_end_async)], states={},
@@ -432,7 +417,7 @@ class TestConversationHandler(object):
         assert len(handler.conversations) == 0
 
     def test_none_on_first_message_async(self, dp, bot, user1):
-        start_none_async = (lambda bot, update: dp.run_async(self.start_none, bot, update))
+        start_none_async = (lambda update, context: dp.run_async(self.start_none, update, context))
 
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', start_none_async)], states={}, fallbacks=[])
@@ -630,54 +615,6 @@ class TestConversationHandler(object):
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert not self.is_timeout
 
-    def test_conversation_handler_timeout_state_context(self, cdp, bot, user1):
-        states = self.states
-        states.update({ConversationHandler.TIMEOUT: [
-            CommandHandler('brew', self.passout_context),
-            MessageHandler(~Filters.regex('oding'), self.passout2_context)
-        ]})
-        handler = ConversationHandler(entry_points=self.entry_points, states=states,
-                                      fallbacks=self.fallbacks, conversation_timeout=0.5)
-        cdp.add_handler(handler)
-
-        # CommandHandler timeout
-        message = Message(0, user1, None, self.group, text='/start',
-                          entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0,
-                                                  length=len('/start'))],
-                          bot=bot)
-        cdp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
-        cdp.process_update(Update(update_id=0, message=message))
-        sleep(0.5)
-        cdp.job_queue.tick()
-        assert handler.conversations.get((self.group.id, user1.id)) is None
-        assert self.is_timeout
-
-        # MessageHandler timeout
-        self.is_timeout = False
-        message.text = '/start'
-        message.entities[0].length = len('/start')
-        cdp.process_update(Update(update_id=1, message=message))
-        sleep(0.5)
-        cdp.job_queue.tick()
-        assert handler.conversations.get((self.group.id, user1.id)) is None
-        assert self.is_timeout
-
-        # Timeout but no valid handler
-        self.is_timeout = False
-        cdp.process_update(Update(update_id=0, message=message))
-        message.text = '/brew'
-        message.entities[0].length = len('/brew')
-        cdp.process_update(Update(update_id=0, message=message))
-        message.text = '/startCoding'
-        message.entities[0].length = len('/startCoding')
-        cdp.process_update(Update(update_id=0, message=message))
-        sleep(0.5)
-        cdp.job_queue.tick()
-        assert handler.conversations.get((self.group.id, user1.id)) is None
-        assert not self.is_timeout
-
     def test_conversation_timeout_cancel_conflict(self, dp, bot, user1):
         # Start state machine, wait half the timeout,
         # then call a callback that takes more than the timeout
@@ -687,7 +624,7 @@ class TestConversationHandler(object):
         # |  t=.75 /slowbrew returns (timeout=1.25)
         # t=1.25 timeout
 
-        def slowbrew(_bot, update):
+        def slowbrew(_update, context):
             sleep(0.25)
             # Let's give to the original timeout a chance to execute
             dp.job_queue.tick()
@@ -759,10 +696,10 @@ class TestConversationHandler(object):
         )
 
     def test_warnings_per_chat_is_only_shown_once(self, recwarn):
-        def hello(bot, update):
+        def hello(update, context):
             return self.BREWING
 
-        def bye(bot, update):
+        def bye(update, context):
             return ConversationHandler.END
 
         ConversationHandler(

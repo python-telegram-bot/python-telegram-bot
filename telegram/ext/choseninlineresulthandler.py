@@ -27,23 +27,6 @@ class ChosenInlineResultHandler(Handler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-
-    Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
-
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -54,22 +37,6 @@ class ChosenInlineResultHandler(Handler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
 
     """
 

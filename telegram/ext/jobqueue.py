@@ -21,14 +21,12 @@
 import datetime
 import logging
 import time
-import warnings
 import weakref
 from numbers import Number
 from queue import PriorityQueue, Empty
 from threading import Thread, Lock, Event
 
 from telegram.ext.callbackcontext import CallbackContext
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import to_float_timestamp, _UTC
 
 
@@ -42,25 +40,12 @@ class JobQueue(object):
 
     Attributes:
         _queue (:obj:`PriorityQueue`): The queue that holds the Jobs.
-        bot (:class:`telegram.Bot`): The bot instance that should be passed to the jobs.
-            DEPRECATED: Use :attr:`set_dispatcher` instead.
 
     """
 
-    def __init__(self, bot=None):
+    def __init__(self):
         self._queue = PriorityQueue()
-        if bot:
-            warnings.warn("Passing bot to jobqueue is deprecated. Please use set_dispatcher "
-                          "instead!", TelegramDeprecationWarning, stacklevel=2)
-
-            class MockDispatcher(object):
-                def __init__(self):
-                    self.bot = bot
-                    self.use_context = False
-
-            self._dispatcher = MockDispatcher()
-        else:
-            self._dispatcher = None
+        self._dispatcher = None
         self.logger = logging.getLogger(self.__class__.__name__)
         self.__start_lock = Lock()
         self.__next_peek_lock = Lock()  # to protect self._next_peek & self.__tick
@@ -70,8 +55,7 @@ class JobQueue(object):
         self._running = False
 
     def set_dispatcher(self, dispatcher):
-        """Set the dispatcher to be used by this JobQueue. Use this instead of passing a
-        :class:`telegram.Bot` to the JobQueue, which is deprecated.
+        """Set the dispatcher to be used by this JobQueue.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
@@ -423,10 +407,7 @@ class Job(object):
 
     def run(self, dispatcher):
         """Executes the callback function."""
-        if dispatcher.use_context:
-            self.callback(CallbackContext.from_job(self, dispatcher))
-        else:
-            self.callback(dispatcher.bot, self)
+        self.callback(CallbackContext.from_job(self, dispatcher))
 
     def schedule_removal(self):
         """

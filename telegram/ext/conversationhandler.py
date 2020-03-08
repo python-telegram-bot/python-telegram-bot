@@ -359,7 +359,7 @@ class ConversationHandler(Handler):
 
         return key, handler, check
 
-    def handle_update(self, update, dispatcher, check_result, context=None):
+    def handle_update(self, update, dispatcher, check_result, context):
         """Send the update to the callback for the current state and Handler
 
         Args:
@@ -367,6 +367,8 @@ class ConversationHandler(Handler):
                 handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that originated the Update.
+            context (:class:`telegram.ext.CallbackContext`): The callback context as provided by
+                the calling dispatcher.
 
         """
         conversation_key, handler, check_result = check_result

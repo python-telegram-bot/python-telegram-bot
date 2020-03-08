@@ -18,12 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
-import warnings
 
 from future.utils import string_types
 
 from telegram.ext import Filters
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import Update, MessageEntity
 from .handler import Handler
@@ -47,27 +45,6 @@ class CommandHandler(Handler):
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
-        allow_edited (:obj:`bool`): Determines Whether the handler should also accept
-            edited messages.
-        pass_args (:obj:`bool`): Determines whether the handler should be passed
-            ``args``.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-
-    Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
-
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
 
     Args:
         command (:obj:`str` | List[:obj:`str`]): The command or list of commands this handler
@@ -85,52 +62,13 @@ class CommandHandler(Handler):
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
-        allow_edited (:obj:`bool`, optional): Determines whether the handler should also accept
-            edited messages. Default is ``False``.
-            DEPRECATED: Edited is allowed by default. To change this behavior use
-            ``~Filters.update.edited_message``.
-        pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
-            arguments passed to the command as a keyword argument called ``args``. It will contain
-            a list of strings, which is the text following the command split on single or
-            consecutive whitespace characters. Default is ``False``
-            DEPRECATED: Please switch to context based callbacks.
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
 
     Raises:
         ValueError - when command is too long or has illegal chars.
     """
 
-    def __init__(self,
-                 command,
-                 callback,
-                 filters=None,
-                 allow_edited=None,
-                 pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
-        super(CommandHandler, self).__init__(
-            callback,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+    def __init__(self, command, callback, filters=None):
+        super(CommandHandler, self).__init__(callback)
 
         if isinstance(command, string_types):
             self.command = [command.lower()]
@@ -144,14 +82,6 @@ class CommandHandler(Handler):
             self.filters = Filters.update.messages & filters
         else:
             self.filters = Filters.update.messages
-
-        if allow_edited is not None:
-            warnings.warn('allow_edited is deprecated. See https://git.io/fxJuV for more info',
-                          TelegramDeprecationWarning,
-                          stacklevel=2)
-            if not allow_edited:
-                self.filters &= ~Filters.update.edited_message
-        self.pass_args = pass_args
 
     def check_update(self, update):
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -182,12 +112,6 @@ class CommandHandler(Handler):
                     return args, filter_result
                 else:
                     return False
-
-    def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
-        if self.pass_args:
-            optional_args['args'] = check_result[0]
-        return optional_args
 
     def collect_additional_context(self, context, update, dispatcher, check_result):
         context.args = check_result[0]
@@ -231,25 +155,6 @@ class PrefixHandler(CommandHandler):
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
-        pass_args (:obj:`bool`): Determines whether the handler should be passed
-            ``args``.
-        pass_update_queue (:obj:`bool`): Determines whether ``update_queue`` will be
-            passed to the callback function.
-        pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
-            the callback function.
-        pass_user_data (:obj:`bool`): Determines whether ``user_data`` will be passed to
-            the callback function.
-        pass_chat_data (:obj:`bool`): Determines whether ``chat_data`` will be passed to
-            the callback function.
-
-    Note:
-        :attr:`pass_user_data` and :attr:`pass_chat_data` determine whether a ``dict`` you
-        can use to keep any data in will be sent to the :attr:`callback` function. Related to
-        either the user or the chat that the update was sent in. For each update from the same user
-        or in the same chat, it will be the same ``dict``.
-
-        Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
 
     Args:
         prefix (:obj:`str` | List[:obj:`str`]): The prefix(es) that will precede :attr:`command`.
@@ -267,27 +172,6 @@ class PrefixHandler(CommandHandler):
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
-        pass_args (:obj:`bool`, optional): Determines whether the handler should be passed the
-            arguments passed to the command as a keyword argument called ``args``. It will contain
-            a list of strings, which is the text following the command split on single or
-            consecutive whitespace characters. Default is ``False``
-            DEPRECATED: Please switch to context based callbacks.
-        pass_update_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``update_queue`` will be passed to the callback function. It will be the ``Queue``
-            instance used by the :class:`telegram.ext.Updater` and :class:`telegram.ext.Dispatcher`
-            that contains new updates which can be used to insert updates. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_job_queue (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``job_queue`` will be passed to the callback function. It will be a
-            :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
-            which can be used to schedule new jobs. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_user_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``user_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
-        pass_chat_data (:obj:`bool`, optional): If set to ``True``, a keyword argument called
-            ``chat_data`` will be passed to the callback function. Default is ``False``.
-            DEPRECATED: Please switch to context based callbacks.
 
     """
 
@@ -295,19 +179,9 @@ class PrefixHandler(CommandHandler):
                  prefix,
                  command,
                  callback,
-                 filters=None,
-                 pass_args=False,
-                 pass_update_queue=False,
-                 pass_job_queue=False,
-                 pass_user_data=False,
-                 pass_chat_data=False):
+                 filters=None):
 
-        super(PrefixHandler, self).__init__(
-            'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
-            pass_update_queue=pass_update_queue,
-            pass_job_queue=pass_job_queue,
-            pass_user_data=pass_user_data,
-            pass_chat_data=pass_chat_data)
+        super(PrefixHandler, self).__init__('nocommand', callback, filters=filters)
 
         if isinstance(prefix, string_types):
             self.prefix = [prefix.lower()]

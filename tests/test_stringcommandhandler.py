@@ -56,22 +56,10 @@ class TestStringCommandHandler(object):
     def reset(self):
         self.test_flag = False
 
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
+    def callback_basic(self, update, context):
         test_update = isinstance(update, str)
-        self.test_flag = test_bot and test_update
-
-    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) or (update_queue is not None)
-
-    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) and (update_queue is not None)
-
-    def sch_callback_args(self, bot, update, args):
-        if update == '/test':
-            self.test_flag = len(args) == 0
-        else:
-            self.test_flag = args == ['one', 'two']
+        test_context = isinstance(context, CallbackContext)
+        self.test_flag = test_update and test_context
 
     def callback_context(self, update, context):
         self.test_flag = (isinstance(context, CallbackContext)
@@ -102,62 +90,16 @@ class TestStringCommandHandler(object):
         check = handler.check_update('/test followed by text')
         assert check is not None and check is not False
 
-    def test_pass_args(self, dp):
-        handler = StringCommandHandler('test', self.sch_callback_args,
-                                       pass_args=True)
-        dp.add_handler(handler)
-
-        dp.process_update('/test')
-        assert self.test_flag
-
-        self.test_flag = False
-        dp.process_update('/test one two')
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp):
-        handler = StringCommandHandler('test', self.callback_queue_1,
-                                       pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update('/test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.callback_queue_1,
-                                       pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('/test')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringCommandHandler('test', self.callback_queue_2,
-                                       pass_job_queue=True,
-                                       pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update('/test')
-        assert self.test_flag
-
     def test_other_update_types(self, false_update):
         handler = StringCommandHandler('test', self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, cdp):
-        handler = StringCommandHandler('test', self.callback_context)
-        cdp.add_handler(handler)
-
-        cdp.process_update('/test')
-        assert self.test_flag
-
-    def test_context_args(self, cdp):
+    def test_context_args(self, dp):
         handler = StringCommandHandler('test', self.callback_context_args)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
-        cdp.process_update('/test')
+        dp.process_update('/test')
         assert not self.test_flag
 
-        cdp.process_update('/test one two')
+        dp.process_update('/test one two')
         assert self.test_flag

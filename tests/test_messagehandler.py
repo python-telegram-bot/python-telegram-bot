@@ -20,7 +20,6 @@ import re
 from queue import Queue
 
 import pytest
-from telegram.utils.deprecate import TelegramDeprecationWarning
 
 from telegram import (Message, Update, Chat, Bot, User, CallbackQuery, InlineQuery,
                       ChosenInlineResult, ShippingQuery, PreCheckoutQuery)
@@ -59,22 +58,11 @@ class TestMessageHandler(object):
     def reset(self):
         self.test_flag = False
 
-    def callback_basic(self, bot, update):
-        test_bot = isinstance(bot, Bot)
+    def callback_basic(self, update, context):
         test_update = isinstance(update, Update)
-        self.test_flag = test_bot and test_update
-
-    def callback_data_1(self, bot, update, user_data=None, chat_data=None):
-        self.test_flag = (user_data is not None) or (chat_data is not None)
-
-    def callback_data_2(self, bot, update, user_data=None, chat_data=None):
-        self.test_flag = (user_data is not None) and (chat_data is not None)
-
-    def callback_queue_1(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) or (update_queue is not None)
-
-    def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
-        self.test_flag = (job_queue is not None) and (update_queue is not None)
+        test_context = isinstance(context, CallbackContext)
+        print(type(update), type(context))
+        self.test_flag = test_update and test_context
 
     def callback_context(self, update, context):
         self.test_flag = (isinstance(context, CallbackContext)
@@ -112,46 +100,6 @@ class TestMessageHandler(object):
         dp.process_update(Update(0, message))
         assert self.test_flag
 
-    def test_deprecation_warning(self):
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
-            MessageHandler(None, self.callback_basic, edited_updates=True)
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
-            MessageHandler(None, self.callback_basic, message_updates=False)
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
-            MessageHandler(None, self.callback_basic, channel_post_updates=True)
-
-    def test_edited_deprecated(self, message):
-        handler = MessageHandler(None, self.callback_basic, edited_updates=True,
-                                 message_updates=False, channel_post_updates=False)
-
-        assert handler.check_update(Update(0, edited_message=message))
-        assert not handler.check_update(Update(0, message=message))
-        assert not handler.check_update(Update(0, channel_post=message))
-        assert handler.check_update(Update(0, edited_channel_post=message))
-
-    def test_channel_post_deprecated(self, message):
-        handler = MessageHandler(None, self.callback_basic,
-                                 edited_updates=False, message_updates=False,
-                                 channel_post_updates=True)
-        assert not handler.check_update(Update(0, edited_message=message))
-        assert not handler.check_update(Update(0, message=message))
-        assert handler.check_update(Update(0, channel_post=message))
-        assert not handler.check_update(Update(0, edited_channel_post=message))
-
-    def test_multiple_flags_deprecated(self, message):
-        handler = MessageHandler(None, self.callback_basic, edited_updates=True,
-                                 message_updates=True, channel_post_updates=True)
-
-        assert handler.check_update(Update(0, edited_message=message))
-        assert handler.check_update(Update(0, message=message))
-        assert handler.check_update(Update(0, channel_post=message))
-        assert handler.check_update(Update(0, edited_channel_post=message))
-
-    def test_none_allowed_deprecated(self):
-        with pytest.raises(ValueError, match='are all False'):
-            MessageHandler(None, self.callback_basic, message_updates=False,
-                           channel_post_updates=False, edited_updates=False)
-
     def test_with_filter(self, message):
         handler = MessageHandler(Filters.group, self.callback_basic)
 
@@ -161,7 +109,7 @@ class TestMessageHandler(object):
         message.chat.type = 'private'
         assert not handler.check_update(Update(0, message))
 
-    def test_specific_filters(self, message):
+    def test_specific_filters(self, message, dp):
         f = (~Filters.update.messages
              & ~Filters.update.channel_post
              & Filters.update.edited_channel_post)
@@ -172,103 +120,27 @@ class TestMessageHandler(object):
         assert not handler.check_update(Update(0, channel_post=message))
         assert handler.check_update(Update(0, edited_channel_post=message))
 
-    def test_pass_user_or_chat_data(self, dp, message):
-        handler = MessageHandler(None, self.callback_data_1,
-                                 pass_user_data=True)
-        dp.add_handler(handler)
-
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_data_1,
-                                 pass_chat_data=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_data_2,
-                                 pass_chat_data=True, pass_user_data=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-    def test_pass_job_or_update_queue(self, dp, message):
-        handler = MessageHandler(None, self.callback_queue_1,
-                                 pass_job_queue=True)
-        dp.add_handler(handler)
-
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_queue_1,
-                                 pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = MessageHandler(None, self.callback_queue_2,
-                                 pass_job_queue=True, pass_update_queue=True)
-        dp.add_handler(handler)
-
-        self.test_flag = False
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-    def test_other_update_types(self, false_update):
-        handler = MessageHandler(None, self.callback_basic, edited_updates=True)
-        assert not handler.check_update(false_update)
-
-    def test_context(self, cdp, message):
-        handler = MessageHandler(None, self.callback_context,
-                                 edited_updates=True, channel_post_updates=True)
-        cdp.add_handler(handler)
-
-        cdp.process_update(Update(0, message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        cdp.process_update(Update(0, edited_message=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        cdp.process_update(Update(0, channel_post=message))
-        assert self.test_flag
-
-        self.test_flag = False
-        cdp.process_update(Update(0, edited_channel_post=message))
-        assert self.test_flag
-
-    def test_context_regex(self, cdp, message):
+    def test_context_regex(self, dp, message):
         handler = MessageHandler(Filters.regex('one two'), self.callback_context_regex1)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
         message.text = 'not it'
-        cdp.process_update(Update(0, message))
+        dp.process_update(Update(0, message))
         assert not self.test_flag
 
         message.text += ' one two now it is'
-        cdp.process_update(Update(0, message))
+        dp.process_update(Update(0, message))
         assert self.test_flag
 
-    def test_context_multiple_regex(self, cdp, message):
+    def test_context_multiple_regex(self, dp, message):
         handler = MessageHandler(Filters.regex('one') & Filters.regex('two'),
                                  self.callback_context_regex2)
-        cdp.add_handler(handler)
+        dp.add_handler(handler)
 
         message.text = 'not it'
-        cdp.process_update(Update(0, message))
+        dp.process_update(Update(0, message))
         assert not self.test_flag
 
         message.text += ' one two now it is'
-        cdp.process_update(Update(0, message))
+        dp.process_update(Update(0, message))
         assert self.test_flag

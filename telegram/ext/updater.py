@@ -57,7 +57,6 @@ class Updater(object):
         running (:obj:`bool`): Indicates if the updater is running.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        use_context (:obj:`bool`, optional): ``True`` if using context based callbacks.
 
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
@@ -81,9 +80,6 @@ class Updater(object):
             `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
             used). The request_kwargs are very useful for the advanced users who would like to
             control the default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API
-            (ignored if `dispatcher` argument is used). During the deprecation period of the old
-            API the default is ``False``. **New users**: set this to ``True``.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
             store data that should be persistent over restarts (ignored if `dispatcher` argument is
             used).
@@ -111,7 +107,6 @@ class Updater(object):
                  request_kwargs=None,
                  persistence=None,
                  defaults=None,
-                 use_context=False,
                  dispatcher=None,
                  base_file_url=None):
 
@@ -129,8 +124,6 @@ class Updater(object):
                 raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
             if workers is not None:
                 raise ValueError('`dispatcher` and `workers` are mutually exclusive')
-            if use_context != dispatcher.use_context:
-                raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
@@ -171,8 +164,7 @@ class Updater(object):
                                          job_queue=self.job_queue,
                                          workers=workers,
                                          exception_event=self.__exception_event,
-                                         persistence=persistence,
-                                         use_context=use_context)
+                                         persistence=persistence)
             self.job_queue.set_dispatcher(self.dispatcher)
         else:
             con_pool_size = dispatcher.workers + 4

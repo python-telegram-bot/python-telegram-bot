@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import sys
 from queue import Queue
 from threading import current_thread
 from time import sleep
@@ -27,7 +26,6 @@ from telegram import TelegramError, Message, User, Chat, Update, Bot, MessageEnt
 from telegram.ext import (MessageHandler, Filters, CommandHandler, CallbackContext,
                           JobQueue, BasePersistence)
 from telegram.ext.dispatcher import run_async, Dispatcher, DispatcherHandlerStop
-from telegram.utils.deprecate import TelegramDeprecationWarning
 from tests.conftest import create_dp
 from collections import defaultdict
 
@@ -44,35 +42,27 @@ class TestDispatcher(object):
     received = None
     count = 0
 
-    @pytest.fixture(autouse=True, name='reset')
-    def reset_fixture(self):
-        self.reset()
-
     def reset(self):
         self.received = None
         self.count = 0
 
-    def error_handler(self, bot, update, error):
-        self.received = error.message
+    def error_handler(self, update, context):
+        self.received = context.error.message
 
-    def error_handler_raise_error(self, bot, update, error):
+    def error_handler_raise_error(self, update, context):
         raise Exception('Failing bigly')
 
-    def callback_increase_count(self, bot, update):
+    def callback_increase_count(self, update, context):
         self.count += 1
 
     def callback_set_count(self, count):
-        def callback(bot, update):
+        def callback(update, context):
             self.count = count
 
         return callback
 
-    def callback_raise_error(self, bot, update):
+    def callback_raise_error(self, update, context):
         raise TelegramError(update.message.text)
-
-    def callback_if_not_update_queue(self, bot, update, update_queue=None):
-        if update_queue is not None:
-            self.received = update.message
 
     def callback_context(self, update, context):
         if (isinstance(context, CallbackContext)
@@ -82,7 +72,7 @@ class TestDispatcher(object):
                 and isinstance(context.error, TelegramError)):
             self.received = context.error.message
 
-    def test_one_context_per_update(self, cdp):
+    def test_one_context_per_update(self, dp):
         def one(update, context):
             if update.message.text == 'test':
                 context.my_flag = True
@@ -95,12 +85,12 @@ class TestDispatcher(object):
                 if hasattr(context, 'my_flag'):
                     pytest.fail()
 
-        cdp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
-        cdp.add_handler(MessageHandler(None, two), group=2)
+        dp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
+        dp.add_handler(MessageHandler(None, two), group=2)
         u = Update(1, Message(1, None, None, None, text='test'))
-        cdp.process_update(u)
+        dp.process_update(u)
         u.message.text = 'something'
-        cdp.process_update(u)
+        dp.process_update(u)
 
     def test_error_handler(self, dp):
         dp.add_error_handler(self.error_handler)
@@ -182,15 +172,6 @@ class TestDispatcher(object):
         with pytest.raises(RuntimeError):
             must_raise_runtime_error()
 
-    def test_run_async_with_args(self, dp):
-        dp.add_handler(MessageHandler(Filters.all,
-                                      run_async(self.callback_if_not_update_queue),
-                                      pass_update_queue=True))
-
-        dp.update_queue.put(self.message_update)
-        sleep(.1)
-        assert self.received == self.message_update.message
-
     def test_error_in_handler(self, dp):
         dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
         dp.add_error_handler(self.error_handler)
@@ -249,19 +230,19 @@ class TestDispatcher(object):
     def test_flow_stop(self, dp, bot):
         passed = []
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise DispatcherHandlerStop
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
 
         update = Update(1, message=Message(1, None, None, None, text='/start',
                                            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
@@ -281,19 +262,19 @@ class TestDispatcher(object):
         passed = []
         err = Exception('General exception')
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise err
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
 
         update = Update(1, message=Message(1, None, None, None, text='/start',
                                            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
@@ -315,19 +296,19 @@ class TestDispatcher(object):
         passed = []
         err = TelegramError('Telegram error')
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise err
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
 
         update = Update(1, message=Message(1, None, None, None, text='/start',
                                            entities=[MessageEntity(type=MessageEntity.BOT_COMMAND,
@@ -373,10 +354,10 @@ class TestDispatcher(object):
             def update_user_data(self, user_id, data):
                 raise Exception
 
-        def start1(b, u):
+        def start1(u, c):
             pass
 
-        def error(b, u, e):
+        def error(u, c):
             increment.append("error")
 
         # If updating a user_data or chat_data from a persistence object throws an error,
@@ -399,19 +380,19 @@ class TestDispatcher(object):
         passed = []
         err = TelegramError('Telegram error')
 
-        def start1(b, u):
+        def start1(u, c):
             passed.append('start1')
             raise err
 
-        def start2(b, u):
+        def start2(u, c):
             passed.append('start2')
 
-        def start3(b, u):
+        def start3(u, c):
             passed.append('start3')
 
-        def error(b, u, e):
+        def error(u, c):
             passed.append('error')
-            passed.append(e)
+            passed.append(c.error)
             raise DispatcherHandlerStop
 
         update = Update(1, message=Message(1, None, None, None, text='/start',
@@ -430,22 +411,8 @@ class TestDispatcher(object):
         assert passed == ['start1', 'error', err]
         assert passed[2] is err
 
-    def test_error_handler_context(self, cdp):
-        cdp.add_error_handler(self.callback_context)
-
-        error = TelegramError('Unauthorized.')
-        cdp.update_queue.put(error)
-        sleep(.1)
-        assert self.received == 'Unauthorized.'
-
     def test_sensible_worker_thread_names(self, dp2):
         thread_names = [thread.name for thread in getattr(dp2, '_Dispatcher__async_threads')]
         print(thread_names)
         for thread_name in thread_names:
             assert thread_name.startswith("Bot:{}:worker:".format(dp2.bot.id))
-
-    @pytest.mark.skipif(sys.version_info < (3, 0), reason='pytest fails this for no reason')
-    def test_non_context_deprecation(self, dp):
-        with pytest.warns(TelegramDeprecationWarning):
-            Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0,
-                       use_context=False)
