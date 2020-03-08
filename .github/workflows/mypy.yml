@@ -30,7 +30,7 @@ jobs:
       shell: bash
     - name: Computing typing coverage
       run: |
-        diff-cover --fail-under=100 cobertura.xml --html-report typing_coverage.html --compare-branch=$GITHUB_BASE_REF/${{github.head_ref}}
+        diff-cover --fail-under=100 cobertura.xml --html-report typing_coverage.html --compare-branch=origin/$GITHUB_BASE_REF
       shell: bash
     - name: Uploading coverage report as html
       uses: actions/upload-artifact@v1
