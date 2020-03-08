@@ -82,7 +82,7 @@ class BaseFilter(object):
     update_filter: bool = False
     data_filter: bool = False
 
-    def __call__(self, update: int) -> Optional[bool]:
+    def __call__(self, update: Update) -> Optional[bool]:
         if self.update_filter:
             return self.filter(update)
         else:
@@ -103,7 +103,7 @@ class BaseFilter(object):
             self.name = self.__class__.__name__
         return self.name
 
-    def filter(self, update):
+    def filter(self, update: Update) -> Optional[bool]:
         """This method must be overwritten.
 
         Note:
