@@ -40,6 +40,6 @@ jobs:
       shell: bash
     - name: Uploading coverage report as html
       uses: actions/upload-artifact@v1
-        with:
-          name: typing_coverage
-          path: typing_coverage.html
+      with:
+        name: typing_coverage
+        path: typing_coverage.html
