@@ -136,7 +136,7 @@ class InvertedFilter(BaseFilter):
     def filter(self, update):
         return not bool(self.f(update))
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> int:
         return "<inverted {}>".format(self.f)
 
 
