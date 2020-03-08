@@ -7,12 +7,6 @@ on:
     paths:
       - 'telegram/**'
       - '**.py'
-  push:
-    branches:
-      - master
-    paths:
-      - 'telegram/**'
-      - '**.py'
 jobs:
   mypy:
     runs-on: ubuntu-latest
@@ -36,7 +30,7 @@ jobs:
       shell: bash
     - name: Computing typing coverage
       run: |
-        diff-cover --fail-under=100 cobertura.xml --html-report typing_coverage.html
+        diff-cover --fail-under=100 cobertura.xml --html-report typing_coverage.html --compare-branch={{env:GITHUB_BASE_REF}/github.head_ref}
       shell: bash
     - name: Uploading coverage report as html
       uses: actions/upload-artifact@v1
