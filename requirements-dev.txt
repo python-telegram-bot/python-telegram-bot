@@ -4,8 +4,6 @@ pylint
 flaky
 yapf
 mypy==0.761
-diff-cover
-lxml
 pre-commit
 beautifulsoup4
 pytest==4.2.0
