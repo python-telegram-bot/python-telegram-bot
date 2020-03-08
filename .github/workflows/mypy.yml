@@ -26,6 +26,7 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
+        pip install diff-cover lxml
     - name: Verify mypy types
       run: |
         mypy --version
@@ -35,5 +36,10 @@ jobs:
       shell: bash
     - name: Computing typing coverage
       run: |
-        diff-cover --fail-under=100 cobertura.xml --html-report report.html
+        diff-cover --fail-under=100 cobertura.xml --html-report typing_coverage.html
       shell: bash
+    - name: Uploading coverage report as html
+      uses: actions/upload-artifact@v1
+      with:
+        name: typing_coverage
+        path: typing_coverage.html
