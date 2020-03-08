@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - type_hinting_master
+      - workflow_test
     paths:
       - 'telegram/**'
       - '**.py'
