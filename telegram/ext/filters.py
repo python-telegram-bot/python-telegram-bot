@@ -97,7 +97,7 @@ class BaseFilter(object):
     def __invert__(self):
         return InvertedFilter(self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
         if self.name is None:
             self.name = self.__class__.__name__
