@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultVoice(InlineQueryResult):
@@ -68,7 +69,7 @@ class InlineQueryResultVoice(InlineQueryResult):
                  caption=None,
                  reply_markup=None,
                  input_message_content=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
 
         # Required
@@ -77,13 +78,8 @@ class InlineQueryResultVoice(InlineQueryResult):
         self.title = title
 
         # Optional
-        if voice_duration:
-            self.voice_duration = voice_duration
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.voice_duration = voice_duration
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

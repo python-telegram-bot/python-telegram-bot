@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
@@ -77,7 +78,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
                  reply_markup=None,
                  input_message_content=None,
                  mpeg4_duration=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
 
         # Required
@@ -86,19 +87,11 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         self.thumb_url = thumb_url
 
         # Optional
-        if mpeg4_width:
-            self.mpeg4_width = mpeg4_width
-        if mpeg4_height:
-            self.mpeg4_height = mpeg4_height
-        if mpeg4_duration:
-            self.mpeg4_duration = mpeg4_duration
-        if title:
-            self.title = title
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
+        self.mpeg4_width = mpeg4_width
+        self.mpeg4_height = mpeg4_height
+        self.mpeg4_duration = mpeg4_duration
+        self.title = title
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content

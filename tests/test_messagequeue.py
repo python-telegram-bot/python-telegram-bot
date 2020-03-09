@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ import pytest
 import telegram.ext.messagequeue as mq
 
 
-@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="On Appveyor precise timings are not accurate.")
 @pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
                     reason="On windows precise timings are not accurate.")
 class TestDelayQueue(object):
@@ -43,7 +42,7 @@ class TestDelayQueue(object):
                             autostart=True)
         assert dsp.is_alive() is True
 
-        for i in range(self.N):
+        for _ in range(self.N):
             dsp(self.call)
 
         starttime = mq.curtime()

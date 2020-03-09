@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
 from telegram import InlineQueryResult
+from telegram.utils.helpers import DEFAULT_NONE
 
 
 class InlineQueryResultDocument(InlineQueryResult):
@@ -82,7 +83,7 @@ class InlineQueryResultDocument(InlineQueryResult):
                  thumb_url=None,
                  thumb_width=None,
                  thumb_height=None,
-                 parse_mode=None,
+                 parse_mode=DEFAULT_NONE,
                  **kwargs):
         # Required
         super(InlineQueryResultDocument, self).__init__('document', id)
@@ -91,19 +92,11 @@ class InlineQueryResultDocument(InlineQueryResult):
         self.mime_type = mime_type
 
         # Optionals
-        if caption:
-            self.caption = caption
-        if parse_mode:
-            self.parse_mode = parse_mode
-        if description:
-            self.description = description
-        if reply_markup:
-            self.reply_markup = reply_markup
-        if input_message_content:
-            self.input_message_content = input_message_content
-        if thumb_url:
-            self.thumb_url = thumb_url
-        if thumb_width:
-            self.thumb_width = thumb_width
-        if thumb_height:
-            self.thumb_height = thumb_height
+        self.caption = caption
+        self.parse_mode = parse_mode
+        self.description = description
+        self.reply_markup = reply_markup
+        self.input_message_content = input_message_content
+        self.thumb_url = thumb_url
+        self.thumb_width = thumb_width
+        self.thumb_height = thumb_height

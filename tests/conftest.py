@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,14 +30,9 @@ import pytest
 from telegram import (Bot, Message, User, Chat, MessageEntity, Update,
                       InlineQuery, CallbackQuery, ShippingQuery, PreCheckoutQuery,
                       ChosenInlineResult)
-from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter
+from telegram.ext import Dispatcher, JobQueue, Updater, BaseFilter, Defaults
 from telegram.utils.helpers import _UtcOffsetTimezone
 from tests.bots import get_bot
-
-TRAVIS = os.getenv('TRAVIS', False)
-
-if TRAVIS:
-    pytest_plugins = ['tests.travis_fold']
 
 GITHUB_ACTION = os.getenv('GITHUB_ACTION', False)
 
@@ -57,6 +52,21 @@ def bot_info():
 @pytest.fixture(scope='session')
 def bot(bot_info):
     return make_bot(bot_info)
+
+
+DEFAULT_BOTS = {}
+@pytest.fixture(scope='function')
+def default_bot(request, bot_info):
+    param = request.param if hasattr(request, 'param') else {}
+
+    defaults = Defaults(**param)
+    default_bot = DEFAULT_BOTS.get(defaults)
+    if default_bot:
+        return default_bot
+    else:
+        default_bot = make_bot(bot_info, **{'defaults': defaults})
+        DEFAULT_BOTS[defaults] = default_bot
+        return default_bot
 
 
 @pytest.fixture(scope='session')
@@ -107,6 +117,7 @@ def dp(_dp):
         _dp.update_queue.get(False)
     _dp.chat_data = defaultdict(dict)
     _dp.user_data = defaultdict(dict)
+    _dp.bot_data = {}
     _dp.persistence = None
     _dp.handlers = {}
     _dp.groups = []
@@ -158,8 +169,8 @@ def pytest_configure(config):
         # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
 
 
-def make_bot(bot_info):
-    return Bot(bot_info['token'], private_key=PRIVATE_KEY)
+def make_bot(bot_info, **kwargs):
+    return Bot(bot_info['token'], private_key=PRIVATE_KEY, **kwargs)
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
