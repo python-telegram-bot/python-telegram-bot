@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -95,6 +95,22 @@ class TestFile(object):
         finally:
             os.close(file_handle)
             os.unlink(custom_path)
+
+    def test_download_no_filename(self, monkeypatch, file):
+        def test(*args, **kwargs):
+            return self.file_content
+
+        file.file_path = None
+
+        monkeypatch.setattr('telegram.utils.request.Request.retrieve', test)
+        out_file = file.download()
+
+        assert out_file[-len(file.file_id):] == file.file_id
+        try:
+            with open(out_file, 'rb') as fobj:
+                assert fobj.read() == self.file_content
+        finally:
+            os.unlink(out_file)
 
     def test_download_file_obj(self, monkeypatch, file):
         def test(*args, **kwargs):

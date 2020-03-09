@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import re
 
 from future.utils import string_types
 
-from telegram import Chat, Update
+from telegram import Chat, Update, MessageEntity
 
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
@@ -243,21 +243,18 @@ class Filters(object):
                 self.name = 'Filters.text({})'.format(iterable)
 
             def filter(self, message):
-                if message.text and not message.text.startswith('/'):
+                if message.text:
                     return message.text in self.iterable
                 return False
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._TextIterable(update)
 
         def filter(self, message):
-            return bool(message.text and not message.text.startswith('/'))
+            return bool(message.text)
 
     text = _Text()
     """Text Messages. If an iterable of strings is passed, it filters messages to only allow those
@@ -296,10 +293,7 @@ class Filters(object):
 
         def __call__(self, update):
             if isinstance(update, Update):
-                if self.update_filter:
-                    return self.filter(update)
-                else:
-                    return self.filter(update.effective_message)
+                return self.filter(update.effective_message)
             else:
                 return self._CaptionIterable(update)
 
@@ -321,11 +315,41 @@ class Filters(object):
     class _Command(BaseFilter):
         name = 'Filters.command'
 
+        class _CommandOnlyStart(BaseFilter):
+
+            def __init__(self, only_start):
+                self.only_start = only_start
+                self.name = 'Filters.command({})'.format(only_start)
+
+            def filter(self, message):
+                return (message.entities
+                        and any([e.type == MessageEntity.BOT_COMMAND for e in message.entities]))
+
+        def __call__(self, update):
+            if isinstance(update, Update):
+                return self.filter(update.effective_message)
+            else:
+                return self._CommandOnlyStart(update)
+
         def filter(self, message):
-            return bool(message.text and message.text.startswith('/'))
+            return (message.entities and message.entities[0].type == MessageEntity.BOT_COMMAND
+                    and message.entities[0].offset == 0)
 
     command = _Command()
-    """Messages starting with ``/``."""
+    """
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    messages `starting` with a bot command. Pass ``False`` to also allow messages that contain a
+    bot command `anywhere` in the text.
+
+    Examples::
+
+        MessageHandler(Filters.command, command_at_start_callback)
+        MessageHandler(Filters.command(False), command_anywhere_callback)
+
+    Args:
+        update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
+            command. Defaults to ``True``.
+    """
 
     class regex(BaseFilter):
         """
@@ -481,38 +505,6 @@ class Filters(object):
         ``Filters.document`` for all document messages.
 
     Attributes:
-        category: This Filter filters documents by their category in the mime-type attribute.
-
-            Example:
-                ``Filters.documents.category('audio/')`` filters all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'. The following
-                attributes can be used as a shortcut like: ``Filters.document.audio``
-
-        application:
-        audio:
-        image:
-        video:
-        text:
-        mime_type: This Filter filters documents by their mime-type attribute.
-
-            Example:
-                ``Filters.documents.mime_type('audio/mpeg')`` filters all audio in mp3 format. The
-                following attributes can be used as a shortcut like: ``Filters.document.jpg``
-        apk:
-        doc:
-        docx:
-        exe:
-        gif:
-        jpg:
-        mp3:
-        pdf:
-        py:
-        svg:
-        txt:
-        targz:
-        wav:
-        xml:
-        zip:
         category: This Filter filters documents by their category in the mime-type attribute
 
             Note:
@@ -956,6 +948,15 @@ officedocument.wordprocessingml.document")``-
     passport_data = _PassportData()
     """Messages that contain a :class:`telegram.PassportData`"""
 
+    class _Poll(BaseFilter):
+        name = 'Filters.poll'
+
+        def filter(self, message):
+            return bool(message.poll)
+
+    poll = _Poll()
+    """Messages that contain a :class:`telegram.Poll`."""
+
     class language(BaseFilter):
         """Filters messages to only allow those which are from users with a certain language code.
 
@@ -987,8 +988,10 @@ officedocument.wordprocessingml.document")``-
 
     class _UpdateType(BaseFilter):
         update_filter = True
+        name = 'Filters.update'
 
         class _Message(BaseFilter):
+            name = 'Filters.update.message'
             update_filter = True
 
             def filter(self, update):
@@ -997,6 +1000,7 @@ officedocument.wordprocessingml.document")``-
         message = _Message()
 
         class _EditedMessage(BaseFilter):
+            name = 'Filters.update.edited_message'
             update_filter = True
 
             def filter(self, update):
@@ -1005,6 +1009,7 @@ officedocument.wordprocessingml.document")``-
         edited_message = _EditedMessage()
 
         class _Messages(BaseFilter):
+            name = 'Filters.update.messages'
             update_filter = True
 
             def filter(self, update):
@@ -1013,6 +1018,7 @@ officedocument.wordprocessingml.document")``-
         messages = _Messages()
 
         class _ChannelPost(BaseFilter):
+            name = 'Filters.update.channel_post'
             update_filter = True
 
             def filter(self, update):
@@ -1022,6 +1028,7 @@ officedocument.wordprocessingml.document")``-
 
         class _EditedChannelPost(BaseFilter):
             update_filter = True
+            name = 'Filters.update.edited_channel_post'
 
             def filter(self, update):
                 return update.edited_channel_post is not None
@@ -1030,6 +1037,7 @@ officedocument.wordprocessingml.document")``-
 
         class _ChannelPosts(BaseFilter):
             update_filter = True
+            name = 'Filters.update.channel_posts'
 
             def filter(self, update):
                 return update.channel_post is not None or update.edited_channel_post is not None

@@ -43,6 +43,8 @@ If you have an idea for something to do, first check if it's already been filed 
 
 Another great way to start contributing is by writing tests. Tests are really important because they help prevent developers from accidentally breaking existing code, allowing them to build cool things faster. If you're interested in helping out, let the development team know by posting to the `developers' mailing list`_, and we'll help you get started.
 
+That being said, we want to mention that we are very hesistant about adding new requirements to our projects. If you intend to do this, please state this in an issue and get a verification from one of the maintainers.
+
 Instructions for making a code change
 #####################################
 
@@ -110,6 +112,14 @@ Here's how to make a one-off code change.
      .. code-block::
 
         $ pytest -v
+
+     To run ``test_official`` (particularly useful if you made API changes), run
+
+     .. code-block::
+
+        $ export TEST_OFFICIAL=True
+
+     prior to running the tests.
 
    - To actually make the commit (this will trigger tests for yapf, lint and pep8 automatically):
 
@@ -238,6 +248,6 @@ break the API classes. For example:
 .. _`developers' mailing list`: mailto:devs@python-telegram-bot.org
 .. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
 .. _`sphinx`: http://sphinx-doc.org
-.. _`Google Python Style Guide`: https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
-.. _`Google Python Style Docstrings`: http://sphinx-doc.org/latest/ext/example_google.html
+.. _`Google Python Style Guide`: http://google.github.io/styleguide/pyguide.html
+.. _`Google Python Style Docstrings`: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
 .. _AUTHORS.rst: ../AUTHORS.rst

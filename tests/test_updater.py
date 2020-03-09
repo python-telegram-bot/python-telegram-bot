@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ import logging
 import os
 import signal
 import sys
+from flaky import flaky
 from functools import partial
 from queue import Queue
 from random import randrange
@@ -39,7 +40,7 @@ from future.builtins import bytes
 
 from telegram import TelegramError, Message, User, Chat, Update, Bot
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
-from telegram.ext import Updater
+from telegram.ext import Updater, Dispatcher, BasePersistence
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
@@ -79,8 +80,8 @@ class TestUpdater(object):
         def test(*args, **kwargs):
             raise error
 
-        monkeypatch.setattr('telegram.Bot.get_updates', test)
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'get_updates', test)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         updater.dispatcher.add_error_handler(self.error_handler)
         updater.start_polling(0.01)
 
@@ -99,8 +100,8 @@ class TestUpdater(object):
             raise error
 
         with caplog.at_level(logging.DEBUG):
-            monkeypatch.setattr('telegram.Bot.get_updates', test)
-            monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+            monkeypatch.setattr(updater.bot, 'get_updates', test)
+            monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
             updater.dispatcher.add_error_handler(self.error_handler)
             updater.start_polling(0.01)
             assert self.err_handler_called.wait(1) is not True
@@ -127,8 +128,8 @@ class TestUpdater(object):
             event.set()
             raise error
 
-        monkeypatch.setattr('telegram.Bot.get_updates', test)
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'get_updates', test)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         updater.dispatcher.add_error_handler(self.error_handler)
         updater.start_polling(0.01)
 
@@ -144,12 +145,12 @@ class TestUpdater(object):
 
     def test_webhook(self, monkeypatch, updater):
         q = Queue()
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(
             ip,
             port,
@@ -182,10 +183,10 @@ class TestUpdater(object):
             updater.stop()
 
     def test_webhook_ssl(self, monkeypatch, updater):
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         tg_err = False
         try:
             updater._start_webhook(
@@ -204,12 +205,12 @@ class TestUpdater(object):
 
     def test_webhook_no_ssl(self, monkeypatch, updater):
         q = Queue()
-        monkeypatch.setattr('telegram.Bot.set_webhook', lambda *args, **kwargs: True)
-        monkeypatch.setattr('telegram.Bot.delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
 
         ip = '127.0.0.1'
-        port = randrange(1024, 49152)  # Select random port for travis
+        port = randrange(1024, 49152)  # Select random port
         updater.start_webhook(ip, port, webhook_url=None)
         sleep(.2)
 
@@ -221,18 +222,42 @@ class TestUpdater(object):
         assert q.get(False) == update
         updater.stop()
 
+    def test_webhook_default_quote(self, monkeypatch, updater):
+        updater._default_quote = True
+        q = Queue()
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN')
+        sleep(.2)
+
+        # Now, we send an update to the server via urlopen
+        update = Update(1, message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                           text='Webhook'))
+        self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
+        sleep(.2)
+        # assert q.get(False) == update
+        assert q.get(False).message.default_quote is True
+        updater.stop()
+
     @pytest.mark.parametrize(('error',),
                              argvalues=[(TelegramError(''),)],
                              ids=('TelegramError',))
     def test_bootstrap_retries_success(self, monkeypatch, updater, error):
         retries = 2
 
-        def attempt(_, *args, **kwargs):
+        def attempt(*args, **kwargs):
             if self.attempts < retries:
                 self.attempts += 1
                 raise error
 
-        monkeypatch.setattr('telegram.Bot.set_webhook', attempt)
+        monkeypatch.setattr(updater.bot, 'set_webhook', attempt)
 
         updater.running = True
         updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
@@ -246,17 +271,18 @@ class TestUpdater(object):
     def test_bootstrap_retries_error(self, monkeypatch, updater, error, attempts):
         retries = 1
 
-        def attempt(_, *args, **kwargs):
+        def attempt(*args, **kwargs):
             self.attempts += 1
             raise error
 
-        monkeypatch.setattr('telegram.Bot.set_webhook', attempt)
+        monkeypatch.setattr(updater.bot, 'set_webhook', attempt)
 
         updater.running = True
         with pytest.raises(type(error)):
             updater._bootstrap(retries, False, 'path', None, bootstrap_interval=0)
         assert self.attempts == attempts
 
+    @flaky(3, 1)
     def test_webhook_invalid_posts(self, updater):
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # select random port for travis
@@ -369,7 +395,7 @@ class TestUpdater(object):
         with pytest.raises(ValueError):
             Updater(token='123:abcd', bot=bot)
 
-    def test_no_token_or_bot(self):
+    def test_no_token_or_bot_or_dispatcher(self):
         with pytest.raises(ValueError):
             Updater()
 
@@ -377,3 +403,26 @@ class TestUpdater(object):
         bot = Bot('123:zyxw')
         with pytest.raises(ValueError):
             Updater(bot=bot, private_key=b'key')
+
+    def test_mutual_exclude_bot_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        bot = Bot('123:zyxw')
+        with pytest.raises(ValueError):
+            Updater(bot=bot, dispatcher=dispatcher)
+
+    def test_mutual_exclude_persistence_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        persistence = BasePersistence()
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, persistence=persistence)
+
+    def test_mutual_exclude_workers_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, workers=8)
+
+    def test_mutual_exclude_use_context_dispatcher(self):
+        dispatcher = Dispatcher(None, None)
+        use_context = not dispatcher.use_context
+        with pytest.raises(ValueError):
+            Updater(dispatcher=dispatcher, use_context=use_context)
