@@ -297,8 +297,7 @@ class TestUpdater(object):
             pass
             # not affected
         else:
-            assert isinstance(asyncio.get_event_loop_policy(),
-                              WindowsSelectorEventLoopPolicy())
+            assert isinstance(asyncio.get_event_loop_policy(), WindowsSelectorEventLoopPolicy)
 
         updater.stop()
 
