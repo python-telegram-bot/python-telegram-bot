@@ -87,6 +87,7 @@ class TestPollHandler(object):
                           and context.user_data is None
                           and context.chat_data is None
                           and isinstance(context.bot_data, dict)
+                          and isinstance(context.roles, dict)
                           and isinstance(update.poll, Poll))
 
     def test_basic(self, dp, poll):

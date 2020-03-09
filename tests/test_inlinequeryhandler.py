@@ -95,6 +95,7 @@ class TestCallbackQueryHandler(object):
                           and isinstance(context.user_data, dict)
                           and context.chat_data is None
                           and isinstance(context.bot_data, dict)
+                          and isinstance(context.roles, dict)
                           and isinstance(update.inline_query, InlineQuery))
 
     def callback_context_pattern(self, update, context):

@@ -84,6 +84,7 @@ class TestMessageHandler(object):
                           and isinstance(context.job_queue, JobQueue)
                           and isinstance(context.chat_data, dict)
                           and isinstance(context.bot_data, dict)
+                          and isinstance(context.roles, dict)
                           and ((isinstance(context.user_data, dict)
                                 and (isinstance(update.message, Message)
                                      or isinstance(update.edited_message, Message)))

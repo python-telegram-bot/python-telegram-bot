@@ -88,6 +88,7 @@ class TestPreCheckoutQueryHandler(object):
                           and isinstance(context.user_data, dict)
                           and context.chat_data is None
                           and isinstance(context.bot_data, dict)
+                          and isinstance(context.roles, dict)
                           and isinstance(update.pre_checkout_query, PreCheckoutQuery))
 
     def test_basic(self, dp, pre_checkout_query):

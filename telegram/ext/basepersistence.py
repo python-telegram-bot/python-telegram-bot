@@ -31,6 +31,8 @@ class BasePersistence(object):
       :meth:`update_chat_data`.
     * If :attr:`store_user_data` is ``True`` you must overwrite :meth:`get_user_data` and
       :meth:`update_user_data`.
+    * If :attr:`store_roles` is ``True`` you must overwrite :meth:`get_roles` and
+      :meth:`update_roles`.
     * If you want to store conversation data with :class:`telegram.ext.ConversationHandler`, you
       must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
     * :meth:`flush` will be called when the bot is shutdown.

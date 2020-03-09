@@ -24,7 +24,8 @@ import time
 
 from copy import deepcopy
 from telegram import Message, User, InlineQuery, Update, ChatMember, Chat, TelegramError
-from telegram.ext import Role, Roles, MessageHandler, InlineQueryHandler
+from telegram.ext import (Role, Roles, MessageHandler, InlineQueryHandler, ChatAdminsRole,
+                          ChatCreatorRole)
 
 
 @pytest.fixture(scope='function')
@@ -46,6 +47,16 @@ def parent_role():
 @pytest.fixture(scope='function')
 def role():
     return Role(name='role')
+
+
+@pytest.fixture(scope='function')
+def chat_admins_role(bot):
+    return ChatAdminsRole(bot, 0.05)
+
+
+@pytest.fixture(scope='function')
+def chat_creator_role(bot):
+    return ChatCreatorRole(bot)
 
 
 class TestRole(object):
@@ -313,6 +324,187 @@ class TestRole(object):
         assert handler.check_update(update)
 
 
+class TestChatAdminsRole(object):
+    def test_creation(self, bot):
+        admins = ChatAdminsRole(bot, timeout=7)
+        assert admins.timeout == 7
+        assert admins._bot is bot
+
+    def test_deepcopy(self, chat_admins_role):
+        chat_admins_role._cache.update({1: 2, 3: 4})
+        cadmins = deepcopy(chat_admins_role)
+
+        assert chat_admins_role is not cadmins
+        assert chat_admins_role.equals(cadmins)
+        assert chat_admins_role.chat_ids is not cadmins.chat_ids
+        assert chat_admins_role.chat_ids == cadmins.chat_ids
+        assert chat_admins_role.parent_roles is not cadmins.parent_roles
+        assert chat_admins_role.child_roles is not cadmins.child_roles
+
+        assert chat_admins_role._bot is cadmins._bot
+        assert chat_admins_role._cache == cadmins._cache
+        assert chat_admins_role.timeout == cadmins.timeout
+
+    def test_simple(self, chat_admins_role, update, monkeypatch):
+        def admins(*args, **kwargs):
+            return [ChatMember(User(0, 'TestUser0', False), 'administrator'),
+                    ChatMember(User(1, 'TestUser1', False), 'creator')]
+
+        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+        handler = MessageHandler(None, None, roles=chat_admins_role)
+
+        update.message.from_user.id = 2
+        assert not handler.check_update(update)
+        update.message.from_user.id = 1
+        assert handler.check_update(update)
+        update.message.from_user.id = 0
+        assert handler.check_update(update)
+
+    def test_private_chat(self, chat_admins_role, update):
+        update.message.from_user.id = 2
+        update.message.chat.id = 2
+        handler = MessageHandler(None, None, roles=chat_admins_role)
+
+        assert handler.check_update(update)
+
+    def test_no_chat(self, chat_admins_role, update):
+        update.message = None
+        update.inline_query = InlineQuery(1, User(0, 'TestUser', False), 'query', 0)
+        handler = InlineQueryHandler(None, roles=chat_admins_role)
+
+        assert not handler.check_update(update)
+
+    def test_no_user(self, chat_admins_role, update):
+        update.message = None
+        update.channel_post = Message(1, None, datetime.datetime.utcnow(), Chat(0, 'channel'))
+        handler = InlineQueryHandler(None, roles=chat_admins_role)
+
+        assert not handler.check_update(update)
+
+    def test_caching(self, chat_admins_role, update, monkeypatch):
+        def admins(*args, **kwargs):
+            return [ChatMember(User(0, 'TestUser0', False), 'administrator'),
+                    ChatMember(User(1, 'TestUser1', False), 'creator')]
+
+        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+        handler = MessageHandler(None, None, roles=chat_admins_role)
+
+        update.message.from_user.id = 2
+        assert not handler.check_update(update)
+        assert isinstance(chat_admins_role._cache[0], tuple)
+        assert pytest.approx(chat_admins_role._cache[0][0]) == time.time()
+        assert chat_admins_role._cache[0][1] == [0, 1]
+
+        def admins(*args, **kwargs):
+            raise ValueError('This method should not be called!')
+
+        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+
+        update.message.from_user.id = 1
+        assert handler.check_update(update)
+
+        time.sleep(0.05)
+
+        def admins(*args, **kwargs):
+            return [ChatMember(User(2, 'TestUser0', False), 'administrator')]
+
+        monkeypatch.setattr(chat_admins_role._bot, 'get_chat_administrators', admins)
+
+        update.message.from_user.id = 2
+        assert handler.check_update(update)
+        assert isinstance(chat_admins_role._cache[0], tuple)
+        assert pytest.approx(chat_admins_role._cache[0][0]) == time.time()
+        assert chat_admins_role._cache[0][1] == [2]
+
+
+class TestChatCreatorRole(object):
+    def test_creation(self, bot):
+        creator = ChatCreatorRole(bot)
+        assert creator._bot is bot
+
+    def test_deepcopy(self, chat_creator_role):
+        chat_creator_role._cache.update({1: 2, 3: 4})
+        ccreator = deepcopy(chat_creator_role)
+
+        assert chat_creator_role is not ccreator
+        assert chat_creator_role.equals(ccreator)
+        assert chat_creator_role.chat_ids is not ccreator.chat_ids
+        assert chat_creator_role.chat_ids == ccreator.chat_ids
+        assert chat_creator_role.parent_roles is not ccreator.parent_roles
+        assert chat_creator_role.child_roles is not ccreator.child_roles
+
+        assert chat_creator_role._bot is ccreator._bot
+        assert chat_creator_role._cache == ccreator._cache
+
+    def test_simple(self, chat_creator_role, monkeypatch, update):
+        def member(*args, **kwargs):
+            if args[1] == 0:
+                return ChatMember(User(0, 'TestUser0', False), 'administrator')
+            if args[1] == 1:
+                return ChatMember(User(1, 'TestUser1', False), 'creator')
+            raise TelegramError('User is not a member')
+
+        monkeypatch.setattr(chat_creator_role._bot, 'get_chat_member', member)
+        handler = MessageHandler(None, None, roles=chat_creator_role)
+
+        update.message.from_user.id = 0
+        update.message.chat.id = -1
+        assert not handler.check_update(update)
+        update.message.from_user.id = 1
+        update.message.chat.id = 1
+        assert handler.check_update(update)
+        update.message.from_user.id = 2
+        update.message.chat.id = -2
+        assert not handler.check_update(update)
+
+    def test_no_chat(self, chat_creator_role, update):
+        update.message = None
+        update.inline_query = InlineQuery(1, User(0, 'TestUser', False), 'query', 0)
+        handler = InlineQueryHandler(None, roles=chat_creator_role)
+
+        assert not handler.check_update(update)
+
+    def test_no_user(self, chat_creator_role, update):
+        update.message = None
+        update.channel_post = Message(1, None, datetime.datetime.utcnow(), Chat(0, 'channel'))
+        handler = InlineQueryHandler(None, roles=chat_creator_role)
+
+        assert not handler.check_update(update)
+
+    def test_private_chat(self, chat_creator_role, update):
+        update.message.from_user.id = 2
+        update.message.chat.id = 2
+        handler = MessageHandler(None, None, roles=chat_creator_role)
+
+        assert handler.check_update(update)
+
+    def test_caching(self, chat_creator_role, monkeypatch, update):
+        def member(*args, **kwargs):
+            if args[1] == 0:
+                return ChatMember(User(0, 'TestUser0', False), 'administrator')
+            if args[1] == 1:
+                return ChatMember(User(1, 'TestUser1', False), 'creator')
+            raise TelegramError('User is not a member')
+
+        monkeypatch.setattr(chat_creator_role._bot, 'get_chat_member', member)
+        handler = MessageHandler(None, None, roles=chat_creator_role)
+
+        update.message.from_user.id = 1
+        assert handler.check_update(update)
+        assert chat_creator_role._cache == {0: 1}
+
+        def member(*args, **kwargs):
+            raise ValueError('This method should not be called!')
+
+        monkeypatch.setattr(chat_creator_role._bot, 'get_chat_member', member)
+
+        update.message.from_user.id = 1
+        assert handler.check_update(update)
+
+        update.message.from_user.id = 2
+        assert not handler.check_update(update)
+
+
 class TestRoles(object):
     def test_creation(self, bot):
         roles = Roles(bot)
@@ -422,6 +614,7 @@ class TestRoles(object):
 
     def test_deepcopy(self, roles, parent_role):
         roles.add_admin(123)
+        roles.CHAT_ADMINS.timeout = 7
         child_role = Role(name='child_role')
         roles.add_role(name='test', chat_ids=[1, 2], parent_roles=parent_role,
                        child_roles=child_role)
@@ -432,6 +625,7 @@ class TestRoles(object):
         assert croles == roles
         assert roles.ADMINS is not croles.ADMINS
         assert roles.ADMINS.equals(croles.ADMINS)
+        assert roles.CHAT_ADMINS.timeout == croles.CHAT_ADMINS.timeout
         assert roles['test'] is not croles['test']
         assert roles['test'].equals(croles['test'])
         assert roles['test2'] is not croles['test2']
@@ -475,131 +669,6 @@ class TestRoles(object):
         roles.kick_admin(2)
         assert not handler.check_update(update)
 
-    def test_chat_admins_simple(self, roles, update, monkeypatch):
-        def admins(*args, **kwargs):
-            return [ChatMember(User(0, 'TestUser0', False), 'administrator'),
-                    ChatMember(User(1, 'TestUser1', False), 'creator')]
-
-        monkeypatch.setattr(roles._bot, 'get_chat_administrators', admins)
-        handler = MessageHandler(None, None, roles=roles.CHAT_ADMINS)
-
-        update.message.from_user.id = 2
-        assert not handler.check_update(update)
-        update.message.from_user.id = 1
-        assert handler.check_update(update)
-        update.message.from_user.id = 0
-        assert handler.check_update(update)
-
-    def test_chat_admins_no_chat(self, roles, update):
-        update.message = None
-        update.inline_query = InlineQuery(1, User(0, 'TestUser', False), 'query', 0)
-        handler = InlineQueryHandler(None, roles=roles.CHAT_ADMINS)
-
-        assert not handler.check_update(update)
-
-    def test_chat_admins_no_user(self, roles, update):
-        update.message = None
-        update.channel_post = Message(1, None, datetime.datetime.utcnow(), Chat(0, 'channel'))
-        handler = InlineQueryHandler(None, roles=roles.CHAT_ADMINS)
-
-        assert not handler.check_update(update)
-
-    def test_chat_admins_caching(self, roles, update, monkeypatch):
-        def admins(*args, **kwargs):
-            return [ChatMember(User(0, 'TestUser0', False), 'administrator'),
-                    ChatMember(User(1, 'TestUser1', False), 'creator')]
-
-        roles.CHAT_ADMINS._timeout = 0.05
-        monkeypatch.setattr(roles._bot, 'get_chat_administrators', admins)
-        handler = MessageHandler(None, None, roles=roles.CHAT_ADMINS)
-
-        update.message.from_user.id = 2
-        assert not handler.check_update(update)
-        assert isinstance(roles.CHAT_ADMINS._cache[0], tuple)
-        assert pytest.approx(roles.CHAT_ADMINS._cache[0][0]) == time.time()
-        assert roles.CHAT_ADMINS._cache[0][1] == [0, 1]
-
-        def admins(*args, **kwargs):
-            raise ValueError('This method should not be called!')
-
-        monkeypatch.setattr(roles._bot, 'get_chat_administrators', admins)
-
-        update.message.from_user.id = 1
-        assert handler.check_update(update)
-
-        time.sleep(0.05)
-
-        def admins(*args, **kwargs):
-            return [ChatMember(User(2, 'TestUser0', False), 'administrator')]
-
-        monkeypatch.setattr(roles._bot, 'get_chat_administrators', admins)
-
-        update.message.from_user.id = 2
-        assert handler.check_update(update)
-        assert isinstance(roles.CHAT_ADMINS._cache[0], tuple)
-        assert pytest.approx(roles.CHAT_ADMINS._cache[0][0]) == time.time()
-        assert roles.CHAT_ADMINS._cache[0][1] == [2]
-
-    def test_chat_creator_simple(self, roles, update, monkeypatch):
-        def member(*args, **kwargs):
-            if args[1] == 0:
-                return ChatMember(User(0, 'TestUser0', False), 'administrator')
-            if args[1] == 1:
-                return ChatMember(User(1, 'TestUser1', False), 'creator')
-            raise TelegramError('User is not a member')
-
-        monkeypatch.setattr(roles._bot, 'get_chat_member', member)
-        handler = MessageHandler(None, None, roles=roles.CHAT_CREATOR)
-
-        update.message.from_user.id = 0
-        assert not handler.check_update(update)
-        update.message.from_user.id = 1
-        update.message.chat.id = 1
-        assert handler.check_update(update)
-        update.message.from_user.id = 2
-        update.message.chat.id = 2
-        assert not handler.check_update(update)
-
-    def test_chat_creator_no_chat(self, roles, update):
-        update.message = None
-        update.inline_query = InlineQuery(1, User(0, 'TestUser', False), 'query', 0)
-        handler = InlineQueryHandler(None, roles=roles.CHAT_CREATOR)
-
-        assert not handler.check_update(update)
-
-    def test_chat_creator_no_user(self, roles, update):
-        update.message = None
-        update.channel_post = Message(1, None, datetime.datetime.utcnow(), Chat(0, 'channel'))
-        handler = InlineQueryHandler(None, roles=roles.CHAT_CREATOR)
-
-        assert not handler.check_update(update)
-
-    def test_chat_creator_caching(self, roles, update, monkeypatch):
-        def member(*args, **kwargs):
-            if args[1] == 0:
-                return ChatMember(User(0, 'TestUser0', False), 'administrator')
-            if args[1] == 1:
-                return ChatMember(User(1, 'TestUser1', False), 'creator')
-            raise TelegramError('User is not a member')
-
-        monkeypatch.setattr(roles._bot, 'get_chat_member', member)
-        handler = MessageHandler(None, None, roles=roles.CHAT_CREATOR)
-
-        update.message.from_user.id = 1
-        assert handler.check_update(update)
-        assert roles.CHAT_CREATOR._cache == {0: 1}
-
-        def member(*args, **kwargs):
-            raise ValueError('This method should not be called!')
-
-        monkeypatch.setattr(roles._bot, 'get_chat_member', member)
-
-        update.message.from_user.id = 1
-        assert handler.check_update(update)
-
-        update.message.from_user.id = 2
-        assert not handler.check_update(update)
-
     def test_json_encoding_decoding(self, roles, parent_role, bot):
         child_role = Role(name='child_role')
         roles.add_role('role_1', chat_ids=[1, 2, 3])
@@ -608,6 +677,7 @@ class TestRoles(object):
         roles.add_role('role_3', chat_ids=[7, 8], parent_roles=parent_role, child_roles=child_role)
         roles.add_admin(9)
         roles.add_admin(10)
+        roles.CHAT_ADMINS.timeout = 7
 
         json_str = roles.encode_to_json()
         assert isinstance(json_str, str)
@@ -620,6 +690,7 @@ class TestRoles(object):
             assert rroles[name] <= rroles.ADMINS
         assert rroles.ADMINS.chat_ids == set([9, 10])
         assert rroles.ADMINS.equals(roles.ADMINS)
+        assert rroles.CHAT_ADMINS.timeout == roles.CHAT_ADMINS.timeout
         assert rroles['role_1'].chat_ids == set([1, 2, 3])
         assert rroles['role_1'].equals(Role(name='role_1', chat_ids=[1, 2, 3]))
         assert rroles['role_2'].chat_ids == set([4, 5, 6])

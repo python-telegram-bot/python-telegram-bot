@@ -46,3 +46,13 @@ Persistence
     telegram.ext.basepersistence
     telegram.ext.picklepersistence
     telegram.ext.dictpersistence
+
+Authentication
+--------------
+
+.. toctree::
+
+    telegram.ext.role
+    telegram.ext.roles
+    telegram.ext.chatadminsrole
+    telegram.ext.chatcreatorrole

@@ -315,29 +315,70 @@ class Role(Filters.user):
             return 'Role({})'
 
 
-class _chat_admins(Role):
-    def __init__(self, bot):
-        super(_chat_admins, self).__init__(name='chat_admins')
+class ChatAdminsRole(Role):
+    """A :class:`telegram.ext.Role` that allows only the administrators of a chat. Private chats
+    always allowed. To minimize the number of API calls, for each chat the admins will be cached.
+
+    Attributes:
+        parent_roles (set(:class:`telegram.ext.Role`)): Parent roles of this role. All the parent
+            roles can do anything, this role can do. May be empty.
+        child_roles (set(:class:`telegram.ext.Role`)): Child roles of this role. This role can do
+            anything, its child roles can do. May be empty.
+        timeout (:obj:`int`): The caching timeout in seconds. For each chat, the admins will be
+            cached and refreshed only after this timeout.
+
+    Args:
+        bot (:class:`telegram.Bot`): A bot to use for getting the administrators of a chat.
+        timeout (:obj:`int`, optional): The caching timeout in seconds. For each chat, the admins
+            will be cached and refreshed only after this timeout. Defaults to ``1800`` (half an
+            hour).
+
+    """
+    def __init__(self, bot, timeout=1800):
+        super(ChatAdminsRole, self).__init__(name='chat_admins')
         self._bot = bot
         self._cache = {}
-        self._timeout = 1800
+        self.timeout = timeout
 
     def filter(self, update):
         user = update.effective_user
         chat = update.effective_chat
         if user and chat:
+            # Always true in private chats
+            if user.id == chat.id:
+                return True
             # Check for cached info first
             if (self._cache.get(chat.id, None)
-                    and (time.time() - self._cache[chat.id][0]) < self._timeout):
+                    and (time.time() - self._cache[chat.id][0]) < self.timeout):
                 return user.id in self._cache[chat.id][1]
             admins = [m.user.id for m in self._bot.get_chat_administrators(chat.id)]
             self._cache[chat.id] = (time.time(), admins)
             return user.id in admins
 
+    def __deepcopy__(self, memo):
+        new_role = super(ChatAdminsRole, self).__deepcopy__(memo)
+        new_role._bot = self._bot
+        new_role._cache = self._cache
+        new_role.timeout = self.timeout
+        return new_role
 
-class _chat_creator(Role):
+
+class ChatCreatorRole(Role):
+    """A :class:`telegram.ext.Role` that allows only the creator of a chat. Private chats are
+    always allowed. To minimize the number of API calls, for each chat the creator will be saved.
+
+    Attributes:
+        parent_roles (set(:class:`telegram.ext.Role`)): Parent roles of this role. All the parent
+            roles can do anything, this role can do. May be empty.
+        child_roles (set(:class:`telegram.ext.Role`)): Child roles of this role. This role can do
+            anything, its child roles can do. May be empty.
+
+    Args:
+        bot (:class:`telegram.Bot`): A bot to use for getting the creator of a chat.
+
+    """
     def __init__(self, bot):
-        super(_chat_creator, self).__init__(name='chat_creator')
+        super(ChatCreatorRole, self).__init__(name='chat_creator')
         self._bot = bot
         self._cache = {}
 
@@ -345,6 +386,9 @@ class _chat_creator(Role):
         user = update.effective_user
         chat = update.effective_chat
         if user and chat:
+            # Always true in private chats
+            if user.id == chat.id:
+                return True
             # Check for cached info first
             if self._cache.get(chat.id, None):
                 return user.id == self._cache[chat.id]
@@ -357,6 +401,12 @@ class _chat_creator(Role):
             except TelegramError:
                 # user is not a chat member or bot has no access
                 return False
+
+    def __deepcopy__(self, memo):
+        new_role = super(ChatCreatorRole, self).__deepcopy__(memo)
+        new_role._bot = self._bot
+        new_role._cache = self._cache
+        return new_role
 
 
 class Roles(dict):
@@ -376,12 +426,12 @@ class Roles(dict):
     Attributes:
         ADMINS (:class:`telegram.ext.Role`): A role reserved for administrators of the bot. All
             roles added to this instance will be child roles of :attr:`ADMINS`.
-        CHAT_ADMINS (:class:`telegram.ext.Role`): Use this role to restrict access to admins of a
-            chat. Handlers with this role wont handle updates that don't have an
-            ``effective_chat``. Admins are cached for each chat with a timeout of half an hour.
-        CHAT_CREATOR (:class:`telegram.ext.Role`): Use this role to restrict access to the creator
-            of a chat. Handlers with this role wont handle updates that don't have an
-            ``effective_chat``.
+        CHAT_ADMINS (:class:`telegram.ext.roles.ChatAdminsRole`): Use this role to restrict access
+            to admins of a chat. Handlers with this role wont handle updates that don't have an
+            ``effective_chat``. Admins are cached for each chat.
+        CHAT_CREATOR (:class:`telegram.ext.roles.ChatCreatorRole`): Use this role to restrict
+            access to the creator of a chat. Handlers with this role wont handle updates that don't
+            have an ``effective_chat``.
 
     Args:
         bot (:class:`telegram.Bot`): A bot associated with this instance.
@@ -392,8 +442,8 @@ class Roles(dict):
         super(Roles, self).__init__()
         self._bot = bot
         self.ADMINS = Role(name='admins')
-        self.CHAT_ADMINS = _chat_admins(bot=self._bot)
-        self.CHAT_CREATOR = _chat_creator(bot=self._bot)
+        self.CHAT_ADMINS = ChatAdminsRole(bot=self._bot)
+        self.CHAT_CREATOR = ChatCreatorRole(bot=self._bot)
 
     def set_bot(self, bot):
         """If for some reason you can't pass the bot on initialization, you can set it with this
@@ -517,6 +567,7 @@ class Roles(dict):
 
     def __deepcopy__(self, memo):
         new_roles = Roles(self._bot)
+        new_roles.CHAT_ADMINS.timeout = self.CHAT_ADMINS.timeout
         memo[id(self)] = new_roles
         for chat_id in self.ADMINS.chat_ids:
             new_roles.add_admin(chat_id)
@@ -553,7 +604,8 @@ class Roles(dict):
                 memo[id_] = inner_tmp
             return id_
 
-        tmp = {'admins': id(self.ADMINS), 'roles': [], 'memo': {}}
+        tmp = {'admins': id(self.ADMINS), 'admins_timeout': self.CHAT_ADMINS.timeout,
+               'roles': [], 'memo': {}}
         tmp['roles'] = [_encode_role_to_json(self[name], tmp['memo'], []) for name in self]
         return json.dumps(tmp)
 
@@ -587,6 +639,7 @@ class Roles(dict):
         memo = tmp['memo']
         roles = Roles(bot)
         roles.ADMINS = _decode_role_from_json(tmp['admins'], memo)
+        roles.CHAT_ADMINS.timeout = tmp['admins_timeout']
         for id_ in tmp['roles']:
             role = _decode_role_from_json(id_, memo)
             roles._setitem(role.name, role)
