@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -67,28 +67,28 @@ class TestPollOption(object):
 
 @pytest.fixture(scope='class')
 def poll():
-    return Poll(TestPoll.id,
+    return Poll(TestPoll.id_,
                 TestPoll.question,
                 TestPoll.options,
                 TestPoll.is_closed)
 
 
 class TestPoll(object):
-    id = 'id'
+    id_ = 'id'
     question = 'Test?'
     options = [PollOption('test', 10), PollOption('test2', 11)]
     is_closed = True
 
     def test_de_json(self):
         json_dict = {
-            'id': self.id,
+            'id': self.id_,
             'question': self.question,
             'options': [o.to_dict() for o in self.options],
             'is_closed': self.is_closed
         }
         poll = Poll.de_json(json_dict, None)
 
-        assert poll.id == self.id
+        assert poll.id == self.id_
         assert poll.question == self.question
         assert poll.options == self.options
         assert poll.options[0].text == self.options[0].text

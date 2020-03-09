@@ -1,10 +1,13 @@
-name: Testing your PR
+name: GitHub Actions
 on:
   pull_request:
     branches:
       - master
   schedule:
     - cron: 7 3 * * *
+  push:
+    branches: 
+      - master
 
 jobs:
   pytest:
@@ -12,7 +15,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7]
+        python-version: [3.5, 3.6, 3.7]
         os: [ubuntu-latest, windows-latest]
         include:
           - os: ubuntu-latest
@@ -87,6 +90,7 @@ jobs:
         run: |
           pytest -v tests/test_official.py
           exit $?
+        continue-on-error: True
         env:
           TEST_OFFICIAL: "true"
         shell: bash --noprofile --norc {0}

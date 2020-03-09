@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2018
+# Copyright (C) 2015-2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -62,25 +62,33 @@ class Updater(object):
     Args:
         token (:obj:`str`, optional): The bot's token given by the @BotFather.
         base_url (:obj:`str`, optional): Base_url for the bot.
+        base_file_url (:obj:`str`, optional): Base_file_url for the bot.
         workers (:obj:`int`, optional): Amount of threads in the thread pool for functions
-            decorated with ``@run_async``.
-        bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance. If a pre-initialized
-            bot is used, it is the user's responsibility to create it using a `Request`
-            instance with a large enough connection pool.
+            decorated with ``@run_async`` (ignored if `dispatcher` argument is used).
+        bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance (ignored if
+            `dispatcher` argument is used). If a pre-initialized bot is used, it is the user's
+            responsibility to create it using a `Request` instance with a large enough connection
+            pool.
+        dispatcher (:class:`telegram.ext.Dispatcher`, optional): A pre-initialized dispatcher
+            instance. If a pre-initialized dispatcher is used, it is the user's responsibility to
+            create it with proper arguments.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
             arguments. This will be called when a signal is received, defaults are (SIGINT,
             SIGTERM, SIGABRT) setable with :attr:`idle`.
         request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
-            `telegram.utils.request.Request` object (ignored if `bot` argument is used). The
-            request_kwargs are very useful for the advanced users who would like to control the
-            default timeouts and/or control the proxy used for http communication.
-        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API.
-            During the deprecation period of the old API the default is ``False``. **New users**:
-            set this to ``True``.
+            `telegram.utils.request.Request` object (ignored if `bot` or `dispatcher` argument is
+            used). The request_kwargs are very useful for the advanced users who would like to
+            control the default timeouts and/or control the proxy used for http communication.
+        use_context (:obj:`bool`, optional): If set to ``True`` Use the context based callback API
+            (ignored if `dispatcher` argument is used). During the deprecation period of the old
+            API the default is ``False``. **New users**: set this to ``True``.
         persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts.
+            store data that should be persistent over restarts (ignored if `dispatcher` argument is
+            used).
+        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
+            be used if not set explicitly in the bot methods.
 
     Note:
         You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -102,53 +110,85 @@ class Updater(object):
                  user_sig_handler=None,
                  request_kwargs=None,
                  persistence=None,
-                 use_context=False):
+                 defaults=None,
+                 use_context=False,
+                 dispatcher=None,
+                 base_file_url=None):
 
-        if (token is None) and (bot is None):
-            raise ValueError('`token` or `bot` must be passed')
-        if (token is not None) and (bot is not None):
-            raise ValueError('`token` and `bot` are mutually exclusive')
-        if (private_key is not None) and (bot is not None):
-            raise ValueError('`bot` and `private_key` are mutually exclusive')
+        if dispatcher is None:
+            if (token is None) and (bot is None):
+                raise ValueError('`token` or `bot` must be passed')
+            if (token is not None) and (bot is not None):
+                raise ValueError('`token` and `bot` are mutually exclusive')
+            if (private_key is not None) and (bot is not None):
+                raise ValueError('`bot` and `private_key` are mutually exclusive')
+        else:
+            if bot is not None:
+                raise ValueError('`dispatcher` and `bot` are mutually exclusive')
+            if persistence is not None:
+                raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
+            if workers is not None:
+                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
+            if use_context != dispatcher.use_context:
+                raise ValueError('`dispatcher` and `use_context` are mutually exclusive')
 
         self.logger = logging.getLogger(__name__)
 
-        con_pool_size = workers + 4
+        if dispatcher is None:
+            con_pool_size = workers + 4
 
-        if bot is not None:
-            self.bot = bot
-            if bot.request.con_pool_size < con_pool_size:
+            if bot is not None:
+                self.bot = bot
+                if bot.request.con_pool_size < con_pool_size:
+                    self.logger.warning(
+                        'Connection pool of Request object is smaller than optimal value (%s)',
+                        con_pool_size)
+            else:
+                # we need a connection pool the size of:
+                # * for each of the workers
+                # * 1 for Dispatcher
+                # * 1 for polling Updater (even if webhook is used, we can spare a connection)
+                # * 1 for JobQueue
+                # * 1 for main thread
+                if request_kwargs is None:
+                    request_kwargs = {}
+                if 'con_pool_size' not in request_kwargs:
+                    request_kwargs['con_pool_size'] = con_pool_size
+                self._request = Request(**request_kwargs)
+                self.bot = Bot(token,
+                               base_url,
+                               base_file_url=base_file_url,
+                               request=self._request,
+                               private_key=private_key,
+                               private_key_password=private_key_password,
+                               defaults=defaults)
+            self.update_queue = Queue()
+            self.job_queue = JobQueue()
+            self.__exception_event = Event()
+            self.persistence = persistence
+            self.dispatcher = Dispatcher(self.bot,
+                                         self.update_queue,
+                                         job_queue=self.job_queue,
+                                         workers=workers,
+                                         exception_event=self.__exception_event,
+                                         persistence=persistence,
+                                         use_context=use_context)
+            self.job_queue.set_dispatcher(self.dispatcher)
+        else:
+            con_pool_size = dispatcher.workers + 4
+
+            self.bot = dispatcher.bot
+            if self.bot.request.con_pool_size < con_pool_size:
                 self.logger.warning(
                     'Connection pool of Request object is smaller than optimal value (%s)',
                     con_pool_size)
-        else:
-            # we need a connection pool the size of:
-            # * for each of the workers
-            # * 1 for Dispatcher
-            # * 1 for polling Updater (even if webhook is used, we can spare a connection)
-            # * 1 for JobQueue
-            # * 1 for main thread
-            if request_kwargs is None:
-                request_kwargs = {}
-            if 'con_pool_size' not in request_kwargs:
-                request_kwargs['con_pool_size'] = con_pool_size
-            self._request = Request(**request_kwargs)
-            self.bot = Bot(token, base_url, request=self._request, private_key=private_key,
-                           private_key_password=private_key_password)
+            self.update_queue = dispatcher.update_queue
+            self.__exception_event = dispatcher.exception_event
+            self.persistence = dispatcher.persistence
+            self.job_queue = dispatcher.job_queue
+            self.dispatcher = dispatcher
+
         self.user_sig_handler = user_sig_handler
-        self.update_queue = Queue()
-        self.job_queue = JobQueue()
-        self.__exception_event = Event()
-        self.persistence = persistence
-        self.dispatcher = Dispatcher(
-            self.bot,
-            self.update_queue,
-            job_queue=self.job_queue,
-            workers=workers,
-            exception_event=self.__exception_event,
-            persistence=persistence,
-            use_context=use_context)
-        self.job_queue.set_dispatcher(self.dispatcher)
         self.last_update_id = 0
         self.running = False
         self.is_idle = False
@@ -156,9 +196,14 @@ class Updater(object):
         self.__lock = Lock()
         self.__threads = []
 
+        # Just for passing to WebhookAppClass
+        self._default_quote = defaults.quote if defaults else None
+
     def _init_thread(self, target, name, *args, **kwargs):
-        thr = Thread(target=self._thread_wrapper, name="Bot:{}:{}".format(self.bot.id, name),
-                     args=(target,) + args, kwargs=kwargs)
+        thr = Thread(target=self._thread_wrapper,
+                     name="Bot:{}:{}".format(self.bot.id, name),
+                     args=(target,) + args,
+                     kwargs=kwargs)
         thr.start()
         self.__threads.append(thr)
 
@@ -288,9 +333,10 @@ class Updater(object):
         self.logger.debug('Bootstrap done')
 
         def polling_action_cb():
-            updates = self.bot.get_updates(
-                self.last_update_id, timeout=timeout, read_latency=read_latency,
-                allowed_updates=allowed_updates)
+            updates = self.bot.get_updates(self.last_update_id,
+                                           timeout=timeout,
+                                           read_latency=read_latency,
+                                           allowed_updates=allowed_updates)
 
             if updates:
                 if not self.running:
@@ -370,7 +416,8 @@ class Updater(object):
             url_path = '/{0}'.format(url_path)
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue,
+                              default_quote=self._default_quote)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate
@@ -391,12 +438,11 @@ class Updater(object):
             if not webhook_url:
                 webhook_url = self._gen_webhook_url(listen, port, url_path)
 
-            self._bootstrap(
-                max_retries=bootstrap_retries,
-                clean=clean,
-                webhook_url=webhook_url,
-                cert=open(cert, 'rb'),
-                allowed_updates=allowed_updates)
+            self._bootstrap(max_retries=bootstrap_retries,
+                            clean=clean,
+                            webhook_url=webhook_url,
+                            cert=open(cert, 'rb'),
+                            allowed_updates=allowed_updates)
         elif clean:
             self.logger.warning("cleaning updates is not supported if "
                                 "SSL-termination happens elsewhere; skipping")
@@ -407,7 +453,12 @@ class Updater(object):
     def _gen_webhook_url(listen, port, url_path):
         return 'https://{listen}:{port}{path}'.format(listen=listen, port=port, path=url_path)
 
-    def _bootstrap(self, max_retries, clean, webhook_url, allowed_updates, cert=None,
+    def _bootstrap(self,
+                   max_retries,
+                   clean,
+                   webhook_url,
+                   allowed_updates,
+                   cert=None,
                    bootstrap_interval=5):
         retries = [0]
 
@@ -423,15 +474,16 @@ class Updater(object):
             return False
 
         def bootstrap_set_webhook():
-            self.bot.set_webhook(
-                url=webhook_url, certificate=cert, allowed_updates=allowed_updates)
+            self.bot.set_webhook(url=webhook_url,
+                                 certificate=cert,
+                                 allowed_updates=allowed_updates)
             return False
 
         def bootstrap_onerr_cb(exc):
             if not isinstance(exc, Unauthorized) and (max_retries < 0 or retries[0] < max_retries):
                 retries[0] += 1
-                self.logger.warning('Failed bootstrap phase; try=%s max_retries=%s',
-                                    retries[0], max_retries)
+                self.logger.warning('Failed bootstrap phase; try=%s max_retries=%s', retries[0],
+                                    max_retries)
             else:
                 self.logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
                 raise exc
