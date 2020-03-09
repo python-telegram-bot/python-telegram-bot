@@ -116,7 +116,7 @@ class WebhookHandler(tornado.web.RequestHandler):
                 pass
                 # not affected
             else:
-                if type(asyncio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy:
+                if isinstance(asyncio.get_event_loop_policy(), WindowsProactorEventLoopPolicy):
                     # WindowsProactorEventLoopPolicy is not compatible with tornado 6
                     # fallback to the pre-3.8 default of Selector
                     asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())

@@ -20,6 +20,7 @@ import logging
 import os
 import signal
 import sys
+import asyncio
 from flaky import flaky
 from functools import partial
 from queue import Queue
@@ -59,7 +60,6 @@ if sys.platform.startswith("win") and sys.version_info >= (3, 8):
             remove and bump tornado requirement for py38
     Copied from https://github.com/ipython/ipykernel/pull/456/
     """
-    import asyncio
     try:
         from asyncio import (
             WindowsProactorEventLoopPolicy,
@@ -272,6 +272,34 @@ class TestUpdater(object):
         sleep(.2)
         # assert q.get(False) == update
         assert q.get(False).message.default_quote is True
+        updater.stop()
+
+    @pytest.mark.skipif(not (sys.platform.startswith("win") and sys.version_info >= (3, 8)),
+                        reason="only relevant on win with py>=3.8")
+    def test_webhook_tornado_win_py38_workaround(self, updater, monkeypatch):
+        updater._default_quote = True
+        q = Queue()
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN')
+        sleep(.2)
+
+        try:
+            from asyncio import (WindowsSelectorEventLoopPolicy)
+        except ImportError:
+            pass
+            # not affected
+        else:
+            assert isinstance(asyncio.get_event_loop_policy(),
+                              WindowsSelectorEventLoopPolicy())
+
         updater.stop()
 
     @pytest.mark.parametrize(('error',),
