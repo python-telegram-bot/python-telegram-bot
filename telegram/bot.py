@@ -224,6 +224,13 @@ class Bot(TelegramObject):
         return self.bot.username
 
     @property
+    @info
+    def link(self):
+        """:obj:`str`: Convenience property. Returns the t.me link of the bot."""
+
+        return "https://t.me/{}".format(self.username)
+
+    @property
     def name(self):
         """:obj:`str`: Bot's @username."""
 

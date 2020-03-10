@@ -20,6 +20,7 @@ import logging
 import os
 import signal
 import sys
+import asyncio
 from flaky import flaky
 from functools import partial
 from queue import Queue
@@ -45,6 +46,33 @@ from telegram.ext import Updater, Dispatcher, BasePersistence
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
                                 reason='Can\'t send signals without stopping '
                                        'whole process on windows')
+
+
+if sys.platform.startswith("win") and sys.version_info >= (3, 8):
+    """set default asyncio policy to be compatible with tornado
+    Tornado 6 (at least) is not compatible with the default
+    asyncio implementation on Windows
+    Pick the older SelectorEventLoopPolicy on Windows
+    if the known-incompatible default policy is in use.
+    do this as early as possible to make it a low priority and overrideable
+    ref: https://github.com/tornadoweb/tornado/issues/2608
+    TODO: if/when tornado supports the defaults in asyncio,
+            remove and bump tornado requirement for py38
+    Copied from https://github.com/ipython/ipykernel/pull/456/
+    """
+    try:
+        from asyncio import (
+            WindowsProactorEventLoopPolicy,
+            WindowsSelectorEventLoopPolicy,
+        )
+    except ImportError:
+        pass
+        # not affected
+    else:
+        if type(asyncio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy:
+            # WindowsProactorEventLoopPolicy is not compatible with tornado 6
+            # fallback to the pre-3.8 default of Selector
+            asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
 
 class TestUpdater(object):
@@ -244,6 +272,33 @@ class TestUpdater(object):
         sleep(.2)
         # assert q.get(False) == update
         assert q.get(False).message.default_quote is True
+        updater.stop()
+
+    @pytest.mark.skipif(not (sys.platform.startswith("win") and sys.version_info >= (3, 8)),
+                        reason="only relevant on win with py>=3.8")
+    def test_webhook_tornado_win_py38_workaround(self, updater, monkeypatch):
+        updater._default_quote = True
+        q = Queue()
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN')
+        sleep(.2)
+
+        try:
+            from asyncio import (WindowsSelectorEventLoopPolicy)
+        except ImportError:
+            pass
+            # not affected
+        else:
+            assert isinstance(asyncio.get_event_loop_policy(), WindowsSelectorEventLoopPolicy)
+
         updater.stop()
 
     @pytest.mark.parametrize(('error',),
