@@ -24,7 +24,7 @@ from threading import Lock
 
 from telegram import Update
 from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
-                          ChosenInlineResultHandler, CallbackContext)
+                          ChosenInlineResultHandler)
 from telegram.utils.promise import Promise
 
 
@@ -417,15 +417,11 @@ class ConversationHandler(Handler):
                 if self.persistent:
                     self.persistence.update_conversation(self.name, key, new_state)
 
-    def _trigger_timeout(self, context, job=None):
+    def _trigger_timeout(self, context):
         self.logger.debug('conversation timeout was triggered!')
 
-        # Backward compatibility with bots that do not use CallbackContext
-        callback_context = None
-        if isinstance(context, CallbackContext):
-            job = context.job
-            callback_context = context
-
+        job = context.job
+        callback_context = context
         context = job.context
 
         with self._timeout_jobs_lock:
