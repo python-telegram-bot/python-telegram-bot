@@ -938,7 +938,7 @@ class TestPickelPersistence(object):
         job_queue.set_dispatcher(cdp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
-        sleep(0.02)
+        sleep(0.05)
         bot_data = pickle_persistence.get_bot_data()
         assert bot_data == {'test1': '456'}
         chat_data = pickle_persistence.get_chat_data()
@@ -1240,7 +1240,7 @@ class TestDictPersistence(object):
         job_queue.set_dispatcher(cdp)
         job_queue.start()
         job_queue.run_once(job_callback, 0.01)
-        sleep(0.02)
+        sleep(0.05)
         bot_data = dict_persistence.get_bot_data()
         assert bot_data == {'test1': '456'}
         chat_data = dict_persistence.get_chat_data()
