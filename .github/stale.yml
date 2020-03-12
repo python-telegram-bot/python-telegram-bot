@@ -11,4 +11,4 @@ markComment: false
 # Comment to post when closing a stale issue. Set to `false` to disable
 closeComment: >
   This issue has been automatically closed due to inactivity. Feel free to comment in order to reopen
-  or ask again in our Telegram support group.
+  or ask again in our Telegram support group at https://t.me/pythontelegrambotgroup.
