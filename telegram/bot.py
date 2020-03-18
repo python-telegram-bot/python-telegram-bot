@@ -142,7 +142,7 @@ class Bot(TelegramObject):
         if any(x.isspace() for x in token):
             raise InvalidToken()
 
-        left, sep, _right = token.partition(':')
+        left, sep, _ = token.partition(':')
         if (not sep) or (not left.isdigit()) or (len(left) < 3):
             raise InvalidToken()
 
