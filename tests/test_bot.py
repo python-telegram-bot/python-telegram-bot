@@ -47,6 +47,12 @@ def media_message(bot, chat_id):
 
 
 class TestBot(object):
+    def test_valid_token(self):
+        try:
+            Bot('1234:abc-def')
+        except InvalidToken:
+            pytest.fail('Valid token considered as invalid')
+
     @pytest.mark.parametrize('token', argvalues=[
         '123',
         '12a:abcd1234',
