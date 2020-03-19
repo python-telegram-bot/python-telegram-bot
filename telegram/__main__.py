@@ -20,7 +20,6 @@ import sys
 import subprocess
 
 import certifi
-import future
 
 
 from . import __version__ as telegram_ver
@@ -40,7 +39,6 @@ def print_ver_info():
     print('python-telegram-bot {0}'.format(telegram_ver) + (' ({0})'.format(git_revision)
                                                             if git_revision else ''))
     print('certifi {0}'.format(certifi.__version__))
-    print('future {0}'.format(future.__version__))
     print('Python {0}'.format(sys.version.replace('\n', ' ')))
 
 
