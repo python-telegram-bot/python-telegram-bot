@@ -74,7 +74,7 @@ class WebhookAppClass(tornado.web.Application):
         self.shared_objects = {"bot": bot, "update_queue": update_queue,
                                "default_quote": default_quote}
         handlers = [
-            (r"{0}/?".format(webhook_path), WebhookHandler,
+            (r"{}/?".format(webhook_path), WebhookHandler,
              self.shared_objects)
             ]  # noqa
         tornado.web.Application.__init__(self, handlers)
@@ -160,5 +160,6 @@ class WebhookHandler(tornado.web.RequestHandler):
 
         """
         super().write_error(status_code, **kwargs)
-        self.logger.debug("%s - - %s" % (self.request.remote_ip, "Exception in WebhookHandler"),
+        self.logger.debug("{} - - {}".format(self.request.remote_ip,
+                                             "Exception in WebhookHandler"),
                           exc_info=kwargs['exc_info'])

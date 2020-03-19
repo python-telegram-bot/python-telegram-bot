@@ -61,11 +61,11 @@ def _render_part(self, name, value):
     """
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
-    \ and " and replace any \n and \r with a space.
+    \\ and " and replace any \n and \r with a space.
     """
     value = value.replace(u'\\', u'\\\\').replace(u'"', u'\\"')
     value = value.replace(u'\r', u' ').replace(u'\n', u' ')
-    return u'%s="%s"' % (name, value)
+    return u'{}="{}"'.format(name, value)
 
 
 RequestField._render_part = _render_part
@@ -227,7 +227,7 @@ class Request:
         except urllib3.exceptions.HTTPError as error:
             # HTTPError must come last as its the base urllib3 exception class
             # TODO: do something smart here; for now just raise NetworkError
-            raise NetworkError('urllib3 HTTPError {0}'.format(error))
+            raise NetworkError('urllib3 HTTPError {}'.format(error))
 
         if 200 <= resp.status <= 299:
             # 200-299 range are HTTP success statuses
@@ -253,7 +253,7 @@ class Request:
         elif resp.status == 502:
             raise NetworkError('Bad Gateway')
         else:
-            raise NetworkError('{0} ({1})'.format(message, resp.status))
+            raise NetworkError('{} ({})'.format(message, resp.status))
 
     def get(self, url, timeout=None):
         """Request an URL.

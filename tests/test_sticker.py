@@ -220,7 +220,7 @@ class TestSticker:
 
 @pytest.fixture(scope='function')
 def sticker_set(bot):
-    ss = bot.get_sticker_set('test_by_{0}'.format(bot.username))
+    ss = bot.get_sticker_set('test_by_{}'.format(bot.username))
     if len(ss.stickers) > 100:
         raise Exception('stickerset is growing too large.')
     return ss
@@ -234,7 +234,7 @@ class TestStickerSet:
     name = 'NOTAREALNAME'
 
     def test_de_json(self, bot):
-        name = 'test_by_{0}'.format(bot.username)
+        name = 'test_by_{}'.format(bot.username)
         json_dict = {
             'name': name,
             'title': self.title,
@@ -256,7 +256,7 @@ class TestStickerSet:
         with open('tests/data/telegram_sticker.png', 'rb') as f:
             file = bot.upload_sticker_file(95205500, f)
         assert file
-        assert bot.add_sticker_to_set(chat_id, 'test_by_{0}'.format(bot.username),
+        assert bot.add_sticker_to_set(chat_id, 'test_by_{}'.format(bot.username),
                                       file.file_id, '😄')
 
     def test_sticker_set_to_dict(self, sticker_set):

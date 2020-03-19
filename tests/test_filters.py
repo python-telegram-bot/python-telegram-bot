@@ -676,9 +676,9 @@ class TestFilters:
         update.message.pinned_message = True
         assert (Filters.text & (Filters.forwarded | Filters.status_update)(update))
 
-        assert str((Filters.text & (Filters.forwarded | Filters.entity(
-            MessageEntity.MENTION)))) == '<Filters.text and <Filters.forwarded or ' \
-                                         'Filters.entity(mention)>>'
+        assert str(Filters.text & (Filters.forwarded | Filters.entity(
+            MessageEntity.MENTION))) == '<Filters.text and <Filters.forwarded or ' \
+                                        'Filters.entity(mention)>>'
 
     def test_inverted_filters(self, update):
         update.message.text = '/test'

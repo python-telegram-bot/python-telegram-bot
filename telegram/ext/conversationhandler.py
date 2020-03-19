@@ -320,7 +320,7 @@ class ConversationHandler(Handler):
                         return key, handler, check
                 return None
 
-        self.logger.debug('selecting conversation %s with state %s' % (str(key), str(state)))
+        self.logger.debug('selecting conversation {} with state {}'.format(str(key), str(state)))
 
         handler = None
 

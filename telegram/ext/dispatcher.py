@@ -303,10 +303,10 @@ class Dispatcher:
             self.__async_queue.put(None)
 
         for i, thr in enumerate(threads):
-            self.logger.debug('Waiting for async thread {0}/{1} to end'.format(i + 1, total))
+            self.logger.debug('Waiting for async thread {}/{} to end'.format(i + 1, total))
             thr.join()
             self.__async_threads.remove(thr)
-            self.logger.debug('async thread {0}/{1} has ended'.format(i + 1, total))
+            self.logger.debug('async thread {}/{} has ended'.format(i + 1, total))
 
     @property
     def has_running_threads(self):
@@ -437,7 +437,7 @@ class Dispatcher:
         from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
-            raise TypeError('handler is not an instance of {0}'.format(Handler.__name__))
+            raise TypeError('handler is not an instance of {}'.format(Handler.__name__))
         if not isinstance(group, int):
             raise TypeError('group is not int')
         if isinstance(handler, ConversationHandler) and handler.persistent:

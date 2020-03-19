@@ -36,10 +36,10 @@ def _git_revision():
 
 def print_ver_info():
     git_revision = _git_revision()
-    print('python-telegram-bot {0}'.format(telegram_ver) + (' ({0})'.format(git_revision)
-                                                            if git_revision else ''))
-    print('certifi {0}'.format(certifi.__version__))
-    print('Python {0}'.format(sys.version.replace('\n', ' ')))
+    print('python-telegram-bot {}'.format(telegram_ver) + (' ({})'.format(git_revision)
+                                                           if git_revision else ''))
+    print('certifi {}'.format(certifi.__version__))
+    print('Python {}'.format(sys.version.replace('\n', ' ')))
 
 
 def main():

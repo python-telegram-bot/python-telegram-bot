@@ -45,7 +45,7 @@ def get_signal_name(signum):
 
 def escape_markdown(text):
     """Helper function to escape telegram markup symbols."""
-    escape_chars = '\*_`\['
+    escape_chars = r'\*_`\['
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
 
@@ -261,7 +261,7 @@ def create_deep_linked_url(bot_username, payload=None, group=False):
     else:
         key = 'start'
 
-    return '{0}?{1}={2}'.format(
+    return '{}?{}={}'.format(
         base_url,
         key,
         payload
