@@ -26,10 +26,9 @@ except ImportError:
 from abc import ABCMeta
 
 
-class TelegramObject(object):
+class TelegramObject(metaclass=ABCMeta):
     """Base class for most telegram objects."""
 
-    __metaclass__ = ABCMeta
     _id_attrs = ()
 
     def __str__(self):
