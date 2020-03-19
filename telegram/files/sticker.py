@@ -149,8 +149,8 @@ class StickerSet(TelegramObject):
 
         self._id_attrs = (self.name,)
 
-    @staticmethod
-    def de_json(data, bot):
+    @classmethod
+    def de_json(cls, data, bot):
         if not data:
             return None
 
