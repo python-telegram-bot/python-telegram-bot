@@ -88,7 +88,7 @@ class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]
 
     def __init__(self, application, request, **kwargs):
-        super(WebhookHandler, self).__init__(application, request, **kwargs)
+        super().__init__(application, request, **kwargs)
         self.logger = logging.getLogger(__name__)
         self._init_asyncio_patch()
 
@@ -159,6 +159,6 @@ class WebhookHandler(tornado.web.RequestHandler):
         The client ip is prefixed to every message.
 
         """
-        super(WebhookHandler, self).write_error(status_code, **kwargs)
+        super().write_error(status_code, **kwargs)
         self.logger.debug("%s - - %s" % (self.request.remote_ip, "Exception in WebhookHandler"),
                           exc_info=kwargs['exc_info'])

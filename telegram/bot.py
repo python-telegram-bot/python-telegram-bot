@@ -92,7 +92,7 @@ class Bot(TelegramObject):
         defaults = kwargs.get('defaults')
 
         # Make an instance of the class
-        instance = super(Bot, cls).__new__(cls)
+        instance = super().__new__(cls)
 
         if not defaults:
             return instance

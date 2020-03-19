@@ -73,7 +73,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.selective = bool(selective)
 
     def to_dict(self):
-        data = super(ReplyKeyboardMarkup, self).to_dict()
+        data = super().to_dict()
 
         data['keyboard'] = []
         for row in self.keyboard:

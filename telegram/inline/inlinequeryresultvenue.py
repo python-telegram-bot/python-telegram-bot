@@ -83,7 +83,7 @@ class InlineQueryResultVenue(InlineQueryResult):
                  **kwargs):
 
         # Required
-        super(InlineQueryResultVenue, self).__init__('venue', id)
+        super().__init__('venue', id)
         self.latitude = latitude
         self.longitude = longitude
         self.title = title

@@ -349,7 +349,7 @@ class TestDispatcher(object):
 
         class OwnPersistence(BasePersistence):
             def __init__(self):
-                super(BasePersistence, self).__init__()
+                super().__init__()
                 self.store_user_data = True
                 self.store_chat_data = True
                 self.store_bot_data = True

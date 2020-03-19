@@ -123,7 +123,7 @@ class CommandHandler(Handler):
                  pass_job_queue=False,
                  pass_user_data=False,
                  pass_chat_data=False):
-        super(CommandHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,
@@ -182,7 +182,7 @@ class CommandHandler(Handler):
                     return False
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(CommandHandler, self).collect_optional_args(dispatcher, update)
+        optional_args = super().collect_optional_args(dispatcher, update)
         if self.pass_args:
             optional_args['args'] = check_result[0]
         return optional_args
@@ -300,7 +300,7 @@ class PrefixHandler(CommandHandler):
                  pass_user_data=False,
                  pass_chat_data=False):
 
-        super(PrefixHandler, self).__init__(
+        super().__init__(
             'nocommand', callback, filters=filters, allow_edited=None, pass_args=pass_args,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue,

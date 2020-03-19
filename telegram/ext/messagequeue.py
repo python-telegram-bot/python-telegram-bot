@@ -81,10 +81,10 @@ class DelayQueue(threading.Thread):
         self.__class__._instcnt += 1
         if name is None:
             name = '%s-%s' % (self.__class__.__name__, self.__class__._instcnt)
-        super(DelayQueue, self).__init__(name=name)
+        super().__init__(name=name)
         self.daemon = False
         if autostart:  # immediately start processing
-            super(DelayQueue, self).start()
+            super().start()
 
     def run(self):
         """
@@ -131,7 +131,7 @@ class DelayQueue(threading.Thread):
 
         self.__exit_req = True  # gently request
         self._queue.put(None)  # put something to unfreeze if frozen
-        super(DelayQueue, self).join(timeout=timeout)
+        super().join(timeout=timeout)
 
     @staticmethod
     def _default_exception_handler(exc):

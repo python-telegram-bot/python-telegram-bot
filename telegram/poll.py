@@ -79,14 +79,14 @@ class Poll(TelegramObject):
         if not data:
             return None
 
-        data = super(Poll, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
 
         data['options'] = [PollOption.de_json(option, bot) for option in data['options']]
 
         return cls(**data)
 
     def to_dict(self):
-        data = super(Poll, self).to_dict()
+        data = super().to_dict()
 
         data['options'] = [x.to_dict() for x in self.options]
 

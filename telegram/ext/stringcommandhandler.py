@@ -71,7 +71,7 @@ class StringCommandHandler(Handler):
                  pass_args=False,
                  pass_update_queue=False,
                  pass_job_queue=False):
-        super(StringCommandHandler, self).__init__(
+        super().__init__(
             callback,
             pass_update_queue=pass_update_queue,
             pass_job_queue=pass_job_queue)
@@ -94,9 +94,7 @@ class StringCommandHandler(Handler):
                 return args[1:]
 
     def collect_optional_args(self, dispatcher, update=None, check_result=None):
-        optional_args = super(StringCommandHandler, self).collect_optional_args(dispatcher,
-                                                                                update,
-                                                                                check_result)
+        optional_args = super().collect_optional_args(dispatcher, update, check_result)
         if self.pass_args:
             optional_args['args'] = check_result
         return optional_args

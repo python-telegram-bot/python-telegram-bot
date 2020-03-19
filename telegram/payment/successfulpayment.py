@@ -74,7 +74,7 @@ class SuccessfulPayment(TelegramObject):
         if not data:
             return None
 
-        data = super(SuccessfulPayment, cls).de_json(data, bot)
+        data = super().de_json(data, bot)
         data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
 
         return cls(**data)
