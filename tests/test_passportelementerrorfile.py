@@ -24,20 +24,20 @@ from telegram import PassportElementErrorFile, PassportElementErrorSelfie
 
 @pytest.fixture(scope='class')
 def passport_element_error_file():
-    return PassportElementErrorFile(TestPassportElementErrorFile.type,
+    return PassportElementErrorFile(TestPassportElementErrorFile.type_,
                                     TestPassportElementErrorFile.file_hash,
                                     TestPassportElementErrorFile.message)
 
 
 class TestPassportElementErrorFile(object):
     source = 'file'
-    type = 'test_type'
+    type_ = 'test_type'
     file_hash = 'file_hash'
     message = 'Error message'
 
     def test_expected_values(self, passport_element_error_file):
         assert passport_element_error_file.source == self.source
-        assert passport_element_error_file.type == self.type
+        assert passport_element_error_file.type == self.type_
         assert passport_element_error_file.file_hash == self.file_hash
         assert passport_element_error_file.message == self.message
 
@@ -55,12 +55,12 @@ class TestPassportElementErrorFile(object):
                 == passport_element_error_file.message)
 
     def test_equality(self):
-        a = PassportElementErrorFile(self.type, self.file_hash, self.message)
-        b = PassportElementErrorFile(self.type, self.file_hash, self.message)
-        c = PassportElementErrorFile(self.type, '', '')
+        a = PassportElementErrorFile(self.type_, self.file_hash, self.message)
+        b = PassportElementErrorFile(self.type_, self.file_hash, self.message)
+        c = PassportElementErrorFile(self.type_, '', '')
         d = PassportElementErrorFile('', self.file_hash, '')
         e = PassportElementErrorFile('', '', self.message)
-        f = PassportElementErrorSelfie(self.type, self.file_hash, self.message)
+        f = PassportElementErrorSelfie(self.type_, self.file_hash, self.message)
 
         assert a == b
         assert hash(a) == hash(b)

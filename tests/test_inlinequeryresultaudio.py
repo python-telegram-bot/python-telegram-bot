@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardMarkup, InlineKeyboardButton, InlineQueryRes
 @pytest.fixture(scope='class')
 def inline_query_result_audio():
     return InlineQueryResultAudio(
-        TestInlineQueryResultAudio.id,
+        TestInlineQueryResultAudio.id_,
         TestInlineQueryResultAudio.audio_url,
         TestInlineQueryResultAudio.title,
         performer=TestInlineQueryResultAudio.performer,
@@ -38,8 +38,8 @@ def inline_query_result_audio():
 
 
 class TestInlineQueryResultAudio(object):
-    id = 'id'
-    type = 'audio'
+    id_ = 'id'
+    type_ = 'audio'
     audio_url = 'audio url'
     title = 'title'
     performer = 'performer'
@@ -50,8 +50,8 @@ class TestInlineQueryResultAudio(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_audio):
-        assert inline_query_result_audio.type == self.type
-        assert inline_query_result_audio.id == self.id
+        assert inline_query_result_audio.type == self.type_
+        assert inline_query_result_audio.id == self.id_
         assert inline_query_result_audio.audio_url == self.audio_url
         assert inline_query_result_audio.title == self.title
         assert inline_query_result_audio.performer == self.performer
@@ -81,11 +81,11 @@ class TestInlineQueryResultAudio(object):
                 == inline_query_result_audio.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultAudio(self.id, self.audio_url, self.title)
-        b = InlineQueryResultAudio(self.id, self.title, self.title)
-        c = InlineQueryResultAudio(self.id, '', self.title)
+        a = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
+        b = InlineQueryResultAudio(self.id_, self.title, self.title)
+        c = InlineQueryResultAudio(self.id_, '', self.title)
         d = InlineQueryResultAudio('', self.audio_url, self.title)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

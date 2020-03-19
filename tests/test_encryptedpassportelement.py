@@ -24,7 +24,7 @@ from telegram import EncryptedPassportElement, PassportFile, PassportElementErro
 
 @pytest.fixture(scope='class')
 def encrypted_passport_element():
-    return EncryptedPassportElement(TestEncryptedPassportElement.type,
+    return EncryptedPassportElement(TestEncryptedPassportElement.type_,
                                     data=TestEncryptedPassportElement.data,
                                     phone_number=TestEncryptedPassportElement.phone_number,
                                     email=TestEncryptedPassportElement.email,
@@ -35,7 +35,7 @@ def encrypted_passport_element():
 
 
 class TestEncryptedPassportElement(object):
-    type = 'type'
+    type_ = 'type'
     data = 'data'
     phone_number = 'phone_number'
     email = 'email'
@@ -45,7 +45,7 @@ class TestEncryptedPassportElement(object):
     selfie = PassportFile('file_id', 50, 0)
 
     def test_expected_values(self, encrypted_passport_element):
-        assert encrypted_passport_element.type == self.type
+        assert encrypted_passport_element.type == self.type_
         assert encrypted_passport_element.data == self.data
         assert encrypted_passport_element.phone_number == self.phone_number
         assert encrypted_passport_element.email == self.email
@@ -75,8 +75,8 @@ class TestEncryptedPassportElement(object):
                 == encrypted_passport_element.selfie.to_dict())
 
     def test_equality(self):
-        a = EncryptedPassportElement(self.type, data=self.data)
-        b = EncryptedPassportElement(self.type, data=self.data)
+        a = EncryptedPassportElement(self.type_, data=self.data)
+        b = EncryptedPassportElement(self.type_, data=self.data)
         c = EncryptedPassportElement(self.data, '')
         d = PassportElementError('source', 'type', 'message')
 
