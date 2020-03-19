@@ -39,7 +39,7 @@ def animation(bot, chat_id):
                                   thumb=open('tests/data/thumb.jpg', 'rb')).animation
 
 
-class TestAnimation(object):
+class TestAnimation:
     animation_file_id = 'CgADAQADngIAAuyVeEez0xRovKi9VAI'
     width = 320
     height = 180

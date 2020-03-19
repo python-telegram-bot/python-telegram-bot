@@ -19,7 +19,7 @@
 """This module contains the BasePersistence class."""
 
 
-class BasePersistence(object):
+class BasePersistence:
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 

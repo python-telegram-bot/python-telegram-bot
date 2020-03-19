@@ -165,7 +165,7 @@ class DelayQueue(threading.Thread):
 # msg --> group delay if group msg, else no delay --> normal msg delay --> out
 # This way OS threading scheduler cares of timings accuracy.
 # (see time.time, time.clock, time.perf_counter, time.sleep @ docs.python.org)
-class MessageQueue(object):
+class MessageQueue:
     """
     Implements callback processing with proper delays to avoid hitting Telegram's message limits.
     Contains two ``DelayQueue``, for group and for all messages, interconnected in delay chain.

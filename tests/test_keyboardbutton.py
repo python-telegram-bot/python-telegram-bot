@@ -29,7 +29,7 @@ def keyboard_button():
                           request_contact=TestKeyboardButton.request_contact)
 
 
-class TestKeyboardButton(object):
+class TestKeyboardButton:
     text = 'text'
     request_location = True
     request_contact = True

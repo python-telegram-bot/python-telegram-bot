@@ -27,7 +27,7 @@ import telegram.ext.messagequeue as mq
 
 @pytest.mark.skipif(os.getenv('GITHUB_ACTIONS', False) and os.name == 'nt',
                     reason="On windows precise timings are not accurate.")
-class TestDelayQueue(object):
+class TestDelayQueue:
     N = 128
     burst_limit = 30
     time_limit_ms = 1000

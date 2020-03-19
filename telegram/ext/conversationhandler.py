@@ -28,7 +28,7 @@ from telegram.ext import (Handler, CallbackQueryHandler, InlineQueryHandler,
 from telegram.utils.promise import Promise
 
 
-class _ConversationTimeoutContext(object):
+class _ConversationTimeoutContext:
     def __init__(self, conversation_key, update, dispatcher):
         self.conversation_key = conversation_key
         self.update = update

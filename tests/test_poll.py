@@ -28,7 +28,7 @@ def poll_option():
                       voter_count=TestPollOption.voter_count)
 
 
-class TestPollOption(object):
+class TestPollOption:
     text = "test option"
     voter_count = 3
 
@@ -58,7 +58,7 @@ def poll():
                 TestPoll.is_closed)
 
 
-class TestPoll(object):
+class TestPoll:
     id_ = 'id'
     question = 'Test?'
     options = [PollOption('test', 10), PollOption('test2', 11)]

@@ -69,7 +69,7 @@ if sys.platform.startswith("win") and sys.version_info >= (3, 8):
             asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
 
-class TestUpdater(object):
+class TestUpdater:
     message_count = 0
     received = None
     attempts = 0

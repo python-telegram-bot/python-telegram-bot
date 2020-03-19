@@ -31,7 +31,7 @@ def shipping_query(bot):
                          bot=bot)
 
 
-class TestShippingQuery(object):
+class TestShippingQuery:
     id_ = 5
     invoice_payload = 'invoice_payload'
     from_user = User(0, '', False)

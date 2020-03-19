@@ -53,7 +53,7 @@ def chat_permissions():
     return ChatPermissions(can_send_messages=False, can_change_info=False, can_invite_users=False)
 
 
-class TestBot(object):
+class TestBot:
     @pytest.mark.parametrize('token', argvalues=[
         '123',
         '12a:abcd1234',

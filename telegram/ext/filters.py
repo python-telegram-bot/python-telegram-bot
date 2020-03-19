@@ -25,7 +25,7 @@ from telegram import Chat, Update, MessageEntity
 __all__ = ['Filters', 'BaseFilter', 'InvertedFilter', 'MergedFilter']
 
 
-class BaseFilter(object):
+class BaseFilter:
     """Base class for all Message Filters.
 
     Subclassing from this class filters to be combined using bitwise operators:
@@ -213,7 +213,7 @@ class MergedFilter(BaseFilter):
                                    self.and_filter or self.or_filter)
 
 
-class Filters(object):
+class Filters:
     """Predefined filters for use as the `filter` argument of :class:`telegram.ext.MessageHandler`.
 
     Examples:

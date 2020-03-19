@@ -28,7 +28,7 @@ def inline_query(bot):
                        TestInlineQuery.offset, location=TestInlineQuery.location, bot=bot)
 
 
-class TestInlineQuery(object):
+class TestInlineQuery:
     id_ = 1234
     from_user = User(1, 'First name', False)
     query = 'query text'

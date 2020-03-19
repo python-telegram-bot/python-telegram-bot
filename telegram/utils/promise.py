@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class Promise(object):
+class Promise:
     """A simple Promise implementation for use with the run_async decorator, DelayQueue etc.
 
     Args:

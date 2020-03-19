@@ -35,7 +35,7 @@ from telegram.utils.webhookhandler import (WebhookServer, WebhookAppClass)
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
-class Updater(object):
+class Updater:
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to

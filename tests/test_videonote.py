@@ -37,7 +37,7 @@ def video_note(bot, chat_id):
         return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
-class TestVideoNote(object):
+class TestVideoNote:
     length = 240
     duration = 3
     file_size = 132084

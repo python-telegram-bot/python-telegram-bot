@@ -30,7 +30,7 @@ def input_text_message_content():
         disable_web_page_preview=TestInputTextMessageContent.disable_web_page_preview)
 
 
-class TestInputTextMessageContent(object):
+class TestInputTextMessageContent:
     message_text = '*message text*'
     parse_mode = ParseMode.MARKDOWN
     disable_web_page_preview = True

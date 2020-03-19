@@ -19,7 +19,7 @@
 """This module contains the base class for handlers as used by the Dispatcher."""
 
 
-class Handler(object):
+class Handler:
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Attributes:

@@ -40,7 +40,7 @@ def user(bot):
                 language_code=TestUser.language_code, bot=bot)
 
 
-class TestUser(object):
+class TestUser:
     id_ = 1
     is_bot = True
     first_name = u'first\u2022name'

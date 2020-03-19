@@ -37,7 +37,7 @@ def dp2(bot):
         yield dp
 
 
-class TestDispatcher(object):
+class TestDispatcher:
     message_update = Update(1,
                             message=Message(1, User(1, '', False), None, Chat(1, ''), text='Text'))
     received = None

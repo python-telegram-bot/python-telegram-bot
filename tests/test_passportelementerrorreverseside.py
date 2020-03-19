@@ -29,7 +29,7 @@ def passport_element_error_reverse_side():
                                            TestPassportElementErrorReverseSide.message)
 
 
-class TestPassportElementErrorReverseSide(object):
+class TestPassportElementErrorReverseSide:
     source = 'reverse_side'
     type_ = 'test_type'
     file_hash = 'file_hash'

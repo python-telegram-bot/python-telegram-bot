@@ -37,7 +37,7 @@ def message_entity(request):
     return MessageEntity(request.param, 0, 0, url='', user='')
 
 
-class TestFilters(object):
+class TestFilters:
     def test_filters_all(self, update):
         assert Filters.all(update)
 

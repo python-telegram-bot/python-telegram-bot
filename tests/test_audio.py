@@ -39,7 +39,7 @@ def audio(bot, chat_id):
                               thumb=open('tests/data/thumb.jpg', 'rb')).audio
 
 
-class TestAudio(object):
+class TestAudio:
     caption = 'Test *audio*'
     performer = 'Leandro Toledo'
     title = 'Teste'

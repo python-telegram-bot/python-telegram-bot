@@ -65,7 +65,7 @@ class DispatcherHandlerStop(Exception):
     pass
 
 
-class Dispatcher(object):
+class Dispatcher:
     """This class dispatches all kinds of updates to its registered handlers.
 
     Attributes:

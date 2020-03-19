@@ -39,7 +39,7 @@ RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
 
-class TestHelpers(object):
+class TestHelpers:
     def test_escape_markdown(self):
         test_str = '*bold*, _italic_, `code`, [text_link](http://github.com/)'
         expected_str = '\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)'

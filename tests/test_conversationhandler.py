@@ -37,7 +37,7 @@ def user2():
     return User(first_name='Mister Test', id=124, is_bot=False)
 
 
-class TestConversationHandler(object):
+class TestConversationHandler:
     # State definitions
     # At first we're thirsty.  Then we brew coffee, we drink it
     # and then we can start coding!

@@ -32,7 +32,7 @@ def chat(bot):
                 permissions=TestChat.permissions)
 
 
-class TestChat(object):
+class TestChat:
     id_ = -28767330
     title = 'ToledosPalaceBot - Group'
     type_ = 'group'

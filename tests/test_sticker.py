@@ -39,7 +39,7 @@ def sticker(bot, chat_id):
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
-class TestSticker(object):
+class TestSticker:
     # sticker_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
     # Serving sticker from gh since our server sends wrong content_type
     sticker_file_url = ('https://github.com/python-telegram-bot/python-telegram-bot/blob/master'
@@ -226,7 +226,7 @@ def sticker_set(bot):
     return ss
 
 
-class TestStickerSet(object):
+class TestStickerSet:
     title = 'Test stickers'
     is_animated = True
     contains_masks = False
@@ -318,7 +318,7 @@ def mask_position():
                         TestMaskPosition.scale)
 
 
-class TestMaskPosition(object):
+class TestMaskPosition:
     point = MaskPosition.EYES
     x_shift = -1
     y_shift = 1

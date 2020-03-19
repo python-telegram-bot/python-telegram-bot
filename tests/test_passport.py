@@ -136,7 +136,7 @@ def passport_data(bot):
     return PassportData.de_json(RAW_PASSPORT_DATA, bot=bot)
 
 
-class TestPassport(object):
+class TestPassport:
     driver_license_selfie_file_id = 'DgADBAADEQQAAkopgFNr6oi-wISRtAI'
     driver_license_front_side_file_id = 'DgADBAADxwMAApnQgVPK2-ckL2eXVAI'
     driver_license_reverse_side_file_id = 'DgADBAADNQQAAtoagFPf4wwmFZdmyQI'

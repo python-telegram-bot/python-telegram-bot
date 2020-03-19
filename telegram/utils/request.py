@@ -75,7 +75,7 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 USER_AGENT = 'Python Telegram Bot (https://github.com/python-telegram-bot/python-telegram-bot)'
 
 
-class Request(object):
+class Request:
     """
     Helper class for python-telegram-bot which provides methods to perform POST & GET towards
     telegram servers.

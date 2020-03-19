@@ -29,7 +29,7 @@ from telegram import TelegramError
 DEFAULT_MIME_TYPE = 'application/octet-stream'
 
 
-class InputFile(object):
+class InputFile:
     """This object represents a Telegram InputFile.
 
     Attributes:

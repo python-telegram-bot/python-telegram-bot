@@ -31,7 +31,7 @@ import tornado.web
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
-class WebhookServer(object):
+class WebhookServer:
 
     def __init__(self, listen, port, webhook_app, ssl_ctx):
         self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
