@@ -3453,6 +3453,7 @@ class Bot(TelegramObject):
                   question,
                   options,
                   disable_notification=None,
+                  is_anonymous=True,
                   reply_to_message_id=None,
                   reply_markup=None,
                   timeout=None,
@@ -3466,6 +3467,8 @@ class Bot(TelegramObject):
             options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            is_anonymous (:obj:`bool`, optional): True, if the poll needs to be anonymous. 
+                Defaults to True.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
@@ -3488,7 +3491,8 @@ class Bot(TelegramObject):
         data = {
             'chat_id': chat_id,
             'question': question,
-            'options': options
+            'options': options,
+            'is_anonymous': is_anonymous
         }
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
