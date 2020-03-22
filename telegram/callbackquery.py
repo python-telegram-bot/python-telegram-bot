@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram CallbackQuery"""
 
 from telegram import TelegramObject, Message, User
+from telegram.utils.helpers import validate_callback_data
 
 
 class CallbackQuery(TelegramObject):
@@ -106,6 +107,14 @@ class CallbackQuery(TelegramObject):
         if message:
             message['default_quote'] = data.get('default_quote')
         data['message'] = Message.de_json(message, bot)
+
+        if bot is not None:
+            chat_id = data['message'].chat.id
+            if bot.validate_callback_data:
+                key = validate_callback_data(chat_id, data['data'], bot)
+            else:
+                key = validate_callback_data(chat_id, data['data'])
+            data['data'] = bot.callback_data.get(key, None)
 
         return cls(bot=bot, **data)
 

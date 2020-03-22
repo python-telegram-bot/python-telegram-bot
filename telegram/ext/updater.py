@@ -25,7 +25,7 @@ from time import sleep
 from signal import signal, SIGINT, SIGTERM, SIGABRT
 from queue import Queue
 
-from telegram import Bot, TelegramError
+from telegram import Bot, TelegramError, Update
 from telegram.ext import Dispatcher, JobQueue
 from telegram.error import Unauthorized, InvalidToken, RetryAfter, TimedOut
 from telegram.utils.helpers import get_signal_name
@@ -89,6 +89,9 @@ class Updater(object):
             used).
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
+        validate_callback_data (:obj:`bool`, optional): Whether the callback data of
+            :class:`telegram.CallbackQuery` updates recieved by the bot should be validated. For
+            more info, please see our wiki. Defaults to :obj:`True`.
 
     Note:
         * You must supply either a :attr:`bot` or a :attr:`token` argument.
@@ -115,7 +118,8 @@ class Updater(object):
                  defaults=None,
                  use_context=False,
                  dispatcher=None,
-                 base_file_url=None):
+                 base_file_url=None,
+                 validate_callback_data=True):
 
         if dispatcher is None:
             if (token is None) and (bot is None):
@@ -163,7 +167,8 @@ class Updater(object):
                                request=self._request,
                                private_key=private_key,
                                private_key_password=private_key_password,
-                               defaults=defaults)
+                               defaults=defaults,
+                               validate_callback_data=validate_callback_data)
             self.update_queue = Queue()
             self.job_queue = JobQueue()
             self.__exception_event = Event()
@@ -345,7 +350,8 @@ class Updater(object):
                     self.logger.debug('Updates ignored and will be pulled again on restart')
                 else:
                     for update in updates:
-                        self.update_queue.put(update)
+                        if isinstance(update, Update):
+                            self.update_queue.put(update)
                     self.last_update_id = updates[-1].update_id + 1
 
             return True

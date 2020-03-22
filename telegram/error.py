@@ -111,3 +111,16 @@ class Conflict(TelegramError):
 
     def __init__(self, msg):
         super(Conflict, self).__init__(msg)
+
+
+class InvalidCallbackData(TelegramError):
+    """
+    Raised when the received callback data has been tempered with.
+
+    Args:
+        update_id (:obj:`int`, optional): The ID of the untrusted Update.
+    """
+    def __init__(self, update_id=None):
+        super(InvalidCallbackData, self).__init__('The callback data has been tampered with! '
+                                                  'Skipping it.')
+        self.update_id = update_id

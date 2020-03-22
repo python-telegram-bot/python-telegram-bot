@@ -40,6 +40,8 @@ class DictPersistence(BasePersistence):
             persistence class.
         store_bot_data (:obj:`bool`): Whether bot_data should be saved by this
             persistence class.
+        store_callback_data (:obj:`bool`): Whether callback_data be saved by this
+            persistence class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
@@ -48,12 +50,16 @@ class DictPersistence(BasePersistence):
             persistence class. Default is ``True``.
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is ``True`` .
+        store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
+            persistence class. Default is ``True`` .
         user_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             chat_data on creating this persistence. Default is ``""``.
         bot_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             bot_data on creating this persistence. Default is ``""``.
+        callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+            callback_data on creating this persistence. Default is ``""``.
         conversations_json (:obj:`str`, optional): Json string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
     """
@@ -65,17 +71,22 @@ class DictPersistence(BasePersistence):
                  user_data_json='',
                  chat_data_json='',
                  bot_data_json='',
-                 conversations_json=''):
+                 conversations_json='',
+                 store_callback_data=True,
+                 callback_data_json=''):
         super(DictPersistence, self).__init__(store_user_data=store_user_data,
                                               store_chat_data=store_chat_data,
-                                              store_bot_data=store_bot_data)
+                                              store_bot_data=store_bot_data,
+                                              store_callback_data=store_callback_data)
         self._user_data = None
         self._chat_data = None
         self._bot_data = None
+        self._callback_data = None
         self._conversations = None
         self._user_data_json = None
         self._chat_data_json = None
         self._bot_data_json = None
+        self._callback_data_json = None
         self._conversations_json = None
         if user_data_json:
             try:
@@ -97,6 +108,14 @@ class DictPersistence(BasePersistence):
                 raise TypeError("Unable to deserialize bot_data_json. Not valid JSON")
             if not isinstance(self._bot_data, dict):
                 raise TypeError("bot_data_json must be serialized dict")
+        if callback_data_json:
+            try:
+                self._callback_data = json.loads(callback_data_json)
+                self._callback_data_json = callback_data_json
+            except (ValueError, AttributeError):
+                raise TypeError("Unable to deserialize callback_data_json. Not valid JSON")
+            if not isinstance(self._bot_data, dict):
+                raise TypeError("callback_data_json must be serialized dict")
 
         if conversations_json:
             try:
@@ -145,6 +164,19 @@ class DictPersistence(BasePersistence):
             return json.dumps(self.bot_data)
 
     @property
+    def callback_data(self):
+        """:obj:`dict`: The callback_data as a dict"""
+        return self._callback_data
+
+    @property
+    def callback_data_json(self):
+        """:obj:`str`: The callback_data serialized as a JSON-string."""
+        if self._callback_data_json:
+            return self._callback_data_json
+        else:
+            return json.dumps(self.callback_data)
+
+    @property
     def conversations(self):
         """:obj:`dict`: The conversations as a dict"""
         return self._conversations
@@ -185,13 +217,25 @@ class DictPersistence(BasePersistence):
         """Returns the bot_data created from the ``bot_data_json`` or an empty dict.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`dict`: The restored user data.
         """
         if self.bot_data:
             pass
         else:
             self._bot_data = {}
         return deepcopy(self.bot_data)
+
+    def get_callback_data(self):
+        """Returns the callback_data created from the ``callback_data_json`` or an empty dict.
+
+        Returns:
+            :obj:`defaultdict`: The restored user data.
+        """
+        if self.callback_data:
+            pass
+        else:
+            self._callback_data = {}
+        return deepcopy(self.callback_data)
 
     def get_conversations(self, name):
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -257,3 +301,14 @@ class DictPersistence(BasePersistence):
             return
         self._bot_data = data.copy()
         self._bot_data_json = None
+
+    def update_callback_data(self, data):
+        """Will update the callback_data (if changed).
+
+        Args:
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.callback_data`.
+        """
+        if self._callback_data == data:
+            return
+        self._callback_data = data.copy()
+        self._callback_data_json = None

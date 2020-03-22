@@ -33,6 +33,8 @@ class BasePersistence(object):
       :meth:`update_user_data`.
     * If you want to store conversation data with :class:`telegram.ext.ConversationHandler`, you
       must overwrite :meth:`get_conversations` and :meth:`update_conversation`.
+    * If :attr:`store_callback_data` is :obj:`True`, you must overwrite :meth:`get_callback_data`
+      and :meth:`update_callback_data`.
     * :meth:`flush` will be called when the bot is shutdown.
 
     Attributes:
@@ -42,6 +44,8 @@ class BasePersistence(object):
             persistence class.
         store_bot_data (:obj:`bool`): Optional. Whether bot_data should be saved by this
             persistence class.
+        store_callback_data (:obj:`bool`): Optional. Whether callback_data be saved by this
+            persistence class.
 
     Args:
         store_user_data (:obj:`bool`, optional): Whether user_data should be saved by this
@@ -50,12 +54,16 @@ class BasePersistence(object):
             persistence class. Default is ``True`` .
         store_bot_data (:obj:`bool`, optional): Whether bot_data should be saved by this
             persistence class. Default is ``True`` .
+        store_callback_data (:obj:`bool`, optional): Whether callback_data should be saved by this
+            persistence class. Default is ``True`` .
     """
 
-    def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True):
+    def __init__(self, store_user_data=True, store_chat_data=True, store_bot_data=True,
+                 store_callback_data=True):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
+        self.store_callback_data = store_callback_data
 
     def get_user_data(self):
         """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
@@ -83,7 +91,17 @@ class BasePersistence(object):
         ``dict``.
 
         Returns:
-            :obj:`defaultdict`: The restored bot data.
+            :obj:`dict`: The restored bot data.
+        """
+        raise NotImplementedError
+
+    def get_callback_data(self):
+        """"Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+        persistence object. It should return the callback_data if stored, or an empty
+        ``dict``.
+
+        Returns:
+            :obj:`dict`: The restored bot data.
         """
         raise NotImplementedError
 
@@ -138,6 +156,15 @@ class BasePersistence(object):
 
         Args:
             data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.bot_data` .
+        """
+        raise NotImplementedError
+
+    def update_callback_data(self, data):
+        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+        handled an update.
+
+        Args:
+            data (:obj:`dict`): The :attr:`telegram.ext.dispatcher.update_callback_data` .
         """
         raise NotImplementedError
 

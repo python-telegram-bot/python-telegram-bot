@@ -19,6 +19,7 @@
 import sys
 import logging
 from telegram import Update
+from telegram.error import InvalidCallbackData
 from future.utils import bytes_to_native_str
 from threading import Lock
 try:
@@ -137,9 +138,12 @@ class WebhookHandler(tornado.web.RequestHandler):
         self.set_status(200)
         self.logger.debug('Webhook received data: ' + json_string)
         data['default_quote'] = self._default_quote
-        update = Update.de_json(data, self.bot)
-        self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
-        self.update_queue.put(update)
+        try:
+            update = Update.de_json(data, self.bot)
+            self.logger.debug('Received Update with ID %d on Webhook' % update.update_id)
+            self.update_queue.put(update)
+        except InvalidCallbackData:
+            pass
 
     def _validate_post(self):
         ct_header = self.request.headers.get("Content-Type", None)
