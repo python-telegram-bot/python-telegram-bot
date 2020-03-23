@@ -20,6 +20,8 @@
 import pytest
 
 from telegram import CallbackQuery, User, Message, Chat, Audio
+from telegram.error import InvalidCallbackData
+from telegram.utils.helpers import sign_callback_data
 
 
 @pytest.fixture(scope='class', params=['message', 'inline'])
@@ -55,7 +57,7 @@ class TestCallbackQuery(object):
                      'inline_message_id': self.inline_message_id,
                      'game_short_name': self.game_short_name,
                      'default_quote': True}
-        callback_query = CallbackQuery.de_json(json_dict, bot)
+        callback_query = CallbackQuery.de_json(json_dict, bot, data_is_signed=False)
 
         assert callback_query.id == self.id_
         assert callback_query.from_user == self.from_user
@@ -65,6 +67,23 @@ class TestCallbackQuery(object):
         assert callback_query.data == self.data
         assert callback_query.inline_message_id == self.inline_message_id
         assert callback_query.game_short_name == self.game_short_name
+
+    def test_de_json_malicious_callback_data(self, bot):
+        signed_data = sign_callback_data(123456, 'callback_data', bot)
+        json_dict = {'id': self.id_,
+                     'from': self.from_user.to_dict(),
+                     'chat_instance': self.chat_instance,
+                     'message': self.message.to_dict(),
+                     'data': signed_data + 'error',
+                     'inline_message_id': self.inline_message_id,
+                     'game_short_name': self.game_short_name,
+                     'default_quote': True}
+        with pytest.raises(InvalidCallbackData):
+            CallbackQuery.de_json(json_dict, bot)
+
+        bot.validate_callback_data = False
+        assert CallbackQuery.de_json(json_dict, bot).data is None
+        bot.validate_callback_data = True
 
     def test_to_dict(self, callback_query):
         callback_query_dict = callback_query.to_dict()

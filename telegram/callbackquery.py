@@ -96,7 +96,7 @@ class CallbackQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data, bot):
+    def de_json(cls, data, bot, data_is_signed=True):
         if not data:
             return None
 
@@ -108,7 +108,7 @@ class CallbackQuery(TelegramObject):
             message['default_quote'] = data.get('default_quote')
         data['message'] = Message.de_json(message, bot)
 
-        if bot is not None:
+        if data_is_signed and 'data' in data:
             chat_id = data['message'].chat.id
             if bot.validate_callback_data:
                 key = validate_callback_data(chat_id, data['data'], bot)

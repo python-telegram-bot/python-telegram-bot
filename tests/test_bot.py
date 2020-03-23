@@ -518,6 +518,11 @@ class TestBot(object):
         if updates:
             assert isinstance(updates[0], Update)
 
+    # TODO: Actually send updates to the test bot so this can be tested properly
+    @pytest.mark.skip(reason="Not implemented yet.")
+    def test_get_updates_malicious_callback_data(self, bot):
+        pass
+
     @flaky(3, 1)
     @pytest.mark.timeout(15)
     @pytest.mark.xfail

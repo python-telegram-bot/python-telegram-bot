@@ -100,6 +100,7 @@ class PicklePersistence(BasePersistence):
             self.user_data = defaultdict(dict)
             self.chat_data = defaultdict(dict)
             self.bot_data = {}
+            self.callback_data = {}
         except pickle.UnpicklingError:
             raise TypeError("File {} does not contain valid pickle data".format(filename))
         except Exception:
@@ -331,7 +332,6 @@ class PicklePersistence(BasePersistence):
             if self.bot_data:
                 self.dump_file("{}_bot_data".format(self.filename), self.bot_data)
             if self.callback_data:
-                print('flushing cd')
                 self.dump_file("{}_callback_data".format(self.filename), self.callback_data)
             if self.conversations:
                 self.dump_file("{}_conversations".format(self.filename), self.conversations)

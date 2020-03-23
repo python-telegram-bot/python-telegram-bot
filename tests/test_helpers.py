@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
 import datetime as dtm
+import base64
 
 import pytest
 
@@ -26,6 +27,7 @@ from telegram import Update
 from telegram import User
 from telegram import MessageEntity
 from telegram.message import Message
+from telegram.error import InvalidCallbackData
 from telegram.utils import helpers
 from telegram.utils.helpers import _UtcOffsetTimezone, _datetime_to_float_timestamp
 
@@ -223,3 +225,45 @@ class TestHelpers(object):
         expected = r'[the\_name](tg://user?id=1)'
 
         assert expected == helpers.mention_markdown(1, 'the_name')
+
+    @pytest.mark.parametrize('callback_data', ['string', object(), Message(1, None, 0, None),
+                                               Update(1), User(1, 'name', False)])
+    def test_sign_callback_data(self, bot, callback_data):
+        data = str(id(callback_data))
+        signed_data = helpers.sign_callback_data(-1234567890, data, bot)
+
+        assert isinstance(signed_data, str)
+        assert len(signed_data) <= 64
+
+        [signature, data] = signed_data.split(' ')
+        assert str(id(callback_data)) == data
+
+        sig = helpers.get_callback_data_signature(-1234567890, str(id(callback_data)), bot)
+        assert signature == base64.b64encode(sig).decode('utf-8')
+
+    @pytest.mark.parametrize('callback_data', ['string', object(), Message(1, None, 0, None),
+                                               Update(1), User(1, 'name', False)])
+    def test_validate_callback_data(self, bot, callback_data):
+        data = str(id(callback_data))
+        signed_data = helpers.sign_callback_data(-1234567890, data, bot)
+
+        assert data == helpers.validate_callback_data(-1234567890, signed_data, bot)
+
+        with pytest.raises(InvalidCallbackData):
+            helpers.validate_callback_data(-1234567, signed_data, bot)
+        assert data == helpers.validate_callback_data(-1234567, signed_data)
+
+        with pytest.raises(InvalidCallbackData):
+            helpers.validate_callback_data(-1234567890, signed_data + 'abc', bot)
+        assert data + 'abc' == helpers.validate_callback_data(-1234567890, signed_data + 'abc')
+
+        with pytest.raises(InvalidCallbackData):
+            helpers.validate_callback_data(-1234567890, signed_data.replace('=', '=a'), bot)
+        assert data == helpers.validate_callback_data(-1234567890, signed_data.replace('=', '=a'))
+
+        char_list = list(signed_data)
+        char_list[1] = 'abc'
+        s_data = ''.join(char_list)
+        with pytest.raises(InvalidCallbackData):
+            helpers.validate_callback_data(-1234567890, s_data, bot)
+        assert data == helpers.validate_callback_data(-1234567890, s_data)

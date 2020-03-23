@@ -23,7 +23,7 @@ import sys
 import asyncio
 from flaky import flaky
 from functools import partial
-from queue import Queue
+from queue import Queue, Empty
 from random import randrange
 from threading import Thread, Event
 from time import sleep
@@ -39,8 +39,8 @@ except ImportError:
 import pytest
 from future.builtins import bytes
 
-from telegram import TelegramError, Message, User, Chat, Update, Bot
-from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter
+from telegram import TelegramError, Message, User, Chat, Update, Bot, CallbackQuery
+from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter, InvalidCallbackData
 from telegram.ext import Updater, Dispatcher, BasePersistence
 
 signalskip = pytest.mark.skipif(sys.platform == 'win32',
@@ -171,6 +171,20 @@ class TestUpdater(object):
         event.wait()
         assert self.err_handler_called.wait(0.5) is not True
 
+    def test_get_updates_invalid_callback_data_error(self, monkeypatch, updater):
+        error = InvalidCallbackData(update_id=7)
+        error.message = 'This should not be passed to the update queue!'
+
+        def test(*args, **kwargs):
+            return [error]
+
+        monkeypatch.setattr(updater.bot, 'get_updates', test)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        updater.dispatcher.add_error_handler(self.error_handler)
+        updater.start_polling(0.01)
+
+        assert self.received != error.message
+
     def test_webhook(self, monkeypatch, updater):
         q = Queue()
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -191,6 +205,48 @@ class TestUpdater(object):
             self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
             sleep(.2)
             assert q.get(False) == update
+
+            # Returns 404 if path is incorrect
+            with pytest.raises(HTTPError) as excinfo:
+                self._send_webhook_msg(ip, port, None, 'webookhandler.py')
+            assert excinfo.value.code == 404
+
+            with pytest.raises(HTTPError) as excinfo:
+                self._send_webhook_msg(ip, port, None, 'webookhandler.py',
+                                       get_method=lambda: 'HEAD')
+            assert excinfo.value.code == 404
+
+            # Test multiple shutdown() calls
+            updater.httpd.shutdown()
+        finally:
+            updater.httpd.shutdown()
+            sleep(.2)
+            assert not updater.httpd.is_running
+            updater.stop()
+
+    def test_webhook_invalid_callback_data(self, monkeypatch, updater):
+        q = Queue()
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+        updater.start_webhook(
+            ip,
+            port,
+            url_path='TOKEN')
+        sleep(.2)
+        try:
+            # Now, we send an update to the server via urlopen
+            update = Update(1, callback_query=CallbackQuery(
+                id=1, from_user=None, chat_instance=123, data='invalid data', message=Message(
+                    1, User(1, '', False), None, Chat(1, ''), text='Webhook')))
+            self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
+            sleep(.2)
+            # Make sure the update wasn't accepted and the queue is empty
+            with pytest.raises(Empty):
+                assert q.get(False)
 
             # Returns 404 if path is incorrect
             with pytest.raises(HTTPError) as excinfo:
@@ -459,25 +515,25 @@ class TestUpdater(object):
         with pytest.raises(ValueError):
             Updater(bot=bot, private_key=b'key')
 
-    def test_mutual_exclude_bot_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_bot_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         bot = Bot('123:zyxw')
         with pytest.raises(ValueError):
             Updater(bot=bot, dispatcher=dispatcher)
 
-    def test_mutual_exclude_persistence_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_persistence_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         persistence = BasePersistence()
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, persistence=persistence)
 
-    def test_mutual_exclude_workers_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_workers_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, workers=8)
 
-    def test_mutual_exclude_use_context_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
+    def test_mutual_exclude_use_context_dispatcher(self, bot):
+        dispatcher = Dispatcher(bot, None)
         use_context = not dispatcher.use_context
         with pytest.raises(ValueError):
             Updater(dispatcher=dispatcher, use_context=use_context)
