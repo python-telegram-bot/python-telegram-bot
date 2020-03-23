@@ -116,6 +116,20 @@ class TestCallbackQueryHandler(object):
         callback_query.callback_query.data = 'nothing here'
         assert not handler.check_update(callback_query)
 
+    def test_with_callable_pattern(self, callback_query):
+        class CallbackData():
+            pass
+
+        def pattern(callback_data):
+            return isinstance(callback_data, CallbackData)
+
+        handler = CallbackQueryHandler(self.callback_basic, pattern=pattern)
+
+        callback_query.callback_query.data = CallbackData()
+        assert handler.check_update(callback_query)
+        callback_query.callback_query.data = 'callback_data'
+        assert not handler.check_update(callback_query)
+
     def test_with_passing_group_dict(self, dp, callback_query):
         handler = CallbackQueryHandler(self.callback_group,
                                        pattern='(?P<begin>.*)est(?P<end>.*)',
@@ -215,3 +229,18 @@ class TestCallbackQueryHandler(object):
 
         cdp.process_update(callback_query)
         assert self.test_flag
+
+    def test_context_callable_pattern(self, cdp, callback_query):
+        class CallbackData():
+            pass
+
+        def pattern(callback_data):
+            return isinstance(callback_data, CallbackData)
+
+        def callback(update, context):
+            assert context.matches is None
+
+        handler = CallbackQueryHandler(callback, pattern=pattern)
+        cdp.add_handler(handler)
+
+        cdp.process_update(callback_query)

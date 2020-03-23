@@ -37,8 +37,8 @@ class CallbackQueryHandler(Handler):
             passed to the callback function.
         pass_job_queue (:obj:`bool`): Determines whether ``job_queue`` will be passed to
             the callback function.
-        pattern (:obj:`str` | `Pattern`): Optional. Regex pattern to test
-            :attr:`telegram.CallbackQuery.data` against.
+        pattern (:obj:`str` | `Pattern` | :obj:`callable`): Optional. Regex pattern or a function
+            to test :attr:`telegram.CallbackQuery.data` against.
         pass_groups (:obj:`bool`): Determines whether ``groups`` will be passed to the
             callback function.
         pass_groupdict (:obj:`bool`): Determines whether ``groupdict``. will be passed to
@@ -76,9 +76,13 @@ class CallbackQueryHandler(Handler):
             :class:`telegram.ext.JobQueue` instance created by the :class:`telegram.ext.Updater`
             which can be used to schedule new jobs. Default is ``False``.
             DEPRECATED: Please switch to context based callbacks.
-        pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not ``None``, ``re.match``
-            is used on :attr:`telegram.CallbackQuery.data` to determine if an update should be
-            handled by this handler.
+        pattern (:obj:`str` | `Pattern` | :obj:`callable`, optional): Regex pattern. If not
+            ``None``, and :attr:`pattern` is a string or regex pattern, ``re.match`` is used on
+            :attr:`telegram.CallbackQuery.data` to determine if an update should be handled by this
+            handler. If the data is no string, the update won't be handled in this case. If
+            :attr:`pattern` is a callable, it must accept exactly one argument, being
+            :attr:`telegram.CallbackQuery.data`. It must return :obj:`True`, :obj:`Fales` or
+            :obj:`None` to indicate, whether the update should be handled.
         pass_groups (:obj:`bool`, optional): If the callback should be passed the result of
             ``re.match(pattern, data).groups()`` as a keyword argument called ``groups``.
             Default is ``False``
@@ -130,11 +134,15 @@ class CallbackQueryHandler(Handler):
 
         """
         if isinstance(update, Update) and update.callback_query:
+            callback_data = update.callback_query.data
             if self.pattern:
-                if update.callback_query.data:
-                    match = re.match(self.pattern, update.callback_query.data)
-                    if match:
-                        return match
+                if callback_data is not None:
+                    if callable(self.pattern):
+                        return self.pattern(callback_data)
+                    elif isinstance(callback_data, str):
+                        match = re.match(self.pattern, callback_data)
+                        if match:
+                            return match
             else:
                 return True
 
@@ -142,7 +150,7 @@ class CallbackQueryHandler(Handler):
         optional_args = super(CallbackQueryHandler, self).collect_optional_args(dispatcher,
                                                                                 update,
                                                                                 check_result)
-        if self.pattern:
+        if self.pattern and not callable(self.pattern):
             if self.pass_groups:
                 optional_args['groups'] = check_result.groups()
             if self.pass_groupdict:
