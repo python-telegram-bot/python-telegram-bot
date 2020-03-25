@@ -470,7 +470,7 @@ class TestPickelPersistence(object):
             pickle_persistence.get_chat_data()
         with pytest.raises(TypeError, match='pickletest_bot_data'):
             pickle_persistence.get_bot_data()
-        with pytest.raises(TypeError, match='pickletest'):
+        with pytest.raises(TypeError, match='pickletest_callback_data'):
             pickle_persistence.get_callback_data()
         with pytest.raises(TypeError, match='pickletest_conversations'):
             pickle_persistence.get_conversations('name')

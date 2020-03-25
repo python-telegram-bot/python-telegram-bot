@@ -26,9 +26,9 @@ from future.utils import string_types
 
 from telegram import (Bot, Update, ChatAction, TelegramError, User, InlineKeyboardMarkup,
                       InlineKeyboardButton, InlineQueryResultArticle, InputTextMessageContent,
-                      ShippingOption, LabeledPrice, ChatPermissions, Poll, BotCommand,
-                      InlineQueryResultDocument)
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter
+                      ShippingOption, LabeledPrice, ChatPermissions, Poll, Chat, Message,
+                      InlineQueryResultDocument, CallbackQuery, BotCommand)
+from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, InvalidCallbackData
 from telegram.utils.helpers import from_timestamp, escape_markdown
 
 BASE_TIME = time.time()
@@ -518,10 +518,34 @@ class TestBot(object):
         if updates:
             assert isinstance(updates[0], Update)
 
-    # TODO: Actually send updates to the test bot so this can be tested properly
-    @pytest.mark.skip(reason="Not implemented yet.")
-    def test_get_updates_malicious_callback_data(self, bot):
-        pass
+    def test_get_updates_malicious_callback_data(self, bot, monkeypatch):
+        def post(*args, **kwargs):
+            return [Update(17, callback_query=CallbackQuery(
+                           id=1, from_user=None, chat_instance=123, data='invalid data',
+                           message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                           text='Webhook'))).to_dict()]
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', post)
+        bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+        updates = bot.get_updates(timeout=1)
+
+        assert isinstance(updates, list)
+        assert isinstance(updates[0], InvalidCallbackData)
+        assert updates[0].update_id == 17
+
+    @pytest.mark.parametrize('default_bot', [{'quote': True}], indirect=True)
+    def test_get_updates_default_quote(self, default_bot, monkeypatch):
+        def post(*args, **kwargs):
+            return [Update(17, message=Message(1, User(1, '', False), None, Chat(1, ''),
+                                               text='Webhook')).to_dict()]
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', post)
+        default_bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
+        updates = default_bot.get_updates(timeout=1)
+
+        assert isinstance(updates, list)
+        assert isinstance(updates[0], Update)
+        assert updates[0].message.default_quote is True
 
     @flaky(3, 1)
     @pytest.mark.timeout(15)
