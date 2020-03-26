@@ -2,6 +2,13 @@
 Changes
 =======
 
+**2020-03-26**
+*Released 11.1.1*
+
+Fixes:
+
+- Fix request timeout
+
 **2018-09-01**
 *Released 11.1.0*
 
