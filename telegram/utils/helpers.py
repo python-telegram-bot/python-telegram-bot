@@ -68,7 +68,7 @@ def escape_markdown(text, version=1, entity_type=None):
     else:
         raise ValueError('Markdown version musst be either 1 or 2!')
 
-    return re.sub('([{}])'.format(re.escape(escape_chars)), r'\1', text)
+    return re.sub('([{}])'.format(re.escape(escape_chars)), r'\\\1', text)
 
 
 # -------- date/time related helpers --------
