@@ -24,6 +24,11 @@ from telegram import TelegramObject
 class ChatPermissions(TelegramObject):
     """Describes actions that a non-administrator user is allowed to take in a chat.
 
+    Note:
+        Though not stated explicitly in the offical docs, Telegram changes not only the permissions
+        that are set, but also sets all the others to :obj:`False`. However, since not documented,
+        this behaviour may change unbeknown to PTB.
+
     Attributes:
         can_send_messages (:obj:`bool`): Optional. True, if the user is allowed to send text
             messages, contacts, locations and venues.
