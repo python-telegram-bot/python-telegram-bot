@@ -6,7 +6,7 @@ repos:
         files: ^(telegram|tests)/.*\.py$
         args:
         - --diff
--   repo: https://gitlab.com/pycqa/flake8
+-   repo: git://github.com/PyCQA/flake8
     rev: 3.7.1
     hooks:
     -   id: flake8
