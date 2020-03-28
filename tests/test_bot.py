@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import os
-import sys
 import time
 import datetime as dtm
 from platform import python_implementation
@@ -92,6 +90,7 @@ class TestBot(object):
         assert get_me_bot.can_join_groups == bot.can_join_groups
         assert get_me_bot.can_read_all_group_messages == bot.can_read_all_group_messages
         assert get_me_bot.supports_inline_queries == bot.supports_inline_queries
+        assert 'https://t.me/{}'.format(get_me_bot.username) == bot.link
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
@@ -506,8 +505,6 @@ class TestBot(object):
     @flaky(3, 1)
     @pytest.mark.timeout(15)
     @pytest.mark.xfail
-    @pytest.mark.skipif(os.getenv('APPVEYOR') and (sys.version_info < (3, 6)),
-                        reason='only run on 3.6 on appveyor')
     def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7

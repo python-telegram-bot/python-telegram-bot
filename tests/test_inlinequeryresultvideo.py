@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQuery
 @pytest.fixture(scope='class')
 def inline_query_result_video():
     return InlineQueryResultVideo(
-        TestInlineQueryResultVideo.id,
+        TestInlineQueryResultVideo.id_,
         TestInlineQueryResultVideo.video_url,
         TestInlineQueryResultVideo.mime_type,
         TestInlineQueryResultVideo.thumb_url,
@@ -42,8 +42,8 @@ def inline_query_result_video():
 
 
 class TestInlineQueryResultVideo(object):
-    id = 'id'
-    type = 'video'
+    id_ = 'id'
+    type_ = 'video'
     video_url = 'video url'
     mime_type = 'mime type'
     video_width = 10
@@ -58,8 +58,8 @@ class TestInlineQueryResultVideo(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_video):
-        assert inline_query_result_video.type == self.type
-        assert inline_query_result_video.id == self.id
+        assert inline_query_result_video.type == self.type_
+        assert inline_query_result_video.id == self.id_
         assert inline_query_result_video.video_url == self.video_url
         assert inline_query_result_video.mime_type == self.mime_type
         assert inline_query_result_video.video_width == self.video_width
@@ -100,15 +100,15 @@ class TestInlineQueryResultVideo(object):
                 == inline_query_result_video.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultVideo(self.id, self.video_url, self.mime_type,
+        a = InlineQueryResultVideo(self.id_, self.video_url, self.mime_type,
                                    self.thumb_url, self.title)
-        b = InlineQueryResultVideo(self.id, self.video_url, self.mime_type,
+        b = InlineQueryResultVideo(self.id_, self.video_url, self.mime_type,
                                    self.thumb_url, self.title)
-        c = InlineQueryResultVideo(self.id, '', self.mime_type, self.thumb_url,
+        c = InlineQueryResultVideo(self.id_, '', self.mime_type, self.thumb_url,
                                    self.title)
         d = InlineQueryResultVideo('', self.video_url, self.mime_type, self.thumb_url,
                                    self.title)
-        e = InlineQueryResultVoice(self.id, '', '')
+        e = InlineQueryResultVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

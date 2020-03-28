@@ -26,7 +26,7 @@ from telegram import (InlineKeyboardButton, InputTextMessageContent, InlineQuery
 @pytest.fixture(scope='class')
 def inline_query_result_cached_gif():
     return InlineQueryResultCachedGif(
-        TestInlineQueryResultCachedGif.id,
+        TestInlineQueryResultCachedGif.id_,
         TestInlineQueryResultCachedGif.gif_file_id,
         title=TestInlineQueryResultCachedGif.title,
         caption=TestInlineQueryResultCachedGif.caption,
@@ -36,8 +36,8 @@ def inline_query_result_cached_gif():
 
 
 class TestInlineQueryResultCachedGif(object):
-    id = 'id'
-    type = 'gif'
+    id_ = 'id'
+    type_ = 'gif'
     gif_file_id = 'gif file id'
     title = 'title'
     caption = 'caption'
@@ -46,8 +46,8 @@ class TestInlineQueryResultCachedGif(object):
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
 
     def test_expected_values(self, inline_query_result_cached_gif):
-        assert inline_query_result_cached_gif.type == self.type
-        assert inline_query_result_cached_gif.id == self.id
+        assert inline_query_result_cached_gif.type == self.type_
+        assert inline_query_result_cached_gif.id == self.id_
         assert inline_query_result_cached_gif.gif_file_id == self.gif_file_id
         assert inline_query_result_cached_gif.title == self.title
         assert inline_query_result_cached_gif.caption == self.caption
@@ -75,11 +75,11 @@ class TestInlineQueryResultCachedGif(object):
                 == inline_query_result_cached_gif.reply_markup.to_dict())
 
     def test_equality(self):
-        a = InlineQueryResultCachedGif(self.id, self.gif_file_id)
-        b = InlineQueryResultCachedGif(self.id, self.gif_file_id)
-        c = InlineQueryResultCachedGif(self.id, '')
+        a = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
+        b = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
+        c = InlineQueryResultCachedGif(self.id_, '')
         d = InlineQueryResultCachedGif('', self.gif_file_id)
-        e = InlineQueryResultCachedVoice(self.id, '', '')
+        e = InlineQueryResultCachedVoice(self.id_, '', '')
 
         assert a == b
         assert hash(a) == hash(b)

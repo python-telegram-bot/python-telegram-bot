@@ -84,7 +84,7 @@ class TestPollAnswer(object):
 
 @pytest.fixture(scope='class')
 def poll():
-    return Poll(TestPoll.id,
+    return Poll(TestPoll.id_,
                 TestPoll.question,
                 TestPoll.options,
                 TestPoll.total_voter_count,
@@ -96,7 +96,7 @@ def poll():
 
 
 class TestPoll(object):
-    id = 'id'
+    id_ = 'id'
     question = 'Test?'
     options = [PollOption('test', 10), PollOption('test2', 11)]
     total_voter_count = 0
@@ -107,7 +107,7 @@ class TestPoll(object):
 
     def test_de_json(self):
         json_dict = {
-            'id': self.id,
+            'id': self.id_,
             'question': self.question,
             'options': [o.to_dict() for o in self.options],
             'total_voter_count': self.total_voter_count,
@@ -118,7 +118,7 @@ class TestPoll(object):
         }
         poll = Poll.de_json(json_dict, None)
 
-        assert poll.id == self.id
+        assert poll.id == self.id_
         assert poll.question == self.question
         assert poll.options == self.options
         assert poll.options[0].text == self.options[0].text

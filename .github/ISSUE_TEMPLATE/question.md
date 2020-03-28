@@ -2,7 +2,7 @@
 name: Question
 about: Get help with errors or general questions
 title: "[QUESTION]"
-labels: 'question :question:'
+labels: question
 assignees: ''
 
 ---
