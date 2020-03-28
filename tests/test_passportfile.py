@@ -25,17 +25,20 @@ from telegram import PassportFile, PassportElementError
 @pytest.fixture(scope='class')
 def passport_file():
     return PassportFile(file_id=TestPassportFile.file_id,
+                        file_unique_id=TestPassportFile.file_unique_id,
                         file_size=TestPassportFile.file_size,
                         file_date=TestPassportFile.file_date)
 
 
 class TestPassportFile(object):
     file_id = 'data'
+    file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     file_size = 50
     file_date = 1532879128
 
     def test_expected_values(self, passport_file):
         assert passport_file.file_id == self.file_id
+        assert passport_file.file_unique_id == self.file_unique_id
         assert passport_file.file_size == self.file_size
         assert passport_file.file_date == self.file_date
 
@@ -45,16 +48,18 @@ class TestPassportFile(object):
         assert isinstance(passport_file_dict, dict)
         assert (passport_file_dict['file_id']
                 == passport_file.file_id)
+        assert (passport_file_dict['file_unique_id']
+                == passport_file.file_unique_id)
         assert (passport_file_dict['file_size']
                 == passport_file.file_size)
         assert (passport_file_dict['file_date']
                 == passport_file.file_date)
 
     def test_equality(self):
-        a = PassportFile(self.file_id, self.file_size, self.file_date)
-        b = PassportFile(self.file_id, self.file_size, self.file_date)
-        c = PassportFile(self.file_id, '', '')
-        d = PassportFile('', self.file_size, self.file_date)
+        a = PassportFile(self.file_id, self.file_unique_id, self.file_size, self.file_date)
+        b = PassportFile('', self.file_unique_id, self.file_size, self.file_date)
+        c = PassportFile(self.file_id, self.file_unique_id, '', '')
+        d = PassportFile('', '', self.file_size, self.file_date)
         e = PassportElementError('source', 'type', 'message')
 
         assert a == b

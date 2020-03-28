@@ -117,7 +117,7 @@ Here's how to make a one-off code change.
 
      .. code-block::
 
-        $ export TEST_OFFICIAL=True
+        $ export TEST_OFFICIAL=true
 
      prior to running the tests.
 

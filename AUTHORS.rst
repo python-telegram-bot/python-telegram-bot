@@ -36,6 +36,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Evan Haberecht <https://github.com/habereet>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
 - `franciscod <https://github.com/franciscod>`_
+- `gamgi <https://github.com/gamgi>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_

@@ -300,7 +300,7 @@ class TestFilters(object):
         assert Filters.document(update)
 
     def test_filters_document_type(self, update):
-        update.message.document = Document("file_id",
+        update.message.document = Document("file_id", 'unique_id',
                                            mime_type="application/vnd.android.package-archive")
         assert Filters.document.apk(update)
         assert Filters.document.application(update)
