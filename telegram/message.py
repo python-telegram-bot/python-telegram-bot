@@ -510,7 +510,7 @@ class Message(TelegramObject):
             bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN, *args,
             **kwargs)
 
-        Sends a message with markdown formatting.
+        Sends a message with markdown version 1 formatting.
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
@@ -523,6 +523,30 @@ class Message(TelegramObject):
         """
 
         kwargs['parse_mode'] = ParseMode.MARKDOWN
+
+        self._quote(kwargs)
+
+        return self.bot.send_message(self.chat_id, *args, **kwargs)
+
+    def reply_markdown_v2(self, *args, **kwargs):
+        """Shortcut for::
+
+            bot.send_message(update.message.chat_id, parse_mode=ParseMode.MARKDOWN_V2, *args,
+            **kwargs)
+
+        Sends a message with markdown version 2 formatting.
+
+        Keyword Args:
+            quote (:obj:`bool`, optional): If set to ``True``, the message is sent as an actual
+                reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
+                parameter will be ignored. Default: ``True`` in group chats and ``False`` in
+                private chats.
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+        """
+
+        kwargs['parse_mode'] = ParseMode.MARKDOWN_V2
 
         self._quote(kwargs)
 
@@ -1012,7 +1036,7 @@ class Message(TelegramObject):
         }
 
     @staticmethod
-    def _parse_html(message_text, entities, urled=False):
+    def _parse_html(message_text, entities, urled=False, offset=0):
         if message_text is None:
             return None
 
@@ -1022,38 +1046,74 @@ class Message(TelegramObject):
         html_text = ''
         last_offset = 0
 
-        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            text = escape(text)
+        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
+        parsed_entities = []
 
-            if entity.type == MessageEntity.TEXT_LINK:
-                insert = '<a href="{}">{}</a>'.format(entity.url, text)
-            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
-            elif entity.type == MessageEntity.URL and urled:
-                insert = '<a href="{0}">{0}</a>'.format(text)
-            elif entity.type == MessageEntity.BOLD:
-                insert = '<b>' + text + '</b>'
-            elif entity.type == MessageEntity.ITALIC:
-                insert = '<i>' + text + '</i>'
-            elif entity.type == MessageEntity.CODE:
-                insert = '<code>' + text + '</code>'
-            elif entity.type == MessageEntity.PRE:
-                insert = '<pre>' + text + '</pre>'
-            else:
-                insert = text
+        for (entity, text) in sorted_entities:
+            if entity not in parsed_entities:
+                nested_entities = {
+                    e: t
+                    for (e, t) in sorted_entities if e.offset >= entity.offset
+                    and e.offset + e.length <= entity.offset + entity.length
+                    and e != entity
+                }
+                parsed_entities.extend([e for e in nested_entities.keys()])
 
+                text = escape(text)
+
+                if nested_entities:
+                    text = Message._parse_html(text, nested_entities,
+                                               urled=urled, offset=entity.offset)
+
+                if entity.type == MessageEntity.TEXT_LINK:
+                    insert = '<a href="{}">{}</a>'.format(entity.url, text)
+                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                    insert = '<a href="tg://user?id={}">{}</a>'.format(entity.user.id, text)
+                elif entity.type == MessageEntity.URL and urled:
+                    insert = '<a href="{0}">{0}</a>'.format(text)
+                elif entity.type == MessageEntity.BOLD:
+                    insert = '<b>' + text + '</b>'
+                elif entity.type == MessageEntity.ITALIC:
+                    insert = '<i>' + text + '</i>'
+                elif entity.type == MessageEntity.CODE:
+                    insert = '<code>' + text + '</code>'
+                elif entity.type == MessageEntity.PRE:
+                    insert = '<pre>' + text + '</pre>'
+                elif entity.type == MessageEntity.UNDERLINE:
+                    insert = '<u>' + text + '</u>'
+                elif entity.type == MessageEntity.STRIKETHROUGH:
+                    insert = '<s>' + text + '</s>'
+                else:
+                    insert = text
+
+                if offset == 0:
+                    if sys.maxunicode == 0xffff:
+                        html_text += escape(message_text[last_offset:entity.offset
+                                                         - offset]) + insert
+                    else:
+                        html_text += escape(message_text[last_offset * 2:(entity.offset
+                                                         - offset) * 2]
+                                            .decode('utf-16-le')) + insert
+                else:
+                    if sys.maxunicode == 0xffff:
+                        html_text += message_text[last_offset:entity.offset - offset] + insert
+                    else:
+                        html_text += message_text[last_offset * 2:(entity.offset
+                                                  - offset) * 2].decode('utf-16-le') + insert
+
+                last_offset = entity.offset - offset + entity.length
+
+        if offset == 0:
             if sys.maxunicode == 0xffff:
-                html_text += escape(message_text[last_offset:entity.offset]) + insert
+                html_text += escape(message_text[last_offset:])
             else:
-                html_text += escape(message_text[last_offset * 2:entity.offset * 2]
-                                    .decode('utf-16-le')) + insert
-
-            last_offset = entity.offset + entity.length
-
-        if sys.maxunicode == 0xffff:
-            html_text += escape(message_text[last_offset:])
+                html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
         else:
-            html_text += escape(message_text[last_offset * 2:].decode('utf-16-le'))
+            if sys.maxunicode == 0xffff:
+                html_text += message_text[last_offset:]
+            else:
+                html_text += message_text[last_offset * 2:].decode('utf-16-le')
+
         return html_text
 
     @property
@@ -1111,7 +1171,9 @@ class Message(TelegramObject):
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
     @staticmethod
-    def _parse_markdown(message_text, entities, urled=False):
+    def _parse_markdown(message_text, entities, urled=False, version=1, offset=0):
+        version = int(version)
+
         if message_text is None:
             return None
 
@@ -1121,42 +1183,114 @@ class Message(TelegramObject):
         markdown_text = ''
         last_offset = 0
 
-        for entity, text in sorted(entities.items(), key=(lambda item: item[0].offset)):
-            text = escape_markdown(text)
+        sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
+        parsed_entities = []
 
-            if entity.type == MessageEntity.TEXT_LINK:
-                insert = '[{}]({})'.format(text, entity.url)
-            elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
-            elif entity.type == MessageEntity.URL and urled:
-                insert = '[{0}]({0})'.format(text)
-            elif entity.type == MessageEntity.BOLD:
-                insert = '*' + text + '*'
-            elif entity.type == MessageEntity.ITALIC:
-                insert = '_' + text + '_'
-            elif entity.type == MessageEntity.CODE:
-                insert = '`' + text + '`'
-            elif entity.type == MessageEntity.PRE:
-                insert = '```' + text + '```'
-            else:
-                insert = text
+        for (entity, text) in sorted_entities:
+            if entity not in parsed_entities:
+                nested_entities = {
+                    e: t
+                    for (e, t) in sorted_entities if e.offset >= entity.offset
+                    and e.offset + e.length <= entity.offset + entity.length
+                    and e != entity
+                }
+                parsed_entities.extend([e for e in nested_entities.keys()])
+
+                orig_text = text
+                text = escape_markdown(text, version=version)
+
+                if nested_entities:
+                    if version < 2:
+                        raise ValueError('Nested entities are not supported for Markdown '
+                                         'version 1')
+
+                    text = Message._parse_markdown(text, nested_entities,
+                                                   urled=urled, offset=entity.offset,
+                                                   version=version)
+
+                if entity.type == MessageEntity.TEXT_LINK:
+                    if version == 1:
+                        url = entity.url
+                    else:
+                        # Links need special escaping. Also can't have entities nested within
+                        url = escape_markdown(entity.url, version=version,
+                                              entity_type=MessageEntity.TEXT_LINK)
+                    insert = '[{}]({})'.format(text, url)
+                elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
+                    insert = '[{}](tg://user?id={})'.format(text, entity.user.id)
+                elif entity.type == MessageEntity.URL and urled:
+                    if version == 1:
+                        link = orig_text
+                    else:
+                        link = text
+                    insert = '[{}]({})'.format(link, orig_text)
+                elif entity.type == MessageEntity.BOLD:
+                    insert = '*' + text + '*'
+                elif entity.type == MessageEntity.ITALIC:
+                    insert = '_' + text + '_'
+                elif entity.type == MessageEntity.CODE:
+                    # Monospace needs special escaping. Also can't have entities nested within
+                    insert = '`' + escape_markdown(orig_text, version=version,
+                                                   entity_type=MessageEntity.CODE) + '`'
+                elif entity.type == MessageEntity.PRE:
+                    # Monospace needs special escaping. Also can't have entities nested within
+                    code = escape_markdown(orig_text, version=version,
+                                           entity_type=MessageEntity.PRE)
+                    if code.startswith('\\'):
+                        prefix = '```'
+                    else:
+                        prefix = '```\n'
+                    insert = prefix + code + '```'
+                elif entity.type == MessageEntity.UNDERLINE:
+                    if version == 1:
+                        raise ValueError('Underline entities are not supported for Markdown '
+                                         'version 1')
+                    insert = '__' + text + '__'
+                elif entity.type == MessageEntity.STRIKETHROUGH:
+                    if version == 1:
+                        raise ValueError('Strikethrough entities are not supported for Markdown '
+                                         'version 1')
+                    insert = '~' + text + '~'
+                else:
+                    insert = text
+
+                if offset == 0:
+                    if sys.maxunicode == 0xffff:
+                        markdown_text += escape_markdown(message_text[last_offset:entity.offset
+                                                                      - offset],
+                                                         version=version) + insert
+                    else:
+                        markdown_text += escape_markdown(message_text[last_offset * 2:
+                                                                      (entity.offset - offset) * 2]
+                                                         .decode('utf-16-le'),
+                                                         version=version) + insert
+                else:
+                    if sys.maxunicode == 0xffff:
+                        markdown_text += message_text[last_offset:entity.offset - offset] + insert
+                    else:
+                        markdown_text += message_text[last_offset * 2:(entity.offset
+                                                      - offset) * 2].decode('utf-16-le') + insert
+
+                last_offset = entity.offset - offset + entity.length
+
+        if offset == 0:
             if sys.maxunicode == 0xffff:
-                markdown_text += escape_markdown(message_text[last_offset:entity.offset]) + insert
+                markdown_text += escape_markdown(message_text[last_offset:], version=version)
             else:
-                markdown_text += escape_markdown(message_text[last_offset * 2:entity.offset * 2]
-                                                 .decode('utf-16-le')) + insert
-
-            last_offset = entity.offset + entity.length
-
-        if sys.maxunicode == 0xffff:
-            markdown_text += escape_markdown(message_text[last_offset:])
+                markdown_text += escape_markdown(message_text[last_offset * 2:]
+                                                 .decode('utf-16-le'), version=version)
         else:
-            markdown_text += escape_markdown(message_text[last_offset * 2:].decode('utf-16-le'))
+            if sys.maxunicode == 0xffff:
+                markdown_text += message_text[last_offset:]
+            else:
+                markdown_text += message_text[last_offset * 2:].decode('utf-16-le')
+
         return markdown_text
 
     @property
     def text_markdown(self):
-        """Creates an Markdown-formatted string from the markup entities found in the message.
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
@@ -1168,8 +1302,23 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
     @property
+    def text_markdown_v2(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown
+        in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.text, self.parse_entities(), urled=False, version=2)
+
+    @property
     def text_markdown_urled(self):
-        """Creates an Markdown-formatted string from the markup entities found in the message.
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
@@ -1181,9 +1330,23 @@ class Message(TelegramObject):
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
     @property
+    def text_markdown_v2_urled(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message
+        using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message text with the entities formatted as Markdown.
+        This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.text, self.parse_entities(), urled=True, version=2)
+
+    @property
     def caption_markdown(self):
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption.
+        caption using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
@@ -1195,9 +1358,24 @@ class Message(TelegramObject):
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
 
     @property
+    def caption_markdown_v2(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown in the same way the original message was formatted.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(),
+                                    urled=False, version=2)
+
+    @property
     def caption_markdown_urled(self):
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption.
+        caption using :class:`telegram.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
@@ -1207,3 +1385,18 @@ class Message(TelegramObject):
 
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
+
+    @property
+    def caption_markdown_v2_urled(self):
+        """Creates an Markdown-formatted string from the markup entities found in the message's
+        caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
+
+        Use this if you want to retrieve the message caption with the caption entities formatted as
+        Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        """
+        return self._parse_markdown(self.caption, self.parse_caption_entities(),
+                                    urled=True, version=2)

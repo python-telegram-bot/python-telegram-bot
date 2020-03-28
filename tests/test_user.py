@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import User, Update
+from telegram.utils.helpers import escape_markdown
 
 
 @pytest.fixture(scope='function')
@@ -187,6 +188,18 @@ class TestUser(object):
         assert user.mention_markdown('the_name*\u2022') == expected.format('the\_name\*\u2022',
                                                                            user.id)
         assert user.mention_markdown(user.username) == expected.format(user.username, user.id)
+
+    def test_mention_markdown_v2(self, user):
+        user.first_name = 'first{name'
+        user.last_name = 'last_name'
+
+        expected = u'[{}](tg://user?id={})'
+
+        assert user.mention_markdown_v2() == expected.format(escape_markdown(user.full_name,
+                                                                             version=2), user.id)
+        assert user.mention_markdown_v2('the{name>\u2022') == expected.format('the\{name\>\u2022',
+                                                                              user.id)
+        assert user.mention_markdown_v2(user.username) == expected.format(user.username, user.id)
 
     def test_equality(self):
         a = User(self.id_, self.first_name, self.is_bot, self.last_name)

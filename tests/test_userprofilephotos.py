@@ -23,12 +23,12 @@ class TestUserProfilePhotos(object):
     total_count = 2
     photos = [
         [
-            PhotoSize('file_id1', 512, 512),
-            PhotoSize('file_id2', 512, 512)
+            PhotoSize('file_id1', 'file_un_id1', 512, 512),
+            PhotoSize('file_id2', 'file_un_id1', 512, 512)
         ],
         [
-            PhotoSize('file_id3', 512, 512),
-            PhotoSize('file_id4', 512, 512)
+            PhotoSize('file_id3', 'file_un_id3', 512, 512),
+            PhotoSize('file_id4', 'file_un_id4', 512, 512)
         ]
     ]
 

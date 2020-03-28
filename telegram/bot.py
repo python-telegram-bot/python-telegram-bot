@@ -2942,6 +2942,44 @@ class Bot(TelegramObject):
         return result
 
     @log
+    def set_chat_administrator_custom_title(self,
+                                            chat_id,
+                                            user_id,
+                                            custom_title,
+                                            timeout=None,
+                                            **kwargs):
+        """
+        Use this method to set a custom title for administrators promoted by the bot in a
+        supergroup. The bot must be an administrator for this to work. Returns True on success.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
+                the target supergroup (in the format `@supergroupusername`).
+            user_id (:obj:`int`): Unique identifier of the target administrator.
+            custom_title (:obj:`str`) New custom title for the administrator. It must be a string
+                with len 0-16 characters, emoji are not allowed.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            **kwargs (:obj:`dict`): Arbitrary keyword arguments
+
+        Returns:
+            :obj:`bool`: Returns True on success.
+
+        Raises:
+            :class:`telegram.TelegramError`
+
+        """
+        url = '{0}/setChatAdministratorCustomTitle'.format(self.base_url)
+
+        data = {'chat_id': chat_id, 'user_id': user_id, 'custom_title': custom_title}
+        data.update(kwargs)
+
+        result = self._request.post(url, data, timeout=timeout)
+
+        return result
+
+    @log
     def export_chat_invite_link(self, chat_id, timeout=None, **kwargs):
         """
         Use this method to export an invite link to a supergroup or a channel. The bot must be an
@@ -3655,6 +3693,8 @@ class Bot(TelegramObject):
     """Alias for :attr:`promote_chat_member`"""
     setChatPermissions = set_chat_permissions
     """Alias for :attr:`set_chat_permissions`"""
+    setChatAdministratorCustomTitle = set_chat_administrator_custom_title
+    """Alias for :attr:`set_chat_administrator_custom_title`"""
     exportChatInviteLink = export_chat_invite_link
     """Alias for :attr:`export_chat_invite_link`"""
     setChatPhoto = set_chat_photo
