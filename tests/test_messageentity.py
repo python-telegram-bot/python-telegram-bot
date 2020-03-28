@@ -32,7 +32,10 @@ def message_entity(request):
     user = None
     if type_ == MessageEntity.TEXT_MENTION:
         user = User(1, 'test_user', False)
-    return MessageEntity(type, 1, 3, url=url, user=user)
+    language = None
+    if type == MessageEntity.PRE:
+        language = "python"
+    return MessageEntity(type, 1, 3, url=url, user=user, language=language)
 
 
 class TestMessageEntity(object):
@@ -64,6 +67,8 @@ class TestMessageEntity(object):
             assert entity_dict['url'] == message_entity.url
         if message_entity.user:
             assert entity_dict['user'] == message_entity.user.to_dict()
+        if message_entity.language:
+            assert entity_dict['language'] == message_entity.language
 
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)

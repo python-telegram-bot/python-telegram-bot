@@ -231,6 +231,27 @@ class Bot(TelegramObject):
         return "https://t.me/{}".format(self.username)
 
     @property
+    @info
+    def can_join_groups(self):
+        """:obj:`str`: Bot's can_join_groups attribute."""
+
+        return self.bot.can_join_groups
+
+    @property
+    @info
+    def can_read_all_group_messages(self):
+        """:obj:`str`: Bot's can_read_all_group_messages attribute."""
+
+        return self.bot.can_read_all_group_messages
+
+    @property
+    @info
+    def supports_inline_queries(self):
+        """:obj:`str`: Bot's supports_inline_queries attribute."""
+
+        return self.bot.supports_inline_queries
+
+    @property
     def name(self):
         """:obj:`str`: Bot's @username."""
 
@@ -3492,18 +3513,33 @@ class Bot(TelegramObject):
                   chat_id,
                   question,
                   options,
+                  is_anonymous=True,
+                  type=Poll.REGULAR,
+                  allows_multiple_answers=False,
+                  correct_option_id=None,
+                  is_closed=None,
                   disable_notification=None,
                   reply_to_message_id=None,
                   reply_markup=None,
                   timeout=None,
                   **kwargs):
         """
-        Use this method to send a native poll. A native poll can't be sent to a private chat.
+        Use this method to send a native poll.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target private chat.
             question (:obj:`str`): Poll question, 1-255 characters.
             options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
+            is_anonymous (:obj:`bool`, optional): True, if the poll needs to be anonymous,
+                defaults to True.
+            type (:obj:`str`, optional): Poll type, :attr:`telegram.Poll.QUIZ` or
+                :attr:`telegram.Poll.REGULAR`, defaults to :attr:`telegram.Poll.REGULAR`.
+            allows_multiple_answers (:obj:`bool`, optional): True, if the poll allows multiple
+                answers, ignored for polls in quiz mode, defaults to False
+            correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
+                option, required for polls in quiz mode
+            is_closed (:obj:`bool`, optional): Pass True, if the poll needs to be immediately
+                closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
@@ -3530,6 +3566,17 @@ class Bot(TelegramObject):
             'question': question,
             'options': options
         }
+
+        if not is_anonymous:
+            data['is_anonymous'] = is_anonymous
+        if type:
+            data['type'] = type
+        if allows_multiple_answers:
+            data['allows_multiple_answers'] = allows_multiple_answers
+        if correct_option_id is not None:
+            data['correct_option_id'] = correct_option_id
+        if is_closed:
+            data['is_closed'] = is_closed
 
         return self._message(url, data, timeout=timeout, disable_notification=disable_notification,
                              reply_to_message_id=reply_to_message_id, reply_markup=reply_markup,

@@ -93,7 +93,7 @@ make the development of bots easy and straightforward. These classes are contain
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **4.5** are supported.
+All types and methods of the Telegram Bot API **4.6** are supported.
 
 ==========
 Installing

@@ -923,6 +923,22 @@ class Message(TelegramObject):
         return self.bot.delete_message(
             chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
 
+    def stop_poll(self, *args, **kwargs):
+        """Shortcut for::
+
+             bot.stop_poll(chat_id=message.chat_id,
+                           message_id=message.message_id,
+                           *args,
+                           **kwargs)
+
+        Returns:
+            :class:`telegram.Poll`: On success, the stopped Poll with the
+                final results is returned.
+
+        """
+        return self.bot.stop_poll(
+            chat_id=self.chat_id, message_id=self.message_id, *args, **kwargs)
+
     def parse_entity(self, entity):
         """Returns the text from a given :class:`telegram.MessageEntity`.
 
@@ -1078,7 +1094,11 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.CODE:
                     insert = '<code>' + text + '</code>'
                 elif entity.type == MessageEntity.PRE:
-                    insert = '<pre>' + text + '</pre>'
+                    if entity.language:
+                        insert = '<pre><code class="{}">{}</code></pre>'.format(entity.language,
+                                                                                text)
+                    else:
+                        insert = '<pre>' + text + '</pre>'
                 elif entity.type == MessageEntity.UNDERLINE:
                     insert = '<u>' + text + '</u>'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
@@ -1236,10 +1256,13 @@ class Message(TelegramObject):
                     # Monospace needs special escaping. Also can't have entities nested within
                     code = escape_markdown(orig_text, version=version,
                                            entity_type=MessageEntity.PRE)
-                    if code.startswith('\\'):
-                        prefix = '```'
+                    if entity.language:
+                        prefix = '```' + entity.language + '\n'
                     else:
-                        prefix = '```\n'
+                        if code.startswith('\\'):
+                            prefix = '```'
+                        else:
+                            prefix = '```\n'
                     insert = prefix + code + '```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
