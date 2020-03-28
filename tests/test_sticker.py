@@ -54,14 +54,21 @@ class TestSticker:
     thumb_height = 320
     thumb_file_size = 21472
 
+    sticker_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
+    sticker_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+
     def test_creation(self, sticker):
         # Make sure file has been uploaded.
         assert isinstance(sticker, Sticker)
         assert isinstance(sticker.file_id, str)
+        assert isinstance(sticker.file_unique_id, str)
         assert sticker.file_id != ''
+        assert sticker.file_unique_id != ''
         assert isinstance(sticker.thumb, PhotoSize)
         assert isinstance(sticker.thumb.file_id, str)
+        assert isinstance(sticker.thumb.file_unique_id, str)
         assert sticker.thumb.file_id != ''
+        assert sticker.thumb.file_unique_id != ''
 
     def test_expected_values(self, sticker):
         assert sticker.width == self.width
@@ -79,7 +86,9 @@ class TestSticker:
 
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
+        assert isinstance(message.sticker.file_unique_id, str)
         assert message.sticker.file_id != ''
+        assert message.sticker.file_unique_id != ''
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
         assert message.sticker.is_animated == sticker.is_animated
@@ -87,7 +96,9 @@ class TestSticker:
 
         assert isinstance(message.sticker.thumb, PhotoSize)
         assert isinstance(message.sticker.thumb.file_id, str)
+        assert isinstance(message.sticker.thumb.file_unique_id, str)
         assert message.sticker.thumb.file_id != ''
+        assert message.sticker.thumb.file_unique_id != ''
         assert message.sticker.thumb.width == sticker.thumb.width
         assert message.sticker.thumb.height == sticker.thumb.height
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
@@ -99,6 +110,7 @@ class TestSticker:
 
         assert new_file.file_size == sticker.file_size
         assert new_file.file_id == sticker.file_id
+        assert new_file.file_unique_id == sticker.file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.webp')
@@ -107,7 +119,6 @@ class TestSticker:
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, sticker):
         message = bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 
@@ -129,7 +140,9 @@ class TestSticker:
 
         assert isinstance(message.sticker, Sticker)
         assert isinstance(message.sticker.file_id, str)
+        assert isinstance(message.sticker.file_unique_id, str)
         assert message.sticker.file_id != ''
+        assert message.sticker.file_unique_id != ''
         assert message.sticker.width == sticker.width
         assert message.sticker.height == sticker.height
         assert message.sticker.is_animated == sticker.is_animated
@@ -137,14 +150,17 @@ class TestSticker:
 
         assert isinstance(message.sticker.thumb, PhotoSize)
         assert isinstance(message.sticker.thumb.file_id, str)
+        assert isinstance(message.sticker.thumb.file_unique_id, str)
         assert message.sticker.thumb.file_id != ''
+        assert message.sticker.thumb.file_unique_id != ''
         assert message.sticker.thumb.width == sticker.thumb.width
         assert message.sticker.thumb.height == sticker.thumb.height
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
 
     def test_de_json(self, bot, sticker):
         json_dict = {
-            'file_id': 'not a file id',
+            'file_id': self.sticker_file_id,
+            'file_unique_id': self.sticker_file_unique_id,
             'width': self.width,
             'height': self.height,
             'is_animated': self.is_animated,
@@ -154,7 +170,8 @@ class TestSticker:
         }
         json_sticker = Sticker.de_json(json_dict, bot)
 
-        assert json_sticker.file_id == 'not a file id'
+        assert json_sticker.file_id == self.sticker_file_id
+        assert json_sticker.file_unique_id == self.sticker_file_unique_id
         assert json_sticker.width == self.width
         assert json_sticker.height == self.height
         assert json_sticker.is_animated == self.is_animated
@@ -175,6 +192,7 @@ class TestSticker:
 
         assert isinstance(sticker_dict, dict)
         assert sticker_dict['file_id'] == sticker.file_id
+        assert sticker_dict['file_unique_id'] == sticker.file_unique_id
         assert sticker_dict['width'] == sticker.width
         assert sticker_dict['height'] == sticker.height
         assert sticker_dict['is_animated'] == sticker.is_animated
@@ -198,11 +216,14 @@ class TestSticker:
             bot.send_sticker(chat_id)
 
     def test_equality(self, sticker):
-        a = Sticker(sticker.file_id, self.width, self.height, self.is_animated)
-        b = Sticker(sticker.file_id, self.width, self.height, self.is_animated)
-        c = Sticker(sticker.file_id, 0, 0, False)
-        d = Sticker('', self.width, self.height, self.is_animated)
-        e = PhotoSize(sticker.file_id, self.width, self.height, self.is_animated)
+        a = Sticker(sticker.file_id, sticker.file_unique_id, self.width,
+                    self.height, self.is_animated)
+        b = Sticker('', sticker.file_unique_id, self.width,
+                    self.height, self.is_animated)
+        c = Sticker(sticker.file_id, sticker.file_unique_id, 0, 0, False)
+        d = Sticker('', '', self.width, self.height, self.is_animated)
+        e = PhotoSize(sticker.file_id, sticker.file_unique_id, self.width,
+                      self.height, self.is_animated)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -230,7 +251,7 @@ class TestStickerSet:
     title = 'Test stickers'
     is_animated = True
     contains_masks = False
-    stickers = [Sticker('file_id', 512, 512, True)]
+    stickers = [Sticker('file_id', 'file_un_id', 512, 512, True)]
     name = 'NOTAREALNAME'
 
     def test_de_json(self, bot):
@@ -294,7 +315,7 @@ class TestStickerSet:
         b = StickerSet(self.name, self.title, self.is_animated, self.contains_masks, self.stickers)
         c = StickerSet(self.name, None, None, None, None)
         d = StickerSet('blah', self.title, self.is_animated, self.contains_masks, self.stickers)
-        e = Audio(self.name, 0, None, None)
+        e = Audio(self.name, '', 0, None, None)
 
         assert a == b
         assert hash(a) == hash(b)

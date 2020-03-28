@@ -28,6 +28,7 @@ class ChatMember(TelegramObject):
     Attributes:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat.
+        custom_title (:obj:`str`): Optional. Custom title for owner and administrators.
         until_date (:class:`datetime.datetime`): Optional. Date when restrictions will be lifted
             for this user.
         can_be_edited (:obj:`bool`): Optional. If the bot is allowed to edit administrator
@@ -62,6 +63,8 @@ class ChatMember(TelegramObject):
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be 'creator', 'administrator',
             'member', 'restricted', 'left' or 'kicked'.
+        custom_title (:obj:`str`, optional): Owner and administrators only.
+            Custom title for this user.
         until_date (:class:`datetime.datetime`, optional): Restricted and kicked only. Date when
             restrictions will be lifted for this user.
         can_be_edited (:obj:`bool`, optional): Administrators only. True, if the bot is allowed to
@@ -118,10 +121,11 @@ class ChatMember(TelegramObject):
                  can_restrict_members=None, can_pin_messages=None,
                  can_promote_members=None, can_send_messages=None,
                  can_send_media_messages=None, can_send_polls=None, can_send_other_messages=None,
-                 can_add_web_page_previews=None, is_member=None, **kwargs):
+                 can_add_web_page_previews=None, is_member=None, custom_title=None, **kwargs):
         # Required
         self.user = user
         self.status = status
+        self.custom_title = custom_title
         self.until_date = until_date
         self.can_be_edited = can_be_edited
         self.can_change_info = can_change_info

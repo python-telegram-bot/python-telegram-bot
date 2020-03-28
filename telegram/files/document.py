@@ -26,6 +26,9 @@ class Document(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique file identifier.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail.
         file_name (:obj:`str`): Original filename.
         mime_type (:obj:`str`): Optional. MIME type of the file.
@@ -33,7 +36,10 @@ class Document(TelegramObject):
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        file_id (:obj:`str`): Unique file identifier
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique and the same over time and
+            for different bots file identifier.
         thumb (:class:`telegram.PhotoSize`, optional): Document thumbnail as defined by sender.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
@@ -46,6 +52,7 @@ class Document(TelegramObject):
 
     def __init__(self,
                  file_id,
+                 file_unique_id,
                  thumb=None,
                  file_name=None,
                  mime_type=None,
@@ -54,6 +61,7 @@ class Document(TelegramObject):
                  **kwargs):
         # Required
         self.file_id = str(file_id)
+        self.file_unique_id = str(file_unique_id)
         # Optionals
         self.thumb = thumb
         self.file_name = file_name
@@ -61,7 +69,7 @@ class Document(TelegramObject):
         self.file_size = file_size
         self.bot = bot
 
-        self._id_attrs = (self.file_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):

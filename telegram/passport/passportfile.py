@@ -28,12 +28,18 @@ class PassportFile(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size.
         file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique and the same over time and
+            for different bots file identifier.
         file_size (:obj:`int`): File size.
         file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -41,16 +47,24 @@ class PassportFile(TelegramObject):
 
     """
 
-    def __init__(self, file_id, file_date, file_size=None, bot=None, credentials=None, **kwargs):
+    def __init__(self,
+                 file_id,
+                 file_unique_id,
+                 file_date,
+                 file_size=None,
+                 bot=None,
+                 credentials=None,
+                 **kwargs):
         # Required
         self.file_id = file_id
+        self.file_unique_id = file_unique_id
         self.file_size = file_size
         self.file_date = file_date
         # Optionals
         self.bot = bot
         self._credentials = credentials
 
-        self._id_attrs = (self.file_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):

@@ -26,6 +26,9 @@ class VideoNote(TelegramObject):
 
     Attributes:
         file_id (:obj:`str`): Unique identifier for this file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which
+            is supposed to be the same over time and for different bots.
+            Can't be used to download or reuse the file.
         length (:obj:`int`): Video width and height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
@@ -33,7 +36,10 @@ class VideoNote(TelegramObject):
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     Args:
-        file_id (:obj:`str`): Unique identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique and the same over time and
+            for different bots file identifier.
         length (:obj:`int`): Video width and height as defined by sender.
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
@@ -43,9 +49,18 @@ class VideoNote(TelegramObject):
 
     """
 
-    def __init__(self, file_id, length, duration, thumb=None, file_size=None, bot=None, **kwargs):
+    def __init__(self,
+                 file_id,
+                 file_unique_id,
+                 length,
+                 duration,
+                 thumb=None,
+                 file_size=None,
+                 bot=None,
+                 **kwargs):
         # Required
         self.file_id = str(file_id)
+        self.file_unique_id = str(file_unique_id)
         self.length = int(length)
         self.duration = int(duration)
         # Optionals
@@ -53,7 +68,7 @@ class VideoNote(TelegramObject):
         self.file_size = file_size
         self.bot = bot
 
-        self._id_attrs = (self.file_id,)
+        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data, bot):
