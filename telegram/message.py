@@ -1094,7 +1094,11 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.CODE:
                     insert = '<code>' + text + '</code>'
                 elif entity.type == MessageEntity.PRE:
-                    insert = '<pre>' + text + '</pre>'
+                    if entity.language:
+                        insert = '<pre><code class="{}">{}</code></pre>'.format(entity.language,
+                                                                                text)
+                    else:
+                        insert = '<pre>' + text + '</pre>'
                 elif entity.type == MessageEntity.UNDERLINE:
                     insert = '<u>' + text + '</u>'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
@@ -1252,10 +1256,13 @@ class Message(TelegramObject):
                     # Monospace needs special escaping. Also can't have entities nested within
                     code = escape_markdown(orig_text, version=version,
                                            entity_type=MessageEntity.PRE)
-                    if code.startswith('\\'):
-                        prefix = '```'
+                    if entity.language:
+                        prefix = '```' + entity.language + '\n'
                     else:
-                        prefix = '```\n'
+                        if code.startswith('\\'):
+                            prefix = '```'
+                        else:
+                            prefix = '```\n'
                     insert = prefix + code + '```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
