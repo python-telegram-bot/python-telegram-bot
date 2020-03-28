@@ -349,6 +349,16 @@ class TestBot(object):
 
         assert bot.set_chat_permissions(2, chat_permissions)
 
+    def test_set_chat_administrator_custom_title(self, monkeypatch, bot):
+        def test(_, url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            user_id = data['user_id'] == 32
+            custom_title = data['custom_title'] == 'custom_title'
+            return chat_id and user_id and custom_title
+
+        monkeypatch.setattr('telegram.utils.request.Request.post', test)
+        assert bot.set_chat_administrator_custom_title(2, 32, 'custom_title')
+
     # TODO: Needs improvement. Need an incoming callbackquery to test
     def test_answer_callback_query(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data

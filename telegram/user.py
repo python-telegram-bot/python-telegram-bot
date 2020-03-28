@@ -131,12 +131,25 @@ class User(TelegramObject):
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
         Returns:
-            :obj:`str`: The inline mention for the user as markdown.
+            :obj:`str`: The inline mention for the user as markdown (version 1).
 
         """
         if name:
             return util_mention_markdown(self.id, name)
         return util_mention_markdown(self.id, self.full_name)
+
+    def mention_markdown_v2(self, name=None):
+        """
+        Args:
+            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
+
+        Returns:
+            :obj:`str`: The inline mention for the user as markdown (version 2).
+
+        """
+        if name:
+            return util_mention_markdown(self.id, name, version=2)
+        return util_mention_markdown(self.id, self.full_name, version=2)
 
     def mention_html(self, name=None):
         """

@@ -44,9 +44,31 @@ def get_signal_name(signum):
     return _signames[signum]
 
 
-def escape_markdown(text):
-    """Helper function to escape telegram markup symbols."""
-    escape_chars = '\*_`\['
+def escape_markdown(text, version=1, entity_type=None):
+    """
+    Helper function to escape telegram markup symbols.
+
+    Args:
+        text (:obj:`str`): The text.
+        version (:obj:`int` | :obj:`str`): Use to specify the version of telegrams Markdown.
+            Either ``1`` or ``2``. Defaults to ``1``.
+        entity_type (:obj:`str`, optional): For the entity types ``PRE``, ``CODE`` and the link
+            part of ``TEXT_LINKS``, only certain characters need to be escaped in ``MarkdownV2``.
+            See the official API documentation for details. Only valid in combination with
+            ``version=2``, will be ignored else.
+    """
+    if int(version) == 1:
+        escape_chars = '\*_`\['
+    elif int(version) == 2:
+        if entity_type == 'pre' or entity_type == 'code':
+            escape_chars = '`\\\\'
+        elif entity_type == 'text_link':
+            escape_chars = ')\\\\'
+        else:
+            escape_chars = '_*\[\]()~`>\#\+\-=|{}\.!'
+    else:
+        raise ValueError('Markdown version musst be either 1 or 2!')
+
     return re.sub(r'([%s])' % escape_chars, r'\\\1', text)
 
 
@@ -207,17 +229,19 @@ def mention_html(user_id, name):
         return u'<a href="tg://user?id={}">{}</a>'.format(user_id, escape(name))
 
 
-def mention_markdown(user_id, name):
+def mention_markdown(user_id, name, version=1):
     """
     Args:
         user_id (:obj:`int`) The user's id which you want to mention.
         name (:obj:`str`) The name the mention is showing.
+        version (:obj:`int` | :obj:`str`): Use to specify the version of telegrams Markdown.
+            Either ``1`` or ``2``. Defaults to ``1``
 
     Returns:
         :obj:`str`: The inline mention for the user as markdown.
     """
     if isinstance(user_id, int):
-        return u'[{}](tg://user?id={})'.format(escape_markdown(name), user_id)
+        return u'[{}](tg://user?id={})'.format(escape_markdown(name, version=version), user_id)
 
 
 def effective_message_type(entity):

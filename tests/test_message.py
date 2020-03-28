@@ -47,21 +47,21 @@ def message(bot):
                     {'caption': 'A message caption',
                      'caption_entities': [MessageEntity('bold', 1, 1),
                                           MessageEntity('text_link', 4, 3)]},
-                    {'audio': Audio('audio_id', 12),
+                    {'audio': Audio('audio_id', 'unique_id', 12),
                      'caption': 'audio_file'},
-                    {'document': Document('document_id'),
+                    {'document': Document('document_id', 'unique_id'),
                      'caption': 'document_file'},
-                    {'animation': Animation('animation_id', 30, 30, 1),
+                    {'animation': Animation('animation_id', 'unique_id', 30, 30, 1),
                      'caption': 'animation_file'},
                     {'game': Game('my_game', 'just my game',
-                                  [PhotoSize('game_photo_id', 30, 30), ])},
-                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                                  [PhotoSize('game_photo_id', 'unique_id', 30, 30), ])},
+                    {'photo': [PhotoSize('photo_id', 'unique_id', 50, 50)],
                      'caption': 'photo_file'},
-                    {'sticker': Sticker('sticker_id', 50, 50, True)},
-                    {'video': Video('video_id', 12, 12, 12),
+                    {'sticker': Sticker('sticker_id', 'unique_id', 50, 50, True)},
+                    {'video': Video('video_id', 'unique_id', 12, 12, 12),
                      'caption': 'video_file'},
-                    {'voice': Voice('voice_id', 5)},
-                    {'video_note': VideoNote('video_note_id', 20, 12)},
+                    {'voice': Voice('voice_id', 'unique_id', 5)},
+                    {'video_note': VideoNote('video_note_id', 'unique_id', 20, 12)},
                     {'new_chat_members': [User(55, 'new_user', False)]},
                     {'contact': Contact('phone_numner', 'contact_name')},
                     {'location': Location(-23.691288, 46.788279)},
@@ -69,7 +69,7 @@ def message(bot):
                                     'some place', 'right here')},
                     {'left_chat_member': User(33, 'kicked', False)},
                     {'new_chat_title': 'new title'},
-                    {'new_chat_photo': [PhotoSize('photo_id', 50, 50)]},
+                    {'new_chat_photo': [PhotoSize('photo_id', 'unique_id', 50, 50)]},
                     {'delete_chat_photo': True},
                     {'group_chat_created': True},
                     {'supergroup_chat_created': True},
@@ -84,7 +84,7 @@ def message(bot):
                     {'connected_website': 'http://example.com/'},
                     {'forward_signature': 'some_forward_sign'},
                     {'author_signature': 'some_author_sign'},
-                    {'photo': [PhotoSize('photo_id', 50, 50)],
+                    {'photo': [PhotoSize('photo_id', 'unique_id', 50, 50)],
                      'caption': 'photo_file',
                      'media_group_id': 1234443322222},
                     {'passport_data': PassportData.de_json(RAW_PASSPORT_DATA, None)},
@@ -119,14 +119,31 @@ class TestMessage(object):
     date = datetime.utcnow()
     chat = Chat(3, 'private')
     test_entities = [{'length': 4, 'offset': 10, 'type': 'bold'},
-                     {'length': 7, 'offset': 16, 'type': 'italic'},
+                     {'length': 3, 'offset': 16, 'type': 'italic'},
+                     {'length': 3, 'offset': 20, 'type': 'italic'},
                      {'length': 4, 'offset': 25, 'type': 'code'},
-                     {'length': 5, 'offset': 31, 'type': 'text_link', 'url': 'http://github.com/'},
+                     {'length': 5, 'offset': 31, 'type': 'text_link',
+                      'url': 'http://github.com/ab_'},
                      {'length': 12, 'offset': 38, 'type': 'text_mention',
                       'user': User(123456789, 'mentioned user', False)},
                      {'length': 3, 'offset': 55, 'type': 'pre'},
-                     {'length': 17, 'offset': 60, 'type': 'url'}]
-    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com'
+                     {'length': 21, 'offset': 60, 'type': 'url'}]
+    test_text = 'Test for <bold, ita_lic, code, links, text-mention and pre. http://google.com/ab_'
+    test_entities_v2 = [{'length': 4, 'offset': 0, 'type': 'underline'},
+                        {'length': 4, 'offset': 10, 'type': 'bold'},
+                        {'length': 7, 'offset': 16, 'type': 'italic'},
+                        {'length': 6, 'offset': 25, 'type': 'code'},
+                        {'length': 5, 'offset': 33, 'type': 'text_link',
+                            'url': 'http://github.com/abc\)def'},
+                        {'length': 12, 'offset': 40, 'type': 'text_mention',
+                            'user': User(123456789, 'mentioned user', False)},
+                        {'length': 5, 'offset': 57, 'type': 'pre'},
+                        {'length': 17, 'offset': 64, 'type': 'url'},
+                        {'length': 36, 'offset': 86, 'type': 'italic'},
+                        {'length': 24, 'offset': 91, 'type': 'bold'},
+                        {'length': 4, 'offset': 101, 'type': 'strikethrough'}]
+    test_text_v2 = ('Test for <bold, ita_lic, \`code, links, text-mention and `\pre. '
+                    'http://google.com and bold nested in strk nested in italic.')
     test_message = Message(message_id=1,
                            from_user=None,
                            date=None,
@@ -135,6 +152,16 @@ class TestMessage(object):
                            entities=[MessageEntity(**e) for e in test_entities],
                            caption=test_text,
                            caption_entities=[MessageEntity(**e) for e in test_entities])
+    test_message_v2 = Message(message_id=1,
+                              from_user=None,
+                              date=None,
+                              chat=None,
+                              text=test_text_v2,
+                              entities=[MessageEntity(**e) for e in test_entities_v2],
+                              caption=test_text_v2,
+                              caption_entities=[
+                                  MessageEntity(**e) for e in test_entities_v2
+                              ])
 
     def test_all_posibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
@@ -182,11 +209,12 @@ class TestMessage(object):
         assert message.parse_caption_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_text_html_simple(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. http://google.com')
-        text_html = self.test_message.text_html
+                            '<pre>`\pre</pre>. http://google.com '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+        text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
 
     def test_text_html_empty(self, message):
@@ -195,30 +223,66 @@ class TestMessage(object):
         assert message.text_html is None
 
     def test_text_html_urled(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. <a href="http://google.com">http://google.com</a>')
-        text_html = self.test_message.text_html_urled
+                            '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+        text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
 
     def test_text_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          'http://google.com/ab\_')
         text_markdown = self.test_message.text_markdown
         assert text_markdown == test_md_string
+
+    def test_text_markdown_v2_simple(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
+        text_markdown = self.test_message_v2.text_markdown_v2
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_new_in_v2(self, message):
+        message.text = 'test'
+        message.entities = [MessageEntity(MessageEntity.BOLD, offset=0, length=4),
+                            MessageEntity(MessageEntity.ITALIC, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            assert message.text_markdown
+
+        message.entities = [MessageEntity(MessageEntity.UNDERLINE, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.entities = []
 
     def test_text_markdown_empty(self, message):
         message.text = None
         message.caption = "test"
         assert message.text_markdown is None
+        assert message.text_markdown_v2 is None
 
     def test_text_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com)')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          '[http://google.com/ab_](http://google.com/ab_)')
         text_markdown = self.test_message.text_markdown_urled
+        assert text_markdown == test_md_string
+
+    def test_text_markdown_v2_urled(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
+                          'nested in* italic_\.')
+        text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
 
     def test_text_html_emoji(self):
@@ -238,11 +302,12 @@ class TestMessage(object):
         assert expected == message.text_markdown
 
     def test_caption_html_simple(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. http://google.com')
-        caption_html = self.test_message.caption_html
+                            '<pre>`\pre</pre>. http://google.com '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+        caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
 
     def test_caption_html_empty(self, message):
@@ -251,30 +316,49 @@ class TestMessage(object):
         assert message.caption_html is None
 
     def test_caption_html_urled(self):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. <a href="http://google.com">http://google.com</a>')
-        caption_html = self.test_message.caption_html_urled
+                            '<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
+        caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
 
     def test_caption_markdown_simple(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          'http://google.com/ab\_')
         caption_markdown = self.test_message.caption_markdown
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_v2_simple(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
+        caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
 
     def test_caption_markdown_empty(self, message):
         message.text = "test"
         message.caption = None
         assert message.caption_markdown is None
+        assert message.caption_markdown_v2 is None
 
     def test_caption_markdown_urled(self):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          '[http://google.com](http://google.com)')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          '[http://google.com/ab_](http://google.com/ab_)')
         caption_markdown = self.test_message.caption_markdown_urled
+        assert caption_markdown == test_md_string
+
+    def test_caption_markdown_v2_urled(self):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          '[http://google\.com](http://google.com) and _bold *nested in ~strk~ '
+                          'nested in* italic_\.')
+        caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
 
     def test_caption_html_emoji(self):
@@ -359,9 +443,9 @@ class TestMessage(object):
         assert message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
     def test_reply_markdown(self, monkeypatch, message):
-        test_md_string = (r'Test for <*bold*, _ita\_lic_, `code`, [links](http://github.com/), '
-                          '[text-mention](tg://user?id=123456789) and ```pre```. '
-                          'http://google.com')
+        test_md_string = ('Test for <*bold*, _ita_\__lic_, `code`, [links](http://github.com/ab_),'
+                          ' [text-mention](tg://user?id=123456789) and ```\npre```. '
+                          'http://google.com/ab\_')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id
@@ -383,11 +467,38 @@ class TestMessage(object):
                                       reply_to_message_id=message.message_id,
                                       quote=True)
 
+    def test_reply_markdown_v2(self, monkeypatch, message):
+        test_md_string = (r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
+                          '[links](http://github.com/abc\\\\\)def), '
+                          '[text\-mention](tg://user?id=123456789) and ```\`\\\\pre```\. '
+                          'http://google\.com and _bold *nested in ~strk~ nested in* italic_\.')
+
+        def test(*args, **kwargs):
+            cid = args[0] == message.chat_id
+            markdown_text = args[1] == test_md_string
+            markdown_enabled = kwargs['parse_mode'] == ParseMode.MARKDOWN_V2
+            if kwargs.get('reply_to_message_id'):
+                reply = kwargs['reply_to_message_id'] == message.message_id
+            else:
+                reply = True
+            return all([cid, markdown_text, reply, markdown_enabled])
+
+        text_markdown = self.test_message_v2.text_markdown_v2
+        assert text_markdown == test_md_string
+
+        monkeypatch.setattr(message.bot, 'send_message', test)
+        assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2)
+        assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2, quote=True)
+        assert message.reply_markdown_v2(self.test_message_v2.text_markdown_v2,
+                                         reply_to_message_id=message.message_id,
+                                         quote=True)
+
     def test_reply_html(self, monkeypatch, message):
-        test_html_string = ('Test for &lt;<b>bold</b>, <i>ita_lic</i>, <code>code</code>, '
-                            '<a href="http://github.com/">links</a>, '
+        test_html_string = ('<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, <code>\`code</code>,'
+                            ' <a href="http://github.com/abc\)def">links</a>, '
                             '<a href="tg://user?id=123456789">text-mention</a> and '
-                            '<pre>pre</pre>. http://google.com')
+                            '<pre>`\pre</pre>. http://google.com '
+                            'and <i>bold <b>nested in <s>strk</s> nested in</b> italic</i>.')
 
         def test(*args, **kwargs):
             cid = args[0] == message.chat_id
@@ -399,13 +510,13 @@ class TestMessage(object):
                 reply = True
             return all([cid, html_text, reply, html_enabled])
 
-        text_html = self.test_message.text_html
+        text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
 
         monkeypatch.setattr(message.bot, 'send_message', test)
-        assert message.reply_html(self.test_message.text_html)
-        assert message.reply_html(self.test_message.text_html, quote=True)
-        assert message.reply_html(self.test_message.text_html,
+        assert message.reply_html(self.test_message_v2.text_html)
+        assert message.reply_html(self.test_message_v2.text_html, quote=True)
+        assert message.reply_html(self.test_message_v2.text_html,
                                   reply_to_message_id=message.message_id,
                                   quote=True)
 

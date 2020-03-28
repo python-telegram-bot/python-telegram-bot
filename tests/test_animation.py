@@ -41,6 +41,7 @@ def animation(bot, chat_id):
 
 class TestAnimation(object):
     animation_file_id = 'CgADAQADngIAAuyVeEez0xRovKi9VAI'
+    animation_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
     width = 320
     height = 180
     duration = 1
@@ -55,7 +56,9 @@ class TestAnimation(object):
     def test_creation(self, animation):
         assert isinstance(animation, Animation)
         assert isinstance(animation.file_id, str)
+        assert isinstance(animation.file_unique_id, str)
         assert animation.file_id != ''
+        assert animation.file_unique_id != ''
 
     def test_expected_values(self, animation):
         assert animation.file_size == self.file_size
@@ -73,7 +76,9 @@ class TestAnimation(object):
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
+        assert isinstance(message.animation.file_unique_id, str)
         assert message.animation.file_id != ''
+        assert message.animation.file_unique_id != ''
         assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
@@ -103,8 +108,12 @@ class TestAnimation(object):
 
         assert isinstance(message.animation, Animation)
         assert isinstance(message.animation.file_id, str)
-        assert message.animation.file_id is not None
+        assert isinstance(message.animation.file_unique_id, str)
+        assert message.animation.file_id != ''
+        assert message.animation.file_unique_id != ''
+
         assert message.animation.duration == animation.duration
+        assert message.animation.file_name == animation.file_name
         assert message.animation.mime_type == animation.mime_type
         assert message.animation.file_size == animation.file_size
 
@@ -143,7 +152,6 @@ class TestAnimation(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_resend(self, bot, chat_id, animation):
         message = bot.send_animation(chat_id, animation.file_id)
 
@@ -160,6 +168,7 @@ class TestAnimation(object):
     def test_de_json(self, bot, animation):
         json_dict = {
             'file_id': self.animation_file_id,
+            'file_unique_id': self.animation_file_unique_id,
             'width': self.width,
             'height': self.height,
             'duration': self.duration,
@@ -170,6 +179,7 @@ class TestAnimation(object):
         }
         animation = Animation.de_json(json_dict, bot)
         assert animation.file_id == self.animation_file_id
+        assert animation.file_unique_id == self.animation_file_unique_id
         assert animation.thumb == animation.thumb
         assert animation.file_name == self.file_name
         assert animation.mime_type == self.mime_type
@@ -180,6 +190,7 @@ class TestAnimation(object):
 
         assert isinstance(animation_dict, dict)
         assert animation_dict['file_id'] == animation.file_id
+        assert animation_dict['file_unique_id'] == animation.file_unique_id
         assert animation_dict['width'] == animation.width
         assert animation_dict['height'] == animation.height
         assert animation_dict['duration'] == animation.duration
@@ -214,10 +225,12 @@ class TestAnimation(object):
         assert animation.get_file()
 
     def test_equality(self):
-        a = Animation(self.animation_file_id, self.height, self.width, self.duration)
-        b = Animation(self.animation_file_id, self.height, self.width, self.duration)
-        d = Animation('', 0, 0, 0)
-        e = Voice(self.animation_file_id, 0)
+        a = Animation(self.animation_file_id, self.animation_file_unique_id,
+                      self.height, self.width, self.duration)
+        b = Animation('', self.animation_file_unique_id,
+                      self.height, self.width, self.duration)
+        d = Animation('', '', 0, 0, 0)
+        e = Voice(self.animation_file_id, self.animation_file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)
