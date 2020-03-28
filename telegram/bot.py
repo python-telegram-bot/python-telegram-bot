@@ -1941,7 +1941,7 @@ class Bot(TelegramObject):
 
         if inline_message_id is None and (chat_id is None or message_id is None):
             raise ValueError(
-                'edit_message_caption: Both chat_id and message_id are required when '
+                'edit_message_media: Both chat_id and message_id are required when '
                 'inline_message_id is not specified')
 
         url = '{0}/editMessageMedia'.format(self.base_url)
