@@ -87,6 +87,7 @@ class TestBot(object):
         assert get_me_bot.first_name == bot.first_name
         assert get_me_bot.last_name == bot.last_name
         assert get_me_bot.name == bot.name
+        assert 'https://t.me/{}'.format(get_me_bot.username) == bot.link
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
