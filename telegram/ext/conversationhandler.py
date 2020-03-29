@@ -93,10 +93,10 @@ class ConversationHandler(Handler):
         per_user (:obj:`bool`): If the conversationkey should contain the User's ID.
         per_message (:obj:`bool`): If the conversationkey should contain the Message's
             ID.
-        conversation_timeout (:obj:`float`|:obj:`datetime.timedelta`): Optional. When this handler
-            is inactive more than this timeout (in seconds), it will be automatically ended. If
-            this value is 0 (default), there will be no timeout. When it's triggered, the last
-            received update will be handled by ALL the handler's who's `check_update` method
+        conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`): Optional. When this
+            handler is inactive more than this timeout (in seconds), it will be automatically
+            ended. If this value is 0 (default), there will be no timeout. When it's triggered, the
+            last received update will be handled by ALL the handler's who's `check_update` method
             returns True that are in the state :attr:`ConversationHandler.TIMEOUT`.
         name (:obj:`str`): Optional. The name for this conversationhandler. Required for
             persistence

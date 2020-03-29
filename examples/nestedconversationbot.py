@@ -66,6 +66,7 @@ def start(update, context):
 
     # If we're starting over we don't need do send a new message
     if context.user_data.get(START_OVER):
+        update.callback_query.answer()
         update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     else:
         update.message.reply_text('Hi, I\'m FamiliyBot and here to help you gather information'
@@ -83,6 +84,7 @@ def adding_self(update, context):
     button = InlineKeyboardButton(text='Add info', callback_data=str(MALE))
     keyboard = InlineKeyboardMarkup.from_button(button)
 
+    update.callback_query.answer()
     update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
     return DESCRIBING_SELF
@@ -118,6 +120,7 @@ def show_data(update, context):
     ]]
     keyboard = InlineKeyboardMarkup(buttons)
 
+    update.callback_query.answer()
     update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     ud[START_OVER] = True
 
@@ -133,6 +136,8 @@ def stop(update, context):
 
 def end(update, context):
     """End conversation from InlineKeyboardButton."""
+    update.callback_query.answer()
+
     text = 'See you around!'
     update.callback_query.edit_message_text(text=text)
 
@@ -151,6 +156,8 @@ def select_level(update, context):
         InlineKeyboardButton(text='Back', callback_data=str(END))
     ]]
     keyboard = InlineKeyboardMarkup(buttons)
+
+    update.callback_query.answer()
     update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
     return SELECTING_LEVEL
@@ -172,8 +179,9 @@ def select_gender(update, context):
         InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
         InlineKeyboardButton(text='Back', callback_data=str(END))
     ]]
-
     keyboard = InlineKeyboardMarkup(buttons)
+
+    update.callback_query.answer()
     update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
     return SELECTING_GENDER
@@ -201,6 +209,8 @@ def select_feature(update, context):
     if not context.user_data.get(START_OVER):
         context.user_data[FEATURES] = {GENDER: update.callback_query.data}
         text = 'Please select a feature to update.'
+
+        update.callback_query.answer()
         update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     # But after we do that, we need to send a new message
     else:
@@ -215,6 +225,8 @@ def ask_for_input(update, context):
     """Prompt user to input data for selected feature."""
     context.user_data[CURRENT_FEATURE] = update.callback_query.data
     text = 'Okay, tell me.'
+
+    update.callback_query.answer()
     update.callback_query.edit_message_text(text=text)
 
     return TYPING

@@ -29,7 +29,8 @@ def chat(bot):
                 all_members_are_administrators=TestChat.all_members_are_administrators,
                 bot=bot, sticker_set_name=TestChat.sticker_set_name,
                 can_set_sticker_set=TestChat.can_set_sticker_set,
-                permissions=TestChat.permissions)
+                permissions=TestChat.permissions,
+                slow_mode_delay=TestChat.slow_mode_delay)
 
 
 class TestChat(object):
@@ -45,6 +46,7 @@ class TestChat(object):
         can_change_info=False,
         can_invite_users=True,
     )
+    slow_mode_delay = 30
 
     def test_de_json(self, bot):
         json_dict = {
@@ -55,7 +57,8 @@ class TestChat(object):
             'all_members_are_administrators': self.all_members_are_administrators,
             'sticker_set_name': self.sticker_set_name,
             'can_set_sticker_set': self.can_set_sticker_set,
-            'permissions': self.permissions.to_dict()
+            'permissions': self.permissions.to_dict(),
+            'slow_mode_delay': self.slow_mode_delay
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -67,6 +70,7 @@ class TestChat(object):
         assert chat.sticker_set_name == self.sticker_set_name
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
+        assert chat.slow_mode_delay == self.slow_mode_delay
 
     def test_de_json_default_quote(self, bot):
         json_dict = {
@@ -94,6 +98,7 @@ class TestChat(object):
         assert chat_dict['username'] == chat.username
         assert chat_dict['all_members_are_administrators'] == chat.all_members_are_administrators
         assert chat_dict['permissions'] == chat.permissions.to_dict()
+        assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
 
     def test_link(self, chat):
         assert chat.link == 'https://t.me/{}'.format(chat.username)
@@ -166,6 +171,16 @@ class TestChat(object):
 
         monkeypatch.setattr(chat.bot, 'set_chat_permissions', test)
         assert chat.set_permissions(self.permissions)
+
+    def test_set_administrator_custom_title(self, monkeypatch, chat):
+        def test(*args, **kwargs):
+            chat_id = args[1] == chat.id
+            user_id = args[2] == 42
+            custom_title = args[3] == 'custom_title'
+            return chat_id and user_id and custom_title
+
+        monkeypatch.setattr('telegram.Bot.set_chat_administrator_custom_title', test)
+        assert chat.set_administrator_custom_title(42, 'custom_title')
 
     def test_instance_method_send_message(self, monkeypatch, chat):
         def test(*args, **kwargs):

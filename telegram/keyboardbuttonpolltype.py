@@ -2,7 +2,7 @@
 # pylint: disable=R0903
 #
 # A library that provides a Python interface to the Telegram Bot API
-# Copyright (C) 2015-2020
+# Copyright (C) 2020
 # Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,21 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Message Parse Modes."""
+"""This module contains an object that represents a type of a Telegram Poll."""
+from telegram import TelegramObject
 
 
-class ParseMode(object):
-    """This object represents a Telegram Message Parse Modes."""
+class KeyboardButtonPollType(TelegramObject):
+    """This object represents type of a poll, which is allowed to be created
+    and sent when the corresponding button is pressed.
 
-    MARKDOWN = 'Markdown'
-    """:obj:`str`: 'Markdown'"""
-    MARKDOWN_V2 = 'MarkdownV2'
-    """:obj:`str`: 'MarkdownV2'"""
-    HTML = 'HTML'
-    """:obj:`str`: 'HTML'"""
+    Attributes:
+        type (:obj:`str`): Optional. If :attr:`telegram.Poll.QUIZ` is passed, the user will be
+            allowed to create only polls in the quiz mode. If :attr:`telegram.Poll.REGULAR` is
+            passed, only regular polls will be allowed. Otherwise, the user will be allowed to
+            create a poll of any type.
+    """
+    def __init__(self, type=None):
+        self.type = type
+
+        self._id_attrs = (self.type,)

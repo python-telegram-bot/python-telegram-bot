@@ -55,8 +55,9 @@ def start_over(update, context):
     """Prompt same text & keyboard as `start` does but not as new message"""
     # Get CallbackQuery from Update
     query = update.callback_query
-    # Get Bot from CallbackContext
-    bot = context.bot
+    # CallbackQueries need to be answered, even if no notification to the user is needed
+    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+    query.answer()
     keyboard = [
         [InlineKeyboardButton("1", callback_data=str(ONE)),
          InlineKeyboardButton("2", callback_data=str(TWO))]
@@ -65,9 +66,7 @@ def start_over(update, context):
     # Instead of sending a new message, edit the message that
     # originated the CallbackQuery. This gives the feeling of an
     # interactive menu.
-    bot.edit_message_text(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
+    query.edit_message_text(
         text="Start handler, Choose a route",
         reply_markup=reply_markup
     )
@@ -77,15 +76,13 @@ def start_over(update, context):
 def one(update, context):
     """Show new choice of buttons"""
     query = update.callback_query
-    bot = context.bot
+    query.answer()
     keyboard = [
         [InlineKeyboardButton("3", callback_data=str(THREE)),
          InlineKeyboardButton("4", callback_data=str(FOUR))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.edit_message_text(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
+    query.edit_message_text(
         text="First CallbackQueryHandler, Choose a route",
         reply_markup=reply_markup
     )
@@ -95,15 +92,13 @@ def one(update, context):
 def two(update, context):
     """Show new choice of buttons"""
     query = update.callback_query
-    bot = context.bot
+    query.answer()
     keyboard = [
         [InlineKeyboardButton("1", callback_data=str(ONE)),
          InlineKeyboardButton("3", callback_data=str(THREE))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.edit_message_text(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
+    query.edit_message_text(
         text="Second CallbackQueryHandler, Choose a route",
         reply_markup=reply_markup
     )
@@ -113,15 +108,13 @@ def two(update, context):
 def three(update, context):
     """Show new choice of buttons"""
     query = update.callback_query
-    bot = context.bot
+    query.answer()
     keyboard = [
         [InlineKeyboardButton("Yes, let's do it again!", callback_data=str(ONE)),
          InlineKeyboardButton("Nah, I've had enough ...", callback_data=str(TWO))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.edit_message_text(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
+    query.edit_message_text(
         text="Third CallbackQueryHandler. Do want to start over?",
         reply_markup=reply_markup
     )
@@ -132,15 +125,13 @@ def three(update, context):
 def four(update, context):
     """Show new choice of buttons"""
     query = update.callback_query
-    bot = context.bot
+    query.answer()
     keyboard = [
         [InlineKeyboardButton("2", callback_data=str(TWO)),
          InlineKeyboardButton("4", callback_data=str(FOUR))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.edit_message_text(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
+    query.edit_message_text(
         text="Fourth CallbackQueryHandler, Choose a route",
         reply_markup=reply_markup
     )
@@ -151,10 +142,8 @@ def end(update, context):
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over"""
     query = update.callback_query
-    bot = context.bot
-    bot.edit_message_text(
-        chat_id=query.message.chat_id,
-        message_id=query.message.message_id,
+    query.answer()
+    query.edit_message_text(
         text="See you next time!"
     )
     return ConversationHandler.END
