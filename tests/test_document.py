@@ -47,11 +47,15 @@ class TestDocument(object):
     thumb_file_size = 8090
     thumb_width = 300
     thumb_height = 300
+    document_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
+    document_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
     def test_creation(self, document):
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)
+        assert isinstance(document.file_unique_id, str)
         assert document.file_id != ''
+        assert document.file_unique_id != ''
 
     def test_expected_values(self, document):
         assert document.file_size == self.file_size
@@ -71,6 +75,8 @@ class TestDocument(object):
         assert isinstance(message.document, Document)
         assert isinstance(message.document.file_id, str)
         assert message.document.file_id != ''
+        assert isinstance(message.document.file_unique_id, str)
+        assert message.document.file_unique_id != ''
         assert isinstance(message.document.thumb, PhotoSize)
         assert message.document.file_name == 'telegram_custom.png'
         assert message.document.mime_type == document.mime_type
@@ -86,6 +92,7 @@ class TestDocument(object):
 
         assert new_file.file_size == document.file_size
         assert new_file.file_id == document.file_id
+        assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.png')
@@ -102,6 +109,8 @@ class TestDocument(object):
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)
         assert document.file_id != ''
+        assert isinstance(message.document.file_unique_id, str)
+        assert message.document.file_unique_id != ''
         assert isinstance(document.thumb, PhotoSize)
         assert document.file_name == 'telegram.gif'
         assert document.mime_type == 'image/gif'
@@ -109,7 +118,6 @@ class TestDocument(object):
 
     @flaky(3, 1)
     @pytest.mark.timeout(10)
-    @pytest.mark.skip(reason='Doesnt work without API 4.5')
     def test_send_resend(self, bot, chat_id, document):
         message = bot.send_document(chat_id=chat_id, document=document.file_id)
 
@@ -159,15 +167,18 @@ class TestDocument(object):
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     def test_de_json(self, bot, document):
-        json_dict = {'file_id': 'not a file id',
-                     'thumb': document.thumb.to_dict(),
-                     'file_name': self.file_name,
-                     'mime_type': self.mime_type,
-                     'file_size': self.file_size
-                     }
+        json_dict = {
+            'file_id': self.document_file_id,
+            'file_unique_id': self.document_file_unique_id,
+            'thumb': document.thumb.to_dict(),
+            'file_name': self.file_name,
+            'mime_type': self.mime_type,
+            'file_size': self.file_size
+        }
         test_document = Document.de_json(json_dict, bot)
 
-        assert test_document.file_id == 'not a file id'
+        assert test_document.file_id == self.document_file_id
+        assert test_document.file_unique_id == self.document_file_unique_id
         assert test_document.thumb == document.thumb
         assert test_document.file_name == self.file_name
         assert test_document.mime_type == self.mime_type
@@ -178,6 +189,7 @@ class TestDocument(object):
 
         assert isinstance(document_dict, dict)
         assert document_dict['file_id'] == document.file_id
+        assert document_dict['file_unique_id'] == document.file_unique_id
         assert document_dict['file_name'] == document.file_name
         assert document_dict['mime_type'] == document.mime_type
         assert document_dict['file_size'] == document.file_size
@@ -207,10 +219,10 @@ class TestDocument(object):
         assert document.get_file()
 
     def test_equality(self, document):
-        a = Document(document.file_id)
-        b = Document(document.file_id)
-        d = Document('')
-        e = Voice(document.file_id, 0)
+        a = Document(document.file_id, document.file_unique_id)
+        b = Document('', document.file_unique_id)
+        d = Document('', '')
+        e = Voice(document.file_id, document.file_unique_id, 0)
 
         assert a == b
         assert hash(a) == hash(b)

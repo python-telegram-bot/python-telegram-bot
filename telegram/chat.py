@@ -40,6 +40,8 @@ class Chat(TelegramObject):
             Returned only in get_chat.
         permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in getChat.
+        slow_mode_delay (:obj:`int`): Optional. For supergroups, the minimum allowed delay between
+            consecutive messages sent by each unpriviledged user. Returned only in getChat.
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. ``True``, if the bot can change group the
             sticker set.
@@ -65,6 +67,8 @@ class Chat(TelegramObject):
             Returned only in get_chat.
         permissions (:class:`telegram.ChatPermission`): Optional. Default chat member permissions,
             for groups and supergroups. Returned only in getChat.
+        slow_mode_delay (:obj:`int`, optional): For supergroups, the minimum allowed delay between
+            consecutive messages sent by each unpriviledged user. Returned only in getChat.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of Group sticker set.
             Returned only in get_chat.
@@ -98,6 +102,7 @@ class Chat(TelegramObject):
                  permissions=None,
                  sticker_set_name=None,
                  can_set_sticker_set=None,
+                 slow_mode_delay=None,
                  **kwargs):
         # Required
         self.id = int(id)
@@ -114,6 +119,7 @@ class Chat(TelegramObject):
         self.invite_link = invite_link
         self.pinned_message = pinned_message
         self.permissions = permissions
+        self.slow_mode_delay = slow_mode_delay
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
 
@@ -239,6 +245,17 @@ class Chat(TelegramObject):
 
     """
         return self.bot.set_chat_permissions(self.id, *args, **kwargs)
+
+    def set_administrator_custom_title(self, *args, **kwargs):
+        """Shortcut for::
+
+                bot.set_chat_administrator_custom_title(update.message.chat.id, *args, **kwargs)
+
+        Returns:
+        :obj:`bool`: If the action was sent successfully.
+
+    """
+        return self.bot.set_chat_administrator_custom_title(self.id, *args, **kwargs)
 
     def send_message(self, *args, **kwargs):
         """Shortcut for::
