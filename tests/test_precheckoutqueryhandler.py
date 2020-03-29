@@ -63,11 +63,6 @@ class TestPreCheckoutQueryHandler(object):
         self.test_flag = False
 
     def callback_basic(self, update, context):
-        test_update = isinstance(update, Update)
-        test_context = isinstance(context, CallbackContext)
-        self.test_flag = test_update and test_context
-
-    def callback_context(self, update, context):
         self.test_flag = (isinstance(context, CallbackContext)
                           and isinstance(context.bot, Bot)
                           and isinstance(update, Update)
