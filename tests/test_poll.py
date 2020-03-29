@@ -96,6 +96,25 @@ class TestPollAnswer(object):
         assert poll_answer_dict['user'] == poll_answer.user.to_dict()
         assert poll_answer_dict['option_ids'] == poll_answer.option_ids
 
+    def test_equality(self):
+        a = PollAnswer(123, self.user, [2])
+        b = PollAnswer(123, User(1, 'first', False), [2])
+        c = PollAnswer(123, self.user, [1, 2])
+        d = PollAnswer(456, self.user, [2])
+        e = PollOption('Text', 1)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
+
 
 @pytest.fixture(scope='class')
 def poll():

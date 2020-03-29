@@ -71,6 +71,8 @@ class PollAnswer(TelegramObject):
         self.user = user
         self.option_ids = option_ids
 
+        self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
+
     @classmethod
     def de_json(cls, data, bot):
         if not data:
