@@ -50,7 +50,7 @@ class BaseFilter(object):
         >>> Filters.text & (~ Filters.forwarded)
 
     Note:
-        Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
         This means that for example:
 
             >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
@@ -368,7 +368,7 @@ class Filters(object):
             if you need to specify flags on your pattern.
 
         Note:
-            Filters use the same short circuiting logic that pythons `and`, `or` and `not`.
+            Filters use the same short circuiting logic as python's `and`, `or` and `not`.
             This means that for example:
 
                 >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
