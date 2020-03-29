@@ -129,10 +129,11 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
@@ -172,10 +173,11 @@ class JobQueue(object):
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run.
+                  which the job should run. If the timezone (``datetime.tzinfo``) is ``None``, UTC
+                  will be assumed.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow.
+                  tomorrow. If the timezone (``time.tzinfo``) is ``None``, UTC will be assumed.
 
                 Defaults to ``interval``
             context (:obj:`object`, optional): Additional data needed for the callback function.
