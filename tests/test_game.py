@@ -97,12 +97,12 @@ class TestGame(object):
         assert game.parse_text_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
     def test_equality(self):
-        a = Game('title', 'description', [PhotoSize('Blah', 640, 360, file_size=0)])
-        b = Game('title', 'description', [PhotoSize('Blah', 640, 360, file_size=0)],
+        a = Game('title', 'description', [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)])
+        b = Game('title', 'description', [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)],
                  text='Here is a text')
-        c = Game('eltit', 'description', [PhotoSize('Blah', 640, 360, file_size=0)],
-                 animation=Animation('blah', 320, 180, 1))
-        d = Animation('blah', 320, 180, 1)
+        c = Game('eltit', 'description', [PhotoSize('Blah', 'unique_id', 640, 360, file_size=0)],
+                 animation=Animation('blah', 'unique_id', 320, 180, 1))
+        d = Animation('blah', 'unique_id', 320, 180, 1)
 
         assert a == b
         assert hash(a) == hash(b)
